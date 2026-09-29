@@ -84,7 +84,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
 | Aktif faz/görev ID | Faz01 / kaynak izlenebilirliği, D01 repo ve ortam temeli |
-| Repo/branch/HEAD | `main` · `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) · ilk omurga pushlandı |
+| Repo/branch/HEAD | `main` · `HEAD` origin/main ile eşit · doğrulanmış omurga `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | `dotnet run --no-build --no-launch-profile --urls http://127.0.0.1:5080` · `GET /api/v1/health` 200/healthy · süreç test sonrası kapatıldı |
 | Son test komutu ve sonucu | `dotnet build/test`, `pnpm lint/build`, `flutter analyze/test` · 2026-09-29 tümü başarılı; .NET 1 test, Flutter 1 test |

@@ -65,7 +65,7 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 
 | ID | Karar | Bağlı işler | Durum / kanıt |
 |---|---|---|---|
-| D01 | Mevcut kod/veri ve yeniden kullanım | Faz01–03 | Kısmi karar · mevcut uygulama kodu yok; yeni private monorepo `beyzaturgut/XinobiYeni`; kaynak kopyaları ve ADR-001 oluşturuldu. Ortam/araç kurulumu sürüyor |
+| D01 | Mevcut kod/veri ve yeniden kullanım | Faz01–03 | Kısmi karar · mevcut uygulama kodu yok, sıfırdan yeni geliştirme; private monorepo ve araç zinciri doğrulandı. Mevcut operasyon/veri örneği ve barındırma envanteri bekliyor |
 | D02 | Ürün-varyant-fiyat-stok ana kaynak ve Mikro yazma yönü | Faz04,08,09 | Açık / operasyon + Mikro sahibi |
 | D03 | Sipariş/ödeme, havale, stok rezervasyon, iptal-iade/kargo | Faz05,08,09,11 | Açık / satış-operasyon |
 | D04 | Baskı tekniği, fiziksel alan, çıktı ve onay | Faz06,11 | Açık / üretim |
@@ -83,20 +83,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
-| Aktif faz/görev ID | Faz01 / kaynak izlenebilirliği, D01 repo ve ortam temeli |
+| Aktif faz/görev ID | Faz01 / kaynak izlenebilirliği tamamlandı; sıradaki as-is/to-be operasyon keşfi |
 | Repo/branch/HEAD | `main` · `HEAD` origin/main ile eşit · doğrulanmış omurga `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | `dotnet run --no-build --no-launch-profile --urls http://127.0.0.1:5080` · `GET /api/v1/health` 200/healthy · süreç test sonrası kapatıldı |
 | Son test komutu ve sonucu | `dotnet build/test`, `pnpm lint/build`, `flutter analyze/test` · 2026-09-29 tümü başarılı; .NET 1 test, Flutter 1 test |
-| Değişen dosyalar / migration | Kaynak/ADR/kayıtlar; `services/api`, `services/worker`, shared kernel, mimari test; `apps/web`, `apps/admin`, `apps/mobile`; kök sürüm/workspace dosyaları. Migration yok |
+| Değişen dosyalar / migration | Önceki omurgaya ek `docs/discovery/requirements-traceability.csv`, `environment-inventory.md` ve tekrar üretim aracı; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
-| Sonraki en küçük güvenli adım | İlk commit/push sonrası Faz01 gereksinim matrisi ve D01 ortam envanterini tamamla; SQL dış portu çözülmeden migration başlatma |
+| Sonraki en küçük güvenli adım | Yetkili iş sahibiyle as-is sipariş/katalog/stok/fiyat/Mikro/kargo/iade akış girdilerini ve kişisel veriden arındırılmış örnekleri topla; SQL dış portu çözülmeden migration başlatma |
 | Geri alma / devam noktası | `2b6099b` doğrulanmış ve pushlanmış iskelet; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz01/01.01 + D01 | `main` / commit bekliyor | Kapsamdaki 366 madde ve Android eşliği için 367 tekil gereksinim satırı; faz/yüzey/API/veri/UAT/D kararı eşlemesi ve ortam envanteri üretildi | Generator iki kez aynı hash; satır kapsam testi 367/367; `git diff --check` başarılı | `docs/discovery/requirements-traceability.csv`, `environment-inventory.md` | As-is/to-be operasyon girdilerini topla | Codex |
 | 2026-09-29 | Faz01/F01-D01 + Faz03 erken iskelet | `main` / `2b6099b` | .NET API/worker/shared/test, Next.js web, Vite admin ve Flutter mobil iskeleti; sürümler sabitlendi; API sağlık ucu eklendi; private origin'e pushlandı | .NET build/test, pnpm lint/build, Flutter analyze/test başarılı; health 200 | `XinobiYeni.slnx`, `apps/*`, `services/*`, `tests/*`, lockfile'lar | Faz01 gereksinim matrisi ve ortam envanteri | Codex |
 | 2026-09-29 | Faz01/F01-D01 | `main` / commit yok | Git deposu ve origin kuruldu; kaynaklar hash ile `docs/sources` altına alındı; ADR-001 ve başlangıç dosyaları yazıldı | Kaynak SHA-256 başarılı; Node/npm var; .NET/Flutter/pnpm yok; SQL `109.104.120.91:1433` login timeout | `docs/sources/README.md`, `docs/decisions/ADR-001-teknoloji-omurgasi.md` | Araç zincirini kur ve sürümleri sabitle | Codex + proje sahibi kararları |
 | 2026-09-28 | Faz00/P-00 | — | Plan defteri oluşturuldu; kod yazılmadı | Belge incelemesi | Faz00–Faz11 | D01 envanteri | Temsili plan ekibi |

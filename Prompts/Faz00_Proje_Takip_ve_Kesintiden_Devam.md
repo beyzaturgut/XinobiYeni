@@ -9,6 +9,7 @@
 3. Değişiklikten önce görevi küçük, doğrulanabilir adıma ayır; değişiklikten sonra gerçek komutu ve sonucunu kaydet. Üretim sırlarını, erişim anahtarlarını, müşteri kişisel verilerini veya gerçek bağlantı dizelerini asla Faz00'a yazma.
 4. Bir hata/ara verme olursa yalnız **başarıyla biten** adımı işaretle; yarım dosyaları, hata mesajını ve güvenli yeniden başlatma komutunu yaz. Bir sonraki geliştirici Faz00 ile kodu karşılaştırır; kod kanıtsızsa önce doğrular.
 5. Fazı yalnız yedi rolün uygulama inceleme kayıtları ve PM'nin **ayrı, açık son onayı** sonrası `Tamamlandı` yap. Doküman inceleme onayı, uygulamanın yapıldığı anlamına gelmez. PM şart gözetmeksizin her kapıyı değerlendirir; şart eksikse `RED` ve eksik kanıt verir.
+6. Her test, build, lint, smoke, bağlantı veya entegrasyon doğrulaması sonrasında sonucu `test/` altında tarihli rapora ve `test/INDEX.md` indeksine işle. Başarısız denemeyi silme; düzeltme ve başarılı tekrar kimliğini bağla. Faz00 yalnız son özeti taşır, ayrıntılı kanıt `test/` klasöründedir.
 
 ## 1. Sınır ve teslim haritası
 
@@ -87,8 +88,8 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Repo/branch/HEAD | `main` · `HEAD` origin/main ile eşit · doğrulanmış omurga `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | `dotnet restore/build/test` başarılı · 0 uyarı/hata, 3/3 test; önceki `--no-restore` denemesinde eski runtime grafiği nedeniyle 2 test hata verdi, restore sonrası düzeldi |
-| Değişen dosyalar / migration | Faz01 API/veri sözleşmeleri, sağlayıcı erişim envanteri, Creative brief girdisi ve faz/UAT planı; API request korelasyonu ve testleri; migration yok |
+| Son test komutu ve sonucu | TST-002 rapor bütünlüğü başarılı; geçmişteki 27 alt test kaydı ve diff kontrolü doğrulandı. Ayrıntı `test/INDEX.md` |
+| Değişen dosyalar / migration | Kök `test/` rapor sistemi, indeks, şablon ve 27 alt kayıtlı geriye dönük ilk rapor; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
 | Sonraki en küçük güvenli adım | Yetkili iş sahibiyle as-is sipariş/katalog/stok/fiyat/Mikro/kargo/iade akış girdilerini ve maskeli örnekleri topla; açık karar gelmeden fiziksel şema/durum üretme |
 | Geri alma / devam noktası | `2b6099b` doğrulanmış ve pushlanmış iskelet; migration ve dış sistem yazımı yok |
@@ -97,6 +98,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz00/test raporlama | `main` / commit bekliyor | Kök `test/` klasörü, indeks, rapor şablonu ve bugüne kadarki 27 tekil test/bağlantı kaydı oluşturuldu; gelecekte her test için zorunlu kayıt kuralı eklendi | Rapor bütünlük ve diff kontrolü bekliyor | `test/README.md`, `test/INDEX.md`, `test/2026-09-29/TST-001-initial-validation-history.md` | Her yeni testte indeks ve tarihli raporu güncelle | Codex |
 | 2026-09-29 | Faz01/01.07,01.12 | `main` / commit bekliyor | Sağlayıcı/test erişim matrisi, Creative brief girdisi ve faz bağımlılık/UAT planı hazırlandı; erişim varmış gibi işaretlenmedi | `git diff --check` bekliyor | `provider-access-inventory.md`, `creative-brief-input.md`, `phase-dependency-uat-plan.md` | Gerçek iş sahibi/erişim girdisi olmadan dur; Faz01'i kapatma | Codex |
 | 2026-09-29 | Faz01/01.11 sözleşmeler | `main` / commit bekliyor | API kuralları ve modül sözleşme taslağı; `X-Request-Id`, Problem Details 404 ve otomatik middleware testleri | İlk test eski restore grafiğiyle 2 hata; `dotnet restore` sonrası build 0 uyarı/hata, 3/3 test; health 200 ve problem 404 smoke başarılı | `docs/contracts/*`, `RequestCorrelationMiddleware.cs`, testler | Müşteri karar girdileri; bağımsız faz plan/kapı dosyası | Codex |
 | 2026-09-29 | Faz01/01.02–01.10 hazırlık | `main` / commit bekliyor | As-is/to-be görüşme ve kanıt formu; D01–D10 sahip/kanıt/etki/geri dönüş karar defteri oluşturuldu; bilinmeyen kararlar doldurulmadı | `git diff --check` bekliyor | `docs/discovery/as-is-to-be.md`, `decision-register.md` | Yetkili iş sahibi girdilerini ve maskeli örnekleri al | Codex |

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.WebUtilities;
+using Xinobi.Api.Contracts;
 using Xinobi.Api.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,13 +41,11 @@ app.UseHttpsRedirection();
 
 var api = app.MapGroup("/api/v1");
 
-api.MapGet("/health", (HttpContext context) => Results.Ok(new
-    {
-        service = "Xinobi.Api",
-        status = "healthy",
-        timestampUtc = DateTimeOffset.UtcNow,
-        requestId = context.TraceIdentifier
-    }))
+api.MapGet("/health", (HttpContext context) => TypedResults.Ok(new HealthResponse(
+        Service: "Xinobi.Api",
+        Status: "healthy",
+        TimestampUtc: DateTimeOffset.UtcNow,
+        RequestId: context.TraceIdentifier)))
     .WithName("GetApiHealth")
     .WithTags("System");
 

@@ -85,19 +85,20 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
 | Aktif faz/görev ID | Faz01 / bağımsız hazırlık çıktıları tamam; müşteri operasyon/karar/erişim girdileri bekleniyor |
-| Repo/branch/HEAD | `main` · test değişiklikleri öncesi `b51e6fd`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Repo/branch/HEAD | `main` · istemci üretimi değişiklikleri öncesi `7a5b901`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | TST-004: .NET Release restore/build başarılı (0 uyarı/0 hata); API sözleşmesi dahil testler 6/6 başarılı |
-| Değişen dosyalar / migration | API entegrasyon testleri, test paketi ve TST-004 raporu; migration yok |
+| Son test komutu ve sonucu | TST-005: .NET build 0/0 ve test 6/6; TypeScript istemci/web/panel lint+build; Flutter analyze ve 1/1 test; peer/deterministik üretim/diff kontrolleri başarılı |
+| Değişen dosyalar / migration | Build-time OpenAPI, `HealthResponse`, ortak TypeScript istemci paketi, CI drift kontrolü ve TST-005; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
-| Sonraki en küçük güvenli adım | SQL/D02/D03 gerektirmeden OpenAPI sözleşmesinden web/panel istemci üretme stratejisini ve sürüm farkı kontrolünü hazırla |
-| Geri alma / devam noktası | `b51e6fd` doğrulanmış ve pushlanmış CI tabanı; migration ve dış sistem yazımı yok |
+| Sonraki en küçük güvenli adım | Aynı OpenAPI belgesinden Flutter/Dart istemci üretimini sabit sürüm ve drift testiyle kur; SQL/D02/D03 iş alanına girme |
+| Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz03/03.02 OpenAPI istemcisi | `main` / `7a5b901` → yerel commit tamam, push bekliyor | Build-time OpenAPI, açık health DTO şeması, ortak tip güvenli TypeScript istemci ve CI drift kontrolü | TST-005: ilk TS peer ve anonim yanıt şeması sorunu düzeltildi; .NET 6/6, TS/web/panel ve Flutter regresyonları; deterministik hash ve temiz commit üzerinde gerçek drift komutu başarılı | `packages/contracts`, `packages/clients/typescript`, `test/.../TST-005-openapi-typescript-client.md` | Flutter/Dart istemci üretimi ve drift kontrolü | Codex |
 | 2026-09-29 | Faz03 erken API sözleşmesi | `main` / `b51e6fd` → commit bekliyor | WebApplicationFactory ile gerçek uygulama health, request ID, 404 Problem Details ve OpenAPI testleri eklendi | TST-004: iki Release doğrulaması 0 uyarı/0 hata ve 6/6 test; diff, rapor indeksi ve sır taraması başarılı | `ApiContractTests.cs`, `test/.../TST-004-api-contract-integration.md` | OpenAPI istemci üretme stratejisi ve drift kontrolü | Codex |
 | 2026-09-29 | Faz03 erken CI | `main` / commit bekliyor | Docker'sız GitHub Actions: .NET Release build/test, pnpm frozen lint/build, Flutter analyze/test; salt okunur izin ve concurrency | TST-003: tüm hedefler başarılı; bir yerel Flutter dizin hatası kaydedilip doğru dizinden geçti | `.github/workflows/ci.yml`, `docs/operations/ci.md`, `test/.../TST-003-ci-workflow.md` | Push sonrası gerçek Actions sonucunu izle; SQL CI job'u erişim gelene kadar ekleme | Codex |
 | 2026-09-29 | Faz00/test raporlama | `main` / commit bekliyor | Kök `test/` klasörü, indeks, rapor şablonu ve bugüne kadarki 27 tekil test/bağlantı kaydı oluşturuldu; gelecekte her test için zorunlu kayıt kuralı eklendi | Rapor bütünlük ve diff kontrolü bekliyor | `test/README.md`, `test/INDEX.md`, `test/2026-09-29/TST-001-initial-validation-history.md` | Her yeni testte indeks ve tarihli raporu güncelle | Codex |

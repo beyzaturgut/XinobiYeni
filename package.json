@@ -7,8 +7,9 @@
   },
   "scripts": {
     "build": "pnpm --recursive --if-present build",
+    "contracts:generate": "dotnet build services/api/Xinobi.Api.csproj --configuration Release --no-restore && pnpm --filter @xinobi/api-client generate",
+    "contracts:check": "pnpm contracts:generate && git diff --exit-code -- packages && test -z \"$(git status --porcelain -- packages)\"",
     "lint": "pnpm --recursive --if-present lint",
     "test": "pnpm --recursive --if-present test"
   }
 }
-

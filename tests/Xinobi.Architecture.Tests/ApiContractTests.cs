@@ -62,6 +62,21 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
         using var payload = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.True(payload.RootElement.GetProperty("paths").TryGetProperty("/api/v1/health", out _));
+        var healthOperation = payload.RootElement
+            .GetProperty("paths")
+            .GetProperty("/api/v1/health")
+            .GetProperty("get");
+        var responseSchema = healthOperation
+            .GetProperty("responses")
+            .GetProperty("200")
+            .GetProperty("content")
+            .GetProperty("application/json")
+            .GetProperty("schema");
+
+        Assert.Equal("#/components/schemas/HealthResponse", responseSchema.GetProperty("$ref").GetString());
+        Assert.True(payload.RootElement
+            .GetProperty("components")
+            .GetProperty("schemas")
+            .TryGetProperty("HealthResponse", out _));
     }
 }

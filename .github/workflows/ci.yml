@@ -51,6 +51,9 @@ jobs:
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Check generated API contracts
+        run: pnpm contracts:check
+
       - name: Lint web applications
         run: pnpm lint
 
@@ -86,4 +89,3 @@ jobs:
       - name: Test Flutter
         working-directory: apps/mobile
         run: flutter test
-

@@ -34,6 +34,7 @@ pnpm contracts:generate
 shasum -a 256 packages/contracts/openapi/v1.json packages/clients/typescript/src/schema.d.ts
 git diff --check
 pnpm contracts:check
+gh run list --workflow ci.yml --limit 1 --json databaseId,headSha,status,conclusion,url
 ```
 
 ## Beklenen sonuç
@@ -56,6 +57,7 @@ pnpm contracts:check
 - İki ardışık üretimde OpenAPI SHA-256 `5dcfbc05...b5004c`, TypeScript şeması SHA-256 `751c34d0...de494`; değişmedi.
 - `git diff --check`: başarılı.
 - Yerel commit sonrasında CI ile aynı `pnpm contracts:check`: başarılı; yeniden üretim çalışma ağacında fark bırakmadı.
+- Push sonrası `HEAD` ve `origin/main`: `8df55b4bd28190911995abe20c4daf7f47ba65d1`, eşit. Uzak GitHub Actions sonucu sorgulanamadı; yerel ortamda `gh` komutu kurulu değil.
 
 ## Hata ve düzeltme
 
@@ -64,6 +66,8 @@ pnpm contracts:check
 İlk OpenAPI çıktısında anonim health yanıtı gövde şeması üretmedi ve TypeScript çıktısı `content?: never` oldu. Yanıt `HealthResponse` DTO'suna dönüştürüldü; entegrasyon testi OpenAPI `$ref` ve bileşen şemasını denetleyecek şekilde genişletildi. Yeniden üretimde dört zorunlu alan doğru oluşturuldu.
 
 `pnpm install`, görevden bağımsız mevcut web `eslint@9.39.5` sürümü için deprecation uyarısı verdi. Kurulum/build/lint başarısız olmadı; kapsam dışı bağımlılık yükseltmesi bu değişikliğe eklenmedi.
+
+Push sonrası uzak workflow durumunu sorgulayan `gh run list` denemesi `zsh: command not found: gh` ile başarısız oldu. Bu bir uygulama/CI test hatası değil, yerel GitHub CLI eksikliğidir. GitHub Actions'ın gerçek sonucu henüz kanıtlanmış sayılmaz; CLI kurulumu veya GitHub arayüzü erişimiyle ayrıca doğrulanmalıdır.
 
 ## Kanıt
 
@@ -75,4 +79,4 @@ pnpm contracts:check
 
 ## Etki ve sonraki adım
 
-Web ve panel artık aynı API sözleşmesinden tip güvenli istemci kullanabilir; CI temiz checkout üzerinde yeniden üretim farkını reddeder. Push sonrasında gerçek GitHub Actions sonucu ayrıca izlenmelidir. Dart istemci üretimi ayrı bir atomik görevdir. SQL/D02/D03 olmadan veri şeması veya iş endpoint'i eklenmeyecektir.
+Web ve panel artık aynı API sözleşmesinden tip güvenli istemci kullanabilir; CI temiz checkout üzerinde yeniden üretim farkını reddeder. Uzak GitHub Actions sonucu `gh` eksikliği nedeniyle bekliyor. Dart istemci üretimi ayrı bir atomik görevdir. SQL/D02/D03 olmadan veri şeması veya iş endpoint'i eklenmeyecektir.

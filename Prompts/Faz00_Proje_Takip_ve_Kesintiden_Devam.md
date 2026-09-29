@@ -88,7 +88,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | `dotnet run --no-build --no-launch-profile --urls http://127.0.0.1:5080` · `GET /api/v1/health` 200/healthy · süreç test sonrası kapatıldı |
 | Son test komutu ve sonucu | `dotnet build/test`, `pnpm lint/build`, `flutter analyze/test` · 2026-09-29 tümü başarılı; .NET 1 test, Flutter 1 test |
-| Değişen dosyalar / migration | Önceki omurgaya ek `docs/discovery/requirements-traceability.csv`, `environment-inventory.md` ve tekrar üretim aracı; migration yok |
+| Değişen dosyalar / migration | Faz01 kanıtları: gereksinim matrisi, ortam envanteri, as-is/to-be formu, D01–D10 karar defteri ve tekrar üretim aracı; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
 | Sonraki en küçük güvenli adım | Yetkili iş sahibiyle as-is sipariş/katalog/stok/fiyat/Mikro/kargo/iade akış girdilerini ve kişisel veriden arındırılmış örnekleri topla; SQL dış portu çözülmeden migration başlatma |
 | Geri alma / devam noktası | `2b6099b` doğrulanmış ve pushlanmış iskelet; migration ve dış sistem yazımı yok |
@@ -97,6 +97,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz01/01.02–01.10 hazırlık | `main` / commit bekliyor | As-is/to-be görüşme ve kanıt formu; D01–D10 sahip/kanıt/etki/geri dönüş karar defteri oluşturuldu; bilinmeyen kararlar doldurulmadı | `git diff --check` bekliyor | `docs/discovery/as-is-to-be.md`, `decision-register.md` | Yetkili iş sahibi girdilerini ve maskeli örnekleri al | Codex |
 | 2026-09-29 | Faz01/01.01 + D01 | `main` / commit bekliyor | Kapsamdaki 366 madde ve Android eşliği için 367 tekil gereksinim satırı; faz/yüzey/API/veri/UAT/D kararı eşlemesi ve ortam envanteri üretildi | Generator iki kez aynı hash; satır kapsam testi 367/367; `git diff --check` başarılı | `docs/discovery/requirements-traceability.csv`, `environment-inventory.md` | As-is/to-be operasyon girdilerini topla | Codex |
 | 2026-09-29 | Faz01/F01-D01 + Faz03 erken iskelet | `main` / `2b6099b` | .NET API/worker/shared/test, Next.js web, Vite admin ve Flutter mobil iskeleti; sürümler sabitlendi; API sağlık ucu eklendi; private origin'e pushlandı | .NET build/test, pnpm lint/build, Flutter analyze/test başarılı; health 200 | `XinobiYeni.slnx`, `apps/*`, `services/*`, `tests/*`, lockfile'lar | Faz01 gereksinim matrisi ve ortam envanteri | Codex |
 | 2026-09-29 | Faz01/F01-D01 | `main` / commit yok | Git deposu ve origin kuruldu; kaynaklar hash ile `docs/sources` altına alındı; ADR-001 ve başlangıç dosyaları yazıldı | Kaynak SHA-256 başarılı; Node/npm var; .NET/Flutter/pnpm yok; SQL `109.104.120.91:1433` login timeout | `docs/sources/README.md`, `docs/decisions/ADR-001-teknoloji-omurgasi.md` | Araç zincirini kur ve sürümleri sabitle | Codex + proje sahibi kararları |

@@ -16,9 +16,14 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-</ItemGroup>
+  </ItemGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../services/api/Xinobi.Api.csproj" />
     <ProjectReference Include="../../services/shared/Xinobi.SharedKernel/Xinobi.SharedKernel.csproj" />
   </ItemGroup>
 

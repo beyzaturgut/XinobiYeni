@@ -88,16 +88,17 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Repo/branch/HEAD | `main` · health değişiklikleri öncesi `5079ddf`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | TST-008: .NET build 0/0 ve 9/9; TS/web/panel lint+build; Dart analyze + 1/1; Flutter analyze + 2/2; diff kontrolü başarılı |
-| Değişen dosyalar / migration | `/health/live`, `/health/ready`, SqlClient readiness probe, güvenli yanıt modelleri, üretilmiş TS/Dart sözleşmeleri ve TST-008; migration yok |
-| Aktif hata/yarım iş | TCP/IP etkinleştirme sonrası da `109.104.120.91:1433` timeout; `SQLEXPRESS` instance keşfi başarısız. Gerçek dinleme portu, servis restartı, Windows Firewall ve dış NAT/firewall doğrulanmalı. Yerel `gh` aracı bulunmadığı için uzak Actions sonucu sorgulanamadı |
-| Sonraki en küçük güvenli adım | Faz03/03.02 standart API hata gövdesinde `code`, `message`, `traceId` ve alan hata sözleşmesini tamamla; SQL erişimi gelirse readiness'i gerçek ortamda ayrıca test et |
+| Son test komutu ve sonucu | TST-009: kesin 1433 bilgisiyle `nc -G 10` ve sqlcmd doğrudan TCP denemeleri timeout; SQL login/DB seçimine ulaşılamadı |
+| Değişen dosyalar / migration | TST-009 dış SQL erişim raporu ve Faz00 blokaj güncellemesi; migration yok |
+| Aktif hata/yarım iş | `109.104.120.91:1433` bu Mac'in genel IP'si `85.100.67.212` üzerinden timeout. Sunucu LISTEN durumu ile Windows Firewall ve varsa AWS Security Group/NACL/NAT yolu doğrulanmalı. Yerel `gh` aracı bulunmadığı için uzak Actions sonucu sorgulanamadı |
+| Sonraki en küçük güvenli adım | Faz01'i sıralı sürdür: yetkili iş sahibinden gerçek as-is operasyon girdileri ve maskeli örnekleri topla; SQL için sunucu LISTEN ve firewall/security-group kanıtını al |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz01 SQL erişim kanıtı | `main` / `a07c242` | Kesin TCP 1433 bilgisiyle ham bağlantı ve doğrudan sqlcmd/XinobiYeniDB yeniden denendi; kaynak genel IP belirlendi | TST-009: nc ve ODBC timeout; SQL kimlik doğrulamaya ulaşılmadı | `test/.../TST-009-sql-1433-external-connectivity.md` | Sunucuda LISTEN + Windows/AWS ağ kuralı kanıtı; Faz01 girdileri | Codex |
 | 2026-09-29 | Faz03/03.02 health | `main` / `5079ddf` → yerel commit tamam, push bekliyor | DB bağımsız liveness; gerçek SqlClient bağlantı probe'lu readiness; güvenli 503 kodları; TS/Dart istemci üretimi | TST-008: ilk 8/8, başarı yolu sonrası 9/9; tüm web/mobil/istemci regresyonları; temiz commit üzerinde iki drift kontrolü başarılı | `SqlServerReadinessProbe.cs`, `ReadinessResponse.cs`, `test/.../TST-008-liveness-readiness.md` | Standart API hata gövdesi | Codex |
 | 2026-09-29 | Faz03/03.02+03.09 Dart istemci | `main` / `400917c` → yerel commit tamam, push bekliyor | OpenAPI Generator 7.25.0 ile Dart/Dio+BuiltValue istemci; Flutter path dependency; serializer/mobil sözleşme testleri; CI drift | TST-007: ara pnpm/serializer/template sorunları düzeltildi; .NET 6/6, Dart 1/1, Flutter 2/2, TS/web/panel ve temiz commit drift kontrolleri başarılı | `packages/clients/dart`, `apps/mobile/test/api_client_contract_test.dart`, `test/.../TST-007-openapi-dart-flutter-client.md` | Liveness/readiness ayrımı | Codex |
 | 2026-09-29 | Faz03 SQL erişim tekrarı | `main` / `f957ab2` | TCP/IP etkinleştirme sonrası 1433, named SQLEXPRESS ve doğrudan sqlcmd bağlantısı yeniden denendi; parola Keychain dışında tutuldu | TST-006: üç deneme de ağ/instance katmanında timeout; login ve DB seçimine ulaşılamadı | `test/.../TST-006-sql-server-connectivity-retry.md` | Gerçek sabit TCP portu + servis restart + firewall/NAT doğrulaması | Codex |

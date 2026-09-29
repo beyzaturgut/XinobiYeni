@@ -52,7 +52,7 @@ Yedi rolün her biri **20+ yıl deneyimli uzman bakışını temsil eden çalı�
 
 ## 3. Teknik çalışma sözleşmesi
 
-**Varsayılan uygulama yığını (ADR-001 taslak, D01'de doğrulanacak):** web ve panel için Next.js + TypeScript; ortak UI tokenları; API ve arka plan işleri için ASP.NET Core/C#; veri için SQL Server + EF Core migrations; iOS/Android için React Native + TypeScript; dosya/baskı varlıkları için erişim kontrollü nesne depolama; provider adapters + outbox/worker. Bunlar mevcut kod, ekip yetkinliği ve lisans/altyapı keşfinde farklıysa ADR'de gerekçe ve geçiş planıyla değiştirilir. Sürümler proje kurulurken resmi uyumluluk tablolarına göre sabitlenir, lockfile'a işlenir; bu belge rastgele sürüm söylemez. Seçim için resmi kaynaklar: [EF SQL Server](https://learn.microsoft.com/en-us/ef/core/providers/sql-server/), [Next.js metadata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata), [React Native](https://reactnative.dev/docs/getting-started), [Expo native geliştirme](https://docs.expo.dev/workflow/customizing/). React Native kullanılırsa native editör/ödeme/push uyumu D09'da gerçek cihazla doğrulanır.
+**Onaylanmış uygulama yığını (ADR-001):** kurumsal web/B2C için Next.js + React + TypeScript; yönetim paneli için React + Vite + TypeScript; ortak UI tokenları; API ve arka plan işleri için ASP.NET Core/C#; veri için SQL Server + EF Core migrations; iOS/Android için Flutter + Dart; dosya/baskı varlıkları için erişim kontrollü nesne depolama; modüler monolit + ayrı worker ve SQL outbox/inbox. Docker ve Kubernetes kullanılmaz. Sürümler resmi uyumluluk tablolarına göre sabitlenir ve lockfile'a işlenir. Mobil editör, ödeme ve push uyumu D09'da gerçek cihazla doğrulanır.
 
 **Önerilen repo sözlüğü:** `apps/web`, `apps/admin`, `apps/mobile`, `services/api`, `services/worker`, `packages/contracts`, `packages/ui`, `infra/db/migrations`, `design` (Faz02 kaynak ve handoff), `docs/decisions`, `tests`. C# paketleri TS paketlerine kaynak olarak otomatik kopyalanmaz; OpenAPI'den tipli istemci üretilir ve CI'da sürüm farkı denetlenir. Repo varsa yerleşimi bozma: mevcut gerçek yolları Faz00'da düzelt, bu haritayı yalnız örnek kabul et.
 
@@ -85,19 +85,20 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
 | Aktif faz/görev ID | Faz01 / bağımsız hazırlık çıktıları tamam; müşteri operasyon/karar/erişim girdileri bekleniyor |
-| Repo/branch/HEAD | `main` · `HEAD` origin/main ile eşit · doğrulanmış omurga `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Repo/branch/HEAD | `main` · test değişiklikleri öncesi `b51e6fd`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | TST-003 CI yerel doğrulaması: .NET 3/3, web/panel lint+build, Flutter analyze+1/1 başarılı; yanlış Flutter çalışma dizini kaydı düzeltilerek tekrarlandı |
-| Değişen dosyalar / migration | `.github/workflows/ci.yml`, Docker'sız CI sözleşmesi ve TST-003 raporu; migration yok |
+| Son test komutu ve sonucu | TST-004: .NET Release restore/build başarılı (0 uyarı/0 hata); API sözleşmesi dahil testler 6/6 başarılı |
+| Değişen dosyalar / migration | API entegrasyon testleri, test paketi ve TST-004 raporu; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
-| Sonraki en küçük güvenli adım | Yetkili iş sahibiyle as-is sipariş/katalog/stok/fiyat/Mikro/kargo/iade akış girdilerini ve maskeli örnekleri topla; açık karar gelmeden fiziksel şema/durum üretme |
-| Geri alma / devam noktası | `2b6099b` doğrulanmış ve pushlanmış iskelet; migration ve dış sistem yazımı yok |
+| Sonraki en küçük güvenli adım | SQL/D02/D03 gerektirmeden OpenAPI sözleşmesinden web/panel istemci üretme stratejisini ve sürüm farkı kontrolünü hazırla |
+| Geri alma / devam noktası | `b51e6fd` doğrulanmış ve pushlanmış CI tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz03 erken API sözleşmesi | `main` / `b51e6fd` → commit bekliyor | WebApplicationFactory ile gerçek uygulama health, request ID, 404 Problem Details ve OpenAPI testleri eklendi | TST-004: iki Release doğrulaması 0 uyarı/0 hata ve 6/6 test; diff, rapor indeksi ve sır taraması başarılı | `ApiContractTests.cs`, `test/.../TST-004-api-contract-integration.md` | OpenAPI istemci üretme stratejisi ve drift kontrolü | Codex |
 | 2026-09-29 | Faz03 erken CI | `main` / commit bekliyor | Docker'sız GitHub Actions: .NET Release build/test, pnpm frozen lint/build, Flutter analyze/test; salt okunur izin ve concurrency | TST-003: tüm hedefler başarılı; bir yerel Flutter dizin hatası kaydedilip doğru dizinden geçti | `.github/workflows/ci.yml`, `docs/operations/ci.md`, `test/.../TST-003-ci-workflow.md` | Push sonrası gerçek Actions sonucunu izle; SQL CI job'u erişim gelene kadar ekleme | Codex |
 | 2026-09-29 | Faz00/test raporlama | `main` / commit bekliyor | Kök `test/` klasörü, indeks, rapor şablonu ve bugüne kadarki 27 tekil test/bağlantı kaydı oluşturuldu; gelecekte her test için zorunlu kayıt kuralı eklendi | Rapor bütünlük ve diff kontrolü bekliyor | `test/README.md`, `test/INDEX.md`, `test/2026-09-29/TST-001-initial-validation-history.md` | Her yeni testte indeks ve tarihli raporu güncelle | Codex |
 | 2026-09-29 | Faz01/01.07,01.12 | `main` / commit bekliyor | Sağlayıcı/test erişim matrisi, Creative brief girdisi ve faz bağımlılık/UAT planı hazırlandı; erişim varmış gibi işaretlenmedi | `git diff --check` bekliyor | `provider-access-inventory.md`, `creative-brief-input.md`, `phase-dependency-uat-plan.md` | Gerçek iş sahibi/erişim girdisi olmadan dur; Faz01'i kapatma | Codex |

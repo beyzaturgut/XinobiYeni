@@ -1,0 +1,8 @@
+packages:
+  - "apps/web"
+  - "apps/admin"
+  - "packages/clients/typescript"
+  - "packages/design-tokens/typescript"
+
+allowBuilds:
+  unrs-resolver: true

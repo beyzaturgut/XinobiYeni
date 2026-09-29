@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/api/">
+    <Project Path="services/api/Xinobi.Api.csproj" />
+  </Folder>
+  <Folder Name="/services/shared/">
+    <Project Path="services/shared/Xinobi.SharedKernel/Xinobi.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/services/worker/">
+    <Project Path="services/worker/Xinobi.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Xinobi.Architecture.Tests/Xinobi.Architecture.Tests.csproj" />
+  </Folder>
+</Solution>

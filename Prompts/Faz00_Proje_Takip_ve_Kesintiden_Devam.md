@@ -1,0 +1,203 @@
+# Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
+
+> **Bu dosyanın ilk hali bir plan ve doldurulabilir çalışma kaydıdır.** Henüz geliştirme, test, müşteri kararı veya canlı yayın tamamlanmış değildir. Her çalışma oturumu başında okunur, anlamlı her değişiklikten sonra ve oturum kapanışında güncellenir.
+
+## 0. Önce bunu oku
+
+1. Kaynak sıra: müşteri kapsamı `Xinobi_Proje_Kapsami(4).md` → hazırlanan kavramsal/teknik analiz `Xinobi_Kavramsal_ve_Teknik_Analiz.md` (kalıcı dosya adı `Xinobi_Kavramsal_ve_Teknik_Analiz(1).md`) → bu Faz00 → ilgili Faz01–Faz11 → mevcut kod/ADR/gerçek test kanıtı. **Yeni depoda ilk iş**, Library'deki bu iki var olan kaynağı `docs/sources/` altına salt okunur kopya olarak alıp özgün ad, sürüm/tarih ve doğrulanmış yol eşlemesini Faz00'a yazmaktır; kaynak okunamıyorsa kapsam işini başlatma. Kaynaklar çelişirse müşteri kapsamında açık teslimi silme; çelişkiyi karar kaydına taşı.
+2. Çalışma başlangıcında bu dosyanın **Anlık durum**, **Blokajlar**, **Kesintiden devam** ve ilgili fazın önkoşul bölümünü oku; ardından `git status --short`, `git branch --show-current`, `git log -1 --oneline`, çalışma ortamı ve ilgili test komutlarını doğrula. Git deposu henüz yoksa Faz01'de mevcut repo/yeniden kullanım D01 kararıyla kurulacak.
+3. Değişiklikten önce görevi küçük, doğrulanabilir adıma ayır; değişiklikten sonra gerçek komutu ve sonucunu kaydet. Üretim sırlarını, erişim anahtarlarını, müşteri kişisel verilerini veya gerçek bağlantı dizelerini asla Faz00'a yazma.
+4. Bir hata/ara verme olursa yalnız **başarıyla biten** adımı işaretle; yarım dosyaları, hata mesajını ve güvenli yeniden başlatma komutunu yaz. Bir sonraki geliştirici Faz00 ile kodu karşılaştırır; kod kanıtsızsa önce doğrular.
+5. Fazı yalnız yedi rolün uygulama inceleme kayıtları ve PM'nin **ayrı, açık son onayı** sonrası `Tamamlandı` yap. Doküman inceleme onayı, uygulamanın yapıldığı anlamına gelmez. PM şart gözetmeksizin her kapıyı değerlendirir; şart eksikse `RED` ve eksik kanıt verir.
+
+## 1. Sınır ve teslim haritası
+
+Toplam **12 dosya: Faz00–Faz11**. Faz00 bir kere yazılıp bırakılmaz; uygulama boyunca güncellenen tek ilerleme defteridir. Fazlar bağımlılığa göre yürür, uygun alt işlerin paralelliği Faz00'a yazılır. Tüm son kapsam: kurumsal web/CMS/SEO, B2C, panel, kişiselleştirme/editör/baskı, kurumsal teklif/toplu sipariş, Mikro, Trendyol–Hepsiburada–N11, AI tasarım ve satış asistanı/yönetimi, iOS/Android, test/eğitim/canlı geçiş.
+
+| Dosya | İş paketi | Zorunlu bağımlılık | Başlangıç uygulama durumu |
+|---|---|---|---|
+| Faz00 | Bu kayıt, karar, değişiklik ve onay mekanizması | — | Plan dosyası hazır; uygulama yapılmadı |
+| Faz01 | Keşif, D01–D10, iş akışları, ADR ve sözleşmeler | Faz00 | Planlandı |
+| Faz02 | Creative yön, UI/UX, tasarım sistemi ve handoff | Faz01 temel marka/akış girdisi | Planlandı |
+| Faz03 | Monorepo, API, SQL Server, güvenlik/rol, altyapı | Faz01 mimari/erişim kararları; panel 03.09 için Faz02 tasarım teslimi | Planlandı |
+| Faz04 | Katalog, stok, fiyat, promosyon, CMS, SEO; gerçek dashboard, temel rapor ve sistem ayarları | Faz02 görselleri + Faz03 veri/API | Planlandı |
+| Faz05 | B2C web, müşteri yönetimi, sepet/ödeme, sipariş/kargo/iade, ürün ve sipariş değerlendirmesi, e-posta/SMS/bildirim yönetimi | Faz03–04; D03/D05 | Planlandı |
+| Faz06 | Basit kişiselleştirme, editör, baskı | Faz02–05; D04 | Planlandı |
+| Faz07 | Teklif, kurumsal müşteri yönetimi ve toplu sipariş | Faz03–04; D07 | Planlandı |
+| Faz08 | Mikro | Faz03–05; D02/D06 | Planlandı |
+| Faz09 | Üç pazaryeri ve merkezi sipariş | Faz03–05; D02/D06 | Planlandı |
+| Faz10 | AI tasarım ve satış asistanı/yönetimi | Faz03–04/06–07; D05/D08 | Planlandı |
+| Faz11 | iOS/Android, bütünleşik UAT, eğitim, canlı/mağaza | Önceki modüllerin kabulü; D09/D10 | Planlandı |
+
+**Paralellik:** Mobil tasarım/Faz11 kabuğu Faz02–03'te, editör/mobile API sözleşmeleri Faz06'da başlayabilir. Faz08–10 bağlayıcılarının mock sözleşmeleri erken geliştirilebilir; gerçek uçtan uca kabul erişim ve müşteri kararına bağlıdır. Faz11'in final kapısı diğer tüm modülleri birleştirir.
+
+## 2. Ekip, görev ayrımı ve onay
+
+Yedi rolün her biri **20+ yıl deneyimli uzman bakışını temsil eden çalışma rolüdür**; burada gerçek kişilerin öz geçmişi veya imzası iddia edilmiyor. Uygulamayı yürütecek gerçek kişiler bu alanlara kendi adını/kanıtını ekler.
+
+| Rol | Sorumluluk ve her fazda inceleme sorusu |
+|---|---|
+| PM (lead) | Bağımlılık, kapsam, risk, karar, kanıt, tüm rol değerlendirmeleri; **her koşulda nihai KABUL/RED** |
+| İş Analisti | Kaynak gereksinimi, iş kuralı, senaryo/UAT, ürün sahibinin karar ve kapsam sahipliği |
+| Sr. Creative Designer | Marka ve görsel yön, bileşen/varlık teslimi, görsel kalite, baskı ve mobil uygunluğu |
+| Sr. Frontend Developer | Creative tesliminin UI/UX uygulanışı, web/panel/editör erişilebilirliği ve responsive davranış |
+| Sr. Backend Developer | API, ödeme/sipariş tutarlılığı, adapter/AI güvenliği ve hata/tekrar işleme |
+| DB Admin | Veri sahipliği, SQL Server bütünlüğü, migration, yedek/geri yükleme ve sorgu/erişim |
+| Sr. Full Stack Developer | Web/mobil/API uçtan uca sözleşme, dağıtım, test ve geri alma |
+
+**Creative → UI/UX → Frontend teslim sözleşmesi:** Designer marka konsepti, tokenlar, ekran prototipi, varlık lisansı, baskı yerleşimi ve durumları üretir. UI/UX sorumluluğunu Designer (akış/görsel) ile Frontend (etkileşim/erişilebilirlik/uygulama) ortak taşır. Frontend `handoff kabul` kaydı, eksik durum/ölçü/asset listesini Faz00'a işler; kabulden sonra bile tasarıma uymayan ekran bitmiş sayılmaz. Yedi rolün yanında ayrı bir UI/UX kadrosu varmış gibi onay yazılmaz.
+
+**İki ayrı onay türü:** (a) şimdi verilen **plan dokümanı incelemesi**, yedi temsili rolün 12 dosyanın tutarlılığına bakması; (b) gelecekte her fazın **gerçek uygulama kabulü**, kod/test/görsel kanıtı ve gerçek iş sahibinin gerekli ürün kararı. İlk tür ikinci yerine geçmez. Bir fazın onay tablosundaki boş alan `BEKLİYOR` kalır; PM dahil onaylar önceden doldurulmaz. PM ret gerekçesi ve düzeltme adımı yazar; bağımlı faza geçiş durur.
+
+## 3. Teknik çalışma sözleşmesi
+
+**Varsayılan uygulama yığını (ADR-001 taslak, D01'de doğrulanacak):** web ve panel için Next.js + TypeScript; ortak UI tokenları; API ve arka plan işleri için ASP.NET Core/C#; veri için SQL Server + EF Core migrations; iOS/Android için React Native + TypeScript; dosya/baskı varlıkları için erişim kontrollü nesne depolama; provider adapters + outbox/worker. Bunlar mevcut kod, ekip yetkinliği ve lisans/altyapı keşfinde farklıysa ADR'de gerekçe ve geçiş planıyla değiştirilir. Sürümler proje kurulurken resmi uyumluluk tablolarına göre sabitlenir, lockfile'a işlenir; bu belge rastgele sürüm söylemez. Seçim için resmi kaynaklar: [EF SQL Server](https://learn.microsoft.com/en-us/ef/core/providers/sql-server/), [Next.js metadata](https://nextjs.org/docs/app/api-reference/functions/generate-metadata), [React Native](https://reactnative.dev/docs/getting-started), [Expo native geliştirme](https://docs.expo.dev/workflow/customizing/). React Native kullanılırsa native editör/ödeme/push uyumu D09'da gerçek cihazla doğrulanır.
+
+**Önerilen repo sözlüğü:** `apps/web`, `apps/admin`, `apps/mobile`, `services/api`, `services/worker`, `packages/contracts`, `packages/ui`, `infra/db/migrations`, `design` (Faz02 kaynak ve handoff), `docs/decisions`, `tests`. C# paketleri TS paketlerine kaynak olarak otomatik kopyalanmaz; OpenAPI'den tipli istemci üretilir ve CI'da sürüm farkı denetlenir. Repo varsa yerleşimi bozma: mevcut gerçek yolları Faz00'da düzelt, bu haritayı yalnız örnek kabul et.
+
+**Ortak API/veri ilkeleri:** Açıkça `/api/v1` sürümü, `requestId`, UTC zaman, tutar için para birimiyle decimal, müşteri ve panel nesne yetkisi, hatalarda kod/mesaj/alan, sayfalama; `variantId` ürün ekranından editör, sepet ve siparişe aynı kalır. Sunucu fiyat/vergi/indirim/kişiselleştirme/stok otoritesidir; `(channel, externalOrderId)`, ödeme sağlayıcı işlem ID ve checkout idempotency benzersiz; `OrderLine` anlık görüntüsü ve `DesignVersion` değişmez; outbox aynı yerel transaction'da. D02 veri sahipliği ve D03 ödeme/rezervasyon kapanmadan ilgili şema ve davranış kesinlenmez. Gereken tüm dış sistemlerde `IProviderAdapter` benzeri arayüz, mock/sandbox ve gerçek adaptör ayrılır. **Mock testi gerçek entegrasyon kabulü değildir.**
+
+**Yerel çalışma varsayımı:** Mac üzerinde SQL Server'a bağlantı yöntemi (erişilebilir geliştirme SQL Server örneği/container/uzak test sunucusu), .NET ve JS araçları Faz01'de doğrulanır; DBeaver yalnız SQL istemcisidir, sunucu değildir. Hiçbir ücretli bulut kaynağı gerçek hesap/limit kontrolü yapılmadan zorunlu sayılmaz. `.env.example` yalnız anahtar isimleri içerir. Komutların gerçek hali repo kurulduktan sonra aşağıya yazılır.
+
+## 4. Müşteri kararları ve blokaj kaydı
+
+Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. Her satır gerçek sahibi, tarih, kanıt URL/dosya, tercih, alternatif, etkilediği faz ve PM kaydı ile doldurulur. Bu tablo ilk andaki blokaj haritasıdır.
+
+| ID | Karar | Bağlı işler | Durum / kanıt |
+|---|---|---|---|
+| D01 | Mevcut kod/veri ve yeniden kullanım | Faz01–03 | Kısmi karar · mevcut uygulama kodu yok; yeni private monorepo `beyzaturgut/XinobiYeni`; kaynak kopyaları ve ADR-001 oluşturuldu. Ortam/araç kurulumu sürüyor |
+| D02 | Ürün-varyant-fiyat-stok ana kaynak ve Mikro yazma yönü | Faz04,08,09 | Açık / operasyon + Mikro sahibi |
+| D03 | Sipariş/ödeme, havale, stok rezervasyon, iptal-iade/kargo | Faz05,08,09,11 | Açık / satış-operasyon |
+| D04 | Baskı tekniği, fiziksel alan, çıktı ve onay | Faz06,11 | Açık / üretim |
+| D05 | Ödeme/kargo/SMS/e-posta/AI ve destek erişimleri | Faz05,10,11 | Açık / sağlayıcı hesapları |
+| D06 | Mikro sürüm/API ve üç pazaryeri mağaza/sandbox | Faz08,09 | Açık / entegrasyon sahipleri |
+| D07 | Tekliften toplu siparişe onay ve fiyatlama | Faz07 | Açık / kurumsal satış |
+| D08 | AI alternatif/limit/politika/maliyet | Faz10 | Açık / ürün sahibi |
+| D09 | Mobil editör tekniği, push, mağaza hesapları | Faz11 | Açık / ürün + mobil |
+| D10 | Hukuki sayfalar, rıza, saklama | Faz04,05,10,11 | Açık / hukuk-operasyon |
+
+Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek entegrasyon/iş kabulü** alınmaz. Bu kararlar Xinobi iş sahibine aittir; geliştirici tahminini `varsayım` yazabilir, gerçek onay diye işaretleyemez.
+
+## 5. Anlık durum — her oturum başında güncelle
+
+| Alan | Şu anki kayıt |
+|---|---|
+| Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
+| Aktif faz/görev ID | Faz01 / kaynak izlenebilirliği, D01 repo ve ortam temeli |
+| Repo/branch/HEAD | Yerel Git başlatıldı · `main` · henüz commit yok · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
+| Son çalışan uygulama komutu/URL | `dotnet run --no-build --no-launch-profile --urls http://127.0.0.1:5080` · `GET /api/v1/health` 200/healthy · süreç test sonrası kapatıldı |
+| Son test komutu ve sonucu | `dotnet build/test`, `pnpm lint/build`, `flutter analyze/test` · 2026-09-29 tümü başarılı; .NET 1 test, Flutter 1 test |
+| Değişen dosyalar / migration | Kaynak/ADR/kayıtlar; `services/api`, `services/worker`, shared kernel, mimari test; `apps/web`, `apps/admin`, `apps/mobile`; kök sürüm/workspace dosyaları. Migration yok |
+| Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
+| Sonraki en küçük güvenli adım | İlk commit/push sonrası Faz01 gereksinim matrisi ve D01 ortam envanterini tamamla; SQL dış portu çözülmeden migration başlatma |
+| Geri alma / devam noktası | İlk commit öncesi doğrulanmış iskelet; migration ve dış sistem yazımı yok |
+
+### Oturum kaydı şablonu — yeni satır üste
+
+| Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
+|---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz01/F01-D01 + Faz03 erken iskelet | `main` / commit bekliyor | .NET API/worker/shared/test, Next.js web, Vite admin ve Flutter mobil iskeleti; sürümler sabitlendi; API sağlık ucu eklendi | .NET build/test, pnpm lint/build, Flutter analyze/test başarılı; health 200 | `XinobiYeni.slnx`, `apps/*`, `services/*`, `tests/*`, lockfile'lar | İlk commit/push; sonra gereksinim matrisi | Codex |
+| 2026-09-29 | Faz01/F01-D01 | `main` / commit yok | Git deposu ve origin kuruldu; kaynaklar hash ile `docs/sources` altına alındı; ADR-001 ve başlangıç dosyaları yazıldı | Kaynak SHA-256 başarılı; Node/npm var; .NET/Flutter/pnpm yok; SQL `109.104.120.91:1433` login timeout | `docs/sources/README.md`, `docs/decisions/ADR-001-teknoloji-omurgasi.md` | Araç zincirini kur ve sürümleri sabitle | Codex + proje sahibi kararları |
+| 2026-09-28 | Faz00/P-00 | — | Plan defteri oluşturuldu; kod yazılmadı | Belge incelemesi | Faz00–Faz11 | D01 envanteri | Temsili plan ekibi |
+
+### Kesintiden devam — olay başına kopyala
+
+```text
+Olay ID / tarih-saat:
+Faz / görev / beklenen kabul:
+Son doğrulanmış branch ve commit:
+Kirli çalışma ağacı (git status):
+Tamamlanan son atomik adım ve test kanıtı:
+Yarım kalan dosyalar / migration / dış işlem ve sonucu:
+Gerçek hata, tekrar üretme komutu ve log yolu (sır yok):
+Gerçek ödeme/sipariş/entegrasyon oluştu mu? İç ve dış işlem ID'leri güvenli referansla:
+Güvenli yeniden deneme veya geri alma adımı; idempotency kontrolü:
+Açık müşteri kararı / engel / sahibi:
+Tek sonraki işlem:
+İnceleyen ve PM kararı:
+```
+
+**Yeniden başlatma kuralı:** Önce son doğrulanmış commit/test ve dış işlem durumunu kontrol et; aynı ödeme, sipariş, fatura veya baskı işini yeniden üretmeden önce idempotency anahtarını ve sağlayıcı durumunu sorgula. Migration yarım kaldıysa geçmişi/şemayı incele, körlemesine tekrar çalıştırma. Hata kanıtını ve çözümü bu deftere ekle.
+
+## 6. Değişiklik, ADR ve test kayıtları
+
+| ID / tarih | Karar veya değişiklik | Kaynak gerekçe | Etkilenen dosya/faz/API/migration | Test/geri alma | İş sahibi / PM |
+|---|---|---|---|---|---|
+| ADR-001 / 2026-09-29 | Next.js web, React/Vite panel, ASP.NET Core/EF/MS SQL, Flutter mobil, modüler monolit + worker/outbox-inbox; Docker yok | Proje sahibi kararları, analiz §6 ve temsili CTO incelemesi | Faz03–11; `docs/decisions/ADR-001-teknoloji-omurgasi.md` | Araç/build ve gerçek SQL testi bekliyor; ADR ile geri dönüş | Proje sahibi onayladı / uygulama kanıtı bekliyor |
+
+Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: problem, kaynak maddesi, seçenekler, karar/sahip/tarih, güvenlik/veri etkisi, geriye dönüş, test, etkilenen fazlar. Sözleşme ya da şema değişince ilgili önceki fazın regresyonunu yeniden çalıştır; Faz00 satırı ve Faz dosyası bağlantısını güncelle.
+
+**Gerçek komut kayıtları** (kurulumdan sonra boşlukları doldur):
+
+| Tür | Komut / ortam | Son sonuç / tarih |
+|---|---|---|
+| API başlatma | `dotnet run --project services/api/Xinobi.Api.csproj` | Sağlık ucu doğrulandı · 2026-09-29 |
+| Web/panel/mobil başlatma | `pnpm --filter web dev`; `pnpm --filter admin dev`; `cd apps/mobile && flutter run` | Web/panel production build ve mobil analyze/test başarılı; cihaz çalıştırması bekliyor |
+| Veritabanı migration/seed | Bekliyor: Faz03 komutu; önce yedek/ortam denetimi | Çalıştırılmadı |
+| Birim/entegrasyon/e2e | `dotnet test XinobiYeni.slnx`; `pnpm lint && pnpm build`; `cd apps/mobile && flutter analyze && flutter test` | Başarılı · 2026-09-29; gerçek SQL ve cihaz entegrasyonu bekliyor |
+| Geri yükleme/rollback | Bekliyor: Faz03 ve Faz11 prosedürü | Denenmedi |
+
+## 7. Faz kabul kayıtları — gerçek uygulamada doldur
+
+İzin verilen statüler: `Planlandı`, `Devam`, `Bloke`, `İncelemede`, `RED`, `Tamamlandı`. Her fazda yedi rol ayrı ayrı `BEKLİYOR / ONAY / RED`, gerekçe, kanıt, tarih ve gerçek kişinin kimliğiyle kaydedilir. Tüm roller onaylasa bile PM'nin **ayrı nihai kararı olmadan** tamamlanmış olmaz. Ürün sahibinin D kararını PM yerine veremez.
+
+| Faz | Kod/teslim kanıtı | BA | Creative | FE | BE | DBA | Full Stack | PM nihai | Statü |
+|---|---|---|---|---|---|---|---|---|---|
+| 00 | Plan var; uygulama kabulü yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 01 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 02 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 03 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 04 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 05 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 06 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 07 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 08 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 09 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 10 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 11 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+
+PM her fazda kontrol eder: ① kaynak kapsamı ve Creative/UIUX handoff ② D kararlarının gerçek sahibi ③ kod/şema/API kanıtı ④ otomatik ve manuel test sonucu ⑤ yedi rol incelemesi ⑥ güvenlik, veri, rollback ⑦ Faz00 güncelliği. PM kendi rol incelemesini `PM-İNCELEME: ONAY/RED`, ardından ayrı nihai kararı `PM-KAPI: KABUL/RED` ve iki ayrı kanıt/tarihle aynı hücreye veya bağlantılı tutanağa yazar. Herhangi biri yoksa gerekçe yazıp `RED`; koşullu kabul ile sonraki bağımlı fazı başlatma. Plan dosyaları için ayrı temsili doküman inceleme sonucu aşağıya yazılır; uygulama tablosunu değiştirmez.
+
+## 8. Plan dokümanı inceleme kaydı
+
+Yedi temsili rol 12 dosyayı çapraz incelemiş, somut revizyonları tekrar denetlemiş; PM her fazı ayrıca son kez incelemiştir. **28.09.2026 plan belge kararı: PM KABUL.** Bu sonuç yalnızca metin planı içindir; müşteri kararları veya yazılımın tamamlandığı anlamına gelmez. §7 uygulama tablosundaki bütün gerçek onaylar beklemede kalır.
+
+| Rol | Belge inceleme sonucu | Açık düzeltme |
+|---|---|---|
+| BA | ONAY · 28.09.2026 · 00–11 | 00/04/05/07/11 kapsam ve kabul revizyonları işlendi |
+| Sr Creative Designer | ONAY · 28.09.2026 · 00–11 | 01 tasarım döngüsü ve 08 panel handoff düzeltildi |
+| Sr Frontend Developer | ONAY · 28.09.2026 · 00–11 | 02 UI/UX, 05/09 sözleşme yolu, 11 PM kapısı düzeltildi |
+| Sr Backend Developer | ONAY · 28.09.2026 · 00–11 | 05 belirsiz ödeme ve 09 belirsiz dış işlem politikası düzeltildi |
+| DB Admin | ONAY · 28.09.2026 · 00–11 | 04/05/09 tablo sahipliği ve göç tekrarları düzeltildi |
+| Sr Full Stack Developer | ONAY · 28.09.2026 · 00–11 | 02 UI/UX ve 09 repo yolu düzeltildi |
+| PM (zorunlu son kapı) | KABUL · 28.09.2026 · 00–11 | Kaynak kopyası ve tüm faz kapıları dahil son inceleme |
+
+**Faz bazlı temsili belge incelemesi:** Her hücre ilgili rolün son sürüm dosyaya plan düzeyinde onayını gösterir; gerçek uygulama kapısının alanı değildir.
+
+| Faz | BA | Creative | FE | BE | DBA | Full Stack | PM son plan kararı |
+|---|---|---|---|---|---|---|---|
+| 00 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 01 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 02 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 03 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 04 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 05 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 06 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 07 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 08 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 09 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 10 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+| 11 | ONAY | ONAY | ONAY | ONAY | ONAY | ONAY | KABUL |
+
+## 9. Tamamlanma tanımı
+
+Faz11 sonunda kaynak analizdeki tüm teslimler canlı ortamda kanıtlanmış, üç pazaryeri/Mikro gerçek erişimle mutabık, ödeme/kargo gerçek sağlayıcıyla doğrulanmış, iOS/Android mağaza süreçleri tamamlanmış, baskı çıktısı fiziksel kabulden geçmiş, AI limit/maliyet ve insan devri işler, güvenlik/yedek-geri yükleme ve eğitim/tam teknik doküman teslim edilmişse proje tamamlanır. Gerçek sağlayıcının kabul etmediği bir işlem veya Xinobi iş sahibinin vermediği karar, `mock tamamlandı` diye işaretlenip proje kapanışına geçirilmez.
+
+## 10. Başka bir geliştirici veya kodlama ajanına verilecek devam talimatı
+
+Her yeni oturumda aşağıdaki talimatı, bu dosyayı, ilgili FazXX dosyasını, kaynak kapsam/analizi ve mevcut repo erişimini birlikte ver. Bir oturumda tek kabul edilebilir alt işi tamamla; sonraki oturum yine Faz00'dan başlayabilir.
+
+> Xinobi geliştirmesine kaldığı yerden devam et. Önce `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` anlık durum, kesintiden devam, açık D kararları, rol/PM kapıları ve son oturum kaydını; sonra aktif `FazXX_<konu>.md` görev ve testini oku. Kaynak kapsam ile analizi karşılaştır. Repo gerçek durumu için `git status`, son commit, son migration ve ilgili testleri doğrula; Faz00'da yazanı kanıt olmadan doğru varsayma. Aktif fazın sıradaki **tek atomik işini** uygula, yalnız o işe bağlı kodu değiştir, test/manuel kanıt üret, regresyonu kontrol et, sonuç ve başarısızlıkları Faz00'a yaz. Dış ödeme, AI, fatura veya pazaryeri işlemi yeniden denenmeden önce sağlayıcı durumunu ve idempotency kimliğini doğrula. Müşteri D kararını uydurma; erişim olmadan mock sonucu gerçek entegrasyon diye kapatma. Fazın yedi ayrı rol incelemesini ve PM'nin ayrıca nihai KABUL/RED kararını talep edilen kanıtlarla kaydet; eksikse fazı Bloke/İncelemede tut. Oturum bitmeden aktif branch/commit, değişen dosyalar, son başarılı komut/sonuç, hata, blokaj sahibi ve **sonraki tek güvenli adımı** Faz00'a işle.
+
+Bu talimat yazılımı kendi başına onaylayan bir vekil değildir. Sağlayıcı kimliği/izinleri, üretim baskı standardı, hukuk metinleri ve gerçek Xinobi iş kuralları gibi D01–D10 müşteriye ait girdiler gelene kadar ilgili canlı kapı açık kalır; bağımsız kod ve test işleri devam eder.

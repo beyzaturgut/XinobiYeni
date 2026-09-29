@@ -83,12 +83,12 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
-| Aktif faz/görev ID | Faz01 / kaynak, ortam ve sözleşme taslakları hazır; müşteri operasyon/karar girdileri bekleniyor |
+| Aktif faz/görev ID | Faz01 / bağımsız hazırlık çıktıları tamam; müşteri operasyon/karar/erişim girdileri bekleniyor |
 | Repo/branch/HEAD | `main` · `HEAD` origin/main ile eşit · doğrulanmış omurga `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
 | Son test komutu ve sonucu | `dotnet restore/build/test` başarılı · 0 uyarı/hata, 3/3 test; önceki `--no-restore` denemesinde eski runtime grafiği nedeniyle 2 test hata verdi, restore sonrası düzeldi |
-| Değişen dosyalar / migration | Faz01 API/veri sözleşme taslakları; API request korelasyonu, Problem Details ve 2 middleware testi; migration yok |
+| Değişen dosyalar / migration | Faz01 API/veri sözleşmeleri, sağlayıcı erişim envanteri, Creative brief girdisi ve faz/UAT planı; API request korelasyonu ve testleri; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
 | Sonraki en küçük güvenli adım | Yetkili iş sahibiyle as-is sipariş/katalog/stok/fiyat/Mikro/kargo/iade akış girdilerini ve maskeli örnekleri topla; açık karar gelmeden fiziksel şema/durum üretme |
 | Geri alma / devam noktası | `2b6099b` doğrulanmış ve pushlanmış iskelet; migration ve dış sistem yazımı yok |
@@ -97,6 +97,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz01/01.07,01.12 | `main` / commit bekliyor | Sağlayıcı/test erişim matrisi, Creative brief girdisi ve faz bağımlılık/UAT planı hazırlandı; erişim varmış gibi işaretlenmedi | `git diff --check` bekliyor | `provider-access-inventory.md`, `creative-brief-input.md`, `phase-dependency-uat-plan.md` | Gerçek iş sahibi/erişim girdisi olmadan dur; Faz01'i kapatma | Codex |
 | 2026-09-29 | Faz01/01.11 sözleşmeler | `main` / commit bekliyor | API kuralları ve modül sözleşme taslağı; `X-Request-Id`, Problem Details 404 ve otomatik middleware testleri | İlk test eski restore grafiğiyle 2 hata; `dotnet restore` sonrası build 0 uyarı/hata, 3/3 test; health 200 ve problem 404 smoke başarılı | `docs/contracts/*`, `RequestCorrelationMiddleware.cs`, testler | Müşteri karar girdileri; bağımsız faz plan/kapı dosyası | Codex |
 | 2026-09-29 | Faz01/01.02–01.10 hazırlık | `main` / commit bekliyor | As-is/to-be görüşme ve kanıt formu; D01–D10 sahip/kanıt/etki/geri dönüş karar defteri oluşturuldu; bilinmeyen kararlar doldurulmadı | `git diff --check` bekliyor | `docs/discovery/as-is-to-be.md`, `decision-register.md` | Yetkili iş sahibi girdilerini ve maskeli örnekleri al | Codex |
 | 2026-09-29 | Faz01/01.01 + D01 | `main` / commit bekliyor | Kapsamdaki 366 madde ve Android eşliği için 367 tekil gereksinim satırı; faz/yüzey/API/veri/UAT/D kararı eşlemesi ve ortam envanteri üretildi | Generator iki kez aynı hash; satır kapsam testi 367/367; `git diff --check` başarılı | `docs/discovery/requirements-traceability.csv`, `environment-inventory.md` | As-is/to-be operasyon girdilerini topla | Codex |

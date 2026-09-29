@@ -11,10 +11,10 @@ part 'health_response.g.dart';
 /// HealthResponse
 ///
 /// Properties:
-/// * [service] 
-/// * [status] 
-/// * [timestampUtc] 
-/// * [requestId] 
+/// * [service]
+/// * [status]
+/// * [timestampUtc]
+/// * [requestId]
 @BuiltValue()
 abstract class HealthResponse implements Built<HealthResponse, HealthResponseBuilder> {
   @BuiltValueField(wireName: r'service')
@@ -151,5 +151,3 @@ class _$HealthResponseSerializer implements PrimitiveSerializer<HealthResponse> 
     return result.build();
   }
 }
-
-

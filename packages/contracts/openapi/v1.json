@@ -24,10 +24,79 @@
           }
         }
       }
+    },
+    "/api/v1/health/live": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "operationId": "GetApiLiveness",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "operationId": "GetApiReadiness",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "DependencyHealth": {
+        "required": [
+          "name",
+          "isReady",
+          "code"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isReady": {
+            "type": "boolean"
+          },
+          "code": {
+            "type": "string"
+          }
+        }
+      },
       "HealthResponse": {
         "required": [
           "service",
@@ -49,6 +118,37 @@
           },
           "requestId": {
             "type": "string"
+          }
+        }
+      },
+      "ReadinessResponse": {
+        "required": [
+          "service",
+          "status",
+          "timestampUtc",
+          "requestId",
+          "checks"
+        ],
+        "type": "object",
+        "properties": {
+          "service": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "timestampUtc": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DependencyHealth"
+            }
           }
         }
       }

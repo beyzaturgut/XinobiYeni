@@ -5,7 +5,7 @@
 ## 1. Bağlayıcı kaynak, sınır ve ön koşullar
 
 - Kaynak: `Xinobi_Kavramsal_ve_Teknik_Analiz.md`, özellikle §2, §3, §4.1 D01–D03/D05/D06/D10, §6.1–6.5, §8. Müşterinin doğrudan kapsamı `Xinobi_Proje_Kapsami(4).md` ile çelişen bir durum varsa PM bunu Faz00 karar kaydında açar ve müşteri kararı alır.
-- Ön koşul: Faz00'da kaynak sürümü ve mevcut kod envanteri (D01), ana veri sahipliği (D02) ve bu fazın başladığı commit yazılıdır. D01'de çalışan kod/altyapı bulunduysa repo, DB motoru ve framework değiştirilmez; burada verilen yollar mantıksal örnek olarak eşlenir ve fark Faz00'da belgelenir. Yeni başlanıyorsa önerilen tek repo: Next.js + TypeScript web/panel, React Native + TypeScript iOS/Android, ASP.NET Core Web API + işleyici, SQL Server, nesne depolama. Mevcut kod veya barındırma buna uymuyorsa somut ADR ve PM kapısı olmadan yığın dayatılmaz.
+- Ön koşul: Faz00'da kaynak sürümü ve mevcut kod envanteri (D01), ana veri sahipliği (D02) ve bu fazın başladığı commit yazılıdır. D01'de çalışan kod/altyapı bulunduysa repo, DB motoru ve framework değiştirilmez; burada verilen yollar mantıksal örnek olarak eşlenir ve fark Faz00'da belgelenir. Onaylanmış yeni repo omurgası: Next.js + TypeScript web, React + Vite + TypeScript panel, Flutter + Dart iOS/Android, ASP.NET Core Web API + worker, SQL Server ve nesne depolama. Mevcut kod veya barındırma buna uymuyorsa somut ADR ve PM kapısı olmadan yığın değiştirilmez.
 - Burada gerçek ödeme, canlı müşteri verisi, Mikro veya pazaryeri transferi yapılmaz. Kimlik, veri ve asenkron çalışma temeli kurulur; e-ticaret iş kuralları sonraki fazlarda kesinleştirilir. `D02` stok/fiyat için alan bazlı sahip kararı alınmamışsa okuma/yazma yalnız örnek veriyle çalışır.
 - Çıktı: tekrarlanabilir yerel ve test ortamı, sürümlü sözleşme, yetki altyapısı, migration geçmişi, audit/outbox/job/media omurgası, minimal panel kabuğu, CI doğrulaması ve geri yükleme kanıtı.
 
@@ -15,8 +15,8 @@ Yeni repo için önerilen yollar; mevcut projede eşdeğerleri Faz00'da birebir 
 
 ```text
 apps/web/                  Next.js müşteri sitesi
-apps/admin/                Next.js yetkili yönetim paneli
-apps/mobile/               React Native iOS/Android
+apps/admin/                React + Vite yetkili yönetim paneli
+apps/mobile/               Flutter iOS/Android
 services/api/              ASP.NET Core HTTP API, modüller ve yetki
 services/worker/           outbox, zamanlanmış işler, retry
 packages/contracts/        OpenAPI'den üretilen TS istemci/tipler ve sözleşme sürümü

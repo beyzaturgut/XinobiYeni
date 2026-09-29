@@ -64,12 +64,16 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-[*SystemApi*](doc/SystemApi.md) | [**getApiHealth**](doc/SystemApi.md#getapihealth) | **GET** /api/v1/health | 
+[*SystemApi*](doc/SystemApi.md) | [**getApiHealth**](doc/SystemApi.md#getapihealth) | **GET** /api/v1/health |
+[*SystemApi*](doc/SystemApi.md) | [**getApiLiveness**](doc/SystemApi.md#getapiliveness) | **GET** /api/v1/health/live |
+[*SystemApi*](doc/SystemApi.md) | [**getApiReadiness**](doc/SystemApi.md#getapireadiness) | **GET** /api/v1/health/ready |
 
 
 ## Documentation For Models
 
+ - [DependencyHealth](doc/DependencyHealth.md)
  - [HealthResponse](doc/HealthResponse.md)
+ - [ReadinessResponse](doc/ReadinessResponse.md)
 
 
 ## Documentation For Authorization
@@ -78,6 +82,3 @@ Endpoints do not require authorization.
 
 
 ## Author
-
-
-

@@ -14,14 +14,22 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:xinobi_api_client/src/date_serializer.dart';
 import 'package:xinobi_api_client/src/model/date.dart';
 
+import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
+import 'package:xinobi_api_client/src/model/readiness_response.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
+  DependencyHealth,
   HealthResponse,
+  ReadinessResponse,
 ])
 Serializers serializers = (_$serializers.toBuilder()
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(DependencyHealth)]),
+        () => ListBuilder<DependencyHealth>(),
+      )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())
       ..add(const DateSerializer())

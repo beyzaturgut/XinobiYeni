@@ -12,5 +12,6 @@ export 'package:xinobi_api_client/src/model/date.dart';
 
 export 'package:xinobi_api_client/src/api/system_api.dart';
 
+export 'package:xinobi_api_client/src/model/dependency_health.dart';
 export 'package:xinobi_api_client/src/model/health_response.dart';
-
+export 'package:xinobi_api_client/src/model/readiness_response.dart';

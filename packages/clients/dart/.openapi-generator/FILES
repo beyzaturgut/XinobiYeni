@@ -1,7 +1,9 @@
 .gitignore
 README.md
 analysis_options.yaml
+doc/DependencyHealth.md
 doc/HealthResponse.md
+doc/ReadinessResponse.md
 doc/SystemApi.md
 lib/src/api.dart
 lib/src/api/system_api.dart
@@ -13,7 +15,9 @@ lib/src/auth/bearer_auth.dart
 lib/src/auth/oauth.dart
 lib/src/date_serializer.dart
 lib/src/model/date.dart
+lib/src/model/dependency_health.dart
 lib/src/model/health_response.dart
+lib/src/model/readiness_response.dart
 lib/src/serializers.dart
 lib/xinobi_api_client.dart
 pubspec.yaml

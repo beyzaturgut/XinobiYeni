@@ -7,9 +7,14 @@
   },
   "scripts": {
     "build": "pnpm --recursive --if-present build",
-    "contracts:generate": "dotnet build services/api/Xinobi.Api.csproj --configuration Release --no-restore && pnpm --filter @xinobi/api-client generate",
+    "contracts:generate": "dotnet build services/api/Xinobi.Api.csproj --configuration Release --no-restore && pnpm contracts:generate:typescript && pnpm contracts:generate:dart",
+    "contracts:generate:typescript": "pnpm --filter @xinobi/api-client generate",
+    "contracts:generate:dart": "openapi-generator-cli generate -i packages/contracts/openapi/v1.json -g dart-dio -o packages/clients/dart -t tools/openapi-templates/dart --global-property=apiTests=false,modelTests=false --additional-properties=pubName=xinobi_api_client,pubVersion=0.1.0,pubPublishTo=none,pubLibrary=xinobi_api_client,serializationLibrary=built_value",
     "contracts:check": "pnpm contracts:generate && git diff --exit-code -- packages && test -z \"$(git status --porcelain -- packages)\"",
     "lint": "pnpm --recursive --if-present lint",
     "test": "pnpm --recursive --if-present test"
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "2.40.1"
   }
 }

@@ -30,6 +30,12 @@ jobs:
         with:
           dotnet-version: 10.0.401
 
+      - name: Set up Java for OpenAPI Generator
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
       - name: Restore .NET dependencies
         run: dotnet restore XinobiYeni.slnx
 
@@ -77,6 +83,22 @@ jobs:
           flutter-version: 3.47.5
           channel: stable
           cache: true
+
+      - name: Install generated Dart client dependencies
+        working-directory: packages/clients/dart
+        run: dart pub get
+
+      - name: Build and verify generated Dart client
+        working-directory: packages/clients/dart
+        run: |
+          dart run build_runner build
+          dart analyze
+          dart test
+
+      - name: Check generated Dart serializer drift
+        run: |
+          git diff --exit-code -- packages/clients/dart
+          test -z "$(git status --porcelain -- packages/clients/dart)"
 
       - name: Install Flutter dependencies
         working-directory: apps/mobile

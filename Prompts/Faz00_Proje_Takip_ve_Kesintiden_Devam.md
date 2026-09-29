@@ -85,19 +85,20 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
 | Aktif faz/görev ID | Faz01 / bağımsız hazırlık çıktıları tamam; müşteri operasyon/karar/erişim girdileri bekleniyor |
-| Repo/branch/HEAD | `main` · `8df55b4`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Repo/branch/HEAD | `main` · Dart istemci değişiklikleri öncesi `400917c`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | TST-006: TCP 1433 timeout; IP\\SQLEXPRESS bulunamadı; doğrudan sqlcmd login timeout. SQL kimlik doğrulamasına ulaşılamadı |
-| Değişen dosyalar / migration | TST-006 SQL bağlantı raporu ve Faz00 blokaj güncellemesi; migration yok |
+| Son test komutu ve sonucu | TST-007: .NET 6/6; Dart istemci analyze + 1/1; Flutter analyze + 2/2; TS/web/panel lint+build başarılı. Ara üretici/analyzer hataları raporda |
+| Değişen dosyalar / migration | Sabit OpenAPI Generator, Dart/Dio istemci, built_value serializer, Flutter path dependency, gerçek sözleşme testleri ve CI drift kontrolü; migration yok |
 | Aktif hata/yarım iş | TCP/IP etkinleştirme sonrası da `109.104.120.91:1433` timeout; `SQLEXPRESS` instance keşfi başarısız. Gerçek dinleme portu, servis restartı, Windows Firewall ve dış NAT/firewall doğrulanmalı. Yerel `gh` aracı bulunmadığı için uzak Actions sonucu sorgulanamadı |
-| Sonraki en küçük güvenli adım | SQL için sunucudaki gerçek sabit dinleme portunu ve dış firewall/NAT erişimini doğrula; port gelene kadar bağımsız Flutter/Dart istemci üretimine devam edilebilir |
+| Sonraki en küçük güvenli adım | Faz03 liveness/readiness uçlarını ayır; liveness DB'den bağımsız, readiness SQL yapılandırması/erişimi yokken güvenli başarısız olsun |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz03/03.02+03.09 Dart istemci | `main` / `400917c` → yerel commit tamam, push bekliyor | OpenAPI Generator 7.25.0 ile Dart/Dio+BuiltValue istemci; Flutter path dependency; serializer/mobil sözleşme testleri; CI drift | TST-007: ara pnpm/serializer/template sorunları düzeltildi; .NET 6/6, Dart 1/1, Flutter 2/2, TS/web/panel ve temiz commit drift kontrolleri başarılı | `packages/clients/dart`, `apps/mobile/test/api_client_contract_test.dart`, `test/.../TST-007-openapi-dart-flutter-client.md` | Liveness/readiness ayrımı | Codex |
 | 2026-09-29 | Faz03 SQL erişim tekrarı | `main` / `f957ab2` | TCP/IP etkinleştirme sonrası 1433, named SQLEXPRESS ve doğrudan sqlcmd bağlantısı yeniden denendi; parola Keychain dışında tutuldu | TST-006: üç deneme de ağ/instance katmanında timeout; login ve DB seçimine ulaşılamadı | `test/.../TST-006-sql-server-connectivity-retry.md` | Gerçek sabit TCP portu + servis restart + firewall/NAT doğrulaması | Codex |
 | 2026-09-29 | Faz03/03.02 OpenAPI istemcisi | `main` / `7a5b901` → yerel commit tamam, push bekliyor | Build-time OpenAPI, açık health DTO şeması, ortak tip güvenli TypeScript istemci ve CI drift kontrolü | TST-005: ilk TS peer ve anonim yanıt şeması sorunu düzeltildi; .NET 6/6, TS/web/panel ve Flutter regresyonları; deterministik hash ve temiz commit üzerinde gerçek drift komutu başarılı | `packages/contracts`, `packages/clients/typescript`, `test/.../TST-005-openapi-typescript-client.md` | Flutter/Dart istemci üretimi ve drift kontrolü | Codex |
 | 2026-09-29 | Faz03 erken API sözleşmesi | `main` / `b51e6fd` → commit bekliyor | WebApplicationFactory ile gerçek uygulama health, request ID, 404 Problem Details ve OpenAPI testleri eklendi | TST-004: iki Release doğrulaması 0 uyarı/0 hata ve 6/6 test; diff, rapor indeksi ve sır taraması başarılı | `ApiContractTests.cs`, `test/.../TST-004-api-contract-integration.md` | OpenAPI istemci üretme stratejisi ve drift kontrolü | Codex |

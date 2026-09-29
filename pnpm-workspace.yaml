@@ -5,4 +5,5 @@ packages:
   - "packages/design-tokens/typescript"
 
 allowBuilds:
+  '@openapitools/openapi-generator-cli': true
   unrs-resolver: true

@@ -12,3 +12,4 @@
 | TST-008 | 29.09.2026 | API liveness ve gerçek SQL bağlantı probe'lu readiness ayrımı | Başarılı; .NET 9/9, istemci/web/panel ve mobil regresyonlar geçti | UNIT / INTEGRATION / CONTRACT / CI CONTRACT | `2026-09-29/TST-008-liveness-readiness.md` |
 | TST-009 | 29.09.2026 | Kesin 1433 bilgisiyle dış SQL Server ve XinobiYeniDB bağlantısı | Bloke; TCP ve ODBC login timeout, kimlik doğrulamaya ulaşılamadı | CONNECTIVITY / INTEGRATION | `2026-09-29/TST-009-sql-1433-external-connectivity.md` |
 | TST-010 | 29.09.2026 | Uzak sunucu TCP 64019 aday SQL portu | Başarılı; TCP bağlantısı kuruldu | CONNECTIVITY | `2026-09-29/TST-010-sql-external-port-64019.md` |
+| TST-011 | 29.09.2026 | TCP 64019 üzerinden SQL Server ve XinobiYeniDB kimlik doğrulaması | Bloke; port erişilebilir, SQL login üç denemede reddedildi | CONNECTIVITY / INTEGRATION | `2026-09-29/TST-011-sql-login-on-64019.md` |

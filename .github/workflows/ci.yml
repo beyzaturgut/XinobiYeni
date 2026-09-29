@@ -1,0 +1,89 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-and-web:
+    name: Backend and web
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.401
+
+      - name: Restore .NET dependencies
+        run: dotnet restore XinobiYeni.slnx
+
+      - name: Build .NET
+        run: dotnet build XinobiYeni.slnx --no-restore --configuration Release
+
+      - name: Test .NET
+        run: dotnet test XinobiYeni.slnx --no-build --configuration Release
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .node-version
+          package-manager-cache: false
+
+      - name: Install pinned pnpm
+        run: npm install --global pnpm@12.6.0
+
+      - name: Install web dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint web applications
+        run: pnpm lint
+
+      - name: Build web applications
+        run: pnpm build
+
+  mobile:
+    name: Flutter mobile
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+
+      - name: Install Flutter dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Analyze Flutter
+        working-directory: apps/mobile
+        run: flutter analyze
+
+      - name: Test Flutter
+        working-directory: apps/mobile
+        run: flutter test
+

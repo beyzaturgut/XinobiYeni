@@ -86,10 +86,10 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
 | Aktif faz/görev ID | Faz01 / bağımsız hazırlık çıktıları tamam; müşteri operasyon/karar/erişim girdileri bekleniyor |
 | Repo/branch/HEAD | `main` · `HEAD` origin/main ile eşit · doğrulanmış omurga `2b6099b` · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
-| Geliştirme/test/canlı ortamları | macOS geliştirme: .NET SDK `10.0.401`, Node `v24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; Docker yasak. Uzak SQL Server erişimi bekliyor |
+| Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL Server erişimi bekliyor |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | TST-002 rapor bütünlüğü başarılı; geçmişteki 27 alt test kaydı ve diff kontrolü doğrulandı. Ayrıntı `test/INDEX.md` |
-| Değişen dosyalar / migration | Kök `test/` rapor sistemi, indeks, şablon ve 27 alt kayıtlı geriye dönük ilk rapor; migration yok |
+| Son test komutu ve sonucu | TST-003 CI yerel doğrulaması: .NET 3/3, web/panel lint+build, Flutter analyze+1/1 başarılı; yanlış Flutter çalışma dizini kaydı düzeltilerek tekrarlandı |
+| Değişen dosyalar / migration | `.github/workflows/ci.yml`, Docker'sız CI sözleşmesi ve TST-003 raporu; migration yok |
 | Aktif hata/yarım iş | `109.104.120.91:1433` / `XinobiYeniDB` SQL girişi timeout; gerçek SQLEXPRESS dış portu/firewall araştırılıyor. GitHub remote ağ/yetki doğrulaması bekliyor |
 | Sonraki en küçük güvenli adım | Yetkili iş sahibiyle as-is sipariş/katalog/stok/fiyat/Mikro/kargo/iade akış girdilerini ve maskeli örnekleri topla; açık karar gelmeden fiziksel şema/durum üretme |
 | Geri alma / devam noktası | `2b6099b` doğrulanmış ve pushlanmış iskelet; migration ve dış sistem yazımı yok |
@@ -98,6 +98,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-29 | Faz03 erken CI | `main` / commit bekliyor | Docker'sız GitHub Actions: .NET Release build/test, pnpm frozen lint/build, Flutter analyze/test; salt okunur izin ve concurrency | TST-003: tüm hedefler başarılı; bir yerel Flutter dizin hatası kaydedilip doğru dizinden geçti | `.github/workflows/ci.yml`, `docs/operations/ci.md`, `test/.../TST-003-ci-workflow.md` | Push sonrası gerçek Actions sonucunu izle; SQL CI job'u erişim gelene kadar ekleme | Codex |
 | 2026-09-29 | Faz00/test raporlama | `main` / commit bekliyor | Kök `test/` klasörü, indeks, rapor şablonu ve bugüne kadarki 27 tekil test/bağlantı kaydı oluşturuldu; gelecekte her test için zorunlu kayıt kuralı eklendi | Rapor bütünlük ve diff kontrolü bekliyor | `test/README.md`, `test/INDEX.md`, `test/2026-09-29/TST-001-initial-validation-history.md` | Her yeni testte indeks ve tarihli raporu güncelle | Codex |
 | 2026-09-29 | Faz01/01.07,01.12 | `main` / commit bekliyor | Sağlayıcı/test erişim matrisi, Creative brief girdisi ve faz bağımlılık/UAT planı hazırlandı; erişim varmış gibi işaretlenmedi | `git diff --check` bekliyor | `provider-access-inventory.md`, `creative-brief-input.md`, `phase-dependency-uat-plan.md` | Gerçek iş sahibi/erişim girdisi olmadan dur; Faz01'i kapatma | Codex |
 | 2026-09-29 | Faz01/01.11 sözleşmeler | `main` / commit bekliyor | API kuralları ve modül sözleşme taslağı; `X-Request-Id`, Problem Details 404 ve otomatik middleware testleri | İlk test eski restore grafiğiyle 2 hata; `dotnet restore` sonrası build 0 uyarı/hata, 3/3 test; health 200 ve problem 404 smoke başarılı | `docs/contracts/*`, `RequestCorrelationMiddleware.cs`, testler | Müşteri karar girdileri; bağımsız faz plan/kapı dosyası | Codex |

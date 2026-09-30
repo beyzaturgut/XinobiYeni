@@ -36,7 +36,7 @@ function Icon({ name }: { name: IconName }) {
 function Header() {
   return <header className={styles.header}>
     <a className={styles.skipLink} href="#main-content">İçeriğe geç</a>
-    <div className={styles.utilityBar}><p>Xinobi ile ev teknolojisini yeniden keşfedin.</p><nav aria-label="Yardımcı bağlantılar"><Link href="#destek">Destek</Link><Link href="#kurumsal">Kurumsal</Link></nav></div>
+    <div className={styles.utilityBar}><p>Xinobi ile ev teknolojisini yeniden keşfedin.</p><nav aria-label="Yardımcı bağlantılar"><Link href="#destek">Destek</Link><Link href="/kurumsal/teklif">Kurumsal</Link></nav></div>
     <div className={styles.mainNav}>
       <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
       <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav>
@@ -73,6 +73,6 @@ export default function Home() {
       <section id="hikaye" className={styles.story} aria-labelledby="story-title"><p className={styles.eyebrow}>Xinobi dünyası</p><h2 id="story-title">İyi tasarım, gözünüzü değil gününüzü yormaz.</h2><p>Xinobi, ev teknolojilerini daha anlaşılır, daha kişisel ve daha sakin bir deneyime dönüştürmek için tasarlanır.</p><Link className={styles.textLink} href="#hikaye">Hikâyemizi keşfedin <Icon name="arrow" /></Link></section>
     </main>
 
-    <footer id="destek" className={styles.footer}><div className={styles.footerBrand}><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} /><p>Gündelik ritüeller için sessiz teknoloji.</p></div><nav aria-label="Alt menü"><div><h2>Ürünler</h2><Link href="#urunler">Çay makineleri</Link><Link href="#urunler">Kahve makineleri</Link><Link href="#urunler">Hava temizleyiciler</Link></div><div><h2>Xinobi</h2><Link href="#hikaye">Hakkımızda</Link><Link id="kurumsal" href="#kurumsal">Kurumsal</Link><Link href="#kisisellestirme">Xinobi Studio</Link></div><div><h2>Destek</h2><Link href="#destek">İletişim</Link><Link href="#destek">Sıkça sorulanlar</Link><Link href="#destek">Garanti ve servis</Link></div></nav><div className={styles.footerBottom}><span>© 2026 Xinobi</span><span>Faz02 arayüz prototipi</span></div></footer>
+    <footer id="destek" className={styles.footer}><div className={styles.footerBrand}><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} /><p>Gündelik ritüeller için sessiz teknoloji.</p></div><nav aria-label="Alt menü"><div><h2>Ürünler</h2><Link href="#urunler">Çay makineleri</Link><Link href="#urunler">Kahve makineleri</Link><Link href="#urunler">Hava temizleyiciler</Link></div><div><h2>Xinobi</h2><Link href="#hikaye">Hakkımızda</Link><Link href="/kurumsal/teklif">Kurumsal</Link><Link href="#kisisellestirme">Xinobi Studio</Link></div><div><h2>Destek</h2><Link href="#destek">İletişim</Link><Link href="#destek">Sıkça sorulanlar</Link><Link href="#destek">Garanti ve servis</Link></div></nav><div className={styles.footerBottom}><span>© 2026 Xinobi</span><span>Faz02 arayüz prototipi</span></div></footer>
   </div>;
 }

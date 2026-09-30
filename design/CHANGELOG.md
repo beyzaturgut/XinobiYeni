@@ -102,3 +102,10 @@
 - İşlem türü, ürün, neden, açıklama, dosya bekleme ve demo özet durumları tasarlandı.
 - Gerçek talep, uygunluk veya geri ödeme sözü üretilmedi; D03/D10 blokajları görünür tutuldu.
 - Sipariş detayındaki iade eylemi yeni rotaya bağlandı.
+
+## 0.15.0 - 30.09.2026
+
+- WEB-015 `/kurumsal/teklif` firma, iletişim, ürün/adet, termin ve proje notu formu eklendi.
+- Ürün seçimi görsel önizlemeye, kişiselleştirme tercihi demo özete bağlandı.
+- D07 olmadan minimum adet, fiyat, termin veya gerçek teklif üretimi açılmadı.
+- Ana sayfanın kurumsal bağlantıları yeni rotaya bağlandı.

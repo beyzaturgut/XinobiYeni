@@ -33,3 +33,4 @@
 | TST-029 | 30.09.2026 | Faz02 WEB-012 hesap/adres kabuğu | Başarılı lint/build/HTTP smoke; kimlik API ve browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-029-phase02-account-address.md` |
 | TST-030 | 30.09.2026 | Faz02 WEB-013 sipariş/kargo takip kabuğu | Başarılı lint/build/HTTP smoke; D03/kargo API/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-030-phase02-orders-tracking.md` |
 | TST-031 | 30.09.2026 | Faz02 WEB-014 iptal/iade form kabuğu | Başarılı lint/build/HTTP smoke; D03/D10/API/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-031-phase02-return-request.md` |
+| TST-032 | 30.09.2026 | Faz02 WEB-015 kurumsal teklif formu | Başarılı lint/build/HTTP smoke; D07/dosya API/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-032-phase02-corporate-quote.md` |

@@ -14,7 +14,7 @@ export default function TeaMakerPage() {
     <a className={styles.skipLink} href="#product-detail">Ürün detayına geç</a>
     <header className={styles.header}>
       <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav aria-label="Ürün detay menüsü"><Link href="/">Ana sayfa</Link><Link href="/urunler">Ürünler</Link><a href="#ozellikler">Özellikler</a><a href="#kisisellestirme">Kişiselleştirme</a></nav>
+      <nav aria-label="Ürün detay menüsü"><Link href="/">Ana sayfa</Link><Link href="/urunler">Ürünler</Link><a href="#ozellikler">Özellikler</a><Link href="/urunler/cay-makinesi-101/kisisellestir">Kişiselleştirme</Link></nav>
       <Link className={styles.catalogLink} href="/urunler">Kataloğa dön <span aria-hidden="true">↗</span></Link>
     </header>
     <main id="product-detail"><ProductExperience /></main>

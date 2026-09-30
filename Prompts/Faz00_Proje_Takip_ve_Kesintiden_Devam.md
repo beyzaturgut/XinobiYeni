@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.3.0 WEB-004 ürün detay-varyant; Faz01 D02/D04 gerçek fiyat-stok/baskı davranışını blokeliyor |
-| Repo/branch/HEAD | `main` · health değişiklikleri öncesi `5079ddf`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Aktif faz/görev ID | Faz02 / v0.4.0 WEB-005 basit kişiselleştirme; Faz01 D02/D04 gerçek fiyat-stok/baskı davranışını blokeliyor |
+| Repo/branch/HEAD | `main` · WEB-005 öncesi `c25ce02`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; ürün detay `http://localhost:3010/urunler/cay-makinesi-101` HTTP 200 |
-| Son test komutu ve sonucu | TST-020: WEB-004 lint/build/TypeScript, 6/6 statik sayfa ve HTTP varyant/bekleme durumları başarılı; browser interaction QA açık |
-| Değişen dosyalar / migration | WEB-004 ürün detay, dört renk varyantı, özellik/Studio bekleme alanı, design v0.3.0 ve TST-020; migration yok |
-| Aktif hata/yarım iş | WEB-001/002/004 görsel ve interaction QA açık. D02 olmadan gerçek fiyat-stok/varyant API; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | WEB-005 basit kişiselleştirme görsel/etkileşim kabuğunu D04 ölçüsü uydurmadan başlat |
+| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; kişiselleştirme `http://localhost:3010/urunler/cay-makinesi-101/kisisellestir` |
+| Son test komutu ve sonucu | TST-021: WEB-005 lint/build/TypeScript, 7/7 statik sayfa ve HTTP güvenli durum smoke başarılı; browser interaction QA açık |
+| Değişen dosyalar / migration | WEB-005 metin/stil/renk önizleme, temsili baskı uyarısı, oturum içi taslak, design v0.4.0 ve TST-021; migration yok |
+| Aktif hata/yarım iş | WEB-001/002/004/005 görsel ve interaction QA açık. D02 olmadan gerçek fiyat-stok/varyant API; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
+| Sonraki en küçük güvenli adım | WEB-006 gelişmiş editörün D04'ten bağımsız responsive araç kabuğunu hazırla |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz02 v0.4.0 / WEB-005 | `main` / `c25ce02` | Metin, stil ve renk seçimi; temsili ayrı önizleme; oturum içi demo taslak ve güvenli satın alma bekleme durumu | TST-021: lint/build/7 statik sayfa, route HTTP 200 ve kritik güvenlik metinleri başarılı | `apps/web/src/app/urunler/cay-makinesi-101/kisisellestir/*`, `test/2026-09-30/TST-021-*` | WEB-006 gelişmiş editör araç kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.3.0 / WEB-004 | `main` / `af74060` | Çay Makinesi 101 detay; dört renk seçimi, güvenli satın alma bekleme, özellik ve Studio placeholder | TST-020: lint/build/6 statik sayfa, route HTTP 200 ve dört varyant adı başarılı | `apps/web/src/app/urunler/cay-makinesi-101/*`, `test/2026-09-30/TST-020-*` | WEB-005 basit kişiselleştirme kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.2.0 / WEB-002 | `main` / `c3faa18` | 10 demo varyantlı katalog; arama, kategori, sıralama, sonuç/boş durum; ana CTA bağlantıları | TST-019: lint/build/5 statik sayfa ve `/urunler` HTTP 200; browser interaction QA açık | `apps/web/src/app/urunler/*`, `test/2026-09-30/TST-019-*` | WEB-004 ürün detay görsel kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.1.0 / WEB-001 | `main` / `57b6d93` | Logo/demo ürün envanteri, Inter tabanlı tokenlar, ekran envanteri ve responsive ana sayfa uygulandı | TST-018: lint/build/static render ve HTTP asset smoke başarılı; görsel browser QA bekliyor | `design/*`, `apps/web/src/app/*`, `test/2026-09-30/TST-018-*` | WEB-001 gerçek tarayıcı responsive görsel QA | Codex |

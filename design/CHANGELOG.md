@@ -24,3 +24,11 @@
 - Özellik anlatımı ve D04'e bağlı Xinobi Studio bekleme alanı eklendi.
 - Fiyat/stok doğrulanmadan satın alma eylemi bilinçli olarak devre dışı bırakıldı.
 - Çay Makinesi 101 katalog kartları detay sayfasına; hazır olmayan diğer ürünler açık `Hazırlanıyor` durumuna bağlandı.
+
+## 0.4.0 - 30.09.2026
+
+- WEB-005 `/urunler/cay-makinesi-101/kisisellestir` basit kişiselleştirme rotası eklendi.
+- Metin, üç yazı stili ve üç renk seçeneği canlı temsili önizlemeye bağlandı.
+- D04 kesinleşmeden ürün fotoğrafı üzerinde fiziksel baskı alanı uydurulmadı; önizleme bunun yerine açıkça temsili ayrı bir kartta sunuldu.
+- Demo taslağı yalnız oturum içi durum olarak işaretlendi; gerçek kaydetme ve satın alma eylemleri API, fiyat, stok ve üretim kararı gelene kadar sınırlandı.
+- Ürün detayı ve ana sayfa Studio bağlantıları kişiselleştirme rotasına bağlandı.

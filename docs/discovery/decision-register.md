@@ -21,4 +21,4 @@ Durum: Açık kararlar mevcut · Son güncelleme: 30.09.2026
 
 - Microsoft SQL Server, Flutter ve Docker kullanılmaması proje sahibinin teknik kararlarıdır; D02–D10 iş kararlarının yerine geçmez.
 - Temsili CTO değerlendirmesi gerçek müşteri, hukuk, üretim veya sağlayıcı onayı değildir.
-- SQL Server erişimi TST-012'de doğrulandı; TST-013'teki süreklilik sorunu ve mevcut şema/yetki envanteri kapanana kadar veritabanı migration'ı başlatılmaz.
+- SQL Server erişimi ve boş veritabanı envanteri TST-017'de doğrulandı. İlk migration Faz03 işidir; öncesinde migration/runtime hesap ayrımı, yedek/geri dönüş ve ilgili D kararlarının sınırı korunur.

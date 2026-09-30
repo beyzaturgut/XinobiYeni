@@ -32,8 +32,8 @@ Son doğrulama: 30.09.2026
 | Yerel API | Hazır | `/api/v1/health` HTTP 200 doğrulandı |
 | Web/panel | İskelet hazır | Production build başarılı; tasarım Faz02'ye bağlı |
 | Flutter mobil | İskelet hazır | Analyze/test başarılı; gerçek cihaz build ve editör PoC bekliyor |
-| SQL Server geliştirme | Kısmi hazır | Sabit dış TCP 64019 üzerinden `WIN-09NT6RPD8SB\\SQLEXPRESS` ve SQL Authentication TST-012'de doğrulandı; TST-013 tekrarında TCP timeout nedeniyle erişim sürekliliği açık risk |
-| SQL veritabanı | Erişim doğrulandı | `XinobiYeniDB` ve `xinobiyeni_app` login'i TST-012'de doğrulandı; mevcut şema/yetki envanteri TST-013 ağ timeout'u nedeniyle bekliyor, bu kontrol olmadan migration yazılmayacak |
+| SQL Server geliştirme | Hazır, riskli süreklilik | TCP 64019 üzerinden `WIN-09NT6RPD8SB\\SQLEXPRESS`; SQL Server 2022 Express `16.0.1000.6` TST-017'de doğrulandı. TST-013/TST-015 geçici timeout kayıtları nedeniyle süreklilik izlenecek |
+| SQL veritabanı | Hazır, boş | `XinobiYeniDB` ONLINE, compatibility `160`, kullanıcı tablosu ve EF migration geçmişi yok. `xinobiyeni_app` geliştirme/migration için `db_owner`; runtime hesabı Faz03'te ayrılmalı |
 | Mikro | Bilinmiyor | Sürüm, API/SDK/COM ve test şirketi D06 kapsamında gerekli |
 | Ödeme/kargo/bildirim | Bilinmiyor | Sağlayıcı ve sandbox erişimi D05 kapsamında gerekli |
 | Pazaryerleri | Bilinmiyor | Trendyol/Hepsiburada/N11 mağaza ve test erişimleri D06 kapsamında gerekli |

@@ -6,7 +6,7 @@ Sırlar, parolalar, tokenlar ve gerçek bağlantı dizileri bu dosyaya yazılmaz
 
 | Sistem | Gerekli bilgi/erişim | Teknik sahip | Test ortamı | Kota/webhook/ağ | Secret referansı | Durum | Etkilediği faz |
 |---|---|---|---|---|---|---|---|
-| SQL Server | Sabit dış TCP ve düşük yetkili uygulama/migration hesabı | Proje sahibi / teknik ekip | `XinobiYeniDB` doğrulandı | TCP 64019 TST-012'de başarılı; TST-013'te timeout, süreklilik bekliyor | macOS Keychain: `XinobiYeniDB-sql` / `xinobiyeni_app` (parola kaydedilmez) | Kısmi hazır | 03–11 |
+| SQL Server | Sabit dış TCP; ayrı migration ve düşük yetkili runtime hesabı | Proje sahibi / teknik ekip | Boş `XinobiYeniDB` ve metadata TST-017'de doğrulandı | TCP 64019 erişilebilir; TST-013/TST-015 geçici timeout kaydı var | macOS Keychain: `XinobiYeniDB-sql` / `xinobiyeni_app` (parola kaydedilmez) | Geliştirme hazır; yetki ayrımı bekliyor | 03–11 |
 | Ödeme | Sağlayıcı, sandbox merchant, webhook imzası, durum sorgusu ve iade yeteneği | Bekliyor | Bekliyor | Kart verisi uygulamada tutulmaz | Bekliyor | Girdi bekliyor | 05,11 |
 | Kargo | Firma, test hesabı, etiket/takip/iptal API yetenekleri | Bekliyor | Bekliyor | Kota ve callback bekliyor | Bekliyor | Girdi bekliyor | 05,11 |
 | E-posta | Sağlayıcı, domain doğrulama, template ve bounce/webhook | Bekliyor | Bekliyor | Gönderim limiti bekliyor | Bekliyor | Girdi bekliyor | 05,07,11 |

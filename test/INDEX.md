@@ -36,3 +36,4 @@
 | TST-032 | 30.09.2026 | Faz02 WEB-015 kurumsal teklif formu | Başarılı lint/build/HTTP smoke; D07/dosya API/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-032-phase02-corporate-quote.md` |
 | TST-033 | 30.09.2026 | Faz02 WEB-016 teklif takip/revizyon kabuğu | Başarılı lint/build/HTTP smoke; D07/API/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-033-phase02-quote-tracking.md` |
 | TST-034 | 30.09.2026 | IIS statik yayın artefaktı | Artefakt başarılı; uzak IIS deployment erişim bekliyor | BUILD / STATIC EXPORT / DEPLOYMENT PRECHECK | `2026-09-30/TST-034-iis-static-export.md` |
+| TST-035 | 30.09.2026 | DEPLOY-001 IIS sunucu içi ve dış bağlantı | Sunucu içi başarılı; dış TCP 8014 timeout | DEPLOYMENT / CONNECTIVITY / SMOKE | `2026-09-30/TST-035-iis-preview-connectivity.md` |

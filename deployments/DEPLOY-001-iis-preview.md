@@ -6,7 +6,7 @@
 - Hedef: `109.104.120.91` Windows IIS
 - Önerilen site adı: `XinobiYeni`
 - Yayın türü: Next.js static export, Docker/Node runtime yok
-- Durum: HAZIRLANDI — uzak IIS aktarımı/yayın erişimi bekleniyor
+- Durum: KISMİ BAŞARILI — IIS/sunucu içi yayın çalışıyor; dış ağ erişimi bekleniyor
 
 ## Güvenli sınır
 
@@ -21,11 +21,16 @@
 - Paket: `/tmp/XinobiYeni-web-b5f87a8.zip` (yerel geçici dosya; Git'e girmez)
 - SHA-256: `e94001b268695975a355fe8fa5fc59acc0c047fd962382e867d5009be728bddf`
 - İçerik: 169 dosya; 19 statik rota; `web.config` dahil.
-- Hedef fiziksel yol/binding: sunucu erişim yöntemi ve kullanıcı seçimi sonrası kaydedilecek.
+- Hedef fiziksel yol: `C:\inetpub\wwwroot\XinobiYeni\out`
+- IIS site adı: `XinobiYeni`
+- Binding: `http`, `*:8014`, host adı yok
 
 ## Yayın ve doğrulama
 
-- IIS aktarımı: bekliyor; SSH/SFTP, WinRM veya erişilebilir SMB paylaşımı verilmedi.
-- Site oluşturma/binding: bekliyor.
-- HTTP/HTTPS smoke: bekliyor.
+- IIS aktarımı: proje sahibi tarafından RDP ile tamamlandı.
+- Site oluşturma/binding: tamamlandı; ilk `0014` binding'i `8014` olarak düzeltildi.
+- Fiziksel yol: ilk üst klasör seçimi directory listing gösterdi; `out` klasörüne düzeltilince proje sahibi ana sayfanın açıldığını doğruladı.
+- Sunucu içi HTTP smoke: `http://localhost:8014` kullanıcı tarafından başarılı doğrulandı.
+- Dış ağ HTTP smoke: `http://109.104.120.91:8014` 10 saniye bağlantı timeout; Windows Firewall/AWS inbound kuralı bekleniyor.
+- HTTPS: yapılandırılmadı; genel kullanıma hazır kabul edilmez.
 - Geri alma noktası: yeni site olduğundan siteyi durdurma; hedef klasör varsa aktarım öncesi zaman damgalı yedek zorunlu.

@@ -122,3 +122,10 @@
 - Üç deterministik görsel düzen seçimi ve temsili ürün önizlemesi hazırlandı; gerçek AI çıktısı iddia edilmedi.
 - Kota, sağlayıcı, içerik politikası, veri saklama, baskı uygunluğu ve editöre aktarım D08/D10/D04 gelene kadar kapalı tutuldu.
 - Gelişmiş editörden AI fikir ekranına bağlantı eklendi.
+
+## 0.18.0 - 30.09.2026
+
+- WEB-018 `/asistan` ürün keşfi, karşılaştırma ve kurumsal yönlendirme konuşma kabuğu eklendi.
+- Sabit demo yanıtlar, ürün kartı ve mesaj gönderilmedi geri bildirimi hazırlandı.
+- AI üretimi, hassas veri, konuşma saklama, canlı destek/WhatsApp devri ve kesin ürün önerisi iddiaları engellendi.
+- Ana sayfa hikâye eylemi asistana bağlandı.

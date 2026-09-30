@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Kurumsal Teklif | Xinobi", descripti
 export default function QuotePage() {
   return <div className={styles.page}>
     <a className={styles.skipLink} href="#quote-form">Teklif formuna geç</a>
-    <header className={styles.header}><Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link><nav aria-label="Kurumsal menü"><Link href="/">Ana sayfa</Link><Link href="/urunler">Ürünler</Link><Link href="/kurumsal/teklif" aria-current="page">Kurumsal teklif</Link></nav><Link href="/">Xinobi&apos;ye dön ↗</Link></header>
+    <header className={styles.header}><Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link><nav aria-label="Kurumsal menü"><Link href="/">Ana sayfa</Link><Link href="/kurumsal/teklif">Teklif iste</Link><Link href="/kurumsal/teklif/takip">Teklif takibi</Link></nav><Link href="/">Xinobi&apos;ye dön ↗</Link></header>
     <main id="quote-form"><QuoteForm /></main>
   </div>;
 }

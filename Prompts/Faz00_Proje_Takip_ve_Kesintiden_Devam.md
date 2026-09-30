@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.15.0 WEB-015 kurumsal teklif; Faz01 D07 ve dosya API davranışı blokeliyor |
-| Repo/branch/HEAD | `main` · WEB-015 öncesi `fcee548`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Aktif faz/görev ID | Faz02 / v0.16.0 WEB-016 teklif takibi; Faz01 D07 ve teklif API davranışı blokeliyor |
+| Repo/branch/HEAD | `main` · WEB-016 öncesi `ee1274f`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; kurumsal teklif `http://localhost:3010/kurumsal/teklif` |
-| Son test komutu ve sonucu | TST-032: lint, TypeScript, 18/18 statik build ve HTTP güvenlik smoke başarılı |
-| Değişen dosyalar / migration | WEB-015 firma/ürün/adet/termin formu, demo özet, design v0.15.0 ve TST-032; migration yok |
+| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; teklif takibi `http://localhost:3010/kurumsal/teklif/takip` |
+| Son test komutu ve sonucu | TST-033: lint, TypeScript, 19/19 statik build ve HTTP güvenlik smoke başarılı |
+| Değişen dosyalar / migration | WEB-016 demo durum/revizyon/takip, design v0.16.0 ve TST-033; migration yok |
 | Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | WEB-016 teklif takip/revizyon kabuğunu D07/API sınırlarıyla hazırla |
+| Sonraki en küçük güvenli adım | WEB-017 AI tasarım kabuğunu D08/D10/sağlayıcı sınırlarıyla hazırla |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz02 v0.16.0 / WEB-016 | `main` / `ee1274f` | Teklif çizgisi, iki demo revizyon, not önizleme ve kapalı onay/sipariş eylemleri | TST-033: lint/build/19 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/kurumsal/teklif/takip/*`, `test/2026-09-30/TST-033-*` | WEB-017 AI tasarım | Codex |
 | 2026-09-30 | Faz02 v0.15.0 / WEB-015 | `main` / `fcee548` | Firma/iletişim, ürün/adet, kişiselleştirme, termin ve demo teklif özeti | TST-032: lint/build/18 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/kurumsal/teklif/*`, `test/2026-09-30/TST-032-*` | WEB-016 teklif takibi | Codex |
 | 2026-09-30 | Faz02 v0.14.0 / WEB-014 | `main` / `c258358` | İptal/iade türü, neden/açıklama, dosya bekleme ve demo özet | TST-031: lint/build/17 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/hesap/siparisler/iade/*`, `test/2026-09-30/TST-031-*` | WEB-015 kurumsal teklif | Codex |
 | 2026-09-30 | Faz02 v0.13.0 / WEB-013 | `main` / `65e5dff` | Demo sipariş listesi/detayı, teslimat çizgisi ve kapalı kargo işlemleri | TST-030: lint/build/16 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/hesap/siparisler/*`, `test/2026-09-30/TST-030-*` | WEB-014 iptal/iade | Codex |

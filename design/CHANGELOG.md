@@ -109,3 +109,9 @@
 - Ürün seçimi görsel önizlemeye, kişiselleştirme tercihi demo özete bağlandı.
 - D07 olmadan minimum adet, fiyat, termin veya gerçek teklif üretimi açılmadı.
 - Ana sayfanın kurumsal bağlantıları yeni rotaya bağlandı.
+
+## 0.16.0 - 30.09.2026
+
+- WEB-016 `/kurumsal/teklif/takip` teklif durumu, zaman çizelgesi ve revizyon geçmişi eklendi.
+- İki demo sürüm arasında geçiş ve oturum içi revizyon notu önizlemesi uygulandı.
+- Yetkili teklif, toplam, termin, PDF, onay ve sipariş dönüşümü D07/API gelene kadar kapalı tutuldu.

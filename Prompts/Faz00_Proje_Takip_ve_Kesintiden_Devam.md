@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.18.0 WEB-018 AI satış asistanı; Faz01 D05/D08/D10 ve sağlayıcı erişimi blokeliyor |
-| Repo/branch/HEAD | `main` · WEB-018 öncesi `a856fe6`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Aktif faz/görev ID | Faz02 / v0.19.0 WEB-019 kurumsal/içerik; Faz04 CMS ve nihai içerik onayı bekleniyor |
+| Repo/branch/HEAD | `main` · WEB-019 öncesi `1f24404`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview DEPLOY-001 `http://109.104.120.91:8014`; yeni değişiklikler yalnız yerel build/Git'te, deployment talep edilmedi |
-| Son test komutu ve sonucu | TST-038: lint, TypeScript, 21/21 static export ve yerel HTTP güvenlik smoke başarılı |
-| Değişen dosyalar / migration | WEB-018 sabit demo konuşma/ürün/teklif yönlendirmesi, design v0.18.0 ve TST-038; migration yok |
+| Son test komutu ve sonucu | TST-039: lint, TypeScript, ağ erişimli 22/22 static export ve yerel HTTP smoke başarılı; ağ-kısıtlı font denemeleri kayıtlı |
+| Değişen dosyalar / migration | WEB-019 kurumsal hikâye/içerik önizleme ve ana sayfa bağlantıları, design v0.19.0 ve TST-039; migration yok |
 | Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | WEB-019 kurumsal/içerik kabuğunu hazırla; deployment yalnız proje sahibi açıkça isteyince yapılır |
+| Sonraki en küçük güvenli adım | WEB-020 yasal/çerez tercih kabuğunu hazırla; deployment yalnız proje sahibi açıkça isteyince yapılır |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz02 v0.19.0 / WEB-019 | `main` / `1f24404` | Kurumsal hikâye, tasarım ilkeleri, içerik önizleme ve ana sayfa bağlantıları | TST-039: lint/static export 22 sayfa başarılı; ağ-kısıtlı font denemesi kayıtlı | `apps/web/src/app/xinobi/*`, `test/2026-09-30/TST-039-*` | WEB-020 yasal/çerez; deploy yok | Codex |
 | 2026-09-30 | Faz02 v0.18.0 / WEB-018 | `main` / `a856fe6` | Demo konuşma, ürün/kurumsal yönlendirme ve kapalı destek devri | TST-038: lint/static export 21 sayfa ve yerel smoke başarılı | `apps/web/src/app/asistan/*`, `test/2026-09-30/TST-038-*` | WEB-019 kurumsal/içerik; deploy yok | Codex |
 | 2026-09-30 | Faz02 v0.17.0 / WEB-017 | `main` / `1b6cfcd` | AI istem/tema/palet, deterministik demo alternatifler, hata ve kapalı aktarım | TST-037: ilk build yolu düzeltildi; lint/static export 20 sayfa başarılı | `apps/web/src/app/studio/ai/*`, `test/2026-09-30/TST-037-*` | DEPLOY-002 preview güncellemesi | Codex |
 | 2026-09-30 | Faz02 v0.16.0 / WEB-016 | `main` / `ee1274f` | Teklif çizgisi, iki demo revizyon, not önizleme ve kapalı onay/sipariş eylemleri | TST-033: lint/build/19 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/kurumsal/teklif/takip/*`, `test/2026-09-30/TST-033-*` | WEB-017 AI tasarım | Codex |

@@ -129,3 +129,10 @@
 - Sabit demo yanıtlar, ürün kartı ve mesaj gönderilmedi geri bildirimi hazırlandı.
 - AI üretimi, hassas veri, konuşma saklama, canlı destek/WhatsApp devri ve kesin ürün önerisi iddiaları engellendi.
 - Ana sayfa hikâye eylemi asistana bağlandı.
+
+## 0.19.0 - 30.09.2026
+
+- WEB-019 `/xinobi` kurumsal hikâye ve içerik önizleme sayfası eklendi.
+- Marka yaklaşımı, tasarım ilkeleri, malzeme anlatısı, içerik kartları ve ürün/asistan yönlendirmeleri hazırlandı.
+- Henüz CMS'de yayınlanmayan metin ve içerikler prototip olarak işaretlendi; nihai kurumsal içerik iddiası engellendi.
+- Ana ve mobil menü ile footer bağlantıları yeni kurumsal rotaya bağlandı.

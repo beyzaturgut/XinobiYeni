@@ -22,7 +22,7 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | WEB-016 | Teklif takibi | Başvuru sahibi / hesap | Demo durum/revizyon gör | QuoteRequest, history | 02,07 | Responsive sürüm/takip kabuğu hazır; D07/API/browser QA bekliyor |
 | WEB-017 | AI tasarım | Müşteri / ürün, editör | Demo istem/alternatif/hata durumunu incele | AiJob, quota, asset | 02,10 | Responsive senaryo kabuğu hazır; D08/D10/sağlayıcı/browser QA bekliyor |
 | WEB-018 | AI satış asistanı | Herkes / global | Demo ürün/teklif yönlendirmesi gör | Katalog, konuşma, lead | 02,10 | Responsive konuşma kabuğu hazır; D05/D08/D10/sağlayıcı/browser QA bekliyor |
-| WEB-019 | Kurumsal/içerik | Herkes / footer, SEO | İçerik oku | Page, BlogPost, SEO | 02,04 | Bekliyor |
+| WEB-019 | Kurumsal/içerik | Herkes / footer, SEO | Marka yaklaşımını ve içerik önizlemesini oku | Page, BlogPost, SEO | 02,04 | Responsive kurumsal hikâye kabuğu hazır; CMS/içerik onayı/browser QA bekliyor |
 | WEB-020 | Yasal/çerez | Herkes / footer, ilk ziyaret | Tercih kaydet | LegalDocument, Consent | 02,04 | D10 bekliyor |
 | ADM-001 | Dashboard | Panel rolü / giriş | Operasyon özeti | Sipariş, stok, hata, teklif | 02,03+ | Bekliyor |
 | ADM-002 | Rol/denetim/ayar | Yönetici | Yetki ve audit incele | Role, Permission, AuditLog | 02,03 | Bekliyor |

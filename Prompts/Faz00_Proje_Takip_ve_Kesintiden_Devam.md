@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.6.0 WEB-003 arama/karşılaştırma; Faz01 D02 gerçek fiyat-stok davranışını blokeliyor |
-| Repo/branch/HEAD | `main` · WEB-003 öncesi `039ee41`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Aktif faz/görev ID | Faz02 / v0.7.0 WEB-007 favoriler; Faz01 D02 gerçek fiyat-stok davranışını blokeliyor |
+| Repo/branch/HEAD | `main` · WEB-007 öncesi `a64409d`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; arama/karşılaştırma `http://localhost:3010/arama` |
-| Son test komutu ve sonucu | TST-023: hatalı ilk göreli yol düzeltildi; lint, TypeScript, 9/9 statik build ve HTTP smoke başarılı |
-| Değişen dosyalar / migration | WEB-003 canlı arama, boş durum, üçlü seçim/karşılaştırma, design v0.6.0 ve TST-023; migration yok |
-| Aktif hata/yarım iş | WEB-001–006 görsel ve interaction QA açık. D02 olmadan gerçek fiyat-stok/varyant API; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | WEB-007 favoriler kabuğunu üyelik/API varmış gibi göstermeden hazırla |
+| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; favoriler `http://localhost:3010/favoriler` |
+| Son test komutu ve sonucu | TST-024: ilk effect lint hatası düzeltildi; ikinci lint, TypeScript ve 10/10 statik build başarılı |
+| Değişen dosyalar / migration | WEB-007 katalog favori kontrolleri, demo tarayıcı saklama, boş/dolu ekran, design v0.7.0 ve TST-024; migration yok |
+| Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
+| Sonraki en küçük güvenli adım | WEB-008 sepet kabuğunu D02/D03 bağımlılıklarını görünür tutarak hazırla |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz02 v0.7.0 / WEB-007 | `main` / `a64409d` | Katalog favori kontrolü, tarayıcı demo saklama ve favoriler boş/dolu ekranı | TST-024: ilk effect lint hatası düzeltildi; lint/build/10 statik sayfa başarılı | `apps/web/src/app/favoriler/*`, `test/2026-09-30/TST-024-*` | WEB-008 sepet kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.6.0 / WEB-003 | `main` / `039ee41` | Canlı arama, hızlı terim, boş durum, en fazla üç ürün ve responsive karşılaştırma tablosu | TST-023: ilk yol hatası düzeltildi; lint/build/9 statik sayfa ve route smoke başarılı | `apps/web/src/app/arama/*`, `test/2026-09-30/TST-023-*` | WEB-007 favoriler kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.5.0 / WEB-006 | `main` / `525d4fc` | Araç/tuval/katman editörü, ön/arka yüz, demo taslak, responsive düzen ve logo kaynak taşıması | TST-022: ilk lint düzeltildi; ikinci lint/build/8 statik sayfa ve route smoke başarılı | `apps/web/src/app/urunler/cay-makinesi-101/editor/*`, `design/logo/*`, `test/2026-09-30/TST-022-*` | WEB-006 kullanıcı görsel geri bildirimi | Codex |
 | 2026-09-30 | Faz02 v0.4.0 / WEB-005 | `main` / `c25ce02` | Metin, stil ve renk seçimi; temsili ayrı önizleme; oturum içi demo taslak ve güvenli satın alma bekleme durumu | TST-021: lint/build/7 statik sayfa, route HTTP 200 ve kritik güvenlik metinleri başarılı | `apps/web/src/app/urunler/cay-makinesi-101/kisisellestir/*`, `test/2026-09-30/TST-021-*` | WEB-006 gelişmiş editör araç kabuğu | Codex |

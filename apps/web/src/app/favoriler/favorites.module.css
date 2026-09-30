@@ -1,0 +1,53 @@
+.page { min-height: 100vh; background: #f3f3ef; color: #16242a; }
+.skipLink { position: fixed; left: 16px; top: -80px; z-index: 30; padding: 12px 18px; background: white; color: #111; }
+.skipLink:focus { top: 0; }
+.header { min-height: 84px; padding: 0 clamp(18px,4vw,58px); display: grid; grid-template-columns: 86px 1fr auto; align-items: center; gap: 30px; background: #101b20; color: white; }
+.brand { width: 65px; height: 69px; overflow: hidden; }
+.brand img { width: 61px; height: auto; }
+.header nav { display: flex; justify-content: center; gap: clamp(16px,2.7vw,40px); font-size: .76rem; }
+.header nav a { padding: 8px 0; border-bottom: 1px solid transparent; }
+.header nav a:hover, .header nav a[aria-current="page"] { border-color: white; }
+.catalogLink { color: #c5d0cd; font-size: .7rem; }
+.hero { padding: clamp(65px,8vw,115px) clamp(20px,8vw,125px) 65px; background: linear-gradient(120deg,#dce5e1,#f2f3ee); }
+.hero > p { margin: 0 0 14px; color: #0b6c68; font-size: .68rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.hero h1 { margin: 0; font-size: clamp(3.5rem,8vw,8rem); font-weight: 370; letter-spacing: -.065em; line-height: .9; }
+.hero > div { max-width: 620px; margin-top: 38px; padding: 16px 18px; display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 15px; border: 1px solid #b8c5c1; background: rgba(255,255,255,.45); }
+.hero > div span { padding: 6px 8px; background: #16242a; color: white; font-size: .52rem; letter-spacing: .08em; text-transform: uppercase; }
+.hero > div p { margin: 0; color: #5d6a67; font-size: .66rem; line-height: 1.5; }
+.content { max-width: 1440px; min-height: 480px; margin: 0 auto; padding: 55px clamp(20px,4vw,58px) 120px; }
+.loading { padding: 90px 20px; color: #687572; text-align: center; }
+.summary { margin-bottom: 23px; padding-bottom: 18px; display: flex; justify-content: space-between; border-bottom: 1px solid #ccd4d1; }
+.summary strong { font-size: .76rem; }
+.summary button { border: 0; background: transparent; color: #5f6c69; cursor: pointer; font-size: .68rem; text-decoration: underline; }
+.grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 17px; }
+.grid article { min-width: 0; background: white; }
+.media { aspect-ratio: 1/.95; position: relative; display: grid; place-items: center; overflow: hidden; background: #e9ece9; }
+.media img { width: 88%; height: 88%; object-fit: contain; mix-blend-mode: multiply; }
+.media img.tall { width: 68%; }
+.media button { width: 41px; height: 41px; position: absolute; right: 15px; top: 15px; border: 0; border-radius: 50%; background: #0b6c68; color: white; cursor: pointer; font-size: 1rem; }
+.copy { padding: 23px; }
+.copy > p { margin: 0 0 7px; color: #0b6c68; font-size: .62rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.copy h2 { margin: 0 0 10px; font-size: 1.2rem; font-weight: 520; }
+.copy > span { color: #64716e; font-size: .68rem; }
+.copy > div { margin-top: 20px; padding-top: 17px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #dde2e0; }
+.copy small { color: #7a8582; font-size: .58rem; }
+.copy a, .copy div > span { font-size: .65rem; font-weight: 600; }
+.empty { min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: white; }
+.empty > span { color: #6d7b77; font-size: 4rem; font-weight: 300; }
+.empty h2 { margin: 16px 0 8px; font-size: clamp(1.7rem,4vw,2.7rem); font-weight: 420; }
+.empty p { margin: 0; color: #687572; }
+.empty a { margin-top: 25px; padding: 14px 20px; background: #0b6c68; color: white; font-size: .72rem; font-weight: 650; }
+
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 680px) {
+  .header { min-height: 74px; padding-inline: 16px; grid-template-columns: 56px 1fr; gap: 12px; }
+  .brand { width: 52px; height: 62px; }
+  .brand img { width: 49px; }
+  .header nav { justify-content: end; gap: 15px; font-size: .65rem; }
+  .header nav a:first-child, .header nav a:nth-child(3), .catalogLink { display: none; }
+  .hero { padding: 55px 20px 45px; }
+  .hero > div { grid-template-columns: 1fr; }
+  .hero > div span { justify-self: start; }
+  .grid { grid-template-columns: 1fr; }
+  .content { padding-inline: 18px; }
+}

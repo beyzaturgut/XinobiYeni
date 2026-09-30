@@ -27,7 +27,10 @@
 .resultSummary { padding: 20px 0; display: flex; justify-content: space-between; border-top: 1px solid #d4dbd9; color: #657174; font-size: .76rem; }
 .resultSummary strong { color: #16242a; font-weight: 600; }
 .grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
-.card { min-width: 0; background: white; }
+.card { min-width: 0; position: relative; background: white; }
+.favoriteButton { width: 39px; height: 39px; position: absolute; right: 14px; top: 14px; z-index: 3; display: grid; place-items: center; border: 1px solid #c5cecb; border-radius: 50%; background: rgba(255,255,255,.9); color: #243330; cursor: pointer; font-size: 1.15rem; }
+.favoriteButton:hover { border-color: #16242a; }
+.favoriteButton[aria-pressed="true"] { border-color: #0b6c68; background: #0b6c68; color: white; }
 .media { aspect-ratio: 1/.98; position: relative; display: grid; place-items: center; overflow: hidden; background: #eceeeb; }
 .media img { width: 91%; height: 91%; object-fit: contain; mix-blend-mode: multiply; transition: transform .35s ease; }
 .media img.tallImage { width: 70%; }

@@ -2,7 +2,7 @@
 
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./catalog.module.css";
 
 import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
@@ -32,11 +32,28 @@ const products: Product[] = [
   { id: "cooking", name: "Yemek Yapma Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: cookingMachine, tall: true, order: 9 },
   { id: "toast", name: "Tost Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: toastMaker, order: 10 },
 ];
+const favoriteStorageKey = "xinobi-demo-favorites";
 
 export default function Catalog() {
   const [category, setCategory] = useState<Category>("Tümü");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try { setFavorites(JSON.parse(localStorage.getItem(favoriteStorageKey) || "[]")); } catch { setFavorites([]); }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function toggleFavorite(id: string) {
+    setFavorites((current) => {
+      const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id];
+      localStorage.setItem(favoriteStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
 
   const visibleProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("tr-TR");
@@ -53,6 +70,7 @@ export default function Catalog() {
     <div className={styles.resultSummary} aria-live="polite"><strong>{visibleProducts.length} ürün varyantı</strong><span>Demo ürünler</span></div>
     {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <article className={styles.card} key={product.id}>
       <div className={styles.media}><span className={styles.demoBadge}>Demo</span><Image className={product.tall ? styles.tallImage : ""} src={product.image} alt={`${product.name}, ${product.color}`} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /></div>
+      <button type="button" className={styles.favoriteButton} aria-label={`${product.name} ${product.color} ürününü ${favorites.includes(product.id) ? "favorilerden çıkar" : "favorilere ekle"}`} aria-pressed={favorites.includes(product.id)} onClick={() => toggleFavorite(product.id)}><span aria-hidden="true">{favorites.includes(product.id) ? "♥" : "♡"}</span></button>
       <div className={styles.cardBody}><p>{product.family}</p><h2>{product.name}</h2><div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{product.color}</span></div><div className={styles.cardFooter}><span>Fiyat bilgisi yakında</span>{product.href ? <Link href={product.href} aria-label={`${product.name} ${product.color} ürününü incele`}>İncele <b aria-hidden="true">→</b></Link> : <button type="button" disabled title="Ürün detay tasarımı hazırlanıyor">Hazırlanıyor</button>}</div></div>
     </article>)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
   </section>;

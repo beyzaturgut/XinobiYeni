@@ -49,3 +49,10 @@
 - Seçilen ürünler erişilebilir, yatay kaydırılabilir özellik tablosunda karşılaştırıldı.
 - D02/API olmadan fiyat veya stok değeri uydurulmadı; bekleme durumu açık gösterildi.
 - Ana sayfa arama eylemi ve katalog navigasyonu yeni rotaya bağlandı.
+
+## 0.7.0 - 30.09.2026
+
+- WEB-007 `/favoriler` rotası, boş/yükleniyor/dolu durumlarıyla eklendi.
+- Katalog kartlarına erişilebilir favoriye ekleme/çıkarma kontrolü bağlandı.
+- Üyelik/API olmadığı için seçimler yalnız tarayıcıda `demo saklama` etiketiyle tutuldu.
+- Favori kartlarında fiyat/stok ve hazır olmayan detay rotaları güvenli bekleme durumunda bırakıldı.

@@ -38,3 +38,4 @@
 | TST-034 | 30.09.2026 | IIS statik yayın artefaktı | Artefakt başarılı; uzak IIS deployment erişim bekliyor | BUILD / STATIC EXPORT / DEPLOYMENT PRECHECK | `2026-09-30/TST-034-iis-static-export.md` |
 | TST-035 | 30.09.2026 | DEPLOY-001 IIS sunucu içi ve dış bağlantı | Sunucu içi başarılı; dış TCP 8014 timeout | DEPLOYMENT / CONNECTIVITY / SMOKE | `2026-09-30/TST-035-iis-preview-connectivity.md` |
 | TST-036 | 30.09.2026 | Firewall sonrası DEPLOY-001 dış HTTP smoke | Başarılı; üç rota HTTP 200, HTTPS bekliyor | DEPLOYMENT / CONNECTIVITY / SMOKE | `2026-09-30/TST-036-iis-external-http-smoke.md` |
+| TST-037 | 30.09.2026 | Faz02 WEB-017 AI tasarım senaryo kabuğu | Başarılı; ilk görsel yolu build hatası düzeltildi, static export geçti | STATIC / BUILD / INTERACTION CONTRACT | `2026-09-30/TST-037-phase02-ai-design.md` |

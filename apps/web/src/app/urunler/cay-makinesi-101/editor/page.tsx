@@ -16,6 +16,7 @@ export default function AdvancedEditorPage() {
       <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
       <div className={styles.documentTitle}><span>Xinobi Studio</span><strong>İsimsiz tasarım</strong><small>Demo · Kaydedilmedi</small></div>
       <div className={styles.headerActions}>
+        <Link href="/studio/ai">AI ile fikir üret</Link>
         <Link href="/urunler/cay-makinesi-101/kisisellestir">Basit moda dön</Link>
         <button type="button" disabled>Sepete aktar</button>
       </div>

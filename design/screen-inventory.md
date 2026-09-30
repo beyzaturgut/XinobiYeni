@@ -20,7 +20,7 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | WEB-014 | İptal/iade | Üye / sipariş | Demo iptal/iade özeti hazırla | ReturnRequest, ödeme, stok | 02,05 | Responsive form kabuğu hazır; D03/D10/dosya API/browser QA bekliyor |
 | WEB-015 | Kurumsal teklif | Başvuru sahibi / menü | Demo teklif özeti hazırla | Firma, ürün, adet, termin, dosya | 02,07 | Responsive form kabuğu hazır; D07/dosya API/browser QA bekliyor |
 | WEB-016 | Teklif takibi | Başvuru sahibi / hesap | Demo durum/revizyon gör | QuoteRequest, history | 02,07 | Responsive sürüm/takip kabuğu hazır; D07/API/browser QA bekliyor |
-| WEB-017 | AI tasarım | Müşteri / ürün, editör | İstem gönder, alternatif seç | AiJob, quota, asset | 02,10 | D08/D10 bekliyor |
+| WEB-017 | AI tasarım | Müşteri / ürün, editör | Demo istem/alternatif/hata durumunu incele | AiJob, quota, asset | 02,10 | Responsive senaryo kabuğu hazır; D08/D10/sağlayıcı/browser QA bekliyor |
 | WEB-018 | AI satış asistanı | Herkes / global | Ürün bul, teklif/devir | Katalog, konuşma, lead | 02,10 | D08/D10 bekliyor |
 | WEB-019 | Kurumsal/içerik | Herkes / footer, SEO | İçerik oku | Page, BlogPost, SEO | 02,04 | Bekliyor |
 | WEB-020 | Yasal/çerez | Herkes / footer, ilk ziyaret | Tercih kaydet | LegalDocument, Consent | 02,04 | D10 bekliyor |

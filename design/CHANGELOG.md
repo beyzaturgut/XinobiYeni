@@ -115,3 +115,10 @@
 - WEB-016 `/kurumsal/teklif/takip` teklif durumu, zaman çizelgesi ve revizyon geçmişi eklendi.
 - İki demo sürüm arasında geçiş ve oturum içi revizyon notu önizlemesi uygulandı.
 - Yetkili teklif, toplam, termin, PDF, onay ve sipariş dönüşümü D07/API gelene kadar kapalı tutuldu.
+
+## 0.17.0 - 30.09.2026
+
+- WEB-017 `/studio/ai` istem, tema, palet, demo alternatif ve hata durumu kabuğu eklendi.
+- Üç deterministik görsel düzen seçimi ve temsili ürün önizlemesi hazırlandı; gerçek AI çıktısı iddia edilmedi.
+- Kota, sağlayıcı, içerik politikası, veri saklama, baskı uygunluğu ve editöre aktarım D08/D10/D04 gelene kadar kapalı tutuldu.
+- Gelişmiş editörden AI fikir ekranına bağlantı eklendi.

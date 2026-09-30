@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.2.0 WEB-002 ürün kataloğu; Faz01 D02/D04 kararları gerçek fiyat-stok/baskı davranışını blokeliyor |
+| Aktif faz/görev ID | Faz02 / v0.3.0 WEB-004 ürün detay-varyant; Faz01 D02/D04 gerçek fiyat-stok/baskı davranışını blokeliyor |
 | Repo/branch/HEAD | `main` · health değişiklikleri öncesi `5079ddf`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; `/` ve `/urunler` statik, `/urunler` HTTP 200 |
-| Son test komutu ve sonucu | TST-019: WEB-002 lint/build/TypeScript ve HTTP render başarılı; gerçek browser interaction/piksel QA açık |
-| Değişen dosyalar / migration | WEB-002 `/urunler`, katalog client filtreleri, dört ek demo asset, design v0.2.0 ve TST-019; migration yok |
-| Aktif hata/yarım iş | WEB-001/002 görsel ve interaction QA açık. D02 olmadan gerçek fiyat-stok/varyant API davranışı; D04 olmadan baskı davranışı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | Proje sahibi `/urunler` tasarımını incelerken WEB-004 ürün detay/varyant ekranının D02'den bağımsız görsel kabuğunu başlat |
+| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; ürün detay `http://localhost:3010/urunler/cay-makinesi-101` HTTP 200 |
+| Son test komutu ve sonucu | TST-020: WEB-004 lint/build/TypeScript, 6/6 statik sayfa ve HTTP varyant/bekleme durumları başarılı; browser interaction QA açık |
+| Değişen dosyalar / migration | WEB-004 ürün detay, dört renk varyantı, özellik/Studio bekleme alanı, design v0.3.0 ve TST-020; migration yok |
+| Aktif hata/yarım iş | WEB-001/002/004 görsel ve interaction QA açık. D02 olmadan gerçek fiyat-stok/varyant API; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
+| Sonraki en küçük güvenli adım | WEB-005 basit kişiselleştirme görsel/etkileşim kabuğunu D04 ölçüsü uydurmadan başlat |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz02 v0.3.0 / WEB-004 | `main` / `af74060` | Çay Makinesi 101 detay; dört renk seçimi, güvenli satın alma bekleme, özellik ve Studio placeholder | TST-020: lint/build/6 statik sayfa, route HTTP 200 ve dört varyant adı başarılı | `apps/web/src/app/urunler/cay-makinesi-101/*`, `test/2026-09-30/TST-020-*` | WEB-005 basit kişiselleştirme kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.2.0 / WEB-002 | `main` / `c3faa18` | 10 demo varyantlı katalog; arama, kategori, sıralama, sonuç/boş durum; ana CTA bağlantıları | TST-019: lint/build/5 statik sayfa ve `/urunler` HTTP 200; browser interaction QA açık | `apps/web/src/app/urunler/*`, `test/2026-09-30/TST-019-*` | WEB-004 ürün detay görsel kabuğu | Codex |
 | 2026-09-30 | Faz02 v0.1.0 / WEB-001 | `main` / `57b6d93` | Logo/demo ürün envanteri, Inter tabanlı tokenlar, ekran envanteri ve responsive ana sayfa uygulandı | TST-018: lint/build/static render ve HTTP asset smoke başarılı; görsel browser QA bekliyor | `design/*`, `apps/web/src/app/*`, `test/2026-09-30/TST-018-*` | WEB-001 gerçek tarayıcı responsive görsel QA | Codex |
 | 2026-09-30 | Faz01 SQL ortam envanteri | `main` / `efd08af` | SQL sürüm/edition, DB durum/collation, tablo/migration sayısı ve login yetkileri salt okunur sorgulandı | TST-017 başarılı; SQL 2022 Express, boş DB, db_owner doğrulandı | `tools/sql/read-only-environment-inventory.sql`, `test/2026-09-30/TST-017-*` | D02/D03/D07 iş sahibi girdilerini al | Codex |

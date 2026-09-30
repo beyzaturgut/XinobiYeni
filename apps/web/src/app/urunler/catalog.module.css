@@ -40,7 +40,9 @@
 .variant > span:first-child { width: 15px; height: 15px; border: 1px solid #b6bfbd; border-radius: 50%; }
 .cardFooter { margin-top: 22px; padding-top: 18px; display: flex; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid #dce1df; }
 .cardFooter > span { color: #687477; font-size: .7rem; }
-.cardFooter button { padding: 8px 0 8px 12px; border: 0; background: transparent; cursor: pointer; font-size: .78rem; font-weight: 600; }
+.cardFooter button, .cardFooter a { padding: 8px 0 8px 12px; border: 0; background: transparent; font-size: .78rem; font-weight: 600; }
+.cardFooter a:hover { color: #0b6c68; }
+.cardFooter button:disabled { color: #929b99; cursor: not-allowed; }
 .cardFooter b { margin-left: 6px; font-size: 1rem; font-weight: 400; }
 .empty { min-height: 400px; padding: 70px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: white; }
 .empty > span { font-size: 3rem; color: #8b9895; }

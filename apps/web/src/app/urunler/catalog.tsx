@@ -1,6 +1,7 @@
 "use client";
 
 import Image, { type StaticImageData } from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import styles from "./catalog.module.css";
 
@@ -16,16 +17,16 @@ import teaSilver from "../../../public/assets/products/tea-maker-101-silver.webp
 import toastMaker from "../../../public/assets/products/toast-maker.webp";
 
 type Category = "Tümü" | "Çay" | "Kahve" | "Hava" | "Pişirme";
-type Product = { id: string; name: string; category: Exclude<Category, "Tümü">; family: string; color: string; swatch: string; image: StaticImageData; tall?: boolean; order: number };
+type Product = { id: string; name: string; category: Exclude<Category, "Tümü">; family: string; color: string; swatch: string; image: StaticImageData; tall?: boolean; order: number; href?: string };
 
 const categories: Category[] = ["Tümü", "Çay", "Kahve", "Hava", "Pişirme"];
 const products: Product[] = [
-  { id: "tea-101-blue", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Lacivert", swatch: "#18304d", image: teaBlue, tall: true, order: 1 },
-  { id: "tea-101-rose", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Rose gold", swatch: "#b87d72", image: teaRose, tall: true, order: 2 },
+  { id: "tea-101-blue", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Lacivert", swatch: "#18304d", image: teaBlue, tall: true, order: 1, href: "/urunler/cay-makinesi-101" },
+  { id: "tea-101-rose", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Rose gold", swatch: "#b87d72", image: teaRose, tall: true, order: 2, href: "/urunler/cay-makinesi-101" },
   { id: "coffee-101-gold", name: "Kahve Makinesi 101", category: "Kahve", family: "Kahve makineleri", color: "Gold", swatch: "#b78945", image: coffeeGold, order: 3 },
   { id: "air-101", name: "Air Purifier 101", category: "Hava", family: "Hava temizleyiciler", color: "Beyaz", swatch: "#efefed", image: airPurifier, tall: true, order: 4 },
-  { id: "tea-101-silver", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Gümüş gri", swatch: "#9ba0a1", image: teaSilver, tall: true, order: 5 },
-  { id: "tea-101-red", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Kırmızı", swatch: "#9f202b", image: teaRed, tall: true, order: 6 },
+  { id: "tea-101-silver", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Gümüş gri", swatch: "#9ba0a1", image: teaSilver, tall: true, order: 5, href: "/urunler/cay-makinesi-101" },
+  { id: "tea-101-red", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Kırmızı", swatch: "#9f202b", image: teaRed, tall: true, order: 6, href: "/urunler/cay-makinesi-101" },
   { id: "coffee-101-red", name: "Kahve Makinesi 101", category: "Kahve", family: "Kahve makineleri", color: "Kırmızı", swatch: "#9f202b", image: coffeeRed, order: 7 },
   { id: "coffee-102", name: "Kahve Makinesi 102", category: "Kahve", family: "Kahve makineleri", color: "Siyah", swatch: "#202426", image: coffeeTwo, order: 8 },
   { id: "cooking", name: "Yemek Yapma Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: cookingMachine, tall: true, order: 9 },
@@ -52,7 +53,7 @@ export default function Catalog() {
     <div className={styles.resultSummary} aria-live="polite"><strong>{visibleProducts.length} ürün varyantı</strong><span>Demo ürünler</span></div>
     {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <article className={styles.card} key={product.id}>
       <div className={styles.media}><span className={styles.demoBadge}>Demo</span><Image className={product.tall ? styles.tallImage : ""} src={product.image} alt={`${product.name}, ${product.color}`} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /></div>
-      <div className={styles.cardBody}><p>{product.family}</p><h2>{product.name}</h2><div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{product.color}</span></div><div className={styles.cardFooter}><span>Fiyat bilgisi yakında</span><button type="button" aria-label={`${product.name} ${product.color} ürününü incele`}>İncele <b aria-hidden="true">→</b></button></div></div>
+      <div className={styles.cardBody}><p>{product.family}</p><h2>{product.name}</h2><div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{product.color}</span></div><div className={styles.cardFooter}><span>Fiyat bilgisi yakında</span>{product.href ? <Link href={product.href} aria-label={`${product.name} ${product.color} ürününü incele`}>İncele <b aria-hidden="true">→</b></Link> : <button type="button" disabled title="Ürün detay tasarımı hazırlanıyor">Hazırlanıyor</button>}</div></div>
     </article>)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
   </section>;
 }

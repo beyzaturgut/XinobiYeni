@@ -16,3 +16,11 @@
 - On demo ürün varyantı, Türkçe metin araması, kategori filtresi, sıralama, sonuç sayacı ve boş sonuç durumu uygulandı.
 - Ana sayfadaki ürün CTA ve navigasyonu gerçek katalog rotasına bağlandı.
 - Fiyat ve stok alanları D02/API verisi gelene kadar açıkça bekleyen bilgi olarak bırakıldı.
+
+## 0.3.0 - 30.09.2026
+
+- WEB-004 `/urunler/cay-makinesi-101` ürün detay rotası eklendi.
+- Lacivert, gümüş gri, kırmızı ve rose gold varyant seçimi ürün fotoğrafına bağlandı.
+- Özellik anlatımı ve D04'e bağlı Xinobi Studio bekleme alanı eklendi.
+- Fiyat/stok doğrulanmadan satın alma eylemi bilinçli olarak devre dışı bırakıldı.
+- Çay Makinesi 101 katalog kartları detay sayfasına; hazır olmayan diğer ürünler açık `Hazırlanıyor` durumuna bağlandı.

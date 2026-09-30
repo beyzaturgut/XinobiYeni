@@ -6,7 +6,7 @@
 - Hedef: `109.104.120.91` Windows IIS
 - Önerilen site adı: `XinobiYeni`
 - Yayın türü: Next.js static export, Docker/Node runtime yok
-- Durum: KISMİ BAŞARILI — IIS/sunucu içi yayın çalışıyor; dış ağ erişimi bekleniyor
+- Durum: BAŞARILI — dış HTTP preview erişimi doğrulandı; HTTPS/üretim kabulü kapsam dışı
 
 ## Güvenli sınır
 
@@ -31,6 +31,9 @@
 - Site oluşturma/binding: tamamlandı; ilk `0014` binding'i `8014` olarak düzeltildi.
 - Fiziksel yol: ilk üst klasör seçimi directory listing gösterdi; `out` klasörüne düzeltilince proje sahibi ana sayfanın açıldığını doğruladı.
 - Sunucu içi HTTP smoke: `http://localhost:8014` kullanıcı tarafından başarılı doğrulandı.
-- Dış ağ HTTP smoke: `http://109.104.120.91:8014` 10 saniye bağlantı timeout; Windows Firewall/AWS inbound kuralı bekleniyor.
+- İlk dış ağ HTTP smoke: `http://109.104.120.91:8014` 10 saniye bağlantı timeout.
+- Düzeltme: Windows Firewall inbound TCP 8014 kuralı proje sahibi tarafından eklendi.
+- Başarılı tekrar: ana sayfa, `/urunler/` ve `/kurumsal/teklif/takip/` dış ağdan HTTP 200; `Microsoft-IIS/10.0` ve beklenen içerik doğrulandı.
+- Dış preview URL: `http://109.104.120.91:8014/`
 - HTTPS: yapılandırılmadı; genel kullanıma hazır kabul edilmez.
 - Geri alma noktası: yeni site olduğundan siteyi durdurma; hedef klasör varsa aktarım öncesi zaman damgalı yedek zorunlu.

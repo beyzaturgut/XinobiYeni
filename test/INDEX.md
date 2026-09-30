@@ -28,3 +28,4 @@
 | TST-024 | 30.09.2026 | Faz02 WEB-007 favoriler | Başarılı; ilk React effect lint hatası düzeltildi, build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-024-phase02-favorites.md` |
 | TST-025 | 30.09.2026 | Faz02 WEB-008 sepet kabuğu | Başarılı lint/build/HTTP smoke; browser interaction QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-025-phase02-basket.md` |
 | TST-026 | 30.09.2026 | Faz02 WEB-009 güvenli ödeme form kabuğu | Başarılı lint/build/HTTP smoke; gerçek sağlayıcı ve browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-026-phase02-checkout.md` |
+| TST-027 | 30.09.2026 | Faz02 WEB-010 ödeme sonucu senaryoları | Başarılı lint/build/HTTP smoke; sağlayıcı/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-027-phase02-payment-result.md` |

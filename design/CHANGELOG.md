@@ -69,3 +69,9 @@
 - WEB-009 `/odeme` teslimat ve ödeme yöntemi form kabuğu eklendi.
 - Kart/havale seçenekleri gösterildi; gerçek hassas ödeme alanları ve işlem eylemi kapalı tutuldu.
 - D02/D03/D05 bağımlılıkları ve verinin gönderilmediği açıkça belirtildi.
+
+## 0.10.0 - 30.09.2026
+
+- WEB-010 `/odeme/sonuc` bekleyen, başarısız ve başarılı ödeme sonucu senaryoları eklendi.
+- Tüm durumlar tasarım önizlemesi olarak etiketlendi; gerçek tahsilat veya sipariş numarası üretilmedi.
+- Sağlayıcı dönüşü, sunucu doğrulaması ve sipariş kesinleştirme sırası görünür kılındı.

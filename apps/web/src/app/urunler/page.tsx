@@ -14,7 +14,7 @@ export default function ProductsPage() {
     <a className={styles.skipLink} href="#catalog">Ürünlere geç</a>
     <header className={styles.header}>
       <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav aria-label="Ürün sayfası menüsü"><Link href="/">Ana sayfa</Link><Link href="/urunler" aria-current="page">Ürünler</Link><Link href="/#kisisellestirme">Kişiselleştir</Link><Link href="/#destek">Destek</Link></nav>
+      <nav aria-label="Ürün sayfası menüsü"><Link href="/">Ana sayfa</Link><Link href="/urunler" aria-current="page">Ürünler</Link><Link href="/arama">Ara ve karşılaştır</Link><Link href="/#kisisellestirme">Kişiselleştir</Link></nav>
       <Link className={styles.backLink} href="/">Ana sayfaya dön <span aria-hidden="true">↗</span></Link>
     </header>
     <main>

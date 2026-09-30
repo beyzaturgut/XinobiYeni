@@ -13,8 +13,8 @@
 .desktopNav a { padding: 12px 2px; border-bottom: 1px solid transparent; }
 .desktopNav a:hover { border-color: white; }
 .navActions { display: flex; gap: 5px; }
-.navActions button { width: 42px; height: 42px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 50%; cursor: pointer; }
-.navActions button:hover { background: rgba(255,255,255,.1); }
+.navActions button, .navActions > a { width: 42px; height: 42px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 50%; cursor: pointer; }
+.navActions button:hover, .navActions > a:hover { background: rgba(255,255,255,.1); }
 .navActions svg { width: 20px; }
 .mobileMenu { display: none; position: relative; }
 
@@ -119,7 +119,7 @@
   .mainNav { height: 72px; grid-template-columns: 66px 1fr auto; padding-inline: 18px; gap: 6px; }
   .brand { width: 54px; height: 61px; }
   .brand img { width: 52px; }
-  .navActions button { width: 36px; height: 36px; }
+  .navActions button, .navActions > a { width: 36px; height: 36px; }
   .navActions button:nth-child(2) { display: none; }
   .hero { min-height: auto; grid-template-columns: 1fr; padding: 0; }
   .heroCopy { padding: 64px 22px 22px; }

@@ -24,3 +24,4 @@
 | TST-020 | 30.09.2026 | Faz02 WEB-004 ürün detay ve dört renk varyantı | Başarılı lint/build/HTTP smoke; browser interaction QA bekliyor | STATIC / BUILD / SMOKE | `2026-09-30/TST-020-phase02-product-detail.md` |
 | TST-021 | 30.09.2026 | Faz02 WEB-005 basit kişiselleştirme stüdyosu | Başarılı lint/build/HTTP smoke; browser interaction QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-021-phase02-simple-personalization.md` |
 | TST-022 | 30.09.2026 | Faz02 WEB-006 gelişmiş editör araç ve katman kabuğu | Başarılı; ilk lint apostrof kaçışı düzeltildi, build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-022-phase02-advanced-editor.md` |
+| TST-023 | 30.09.2026 | Faz02 WEB-003 arama ve karşılaştırma | Başarılı; ilk komut yolu düzeltildi, lint/build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-023-phase02-search-compare.md` |

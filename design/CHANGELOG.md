@@ -41,3 +41,11 @@
 - Masaüstünde araç/tuval/katman üçlüsü; tablet ve telefonda sıralı responsive çalışma düzeni hazırlandı.
 - Basit kişiselleştirmeden gelişmiş editöre ve geri dönüş bağlantıları kuruldu.
 - Yetkili logo kaynağı `design/logo/` altına taşındı ve tasarım kararı yolu güncellendi.
+
+## 0.6.0 - 30.09.2026
+
+- WEB-003 `/arama` arama ve ürün karşılaştırma rotası eklendi.
+- Canlı metin araması, hızlı arama terimleri, boş sonuç ve en fazla üç ürün seçimi uygulandı.
+- Seçilen ürünler erişilebilir, yatay kaydırılabilir özellik tablosunda karşılaştırıldı.
+- D02/API olmadan fiyat veya stok değeri uydurulmadı; bekleme durumu açık gösterildi.
+- Ana sayfa arama eylemi ve katalog navigasyonu yeni rotaya bağlandı.

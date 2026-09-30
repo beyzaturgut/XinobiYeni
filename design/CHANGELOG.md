@@ -141,3 +141,10 @@
 
 - `/xinobi` üst menü bağlantıları ana sayfadaki `0.86rem` navigasyon ölçüsüyle eşitlendi.
 - `/xinobi` footer menüsü ana sayfadaki `0.82rem` bağlantı ölçüsüyle eşitlendi.
+
+## 0.20.0 - 30.09.2026
+
+- WEB-020 `/yasal` gizlilik, çerez, kullanım ve mesafeli satış belge alanları eklendi.
+- Tüm web rotalarında erişilebilen responsive çerez tercih paneli hazırlandı.
+- Zorunlu, analitik ve pazarlama kategori durumları gösterildi; gerçek çerez, analitik, pazarlama veya kalıcı rıza kaydı oluşturulmadı.
+- D10, hukuk metni, üçüncü taraf envanteri ve iletişim kanalı blokajları kullanıcıya görünür kılındı.

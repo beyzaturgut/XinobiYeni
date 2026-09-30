@@ -42,3 +42,4 @@
 | TST-038 | 30.09.2026 | Faz02 WEB-018 AI satış asistanı kabuğu | Başarılı lint/build/static smoke; sağlayıcı/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-038-phase02-ai-sales-assistant.md` |
 | TST-039 | 30.09.2026 | Faz02 WEB-019 kurumsal/içerik kabuğu | Başarılı lint ve 22 sayfalık static export; iki ağ-kısıtlı deneme kayıtlı | STATIC / BUILD / CONTENT CONTRACT | `2026-09-30/TST-039-phase02-corporate-content.md` |
 | TST-040 | 30.09.2026 | WEB-019 menü tipografi eşlemesi | Başarılı lint, TypeScript ve 22/22 static export | STATIC / BUILD / VISUAL TOKEN | `2026-09-30/TST-040-web019-menu-typography.md` |
+| TST-041 | 30.09.2026 | Faz02 WEB-020 yasal/çerez tercih kabuğu | Başarılı lint, 23/23 static export ve kritik sınır smoke | STATIC / BUILD / CONSENT CONTRACT / SMOKE | `2026-09-30/TST-041-phase02-legal-consent.md` |

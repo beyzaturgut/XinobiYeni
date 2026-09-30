@@ -82,3 +82,10 @@
 - Parola görünürlüğü, autocomplete semantiği ve D10 rıza bekleme durumu tasarlandı.
 - Kimlik API'si olmadan form gönderimi ve gerçek oturum/hesap oluşturma devre dışı bırakıldı.
 - Ana sayfa hesap ikonu yeni rotaya bağlandı.
+
+## 0.12.0 - 30.09.2026
+
+- WEB-012 `/hesap` profil ve adres yönetimi kabuğu eklendi.
+- Profil görüntüleme/düzenleme, iletişim tercihi, adres listesi ve yeni adres demo durumları hazırlandı.
+- Tüm müşteri bilgileri örnek olarak etiketlendi; API olmadan kalıcı kayıt veya gerçek müşteri verisi iddiası kurulmadı.
+- D10 veri saklama, hesap silme ve iletişim rızası blokajları görünür tutuldu.

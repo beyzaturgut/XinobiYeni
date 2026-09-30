@@ -95,3 +95,10 @@
 - WEB-013 `/hesap/siparisler` sipariş listesi, detay ve teslimat zaman çizelgesi eklendi.
 - Hazırlanıyor ve kargoda durumları etkileşimli demo senaryoları olarak ayrıldı.
 - Gerçek sipariş/kargo/takip numarası, fiyat anlık görüntüsü ve canlı takip iddiası oluşturulmadı.
+
+## 0.14.0 - 30.09.2026
+
+- WEB-014 `/hesap/siparisler/iade` iptal/iade talebi form kabuğu eklendi.
+- İşlem türü, ürün, neden, açıklama, dosya bekleme ve demo özet durumları tasarlandı.
+- Gerçek talep, uygunluk veya geri ödeme sözü üretilmedi; D03/D10 blokajları görünür tutuldu.
+- Sipariş detayındaki iade eylemi yeni rotaya bağlandı.

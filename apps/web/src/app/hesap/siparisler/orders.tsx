@@ -25,7 +25,7 @@ export default function Orders() {
         <article className={styles.product}><Image src={selected.image} alt={`${selected.name}, ${selected.color}`} sizes="130px" /><div><p>{selected.name}</p><span>{selected.color} · 1 adet</span><small>Fiyat anlık görüntüsü D02/D03 bekleniyor</small></div></article>
         <ol className={styles.timeline}><li className={styles.done}><i>✓</i><div><strong>Sipariş alındı</strong><span>Demo durum</span></div></li><li className={styles.done}><i>✓</i><div><strong>Hazırlanıyor</strong><span>Üretim/kargo API verisi bekleniyor</span></div></li><li className={selected.state === "shipped" ? styles.done : ""}><i>{selected.state === "shipped" ? "✓" : "3"}</i><div><strong>Kargoya verildi</strong><span>{selected.state === "shipped" ? "Demo kargo durumu" : "Henüz doğrulanmadı"}</span></div></li><li><i>4</i><div><strong>Teslim edildi</strong><span>Canlı takip bağlı değil</span></div></li></ol>
         <div className={styles.tracking}><div><small>Kargo firması</small><strong>Sağlayıcı bekleniyor</strong></div><div><small>Takip numarası</small><strong>Oluşturulmadı</strong></div><button type="button" disabled>Kargoyu takip et</button></div>
-        <div className={styles.actions}><button type="button" disabled>Faturayı görüntüle</button><Link href="/#destek">Yardım al</Link><button type="button" disabled>İade talebi</button></div>
+        <div className={styles.actions}><button type="button" disabled>Faturayı görüntüle</button><Link href="/#destek">Yardım al</Link><Link href="/hesap/siparisler/iade">İade talebi</Link></div>
       </section>
     </div>
   </div>;

@@ -20,3 +20,4 @@
 | TST-016 | 30.09.2026 | Faz01 iş sahibi karar formu kapsam kontrolü | Başarılı; D01–D10 ve kapanış alanları doğrulandı | DOCUMENT / CONTRACT | `2026-09-30/TST-016-stakeholder-decision-intake.md` |
 | TST-017 | 30.09.2026 | Uzak SQL Server sürüm, şema, migration ve yetki envanteri | Başarılı; SQL 2022 Express, boş DB ve geçici db_owner yetkisi doğrulandı | CONNECTIVITY / INTEGRATION | `2026-09-30/TST-017-sql-environment-inventory.md` |
 | TST-018 | 30.09.2026 | Faz02 tasarım sistemi ve responsive ana sayfa başlangıcı | Başarılı build/smoke; gerçek tarayıcı görsel QA bekliyor | STATIC / BUILD / SMOKE | `2026-09-30/TST-018-phase02-home-foundation.md` |
+| TST-019 | 30.09.2026 | Faz02 WEB-002 responsive ürün kataloğu | Başarılı lint/build/HTTP smoke; browser interaction QA bekliyor | STATIC / BUILD / SMOKE | `2026-09-30/TST-019-phase02-product-catalog.md` |

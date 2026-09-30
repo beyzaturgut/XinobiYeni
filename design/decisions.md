@@ -2,6 +2,10 @@
 
 Sürüm: `0.1.0` · Tarih: 30.09.2026 · Durum: İlk yön uygulandı, inceleme bekliyor
 
+## Geri bildirim kaydı
+
+- 30.09.2026: Proje sahibi WEB-001 yerel tasarımını inceledikten sonra “gayet iyi” geri bildirimi verdi ve devam edilmesini istedi. Bu geri bildirim yaratıcı yönün sürdürülmesine izin verir; Faz02'nin yedi rol/PM nihai kabul kapısı yerine geçmez.
+
 ## Yaratıcı yön
 
 `Sessiz teknoloji`: ürün fotoğrafını merkeze alan, açık yüzeyler ve koyu teknik alanlarla dengelenen, gereksiz dekorasyondan kaçınan premium ev teknolojisi dili.

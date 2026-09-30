@@ -39,9 +39,9 @@ function Header() {
     <div className={styles.utilityBar}><p>Xinobi ile ev teknolojisini yeniden keşfedin.</p><nav aria-label="Yardımcı bağlantılar"><Link href="#destek">Destek</Link><Link href="#kurumsal">Kurumsal</Link></nav></div>
     <div className={styles.mainNav}>
       <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="#urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav>
+      <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav>
       <div className={styles.navActions}><button type="button" aria-label="Ara"><Icon name="search" /></button><button type="button" aria-label="Hesabım"><Icon name="user" /></button><button type="button" aria-label="Sepet"><Icon name="bag" /></button></div>
-      <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="#urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav></details>
+      <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav></details>
     </div>
   </header>;
 }
@@ -58,13 +58,13 @@ export default function Home() {
     <Header />
     <main id="main-content">
       <section className={styles.hero} aria-labelledby="hero-title">
-        <div className={styles.heroCopy}><p className={styles.heroKicker}>Xinobi ev teknolojileri</p><h1 id="hero-title">Gündelik ritüeller için sessiz teknoloji.</h1><p className={styles.heroLead}>Metalin güçlü karakterini, yalın tasarımı ve kişisel seçimleri aynı üründe buluşturun.</p><div className={styles.heroActions}><Link className={styles.primaryButton} href="#urunler">Ürünleri keşfet <Icon name="arrow" /></Link><Link className={styles.secondaryButton} href="#kisisellestirme">Kişiselleştirmeyi gör</Link></div></div>
+        <div className={styles.heroCopy}><p className={styles.heroKicker}>Xinobi ev teknolojileri</p><h1 id="hero-title">Gündelik ritüeller için sessiz teknoloji.</h1><p className={styles.heroLead}>Metalin güçlü karakterini, yalın tasarımı ve kişisel seçimleri aynı üründe buluşturun.</p><div className={styles.heroActions}><Link className={styles.primaryButton} href="/urunler">Ürünleri keşfet <Icon name="arrow" /></Link><Link className={styles.secondaryButton} href="#kisisellestirme">Kişiselleştirmeyi gör</Link></div></div>
         <div className={styles.heroVisual}><div className={styles.heroHalo} /><Image className={styles.heroProduct} src={teaMaker} alt="Lacivert Xinobi Çay Makinesi 101" priority sizes="(max-width: 820px) 92vw, 52vw" /><div className={styles.heroNote}><span>01</span><p>Renk, form ve kullanım deneyimi tek bir dengede.</p></div></div>
       </section>
 
       <section className={styles.valueStrip} aria-label="Xinobi yaklaşımı"><article><strong>Ürün merkezli</strong><span>Her detay işlevi görünür kılar.</span></article><article><strong>Size özgü</strong><span>Seçili ürünlerde kişisel dokunuş.</span></article><article><strong>Tek deneyim</strong><span>Web ve mobilde aynı Xinobi dili.</span></article></section>
 
-      <section id="urunler" className={styles.section} aria-labelledby="featured-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Öne çıkanlar</p><h2 id="featured-title">Gününüz için tasarlandı.</h2></div><Link className={styles.textLink} href="#kategoriler">Tüm ürünler <Icon name="arrow" /></Link></div><div className={styles.productGrid}>{products.map((product) => <ProductCard key={product.name} product={product} />)}</div></section>
+      <section id="urunler" className={styles.section} aria-labelledby="featured-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Öne çıkanlar</p><h2 id="featured-title">Gününüz için tasarlandı.</h2></div><Link className={styles.textLink} href="/urunler">Tüm ürünler <Icon name="arrow" /></Link></div><div className={styles.productGrid}>{products.map((product) => <ProductCard key={product.name} product={product} />)}</div></section>
 
       <section id="kisisellestirme" className={styles.personalize} aria-labelledby="personalize-title"><div className={styles.personalizeImage}><Image src={coffeeMaker} alt="Gold detaylı Xinobi kahve makinesi" sizes="(max-width: 820px) 100vw, 50vw" /></div><div className={styles.personalizeCopy}><span className={styles.sparkIcon}><Icon name="spark" /></span><p className={styles.eyebrow}>Xinobi Studio</p><h2 id="personalize-title">Ürününüzde size ait bir iz.</h2><p>Seçili ürünlerde renk, yüzey ve kişisel tasarım seçeneklerini tek bir akışta keşfedin.</p><p className={styles.prototypeNote}>Kişiselleştirme ölçüleri ve baskı seçenekleri D04 üretim kararıyla kesinleşecektir.</p><Link className={styles.lightButton} href="#kisisellestirme">Nasıl çalışır? <Icon name="arrow" /></Link></div></section>
 

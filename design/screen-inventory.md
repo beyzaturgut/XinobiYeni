@@ -5,7 +5,7 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | ID | Yüzey / ekran | Rol ve giriş | Ana eylem | Temel veri | Sonraki faz | Tasarım durumu |
 |---|---|---|---|---|---|---|
 | WEB-001 | Ana sayfa | Herkes / doğrudan | Kategori ve ürüne git | Kategori, ürün, medya, içerik | 02,04 | İlk responsive uygulama hazır |
-| WEB-002 | Kategori/liste | Herkes / ana menü, arama | Filtrele, ürüne git | Kategori, ürün, varyant, fiyat, stok | 02,04 | Bekliyor |
+| WEB-002 | Kategori/liste | Herkes / ana menü, arama | Filtrele, ürüne git | Kategori, ürün, varyant, fiyat, stok | 02,04 | İlk responsive uygulama hazır; D02/API ve tarayıcı etkileşim QA bekliyor |
 | WEB-003 | Arama/karşılaştırma | Herkes / header | Ürün bul, karşılaştır | Arama indeksi, ürün, özellik | 02,04 | Bekliyor |
 | WEB-004 | Ürün detay/varyant | Herkes / liste | Varyant seç, sepete ekle | Ürün, varyant, medya, fiyat, stok | 02,04,05 | D02 bekliyor |
 | WEB-005 | Basit kişiselleştirme | Müşteri / ürün | Metin/görsel uygula | Baskı alanı, varlık, fiyat farkı | 02,06 | D04 bekliyor |

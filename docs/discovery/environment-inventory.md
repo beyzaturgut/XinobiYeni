@@ -1,6 +1,6 @@
 # Faz01 — D01 ortam ve depo envanteri
 
-Son doğrulama: 29.09.2026
+Son doğrulama: 30.09.2026
 
 ## Depo
 
@@ -32,18 +32,17 @@ Son doğrulama: 29.09.2026
 | Yerel API | Hazır | `/api/v1/health` HTTP 200 doğrulandı |
 | Web/panel | İskelet hazır | Production build başarılı; tasarım Faz02'ye bağlı |
 | Flutter mobil | İskelet hazır | Analyze/test başarılı; gerçek cihaz build ve editör PoC bekliyor |
-| SQL Server geliştirme | Bloke | `109.104.120.91:1433` ve `SQLEXPRESS` instance keşfi login öncesi timeout; sabit dış TCP port/firewall/VPN bilgisi bekleniyor |
-| SQL veritabanı | Bildirildi, doğrulanamadı | `XinobiYeniDB`; erişim sağlanmadan migration yazılmayacak |
+| SQL Server geliştirme | Kısmi hazır | Sabit dış TCP 64019 üzerinden `WIN-09NT6RPD8SB\\SQLEXPRESS` ve SQL Authentication TST-012'de doğrulandı; TST-013 tekrarında TCP timeout nedeniyle erişim sürekliliği açık risk |
+| SQL veritabanı | Erişim doğrulandı | `XinobiYeniDB` ve `xinobiyeni_app` login'i TST-012'de doğrulandı; mevcut şema/yetki envanteri TST-013 ağ timeout'u nedeniyle bekliyor, bu kontrol olmadan migration yazılmayacak |
 | Mikro | Bilinmiyor | Sürüm, API/SDK/COM ve test şirketi D06 kapsamında gerekli |
 | Ödeme/kargo/bildirim | Bilinmiyor | Sağlayıcı ve sandbox erişimi D05 kapsamında gerekli |
 | Pazaryerleri | Bilinmiyor | Trendyol/Hepsiburada/N11 mağaza ve test erişimleri D06 kapsamında gerekli |
 | AI | Bilinmiyor | Sağlayıcı, kota, maliyet ve politika D05/D08 kapsamında gerekli |
 | Nesne depolama | Seçilmedi | Barındırma kararıyla ayrı ADR |
-| CI/CD | Planlandı | GitHub Actions; gerçek SQL test ortamı oluşunca uygulanacak |
+| CI/CD | Kısmi hazır | Docker'sız GitHub Actions iş akışı mevcut; uzak SQL erişimi süreksiz olduğundan gerçek SQL job'u henüz eklenmedi |
 
 ## D01 sonucu
 
 Karar: **Sıfırdan yeni geliştirme**. Mevcut kod veya migration geçmişi verilmediği için yeniden kullanım iddiası yoktur. Kaynak belgeler hash ile `docs/sources/` altında korunur. D01'in repo ve teknoloji bölümü kapanmıştır; mevcut operasyon/veri örneği ve barındırma envanteri gelene kadar ortam bölümü kısmi açık kalır.
 
 Bu belge sır, parola veya gerçek bağlantı dizisi içermez.
-

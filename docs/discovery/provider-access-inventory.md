@@ -1,12 +1,12 @@
 # Faz01 — Sağlayıcı ve erişim envanteri
 
-Durum: Girdi bekliyor · Son güncelleme: 29.09.2026
+Durum: Girdi bekliyor · Son güncelleme: 30.09.2026
 
 Sırlar, parolalar, tokenlar ve gerçek bağlantı dizileri bu dosyaya yazılmaz. Yalnız erişimin varlığı, sahibi ve güvenli secret-store referansı kaydedilir.
 
 | Sistem | Gerekli bilgi/erişim | Teknik sahip | Test ortamı | Kota/webhook/ağ | Secret referansı | Durum | Etkilediği faz |
 |---|---|---|---|---|---|---|---|
-| SQL Server | Sabit dış TCP portu veya VPN/private ağ; düşük yetkili uygulama ve migration hesabı | Bekliyor | `XinobiYeniDB` bildirildi | SQLEXPRESS instance keşfi dışarıdan başarısız | macOS Keychain geçici giriş mevcut | Bloke | 03–11 |
+| SQL Server | Sabit dış TCP ve düşük yetkili uygulama/migration hesabı | Proje sahibi / teknik ekip | `XinobiYeniDB` doğrulandı | TCP 64019 TST-012'de başarılı; TST-013'te timeout, süreklilik bekliyor | macOS Keychain: `XinobiYeniDB-sql` / `xinobiyeni_app` (parola kaydedilmez) | Kısmi hazır | 03–11 |
 | Ödeme | Sağlayıcı, sandbox merchant, webhook imzası, durum sorgusu ve iade yeteneği | Bekliyor | Bekliyor | Kart verisi uygulamada tutulmaz | Bekliyor | Girdi bekliyor | 05,11 |
 | Kargo | Firma, test hesabı, etiket/takip/iptal API yetenekleri | Bekliyor | Bekliyor | Kota ve callback bekliyor | Bekliyor | Girdi bekliyor | 05,11 |
 | E-posta | Sağlayıcı, domain doğrulama, template ve bounce/webhook | Bekliyor | Bekliyor | Gönderim limiti bekliyor | Bekliyor | Girdi bekliyor | 05,07,11 |
@@ -24,4 +24,3 @@ Sırlar, parolalar, tokenlar ve gerçek bağlantı dizileri bu dosyaya yazılmaz
 | Google Play | Console, signing ve yayın rolleri | Bekliyor | Internal testing bekliyor | Sözleşme/hesap durumu | Bekliyor | Girdi bekliyor | 11 |
 
 Bir satır yalnız gerçek erişimle test edildiğinde `Hazır` olur. Fixture veya fake ile doğrulanan satır `Mock hazır` olarak kalır.
-

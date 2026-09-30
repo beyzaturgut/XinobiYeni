@@ -83,21 +83,24 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-09-29 · Codex uygulama oturumu; proje sahibi teknoloji omurgasını ve geliştirme başlangıcını onayladı |
-| Aktif faz/görev ID | Faz01 / bağımsız hazırlık çıktıları tamam; müşteri operasyon/karar/erişim girdileri bekleniyor |
+| Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
+| Aktif faz/görev ID | Faz01 / veri sahipliği ve durum geçişi karar girdileri; SQL ortam sürekliliği ayrıca bekleniyor |
 | Repo/branch/HEAD | `main` · health değişiklikleri öncesi `5079ddf`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
-| Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL Server erişimi bekliyor |
+| Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL TST-012'de doğrulandı, TST-013'te süreklilik timeout'u oluştu |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
-| Son test komutu ve sonucu | TST-011: 64019 üzerinde SQL Server yanıt verdi; `administrator`/`Administrator` ile XinobiYeniDB ve master girişleri `Login failed` |
-| Değişen dosyalar / migration | TST-011 SQL kimlik doğrulama raporu ve Faz00 blokaj güncellemesi; migration yok |
-| Aktif hata/yarım iş | 64019 TCP/SQL erişilebilir; SQL Authentication kullanıcı/parola reddediliyor. Mixed Mode, SQL Login varlığı/aktifliği ve Keychain parola güncelliği doğrulanmalı. Yerel `gh` aracı bulunmadığı için uzak Actions sonucu sorgulanamadı |
-| Sonraki en küçük güvenli adım | Sunucuda Mixed Mode ve ayrı en az yetkili SQL Login oluşturma/aktiflik durumunu doğrula; yeni kullanıcıyı Keychain üzerinden tekrar test et |
+| Son test komutu ve sonucu | TST-012: `xinobiyeni_app` ile XinobiYeniDB/instance başarılı; TST-013: ertesi gün SQL ve ham TCP 64019 login öncesi timeout |
+| Değişen dosyalar / migration | SQL erişim raporları/envanteri ve `data-ownership-and-state-transitions.md` Faz01 taslağı; migration yok |
+| Aktif hata/yarım iş | Uzak SQL hesabı ve DB erişimi doğrulandı, fakat TCP 64019 erişimi süreksiz; mevcut şema, sürüm ve yetki envanteri alınamadı. Yerel `gh` aracı bulunmadığı için uzak Actions sonucu sorgulanamadı |
+| Sonraki en küçük güvenli adım | D02/D03/D07 iş sahiplerinden veri sahipliği ve geçiş kararlarını al; sunucu erişilebilirken salt okunur SQL envanterini tekrarla |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz01 D02/D03/D07 hazırlığı | `main` / `8e872a7` | Alan bazlı veri sahipliği; sipariş/ödeme/stok/teklif öneri durumları; dış durum eşleme ve karar listesi hazırlandı | Belge yapısı, açık karar işaretleri ve diff kontrolü TST-014 ile doğrulandı | `docs/discovery/data-ownership-and-state-transitions.md`, `test/2026-09-30/TST-014-phase01-data-state-document.md` | Gerçek iş sahiplerinden D02/D03/D07 yanıtlarını al | Codex |
+| 2026-09-30 09:26 | Faz01 SQL ortam envanteri | `main` / `8e872a7` | TST-012 başarısı sonrası sürüm/şema/yetki metadata sorgusu ve ham TCP süreklilik kontrolü yapıldı | TST-013: iki kontrol de login öncesi timeout; DB yazımı/migration yok | `test/2026-09-30/TST-013-sql-availability-recheck.md` | Sunucu erişilebilirken aynı salt okunur envanteri tekrarla | Codex |
+| 2026-09-29 23:37 | Faz01 SQL login | `main` / `8e872a7` | Uygulamaya özel `xinobiyeni_app` ile uzak DB, login ve instance salt okunur sorguyla doğrulandı | TST-012: başarılı, çıkış kodu 0 | `test/2026-09-29/TST-012-sql-login-xinobiyeni-app.md` | SQL sürüm/şema/yetki envanteri | Codex |
 | 2026-09-29 | Faz01 SQL login | `main` / `a3f37f3` | 64019 üzerinden XinobiYeniDB/master ve iki kullanıcı adı biçimiyle salt okunur SQL oturumu denendi | TST-011: ağ başarılı; üç giriş de `Login failed for user` | `test/.../TST-011-sql-login-on-64019.md` | Mixed Mode + ayrı SQL Login + Keychain güncellemesi | Codex |
 | 2026-09-29 | Faz01 SQL aday port | `main` / `3da1c41` | `109.104.120.91:64019` ham TCP erişimi test edildi | TST-010: bağlantı başarılı, çıkış kodu 0 | `test/.../TST-010-sql-external-port-64019.md` | 64019 üzerinden SQL login ve DB seçimi | Codex |
 | 2026-09-29 | Faz01 SQL erişim kanıtı | `main` / `a07c242` | Kesin TCP 1433 bilgisiyle ham bağlantı ve doğrudan sqlcmd/XinobiYeniDB yeniden denendi; kaynak genel IP belirlendi | TST-009: nc ve ODBC timeout; SQL kimlik doğrulamaya ulaşılmadı | `test/.../TST-009-sql-1433-external-connectivity.md` | Sunucuda LISTEN + Windows/AWS ağ kuralı kanıtı; Faz01 girdileri | Codex |

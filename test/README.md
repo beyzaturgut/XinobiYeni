@@ -20,5 +20,5 @@ Yeni raporlar `test/YYYY-MM-DD/TST-###-kisa-ad.md` biçiminde adlandırılır. B
 
 - İlk geriye dönük rapor: `2026-09-29/TST-001-initial-validation-history.md`
 - Son otomatik regresyon: .NET build 0 hata/uyarı; 3/3 test başarılı.
-- Açık dış blokaj: SQL Server bağlantısı login aşamasına ulaşmadan timeout.
-
+- Son başarılı dış SQL kanıtı: TST-012; `xinobiyeni_app` ile `XinobiYeniDB` ve instance doğrulandı.
+- Açık dış blokaj: TST-013 tekrarında uzak TCP 64019 erişimi zaman aşımına uğradı; bağlantı sürekliliği doğrulanmalı.

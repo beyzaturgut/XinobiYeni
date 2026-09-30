@@ -63,3 +63,9 @@
 - D02/D03 kesinleşmeden fiyat, toplam, stok rezervasyonu veya teslimat vaadi üretilmedi.
 - Ödeme eylemi gerekçeli biçimde devre dışı bırakıldı; sunucuda sipariş/ödeme oluşturulmadığı açıklandı.
 - Ana sayfa sepet ikonu gerçek rotaya bağlandı.
+
+## 0.9.0 - 30.09.2026
+
+- WEB-009 `/odeme` teslimat ve ödeme yöntemi form kabuğu eklendi.
+- Kart/havale seçenekleri gösterildi; gerçek hassas ödeme alanları ve işlem eylemi kapalı tutuldu.
+- D02/D03/D05 bağımlılıkları ve verinin gönderilmediği açıkça belirtildi.

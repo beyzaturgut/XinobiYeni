@@ -87,17 +87,18 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Aktif faz/görev ID | Faz02 / v0.20.0 WEB-020 yasal/çerez; D10 hukuk, rıza ve saklama kararları bekleniyor |
 | Repo/branch/HEAD | `main` · WEB-020 öncesi `406c892`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | IIS preview DEPLOY-001 `http://109.104.120.91:8014`; yeni değişiklikler yalnız yerel build/Git'te, deployment talep edilmedi |
-| Son test komutu ve sonucu | TST-041: lint, TypeScript, 23/23 static export ve yasal/çerez kritik sınır HTTP smoke başarılı |
-| Değişen dosyalar / migration | WEB-020 yasal merkez, global tercih paneli, design v0.20.0 ve TST-041; gerçek rıza/çerez/migration yok |
+| Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
+| Son test komutu ve sonucu | TST-042: DEPLOY-002 tam paket 226 girdi, ZIP CRC ve SHA-256 başarılı; IIS smoke bekliyor |
+| Değişen dosyalar / migration | `XinobiYeni-web-14be3ea.zip`, DEPLOY-002 planı ve TST-042; SQL/API/migration değişikliği yok |
 | Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | Faz02 web ekran envanterinin açık responsive/browser QA kanıtlarını sırayla kapat; deployment yalnız proje sahibi açıkça isteyince yapılır |
+| Sonraki en küçük güvenli adım | Proje sahibi DEPLOY-002 paketini RDP'ye aktarır; eski `out` yedeklenerek tam klasör değiştirilir, sonra iç/dış HTTP smoke yapılır |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | DEPLOY-002 hazırlık | `main` / `14be3ea` | Güncel 23 rotalık `out` tam paketlendi; değişen dosya paketi tercih edilmedi | TST-042: 226 girdi, CRC/SHA-256 başarılı | `XinobiYeni-web-14be3ea.zip`, `deployments/DEPLOY-002-web-preview-update.md` | RDP'de yedekle/değiştir/smoke | Codex |
 | 2026-09-30 | Faz02 v0.20.0 / WEB-020 | `main` / `406c892` | Taslak yasal merkez ve global, kayıtsız tercih paneli | TST-041: lint/static export 23 sayfa ve kritik sınır smoke başarılı | `apps/web/src/app/yasal/*`, `apps/web/src/app/legal-consent*`, `test/2026-09-30/TST-041-*` | Faz02 browser/responsive QA; deploy yok | Codex |
 | 2026-09-30 | Faz02 v0.19.1 / WEB-019 | `main` / `b768b20` | `/xinobi` üst ve alt menü puntoları ana sayfa navigasyonuyla eşitlendi | TST-040: lint/static export 22 sayfa başarılı | `apps/web/src/app/xinobi/xinobi.module.css`, `test/2026-09-30/TST-040-*` | WEB-020 yasal/çerez; deploy yok | Codex |
 | 2026-09-30 | Faz02 v0.19.0 / WEB-019 | `main` / `1f24404` | Kurumsal hikâye, tasarım ilkeleri, içerik önizleme ve ana sayfa bağlantıları | TST-039: lint/static export 22 sayfa başarılı; ağ-kısıtlı font denemesi kayıtlı | `apps/web/src/app/xinobi/*`, `test/2026-09-30/TST-039-*` | WEB-020 yasal/çerez; deploy yok | Codex |

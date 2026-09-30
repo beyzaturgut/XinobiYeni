@@ -136,3 +136,8 @@
 - Marka yaklaşımı, tasarım ilkeleri, malzeme anlatısı, içerik kartları ve ürün/asistan yönlendirmeleri hazırlandı.
 - Henüz CMS'de yayınlanmayan metin ve içerikler prototip olarak işaretlendi; nihai kurumsal içerik iddiası engellendi.
 - Ana ve mobil menü ile footer bağlantıları yeni kurumsal rotaya bağlandı.
+
+## 0.19.1 - 30.09.2026
+
+- `/xinobi` üst menü bağlantıları ana sayfadaki `0.86rem` navigasyon ölçüsüyle eşitlendi.
+- `/xinobi` footer menüsü ana sayfadaki `0.82rem` bağlantı ölçüsüyle eşitlendi.

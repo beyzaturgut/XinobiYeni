@@ -1,16 +1,16 @@
 # Faz01 — Creative brief ve medya girdisi
 
-Durum: Marka/ürün sahibi girdisi bekliyor · Faz02'nin tasarım teslimi değildir.
+Durum: Logo, referans yön ve demo ürünler alındı; lisans/nihai marka onayı bekliyor · Faz02'nin tasarım teslimi değildir.
 
 ## Marka girdileri
 
 | Girdi | Beklenen biçim/kanıt | Durum |
 |---|---|---|
-| Logo ve varyasyonları | SVG/vektör kaynak, kullanım kılavuzu | Bekliyor |
-| Renk ve tipografi | Onaylı marka renkleri, font dosyası/lisansı | Bekliyor |
+| Logo ve varyasyonları | SVG/vektör kaynak, kullanım kılavuzu | Beyaz PDF logo alındı; kullanım kılavuzu ve diğer varyasyonlar bekliyor |
+| Renk ve tipografi | Onaylı marka renkleri, font dosyası/lisansı | Dyson yön referansı alındı; özel font kopyalanmadı, lisanslı Inter ile Faz02 v0.1.0 uygulandı |
 | Marka tonu | Kurumsal, B2C ve kurumsal teklif dili örnekleri | Bekliyor |
-| Fotoğraf/görsel | Gerçek ürün görselleri, açı/varyant eşlemesi, kullanım lisansı | Bekliyor |
-| Rakip/referans | Beğenilen/beğenilmeyen örnek ve gerekçe | Bekliyor |
+| Fotoğraf/görsel | Gerçek ürün görselleri, açı/varyant eşlemesi, kullanım lisansı | 18 demo ürün görseli alındı; ad/varyant eşlemesi ve kullanım hakkı onayı bekliyor |
+| Rakip/referans | Beğenilen/beğenilmeyen örnek ve gerekçe | Dyson Türkiye beğenilen referans olarak verildi; ürün odağı ve bilgi hiyerarşisi not edildi |
 | Yasal metin | KVKK, çerez, satış, teslimat/iade metin sahibi | Bekliyor |
 
 ## Ürün ve baskı girdileri
@@ -32,4 +32,3 @@ Durum: Marka/ürün sahibi girdisi bekliyor · Faz02'nin tasarım teslimi değil
 - Creative → Frontend handoff: token, ölçü, breakpoint, asset, lisans, etkileşim ve kabul/eksik kaydı.
 
 Faz02, gerçek marka girdisi olmadan varsayımsal görsel yönü müşteri onayı olarak işaretlemez.
-

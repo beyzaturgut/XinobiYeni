@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.10.0 WEB-010 ödeme sonucu; Faz01 D03/D05 gerçek işlem davranışını blokeliyor |
-| Repo/branch/HEAD | `main` · WEB-010 öncesi `728e719`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Aktif faz/görev ID | Faz02 / v0.11.0 WEB-011 üyelik/oturum; Faz01 D10 ve kimlik API davranışı blokeliyor |
+| Repo/branch/HEAD | `main` · WEB-011 öncesi `dfec7f6`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; ödeme sonucu `http://localhost:3010/odeme/sonuc` |
-| Son test komutu ve sonucu | TST-027: lint, TypeScript, 13/13 statik build ve HTTP güvenlik smoke başarılı |
-| Değişen dosyalar / migration | WEB-010 üç sonuç senaryosu, doğrulama zaman çizgisi, design v0.10.0 ve TST-027; migration yok |
+| Son çalışan uygulama komutu/URL | Güncel Next.js production build `http://localhost:3010`; üyelik `http://localhost:3010/hesap/giris` |
+| Son test komutu ve sonucu | TST-028: ilk apostrof lint hataları düzeltildi; ikinci lint, TypeScript ve 14/14 statik build başarılı |
+| Değişen dosyalar / migration | WEB-011 giriş/kayıt/parola yenileme, güvenli kapalı submit, design v0.11.0 ve TST-028; migration yok |
 | Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | WEB-011 üyelik/oturum kabuğunu gerçek kimlik doğrulaması iddiası kurmadan hazırla |
+| Sonraki en küçük güvenli adım | WEB-012 hesap/adres kabuğunu D10/API sınırlarıyla hazırla |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz02 v0.11.0 / WEB-011 | `main` / `dfec7f6` | Giriş/kayıt/parola yenileme, parola görünürlüğü ve güvenli işlem sınırı | TST-028: ilk lint düzeltildi; lint/build/14 statik sayfa başarılı | `apps/web/src/app/hesap/giris/*`, `test/2026-09-30/TST-028-*` | WEB-012 hesap/adres | Codex |
 | 2026-09-30 | Faz02 v0.10.0 / WEB-010 | `main` / `728e719` | Bekleyen/başarısız/başarılı senaryo, işlem sınırı ve doğrulama sırası | TST-027: lint/build/13 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/odeme/sonuc/*`, `test/2026-09-30/TST-027-*` | WEB-011 üyelik/oturum | Codex |
 | 2026-09-30 | Faz02 v0.9.0 / WEB-009 | `main` / `10f9ebd` | Teslimat formu, kart/havale yöntem görünümü ve güvenli kapalı ödeme alanı | TST-026: lint/build/12 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/odeme/*`, `test/2026-09-30/TST-026-*` | WEB-010 ödeme sonucu kabukları | Codex |
 | 2026-09-30 | Faz02 v0.8.0 / WEB-008 | `main` / `2edab8c` | Demo sepet satırı, adet/çıkarma/boş durum ve güvenli sipariş özeti | TST-025: lint/build/11 statik sayfa ve route güvenlik smoke başarılı | `apps/web/src/app/sepet/*`, `test/2026-09-30/TST-025-*` | WEB-009 ödeme kabuğu | Codex |

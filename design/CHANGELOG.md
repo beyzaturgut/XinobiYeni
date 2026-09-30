@@ -75,3 +75,10 @@
 - WEB-010 `/odeme/sonuc` bekleyen, başarısız ve başarılı ödeme sonucu senaryoları eklendi.
 - Tüm durumlar tasarım önizlemesi olarak etiketlendi; gerçek tahsilat veya sipariş numarası üretilmedi.
 - Sağlayıcı dönüşü, sunucu doğrulaması ve sipariş kesinleştirme sırası görünür kılındı.
+
+## 0.11.0 - 30.09.2026
+
+- WEB-011 `/hesap/giris` giriş, yeni hesap ve parola yenileme kabuğu eklendi.
+- Parola görünürlüğü, autocomplete semantiği ve D10 rıza bekleme durumu tasarlandı.
+- Kimlik API'si olmadan form gönderimi ve gerçek oturum/hesap oluşturma devre dışı bırakıldı.
+- Ana sayfa hesap ikonu yeni rotaya bağlandı.

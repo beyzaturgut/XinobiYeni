@@ -11,7 +11,7 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | WEB-005 | Basit kişiselleştirme | Müşteri / ürün | Metin/stil/renk önizle, demo taslağı hazırla | Baskı alanı, varlık, fiyat farkı | 02,06 | İlk responsive etkileşim kabuğu hazır; D04/API/browser QA bekliyor |
 | WEB-006 | Gelişmiş editör | Müşteri / ürün, tasarımlar | Tasarla, katmanları yönet, demo taslak hazırla | DesignDocument, sürüm, baskı alanı | 02,06 | İlk responsive araç/katman kabuğu hazır; D04/API/browser QA bekliyor |
 | WEB-007 | Favoriler | Üye / hesap, ürün | Demo listeye ekle/çıkar | Kullanıcı, ürün | 02,04 | Responsive demo saklama kabuğu hazır; kimlik/API/browser QA bekliyor |
-| WEB-008 | Sepet | Misafir/üye / header | Satır güncelle, checkout | Sepet, varyant, fiyat, stok | 02,05 | D02/D03 bekliyor |
+| WEB-008 | Sepet | Misafir/üye / header | Demo satır/adet yönet, checkout sınırını gör | Sepet, varyant, fiyat, stok | 02,05 | Responsive demo kabuk hazır; D02/D03/API/browser QA bekliyor |
 | WEB-009 | Ödeme | Misafir/üye / sepet | Ödeme/havale başlat | Checkout, adres, ödeme girişimi | 02,05 | D03/D05 bekliyor |
 | WEB-010 | Ödeme sonucu | Müşteri / sağlayıcı dönüşü | Sonucu gör, tekrar dene | PaymentAttempt, Order | 02,05 | D03/D05 bekliyor |
 | WEB-011 | Üyelik/oturum | Müşteri / header | Kayıt, giriş, parola yenile | User, consent | 02,03 | Bekliyor |

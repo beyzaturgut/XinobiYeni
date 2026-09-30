@@ -56,3 +56,10 @@
 - Katalog kartlarına erişilebilir favoriye ekleme/çıkarma kontrolü bağlandı.
 - Üyelik/API olmadığı için seçimler yalnız tarayıcıda `demo saklama` etiketiyle tutuldu.
 - Favori kartlarında fiyat/stok ve hazır olmayan detay rotaları güvenli bekleme durumunda bırakıldı.
+
+## 0.8.0 - 30.09.2026
+
+- WEB-008 `/sepet` rotası demo satır, adet kontrolü, çıkarma ve boş sepet durumuyla eklendi.
+- D02/D03 kesinleşmeden fiyat, toplam, stok rezervasyonu veya teslimat vaadi üretilmedi.
+- Ödeme eylemi gerekçeli biçimde devre dışı bırakıldı; sunucuda sipariş/ödeme oluşturulmadığı açıklandı.
+- Ana sayfa sepet ikonu gerçek rotaya bağlandı.

@@ -26,3 +26,4 @@
 | TST-022 | 30.09.2026 | Faz02 WEB-006 gelişmiş editör araç ve katman kabuğu | Başarılı; ilk lint apostrof kaçışı düzeltildi, build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-022-phase02-advanced-editor.md` |
 | TST-023 | 30.09.2026 | Faz02 WEB-003 arama ve karşılaştırma | Başarılı; ilk komut yolu düzeltildi, lint/build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-023-phase02-search-compare.md` |
 | TST-024 | 30.09.2026 | Faz02 WEB-007 favoriler | Başarılı; ilk React effect lint hatası düzeltildi, build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-024-phase02-favorites.md` |
+| TST-025 | 30.09.2026 | Faz02 WEB-008 sepet kabuğu | Başarılı lint/build/HTTP smoke; browser interaction QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-025-phase02-basket.md` |

@@ -40,7 +40,7 @@ function Header() {
     <div className={styles.mainNav}>
       <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
       <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav>
-      <div className={styles.navActions}><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><button type="button" aria-label="Hesabım"><Icon name="user" /></button><button type="button" aria-label="Sepet"><Icon name="bag" /></button></div>
+      <div className={styles.navActions}><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><button type="button" aria-label="Hesabım"><Icon name="user" /></button><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link></div>
       <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="#hikaye">Xinobi dünyası</Link></nav></details>
     </div>
   </header>;

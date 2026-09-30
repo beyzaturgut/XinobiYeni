@@ -89,3 +89,9 @@
 - Profil görüntüleme/düzenleme, iletişim tercihi, adres listesi ve yeni adres demo durumları hazırlandı.
 - Tüm müşteri bilgileri örnek olarak etiketlendi; API olmadan kalıcı kayıt veya gerçek müşteri verisi iddiası kurulmadı.
 - D10 veri saklama, hesap silme ve iletişim rızası blokajları görünür tutuldu.
+
+## 0.13.0 - 30.09.2026
+
+- WEB-013 `/hesap/siparisler` sipariş listesi, detay ve teslimat zaman çizelgesi eklendi.
+- Hazırlanıyor ve kargoda durumları etkileşimli demo senaryoları olarak ayrıldı.
+- Gerçek sipariş/kargo/takip numarası, fiyat anlık görüntüsü ve canlı takip iddiası oluşturulmadı.

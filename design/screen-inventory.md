@@ -16,7 +16,7 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | WEB-010 | Ödeme sonucu | Müşteri / sağlayıcı dönüşü | Bekleyen/başarısız/başarılı senaryoyu gör | PaymentAttempt, Order | 02,05 | Senaryo önizleme kabuğu hazır; D03/D05/API/browser QA bekliyor |
 | WEB-011 | Üyelik/oturum | Müşteri / header | Kayıt, giriş, parola yenile | User, consent | 02,03 | Responsive güvenli form kabuğu hazır; kimlik/D10/API/browser QA bekliyor |
 | WEB-012 | Hesap/adres | Üye / hesap | Demo profil/adres durumlarını yönet | Customer, Address | 02,03 | Responsive demo kabuk hazır; D10/kimlik API/browser QA bekliyor |
-| WEB-013 | Sipariş/takip | Üye / hesap | Siparişi ve kargoyu izle | Order, Shipment, history | 02,05 | D03 bekliyor |
+| WEB-013 | Sipariş/takip | Üye / hesap | Demo sipariş ve kargo zaman çizgisini incele | Order, Shipment, history | 02,05 | Responsive senaryo kabuğu hazır; D03/kargo API/browser QA bekliyor |
 | WEB-014 | İptal/iade | Üye / sipariş | Talep aç, sonucu izle | ReturnRequest, ödeme, stok | 02,05 | D03/D10 bekliyor |
 | WEB-015 | Kurumsal teklif | Başvuru sahibi / menü | Talep oluştur | Firma, ürün, adet, termin, dosya | 02,07 | D07 bekliyor |
 | WEB-016 | Teklif takibi | Başvuru sahibi / hesap | Durum/revizyon gör | QuoteRequest, history | 02,07 | D07 bekliyor |

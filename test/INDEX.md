@@ -31,3 +31,4 @@
 | TST-027 | 30.09.2026 | Faz02 WEB-010 ödeme sonucu senaryoları | Başarılı lint/build/HTTP smoke; sağlayıcı/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-027-phase02-payment-result.md` |
 | TST-028 | 30.09.2026 | Faz02 WEB-011 üyelik/oturum kabuğu | Başarılı; ilk JSX apostrof lint hataları düzeltildi, build/smoke geçti | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-028-phase02-account-access.md` |
 | TST-029 | 30.09.2026 | Faz02 WEB-012 hesap/adres kabuğu | Başarılı lint/build/HTTP smoke; kimlik API ve browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-029-phase02-account-address.md` |
+| TST-030 | 30.09.2026 | Faz02 WEB-013 sipariş/kargo takip kabuğu | Başarılı lint/build/HTTP smoke; D03/kargo API/browser QA bekliyor | STATIC / BUILD / SMOKE / INTERACTION CONTRACT | `2026-09-30/TST-030-phase02-orders-tracking.md` |

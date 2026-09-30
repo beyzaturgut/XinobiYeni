@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import styles from "./studio.module.css";
 import teaMaker from "../../../../../public/assets/products/tea-maker-101-blue.webp";
@@ -63,6 +64,7 @@ export default function PersonalizationStudio() {
       <div className={styles.actionPanel}>
         <div><span>Tasarım bedeli</span><strong>Ürün verisi bekleniyor</strong></div>
         <button type="button" className={styles.saveButton} onClick={() => setSaved(true)} disabled={!text.trim()}>Demo taslağını hazırla</button>
+        <Link className={styles.editorLink} href="/urunler/cay-makinesi-101/editor">Gelişmiş editörde devam et <span aria-hidden="true">↗</span></Link>
         <button type="button" className={styles.continueButton} disabled aria-describedby="continue-note">Siparişe devam et</button>
         <p id="continue-note">D04 baskı standardı ile fiyat/stok doğrulanmadan siparişe aktarılamaz.</p>
         <p className={styles.saveStatus} aria-live="polite">{saved ? "Demo taslağınız bu oturum için hazırlandı. Kalıcı kayıt yapılmadı." : ""}</p>

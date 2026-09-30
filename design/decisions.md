@@ -12,7 +12,7 @@ Sürüm: `0.1.0` · Tarih: 30.09.2026 · Durum: İlk yön uygulandı, inceleme b
 
 ## Kaynaklar
 
-- Yetkili Xinobi logo kaynağı: `UX:UI/xinobi logo beyaz.pdf`.
+- Yetkili Xinobi logo kaynağı: `design/logo/xinobi logo beyaz.pdf`.
 - Demo ürün kaynağı: `demo ürünler/`; ürün adları ve ticari bilgiler temsili olarak işaretlenir.
 - Referans: Dyson Türkiye. Alınan ilkeler büyük ürün görseli, açık bilgi hiyerarşisi, kısa CTA metni ve kategori keşfidir. Dyson varlıkları, kodu veya özel fontu kopyalanmaz.
 

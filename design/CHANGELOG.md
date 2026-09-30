@@ -32,3 +32,12 @@
 - D04 kesinleşmeden ürün fotoğrafı üzerinde fiziksel baskı alanı uydurulmadı; önizleme bunun yerine açıkça temsili ayrı bir kartta sunuldu.
 - Demo taslağı yalnız oturum içi durum olarak işaretlendi; gerçek kaydetme ve satın alma eylemleri API, fiyat, stok ve üretim kararı gelene kadar sınırlandı.
 - Ürün detayı ve ana sayfa Studio bağlantıları kişiselleştirme rotasına bağlandı.
+
+## 0.5.0 - 30.09.2026
+
+- WEB-006 `/urunler/cay-makinesi-101/editor` gelişmiş editör rotası eklendi.
+- Metin ve şekil ekleme, katman seçme, görünürlük/kilit durumu ile ön/arka yüz seçimi etkileşimli tasarım kabuğuna bağlandı.
+- Medya yükleme, şablon, gerçek konum/boyut, baskı kontrolü ve sepete aktarım bağımlılıkları açık devre dışı durumlarla gösterildi.
+- Masaüstünde araç/tuval/katman üçlüsü; tablet ve telefonda sıralı responsive çalışma düzeni hazırlandı.
+- Basit kişiselleştirmeden gelişmiş editöre ve geri dönüş bağlantıları kuruldu.
+- Yetkili logo kaynağı `design/logo/` altına taşındı ve tasarım kararı yolu güncellendi.

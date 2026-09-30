@@ -56,10 +56,12 @@
 .actionPanel > div { margin-bottom: 22px; display: flex; justify-content: space-between; gap: 14px; }
 .actionPanel > div span { color: #6b7774; font-size: .68rem; }
 .actionPanel > div strong { font-size: .76rem; font-weight: 550; }
-.saveButton, .continueButton { width: 100%; min-height: 50px; border: 0; font-size: .78rem; font-weight: 650; }
+.saveButton, .continueButton, .editorLink { width: 100%; min-height: 50px; border: 0; font-size: .78rem; font-weight: 650; }
 .saveButton { background: #0b6c68; color: white; cursor: pointer; }
 .saveButton:hover { background: #085954; }
 .saveButton:disabled { background: #cfd7d4; cursor: not-allowed; }
+.editorLink { margin-top: 9px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #16242a; color: #16242a; }
+.editorLink:hover { background: #eef2f0; }
 .continueButton { margin-top: 9px; background: #dfe4e2; color: #7b8583; cursor: not-allowed; }
 .actionPanel > p { margin: 9px 0 0; color: #78827f; font-size: .6rem; line-height: 1.45; }
 .actionPanel .saveStatus { min-height: 32px; color: #176b45; }

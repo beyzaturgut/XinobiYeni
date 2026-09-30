@@ -148,3 +148,10 @@
 - Tüm web rotalarında erişilebilen responsive çerez tercih paneli hazırlandı.
 - Zorunlu, analitik ve pazarlama kategori durumları gösterildi; gerçek çerez, analitik, pazarlama veya kalıcı rıza kaydı oluşturulmadı.
 - D10, hukuk metni, üçüncü taraf envanteri ve iletişim kanalı blokajları kullanıcıya görünür kılındı.
+
+## 0.20.1 - 30.09.2026
+
+- Ana sayfa, katalog ve ürün detayı gerçek Chrome render görüntüleriyle ilk görsel QA grubundan geçirildi.
+- Katalog mobil başlık ölçüsü ve yatay taşma koruması dar ekran için iyileştirildi.
+- Global çerez paneli metninin grid içinde güvenli küçülmesi sağlandı.
+- macOS headless Chrome'un 390 px ekran görüntüsünde minimum layout viewport farkı kaydedildi; 500 px dar ekran geçti, 390 px gerçek cihaz testi açık bırakıldı.

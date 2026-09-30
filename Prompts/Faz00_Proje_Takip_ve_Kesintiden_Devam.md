@@ -89,15 +89,16 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Geliştirme/test/canlı ortamları | macOS geliştirme ve Docker'sız GitHub Actions CI: .NET `10.0.401`, Node `24.20.0`, pnpm `12.6.0`, Flutter `3.47.5`, Dart `3.13.4`; uzak SQL TST-012'de doğrulandı, TST-013'te süreklilik timeout'u oluştu |
 | Son çalışan uygulama komutu/URL | Yerel API: health 200 ve `X-Request-Id` korundu; bilinmeyen yol 404 `application/problem+json` + requestId; süreç test sonrası kapatıldı |
 | Son test komutu ve sonucu | TST-012: `xinobiyeni_app` ile XinobiYeniDB/instance başarılı; TST-013: ertesi gün SQL ve ham TCP 64019 login öncesi timeout |
-| Değişen dosyalar / migration | SQL erişim raporları/envanteri ve `data-ownership-and-state-transitions.md` Faz01 taslağı; migration yok |
+| Değişen dosyalar / migration | SQL erişim raporları/envanteri, veri/durum taslağı ve D01–D10 iş sahibi karar formu; migration yok |
 | Aktif hata/yarım iş | Uzak SQL hesabı ve DB erişimi doğrulandı, fakat TCP 64019 erişimi süreksiz; mevcut şema, sürüm ve yetki envanteri alınamadı. Yerel `gh` aracı bulunmadığı için uzak Actions sonucu sorgulanamadı |
-| Sonraki en küçük güvenli adım | D02/D03/D07 iş sahiplerinden veri sahipliği ve geçiş kararlarını al; sunucu erişilebilirken salt okunur SQL envanterini tekrarla |
+| Sonraki en küçük güvenli adım | `stakeholder-decision-intake.md` üzerinden öncelikle D02/D03/D07 yanıtlarını al; sunucu erişilebilirken salt okunur SQL envanterini tekrarla |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-09-30 | Faz01 karar toplama | `main` / `2abb59e` | D01–D10 için sahip/tarih/kanıt formatlı tek karar formu hazırlandı; tam `nc` komutu tekrar kaydedildi | TST-015 bloke; TST-016 belge kontrolü başarılı | `docs/discovery/stakeholder-decision-intake.md`, `test/2026-09-30/TST-015-*`, `TST-016-*` | İş sahiplerinden öncelikle D02/D03/D07 girdilerini al | Codex |
 | 2026-09-30 | Faz01 D02/D03/D07 hazırlığı | `main` / `8e872a7` | Alan bazlı veri sahipliği; sipariş/ödeme/stok/teklif öneri durumları; dış durum eşleme ve karar listesi hazırlandı | Belge yapısı, açık karar işaretleri ve diff kontrolü TST-014 ile doğrulandı | `docs/discovery/data-ownership-and-state-transitions.md`, `test/2026-09-30/TST-014-phase01-data-state-document.md` | Gerçek iş sahiplerinden D02/D03/D07 yanıtlarını al | Codex |
 | 2026-09-30 09:26 | Faz01 SQL ortam envanteri | `main` / `8e872a7` | TST-012 başarısı sonrası sürüm/şema/yetki metadata sorgusu ve ham TCP süreklilik kontrolü yapıldı | TST-013: iki kontrol de login öncesi timeout; DB yazımı/migration yok | `test/2026-09-30/TST-013-sql-availability-recheck.md` | Sunucu erişilebilirken aynı salt okunur envanteri tekrarla | Codex |
 | 2026-09-29 23:37 | Faz01 SQL login | `main` / `8e872a7` | Uygulamaya özel `xinobiyeni_app` ile uzak DB, login ve instance salt okunur sorguyla doğrulandı | TST-012: başarılı, çıkış kodu 0 | `test/2026-09-29/TST-012-sql-login-xinobiyeni-app.md` | SQL sürüm/şema/yetki envanteri | Codex |

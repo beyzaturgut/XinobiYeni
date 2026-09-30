@@ -16,3 +16,5 @@
 | TST-012 | 29.09.2026 | `xinobiyeni_app` ile uzak SQL Server ve XinobiYeniDB kimlik doğrulaması | Başarılı; veritabanı, login ve instance doğrulandı | CONNECTIVITY / INTEGRATION | `2026-09-29/TST-012-sql-login-xinobiyeni-app.md` |
 | TST-013 | 30.09.2026 | Uzak SQL Server süreklilik ve metadata envanteri tekrar kontrolü | Bloke; SQL login öncesi ve ham TCP bağlantısında timeout | CONNECTIVITY / INTEGRATION | `2026-09-30/TST-013-sql-availability-recheck.md` |
 | TST-014 | 30.09.2026 | Faz01 veri sahipliği ve durum geçişi teslim kontrolü | Başarılı; kapsam, açık karar ayrımı ve belge bağlantıları doğrulandı | DOCUMENT / CONTRACT | `2026-09-30/TST-014-phase01-data-state-document.md` |
+| TST-015 | 30.09.2026 | Bildirilen tam `nc -vz 109.104.120.91 64019` komutuyla tekrar | Bloke; 30 saniyede yanıt yok, önceki süreli kontrolde timeout | CONNECTIVITY | `2026-09-30/TST-015-sql-exact-nc-retry.md` |
+| TST-016 | 30.09.2026 | Faz01 iş sahibi karar formu kapsam kontrolü | Başarılı; D01–D10 ve kapanış alanları doğrulandı | DOCUMENT / CONTRACT | `2026-09-30/TST-016-stakeholder-decision-intake.md` |

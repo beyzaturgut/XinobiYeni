@@ -1,5 +1,13 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.20.6 - 01.10.2026
+
+- 20 web rotasına WCAG 2 A/AA ve 2.1 A/AA axe taraması eklendi.
+- Açık zeminlerdeki yardımcı gri/amber metin renkleri AA kontrastı sağlayan koyu karşılıklarla güncellendi; iki koyu bölümün vurgu renkleri açıldı.
+- Editördeki görsel şekil katmanı düğmesine erişilebilir ad eklendi.
+- Üyelik ve ödeme sonucu için ileri/geri Tab odak testleri; tüm paket için tek worker kararlılığı eklendi.
+- Final erişilebilirlik paketi 22/22, birleşik Playwright regresyonu 35/35, lint ve 23 rota build başarılı; deploy yapılmadı.
+
 ## 0.20.5 - 01.10.2026
 
 - Playwright kritik etkileşim paketi 13 senaryoya genişletildi.

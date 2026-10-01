@@ -16,7 +16,7 @@
 .halo { position: absolute; width: min(47vw,650px); aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.78); box-shadow: 0 30px 85px rgba(32,48,52,.12); }
 .imageStage img { width: auto; height: min(74vh,700px); max-width: 88%; position: relative; z-index: 1; object-fit: contain; mix-blend-mode: multiply; animation: reveal .35s ease; }
 .productInfo { padding: clamp(44px,5.5vw,88px); display: flex; flex-direction: column; justify-content: center; background: white; }
-.breadcrumb { margin-bottom: 42px; display: flex; gap: 9px; color: #77827f; font-size: .7rem; }
+.breadcrumb { margin-bottom: 42px; display: flex; gap: 9px; color: #52605d; font-size: .7rem; }
 .breadcrumb a:hover { color: #16242a; }
 .eyebrow { margin: 0 0 14px; color: #0b6c68; font-size: .7rem; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; }
 .productInfo h1 { margin: 0; font-size: clamp(3rem,5vw,5.9rem); font-weight: 380; line-height: .92; letter-spacing: -.06em; }
@@ -24,7 +24,7 @@
 .pendingPrice { margin-top: 32px; padding: 22px 0; display: grid; gap: 6px; border-top: 1px solid #d9dfdd; border-bottom: 1px solid #d9dfdd; }
 .pendingPrice span { color: #6c7779; font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; }
 .pendingPrice strong { font-size: 1.15rem; font-weight: 500; }
-.pendingPrice p { margin: 0; color: #758083; font-size: .68rem; }
+.pendingPrice p { margin: 0; color: #52605d; font-size: .68rem; }
 .variants { margin: 28px 0 0; padding: 0; border: 0; }
 .variants legend { margin-bottom: 15px; font-size: .78rem; }
 .variants legend strong { font-weight: 600; }
@@ -39,7 +39,7 @@
 .actions button { background: #dfe4e2; color: #75807d; cursor: not-allowed; }
 .actions a { justify-content: space-between; border: 1px solid #8b9693; }
 .actions a:hover { background: #f1f4f2; }
-.purchaseNote { margin: 10px 0 0; color: #758083; font-size: .65rem; }
+.purchaseNote { margin: 10px 0 0; color: #52605d; font-size: .65rem; }
 .summary { margin: 34px 0 0; padding: 0; list-style: none; display: grid; gap: 16px; }
 .summary li { display: grid; grid-template-columns: 30px 1fr; gap: 12px; }
 .summary li > span { color: #0b6c68; font-size: .65rem; }
@@ -54,6 +54,7 @@
 .featureGrid h3 { margin: 44px 0 12px; font-size: 1.25rem; font-weight: 500; }
 .featureGrid p { margin: 0; color: #687477; font-size: .8rem; line-height: 1.65; }
 .personalization { max-width: 1500px; margin: 0 auto; padding: clamp(70px,9vw,130px) clamp(20px,7vw,110px); display: grid; grid-template-columns: 1fr .8fr; gap: clamp(45px,8vw,130px); align-items: center; background: #101b20; color: white; }
+.personalization .eyebrow { color: #8cd5cd; }
 .personalization > div:first-child > p:not(.eyebrow) { max-width: 670px; color: #c4cfcc; line-height: 1.7; }
 .placeholder { min-height: 300px; padding: 42px; display: grid; place-items: center; align-content: center; gap: 18px; text-align: center; border: 1px dashed #60706c; background: #17262b; }
 .placeholder > span { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid #60706c; border-radius: 50%; color: #8cd5cd; font-size: 1.4rem; }

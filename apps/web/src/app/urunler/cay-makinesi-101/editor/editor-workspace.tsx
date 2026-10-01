@@ -51,7 +51,7 @@ export default function EditorWorkspace() {
           <div className={styles.halo} />
           <Image src={teaMaker} alt={`Lacivert Çay Makinesi 101, ${face.toLocaleLowerCase("tr-TR")} temsili görünümü`} priority sizes="(max-width: 980px) 90vw, 52vw" />
           <div className={styles.designBoard} aria-label="Temsili tasarım alanı">
-            {layers.filter((layer) => layer.visible).map((layer, index) => <button type="button" key={layer.id} className={selected === layer.id ? styles.selectedObject : ""} onClick={() => setSelected(layer.id)} disabled={layer.locked} style={{ transform: `translate(${index * 5}px, ${index * 32}px)` }}>{layer.type === "Şekil" ? <span className={styles.shape} /> : layer.name}</button>)}
+            {layers.filter((layer) => layer.visible).map((layer, index) => <button type="button" key={layer.id} aria-label={layer.type === "Şekil" ? layer.name : undefined} className={selected === layer.id ? styles.selectedObject : ""} onClick={() => setSelected(layer.id)} disabled={layer.locked} style={{ transform: `translate(${index * 5}px, ${index * 32}px)` }}>{layer.type === "Şekil" ? <span className={styles.shape} /> : layer.name}</button>)}
           </div>
         </div>
         <p className={styles.canvasDisclaimer}>Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.</p>

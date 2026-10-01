@@ -12,7 +12,7 @@
 .intro { padding: clamp(70px,9vw,130px) clamp(20px,7vw,110px) 70px; background: linear-gradient(115deg,#dce3e0,#f4f4f0 58%,#e7eae6); }
 .intro p { margin: 0 0 16px; color: #0b6c68; font-size: .72rem; font-weight: 650; letter-spacing: .14em; text-transform: uppercase; }
 .intro h1 { max-width: 900px; margin: 0; font-size: clamp(3.1rem,6.4vw,7rem); font-weight: 380; letter-spacing: -.06em; line-height: .92; }
-.intro span { display: block; margin-top: 34px; color: #5b686c; font-size: .78rem; }
+.intro span { display: block; margin-top: 34px; color: #52605d; font-size: .78rem; }
 .catalog { max-width: 1500px; margin: 0 auto; padding: 54px clamp(20px,4vw,58px) 120px; }
 .toolbar { display: grid; grid-template-columns: minmax(280px,560px) 210px; justify-content: space-between; gap: 24px; align-items: end; }
 .search label, .sort label { display: block; margin-bottom: 9px; color: #596569; font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }

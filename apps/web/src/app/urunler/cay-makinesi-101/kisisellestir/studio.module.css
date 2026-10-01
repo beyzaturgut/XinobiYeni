@@ -14,7 +14,7 @@
 .previewHeader { display: flex; justify-content: space-between; align-items: start; gap: 28px; }
 .previewHeader p { margin: 0 0 8px; color: #0b6c68; font-size: .68rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
 .previewHeader h1 { margin: 0; font-size: clamp(2.2rem,4vw,4.7rem); font-weight: 380; letter-spacing: -.055em; line-height: .95; }
-.previewHeader > span { padding: 8px 11px; border: 1px solid #bdc8c5; color: #63706d; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
+.previewHeader > span { padding: 8px 11px; border: 1px solid #bdc8c5; color: #52605d; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
 .productStage { min-height: 580px; flex: 1; position: relative; display: grid; place-items: center; overflow: hidden; }
 .halo { position: absolute; width: min(48vw,650px); aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.72); box-shadow: 0 28px 80px rgba(30,47,51,.1); }
 .productStage > img { width: auto; height: min(67vh,650px); max-width: 75%; position: relative; z-index: 1; object-fit: contain; mix-blend-mode: multiply; }
@@ -38,10 +38,10 @@
 .sectionTitle h2 { margin: 0; font-size: .84rem; font-weight: 650; }
 .controlSection label { display: block; margin-bottom: 8px; color: #677370; font-size: .68rem; }
 .controlSection input { width: 100%; height: 48px; padding: 0 13px; border: 1px solid #bdc7c4; color: #16242a; }
-.fieldHint { margin-top: 8px; display: flex; justify-content: space-between; color: #7b8583; font-size: .6rem; }
+.fieldHint { margin-top: 8px; display: flex; justify-content: space-between; color: #52605d; font-size: .6rem; }
 .styleChoices { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
 .styleChoices button { min-width: 0; min-height: 72px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #cbd3d1; background: white; cursor: pointer; }
-.styleChoices button:hover { border-color: #75817e; }
+.styleChoices button:hover { border-color: #52605d; }
 .styleChoices button.selectedChoice { border: 2px solid #16242a; }
 .styleChoices strong { font-size: 1rem; font-weight: 450; }
 .styleChoices button[data-style="Geometrik"] strong { font-weight: 750; letter-spacing: .08em; }
@@ -54,7 +54,7 @@
 .colorChoices small { color: #65716f; font-size: .55rem; }
 .actionPanel { padding-top: 28px; }
 .actionPanel > div { margin-bottom: 22px; display: flex; justify-content: space-between; gap: 14px; }
-.actionPanel > div span { color: #6b7774; font-size: .68rem; }
+.actionPanel > div span { color: #52605d; font-size: .68rem; }
 .actionPanel > div strong { font-size: .76rem; font-weight: 550; }
 .saveButton, .continueButton, .editorLink { width: 100%; min-height: 50px; border: 0; font-size: .78rem; font-weight: 650; }
 .saveButton { background: #0b6c68; color: white; cursor: pointer; }
@@ -62,8 +62,8 @@
 .saveButton:disabled { background: #cfd7d4; cursor: not-allowed; }
 .editorLink { margin-top: 9px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #16242a; color: #16242a; }
 .editorLink:hover { background: #eef2f0; }
-.continueButton { margin-top: 9px; background: #dfe4e2; color: #7b8583; cursor: not-allowed; }
-.actionPanel > p { margin: 9px 0 0; color: #78827f; font-size: .6rem; line-height: 1.45; }
+.continueButton { margin-top: 9px; background: #dfe4e2; color: #52605d; cursor: not-allowed; }
+.actionPanel > p { margin: 9px 0 0; color: #52605d; font-size: .6rem; line-height: 1.45; }
 .actionPanel .saveStatus { min-height: 32px; color: #176b45; }
 
 @media (max-width: 1050px) {

@@ -15,9 +15,9 @@
 .searchBox { max-width: 900px; height: 68px; padding: 0 20px; display: flex; align-items: center; gap: 14px; border: 1px solid #b7c3bf; background: white; box-shadow: 0 18px 45px rgba(30,47,51,.06); }
 .searchBox > span { font-size: 1.45rem; transform: rotate(-15deg); }
 .searchBox input { min-width: 0; flex: 1; border: 0; outline: 0; font-size: clamp(.9rem,2vw,1.15rem); }
-.searchBox kbd { padding: 6px 8px; border: 1px solid #cad2d0; background: #f4f6f5; color: #75817e; font-size: .52rem; }
+.searchBox kbd { padding: 6px 8px; border: 1px solid #cad2d0; background: #f4f6f5; color: #52605d; font-size: .52rem; }
 .quickLinks { margin-top: 18px; display: flex; align-items: center; flex-wrap: wrap; gap: 9px; }
-.quickLinks > span { margin-right: 7px; color: #6c7874; font-size: .6rem; }
+.quickLinks > span { margin-right: 7px; color: #52605d; font-size: .6rem; }
 .quickLinks button { min-height: 32px; padding: 0 13px; border: 1px solid #aebbb7; border-radius: 999px; background: transparent; color: #394743; cursor: pointer; font-size: .65rem; }
 .results, .compare { max-width: 1480px; margin: 0 auto; padding: 70px clamp(20px,4vw,58px); }
 .sectionHeader { margin-bottom: 28px; display: flex; justify-content: space-between; align-items: end; gap: 24px; }
@@ -33,7 +33,7 @@
 .productCopy { padding: 22px; }
 .productCopy > p { margin: 0 0 7px; color: #0b6c68; font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
 .productCopy h3 { margin: 0; font-size: 1.15rem; font-weight: 550; }
-.productCopy > span { min-height: 42px; margin-top: 9px; display: block; color: #687471; font-size: .68rem; line-height: 1.5; }
+.productCopy > span { min-height: 42px; margin-top: 9px; display: block; color: #52605d; font-size: .68rem; line-height: 1.5; }
 .productCopy > div { margin-top: 18px; padding-top: 17px; display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid #dce2df; }
 .productCopy button { min-height: 36px; padding: 0 11px; border: 1px solid #9ba8a4; background: white; cursor: pointer; font-size: .62rem; }
 .productCopy button[aria-pressed="true"] { border-color: #0b6c68; background: #e7f2ef; color: #075d59; }
@@ -42,7 +42,7 @@
 .empty { min-height: 340px; display: grid; place-items: center; align-content: center; text-align: center; background: white; }
 .empty > span { font-size: 2.8rem; color: #82908c; }
 .empty h2 { margin: 14px 0 6px; font-weight: 450; }
-.empty p { margin: 0; color: #697572; }
+.empty p { margin: 0; color: #52605d; }
 .empty button { margin-top: 20px; min-height: 42px; padding: 0 17px; border: 0; background: #0b6c68; color: white; }
 .compare { padding-top: 40px; padding-bottom: 120px; }
 .compareTable { overflow-x: auto; border: 1px solid #ccd4d1; background: white; }
@@ -53,7 +53,7 @@
 .compareTable thead button { float: right; border: 0; background: transparent; color: #aab7b3; font-size: 1rem; }
 .compareTable tbody th { color: #5e6b68; font-weight: 550; }
 .waiting { color: #93641e; font-size: .62rem; }
-.compareEmpty { padding: 55px 20px; border: 1px dashed #b8c3bf; color: #687471; text-align: center; font-size: .72rem; }
+.compareEmpty { padding: 55px 20px; border: 1px dashed #b8c3bf; color: #52605d; text-align: center; font-size: .72rem; }
 
 @media (max-width: 900px) { .resultGrid { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 680px) {

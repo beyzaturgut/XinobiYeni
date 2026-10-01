@@ -1,5 +1,11 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.20.8 - 01.10.2026
+
+- Ana sayfa, Xinobi dünyası ve yasal merkez için iç hedef ve rota bağlantısı smoke testleri eklendi.
+- Faz02 planı mevcut kanıtla karşılaştırılarak `design/faz02-open-acceptance.md` açık kabul listesi oluşturuldu.
+- Web prototip kanıtları ile panel, mobil, handoff, gerçek cihaz, karar ve gerçek rol/PM eksikleri birbirinden ayrıldı; Faz02 yanlış biçimde tamamlandı işaretlenmedi.
+
 ## 0.20.7 - 01.10.2026
 
 - Katalog kategori/arama/sıralama/boş durum, ürün renk varyantı, katalog-favori geçişi, ödeme yöntemi ve basit kişiselleştirme Playwright kapsamına eklendi.

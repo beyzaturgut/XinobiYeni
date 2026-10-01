@@ -83,21 +83,22 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-09-30 · Codex uygulama oturumu; uzak SQL erişimi ve sürekliliği yeniden değerlendirildi |
-| Aktif faz/görev ID | Faz02 / v0.20.1 responsive/browser QA grubu 01; D02/D03/D04/D10 blokajları sürüyor |
-| Repo/branch/HEAD | `main` · QA öncesi `1f399f4`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-01 · Codex uygulama oturumu; Faz02 tarayıcı QA sürdürüldü |
+| Aktif faz/görev ID | Faz02 / responsive/browser QA grubu 02; D02/D03/D04/D10 blokajları sürüyor |
+| Repo/branch/HEAD | `main` · QA grubu 02 kaynağı `066c02a`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-043: Chrome 1440/500 px görsel QA kısmi başarılı; lint, TypeScript, 23/23 export geçti; 390 px gerçek cihaz açık |
-| Değişen dosyalar / migration | Katalog dar ekran başlık/taşma ve çerez paneli grid düzeltmesi, design v0.20.1, TST-043; migration yok |
+| Son test komutu ve sonucu | TST-044: WEB-003/005/006/008/009/010 altı rota 500 px Chrome görsel QA geçti; interaction/gerçek cihaz açık |
+| Değişen dosyalar / migration | QA grubu 02 yalnız test/envanter dokümantasyonu; uygulama, migration ve deploy paketi değişmedi |
 | Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | WEB-003 ve WEB-005–010 Chrome responsive/interaction QA grubu; DEPLOY-002 kurulursa ayrıca iç/dış HTTP smoke |
+| Sonraki en küçük güvenli adım | WEB-007 ve WEB-011–016 Chrome responsive görsel QA grubu; ardından interaction/klavye test altyapısı |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Faz02 QA-02 | `main` / `066c02a` | WEB-003/005/006/008/009/010 altı rota Chrome 500 px render incelemesi | TST-044: ilk görünür alanlar geçti; interaction/gerçek cihaz açık | `test/2026-10-01/TST-044-*` | WEB-007/011–016 QA | Codex |
 | 2026-09-30 | Faz02 v0.20.1 / QA-01 | `main` / `1f399f4` | WEB-001/002/004 ve global consent Chrome render; katalog/consent taşma koruması | TST-043: 1440/500 px geçti; lint/export 23 sayfa; 390 gerçek cihaz açık | `test/2026-09-30/TST-043-*` | WEB-003/005–010 QA | Codex |
 | 2026-09-30 | DEPLOY-002 hazırlık | `main` / `14be3ea` | Güncel 23 rotalık `out` tam paketlendi; değişen dosya paketi tercih edilmedi | TST-042: 226 girdi, CRC/SHA-256 başarılı | `XinobiYeni-web-14be3ea.zip`, `deployments/DEPLOY-002-web-preview-update.md` | RDP'de yedekle/değiştir/smoke | Codex |
 | 2026-09-30 | Faz02 v0.20.0 / WEB-020 | `main` / `406c892` | Taslak yasal merkez ve global, kayıtsız tercih paneli | TST-041: lint/static export 23 sayfa ve kritik sınır smoke başarılı | `apps/web/src/app/yasal/*`, `apps/web/src/app/legal-consent*`, `test/2026-09-30/TST-041-*` | Faz02 browser/responsive QA; deploy yok | Codex |

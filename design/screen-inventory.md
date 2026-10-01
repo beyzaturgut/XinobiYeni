@@ -6,14 +6,14 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 |---|---|---|---|---|---|---|
 | WEB-001 | Ana sayfa | Herkes / doğrudan | Kategori ve ürüne git | Kategori, ürün, medya, içerik | 02,04 | Masaüstü ve 500 px Chrome görsel QA geçti; 390 px gerçek cihaz/interaction QA bekliyor |
 | WEB-002 | Kategori/liste | Herkes / ana menü, arama | Filtrele, ürüne git | Kategori, ürün, varyant, fiyat, stok | 02,04 | 500 px Chrome görsel QA ve taşma düzeltmesi geçti; D02/API/interaction/gerçek cihaz QA bekliyor |
-| WEB-003 | Arama/karşılaştırma | Herkes / header | Ürün bul, en fazla üç ürünü karşılaştır | Arama indeksi, ürün, özellik | 02,04 | İlk responsive etkileşim kabuğu hazır; API/browser QA bekliyor |
+| WEB-003 | Arama/karşılaştırma | Herkes / header | Ürün bul, en fazla üç ürünü karşılaştır | Arama indeksi, ürün, özellik | 02,04 | 500 px Chrome görsel QA geçti; API/interaction/gerçek cihaz QA bekliyor |
 | WEB-004 | Ürün detay/varyant | Herkes / liste | Varyant seç, sepete ekle | Ürün, varyant, medya, fiyat, stok | 02,04,05 | Masaüstü Chrome görsel QA geçti; D02/API/mobil/interaction QA bekliyor |
-| WEB-005 | Basit kişiselleştirme | Müşteri / ürün | Metin/stil/renk önizle, demo taslağı hazırla | Baskı alanı, varlık, fiyat farkı | 02,06 | İlk responsive etkileşim kabuğu hazır; D04/API/browser QA bekliyor |
-| WEB-006 | Gelişmiş editör | Müşteri / ürün, tasarımlar | Tasarla, katmanları yönet, demo taslak hazırla | DesignDocument, sürüm, baskı alanı | 02,06 | İlk responsive araç/katman kabuğu hazır; D04/API/browser QA bekliyor |
+| WEB-005 | Basit kişiselleştirme | Müşteri / ürün | Metin/stil/renk önizle, demo taslağı hazırla | Baskı alanı, varlık, fiyat farkı | 02,06 | 500 px Chrome görsel QA geçti; D04/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-006 | Gelişmiş editör | Müşteri / ürün, tasarımlar | Tasarla, katmanları yönet, demo taslak hazırla | DesignDocument, sürüm, baskı alanı | 02,06 | 500 px Chrome görsel QA geçti; D04/API/interaction/gerçek cihaz QA bekliyor |
 | WEB-007 | Favoriler | Üye / hesap, ürün | Demo listeye ekle/çıkar | Kullanıcı, ürün | 02,04 | Responsive demo saklama kabuğu hazır; kimlik/API/browser QA bekliyor |
-| WEB-008 | Sepet | Misafir/üye / header | Demo satır/adet yönet, checkout sınırını gör | Sepet, varyant, fiyat, stok | 02,05 | Responsive demo kabuk hazır; D02/D03/API/browser QA bekliyor |
-| WEB-009 | Ödeme | Misafir/üye / sepet | Teslimat/yöntem kabuğunu incele | Checkout, adres, ödeme girişimi | 02,05 | Güvenli responsive form kabuğu hazır; D02/D03/D05/API/browser QA bekliyor |
-| WEB-010 | Ödeme sonucu | Müşteri / sağlayıcı dönüşü | Bekleyen/başarısız/başarılı senaryoyu gör | PaymentAttempt, Order | 02,05 | Senaryo önizleme kabuğu hazır; D03/D05/API/browser QA bekliyor |
+| WEB-008 | Sepet | Misafir/üye / header | Demo satır/adet yönet, checkout sınırını gör | Sepet, varyant, fiyat, stok | 02,05 | 500 px Chrome görsel QA geçti; D02/D03/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-009 | Ödeme | Misafir/üye / sepet | Teslimat/yöntem kabuğunu incele | Checkout, adres, ödeme girişimi | 02,05 | 500 px Chrome görsel QA geçti; D02/D03/D05/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-010 | Ödeme sonucu | Müşteri / sağlayıcı dönüşü | Bekleyen/başarısız/başarılı senaryoyu gör | PaymentAttempt, Order | 02,05 | 500 px Chrome bekleyen durum görsel QA geçti; diğer durum/interaction/gerçek cihaz QA bekliyor |
 | WEB-011 | Üyelik/oturum | Müşteri / header | Kayıt, giriş, parola yenile | User, consent | 02,03 | Responsive güvenli form kabuğu hazır; kimlik/D10/API/browser QA bekliyor |
 | WEB-012 | Hesap/adres | Üye / hesap | Demo profil/adres durumlarını yönet | Customer, Address | 02,03 | Responsive demo kabuk hazır; D10/kimlik API/browser QA bekliyor |
 | WEB-013 | Sipariş/takip | Üye / hesap | Demo sipariş ve kargo zaman çizgisini incele | Order, Shipment, history | 02,05 | Responsive senaryo kabuğu hazır; D03/kargo API/browser QA bekliyor |

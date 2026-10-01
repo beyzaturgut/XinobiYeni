@@ -1,5 +1,13 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.23.0 - 01.10.2026
+
+- WEB-001 ortak yönü, üretim uygulamasından ayrı yüksek doğruluklu HTML/CSS tasarım prototipine dönüştürüldü.
+- Gerçek Xinobi logo/demo ürün varlıklarıyla 1440, 1024, 768, 390 ve 320 px tam sayfa PNG çıktıları üretildi.
+- Creative/Web Designer ilk QA'sındaki mobil “Temsilidir”, Nobi simgesi, logo boşluğu, XINOBI U ürün çerçevesi ve yatay ray kullanılabilirliği bulguları düzeltildi.
+- Desenler ve XINOBI U özel kategori girişleri, görünür focus stili ve responsive scroll-snap eklendi.
+- Beş kırılımda 14/14 görsel yüklendi; yatay sayfa taşması yok, tek `h1`/`main` doğrulandı. Üretim web kodu ve deploy değiştirilmedi.
+
 ## 0.22.0 - 01.10.2026
 
 - Proje sahibi ortak tek tasarım çalışmasının başlamasını onayladı; Creative Designer ve Web Designer alternatif yönler yerine aynı brief üzerinde birleşti.

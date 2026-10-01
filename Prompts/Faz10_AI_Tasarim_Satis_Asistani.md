@@ -8,7 +8,7 @@ Faz03 kimlik/rol, API, worker, kontrollü medya depolama; Faz04 yayınlanmış �
 
 **Sınır:** Yeni görüntü modeli eğitimi, CRM ürünü veya ayrı çağrı merkezi eklenmez. Maliyet/limit ve bilgi güvenliği bu iki işlevin parçasıdır.
 
-**AI-P01 — kullanıcı onayı zorunlu sağlayıcı seçimi:** CTO Advisor, Cloudflare Workers AI dahil en az iki uygun adayı resmi güncel dokümanlarla karşılaştırır. Değerlendirme; text-to-image ve gereken image-to-image/edit yetenekleri, dört kullanılabilir adayın üretimi, içerik güvenliği, giriş/çıktı sahipliği ve eğitimde kullanım koşulu, veri bölgesi/saklama, fiyat-kota, gecikme/asenkron iş, gözlemlenebilirlik, SLA ve sağlayıcıdan çıkış/fixture planını kapsar. Önerilen API yalnız karar belgesine yazılır; proje sahibi `AI-P01 ONAY` vermeden SDK/paket, hesap, secret, model adı, adaptör veya ücretli çağrı eklenmez. Cloudflare örnektir, peşinen seçilmiş sağlayıcı değildir.
+**AI-P01 — Cloudflare Workers AI onaylandı:** Proje sahibi 01.10.2026'da Cloudflare Workers AI'ı AI görsel sağlayıcısı olarak seçti. Entegrasyon `IImageGenerationProvider` ve `IImageEditingProvider` arkasında kalır; istemciler Cloudflare'ı doğrudan çağırmaz. Faz10 başlangıcında FLUX ailesindeki güncel uygun model, ticari lisans, image-to-image/edit sınırı, dört aday kalitesi, moderasyon, veri kullanımı/bölgesi, fiyat/kota, gecikme ve çıktı formatı resmi doküman ve PoC ile doğrulanır. Model adı şimdiden kalıcı kod sözleşmesine gömülmez. API hesabı, secret, adaptör ve ücretli çağrı yalnız 10.01–10.05 sırası ve D05/D08/D10 kapılarıyla eklenir.
 
 ## 2. Sözleşme, veri ve tasarım handoff'u
 
@@ -31,7 +31,7 @@ API önerisi: `POST /api/v1/ai/design-jobs` (prompt, tema, renk, stil, sektör, 
 | ID | Görev ve çıktı | Doğrulama |
 |---|---|---|
 | 10.01 | BA ve PM D05/D08/D10'u, prompt ve bilgi yayını yetkilisini, kullanıcı limit dönemi/ücretsiz hak/yenileme, maliyet tavanı, uygunsuz içerik politikası, sağlayıcı veri kullanımını ve handoff adreslerini iş sahibiyle kaydeder. | D kararlarının sahibi/kanıtı, örnek kabul senaryoları ve blokaj Faz00'da. |
-| 10.01A | CTO Advisor AI-P01 aday karşılaştırmasını ve birincil/yedek önerisini resmi kaynak, tarih, fiyat varsayımı, veri riski ve çıkış planıyla sunar; proje sahibi kararını verir. | `AI-P01 ONAY/RED/REVİZYON` Faz00'da; onay öncesi entegrasyon veya ücretli istek yok. |
+| 10.01A | CTO Advisor seçilmiş Cloudflare Workers AI için güncel model/yetenek/lisans/veri/fiyat doğrulamasını, PoC test setini ve sağlayıcıdan çıkış planını sunar. | `AI-P01 ONAY` Faz00/ADR-002'de; gerçek adaptör ancak D05/D08/D10 ve PoC kapılarıyla. |
 | 10.02 | Creative tasarım paketi üretir; FE UI/UX etkileşim ve erişilebilirlik kabulünü kaydeder. | Her AI işi bekliyor, çalışıyor, başarı, hata, tekrar, uygunsuz ve kota dolu görünür; tutar/teslimat kesin vaat edilmez. |
 | 10.03 | DBA migration ile AI tablolarını, kullanıcı sahiplik ve referans bütünlüğünü, geçmiş ve kullanım indekslerini kurar; medya depolama yaşam döngüsü D10'a bağlanır. | Migration geri alınabilir, aynı job/callback iki varlık veya iki tüketim yaratmaz. |
 | 10.04 | BE prompt/parametre doğrulama, moderasyon (girdi ve çıktı), kullanıcı ve servis limitini transaction ile ayırma, worker kuyruğu, başarısızlıkta kota iadesi ve ücret ölçümünü kurar. | Eşzamanlı talepler kotayı aşmaz; iş tekrarında ikinci sağlayıcı isteği/ücret engellenir veya mevcut durum sorgulanır. |

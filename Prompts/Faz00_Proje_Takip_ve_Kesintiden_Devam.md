@@ -81,7 +81,7 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 | D09 | Mobil editör tekniği, push, mağaza hesapları | Faz11 | Açık / ürün + mobil |
 | D10 | Hukuki sayfalar, rıza, saklama | Faz04,05,10,11 | Açık / hukuk-operasyon |
 
-**AI-P01 sağlayıcı seçim kapısı:** CTO Advisor, görsel üretim/düzenleme için Cloudflare Workers AI dahil güncel adayları resmi kaynaklarla karşılaştırır. Öneri; model yeteneği, dört kullanılabilir aday üretme, ürün önizleme hattı, moderasyon, veri işleme, kota/maliyet, bölge, gözlemlenebilirlik ve sağlayıcıdan çıkış planını kapsar. Bu kayıt D05/D08'in alt kararıdır; proje sahibinin açık onayı olmadan hiçbir API paketi, hesap, secret, adaptör veya ücretli çağrı eklenmez.
+**AI-P01 sağlayıcı kararı — ONAYLANDI, 01.10.2026:** Proje sahibi AI görsel sağlayıcısı olarak **Cloudflare Workers AI** seçimini açıkça onayladı. Uygulama sağlayıcıdan bağımsız `IImageGenerationProvider` / `IImageEditingProvider` adaptör sınırını korur; model, fiyat/kota, veri işleme, ticari lisans ve bölge Faz10 başlangıcında resmi dokümanla yeniden doğrulanır. API hesabı, secret, SDK/REST adaptörü ve ücretli çağrı Faz10 sırası gelmeden eklenmez; bu karar erken entegrasyon yetkisi değildir. Ayrıntı: `docs/decisions/ADR-002-cloudflare-workers-ai.md`.
 
 Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek entegrasyon/iş kabulü** alınmaz. Bu kararlar Xinobi iş sahibine aittir; geliştirici tahminini `varsayım` yazabilir, gerçek onay diye işaretleyemez.
 
@@ -89,21 +89,22 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex planlama oturumu; Analiz2 yaratıcı/web/AI karar farkları fazlara işlendi |
-| Aktif faz/görev ID | Faz02 / Analiz2 onay kapısı planlaması; tasarım ve AI entegrasyonu kullanıcı onayı bekliyor |
-| Repo/branch/HEAD | `main` · plan güncellemesi öncesi `9f06673`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-01 · Codex karar kaydı; ortak tek tasarım süreci ve Cloudflare Workers AI seçimi işlendi |
+| Aktif faz/görev ID | Faz02 / Creative + Web Designer ortak tek tasarım başlangıç onayı bekliyor; AI-P01 onaylandı, uygulaması Faz10'da |
+| Repo/branch/HEAD | `main` · karar güncellemesi öncesi `43c05b3`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-055: Analiz2, Web Designer, kullanıcı tasarım onayları, AI-P01 ve ADR-001 sınır işaretleri mevcut; diff kontrolü temiz |
-| Değişen dosyalar / migration | Faz00/01/02/04/06/10/11 planları, Faz02 açık kabul ve TST-055; uygulama/migration/deploy/API entegrasyonu değişmedi |
-| Aktif hata/yarım iş | `YÖN ONAY`, `WEB TASARIM ONAY` ve `AI-P01` kullanıcı kararları açık. Panel/mobil hi-fi, 390 px cihaz ve manuel ekran okuyucu QA ayrıca açık |
-| Sonraki en küçük güvenli adım | Proje sahibine yaratıcı süreç sırasını ve CTO AI-P01 önerisini sun; açık onay olmadan tasarım, görsel refactor veya AI entegrasyonu başlatma |
+| Son test komutu ve sonucu | TST-056: ortak tek tasarım işaretleri ve Cloudflare AI-P01/ADR-002 sınırları mevcut; diff kontrolü temiz |
+| Değişen dosyalar / migration | Faz00/01/02/10 planları, Faz02 açık kabul, ADR-002 ve TST-056; uygulama/migration/deploy/API entegrasyonu değişmedi |
+| Aktif hata/yarım iş | Creative + Web Designer ortak tek tasarımı henüz üretmedi; `ORTAK TASARIM ONAY` ve `WEB TASARIM ONAY` açık. Panel/mobil hi-fi, 390 px cihaz ve manuel ekran okuyucu QA ayrıca açık |
+| Sonraki en küçük güvenli adım | Creative Designer ve Web Designer'ın tek ortak Xinobi tasarımını hazırlaması için kullanıcıdan çalışma başlangıç onayı al; onay olmadan tasarım veya görsel refactor başlatma |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Tasarım/AI kararları / TST-056 | `main` / `43c05b3` | İki yön kaldırıldı; Creative + Web Designer tek ortak tasarıma bağlandı; Cloudflare Workers AI sağlayıcı olarak onaylandı | TST-056 karar/sınır işaretleri ve diff kontrolü başarılı; AI çağrısı/deploy yok | `ADR-002`, `Prompts/Faz00/01/02/10`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-056-*` | Ortak tasarım üretimi için başlangıç onayı al | Codex |
 | 2026-10-01 | Analiz2 plan farkı / TST-055 | `main` / `9f06673` | Creative/Web Designer sırası, Dyson sınırı, Analiz2 K-01–K-21, AI-P01 ve ADR-001 koruması fazlara eklendi | TST-055 belge işaretleri ve diff kontrolü başarılı; uygulama/deploy yok | `Prompts/Faz00/01/02/04/06/10/11`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-055-*` | Kullanıcıdan tasarım yönü ve AI PoC kapsamı onayı iste | Codex + Creative/Web Designer/CTO temsili incelemeleri |
 | 2026-10-01 | Faz02 v0.21.0 / F02-A04 | `main` / `7613607` | Web, panel ve Flutter ekran zincirleri; hata, retry, kanal uzlaştırma ve karar bağımlılıkları | TST-054: ekran ID, D-kararı ve belge diff kontrolleri başarılı | `design/flows.md`, `test/2026-10-01/TST-054-*` | F02-A05 editör ve AI ayrıntılı spec | Codex |
 | 2026-10-01 | Faz02 v0.20.9 / F02-A03 | `main` / `83ead98` | Web bileşen durum/semantik/klavye/veri sözleşmesi; token ve karar eşliği | TST-053: JSON ve 10 bölüm/zorunlu işaret kontrolü başarılı | `design/components.md`, `design/tokens.json`, `test/2026-10-01/TST-053-*` | F02-A04 `design/flows.md` | Codex |

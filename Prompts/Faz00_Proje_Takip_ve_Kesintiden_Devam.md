@@ -45,6 +45,8 @@ Yedi rolün her biri **20+ yıl deneyimli uzman bakışını temsil eden çalı�
 | Sr. Backend Developer | API, ödeme/sipariş tutarlılığı, adapter/AI güvenliği ve hata/tekrar işleme |
 | DB Admin | Veri sahipliği, SQL Server bütünlüğü, migration, yedek/geri yükleme ve sorgu/erişim |
 | Sr. Full Stack Developer | Web/mobil/API uçtan uca sözleşme, dağıtım, test ve geri alma |
+| Web Designer | Creative yönü web bilgi mimarisi, responsive wireframe, yüksek doğruluk ekran, motion ve erişilebilir etkileşim tanımına dönüştürür; kodlama öncesi kullanıcı web tasarım onayını hazırlar |
+| CTO Advisor | Teknoloji ve sağlayıcı adaylarını güvenlik, maliyet, veri işleme, taşınabilirlik ve işletim açısından karşılaştırır; ürün sahibinin onayı olmadan yığını veya sağlayıcıyı değiştirmez |
 
 **Creative → UI/UX → Frontend teslim sözleşmesi:** Designer marka konsepti, tokenlar, ekran prototipi, varlık lisansı, baskı yerleşimi ve durumları üretir. UI/UX sorumluluğunu Designer (akış/görsel) ile Frontend (etkileşim/erişilebilirlik/uygulama) ortak taşır. Frontend `handoff kabul` kaydı, eksik durum/ölçü/asset listesini Faz00'a işler; kabulden sonra bile tasarıma uymayan ekran bitmiş sayılmaz. Yedi rolün yanında ayrı bir UI/UX kadrosu varmış gibi onay yazılmaz.
 
@@ -53,6 +55,8 @@ Yedi rolün her biri **20+ yıl deneyimli uzman bakışını temsil eden çalı�
 ## 3. Teknik çalışma sözleşmesi
 
 **Onaylanmış uygulama yığını (ADR-001):** kurumsal web/B2C için Next.js + React + TypeScript; yönetim paneli için React + Vite + TypeScript; ortak UI tokenları; API ve arka plan işleri için ASP.NET Core/C#; veri için SQL Server + EF Core migrations; iOS/Android için Flutter + Dart; dosya/baskı varlıkları için erişim kontrollü nesne depolama; modüler monolit + ayrı worker ve SQL outbox/inbox. Docker ve Kubernetes kullanılmaz. Sürümler resmi uyumluluk tablolarına göre sabitlenir ve lockfile'a işlenir. Mobil editör, ödeme ve push uyumu D09'da gerçek cihazla doğrulanır.
+
+`Proje Yönetimi/Xinobi_Kavramsal_ve_Teknik_Analiz2.md` içindeki Node.js, PostgreSQL, React Native ve konteyner seçenekleri belgenin de belirttiği gibi öneri/adaydır; proje sahibinin daha önce verdiği ADR-001 kararını değiştirmez. Teknoloji omurgası ancak ayrı değişiklik önerisi, etki/geri dönüş analizi ve proje sahibinin açık onayıyla değişebilir.
 
 **Önerilen repo sözlüğü:** `apps/web`, `apps/admin`, `apps/mobile`, `services/api`, `services/worker`, `packages/contracts`, `packages/ui`, `infra/db/migrations`, `design` (Faz02 kaynak ve handoff), `docs/decisions`, `tests`. C# paketleri TS paketlerine kaynak olarak otomatik kopyalanmaz; OpenAPI'den tipli istemci üretilir ve CI'da sürüm farkı denetlenir. Repo varsa yerleşimi bozma: mevcut gerçek yolları Faz00'da düzelt, bu haritayı yalnız örnek kabul et.
 
@@ -77,27 +81,30 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 | D09 | Mobil editör tekniği, push, mağaza hesapları | Faz11 | Açık / ürün + mobil |
 | D10 | Hukuki sayfalar, rıza, saklama | Faz04,05,10,11 | Açık / hukuk-operasyon |
 
+**AI-P01 sağlayıcı seçim kapısı:** CTO Advisor, görsel üretim/düzenleme için Cloudflare Workers AI dahil güncel adayları resmi kaynaklarla karşılaştırır. Öneri; model yeteneği, dört kullanılabilir aday üretme, ürün önizleme hattı, moderasyon, veri işleme, kota/maliyet, bölge, gözlemlenebilirlik ve sağlayıcıdan çıkış planını kapsar. Bu kayıt D05/D08'in alt kararıdır; proje sahibinin açık onayı olmadan hiçbir API paketi, hesap, secret, adaptör veya ücretli çağrı eklenmez.
+
 Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek entegrasyon/iş kabulü** alınmaz. Bu kararlar Xinobi iş sahibine aittir; geliştirici tahminini `varsayım` yazabilir, gerçek onay diye işaretleyemez.
 
 ## 5. Anlık durum — her oturum başında güncelle
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex uygulama oturumu; Faz02 akış teslimi sürdürüldü |
-| Aktif faz/görev ID | Faz02 / v0.21.0 F02-A04 web/panel/mobil akış sözleşmesi; karar blokajları sürüyor |
-| Repo/branch/HEAD | `main` · F02-A04 öncesi `7613607`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-01 · Codex planlama oturumu; Analiz2 yaratıcı/web/AI karar farkları fazlara işlendi |
+| Aktif faz/görev ID | Faz02 / Analiz2 onay kapısı planlaması; tasarım ve AI entegrasyonu kullanıcı onayı bekliyor |
+| Repo/branch/HEAD | `main` · plan güncellemesi öncesi `9f06673`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-054: WEB 20/20, ADM 12/12, MOB 6/6 ve D02–D10 akış işaretleri mevcut; diff kontrolü temiz |
-| Değişen dosyalar / migration | `design/flows.md`, Faz02 açık kabul/değişiklik kayıtları ve TST-054; uygulama/migration/deploy paketi değişmedi |
-| Aktif hata/yarım iş | 390 px gerçek cihaz ve manuel ekran okuyucu QA açık. Panel/mobil yüksek doğruluk ekranları yok; D02–D10 ve Faz01 rol/PM girdileri açık |
-| Sonraki en küçük güvenli adım | F02-A05 için `design/editor-spec.md` ve `design/ai-spec.md` ayrıntılı sözleşmelerini çıkar; D kararları ve gerçek onaylar olmadan Faz02'yi kapatma |
+| Son test komutu ve sonucu | TST-055: Analiz2, Web Designer, kullanıcı tasarım onayları, AI-P01 ve ADR-001 sınır işaretleri mevcut; diff kontrolü temiz |
+| Değişen dosyalar / migration | Faz00/01/02/04/06/10/11 planları, Faz02 açık kabul ve TST-055; uygulama/migration/deploy/API entegrasyonu değişmedi |
+| Aktif hata/yarım iş | `YÖN ONAY`, `WEB TASARIM ONAY` ve `AI-P01` kullanıcı kararları açık. Panel/mobil hi-fi, 390 px cihaz ve manuel ekran okuyucu QA ayrıca açık |
+| Sonraki en küçük güvenli adım | Proje sahibine yaratıcı süreç sırasını ve CTO AI-P01 önerisini sun; açık onay olmadan tasarım, görsel refactor veya AI entegrasyonu başlatma |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Analiz2 plan farkı / TST-055 | `main` / `9f06673` | Creative/Web Designer sırası, Dyson sınırı, Analiz2 K-01–K-21, AI-P01 ve ADR-001 koruması fazlara eklendi | TST-055 belge işaretleri ve diff kontrolü başarılı; uygulama/deploy yok | `Prompts/Faz00/01/02/04/06/10/11`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-055-*` | Kullanıcıdan tasarım yönü ve AI PoC kapsamı onayı iste | Codex + Creative/Web Designer/CTO temsili incelemeleri |
 | 2026-10-01 | Faz02 v0.21.0 / F02-A04 | `main` / `7613607` | Web, panel ve Flutter ekran zincirleri; hata, retry, kanal uzlaştırma ve karar bağımlılıkları | TST-054: ekran ID, D-kararı ve belge diff kontrolleri başarılı | `design/flows.md`, `test/2026-10-01/TST-054-*` | F02-A05 editör ve AI ayrıntılı spec | Codex |
 | 2026-10-01 | Faz02 v0.20.9 / F02-A03 | `main` / `83ead98` | Web bileşen durum/semantik/klavye/veri sözleşmesi; token ve karar eşliği | TST-053: JSON ve 10 bölüm/zorunlu işaret kontrolü başarılı | `design/components.md`, `design/tokens.json`, `test/2026-10-01/TST-053-*` | F02-A04 `design/flows.md` | Codex |
 | 2026-10-01 | Faz02 v0.20.8 / NAV-01 | `main` / `ed95092` | Ana/Xinobi/yasal bağlantı smoke; plan-kod karşılaştırmalı açık kabul listesi | TST-052: navigasyon 3/3; lint ve birleşik E2E 43/43 başarılı | `apps/web/tests/e2e/navigation.spec.ts`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-052-*` | F02-A03 bileşen sözleşmesi | Codex |

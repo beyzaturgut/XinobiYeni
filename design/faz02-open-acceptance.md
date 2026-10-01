@@ -30,6 +30,13 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 | F02-A08 | Düzenlenebilir ekran kaynakları/çıktıları | `design/screens/` altında web, panel ve mobil kaynak/PNG/PDF | Creative |
 | F02-A09 | Yönetim paneli yüksek doğruluk ekranları | ADM-001–012 durumları; yetki/boş/hata/yeniden dene | Creative + FE; Faz03–04 sözleşmeleriyle hizala |
 | F02-A10 | Flutter iOS/Android referans ekranları | MOB-001–007 iOS/Android; güvenli alan/geri/klavye/düşük bağlantı | Creative + Flutter geliştirici |
+| F02-A11 | Analiz2 fark matrisi ve creative brief | K-01–K-21 → ekran/faz/kanıt; marka, hedef kitle, medya/lisans girdileri | BA + Creative + Web Designer |
+| F02-A12 | Özgün yaratıcı yön ve kullanıcı seçimi | Dyson'dan yalnız ilke alan en az iki yön; sürümlü `YÖN ONAY` kaydı | Creative + proje sahibi |
+| F02-A13 | Global web IA ve navigasyon | Header/mega menü/footer/Nobi; route tipografi ve focus davranışı | Web Designer + FE |
+| F02-A14 | Analiz2 sıralı ana sayfa hi-fi | Karma slider → XINOBI U → kategoriler → ürün sliderı → keşfet → Nobi | Web Designer + Creative |
+| F02-A15 | Responsive tasarım matrisi | 320/390/768/1024/1440+ ve gerçek telefon/tablet kanıtı | Web Designer + FE |
+| F02-A16 | Motion, medya ve manuel a11y | Slider/video/reduced-motion; VoiceOver/TalkBack ve klavye | Web Designer + FE |
+| F02-A17 | Web tasarım onayı ve handoff kapısı | Sürümlü `WEB TASARIM ONAY`; düzenlenebilir kaynak, annotation ve FE kabulü | Proje sahibi + Creative + Web Designer + FE |
 
 ## Müşteri kararına bağlı blokajlar
 

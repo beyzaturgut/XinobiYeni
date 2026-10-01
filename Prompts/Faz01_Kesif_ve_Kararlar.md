@@ -1,6 +1,6 @@
 # Faz01 — Keşif, kararlar ve uygulanabilir teslim temeli
 
-**Durum:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–4, 6–8 ve müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`. Bu faz, Faz00'daki ilerleme kaydından yönetilir. Bu belgede iş kararı verilmiş gibi gösterilen hiçbir boşluk yoktur.
+**Durum:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–4, 6–8, ek kaynak `Proje Yönetimi/Xinobi_Kavramsal_ve_Teknik_Analiz2.md` K-01–K-21 ve müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`. Bu faz, Faz00'daki ilerleme kaydından yönetilir. Bu belgede iş kararı verilmiş gibi gösterilen hiçbir boşluk yoktur.
 
 ## Amaç ve sınır
 
@@ -26,6 +26,8 @@ K0/K1 kapılarını müşteri kanıtlarıyla kapatmak; D01–D10 kararlarını s
 10. **D10 hukuk ve işletim:** Müşteri hukuk/operasyonundan KVKK ve satış metinleri, izin akışı, veri saklama/silme süreleri alınır. Hedef ortamlar, yedek/geri yükleme, ölçülebilir performans hedefi, RPO/RTO, üretim yetkisi ve yayın hesapları ayrı karar kayıtlarına yazılır. Bunlar müşteri kararı beklerken temel yetki, şifreleme ve denetim tedbirleri planlanır.
 11. **Sözleşme taslakları:** Kimlik/rol, katalog-varyant, fiyat-stok, sepet-ödeme-sipariş/iade, tasarım, teklif, CMS, AI, entegrasyon ve rapor için API alan/durum/hata şemaları ve veri varlıkları hazırlanır. Her API'de nesne yetkisi, idempotency gereken komutlar, sayfalama, izleme ve test örneği belirtilir. Bu aşama kod üretimi değil, kodun girdisidir.
 12. **Plan ve kapı:** Modüllerin bağımlılık sırasını, gerekli kişi/ortam kapasitesini, tasarım teslim ritmini, test sahiplerini ve her fazın kanıt dosyasını PM takvime bağlar. Gerekli girdisi olmayan iş `blokeli`; bağımsız işler ilerleyebilir. Tüm açık kararlar Faz00'a `ID, sahibi, etki, sonraki eylem, tarih, kanıt` ile aktarılır.
+13. **Analiz2 yaratıcı keşif eki:** K-01–K-21'i mevcut ekran ve fazlarla ayrı fark matrisine bağla. Hedef kitle, marka konumlandırma, yetkili logo, gerçek ürün/varyant medyası ve lisansları, fotoğraf/video gereksinimi, XINOBI U ve Nobi görsel kişiliği ile görsel başarı ölçütlerini Creative Designer ve Web Designer brief'ine ekle. Dyson yalnız ürün merkezli hiyerarşi, sade yüzey, güçlü hero, kısa ve kanıtlanabilir fayda ile net CTA referansıdır; logo, metin, varlık, font veya birebir düzen kopyalanmaz.
+14. **AI-P01 karar hazırlığı:** CTO Advisor; Cloudflare Workers AI dahil adayları görsel üretim/düzenleme, moderasyon, dört aday kalitesi, veri işleme, fiyat/kota, gecikme, gözlemlenebilirlik ve sağlayıcıdan çıkış açısından resmi kaynaklarla karşılaştırır. Sonuç yalnız öneridir; ürün sahibi onayı olmadan D05/D08 kapanmaz ve entegrasyon başlamaz.
 
 ## Karar defteri ve blokaj koşulu
 

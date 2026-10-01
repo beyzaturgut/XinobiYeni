@@ -10,6 +10,8 @@ Seçili ürün ve varyantta basit yazı/isim/logo/görsel kişiselleştirmesi il
 
 Sr. Creative Designer ürün üstü gerçekçi görsel önizleme biçimini, ön/arka yüz ayrımını, alan sınırını, katman panelini, araç çubuğunu, şablon küçük resimlerini, kalite ve taşma uyarılarını, masaüstü/tablet/telefon düzenlerini ve renge göre gerçek ürün fotoğrafı kullanımını tasarlar. UI/UX işlevi Creative Designer ve Sr. Frontend tarafından ortak yürütülür: basit akış/gelişmiş akış geçişi, dokunma/sürükleme, klavye kullanımı, erişilebilir alternatif komutlar, kaydetme başarısızlığı, tekrar açma ve siparişe bağlama prototipi. FE'ye ölçü/token, bileşen durumları, hareket ve test örnekleriyle teslim edilir; PM tasarımı ve üretim kuralları uyumunu onaylar. Aynı görsel belgedeki önizleme ve sunucu çıktısı geometrik olarak karşılaştırılır; estetik mockup baskı doğruluğu kanıtı sayılmaz.
 
+Analiz2 K-12 ve K-14–K-21 için Web Designer iki ayrı giriş yolunu tasarlar: `(a) ürün seç → beş eksenden beş soru → her soruda dört seçenek → dört kullanılabilir AI adayı`, `(b) ürün seç → kendi görselini yükle`; iki yol ortak temsili ürün önizlemesi, kayıt ve uygunluk kontrolünde birleşir. “Temsilidir” etiketi kalıcı okunabilir metindir. Creative art direction; ürün malzemesi, ışık ve gölgeyi korur, sap/kulp/cam/plastik ve onaysız yüzeyleri maskenin dışında bırakır. Fiziksel örnek ve D04 onayı olmadan önizleme üretime uygunluk kanıtı sayılmaz.
+
 ## 3. İş ve dönüşüm kuralları
 
 1. Ürün/varyant yalnız `personalizationEnabled=true` ve en az bir etkin `PrintArea` ise editörü açar. Varyant değişirse mevcut tasarım otomatik olarak başka alana taşınmaz: alan eşleşmesi doğrulanır, kullanıcıya uyarı gösterilir; uyumsuz tasarım sepete gidemez.

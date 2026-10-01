@@ -1,5 +1,13 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.22.0 - 01.10.2026
+
+- Proje sahibi ortak tek tasarım çalışmasının başlamasını onayladı; Creative Designer ve Web Designer alternatif yönler yerine aynı brief üzerinde birleşti.
+- Analiz2 K-01–K-21 fark matrisi, `Sessiz teknoloji / kişisel imza` creative brief ve art direction üretildi.
+- İçerik hiyerarşisi ile ürün fotoğrafı, responsive crop, slider/video ve XINOBI U medya kuralları belgelendi.
+- WEB-001 için karma hero → XINOBI U → kategoriler → ürün sliderı → keşfet → destek/hikâye/footer ve sabit Nobi sırasını taşıyan responsive wireframe oluşturuldu.
+- F02-A11 kapatıldı; F02-A12 kullanıcı `ORTAK TASARIM ONAY` ve yüksek doğruluklu görsel kaynak/çıktı bekliyor. Üretim web kodu değiştirilmedi.
+
 ## 0.21.0 - 01.10.2026
 
 - F02-A04 kapsamında `design/flows.md` oluşturuldu; WEB-001–020, ADM-001–012 ve MOB-001–006 bağlantıları tanımlandı.

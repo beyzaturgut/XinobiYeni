@@ -89,21 +89,22 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex karar kaydı; ortak tek tasarım süreci ve Cloudflare Workers AI seçimi işlendi |
-| Aktif faz/görev ID | Faz02 / Creative + Web Designer ortak tek tasarım başlangıç onayı bekliyor; AI-P01 onaylandı, uygulaması Faz10'da |
-| Repo/branch/HEAD | `main` · karar güncellemesi öncesi `43c05b3`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-01 · Codex + Creative/Web Designer; ortak brief, art direction ve WEB-001 wireframe hazırlandı |
+| Aktif faz/görev ID | Faz02 / v0.22.0 F02-A12 ortak tasarım kullanıcı incelemesi; üretim kodu değişmedi |
+| Repo/branch/HEAD | `main` · ortak tasarım paketi öncesi `b3c94ab`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-056: ortak tek tasarım işaretleri ve Cloudflare AI-P01/ADR-002 sınırları mevcut; diff kontrolü temiz |
-| Değişen dosyalar / migration | Faz00/01/02/10 planları, Faz02 açık kabul, ADR-002 ve TST-056; uygulama/migration/deploy/API entegrasyonu değişmedi |
-| Aktif hata/yarım iş | Creative + Web Designer ortak tek tasarımı henüz üretmedi; `ORTAK TASARIM ONAY` ve `WEB TASARIM ONAY` açık. Panel/mobil hi-fi, 390 px cihaz ve manuel ekran okuyucu QA ayrıca açık |
-| Sonraki en küçük güvenli adım | Creative Designer ve Web Designer'ın tek ortak Xinobi tasarımını hazırlaması için kullanıcıdan çalışma başlangıç onayı al; onay olmadan tasarım veya görsel refactor başlatma |
+| Son test komutu ve sonucu | TST-057: K-01–K-21 21/21, ortak yön/medya/içerik ve WEB-001 responsive wireframe işaretleri mevcut; diff temiz |
+| Değişen dosyalar / migration | Altı yeni design kaynağı, ekran envanteri/açık kabul/changelog ve TST-057; uygulama/migration/deploy/API entegrasyonu değişmedi |
+| Aktif hata/yarım iş | `ORTAK TASARIM ONAY` ve sonrasında yüksek doğruluklu WEB-001 kaynak/PNG çıktısı bekliyor. Panel/mobil hi-fi, 390 px cihaz ve manuel ekran okuyucu QA ayrıca açık |
+| Sonraki en küçük güvenli adım | Ortak art direction ve WEB-001 wireframe'i proje sahibine sun; onay verilirse tek yüksek doğruluklu responsive WEB-001 tasarımını üret, üretim koduna henüz geçme |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Faz02 v0.22.0 / F02-A11–A12 | `main` / `b3c94ab` | Ortak brief/art direction, Analiz2 fark matrisi, içerik/medya rehberi ve WEB-001 responsive wireframe | TST-057: K-01–K-21 21/21 ve zorunlu tasarım işaretleri başarılı; app/deploy yok | `design/creative-brief.md`, `analysis2-gap-matrix.md`, `art-direction.md`, `content-hierarchy.md`, `photography-media-guide.md`, `screens/WEB-001-*` | Kullanıcı ortak tasarım onayı; sonra hi-fi WEB-001 | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Tasarım/AI kararları / TST-056 | `main` / `43c05b3` | İki yön kaldırıldı; Creative + Web Designer tek ortak tasarıma bağlandı; Cloudflare Workers AI sağlayıcı olarak onaylandı | TST-056 karar/sınır işaretleri ve diff kontrolü başarılı; AI çağrısı/deploy yok | `ADR-002`, `Prompts/Faz00/01/02/10`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-056-*` | Ortak tasarım üretimi için başlangıç onayı al | Codex |
 | 2026-10-01 | Analiz2 plan farkı / TST-055 | `main` / `9f06673` | Creative/Web Designer sırası, Dyson sınırı, Analiz2 K-01–K-21, AI-P01 ve ADR-001 koruması fazlara eklendi | TST-055 belge işaretleri ve diff kontrolü başarılı; uygulama/deploy yok | `Prompts/Faz00/01/02/04/06/10/11`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-055-*` | Kullanıcıdan tasarım yönü ve AI PoC kapsamı onayı iste | Codex + Creative/Web Designer/CTO temsili incelemeleri |
 | 2026-10-01 | Faz02 v0.21.0 / F02-A04 | `main` / `7613607` | Web, panel ve Flutter ekran zincirleri; hata, retry, kanal uzlaştırma ve karar bağımlılıkları | TST-054: ekran ID, D-kararı ve belge diff kontrolleri başarılı | `design/flows.md`, `test/2026-10-01/TST-054-*` | F02-A05 editör ve AI ayrıntılı spec | Codex |

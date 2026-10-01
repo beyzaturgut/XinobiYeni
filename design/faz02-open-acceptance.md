@@ -12,6 +12,7 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 - Tasarım tokenleri ve karar özeti `design/tokens.json` ile `design/decisions.md` içinde mevcut.
 - F02-A03 web bileşen sözleşmesi `design/components.md` içinde durum, semantik, klavye, responsive ve veri sınırlarıyla mevcut.
 - F02-A04 web, panel ve Flutter mobil akış sözleşmesi `design/flows.md` içinde ekran, hata, kanal geçişi ve karar bağımlılıklarıyla mevcut.
+- F02-A11 Analiz2 K-01–K-21 fark matrisi, ortak creative brief ve medya girdileri `design/analysis2-gap-matrix.md`, `design/creative-brief.md` ve `design/photography-media-guide.md` içinde mevcut.
 - Masaüstü ve 500 px Chrome görsel QA grupları kayıtlı.
 - Kritik web etkileşimleri Playwright ile 18/18 geçti.
 - Yirmi rotada WCAG A/AA axe taraması ve iki klavye odağı senaryosu 22/22 geçti.
@@ -30,7 +31,6 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 | F02-A08 | Düzenlenebilir ekran kaynakları/çıktıları | `design/screens/` altında web, panel ve mobil kaynak/PNG/PDF | Creative |
 | F02-A09 | Yönetim paneli yüksek doğruluk ekranları | ADM-001–012 durumları; yetki/boş/hata/yeniden dene | Creative + FE; Faz03–04 sözleşmeleriyle hizala |
 | F02-A10 | Flutter iOS/Android referans ekranları | MOB-001–007 iOS/Android; güvenli alan/geri/klavye/düşük bağlantı | Creative + Flutter geliştirici |
-| F02-A11 | Analiz2 fark matrisi ve creative brief | K-01–K-21 → ekran/faz/kanıt; marka, hedef kitle, medya/lisans girdileri | BA + Creative + Web Designer |
 | F02-A12 | Ortak yaratıcı yön ve kullanıcı seçimi | Creative + Web Designer'ın Dyson'dan yalnız ilke alan tek ortak tasarımı; sürümlü `ORTAK TASARIM ONAY` kaydı | Creative + Web Designer + proje sahibi |
 | F02-A13 | Global web IA ve navigasyon | Header/mega menü/footer/Nobi; route tipografi ve focus davranışı | Web Designer + FE |
 | F02-A14 | Analiz2 sıralı ana sayfa hi-fi | Karma slider → XINOBI U → kategoriler → ürün sliderı → keşfet → Nobi | Web Designer + Creative |

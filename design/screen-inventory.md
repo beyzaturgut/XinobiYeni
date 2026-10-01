@@ -4,7 +4,7 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 
 | ID | Yüzey / ekran | Rol ve giriş | Ana eylem | Temel veri | Sonraki faz | Tasarım durumu |
 |---|---|---|---|---|---|---|
-| WEB-001 | Ana sayfa | Herkes / doğrudan | Kategori ve ürüne git | Kategori, ürün, medya, içerik | 02,04 | Masaüstü ve 500 px Chrome görsel QA geçti; 390 px gerçek cihaz/interaction QA bekliyor |
+| WEB-001 | Ana sayfa | Herkes / doğrudan | Kategori ve ürüne git | Kategori, ürün, medya, içerik | 02,04 | Analiz2 ortak creative/web brief, art direction ve responsive wireframe hazır; kullanıcı ortak tasarım onayı, hi-fi kaynak/çıktı ve gerçek cihaz QA bekliyor |
 | WEB-002 | Kategori/liste | Herkes / ana menü, arama | Filtrele, ürüne git | Kategori, ürün, varyant, fiyat, stok | 02,04 | Chrome kategori/arama/sıralama/boş durum otomasyonu geçti; D02/API/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-003 | Arama/karşılaştırma | Herkes / header | Ürün bul, en fazla üç ürünü karşılaştır | Arama indeksi, ürün, özellik | 02,04 | Chrome arama/Escape/üç ürün sınırı otomasyonu geçti; API/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-004 | Ürün detay/varyant | Herkes / liste | Varyant seç, sepete ekle | Ürün, varyant, medya, fiyat, stok | 02,04,05 | Chrome renk/görsel/seçili durum otomasyonu geçti; D02/API/tam klavye/gerçek cihaz QA bekliyor |

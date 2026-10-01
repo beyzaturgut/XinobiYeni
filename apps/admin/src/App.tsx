@@ -10,10 +10,14 @@ const initialSlides: Slide[] = [
 ]
 
 function App() {
+  const [section, setSection] = useState<'slider' | 'xinobi-u'>('slider')
   const [slides, setSlides] = useState(initialSlides)
   const [selectedId, setSelectedId] = useState(1)
   const [notice, setNotice] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const bannerInputRef = useRef<HTMLInputElement>(null)
+  const [xinobiBanner, setXinobiBanner] = useState('/assets/banners/xinobi-u-banner.png')
+  const [buttonColor, setButtonColor] = useState('#ed2639')
   const selected = slides.find((slide) => slide.id === selectedId) ?? slides[0]
 
   function updateSelected(patch: Partial<Slide>) {
@@ -42,16 +46,24 @@ function App() {
     })
   }
 
+  function updateXinobiBanner(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    setXinobiBanner(URL.createObjectURL(file))
+    setNotice(`${file.name} XINOBI U banner önizlemesine eklendi.`)
+    event.target.value = ''
+  }
+
   return <div className="admin-shell">
     <aside className="sidebar">
       <div className="admin-brand"><span>✦</span><div><strong>XINOBI</strong><small>Yönetim paneli</small></div></div>
-      <nav aria-label="Yönetim menüsü"><button className="active">Ana sayfa slider</button><button>Ürünler</button><button>Kategoriler</button><button>XINOBI U</button><button>Siparişler</button></nav>
+      <nav aria-label="Yönetim menüsü"><button className={section === 'slider' ? 'active' : ''} onClick={() => setSection('slider')}>Ana sayfa slider</button><button>Ürünler</button><button>Kategoriler</button><button className={section === 'xinobi-u' ? 'active' : ''} onClick={() => setSection('xinobi-u')}>XINOBI U</button><button>Siparişler</button></nav>
       <p>Faz02 · Yerel yönetim prototipi</p>
     </aside>
     <main className="workspace">
-      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>Ana sayfa slider</h1></div><button className="preview">Site önizleme ↗</button></header>
+      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : 'XINOBI U banner'}</h1></div><button className="preview">Site önizleme ↗</button></header>
       <section className="status-note"><strong>Demo yönetim alanı</strong><span>Değişiklikler bu tarayıcı oturumunda önizlenir. Kalıcı kayıt ve canlı yayın, CMS API bağlantısıyla açılacaktır.</span></section>
-      <div className="editor-layout">
+      {section === 'slider' ? <div className="editor-layout">
         <section className="slides-panel" aria-labelledby="slides-title">
           <div className="panel-heading"><div><p>SLIDER ÖĞELERİ</p><h2 id="slides-title">Yayın sırası</h2></div><button onClick={() => inputRef.current?.click()}>+ Medya ekle</button><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={addMedia} hidden /></div>
           <div className="slides-list">{slides.map((slide, index) => <button key={slide.id} className={slide.id === selected.id ? 'slide-row selected' : 'slide-row'} onClick={() => setSelectedId(slide.id)}><span className="order">{String(index + 1).padStart(2, '0')}</span><span className="thumb">{slide.type === 'Video' ? <video src={slide.src} muted /> : <img src={slide.src} alt="" />}</span><span className="slide-name"><strong>{slide.name}</strong><small>{slide.type} · {slide.active ? 'Yayında' : 'Taslak'}</small></span><span aria-hidden="true">›</span></button>)}</div>
@@ -69,7 +81,16 @@ function App() {
           </div>
           <div className="save-row"><p aria-live="polite">{notice}</p><button onClick={() => setNotice('Değişiklikler yerel taslak olarak kaydedildi.')}>Taslağı kaydet</button></div>
         </section>
-      </div>
+      </div> : <section className="xinobi-editor" aria-labelledby="xinobi-u-settings">
+        <div className="panel-heading"><div><p>ANA SAYFA BANNERI</p><h2 id="xinobi-u-settings">Görsel ve sabit buton</h2></div><span className="state live">Yerel önizleme</span></div>
+        <div className="xinobi-preview"><img src={xinobiBanner} alt="XINOBI U banner önizlemesi" /><a href="#" style={{ backgroundColor: buttonColor }} onClick={(event) => event.preventDefault()}>Tasarımını Oluştur <span>→</span></a></div>
+        <div className="xinobi-settings">
+          <div><h3>Banner görseli</h3><p>Önerilen oran 1945 × 809. Görsel alanın tamamını kaplar; buton görselin parçası değildir.</p><button onClick={() => bannerInputRef.current?.click()}>Görseli değiştir</button><input ref={bannerInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={updateXinobiBanner} hidden /></div>
+          <label><span>Buton rengi</span><input type="color" value={buttonColor} onChange={(event) => setButtonColor(event.target.value)} /><strong>{buttonColor}</strong></label>
+          <div><h3>Sabit bağlantı</h3><p><code>/urunler/cay-makinesi-101/kisisellestir</code></p><small>Buton konumu ve bağlantısı tasarım sözleşmesinde sabittir.</small></div>
+        </div>
+        <div className="save-row"><p aria-live="polite">{notice}</p><button onClick={() => setNotice('XINOBI U ayarları yerel taslak olarak kaydedildi.')}>Taslağı kaydet</button></div>
+      </section>}
     </main>
   </div>
 }

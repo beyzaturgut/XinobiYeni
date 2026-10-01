@@ -1,5 +1,12 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.24.0 - 01.10.2026
+
+- WEB-001 tasarım prototipine masaüstü mega menü, mobil drawer, üç slaytlı hero, duraklat/ileri/geri kontrolleri, mobil ürün carousel ve Nobi açılır paneli eklendi.
+- Escape ile menü/Nobi kapatma, odak geri dönüşü, `aria-expanded/controls`, reduced-motion altında autoplay kapatma ve temsili asistan açıklaması uygulandı.
+- Chrome etkileşim testi masaüstü mega menü/hero/Nobi ve mobil drawer/carousel senaryolarında başarılı oldu.
+- Beş responsive render 15/15 görsel ve yatay taşmasız olarak yenilendi. Deploy yapılmadı; prototip yalnız yerelde sunuluyor.
+
 ## 0.23.1 - 01.10.2026
 
 - Admin panelinden yönetilecek hero slider, XINOBI U bannerı, kategori görselleri ve keşfet bannerlarına görünür geçici içerik açıklaması eklendi.

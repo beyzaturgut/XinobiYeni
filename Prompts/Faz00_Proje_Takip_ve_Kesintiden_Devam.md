@@ -89,21 +89,22 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex + Creative/Web Designer; WEB-001 admin yönetimli geçici içerik açıklamaları eklendi |
-| Aktif faz/görev ID | Faz02 / v0.23.1 F02-A12/A14 ortak WEB-001 tasarım kullanıcı incelemesi; üretim kodu değişmedi |
-| Repo/branch/HEAD | `main` · admin placeholder güncellemesi öncesi `476255b`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-01 · Codex + Creative/Web Designer; WEB-001 etkileşimli yerel prototip hazırlandı |
+| Aktif faz/görev ID | Faz02 / v0.24.0 F02-A12–A14 yerel tasarım kullanıcı incelemesi; deploy yok |
+| Repo/branch/HEAD | `main` · etkileşimli prototip öncesi `6956a99`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-059: dört admin yönetimli içerik alanı etiketlendi; beş renderda 14/14 görsel, overflow=false, h1=1 |
-| Değişen dosyalar / migration | WEB-001 prototip/PNG, wireframe geçici içerik kuralı, changelog ve TST-059; uygulama/migration/deploy/API değişmedi |
-| Aktif hata/yarım iş | Kullanıcı `ORTAK TASARIM ONAY` bekleniyor. Çalışan slider/mega menü/Nobi paneli, manuel ekran okuyucu ve gerçek cihaz QA henüz uygulama kabulü değil |
-| Sonraki en küçük güvenli adım | Masaüstü ve mobil WEB-001 çıktısını proje sahibine sun; onaylanırsa F02-A13/14 etkileşimli prototip/handoff, ardından ayrı `WEB TASARIM ONAY` kapısı |
+| Son çalışan uygulama komutu/URL | Yerel tasarım `http://127.0.0.1:4175/design/screens/WEB-001/prototype.html`; deploy/IIS değiştirilmedi |
+| Son test komutu ve sonucu | TST-060: masaüstü mega menü/hero/Nobi ve mobil drawer/carousel başarılı; 5 render × 15/15 görsel, overflow=false |
+| Değişen dosyalar / migration | WEB-001 HTML/CSS/JS + beş PNG, interaction renderer/testi ve TST-060; `apps/web`/migration/deploy/API değişmedi |
+| Aktif hata/yarım iş | Kullanıcı yerel prototip incelemesi ve `ORTAK TASARIM ONAY` bekleniyor. Manuel ekran okuyucu/fiziksel cihaz ve üretim uygulaması ayrı kabul |
+| Sonraki en küçük güvenli adım | Kullanıcının yerel prototip geri bildirimini al; onaydan sonra `apps/web` uygulama planı/handoff'u çıkar, deploy yapma |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Faz02 v0.24.0 / WEB-001 interaction | `main` / `6956a99` | Mega menü/drawer, hero slider, product carousel ve Nobi paneli tasarım prototipine eklendi | TST-060: desktop/mobile interaction başarılı; 5 kırılım × 15/15 görsel, overflow=false | `design/screens/WEB-001/*`, `tools/test-web001-interactions.mjs`, `test/2026-10-01/TST-060-*` | Kullanıcı yerel inceleme/ortak tasarım onayı | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.23.1 / WEB-001 içerik yönetimi | `main` / `476255b` | Admin panelinden yönetilecek dört görsel/içerik alanı geçici `Temsili` açıklamayla ayrıştırıldı | TST-059: 5 kırılım × 14/14 görsel, overflow=false; app/deploy yok | `design/screens/WEB-001/*`, `test/2026-10-01/TST-059-*` | F02-A13/14 etkileşimli prototip/handoff | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.23.0 / F02-A12–A14 | `main` / `996a2a2` | WEB-001 ortak hi-fi HTML/CSS; Creative/Web QA revizyonları; beş responsive PNG | TST-058: 5 kırılım × 14/14 görsel, overflow=false, h1=1; app/deploy yok | `design/screens/WEB-001/*`, `tools/render-web001.mjs`, `test/2026-10-01/TST-058-*` | Kullanıcı ortak tasarım onayı | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.22.0 / F02-A11–A12 | `main` / `b3c94ab` | Ortak brief/art direction, Analiz2 fark matrisi, içerik/medya rehberi ve WEB-001 responsive wireframe | TST-057: K-01–K-21 21/21 ve zorunlu tasarım işaretleri başarılı; app/deploy yok | `design/creative-brief.md`, `analysis2-gap-matrix.md`, `art-direction.md`, `content-hierarchy.md`, `photography-media-guide.md`, `screens/WEB-001-*` | Kullanıcı ortak tasarım onayı; sonra hi-fi WEB-001 | Codex + Creative Designer + Web Designer |

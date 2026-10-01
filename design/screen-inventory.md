@@ -5,14 +5,14 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | ID | Yüzey / ekran | Rol ve giriş | Ana eylem | Temel veri | Sonraki faz | Tasarım durumu |
 |---|---|---|---|---|---|---|
 | WEB-001 | Ana sayfa | Herkes / doğrudan | Kategori ve ürüne git | Kategori, ürün, medya, içerik | 02,04 | Masaüstü ve 500 px Chrome görsel QA geçti; 390 px gerçek cihaz/interaction QA bekliyor |
-| WEB-002 | Kategori/liste | Herkes / ana menü, arama | Filtrele, ürüne git | Kategori, ürün, varyant, fiyat, stok | 02,04 | 500 px Chrome görsel QA ve taşma düzeltmesi geçti; D02/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-002 | Kategori/liste | Herkes / ana menü, arama | Filtrele, ürüne git | Kategori, ürün, varyant, fiyat, stok | 02,04 | Chrome kategori/arama/sıralama/boş durum otomasyonu geçti; D02/API/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-003 | Arama/karşılaştırma | Herkes / header | Ürün bul, en fazla üç ürünü karşılaştır | Arama indeksi, ürün, özellik | 02,04 | Chrome arama/Escape/üç ürün sınırı otomasyonu geçti; API/tam klavye/gerçek cihaz QA bekliyor |
-| WEB-004 | Ürün detay/varyant | Herkes / liste | Varyant seç, sepete ekle | Ürün, varyant, medya, fiyat, stok | 02,04,05 | Masaüstü Chrome görsel QA geçti; D02/API/mobil/interaction QA bekliyor |
-| WEB-005 | Basit kişiselleştirme | Müşteri / ürün | Metin/stil/renk önizle, demo taslağı hazırla | Baskı alanı, varlık, fiyat farkı | 02,06 | 500 px Chrome görsel QA geçti; D04/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-004 | Ürün detay/varyant | Herkes / liste | Varyant seç, sepete ekle | Ürün, varyant, medya, fiyat, stok | 02,04,05 | Chrome renk/görsel/seçili durum otomasyonu geçti; D02/API/tam klavye/gerçek cihaz QA bekliyor |
+| WEB-005 | Basit kişiselleştirme | Müşteri / ürün | Metin/stil/renk önizle, demo taslağı hazırla | Baskı alanı, varlık, fiyat farkı | 02,06 | Chrome metin sınırı/stil/renk/taslak otomasyonu geçti; D04/API/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-006 | Gelişmiş editör | Müşteri / ürün, tasarımlar | Tasarla, katmanları yönet, demo taslak hazırla | DesignDocument, sürüm, baskı alanı | 02,06 | Chrome katman ekleme/görünürlük/kilit/yüz/taslak otomasyonu geçti; D04/API/tam klavye/gerçek cihaz QA bekliyor |
-| WEB-007 | Favoriler | Üye / hesap, ürün | Demo listeye ekle/çıkar | Kullanıcı, ürün | 02,04 | 500 px boş durum Chrome görsel QA geçti; kimlik/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-007 | Favoriler | Üye / hesap, ürün | Demo listeye ekle/çıkar | Kullanıcı, ürün | 02,04 | Chrome katalogdan ekleme/listeleme/çıkarma otomasyonu geçti; kimlik/API/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-008 | Sepet | Misafir/üye / header | Demo satır/adet yönet, checkout sınırını gör | Sepet, varyant, fiyat, stok | 02,05 | Chrome adet/artır/kaldır/boş durum otomasyonu geçti; D02/D03/API/tam klavye/gerçek cihaz QA bekliyor |
-| WEB-009 | Ödeme | Misafir/üye / sepet | Teslimat/yöntem kabuğunu incele | Checkout, adres, ödeme girişimi | 02,05 | 500 px Chrome görsel QA geçti; D02/D03/D05/API/interaction/gerçek cihaz QA bekliyor |
+| WEB-009 | Ödeme | Misafir/üye / sepet | Teslimat/yöntem kabuğunu incele | Checkout, adres, ödeme girişimi | 02,05 | Chrome form/yöntem/açıklama/kapalı ödeme otomasyonu geçti; D02/D03/D05/API/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-010 | Ödeme sonucu | Müşteri / sağlayıcı dönüşü | Bekleyen/başarısız/başarılı senaryoyu gör | PaymentAttempt, Order | 02,05 | Chrome üç durum ve Enter/Space klavye otomasyonu geçti; D03/D05/API/gerçek cihaz QA bekliyor |
 | WEB-011 | Üyelik/oturum | Müşteri / header | Kayıt, giriş, parola yenile | User, consent | 02,03 | Chrome sekme/parola görünürlüğü/yenileme otomasyonu ve mobil header düzeltmesi geçti; kimlik/D10/API/tam klavye QA bekliyor |
 | WEB-012 | Hesap/adres | Üye / hesap | Demo profil/adres durumlarını yönet | Customer, Address | 02,03 | Chrome profil/adres düzenleme ve kayıtsız geri bildirim otomasyonu geçti; D10/kimlik API/tam klavye/gerçek cihaz QA bekliyor |

@@ -1,5 +1,11 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.20.7 - 01.10.2026
+
+- Katalog kategori/arama/sıralama/boş durum, ürün renk varyantı, katalog-favori geçişi, ödeme yöntemi ve basit kişiselleştirme Playwright kapsamına eklendi.
+- İlk genişletilmiş koşudaki üç dinamik erişilebilir ad seçicisi daraltıldı; uygulama davranışı değiştirilmedi.
+- Kritik etkileşim paketi 18/18, axe/klavye dahil birleşik paket 40/40 ve lint başarılı; deploy yapılmadı.
+
 ## 0.20.6 - 01.10.2026
 
 - 20 web rotasına WCAG 2 A/AA ve 2.1 A/AA axe taraması eklendi.

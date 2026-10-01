@@ -173,3 +173,68 @@ test("gelişmiş editör katman, görünürlük, kilit ve yüz seçimlerini yön
   await page.getByRole("button", { name: "Demo taslağı hazırla" }).click();
   await expect(page.getByText("Demo taslak hazırlandı; sunucuya kalıcı kayıt yapılmadı.")).toBeVisible();
 });
+
+test("katalog arama, kategori, sıralama ve boş durumdan sıfırlama akışlarını çalıştırır", async ({ page }) => {
+  await page.goto("/urunler/");
+  await closeConsent(page);
+  await page.getByRole("button", { name: "Kahve", exact: true }).click();
+  await expect(page.getByText("3 ürün varyantı")).toBeVisible();
+  await page.getByLabel("Ürünlerde ara").fill("kırmızı");
+  await expect(page.getByText("1 ürün varyantı")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Kahve Makinesi 101" })).toBeVisible();
+  await page.getByLabel("Sırala").selectOption("name");
+  await page.getByLabel("Ürünlerde ara").fill("bulunmayan ürün");
+  await expect(page.getByRole("heading", { name: "Aradığınız ürün bulunamadı." })).toBeVisible();
+  await page.getByRole("button", { name: "Filtreleri temizle" }).click();
+  await expect(page.getByText("10 ürün varyantı")).toBeVisible();
+});
+
+test("ürün detayında renk varyantı görsel ve seçili durumla birlikte değişir", async ({ page }) => {
+  await page.goto("/urunler/cay-makinesi-101/");
+  await closeConsent(page);
+  const red = page.getByRole("button", { name: "Kırmızı rengini seç" });
+  await red.click();
+  await expect(red).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("group", { name: "Renk: Kırmızı" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Xinobi Çay Makinesi 101, Kırmızı" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Satış bilgisi hazırlanıyor" })).toBeDisabled();
+});
+
+test("katalog favorisi tarayıcı listesine taşınır ve listeden kaldırılır", async ({ page }) => {
+  await page.goto("/urunler/");
+  await closeConsent(page);
+  const favorite = page.getByRole("button", { name: "Çay Makinesi 101 Lacivert ürününü favorilere ekle" });
+  await favorite.click();
+  await expect(page.getByRole("button", { name: "Çay Makinesi 101 Lacivert ürününü favorilerden çıkar" })).toHaveAttribute("aria-pressed", "true");
+  await page.goto("/favoriler/");
+  await expect(page.getByText("1 favori ürün")).toBeVisible();
+  await page.getByRole("button", { name: "Çay Makinesi 101 Lacivert ürününü favorilerden çıkar" }).click();
+  await expect(page.getByRole("heading", { name: "Favori listeniz henüz boş." })).toBeVisible();
+});
+
+test("ödeme formu girişleri korur ve yöntem açıklamasını değiştirir", async ({ page }) => {
+  await page.goto("/odeme/");
+  await closeConsent(page);
+  await page.getByLabel("Ad soyad").fill("Demo Kullanıcı");
+  await page.getByLabel("Telefon").fill("0555 000 00 00");
+  await page.getByLabel("E-posta").fill("demo@example.com");
+  await page.getByLabel("Havale / EFT").check();
+  await expect(page.getByText("Banka bilgileri etkin değil")).toBeVisible();
+  await expect(page.getByLabel("Ad soyad")).toHaveValue("Demo Kullanıcı");
+  await expect(page.getByRole("button", { name: "Ödemeyi başlat" })).toBeDisabled();
+});
+
+test("basit kişiselleştirme metin sınırı, stil, renk ve demo taslağı uygular", async ({ page }) => {
+  await page.goto("/urunler/cay-makinesi-101/kisisellestir/");
+  await closeConsent(page);
+  const text = page.getByLabel("İsim veya kısa mesaj");
+  await text.fill("Xinobi için uzun demo metni");
+  await expect(text).toHaveValue("Xinobi için uzun demo me");
+  await page.getByRole("button", { name: /Geometrik/ }).click();
+  await page.getByRole("button", { name: "Xinobi teal rengini seç" }).click();
+  await expect(page.getByRole("button", { name: /Geometrik/ })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByRole("button", { name: "Xinobi teal rengini seç" })).toHaveAttribute("aria-pressed", "true");
+  await page.getByRole("button", { name: "Demo taslağını hazırla" }).click();
+  await expect(page.getByText("Demo taslağınız bu oturum için hazırlandı. Kalıcı kayıt yapılmadı.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Siparişe devam et" })).toBeDisabled();
+});

@@ -155,3 +155,9 @@
 - Katalog mobil başlık ölçüsü ve yatay taşma koruması dar ekran için iyileştirildi.
 - Global çerez paneli metninin grid içinde güvenli küçülmesi sağlandı.
 - macOS headless Chrome'un 390 px ekran görüntüsünde minimum layout viewport farkı kaydedildi; 500 px dar ekran geçti, 390 px gerçek cihaz testi açık bırakıldı.
+
+## 0.20.2 - 01.10.2026
+
+- Favori, giriş, hesap, sipariş, iade ve kurumsal teklif/takip ekranları 500 px Chrome görsel QA grubundan geçirildi.
+- Üç öğeli mobil üst menülerde kapatma bağlantısının ikinci satıra düşmesine neden olan ortak grid sorunu düzeltildi.
+- Giriş, iade, AI tasarım ve satış asistanı başlıkları düzeltme sonrası yeniden render edilerek doğrulandı.

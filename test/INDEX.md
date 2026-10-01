@@ -46,3 +46,4 @@
 | TST-042 | 30.09.2026 | DEPLOY-002 güncel IIS tam paket bütünlüğü | Başarılı; 226 girdi, ZIP CRC ve SHA-256 doğrulandı | BUILD / STATIC EXPORT / DEPLOYMENT PRECHECK | `2026-09-30/TST-042-deploy-002-package.md` |
 | TST-043 | 30.09.2026 | Faz02 ilk Chrome responsive görsel QA grubu | Kısmi başarılı; 1440/500 px geçti, iki taşma koruması düzeltildi, 390 px gerçek cihaz açık | BROWSER / RESPONSIVE / BUILD | `2026-09-30/TST-043-phase02-browser-responsive-qa-01.md` |
 | TST-044 | 01.10.2026 | Faz02 ikinci Chrome responsive görsel QA grubu | Kısmi başarılı; altı rota 500 px görsel kontrolden geçti, interaction/gerçek cihaz açık | BROWSER / RESPONSIVE / VISUAL | `2026-10-01/TST-044-phase02-browser-responsive-qa-02.md` |
+| TST-045 | 01.10.2026 | Faz02 üçüncü Chrome responsive görsel QA grubu | Başarılı görsel grup; yedi rota geçti, dört mobil header düzeltildi ve tekrar doğrulandı | BROWSER / RESPONSIVE / BUILD | `2026-10-01/TST-045-phase02-browser-responsive-qa-03.md` |

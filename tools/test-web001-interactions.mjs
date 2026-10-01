@@ -12,6 +12,10 @@ await desktop.locator(".nav-trigger").click();
 if (await desktop.locator("#mega-menu").isHidden()) throw new Error("Mega menu did not open");
 await desktop.keyboard.press("Escape");
 if (await desktop.locator("#mega-menu").isVisible()) throw new Error("Mega menu did not close with Escape");
+await desktop.mouse.move(900, 300);
+await desktop.locator(".nav-trigger").hover();
+if (await desktop.locator("#mega-menu").isHidden()) throw new Error("Mega menu did not open on hover");
+await desktop.keyboard.press("Escape");
 
 const initialSlide = await desktop.locator("[data-hero-image]").getAttribute("src");
 await desktop.locator("[data-slide='1']").click();

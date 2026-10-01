@@ -26,13 +26,21 @@ restartHero();
 
 const megaMenu = document.querySelector("#mega-menu");
 const menuTriggers = [...document.querySelectorAll("[aria-controls='mega-menu']")];
-function setMenu(open, trigger = menuTriggers[0]) {
+function setMenu(open, trigger = menuTriggers[0], manageFocus = true) {
   megaMenu.hidden = !open;
   menuTriggers.forEach((item) => item.setAttribute("aria-expanded", String(open)));
-  if (open) megaMenu.querySelector("a").focus();
-  else trigger.focus();
+  if (manageFocus && open) megaMenu.querySelector("a").focus();
+  else if (manageFocus) trigger.focus();
 }
-menuTriggers.forEach((trigger) => trigger.addEventListener("click", () => setMenu(megaMenu.hidden, trigger)));
+let menuCloseTimer;
+const desktopMenuTrigger = document.querySelector(".nav-trigger");
+const mobileMenuTrigger = document.querySelector(".menu");
+desktopMenuTrigger.addEventListener("click", () => setMenu(true, desktopMenuTrigger));
+mobileMenuTrigger.addEventListener("click", () => setMenu(megaMenu.hidden, mobileMenuTrigger));
+desktopMenuTrigger.addEventListener("mouseenter", () => { clearTimeout(menuCloseTimer); setMenu(true, desktopMenuTrigger, false); });
+desktopMenuTrigger.addEventListener("mouseleave", () => { menuCloseTimer = setTimeout(() => setMenu(false, desktopMenuTrigger, false), 160); });
+megaMenu.addEventListener("mouseenter", () => clearTimeout(menuCloseTimer));
+megaMenu.addEventListener("mouseleave", () => { menuCloseTimer = setTimeout(() => setMenu(false, desktopMenuTrigger, false), 160); });
 document.querySelector(".mega-close").addEventListener("click", () => setMenu(false));
 megaMenu.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenu(false)));
 

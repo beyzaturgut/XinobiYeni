@@ -7,7 +7,7 @@ Sonuç: **Başarılı**
 ## Doğrulanan değişiklikler
 
 - Hero slider `design/banner` altındaki üç görseli kullanıyor; görünür metin ve yön okları yok.
-- Header'daki `Kategoriler` menüsü beş ürün kategorisini ve `XINOBI U` bağlantısını içeriyor.
+- Header'daki üzerine gelme veya tıklamayla açılan `Kategoriler` menüsü beş ürün kategorisini ve `XINOBI U` bağlantısını içeriyor.
 - Kategori alanı, istenen sıradaki beş karttan oluşan yatay kaydırmalı raydır.
 - XINOBI U banner yüksekliği masaüstünde ana bannerın yaklaşık yarısına indirildi.
 - Öne çıkan ürün görselleri küçültüldü.

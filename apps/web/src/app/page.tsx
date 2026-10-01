@@ -1,5 +1,8 @@
+"use client";
+
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import styles from "./page.module.css";
 
 import airPurifier from "../../public/assets/products/air-purifier-101.webp";
@@ -7,6 +10,7 @@ import coffeeMaker from "../../public/assets/products/coffee-maker-101-gold.webp
 import cookingMachine from "../../public/assets/products/cooking-machine.webp";
 import teaMaker from "../../public/assets/products/tea-maker-101-blue.webp";
 import toastMaker from "../../public/assets/products/toast-maker.webp";
+import personalizedTeaMakers from "../../public/assets/banners/xinobi-personalized-tea-makers.png";
 
 type IconName = "arrow" | "bag" | "search" | "spark" | "user";
 type Product = { name: string; category: string; description: string; image: StaticImageData; tall?: boolean; accent: string; swatch: string };
@@ -34,14 +38,15 @@ function Icon({ name }: { name: IconName }) {
 }
 
 function Header() {
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   return <header className={styles.header}>
     <a className={styles.skipLink} href="#main-content">İçeriğe geç</a>
     <div className={styles.utilityBar}><p>Xinobi ile ev teknolojisini yeniden keşfedin.</p><nav aria-label="Yardımcı bağlantılar"><Link href="#destek">Destek</Link><Link href="/kurumsal/teklif">Kurumsal</Link></nav></div>
     <div className={styles.mainNav}>
       <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="/xinobi">Xinobi dünyası</Link></nav>
+      <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><div className={styles.categoryMenu} onMouseEnter={() => setCategoriesOpen(true)} onMouseLeave={() => setCategoriesOpen(false)}><button type="button" aria-expanded={categoriesOpen} aria-controls="home-category-menu" onClick={() => setCategoriesOpen((open) => !open)}>Kategoriler</button><div id="home-category-menu" hidden={!categoriesOpen}><Link href="#kategoriler">Çay makineleri</Link><Link href="#kategoriler">Kahve makineleri</Link><Link href="#kategoriler">Tost makineleri</Link><Link href="#kategoriler">Pişirme makineleri</Link><Link href="#kategoriler">Hava temizleme</Link><Link href="#kisisellestirme">XINOBI U</Link></div></div><Link href="/xinobi">Xinobi dünyası</Link></nav>
       <div className={styles.navActions}><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><Link href="/hesap/giris" aria-label="Hesabım"><Icon name="user" /></Link><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link></div>
-      <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">Kişiselleştir</Link><Link href="/xinobi">Xinobi dünyası</Link></nav></details>
+      <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">XINOBI U</Link><Link href="/xinobi">Xinobi dünyası</Link></nav></details>
     </div>
   </header>;
 }
@@ -66,7 +71,7 @@ export default function Home() {
 
       <section id="urunler" className={styles.section} aria-labelledby="featured-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Öne çıkanlar</p><h2 id="featured-title">Gününüz için tasarlandı.</h2></div><Link className={styles.textLink} href="/urunler">Tüm ürünler <Icon name="arrow" /></Link></div><div className={styles.productGrid}>{products.map((product) => <ProductCard key={product.name} product={product} />)}</div></section>
 
-      <section id="kisisellestirme" className={styles.personalize} aria-labelledby="personalize-title"><div className={styles.personalizeImage}><Image src={coffeeMaker} alt="Gold detaylı Xinobi kahve makinesi" sizes="(max-width: 820px) 100vw, 50vw" /></div><div className={styles.personalizeCopy}><span className={styles.sparkIcon}><Icon name="spark" /></span><p className={styles.eyebrow}>Xinobi Studio</p><h2 id="personalize-title">Ürününüzde size ait bir iz.</h2><p>Seçili ürünlerde renk, yüzey ve kişisel tasarım seçeneklerini tek bir akışta keşfedin.</p><p className={styles.prototypeNote}>Kişiselleştirme ölçüleri ve baskı seçenekleri D04 üretim kararıyla kesinleşecektir.</p><Link className={styles.lightButton} href="/urunler/cay-makinesi-101/kisisellestir">Nasıl çalışır? <Icon name="arrow" /></Link></div></section>
+      <section id="kisisellestirme" className={styles.personalize} aria-labelledby="personalize-title"><Image className={styles.personalizeImage} src={personalizedTeaMakers} alt="Özel desenlerle kişiselleştirilmiş iki Xinobi çay makinesi" sizes="100vw" /><div className={styles.personalizeCopy}><span className={styles.sparkIcon}><Icon name="spark" /></span><p className={styles.eyebrow}>XINOBI U</p><h2 id="personalize-title">Hayaliniz, ürününüzün yüzeyinde.</h2><p>Kendi görselinizi yükleyin veya birkaç soruyla size özel tasarım yönünü oluşturun. Seçiminizi gerçek ürün üzerinde görün.</p><Link className={styles.lightButton} href="/urunler/cay-makinesi-101/kisisellestir">Tasarlamaya başla <Icon name="arrow" /></Link></div><span className={styles.personalizeDemo}>Temsili kişiselleştirme görseli</span></section>
 
       <section id="kategoriler" className={styles.section} aria-labelledby="categories-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Koleksiyonu keşfedin</p><h2 id="categories-title">Evin her anına eşlik eder.</h2></div></div><div className={styles.categoryGrid}>{categories.map((category) => <Link className={styles.categoryCard} href="#urunler" key={category.name}><Image className={category.tall ? styles.categoryImageTall : ""} src={category.image} alt="" sizes="(max-width: 640px) 90vw, 24vw" /><span>{category.name}<Icon name="arrow" /></span></Link>)}</div></section>
 

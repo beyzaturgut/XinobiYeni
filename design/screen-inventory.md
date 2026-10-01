@@ -20,10 +20,10 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | WEB-014 | İptal/iade | Üye / sipariş | Demo iptal/iade özeti hazırla | ReturnRequest, ödeme, stok | 02,05 | 500 px Chrome görsel QA ve mobil header düzeltmesi geçti; D03/D10/API/interaction QA bekliyor |
 | WEB-015 | Kurumsal teklif | Başvuru sahibi / menü | Demo teklif özeti hazırla | Firma, ürün, adet, termin, dosya | 02,07 | 500 px Chrome görsel QA geçti; D07/dosya API/interaction/gerçek cihaz QA bekliyor |
 | WEB-016 | Teklif takibi | Başvuru sahibi / hesap | Demo durum/revizyon gör | QuoteRequest, history | 02,07 | 500 px Chrome görsel QA geçti; D07/API/interaction/gerçek cihaz QA bekliyor |
-| WEB-017 | AI tasarım | Müşteri / ürün, editör | Demo istem/alternatif/hata durumunu incele | AiJob, quota, asset | 02,10 | 500 px mobil header QA geçti; D08/D10/sağlayıcı/interaction/gerçek cihaz QA bekliyor |
-| WEB-018 | AI satış asistanı | Herkes / global | Demo ürün/teklif yönlendirmesi gör | Katalog, konuşma, lead | 02,10 | 500 px mobil header QA geçti; D05/D08/D10/sağlayıcı/interaction/gerçek cihaz QA bekliyor |
-| WEB-019 | Kurumsal/içerik | Herkes / footer, SEO | Marka yaklaşımını ve içerik önizlemesini oku | Page, BlogPost, SEO | 02,04 | Responsive kurumsal hikâye kabuğu hazır; CMS/içerik onayı/browser QA bekliyor |
-| WEB-020 | Yasal/çerez | Herkes / footer, ilk ziyaret | Taslak belgeleri ve tercih durumlarını incele | LegalDocument, Consent | 02,04 | Responsive yasal merkez ve global tercih kabuğu hazır; D10/hukuk/persistence/browser QA bekliyor |
+| WEB-017 | AI tasarım | Müşteri / ürün, editör | Demo istem/alternatif/hata durumunu incele | AiJob, quota, asset | 02,10 | 500 px uzun Chrome görsel QA geçti; D08/D10/sağlayıcı/interaction/gerçek cihaz QA bekliyor |
+| WEB-018 | AI satış asistanı | Herkes / global | Demo ürün/teklif yönlendirmesi gör | Katalog, konuşma, lead | 02,10 | 500 px uzun Chrome görsel QA geçti; D05/D08/D10/sağlayıcı/interaction/gerçek cihaz QA bekliyor |
+| WEB-019 | Kurumsal/içerik | Herkes / footer, SEO | Marka yaklaşımını ve içerik önizlemesini oku | Page, BlogPost, SEO | 02,04 | 500 px uzun Chrome görsel QA geçti; CMS/içerik onayı/interaction/gerçek cihaz QA bekliyor |
+| WEB-020 | Yasal/çerez | Herkes / footer, ilk ziyaret | Taslak belgeleri ve tercih durumlarını incele | LegalDocument, Consent | 02,04 | 500 px uzun Chrome görsel QA geçti; D10/hukuk/persistence/interaction/gerçek cihaz QA bekliyor |
 | ADM-001 | Dashboard | Panel rolü / giriş | Operasyon özeti | Sipariş, stok, hata, teklif | 02,03+ | Bekliyor |
 | ADM-002 | Rol/denetim/ayar | Yönetici | Yetki ve audit incele | Role, Permission, AuditLog | 02,03 | Bekliyor |
 | ADM-003 | Katalog/varyant/medya | Katalog rolü | Ürün yayınla | Product, Variant, Asset | 02,04 | D02 bekliyor |

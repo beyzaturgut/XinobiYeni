@@ -83,21 +83,22 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex uygulama oturumu; Faz02 tarayıcı QA sürdürüldü |
-| Aktif faz/görev ID | Faz02 / v0.20.9 F02-A03 web bileşen sözleşmesi; karar blokajları sürüyor |
-| Repo/branch/HEAD | `main` · interaction kapsamı 02 öncesi `f466595`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-01 · Codex uygulama oturumu; Faz02 akış teslimi sürdürüldü |
+| Aktif faz/görev ID | Faz02 / v0.21.0 F02-A04 web/panel/mobil akış sözleşmesi; karar blokajları sürüyor |
+| Repo/branch/HEAD | `main` · F02-A04 öncesi `7613607`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-053: tokens JSON geçerli; components 10/10 bölüm ve zorunlu durum/a11y/D-kararı işaretleri başarılı; diff kontrolü temiz |
-| Değişen dosyalar / migration | `design/components.md`, tokens 0.2.0 muted eşliği, karar/açık kabul güncellemesi ve TST-053; uygulama/migration/deploy paketi değişmedi |
-| Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | F02-A04 web/panel/mobil akış teslimini `design/flows.md` olarak çıkar; D kararları ve gerçek onaylar olmadan Faz02'yi kapatma |
+| Son test komutu ve sonucu | TST-054: WEB 20/20, ADM 12/12, MOB 6/6 ve D02–D10 akış işaretleri mevcut; diff kontrolü temiz |
+| Değişen dosyalar / migration | `design/flows.md`, Faz02 açık kabul/değişiklik kayıtları ve TST-054; uygulama/migration/deploy paketi değişmedi |
+| Aktif hata/yarım iş | 390 px gerçek cihaz ve manuel ekran okuyucu QA açık. Panel/mobil yüksek doğruluk ekranları yok; D02–D10 ve Faz01 rol/PM girdileri açık |
+| Sonraki en küçük güvenli adım | F02-A05 için `design/editor-spec.md` ve `design/ai-spec.md` ayrıntılı sözleşmelerini çıkar; D kararları ve gerçek onaylar olmadan Faz02'yi kapatma |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Faz02 v0.21.0 / F02-A04 | `main` / `7613607` | Web, panel ve Flutter ekran zincirleri; hata, retry, kanal uzlaştırma ve karar bağımlılıkları | TST-054: ekran ID, D-kararı ve belge diff kontrolleri başarılı | `design/flows.md`, `test/2026-10-01/TST-054-*` | F02-A05 editör ve AI ayrıntılı spec | Codex |
 | 2026-10-01 | Faz02 v0.20.9 / F02-A03 | `main` / `83ead98` | Web bileşen durum/semantik/klavye/veri sözleşmesi; token ve karar eşliği | TST-053: JSON ve 10 bölüm/zorunlu işaret kontrolü başarılı | `design/components.md`, `design/tokens.json`, `test/2026-10-01/TST-053-*` | F02-A04 `design/flows.md` | Codex |
 | 2026-10-01 | Faz02 v0.20.8 / NAV-01 | `main` / `ed95092` | Ana/Xinobi/yasal bağlantı smoke; plan-kod karşılaştırmalı açık kabul listesi | TST-052: navigasyon 3/3; lint ve birleşik E2E 43/43 başarılı | `apps/web/tests/e2e/navigation.spec.ts`, `design/faz02-open-acceptance.md`, `test/2026-10-01/TST-052-*` | F02-A03 bileşen sözleşmesi | Codex |
 | 2026-10-01 | Faz02 v0.20.7 / E2E-04 | `main` / `c062498` | Katalog, varyant, favori, ödeme ve basit kişiselleştirme için beş Playwright senaryosu | TST-051: ilk 15/18; final kritik 18/18, birleşik E2E 40/40 ve lint başarılı | `apps/web/tests/e2e/critical-interactions.spec.ts`, `test/2026-10-01/TST-051-*` | Navigasyon smoke ve Faz02 açık kabul listesi | Codex |

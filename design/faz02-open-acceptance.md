@@ -11,6 +11,7 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 - Yetkili logo `design/logo/`, demo ürün görselleri uygulama varlıklarında kullanılıyor.
 - Tasarım tokenleri ve karar özeti `design/tokens.json` ile `design/decisions.md` içinde mevcut.
 - F02-A03 web bileşen sözleşmesi `design/components.md` içinde durum, semantik, klavye, responsive ve veri sınırlarıyla mevcut.
+- F02-A04 web, panel ve Flutter mobil akış sözleşmesi `design/flows.md` içinde ekran, hata, kanal geçişi ve karar bağımlılıklarıyla mevcut.
 - Masaüstü ve 500 px Chrome görsel QA grupları kayıtlı.
 - Kritik web etkileşimleri Playwright ile 18/18 geçti.
 - Yirmi rotada WCAG A/AA axe taraması ve iki klavye odağı senaryosu 22/22 geçti.
@@ -23,7 +24,6 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 |---|---|---|---|
 | F02-A01 | 390 px gerçek telefon ve tablet QA | Fiziksel cihaz ekran görüntüsü, taşma/dokunma/klavye sonucu | FE + Creative; web kritik rotalarını gerçek cihazda doğrula |
 | F02-A02 | Manuel ekran okuyucu kontrolü | VoiceOver ve TalkBack temel akış tutanağı | FE; ana menü, form, ürün, editör ve ödeme kabuğunu incele |
-| F02-A04 | Akış teslimi | `design/flows.md`; web, panel ve mobil akış bağlantıları | BA + Creative |
 | F02-A05 | Editör ve AI ayrıntılı spec | `design/editor-spec.md`, `design/ai-spec.md` | Creative + FE + BE |
 | F02-A06 | Handoff paketi | `design/handoff.md`, medya/lisans, ölçü ve API alan eşlemesi | Creative → FE; BE/DBA/Full Stack incelemesi |
 | F02-A07 | Erişilebilirlik tutanağı | `design/a11y-audit.md`; kontrast, odak, reduced-motion ve manuel sonuçlar | FE |
@@ -52,4 +52,4 @@ Faz02 ancak aşağıdakilerin tümü gerçekleştiğinde `Tamamlandı` olabilir:
 3. İş Analisti, Creative, FE, BE, DBA ve Full Stack ayrı uygulama incelemelerini gerçek kimlik/tarih/kanıtla verir.
 4. PM, bu altı incelemeden sonra ayrı `PM-KAPI: KABUL` kararı verir.
 
-Mevcut değerlendirme: web prototipi ve otomatik QA ilerlemiştir; panel, mobil, handoff ve gerçek onaylar eksik olduğu için **Faz02 = Devam**.
+Mevcut değerlendirme: web prototipi, otomatik QA ve kanal akış sözleşmeleri ilerlemiştir; panel, mobil, handoff ve gerçek onaylar eksik olduğu için **Faz02 = Devam**.

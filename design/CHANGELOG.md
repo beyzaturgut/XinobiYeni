@@ -1,5 +1,12 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.21.0 - 01.10.2026
+
+- F02-A04 kapsamında `design/flows.md` oluşturuldu; WEB-001–020, ADM-001–012 ve MOB-001–006 bağlantıları tanımlandı.
+- Alışveriş, hesap/iade, kurumsal teklif, kişiselleştirme/baskı, AI, panel operasyonu ve mobil eşlik akışlarında hata/yeniden deneme ve sunucu otoritesi sınırları belgelendi.
+- D02–D10 karar bağımlılıkları ile Faz03–11 uygulama ve kabul sahipliği eşlendi; panel ve mobil sözleşmeler tamamlanmış ekran olarak gösterilmedi.
+- F02-A04 kapatıldı; sıradaki bağımsız teslim F02-A05 `design/editor-spec.md` ve `design/ai-spec.md` olarak belirlendi.
+
 ## 0.20.9 - 01.10.2026
 
 - F02-A03 kapsamında çalışan web arayüzüyle eşlenmiş `design/components.md` oluşturuldu.

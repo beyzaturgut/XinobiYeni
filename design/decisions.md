@@ -1,10 +1,11 @@
 # Faz02 tasarım kararları
 
-Sürüm: `0.1.0` · Tarih: 30.09.2026 · Durum: İlk yön uygulandı, inceleme bekliyor
+Sürüm: `0.2.0` · Tarih: 01.10.2026 · Durum: Web yönü uygulandı, geniş kapsam incelemesi bekliyor
 
 ## Geri bildirim kaydı
 
 - 30.09.2026: Proje sahibi WEB-001 yerel tasarımını inceledikten sonra “gayet iyi” geri bildirimi verdi ve devam edilmesini istedi. Bu geri bildirim yaratıcı yönün sürdürülmesine izin verir; Faz02'nin yedi rol/PM nihai kabul kapısı yerine geçmez.
+- 01.10.2026: WCAG A/AA axe taramasındaki kontrast bulguları sonrası yardımcı metin tokeni `#52605D` olarak koyulaştırıldı. Yirmi web rotası final taramada kritik/ciddi ihlal olmadan geçti; bu otomasyon manuel ekran okuyucu kabulü yerine geçmez.
 
 ## Yaratıcı yön
 

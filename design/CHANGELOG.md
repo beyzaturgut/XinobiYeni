@@ -1,5 +1,12 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.20.9 - 01.10.2026
+
+- F02-A03 kapsamında çalışan web arayüzüyle eşlenmiş `design/components.md` oluşturuldu.
+- Eylem, form, seçim, geri bildirim, navigasyon, ürün, sepet, editör, AI ve çerez bileşenlerinin durum/semantik/klavye/veri sınırları belgelendi.
+- Axe düzeltmeleri sonrası gerçek uygulamadaki yardımcı metin rengi `design/tokens.json` 0.2.0 ile eşitlendi; karar kaydına gerekçesi eklendi.
+- F02-A03 kapatıldı; sıradaki bağımsız teslim F02-A04 `design/flows.md` olarak belirlendi.
+
 ## 0.20.8 - 01.10.2026
 
 - Ana sayfa, Xinobi dünyası ve yasal merkez için iç hedef ve rota bağlantısı smoke testleri eklendi.

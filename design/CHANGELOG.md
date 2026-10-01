@@ -1,5 +1,11 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.23.1 - 01.10.2026
+
+- Admin panelinden yönetilecek hero slider, XINOBI U bannerı, kategori görselleri ve keşfet bannerlarına görünür geçici içerik açıklaması eklendi.
+- Gerçek CMS yayını oluşana kadar ilgili alanlar `Temsili` ve `Admin panelinden yönetilir` olarak ayrıştırıldı; sahte kampanya/ticari vaat üretilmedi.
+- 320/390/768/1024/1440 renderlar yenilendi; her görünümde 14/14 görsel yüklendi, yatay taşma oluşmadı.
+
 ## 0.23.0 - 01.10.2026
 
 - WEB-001 ortak yönü, üretim uygulamasından ayrı yüksek doğruluklu HTML/CSS tasarım prototipine dönüştürüldü.

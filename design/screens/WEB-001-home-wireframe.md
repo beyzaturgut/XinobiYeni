@@ -90,6 +90,10 @@ Durum: Kullanıcı `ORTAK TASARIM ONAY` incelemesine hazırlanıyor
 | Medya hatası | oranı koruyan marka placeholder; metin/CTA kaybolmaz |
 | CMS boşluğu | bölüm tamamen gizlenmezse editör kontrollü güvenli fallback; kırık kart gösterilmez |
 
+## Geçici içerik kuralı
+
+Admin panelinden yönetilecek slider, XINOBI U bannerı, kategori görseli ve keşfet bannerı gerçek CMS bağlantısı kurulana kadar görünür `Temsili` ve `Admin panelinden yönetilir` açıklaması taşır. Geçici içerik fiyat, stok, kampanya, teslimat veya üretim uygunluğu iddiası kurmaz. Gerçek onaylı içerik yayınlandığında etiket CMS yayın kanıtıyla kaldırılır.
+
 ## Tasarım onayı sonrası hi-fi üretim
 
 Wireframe onayından sonra aynı dosya ID'siyle 1440, 1024, 768, 390 ve 320 px yüksek doğruluklu kaynak/PNG çıktıları hazırlanır. Onaydan önce `apps/web` görsel düzeni değiştirilmez.

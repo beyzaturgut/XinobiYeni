@@ -13,12 +13,12 @@ if (await desktop.locator("#mega-menu").isHidden()) throw new Error("Mega menu d
 await desktop.keyboard.press("Escape");
 if (await desktop.locator("#mega-menu").isVisible()) throw new Error("Mega menu did not close with Escape");
 
-const initialSlide = await desktop.locator("[data-hero-index]").textContent();
-await desktop.locator("[data-hero-next]").click();
-const nextSlide = await desktop.locator("[data-hero-index]").textContent();
-if (initialSlide === nextSlide) throw new Error("Hero did not advance");
-await desktop.locator("[data-hero-pause]").click();
-if ((await desktop.locator("[data-hero-pause]").getAttribute("aria-label")) !== "Otomatik geçişi başlat") throw new Error("Hero pause state missing");
+const initialSlide = await desktop.locator("[data-hero-image]").getAttribute("src");
+await desktop.locator("[data-slide='1']").click();
+const nextSlide = await desktop.locator("[data-hero-image]").getAttribute("src");
+if (initialSlide === nextSlide) throw new Error("Hero did not advance from pagination");
+if (await desktop.locator(".slider-controls").count()) throw new Error("Hero arrows must not be visible");
+if (await desktop.locator(".hero h1, .hero p").count()) throw new Error("Hero must not contain copy");
 
 await desktop.locator(".nobi").click();
 if (await desktop.locator("#nobi-panel").isHidden()) throw new Error("Nobi did not open");
@@ -40,6 +40,10 @@ await mobile.waitForTimeout(500);
 const after = await track.evaluate((element) => element.scrollLeft);
 if (after <= before) throw new Error("Mobile product carousel did not scroll");
 
-console.log("desktop: mega-menu, hero controls, Nobi = OK");
+const categoryLabels = await desktop.locator("[data-category-track] .category-card span").allTextContents();
+if (categoryLabels.join("|") !== "Çay makineleri|Kahve makineleri|Tost makineleri|Pişirme makineleri|Hava temizleme") throw new Error("Category order/content is incorrect");
+if (await desktop.locator(".discover").count()) throw new Error("Discover section must be removed");
+
+console.log("desktop: category menu, image-only hero, category rail, Nobi = OK");
 console.log("mobile: drawer, product carousel = OK");
 await browser.close();

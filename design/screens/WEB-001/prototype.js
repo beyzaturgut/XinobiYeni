@@ -1,69 +1,27 @@
 const heroSlides = [
-  {
-    title: "Gündelik ritüeller için sessiz teknoloji.",
-    copy: "Metalin güçlü karakterini, yalın tasarımı ve kişisel seçimleri aynı üründe buluşturun.",
-    image: "../../../apps/web/public/assets/products/tea-maker-101-blue.webp",
-    alt: "Lacivert Xinobi Çay Makinesi 101",
-    model: "Çay Makinesi 101",
-    variant: "Lacivert",
-  },
-  {
-    title: "Kahvenin ritmi, günün temposuna uyum sağlar.",
-    copy: "Sade kullanım ve güçlü form, kahve köşenizde tek bir çizgide buluşur.",
-    image: "../../../apps/web/public/assets/products/coffee-maker-101-red.webp",
-    alt: "Kırmızı Xinobi Kahve Makinesi 101",
-    model: "Kahve Makinesi 101",
-    variant: "Kırmızı",
-  },
-  {
-    title: "Temiz hava, sakin bir yaşam alanı.",
-    copy: "Yaşam alanınıza uyum sağlayan yalın ve anlaşılır bir teknoloji deneyimi.",
-    image: "../../../apps/web/public/assets/products/air-purifier-101.webp",
-    alt: "Xinobi Hava Temizleme 101",
-    model: "Hava Temizleme 101",
-    variant: "Gümüş gri",
-  },
+  "../../banner/exec-538ef509-f295-43f6-9a93-9026ead66ffa.png",
+  "../../banner/exec-76dfc190-8682-4e57-860e-69dbc0a5b0c4.png",
+  "../../banner/exec-f07f474b-1bec-473a-937c-b45b3a958ed5.png",
 ];
 
-const hero = {
-  title: document.querySelector("[data-hero-title]"),
-  copy: document.querySelector("[data-hero-copy]"),
-  image: document.querySelector("[data-hero-image]"),
-  model: document.querySelector("[data-hero-model]"),
-  variant: document.querySelector("[data-hero-variant]"),
-  index: document.querySelector("[data-hero-index]"),
-};
+const heroImage = document.querySelector("[data-hero-image]");
+const heroDots = [...document.querySelectorAll("[data-slide]")];
 let activeSlide = 0;
-let heroPaused = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let heroTimer;
 
-function showSlide(index, announce = true) {
+function showSlide(index) {
   activeSlide = (index + heroSlides.length) % heroSlides.length;
-  const slide = heroSlides[activeSlide];
-  hero.title.textContent = slide.title;
-  hero.copy.textContent = slide.copy;
-  hero.image.src = slide.image;
-  hero.image.alt = slide.alt;
-  hero.model.textContent = slide.model;
-  hero.variant.textContent = slide.variant;
-  hero.index.textContent = String(activeSlide + 1).padStart(2, "0");
-  if (!announce) hero.index.closest("span").setAttribute("aria-live", "off");
-  else hero.index.closest("span").setAttribute("aria-live", "polite");
+  heroImage.src = heroSlides[activeSlide];
+  heroImage.alt = `Xinobi tanıtım bannerı ${activeSlide + 1}`;
+  heroDots.forEach((dot, dotIndex) => dot.classList.toggle("active", dotIndex === activeSlide));
 }
 
 function restartHero() {
   clearInterval(heroTimer);
-  if (!heroPaused) heroTimer = setInterval(() => showSlide(activeSlide + 1, false), 6500);
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) heroTimer = setInterval(() => showSlide(activeSlide + 1), 6500);
 }
 
-document.querySelector("[data-hero-prev]").addEventListener("click", () => { showSlide(activeSlide - 1); restartHero(); });
-document.querySelector("[data-hero-next]").addEventListener("click", () => { showSlide(activeSlide + 1); restartHero(); });
-document.querySelector("[data-hero-pause]").addEventListener("click", (event) => {
-  heroPaused = !heroPaused;
-  event.currentTarget.textContent = heroPaused ? "▶" : "Ⅱ";
-  event.currentTarget.setAttribute("aria-label", heroPaused ? "Otomatik geçişi başlat" : "Otomatik geçişi duraklat");
-  restartHero();
-});
+heroDots.forEach((dot) => dot.addEventListener("click", () => { showSlide(Number(dot.dataset.slide)); restartHero(); }));
 restartHero();
 
 const megaMenu = document.querySelector("#mega-menu");

@@ -106,3 +106,70 @@ test("satış asistanı sabit öneri, bildirim ve temizleme akışını çalış
   await expect(page.getByRole("button", { name: /Çay makinesi öner/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "Canlı desteğe bağlan" })).toBeDisabled();
 });
+
+test("üyelik sekmeleri, parola görünürlüğü ve parola yenileme görünümü çalışır", async ({ page }) => {
+  await page.goto("/hesap/giris/");
+  await closeConsent(page);
+  await page.getByRole("tab", { name: "Yeni hesap" }).click();
+  await expect(page.getByRole("heading", { name: "Yeni hesabınızı oluşturun." })).toBeVisible();
+  await expect(page.getByLabel(/Üyelik koşullarını/)).not.toBeChecked();
+  const password = page.getByPlaceholder("En az 8 karakter");
+  await expect(password).toHaveAttribute("type", "password");
+  await page.getByRole("button", { name: "Parolayı göster" }).click();
+  await expect(password).toHaveAttribute("type", "text");
+  await page.getByRole("tab", { name: "Giriş" }).click();
+  await page.getByRole("button", { name: "Parolamı unuttum" }).click();
+  await expect(page.getByRole("heading", { name: "Parolanızı yenileyin." })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Yenileme bağlantısı gönder" })).toBeDisabled();
+});
+
+test("sipariş seçimi detay ve teslimat çizgisini günceller", async ({ page }) => {
+  await page.goto("/hesap/siparisler/");
+  await closeConsent(page);
+  await page.getByRole("button", { name: /DEMO-2312/ }).click();
+  await expect(page.getByRole("heading", { name: "DEMO-2312" })).toBeVisible();
+  const detail = page.locator("section[aria-labelledby='order-title']");
+  await expect(detail.getByText("Kahve Makinesi 101", { exact: true })).toBeVisible();
+  await expect(page.getByText("Demo kargo durumu")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Kargoyu takip et" })).toBeDisabled();
+});
+
+test("iade formu geçerli girişlerle demo özeti hazırlar", async ({ page }) => {
+  await page.goto("/hesap/siparisler/iade/");
+  await closeConsent(page);
+  await page.getByLabel("İptal talebi").check();
+  await page.getByLabel("Neden").selectOption({ label: "Yanlış ürün seçtim" });
+  await page.getByLabel("Açıklama").fill("Yanlış ürün seçildiği için iptal etmek istiyorum.");
+  await page.getByRole("button", { name: "Demo talep özetini hazırla" }).click();
+  await expect(page.getByRole("heading", { name: "İptal önizlemesi" })).toBeVisible();
+  await expect(page.getByText("Demo özet hazırlandı; talep sunucuya gönderilmedi.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Talebi gönder" })).toBeDisabled();
+});
+
+test("teklif revizyonu ve demo geri bildirim notu birlikte güncellenir", async ({ page }) => {
+  await page.goto("/kurumsal/teklif/takip/");
+  await closeConsent(page);
+  await page.getByRole("button", { name: "Revizyon 1" }).click();
+  await expect(page.getByRole("heading", { name: "Revizyon 1" })).toBeVisible();
+  await expect(page.getByText("20", { exact: true })).toBeVisible();
+  await page.getByLabel("Talebiniz").fill("Termin ve renk seçeneklerinin güncellenmesini rica ederiz.");
+  await page.getByRole("button", { name: "Demo revizyon notunu hazırla" }).click();
+  await expect(page.getByText("Demo revizyon notu hazırlandı; sunucuya gönderilmedi.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Teklifi onayla" })).toBeDisabled();
+});
+
+test("gelişmiş editör katman, görünürlük, kilit ve yüz seçimlerini yönetir", async ({ page }) => {
+  await page.goto("/urunler/cay-makinesi-101/editor/");
+  await closeConsent(page);
+  await page.locator("aside[aria-label='Tasarım araçları'] button").filter({ hasText: "Metin" }).click();
+  await expect(page.getByText("3 öğe")).toBeVisible();
+  await expect(page.getByText("Metin katmanı demo çalışma alanına eklendi.")).toBeVisible();
+  await page.getByRole("button", { name: "Yeni metin katmanını gizle" }).click();
+  await expect(page.getByRole("button", { name: "Yeni metin katmanını göster" })).toBeVisible();
+  await page.getByRole("button", { name: "Bana özel katmanının kilidini kapat" }).click();
+  await expect(page.getByRole("button", { name: "Bana özel katmanının kilidini aç" })).toBeVisible();
+  await page.getByRole("button", { name: "Arka yüz" }).click();
+  await expect(page.getByRole("heading", { name: "Arka yüz" })).toBeVisible();
+  await page.getByRole("button", { name: "Demo taslağı hazırla" }).click();
+  await expect(page.getByText("Demo taslak hazırlandı; sunucuya kalıcı kayıt yapılmadı.")).toBeVisible();
+});

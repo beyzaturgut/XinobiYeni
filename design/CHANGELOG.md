@@ -1,5 +1,12 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.20.5 - 01.10.2026
+
+- Playwright kritik etkileşim paketi 13 senaryoya genişletildi.
+- Üyelik/parola, sipariş seçimi, iade özeti, teklif revizyonu ve gelişmiş editör akışları gerçek Chrome üzerinde otomatik doğrulandı.
+- İki belirsiz seçici ve editör araç seçicisi daraltıldı; final regresyon 13/13 geçti.
+- Lint ve ağ erişimli temiz production build 23 statik rota ile başarılı oldu; canlı deploy değiştirilmedi.
+
 ## 0.1.0 - 30.09.2026
 
 - Xinobi logosu ve demo ürün görselleri envanterlendi.

@@ -169,3 +169,9 @@
 - Arama, Escape ile temizleme ve en fazla üç ürün karşılaştırma sınırı otomatikleştirildi.
 - Ödeme sonucu başarısız/başarılı durumları Enter ve Space klavye girdileriyle doğrulandı.
 - Arama alanındaki görünür ESC ipucu gerçek davranışa bağlandı.
+
+## 0.20.4 - 01.10.2026
+
+- Playwright kritik etkileşim paketi 3 senaryodan 8 senaryoya genişletildi.
+- Sepet adet/kaldırma/boş durum, hesap profil/adres demo kaydı ve kurumsal teklif özet akışları eklendi.
+- AI tasarım alternatif/seçim/hata dönüşü ve satış asistanı konu/mesaj/temizleme akışları otomatikleştirildi.

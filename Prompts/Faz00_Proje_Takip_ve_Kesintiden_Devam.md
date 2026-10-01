@@ -84,20 +84,21 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | Alan | Şu anki kayıt |
 |---|---|
 | Son güncelleme ve sorumlu | 2026-10-01 · Codex uygulama oturumu; Faz02 tarayıcı QA sürdürüldü |
-| Aktif faz/görev ID | Faz02 / v0.20.3 Playwright kritik interaction/klavye altyapısı; karar blokajları sürüyor |
-| Repo/branch/HEAD | `main` · interaction altyapısı öncesi `8eb5d1c`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Aktif faz/görev ID | Faz02 / v0.20.4 Playwright kritik interaction kapsamı 02; karar blokajları sürüyor |
+| Repo/branch/HEAD | `main` · interaction kapsamı 02 öncesi `f466595`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
 | Son çalışan uygulama komutu/URL | IIS preview hâlen DEPLOY-001 `http://109.104.120.91:8014`; DEPLOY-002 tam paket hazır, RDP kurulumu bekliyor |
-| Son test komutu ve sonucu | TST-047: ilk Playwright 2/3; fixture beklentisi düzeltildi; final 3/3 ve 23/23 static export başarılı |
-| Değişen dosyalar / migration | Playwright config/test, arama ESC davranışı, v0.20.3 ve TST-047; migration ve deploy paketi değişmedi |
+| Son test komutu ve sonucu | TST-048: genişletilmiş ilk Playwright 7/8; seçici düzeltildi; final 8/8 başarılı |
+| Değişen dosyalar / migration | Beş yeni kritik interaction senaryosu, design v0.20.4 ve TST-048; uygulama/migration/deploy paketi değişmedi |
 | Aktif hata/yarım iş | WEB-001–007 görsel ve interaction QA açık. D02/D03 olmadan gerçek fiyat-stok/sepet; D04 olmadan baskı alanı kesinleşmedi. Faz01 rol/PM girdileri ayrıca açık |
-| Sonraki en küçük güvenli adım | Sepet, hesap, teklif, AI/asistan etkileşimlerini ve tab/odak sırasını Playwright kapsamına ekle |
+| Sonraki en küçük güvenli adım | Üyelik, sipariş, iade, teklif takibi ve editör interaction testlerini ekle; ardından odak/a11y taraması |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-01 | Faz02 v0.20.4 / E2E-02 | `main` / `f466595` | Sepet, hesap, teklif, AI ve asistan için beş Playwright senaryosu | TST-048: ilk 7/8, seçici düzeltmesi sonrası final 8/8 | `apps/web/tests/e2e/*`, `test/2026-10-01/TST-048-*` | Kalan interaction ve odak/a11y | Codex |
 | 2026-10-01 | Faz02 v0.20.3 / E2E-01 | `main` / `8eb5d1c` | Playwright sistem Chrome altyapısı; consent, arama/limit/ESC ve ödeme klavye senaryoları | TST-047: final 3/3 ve build 23 rota başarılı | `apps/web/tests/e2e/*`, `test/2026-10-01/TST-047-*` | Kritik interaction kapsamını genişlet | Codex |
 | 2026-10-01 | Faz02 QA-04 | `main` / `3a37380` | WEB-017–020 Chrome 500 px uzun sayfa görsel QA ve hero yükleme tekrar kontrolü | TST-046: dört rota başarılı; interaction/gerçek cihaz açık | `test/2026-10-01/TST-046-*` | Interaction/klavye altyapısı | Codex |
 | 2026-10-01 | Faz02 v0.20.2 / QA-03 | `main` / `d083c4c` | WEB-007/011–016 görsel QA; dört üç-öğeli mobil header düzeltmesi ve tekrar render | TST-045: lint/export 23 rota ve Chrome doğrulama başarılı | `test/2026-10-01/TST-045-*` | WEB-017–020 tam sayfa QA | Codex |

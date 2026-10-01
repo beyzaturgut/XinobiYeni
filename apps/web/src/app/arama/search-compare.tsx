@@ -34,7 +34,7 @@ export default function SearchCompare() {
     <section className={styles.searchHero} aria-labelledby="search-title">
       <p>Ürün keşfi</p><h1 id="search-title">Aradığınızı daha sakin bulun.</h1>
       <label htmlFor="global-product-search">Ürün, kategori veya özellik ara</label>
-      <div className={styles.searchBox}><span aria-hidden="true">⌕</span><input id="global-product-search" type="search" autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Örneğin: çay, kahve veya pişirme" /><kbd>ESC</kbd></div>
+      <div className={styles.searchBox}><span aria-hidden="true">⌕</span><input id="global-product-search" type="search" autoFocus value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Escape") setQuery(""); }} placeholder="Örneğin: çay, kahve veya pişirme" /><kbd>ESC</kbd></div>
       <div className={styles.quickLinks}><span>Hızlı aramalar</span>{["Çay", "Kahve", "Pişirme"].map((term) => <button type="button" key={term} onClick={() => setQuery(term)}>{term}</button>)}</div>
     </section>
 

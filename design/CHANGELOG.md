@@ -161,3 +161,11 @@
 - Favori, giriş, hesap, sipariş, iade ve kurumsal teklif/takip ekranları 500 px Chrome görsel QA grubundan geçirildi.
 - Üç öğeli mobil üst menülerde kapatma bağlantısının ikinci satıra düşmesine neden olan ortak grid sorunu düzeltildi.
 - Giriş, iade, AI tasarım ve satış asistanı başlıkları düzeltme sonrası yeniden render edilerek doğrulandı.
+
+## 0.20.3 - 01.10.2026
+
+- Sistem Chrome'u üzerinde çalışan Playwright etkileşim/klavye test altyapısı eklendi.
+- Çerez panelinin kapatma, yeniden açma, kategori ve prototip tercih geri bildirimi otomatikleştirildi.
+- Arama, Escape ile temizleme ve en fazla üç ürün karşılaştırma sınırı otomatikleştirildi.
+- Ödeme sonucu başarısız/başarılı durumları Enter ve Space klavye girdileriyle doğrulandı.
+- Arama alanındaki görünür ESC ipucu gerçek davranışa bağlandı.

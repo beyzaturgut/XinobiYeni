@@ -11,4 +11,6 @@
 **/build/
 **/.flutter-plugins*
 **/coverage/
+**/test-results/
+**/playwright-report/
 XinobiYeni-web-*.zip

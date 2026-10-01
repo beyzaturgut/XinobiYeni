@@ -1,41 +1,14 @@
 .page { min-height: 100vh; background: #e9eeeb; color: #16242a; }
 .skipLink { position: fixed; left: 16px; top: -80px; z-index: 30; padding: 12px 18px; background: white; color: #111; }
 .skipLink:focus { top: 0; }
-.header { min-height: 104px; padding: 0 clamp(20px,4.5vw,90px); display: grid; grid-template-columns: 120px minmax(0,1fr) auto; align-items: center; gap: 28px; background: #030303; color: white; }
-.brand { width: 94px; height: 88px; display: flex; align-items: center; overflow: hidden; }
-.brand img { width: 86px; height: auto; }
-.header nav { display: flex; align-items: center; justify-content: center; gap: clamp(14px,1.35vw,27px); white-space: nowrap; font-size: clamp(.68rem,.82vw,.9rem); }
-.header nav a { padding: 12px 0; border-bottom: 1px solid transparent; }
-.header nav a:hover { border-color: white; }
-.headerActions { display: flex; align-items: center; gap: 12px; }
-.headerActions>a:not(.searchLink) { width: 43px; height: 43px; display: grid; place-items: center; border: 1px solid #e8e8e8; border-radius: 50%; font-size: 1.35rem; }
-.searchLink { width: clamp(150px,16vw,260px); height: 56px; padding: 0 18px; display: flex; align-items: center; gap: 14px; border-radius: 6px; background: white; color: #6d5a56; font-size: .85rem; }
-.searchLink span { color: #111; font-size: 2rem; line-height: 1; }
-.campaignHero { height: clamp(610px,43vw,730px); position: relative; isolation: isolate; overflow: hidden; background: #111; color: #fff; }
-.campaignBackground { z-index: -2; object-fit: cover; object-position: center; }
-.campaignShade { position: absolute; z-index: -1; inset: 0; background: linear-gradient(90deg,rgba(5,7,7,.88) 0%,rgba(5,7,7,.68) 32%,rgba(5,7,7,.08) 57%,rgba(5,7,7,.16) 100%); }
-.campaignCopy { width: 48%; height: 100%; padding: clamp(55px,5vw,92px) 20px clamp(48px,5vw,80px) clamp(35px,5vw,85px); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
-.campaignCopy>p { margin: 0 0 24px; display: flex; align-items: center; gap: 15px; font-size: .76rem; font-weight: 700; letter-spacing: .12em; }
-.campaignCopy>p span { width: 42px; height: 2px; background: #ef2638; }
-.campaignCopy h1 { margin: 0; font-size: clamp(3.3rem,4.5vw,5rem); font-weight: 720; letter-spacing: -.045em; line-height: 1.02; }
-.campaignCopy h1 small { display: block; margin-bottom: 6px; color: #f0d7d1; font-size: .28em; font-weight: 650; letter-spacing: .06em; }
-.campaignCopy>strong { margin-top: 24px; font-size: clamp(.9rem,1.15vw,1.15rem); font-weight: 430; }
-.benefits { width: min(660px,100%); margin-top: 38px; display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
-.benefits>div { display: grid; grid-template-columns: 38px 1fr; gap: 10px; align-items: start; }
-.benefits b { font-size: 1.85rem; line-height: 1; }
-.benefits span { display: grid; gap: 4px; }
-.benefits strong { font-size: .86rem; }
-.benefits small { color: #d3d3d3; font-size: .68rem; }
-.createButton { min-width: 310px; min-height: 70px; margin-top: 38px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-radius: 4px; background: #ed2639; font-size: 1.05rem; font-weight: 700; box-shadow: 0 14px 36px rgba(237,38,57,.25); }
-.designOptions { width: clamp(270px,19vw,340px); position: absolute; top: 12%; right: clamp(28px,4vw,75px); display: grid; gap: 18px; }
-.designOptions section,.designOptions>a { padding: 20px; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; background: rgba(22,22,22,.88); box-shadow: 0 18px 42px rgba(0,0,0,.22); backdrop-filter: blur(8px); }
-.designOptions h2 { margin: 0 0 14px; color: #fff; font-size: .95rem; }
-.colorDots,.patternDots { display: flex; justify-content: space-between; gap: 8px; }
-.colorDots span { width: 44px; height: 44px; border: 1px solid #777; border-radius: 50%; }
-.white{background:#f1ede6}.red{background:#c92731}.green{background:#404632}.black{background:#1d1d1d}.gold{background:linear-gradient(135deg,#8b6540,#f4dfbf,#9b714a)}
-.patternDots span { width: 50px; height: 50px; display: grid; place-items: center; border: 1px solid #777; border-radius: 8px; background:#e9e1d8;color:#272727;font-size:1.35rem }.patternDots span:nth-child(2){background:#f6f1e8}.patternDots span:nth-child(3){background:#9f6436}.patternDots span:nth-child(4){background:#202020;color:#aaa}
-.designOptions>a { display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:12px;color:#fff;font-size:.85rem}.designOptions>a b{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#474747}.designOptions>a i{font-size:1.3rem;font-style:normal}
-.nobiCall { position:absolute;right:30px;bottom:20px;z-index:3;display:grid;place-items:center;gap:5px;color:#25191a}.nobiCall span{width:74px;height:60px;display:grid;place-items:center;border:8px solid #fff;border-radius:28px 28px 20px 20px;background:#181818;color:#fff;font-size:2rem;box-shadow:0 8px 25px rgba(238,38,57,.22)}.nobiCall strong{padding:9px 16px;border:1px solid #efbbc1;border-radius:999px;background:#fff;font-size:.72rem}
+.header { min-height: 82px; padding: 0 clamp(18px,3.5vw,54px); display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 28px; background: #101b20; color: white; }
+.brand { width: 62px; height: 68px; overflow: hidden; }
+.brand img { width: 58px; height: auto; }
+.headerTitle { display: flex; align-items: baseline; gap: 14px; }
+.headerTitle span { color: #8cd5cd; font-size: .7rem; font-weight: 650; letter-spacing: .11em; text-transform: uppercase; }
+.headerTitle strong { font-size: .82rem; font-weight: 450; }
+.closeLink { display: flex; align-items: center; gap: 13px; color: #c5d0cd; font-size: .75rem; }
+.closeLink span { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #52605e; border-radius: 50%; color: white; font-size: 1.2rem; }
 .workspace { min-height: calc(100vh - 82px); display: grid; grid-template-columns: minmax(0,1.45fr) minmax(390px,.55fr); }
 .preview { min-width: 0; padding: clamp(28px,4vw,60px); display: flex; flex-direction: column; }
 .previewHeader { display: flex; justify-content: space-between; align-items: start; gap: 28px; }
@@ -94,12 +67,6 @@
 .actionPanel .saveStatus { min-height: 32px; color: #176b45; }
 
 @media (max-width: 1050px) {
-  .header { grid-template-columns: 85px 1fr auto; }
-  .header nav a:nth-child(n+4) { display: none; }
-  .headerActions>a:not(.searchLink) { display: none; }
-  .searchLink { width: 150px; }
-  .campaignCopy { width: 60%; }
-  .designOptions { right: 24px; width: 270px; }
   .workspace { grid-template-columns: 1fr; }
   .productStage { min-height: 620px; }
   .halo { width: min(75vw,640px); }
@@ -107,13 +74,12 @@
 }
 
 @media (max-width: 640px) {
-  .header { min-height: 74px; padding-inline: 16px; grid-template-columns: 62px 1fr; gap: 12px; }
-  .brand { width: 58px; height: 64px; }.brand img { width: 54px; }.header nav { justify-content:flex-end }.header nav a { display:none!important }.header nav a:first-child { display:block!important }.headerActions { display:none }
-  .campaignHero { height: 720px; }
-  .campaignBackground { object-position: 63% center; }
-  .campaignShade { background:linear-gradient(180deg,rgba(5,7,7,.65),rgba(5,7,7,.78)) }
-  .campaignCopy { width:100%;height:auto;padding:46px 20px 20px }
-  .campaignCopy h1 { font-size:2.9rem }.campaignCopy>strong{max-width:340px}.benefits{grid-template-columns:1fr;gap:10px;margin-top:24px}.benefits>div{grid-template-columns:32px 1fr}.benefits small{display:none}.createButton{min-width:0;width:100%;min-height:58px;margin-top:24px}.designOptions{width:calc(100% - 40px);left:20px;right:auto;top:auto;bottom:20px;grid-template-columns:1fr 1fr;gap:10px}.designOptions section{padding:14px}.designOptions>a{grid-column:1/-1;padding:13px}.colorDots span{width:28px;height:28px}.patternDots span{width:34px;height:34px}.nobiCall{display:none}
+  .header { min-height: 74px; padding-inline: 16px; grid-template-columns: 52px 1fr auto; gap: 12px; }
+  .brand { width: 50px; height: 61px; }
+  .brand img { width: 48px; }
+  .headerTitle strong { display: none; }
+  .closeLink { font-size: 0; gap: 0; }
+  .closeLink span { font-size: 1.2rem; }
   .preview { padding: 36px 18px 22px; }
   .previewHeader { flex-direction: column; }
   .productStage { min-height: 520px; }

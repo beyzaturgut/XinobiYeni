@@ -1,7 +1,7 @@
 const heroSlides = [
-  "../../banner/slider-1.png",
-  "../../banner/slider-2.png",
-  "../../banner/slider-3.png",
+  "../../banner/slider-1.png?v=20261002-4",
+  "../../banner/slider-2.png?v=20261002-4",
+  "../../banner/slider-3.png?v=20261002-4",
 ];
 
 const heroImage = document.querySelector("[data-hero-image]");

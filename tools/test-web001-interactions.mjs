@@ -22,7 +22,8 @@ const actualSlides = [];
 for (let index = 0; index < 3; index += 1) {
   await desktop.locator(`[data-slide='${index}']`).click();
   const src = await desktop.locator("[data-hero-image]").getAttribute("src");
-  if (!src?.endsWith(expectedSlideSuffixes[index])) throw new Error(`Hero slide ${index + 1} is incorrect: ${src}`);
+  const slidePath = src?.split("?", 1)[0];
+  if (!slidePath?.endsWith(expectedSlideSuffixes[index])) throw new Error(`Hero slide ${index + 1} is incorrect: ${src}`);
   await desktop.locator("[data-hero-image]").evaluate((image) => image.complete || new Promise((resolve) => image.addEventListener("load", resolve, { once: true })));
   if ((await desktop.locator("[data-hero-image]").evaluate((image) => image.naturalWidth)) === 0) throw new Error(`Hero slide ${index + 1} is broken`);
   actualSlides.push(src);

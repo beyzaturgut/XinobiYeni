@@ -17,10 +17,19 @@ await desktop.locator(".nav-trigger").hover();
 if (await desktop.locator("#mega-menu").isHidden()) throw new Error("Mega menu did not open on hover");
 await desktop.keyboard.press("Escape");
 
-const initialSlide = await desktop.locator("[data-hero-image]").getAttribute("src");
-await desktop.locator("[data-slide='1']").click();
-const nextSlide = await desktop.locator("[data-hero-image]").getAttribute("src");
-if (initialSlide === nextSlide) throw new Error("Hero did not advance from pagination");
+const expectedSlideSuffixes = ["-1.png", "-2.png", "-3.png"];
+const actualSlides = [];
+for (let index = 0; index < 3; index += 1) {
+  await desktop.locator(`[data-slide='${index}']`).click();
+  const src = await desktop.locator("[data-hero-image]").getAttribute("src");
+  if (!src?.endsWith(expectedSlideSuffixes[index])) throw new Error(`Hero slide ${index + 1} is incorrect: ${src}`);
+  await desktop.locator("[data-hero-image]").evaluate((image) => image.complete || new Promise((resolve) => image.addEventListener("load", resolve, { once: true })));
+  if ((await desktop.locator("[data-hero-image]").evaluate((image) => image.naturalWidth)) === 0) throw new Error(`Hero slide ${index + 1} is broken`);
+  actualSlides.push(src);
+}
+if (new Set(actualSlides).size !== 3) throw new Error("Hero slides are not three distinct new images");
+const ctaSize = await desktop.locator(".u-fixed-cta").evaluate((element) => ({ width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height }));
+if (ctaSize.width > 172 || ctaSize.height > 44) throw new Error(`XINOBI U CTA is still too large: ${ctaSize.width}x${ctaSize.height}`);
 if (await desktop.locator(".slider-controls").count()) throw new Error("Hero arrows must not be visible");
 if (await desktop.locator(".hero h1, .hero p").count()) throw new Error("Hero must not contain copy");
 

@@ -1,7 +1,7 @@
 const heroSlides = [
-  "../../banner/Koyu mermerde beyaz hava temizleyici-1.png",
-  "../../banner/Krom detaylı lüks kahve makinesi-2.png",
-  "../../banner/Pembe çay makinesi yanında Türk çayı-3.png",
+  "../../banner/slider-1.png",
+  "../../banner/slider-2.png",
+  "../../banner/slider-3.png",
 ];
 
 const heroImage = document.querySelector("[data-hero-image]");

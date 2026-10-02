@@ -74,3 +74,22 @@
 .product-card>p:not(.meta){min-height:44px;margin-bottom:8px}
 .product-card>a{margin-top:auto;width:max-content}
 @media(max-width:767px){.product-card{min-width:90vw}.product-image{padding:22px}.product-card:nth-child(1) .product-image img,.product-card:nth-child(2) .product-image img,.product-card:nth-child(3) .product-image img{left:6%;bottom:22px;width:88%;height:70%;max-width:none}.product-card h3,.product-card>p:not(.meta){min-height:0}}
+
+/* Header hızlı işlemler: yalnızca ikon */
+.header-actions{gap:18px}
+.header-actions>button,.header-actions>a{width:44px;height:44px;padding:0;display:grid;place-items:center;border:0;background:transparent;color:#fff}
+.header-actions svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.header-actions>button:hover,.header-actions>a:hover{color:#dce7e6}
+
+/* Nobi robot işareti */
+.nobi{right:24px;bottom:22px;width:132px;min-height:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:2px;border-radius:0;background:transparent;color:var(--ink);box-shadow:none}
+.nobi-mark{display:block;width:104px;height:100px;overflow:visible;filter:drop-shadow(0 10px 18px rgba(0,0,0,.16))}
+.nobi-antenna{stroke:#d5ceca;stroke-width:6;stroke-linecap:square}
+.nobi-antenna-tip{fill:#ff4054;stroke:#ff91a0;stroke-width:3}
+.nobi-shell{fill:#fffdfd;stroke:#fff;stroke-width:2}
+.nobi-face{fill:#171717}
+.nobi-smile{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.nobi b{min-width:126px;padding:10px 16px;border:1.5px solid #efc8c3;border-radius:999px;background:#fffafa;color:#3c2524;font-size:15px;line-height:1.15;font-weight:700;box-shadow:0 7px 18px rgba(0,0,0,.13)}
+.nobi:hover b{background:#fff;color:#251717}.nobi:focus-visible{outline-offset:5px}
+.nobi-panel{bottom:174px}
+@media(max-width:767px){.nobi{right:14px;bottom:max(14px,env(safe-area-inset-bottom));width:76px}.nobi-mark{width:76px;height:73px}.nobi b{display:none}.nobi-panel{bottom:98px}}

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Xinobi — WEB-001 ortak tasarım</title>
-    <link rel="stylesheet" href="prototype.css?v=20261002-8" />
+    <link rel="stylesheet" href="prototype.css?v=20261002-9" />
     <script src="prototype.js?v=20261002-4" defer></script>
   </head>
   <body>
@@ -17,7 +17,9 @@
         <a href="http://127.0.0.1:3000/urunler">Ürünler</a><button class="nav-trigger" type="button" aria-expanded="false" aria-controls="mega-menu">Kategoriler</button><a href="#hikaye">Xinobi Dünyası</a>
       </nav>
       <div class="header-actions" aria-label="Hızlı işlemler">
-        <button aria-label="Ara">⌕</button><a href="#">Hesap</a><a href="#">Sepet <span>0</span></a>
+        <button type="button" aria-label="Ara"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="14" cy="14" r="8.5"/><path d="m20.5 20.5 6 6"/></svg></button>
+        <a href="#" aria-label="Hesabım"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="10" r="5"/><path d="M7.5 27c.7-7 3.7-10.5 8.5-10.5S23.8 20 24.5 27"/></svg></a>
+        <a href="#" aria-label="Sepet"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 10h18l-1.4 17H8.4L7 10Z"/><path d="M12 11V7a4 4 0 0 1 8 0v4"/></svg></a>
       </div>
       <button class="menu" type="button" aria-expanded="false" aria-controls="mega-menu">Menü</button>
     </header>
@@ -70,6 +72,14 @@
       <div class="nobi-quick"><button type="button">Çay makinesi arıyorum</button><button type="button">XINOBI U nasıl çalışır?</button><button type="button">Kurumsal teklif almak istiyorum</button></div>
       <p class="nobi-demo">Temsili asistan · Gerçek yanıtlar Faz10’da Cloudflare Workers AI ve onaylı katalog verisiyle bağlanacak.</p>
     </section>
-    <button class="nobi" type="button" aria-expanded="false" aria-controls="nobi-panel" aria-label="Nobi’ye sor"><span aria-hidden="true">✦</span><b>Nobi’ye sor</b></button>
+    <button class="nobi" type="button" aria-expanded="false" aria-controls="nobi-panel" aria-label="Nobi’ye sor">
+      <svg class="nobi-mark" viewBox="0 0 112 108" aria-hidden="true">
+        <path class="nobi-antenna" d="M56 22V35"/><circle class="nobi-antenna-tip" cx="56" cy="14" r="10"/>
+        <rect class="nobi-shell" x="13" y="31" width="86" height="68" rx="31"/>
+        <rect class="nobi-face" x="25" y="48" width="62" height="40" rx="17"/>
+        <path class="nobi-smile" d="M35 68c0-7 4-11 9-11 8 0 7 15 15 15s7-15 15-15c5 0 9 4 9 11"/>
+      </svg>
+      <b>Nobi’ye sor</b>
+    </button>
   </body>
 </html>

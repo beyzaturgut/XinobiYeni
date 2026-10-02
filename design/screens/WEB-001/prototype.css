@@ -63,3 +63,14 @@
 .u-fixed-cta:hover{background:#cf1f31}.u-fixed-cta:focus-visible{outline-color:#fff}
 @media(max-width:1023px){.u-banner{height:330px}.u-fixed-cta{left:32px;bottom:22px;width:155px;min-height:40px;font-size:11px}}
 @media(max-width:767px){.u-banner{height:300px}.u-banner-image{object-position:center}.u-fixed-cta{left:20px;bottom:16px;width:145px;min-height:38px;padding:0 12px;font-size:10px}}
+
+/* Öne çıkan ürünlerde ortak ölçek ve taban çizgisi */
+.product-row{align-items:stretch}
+.product-card{display:flex;flex-direction:column;min-width:0}
+.product-image{height:auto;aspect-ratio:4/3;padding:28px;display:flex;align-items:flex-end;justify-content:center}
+.product-card:nth-child(1) .product-image img,.product-card:nth-child(2) .product-image img,.product-card:nth-child(3) .product-image img{position:absolute;left:7%;bottom:28px;width:86%;height:72%;max-width:none;object-fit:contain;object-position:center bottom}
+.product-card:nth-child(2) .product-image img{transform:scale(1.16);transform-origin:center bottom}
+.product-card h3{min-height:38px;display:flex;align-items:flex-start}
+.product-card>p:not(.meta){min-height:44px;margin-bottom:8px}
+.product-card>a{margin-top:auto;width:max-content}
+@media(max-width:767px){.product-card{min-width:90vw}.product-image{padding:22px}.product-card:nth-child(1) .product-image img,.product-card:nth-child(2) .product-image img,.product-card:nth-child(3) .product-image img{left:6%;bottom:22px;width:88%;height:70%;max-width:none}.product-card h3,.product-card>p:not(.meta){min-height:0}}

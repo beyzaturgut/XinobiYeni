@@ -49,14 +49,21 @@ if (await mobile.locator("#mega-menu").isVisible()) throw new Error("Mobile draw
 const track = mobile.locator("[data-product-track]");
 const before = await track.evaluate((element) => element.scrollLeft);
 await mobile.locator("[data-product-next]").click();
-await mobile.waitForTimeout(500);
+await mobile.waitForTimeout(900);
 const after = await track.evaluate((element) => element.scrollLeft);
-if (after <= before) throw new Error("Mobile product carousel did not scroll");
+if (after <= before) {
+  const dimensions = await track.evaluate((element) => ({ scrollWidth: element.scrollWidth, clientWidth: element.clientWidth }));
+  throw new Error(`Mobile product carousel did not scroll: ${JSON.stringify({ before, after, ...dimensions })}`);
+}
 
 const categoryLabels = await desktop.locator("[data-category-track] .category-card span").allTextContents();
 if (categoryLabels.join("|") !== "Çay makineleri|Kahve makineleri|Tost makineleri|Pişirme makineleri|Hava temizleme") throw new Error("Category order/content is incorrect");
 if (await desktop.locator(".discover").count()) throw new Error("Discover section must be removed");
+const featuredMediaBoxes = await desktop.locator(".product-image").evaluateAll((items) => items.map((item) => ({ top: item.getBoundingClientRect().top, bottom: item.getBoundingClientRect().bottom, height: item.getBoundingClientRect().height })));
+if (Math.max(...featuredMediaBoxes.map((box) => box.height)) - Math.min(...featuredMediaBoxes.map((box) => box.height)) > 1) throw new Error(`Featured product media heights differ: ${JSON.stringify(featuredMediaBoxes)}`);
+if (Math.max(...featuredMediaBoxes.map((box) => box.bottom)) - Math.min(...featuredMediaBoxes.map((box) => box.bottom)) > 1) throw new Error(`Featured product media baselines differ: ${JSON.stringify(featuredMediaBoxes)}`);
 
 console.log("desktop: category menu, image-only hero, category rail, Nobi = OK");
+console.log("desktop: featured products equal height and baseline = OK");
 console.log("mobile: drawer, product carousel = OK");
 await browser.close();

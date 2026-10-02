@@ -8,7 +8,7 @@ const browser = await chromium.launch({
 const desktop = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 await desktop.goto("http://127.0.0.1:4175/design/screens/WEB-001/prototype.html", { waitUntil: "networkidle" });
 if (await desktop.locator(".header-actions > *").count() !== 3) throw new Error("Header must contain search, account and cart icons");
-if (await desktop.locator(".nobi .nobi-mark").count() !== 1) throw new Error("Nobi robot mark is missing");
+if (await desktop.locator("[data-nobi-mark]").count() !== 2) throw new Error("Nobi marks must use the shared robot symbol");
 
 await desktop.locator(".nav-trigger").click();
 if (await desktop.locator("#mega-menu").isHidden()) throw new Error("Mega menu did not open");

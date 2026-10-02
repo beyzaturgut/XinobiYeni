@@ -32,8 +32,8 @@ Sürüm: 1.0 · Yön: **Sessiz teknoloji / kişisel imza**
 
 ## Nobi dili
 
-- Nobi, sayfanın sağ altındaki 56 px launcher ile erişilir; ana CTA değildir.
-- İkon/karakter sade, sıcak ve teknik olmalıdır; mevcut Xinobi logosunun kopyası gibi davranmaz.
+- Nobi, sayfanın sağ altındaki sabit robot launcher ile erişilir; ana CTA değildir. Masaüstünde robot + `Nobi’ye sor`, dar ekranda yalnız robot gösterilir.
+- Nobi’nin tek görsel kimliği kırmızı antenli, beyaz gövdeli, siyah yüzlü ve beyaz dalga gülümsemeli robot sembolüdür. Launcher, panel başlığı ve gelecekteki tüm Nobi temas noktaları aynı ortak sembolü kullanır; yıldız, durum noktası veya alternatif avatar kullanılmaz.
 - Açılış metni: “Size nasıl yardımcı olabilirim?”
 - Ürün önerisinde kaynak ürün kartı; bilinmeyen yanıtta açık belirsizlik ve destek yolu gösterilir.
 

@@ -4,11 +4,19 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Xinobi — WEB-001 ortak tasarım</title>
-    <link rel="stylesheet" href="prototype.css?v=20261002-9" />
+    <link rel="stylesheet" href="prototype.css?v=20261002-10" />
     <script src="prototype.js?v=20261002-4" defer></script>
   </head>
   <body>
     <a class="skip" href="#icerik">İçeriğe geç</a>
+    <svg class="nobi-symbols" aria-hidden="true">
+      <symbol id="nobi-symbol" viewBox="0 0 112 108">
+        <path class="nobi-antenna" d="M56 22V35"/><circle class="nobi-antenna-tip" cx="56" cy="14" r="10"/>
+        <rect class="nobi-shell" x="13" y="31" width="86" height="68" rx="31"/>
+        <rect class="nobi-face" x="25" y="48" width="62" height="40" rx="17"/>
+        <path class="nobi-smile" d="M35 68c0-7 4-11 9-11 8 0 7 15 15 15s7-15 15-15c5 0 9 4 9 11"/>
+      </symbol>
+    </svg>
     <header class="site-header">
       <a class="brand" href="#" aria-label="Xinobi ana sayfa">
         <img src="../../../apps/web/public/assets/brand/xinobi-logo-white.png" alt="Xinobi" />
@@ -67,18 +75,13 @@
 
     <footer><div class="footer-brand"><img src="../../../apps/web/public/assets/brand/xinobi-logo-white.png" alt="Xinobi" /><p>Gündelik ritüeller için sessiz teknoloji.</p></div><div><h3>Ürünler</h3><a href="#">Çay makineleri</a><a href="#">Kahve makineleri</a><a href="#">Pişirme</a></div><div><h3>Xinobi</h3><a href="#">XINOBI U</a><a href="#">Hikâyemiz</a><a href="#">Kurumsal</a></div><div><h3>Destek</h3><a href="#">İletişim</a><a href="#">Sipariş takibi</a><a href="#">Yasal bilgiler</a></div></footer>
     <section class="nobi-panel" id="nobi-panel" aria-labelledby="nobi-title" hidden>
-      <div class="nobi-head"><div><span aria-hidden="true">✦</span><div><p class="eyebrow">NOBI</p><h2 id="nobi-title">Size nasıl yardımcı olabilirim?</h2></div></div><button type="button" data-nobi-close aria-label="Nobi panelini kapat">×</button></div>
+      <div class="nobi-head"><div><svg class="nobi-panel-mark" data-nobi-mark viewBox="0 0 112 108" aria-hidden="true"><use href="#nobi-symbol"/></svg><div><p class="eyebrow">NOBI</p><h2 id="nobi-title">Size nasıl yardımcı olabilirim?</h2></div></div><button type="button" data-nobi-close aria-label="Nobi panelini kapat">×</button></div>
       <p>Ürünleri keşfetmenize veya XINOBI U adımlarını anlamanıza yardımcı olabilirim.</p>
       <div class="nobi-quick"><button type="button">Çay makinesi arıyorum</button><button type="button">XINOBI U nasıl çalışır?</button><button type="button">Kurumsal teklif almak istiyorum</button></div>
       <p class="nobi-demo">Temsili asistan · Gerçek yanıtlar Faz10’da Cloudflare Workers AI ve onaylı katalog verisiyle bağlanacak.</p>
     </section>
     <button class="nobi" type="button" aria-expanded="false" aria-controls="nobi-panel" aria-label="Nobi’ye sor">
-      <svg class="nobi-mark" viewBox="0 0 112 108" aria-hidden="true">
-        <path class="nobi-antenna" d="M56 22V35"/><circle class="nobi-antenna-tip" cx="56" cy="14" r="10"/>
-        <rect class="nobi-shell" x="13" y="31" width="86" height="68" rx="31"/>
-        <rect class="nobi-face" x="25" y="48" width="62" height="40" rx="17"/>
-        <path class="nobi-smile" d="M35 68c0-7 4-11 9-11 8 0 7 15 15 15s7-15 15-15c5 0 9 4 9 11"/>
-      </svg>
+      <svg class="nobi-mark" data-nobi-mark viewBox="0 0 112 108" aria-hidden="true"><use href="#nobi-symbol"/></svg>
       <b>Nobi’ye sor</b>
     </button>
   </body>

@@ -18,6 +18,6 @@ await page.getByRole("button", { name: "XINOBI U" }).click();
 if (!(await page.getByRole("heading", { name: "Görsel ve sabit buton" }).isVisible())) throw new Error("XINOBI U settings did not open");
 await page.locator('input[type="color"]').fill("#d51f35");
 if ((await page.locator(".xinobi-preview > a").evaluate((element) => getComputedStyle(element).backgroundColor)) !== "rgb(213, 31, 53)") throw new Error("CTA color preview did not update");
-await page.screenshot({ path: "test/2026-10-01/TST-063-xinobi-u-admin.png", fullPage: true });
+await page.screenshot({ path: "test/2026-10-02/TST-064-xinobi-banner-admin.png", fullPage: true });
 console.log("admin XINOBI U: image control, fixed CTA, color preview = OK");
 await browser.close();

@@ -4,9 +4,9 @@ import './App.css'
 type Slide = { id: number; name: string; type: 'Fotoğraf' | 'Video'; src: string; alt: string; duration: number; active: boolean }
 
 const initialSlides: Slide[] = [
-  { id: 1, name: 'Rose gold çay makinesi', type: 'Fotoğraf', src: '/assets/banners/slider-1.png', alt: 'Rose gold Xinobi çay makinesi mutfakta', duration: 6, active: true },
-  { id: 2, name: 'Kahve makineleri', type: 'Fotoğraf', src: '/assets/banners/slider-2.png', alt: 'Xinobi kahve makineleri', duration: 6, active: true },
-  { id: 3, name: 'Hava temizleme', type: 'Fotoğraf', src: '/assets/banners/slider-3.png', alt: 'Xinobi hava temizleme ürünü', duration: 6, active: true },
+  { id: 1, name: 'Beyaz hava temizleyici', type: 'Fotoğraf', src: '/assets/banners/slider-1.png', alt: 'Koyu mermer üzerinde beyaz Xinobi hava temizleyici', duration: 6, active: true },
+  { id: 2, name: 'Krom detaylı kahve makinesi', type: 'Fotoğraf', src: '/assets/banners/slider-2.png', alt: 'Krom detaylı lüks Xinobi kahve makinesi', duration: 6, active: true },
+  { id: 3, name: 'Pembe çay makinesi', type: 'Fotoğraf', src: '/assets/banners/slider-3.png', alt: 'Türk çayı yanında pembe Xinobi çay makinesi', duration: 6, active: true },
 ]
 
 function App() {

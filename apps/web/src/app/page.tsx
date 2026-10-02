@@ -2,82 +2,80 @@
 
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./page.module.css";
 
 import airPurifier from "../../public/assets/products/air-purifier-101.webp";
-import coffeeMaker from "../../public/assets/products/coffee-maker-101-gold.webp";
+import coffeeMaker from "../../public/assets/products/coffee-maker-101-red.webp";
 import cookingMachine from "../../public/assets/products/cooking-machine.webp";
 import teaMaker from "../../public/assets/products/tea-maker-101-blue.webp";
 import toastMaker from "../../public/assets/products/toast-maker.webp";
-import personalizedTeaMakers from "../../public/assets/banners/xinobi-personalized-tea-makers.png";
 
-type IconName = "arrow" | "bag" | "search" | "spark" | "user";
-type Product = { name: string; category: string; description: string; image: StaticImageData; tall?: boolean; accent: string; swatch: string };
+type IconName = "arrow" | "bag" | "search" | "user";
+type Product = { name: string; category: string; image: StaticImageData; badge?: string };
+
+const slides = [
+  { src: "/assets/banners/home-slider-1.png", alt: "Kömür grisi stüdyoda beyaz Xinobi hava temizleyici" },
+  { src: "/assets/banners/home-slider-2.png", alt: "Minimal koyu fonda Xinobi kahve makinesi" },
+  { src: "/assets/banners/home-slider-3.png", alt: "Sade koyu stüdyoda Xinobi çay makinesi ve çay bardağı" },
+];
 
 const products: Product[] = [
-  { name: "Çay Makinesi 101", category: "Çay makineleri", description: "Günün ritmine uyum sağlayan modern çay deneyimi.", image: teaMaker, tall: true, accent: "Lacivert", swatch: "#18304d" },
-  { name: "Kahve Makinesi 101", category: "Kahve makineleri", description: "İki fincanı aynı anda hazırlayan dengeli tasarım.", image: coffeeMaker, accent: "Gold", swatch: "#b78945" },
-  { name: "Air Purifier 101", category: "Hava temizleyiciler", description: "Sade form, ev yaşamına uyumlu temiz hava yaklaşımı.", image: airPurifier, tall: true, accent: "Beyaz", swatch: "#e9e9e7" },
+  { name: "Çay Makinesi 101", category: "Çay makineleri", image: teaMaker, badge: "Yeni" },
+  { name: "Kahve Makinesi 101", category: "Kahve makineleri", image: coffeeMaker },
+  { name: "Hava Temizleme 101", category: "Hava temizleme", image: airPurifier },
 ];
 
 const categories = [
-  { name: "Çay makineleri", image: teaMaker, tall: true },
-  { name: "Kahve makineleri", image: coffeeMaker },
-  { name: "Pişirme", image: cookingMachine, tall: true },
-  { name: "Tost makineleri", image: toastMaker },
+  { name: "Çay makineleri", image: teaMaker }, { name: "Kahve makineleri", image: coffeeMaker },
+  { name: "Tost makineleri", image: toastMaker }, { name: "Pişirme makineleri", image: cookingMachine },
+  { name: "Hava temizleme", image: airPurifier },
 ];
 
 function Icon({ name }: { name: IconName }) {
-  const common = { "aria-hidden": true, fill: "none", stroke: "currentColor", strokeLinecap: "round" as const, strokeLinejoin: "round" as const, strokeWidth: 1.7, viewBox: "0 0 24 24" };
-  if (name === "search") return <svg {...common}><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg>;
-  if (name === "user") return <svg {...common}><circle cx="12" cy="8" r="3.5" /><path d="M5.5 20a6.5 6.5 0 0 1 13 0" /></svg>;
-  if (name === "bag") return <svg {...common}><path d="M5 8.5h14l-1 12H6l-1-12Z" /><path d="M9 9V6.5a3 3 0 0 1 6 0V9" /></svg>;
-  if (name === "spark") return <svg {...common}><path d="m12 2 1.5 5.2L19 9l-5.5 1.8L12 16l-1.5-5.2L5 9l5.5-1.8L12 2Z" /><path d="m19 15 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z" /></svg>;
-  return <svg {...common}><path d="M5 12h14M14 7l5 5-5 5" /></svg>;
+  const common = { "aria-hidden": true, fill: "none", stroke: "currentColor", strokeLinecap: "round" as const, strokeLinejoin: "round" as const, strokeWidth: 1.8, viewBox: "0 0 32 32" };
+  if (name === "search") return <svg {...common}><circle cx="14" cy="14" r="8.5" /><path d="m20.5 20.5 6 6" /></svg>;
+  if (name === "user") return <svg {...common}><circle cx="16" cy="10" r="5" /><path d="M7.5 27c.7-7 3.7-10.5 8.5-10.5S23.8 20 24.5 27" /></svg>;
+  if (name === "bag") return <svg {...common}><path d="M7 10h18l-1.4 17H8.4L7 10Z" /><path d="M12 11V7a4 4 0 0 1 8 0v4" /></svg>;
+  return <svg {...common}><path d="M6 16h19M19 10l6 6-6 6" /></svg>;
+}
+
+function NobiMark({ compact = false }: { compact?: boolean }) {
+  return <svg className={compact ? styles.nobiPanelMark : styles.nobiMark} viewBox="0 0 112 108" aria-hidden="true"><path className={styles.nobiAntenna} d="M56 22V35" /><circle className={styles.nobiAntennaTip} cx="56" cy="14" r="10" /><rect className={styles.nobiShell} x="13" y="31" width="86" height="68" rx="31" /><rect className={styles.nobiFace} x="25" y="48" width="62" height="40" rx="17" /><path className={styles.nobiSmile} d="M35 68c0-7 4-11 9-11 8 0 7 15 15 15s7-15 15-15c5 0 9 4 9 11" /></svg>;
 }
 
 function Header() {
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  return <header className={styles.header}>
-    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a>
-    <div className={styles.utilityBar}><p>Xinobi ile ev teknolojisini yeniden keşfedin.</p><nav aria-label="Yardımcı bağlantılar"><Link href="#destek">Destek</Link><Link href="/kurumsal/teklif">Kurumsal</Link></nav></div>
-    <div className={styles.mainNav}>
-      <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><div className={styles.categoryMenu} onMouseEnter={() => setCategoriesOpen(true)} onMouseLeave={() => setCategoriesOpen(false)}><button type="button" aria-expanded={categoriesOpen} aria-controls="home-category-menu" onClick={() => setCategoriesOpen((open) => !open)}>Kategoriler</button><div id="home-category-menu" hidden={!categoriesOpen}><Link href="#kategoriler">Çay makineleri</Link><Link href="#kategoriler">Kahve makineleri</Link><Link href="#kategoriler">Tost makineleri</Link><Link href="#kategoriler">Pişirme makineleri</Link><Link href="#kategoriler">Hava temizleme</Link><Link href="#kisisellestirme">XINOBI U</Link></div></div><Link href="/xinobi">Xinobi dünyası</Link></nav>
-      <div className={styles.navActions}><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><Link href="/hesap/giris" aria-label="Hesabım"><Icon name="user" /></Link><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link></div>
-      <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#kisisellestirme">XINOBI U</Link><Link href="/xinobi">Xinobi dünyası</Link></nav></details>
-    </div>
+  return <header className={styles.siteHeader}>
+    <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
+    <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><div className={styles.categoryMenu} onMouseEnter={() => setCategoriesOpen(true)} onMouseLeave={() => setCategoriesOpen(false)}><button type="button" aria-expanded={categoriesOpen} aria-controls="home-category-menu" onClick={() => setCategoriesOpen((open) => !open)}>Kategoriler</button><div id="home-category-menu" hidden={!categoriesOpen}>{categories.map((category) => <Link href="#kategoriler" key={category.name}>{category.name}</Link>)}<Link href="#xinobi-u">XINOBI U</Link></div></div><Link href="/xinobi">Xinobi Dünyası</Link></nav>
+    <div className={styles.headerActions} aria-label="Hızlı işlemler"><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><Link href="/hesap/giris" aria-label="Hesabım"><Icon name="user" /></Link><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link></div>
+    <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="#xinobi-u">XINOBI U</Link><Link href="/xinobi">Xinobi Dünyası</Link></nav></details>
   </header>;
 }
 
 function ProductCard({ product }: { product: Product }) {
-  return <article className={styles.productCard}>
-    <div className={styles.productMedia}><span className={styles.productBadge}>Yeni</span><Image className={`${styles.productImage} ${product.tall ? styles.productImageTall : ""}`} src={product.image} alt={`${product.name}, ${product.accent}`} sizes="(max-width: 760px) 88vw, (max-width: 1100px) 45vw, 31vw" /></div>
-    <div className={styles.productBody}><p className={styles.eyebrow}>{product.category}</p><h3>{product.name}</h3><p>{product.description}</p><div className={styles.productMeta}><span><i style={{ backgroundColor: product.swatch }} />{product.accent}</span><span>Fiyat bilgisi yakında</span></div><Link className={styles.textLink} href="#urunler">Ürünü incele <Icon name="arrow" /></Link></div>
-  </article>;
+  return <article className={styles.productCard}><div className={styles.productMedia}>{product.badge && <span className={styles.productBadge}>{product.badge}</span>}<Image className={styles.productImage} src={product.image} alt={product.name} sizes="(max-width: 760px) 88vw, 31vw" /></div><p className={styles.eyebrow}>{product.category}</p><h3>{product.name}</h3><p>Fiyat ve stok doğrulanıyor</p><Link className={styles.productLink} href="/urunler">Ürünü incele <Icon name="arrow" /></Link></article>;
 }
 
 export default function Home() {
+  const [slide, setSlide] = useState(0);
+  const [nobiOpen, setNobiOpen] = useState(false);
+  useEffect(() => { if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; const timer = window.setInterval(() => setSlide((current) => (current + 1) % slides.length), 6500); return () => window.clearInterval(timer); }, []);
+  useEffect(() => { const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setNobiOpen(false); }; document.addEventListener("keydown", closeOnEscape); return () => document.removeEventListener("keydown", closeOnEscape); }, []);
+
   return <div id="top" className={styles.page}>
-    <Header />
+    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a><Header />
     <main id="main-content">
-      <section className={styles.hero} aria-labelledby="hero-title">
-        <div className={styles.heroCopy}><p className={styles.heroKicker}>Xinobi ev teknolojileri</p><h1 id="hero-title">Gündelik ritüeller için sessiz teknoloji.</h1><p className={styles.heroLead}>Metalin güçlü karakterini, yalın tasarımı ve kişisel seçimleri aynı üründe buluşturun.</p><div className={styles.heroActions}><Link className={styles.primaryButton} href="/urunler">Ürünleri keşfet <Icon name="arrow" /></Link><Link className={styles.secondaryButton} href="#kisisellestirme">Kişiselleştirmeyi gör</Link></div></div>
-        <div className={styles.heroVisual}><div className={styles.heroHalo} /><Image className={styles.heroProduct} src={teaMaker} alt="Lacivert Xinobi Çay Makinesi 101" priority sizes="(max-width: 820px) 92vw, 52vw" /><div className={styles.heroNote}><span>01</span><p>Renk, form ve kullanım deneyimi tek bir dengede.</p></div></div>
-      </section>
-
-      <section className={styles.valueStrip} aria-label="Xinobi yaklaşımı"><article><strong>Ürün merkezli</strong><span>Her detay işlevi görünür kılar.</span></article><article><strong>Size özgü</strong><span>Seçili ürünlerde kişisel dokunuş.</span></article><article><strong>Tek deneyim</strong><span>Web ve mobilde aynı Xinobi dili.</span></article></section>
-
-      <section id="urunler" className={styles.section} aria-labelledby="featured-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Öne çıkanlar</p><h2 id="featured-title">Gününüz için tasarlandı.</h2></div><Link className={styles.textLink} href="/urunler">Tüm ürünler <Icon name="arrow" /></Link></div><div className={styles.productGrid}>{products.map((product) => <ProductCard key={product.name} product={product} />)}</div></section>
-
-      <section id="kisisellestirme" className={styles.personalize} aria-labelledby="personalize-title"><Image className={styles.personalizeImage} src={personalizedTeaMakers} alt="Özel desenlerle kişiselleştirilmiş iki Xinobi çay makinesi" sizes="100vw" /><div className={styles.personalizeCopy}><span className={styles.sparkIcon}><Icon name="spark" /></span><p className={styles.eyebrow}>XINOBI U</p><h2 id="personalize-title">Hayaliniz, ürününüzün yüzeyinde.</h2><p>Kendi görselinizi yükleyin veya birkaç soruyla size özel tasarım yönünü oluşturun. Seçiminizi gerçek ürün üzerinde görün.</p><Link className={styles.lightButton} href="/urunler/cay-makinesi-101/kisisellestir">Tasarlamaya başla <Icon name="arrow" /></Link></div><span className={styles.personalizeDemo}>Temsili kişiselleştirme görseli</span></section>
-
-      <section id="kategoriler" className={styles.section} aria-labelledby="categories-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Koleksiyonu keşfedin</p><h2 id="categories-title">Evin her anına eşlik eder.</h2></div></div><div className={styles.categoryGrid}>{categories.map((category) => <Link className={styles.categoryCard} href="#urunler" key={category.name}><Image className={category.tall ? styles.categoryImageTall : ""} src={category.image} alt="" sizes="(max-width: 640px) 90vw, 24vw" /><span>{category.name}<Icon name="arrow" /></span></Link>)}</div></section>
-
-      <section id="hikaye" className={styles.story} aria-labelledby="story-title"><p className={styles.eyebrow}>Xinobi dünyası</p><h2 id="story-title">İyi tasarım, gözünüzü değil gününüzü yormaz.</h2><p>Xinobi, ev teknolojilerini daha anlaşılır, daha kişisel ve daha sakin bir deneyime dönüştürmek için tasarlanır.</p><Link className={styles.textLink} href="/xinobi">Hikâyemizi keşfedin <Icon name="arrow" /></Link></section>
+      <section className={styles.hero} aria-label="Xinobi ürün tanıtımları"><h1 className={styles.srOnly}>Xinobi ev teknolojileri</h1><Image className={styles.heroImage} src={slides[slide].src} alt={slides[slide].alt} fill priority sizes="100vw" /><div className={styles.sliderDots} aria-label="Slider sayfaları">{slides.map((item, index) => <button type="button" key={item.src} className={index === slide ? styles.activeDot : ""} onClick={() => setSlide(index)} aria-label={`${index + 1}. görsel`} aria-current={index === slide ? "true" : undefined} />)}</div></section>
+      <section id="xinobi-u" className={styles.personalize} aria-label="XINOBI U"><Image className={styles.personalizeImage} src="/assets/banners/home-xinobi-u.png" alt="XINOBI U özel tasarım çay makinesi koleksiyonu" fill sizes="100vw" /><Link className={styles.personalizeCta} href="/urunler/cay-makinesi-101/kisisellestir">Tasarımını Oluştur <Icon name="arrow" /></Link></section>
+      <section id="kategoriler" className={styles.section} aria-labelledby="categories-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Kategoriler</p><h2 id="categories-title">Günün her anına eşlik eden<br />tasarımlar.</h2><small>Temsili kategori görselleri · Admin panelinden yönetilir</small></div><Link className={styles.textLink} href="/urunler">Tümünü gör <Icon name="arrow" /></Link></div><div className={styles.categoryRail}>{categories.map((category) => <Link className={styles.categoryCard} href="/urunler" key={category.name}><Image src={category.image} alt="" sizes="(max-width: 760px) 84vw, 24vw" /><span>{category.name}</span></Link>)}</div></section>
+      <section id="urunler" className={`${styles.section} ${styles.products}`} aria-labelledby="featured-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Öne çıkanlar</p><h2 id="featured-title">Form ve işlev, tek çizgide.</h2></div><Link className={styles.textLink} href="/urunler">Tüm ürünler <Icon name="arrow" /></Link></div><div className={styles.productGrid}>{products.map((product) => <ProductCard key={product.name} product={product} />)}</div></section>
+      <section className={styles.values} aria-label="Xinobi değerleri"><div><span>01</span><h3>Ürün merkezli</h3><p>Gerçek ürün, doğru varyant ve açık bilgi.</p></div><div><span>02</span><h3>Size özgü</h3><p>Kişisel seçimlerinize alan açan tasarım.</p></div><div><span>03</span><h3>Tek deneyim</h3><p>Web ve mobilde aynı sakin akış.</p></div></section>
+      <section className={styles.story} id="hikaye"><p className={styles.eyebrow}>Xinobi Dünyası</p><h2>Teknoloji görünür olmak için değil,<br />hayatınıza uyum sağlamak için.</h2><Link className={styles.textLink} href="/xinobi">Hikâyemizi keşfedin <Icon name="arrow" /></Link></section>
     </main>
-
-    <footer id="destek" className={styles.footer}><div className={styles.footerBrand}><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} /><p>Gündelik ritüeller için sessiz teknoloji.</p></div><nav aria-label="Alt menü"><div><h2>Ürünler</h2><Link href="#urunler">Çay makineleri</Link><Link href="#urunler">Kahve makineleri</Link><Link href="#urunler">Hava temizleyiciler</Link></div><div><h2>Xinobi</h2><Link href="/xinobi">Hakkımızda</Link><Link href="/kurumsal/teklif">Kurumsal</Link><Link href="#kisisellestirme">Xinobi Studio</Link></div><div><h2>Destek</h2><Link href="#destek">İletişim</Link><Link href="#destek">Sıkça sorulanlar</Link><Link href="/yasal">Yasal merkez</Link></div></nav><div className={styles.footerBottom}><span>© 2026 Xinobi</span><span>Faz02 arayüz prototipi</span></div></footer>
+    <footer id="destek" className={styles.footer}><div className={styles.footerBrand}><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} /><p>Gündelik ritüeller için sessiz teknoloji.</p></div><div><h3>Ürünler</h3><Link href="/urunler">Çay makineleri</Link><Link href="/urunler">Kahve makineleri</Link><Link href="/urunler">Pişirme</Link></div><div><h3>Xinobi</h3><Link href="#xinobi-u">XINOBI U</Link><Link href="/xinobi">Hikâyemiz</Link><Link href="/kurumsal/teklif">Kurumsal</Link></div><div><h3>Destek</h3><Link href="#destek">İletişim</Link><Link href="/hesap/siparisler">Sipariş takibi</Link><Link href="/yasal">Yasal bilgiler</Link></div></footer>
+    <section id="nobi-panel" className={styles.nobiPanel} aria-labelledby="nobi-title" hidden={!nobiOpen}><div className={styles.nobiHead}><div><NobiMark compact /><div><p className={styles.eyebrow}>NOBI</p><h2 id="nobi-title">Size nasıl yardımcı olabilirim?</h2></div></div><button type="button" onClick={() => setNobiOpen(false)} aria-label="Nobi panelini kapat">×</button></div><p>Ürünleri keşfetmenize veya XINOBI U adımlarını anlamanıza yardımcı olabilirim.</p><div className={styles.nobiQuick}><Link href="/urunler">Çay makinesi arıyorum</Link><Link href="/urunler/cay-makinesi-101/kisisellestir">XINOBI U nasıl çalışır?</Link><Link href="/kurumsal/teklif">Kurumsal teklif almak istiyorum</Link></div><p className={styles.nobiDemo}>Temsili asistan · Gerçek yanıtlar Faz10’da Cloudflare Workers AI ve onaylı katalog verisiyle bağlanacak.</p></section>
+    <button className={styles.nobi} type="button" aria-label="Nobi’ye sor" aria-expanded={nobiOpen} aria-controls="nobi-panel" onClick={() => setNobiOpen((open) => !open)}><NobiMark /><b>Nobi’ye sor</b></button>
   </div>;
 }

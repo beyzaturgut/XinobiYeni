@@ -6,6 +6,10 @@ await desktop.goto("http://127.0.0.1:4181/", { waitUntil: "load", timeout: 10000
 console.log("production home: desktop loaded");
 const desktopConsentClose = desktop.getByRole("button", { name: "Çerez tercih panelini kapat" });
 if (await desktopConsentClose.isVisible()) await desktopConsentClose.click();
+const desktopCookie = desktop.getByRole("button", { name: "Çerez tercihleri" });
+const desktopNobi = desktop.getByRole("button", { name: "Nobi’ye sor" });
+const [desktopCookieBox, desktopNobiBox] = await Promise.all([desktopCookie.boundingBox(), desktopNobi.boundingBox()]);
+if (!desktopCookieBox || !desktopNobiBox || desktopCookieBox.x + desktopCookieBox.width > desktopNobiBox.x) throw new Error("Cookie preferences overlaps Nobi on desktop");
 
 if (await desktop.locator("header [aria-label='Hızlı işlemler'] > a").count() !== 3) throw new Error("Desktop header icons are incomplete");
 if (await desktop.locator("#kategoriler a:has(img)").count() !== 5) throw new Error("Category rail must contain five categories");
@@ -26,6 +30,9 @@ const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
 await mobile.goto("http://127.0.0.1:4181/", { waitUntil: "load", timeout: 10000 });
 const mobileConsentClose = mobile.getByRole("button", { name: "Çerez tercih panelini kapat" });
 if (await mobileConsentClose.isVisible()) await mobileConsentClose.click();
+const mobileCookieBox = await mobile.getByRole("button", { name: "Çerez tercihleri" }).boundingBox();
+const mobileNobiBox = await mobile.getByRole("button", { name: "Nobi’ye sor" }).boundingBox();
+if (!mobileCookieBox || !mobileNobiBox || mobileCookieBox.x + mobileCookieBox.width > mobileNobiBox.x) throw new Error("Cookie preferences overlaps Nobi on mobile");
 if (await mobile.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)) throw new Error("Mobile horizontal overflow");
 await mobile.screenshot({ path: "test/2026-10-02/TST-070-production-home-mobile.png", fullPage: true, animations: "disabled", timeout: 15000 });
 

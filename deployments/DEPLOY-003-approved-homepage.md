@@ -1,12 +1,12 @@
 # DEPLOY-003 — Onaylı ana sayfa ve güncel web tam paketi
 
 - Tarih (Europe/Istanbul): 2026-10-02
-- Kaynak: `main` / `564184a`
+- Kaynak: `main` / `5445569`
 - Önceki yayın paketi: DEPLOY-002 / `14be3ea`
 - Hedef: IIS `XinobiYeni`, `C:\inetpub\wwwroot\XinobiYeni\out`, `http://*:8014`
-- Paket: `XinobiYeni-web-564184a.zip`
-- Yerel konum: `/Users/beyzaturgut/Desktop/Xinobi/XinobiYeni-web-564184a.zip`
-- SHA-256: `9e0206d3eaa01e76f760069dd53bc6a49f4d1b17218977a49a9551674e410c99`
+- Paket: `XinobiYeni-web-5445569.zip`
+- Yerel konum: `/Users/beyzaturgut/Desktop/Xinobi/XinobiYeni-web-5445569.zip`
+- SHA-256: `83e007a3cbc0094840a3b1d010437f876c8e350cf3f803441065bc477dc7614c`
 - Boyut: yaklaşık 9.3 MB
 - İçerik: 233 ZIP girdisi; doğrudan `out` kökü; 23 statik rota
 - Durum: HAZIRLANDI — RDP aktarımı ve IIS güncellemesi bekleniyor
@@ -17,6 +17,7 @@
 - Üç yeni slider görseli ve XINOBI U bannerı.
 - Header ikonları, kategori menüsü/rayı ve eşit hizalı öne çıkan ürünler.
 - Ortak Nobi robot sembolü, küçültülmüş tetikleyici ve Nobi paneli.
+- Nobi ile çakışmaması için sol alta taşınmış çerez tercihleri düğmesi.
 - DEPLOY-002 sonrasındaki diğer kaynak değişikliklerini de içeren tam statik export.
 
 ## Neden tam paket?
@@ -25,8 +26,8 @@ Next.js ortak CSS/JavaScript parça adlarını her buildde değiştirebildiği i
 
 ## RDP üzerinde yayın adımları
 
-1. `XinobiYeni-web-564184a.zip` dosyasını RDP sunucusunda `C:\deploy\` klasörüne aktarın.
-2. ZIP’i yeni ve boş `C:\deploy\XinobiYeni-web-564184a\` klasörüne açın; içinde doğrudan `out` görünmelidir.
+1. `XinobiYeni-web-5445569.zip` dosyasını RDP sunucusunda `C:\deploy\` klasörüne aktarın.
+2. ZIP’i yeni ve boş `C:\deploy\XinobiYeni-web-5445569\` klasörüne açın; içinde doğrudan `out` görünmelidir.
 3. IIS Manager’da `XinobiYeni` sitesini **Stop** edin.
 4. `C:\inetpub\wwwroot\XinobiYeni\out` klasörünü `out-backup-deploy-002` olarak yeniden adlandırın. İsim doluysa tarih/saat ekleyin; mevcut yedeğin üzerine yazmayın.
 5. Paketten çıkan yeni `out` klasörünü `C:\inetpub\wwwroot\XinobiYeni\` altına kopyalayın.

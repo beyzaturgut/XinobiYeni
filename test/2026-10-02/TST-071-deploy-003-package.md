@@ -1,8 +1,8 @@
 # TST-071 — DEPLOY-003 paket bütünlüğü
 
 - Tarih: 02.10.2026
-- Kaynak commit: `564184a`
-- Paket: `XinobiYeni-web-564184a.zip`
+- Kaynak commit: `5445569`
+- Paket: `XinobiYeni-web-5445569.zip`
 - Seviye: BUILD / STATIC EXPORT / DEPLOYMENT PRECHECK
 
 ## Kontroller
@@ -13,10 +13,10 @@
 - ZIP girdi sayısı: 233.
 - `unzip -t`: sıkıştırılmış veride hata yok.
 - Paket boyutu: yaklaşık 9.3 MB.
-- SHA-256: `9e0206d3eaa01e76f760069dd53bc6a49f4d1b17218977a49a9551674e410c99`.
+- SHA-256: `83e007a3cbc0094840a3b1d010437f876c8e350cf3f803441065bc477dc7614c`.
 
 ## Not
 
-İlk geçici arşiv `apps/web/out` köküyle üretildiği için yayın paketi olarak reddedildi ve `/tmp/XinobiYeni-web-564184a-invalid-root.zip` konumuna taşındı. Final paket doğru `out/` köküyle yeniden oluşturuldu ve yalnız final özet raporlandı.
+İlk geçici arşiv `apps/web/out` köküyle üretildiği için yayın paketi olarak reddedildi. Ardından hazırlanan `564184a` paketi çerez/Nobi konum düzeltmesi sonrasında geçersiz kılındı ve `/tmp/XinobiYeni-web-564184a-superseded.zip` konumuna taşındı. Final `5445569` paketi doğru `out/` kökü ve son düzeltmeyle yeniden oluşturuldu.
 
 Durum: HAZIRLANDI. RDP aktarımı, IIS klasör değişimi ve canlı smoke henüz tamamlanmadı.

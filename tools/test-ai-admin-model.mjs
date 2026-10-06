@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {initialPolicies,validateAiPolicy,sourceEligibility,knowledgeSources} from '../apps/admin/src/ai-admin-model.ts';
+assert.equal(validateAiPolicy(initialPolicies[0]),'');
+for(const dailyLimit of [0,-1,1.5,1001,NaN])assert.ok(validateAiPolicy({...initialPolicies[0],dailyLimit}));
+assert.ok(validateAiPolicy({...initialPolicies[0],prompt:'short'}));assert.ok(validateAiPolicy({...initialPolicies[0],reason:''}));assert.ok(validateAiPolicy({...initialPolicies[0],alternativeCount:3}));
+assert.match(sourceEligibility(knowledgeSources[0],'2026-10-31'),/Örnek kaynak uygun/);
+assert.match(sourceEligibility(knowledgeSources[0],'2026-11-01'),/Süresi dolmuş/);
+assert.match(sourceEligibility(knowledgeSources[1],'2026-10-03'),/Taslak/);
+assert.match(sourceEligibility({...knowledgeSources[0],approved:false},'2026-10-03'),/Onay eksik/);
+console.log('AI admin model: policy bounds and approved/published/expiry source gate = OK');

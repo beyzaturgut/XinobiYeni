@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import {parseDecimal,previewPrice,validateCampaign,initialCampaigns} from '../apps/admin/src/pricing-model.ts';
+assert.equal(parseDecimal('123,45'),12345);assert.equal(parseDecimal('0.01'),1);
+for(const value of ['', '-1','1.234','1e3','NaN','1.2.3'])assert.equal(parseDecimal(value),null);
+const campaign={...initialCampaigns[0],minimum:'0',coupon:''};
+const context={date:'2026-10-03',channel:'Web',variantId:'DEMO-V101-B',coupon:''};
+assert.equal(previewPrice(10005,1,campaign,context).discount,1001);
+assert.equal(previewPrice(10005,1,campaign,context).total,9004);
+assert.equal(previewPrice(100,2,{...campaign,kind:'fixed',value:'999'},context).total,0);
+assert.equal(previewPrice(undefined,1,campaign,context).error,'Seçili varyantın örnek fiyatı tanımlı değil.');
+assert.ok(previewPrice(100,0,campaign,context).error);
+assert.ok(validateCampaign({...campaign,value:'101'}));assert.ok(validateCampaign({...campaign,start:'2026-02-30'}));
+assert.equal(previewPrice(100,1,campaign,{...context,date:'2026-10-01'}).discount,10);
+assert.equal(previewPrice(100,1,campaign,{...context,date:'2026-10-31'}).discount,10);
+for(const patch of [{enabled:false},{channel:'Kurumsal'},{variantId:'other'},{minimum:'9999'},{coupon:'REQUIRED'},{start:'2027-01-01',end:'2027-02-01'}])assert.equal(previewPrice(100,1,{...campaign,...patch},context).discount,0);
+console.log('pricing model: decimal parsing, half-up cents, caps, dates, eligibility and unknown prices = OK');

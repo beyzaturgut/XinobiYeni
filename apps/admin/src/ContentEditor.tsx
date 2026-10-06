@@ -1,0 +1,96 @@
+import { useRef, useState, type ChangeEvent } from 'react'
+
+import { commerceApi, mediaUrl, uploadMedia, type Content, type Slide } from './commerce'
+
+function ContentEditor({ content, onSave }: { content: Content; onSave: (content: Content) => Promise<void> }) {
+  const [section, setSection] = useState<'slider' | 'xinobi-u'>('slider')
+  const [slides, setSlides] = useState(content.slides)
+  const [selectedId, setSelectedId] = useState(content.slides[0]?.id ?? 0)
+  const [notice, setNotice] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
+  const bannerInputRef = useRef<HTMLInputElement>(null)
+  const [xinobiBanner, setXinobiBanner] = useState(content.xinobiBanner)
+  const buttonColor = content.buttonColor
+  const selected = slides.find((slide) => slide.id === selectedId) ?? slides[0]
+
+  function updateSelected(patch: Partial<Slide>) {
+    if (!selected) return
+    setSlides((current) => current.map((slide) => slide.id === selected?.id ? { ...slide, ...patch } : slide))
+  }
+
+  async function addMedia(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    try {
+    const src = await uploadMedia(commerceApi, file)
+    const isVideo = file.type.startsWith('video/')
+    const slide: Slide = { id: Date.now(), name: file.name.replace(/\.[^.]+$/, ''), type: isVideo ? 'Video' : 'Fotoğraf', src, alt: '', duration: isVideo ? 0 : 6, active: true }
+    setSlides((current) => [...current, slide])
+    setSelectedId(slide.id)
+    setNotice(`${file.name} eklendi; web’e yansıtmak için kaydedin.`)
+    event.target.value = ''
+    } catch (error) { setNotice(error instanceof Error ? error.message : 'Medya yüklenemedi.') }
+  }
+
+  function moveSelected(direction: -1 | 1) {
+    if (!selected) return
+    setSlides((current) => {
+      const index = current.findIndex((slide) => slide.id === selected?.id)
+      const target = index + direction
+      if (target < 0 || target >= current.length) return current
+      const next = [...current]
+      ;[next[index], next[target]] = [next[target], next[index]]
+      return next
+    })
+  }
+
+  async function updateXinobiBanner(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    try { setXinobiBanner(await uploadMedia(commerceApi, file)) } catch (error) { setNotice(error instanceof Error ? error.message : 'Yükleme başarısız.'); return }
+    setNotice(`${file.name} XINOBI U banner önizlemesine eklendi.`)
+    event.target.value = ''
+  }
+
+  async function saveContent() {
+    try { await onSave({ slides, xinobiBanner, buttonColor }); setNotice('İçerik kaydedildi; local web güncelleniyor.') }
+    catch (error) { setNotice(error instanceof Error ? error.message : 'İçerik kaydedilemedi.') }
+  }
+  const source = (src: string) => mediaUrl(src, commerceApi, 'http://127.0.0.1:3000')
+
+  return <div className="content-editor">
+    <main className="workspace">
+      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : 'XINOBI U banner'}</h1></div><div className="content-tabs"><button aria-pressed={section === 'slider'} onClick={() => setSection('slider')}>Slider</button><button aria-pressed={section === 'xinobi-u'} onClick={() => setSection('xinobi-u')}>XINOBI U</button></div></header>
+      <section className="status-note"><strong>Ortak içerik yönetimi</strong><span>Görselleri düzenledikten sonra “Kaydet ve web’i güncelle” düğmesine basın. Kayıtlar local API’de korunur.</span></section>
+      {section === 'slider' ? <div className="editor-layout">
+        <section className="slides-panel" aria-labelledby="slides-title">
+          <div className="panel-heading"><div><p>SLIDER ÖĞELERİ</p><h2 id="slides-title">Yayın sırası</h2></div><button onClick={() => inputRef.current?.click()}>+ Medya ekle</button><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={addMedia} hidden /></div>
+          <div className="slides-list">{slides.map((slide, index) => <button key={slide.id} className={slide.id === selected?.id ? 'slide-row selected' : 'slide-row'} onClick={() => setSelectedId(slide.id)}><span className="order">{String(index + 1).padStart(2, '0')}</span><span className="thumb">{slide.type === 'Video' ? <video src={source(slide.src)} muted /> : <img src={source(slide.src)} alt="" />}</span><span className="slide-name"><strong>{slide.name}</strong><small>{slide.type} · {slide.active ? 'Web’de etkin' : 'Taslak'}</small></span><span aria-hidden="true">›</span></button>)}</div>
+          <div className="order-actions"><button onClick={() => moveSelected(-1)}>↑ Yukarı taşı</button><button onClick={() => moveSelected(1)}>↓ Aşağı taşı</button></div>
+        </section>
+        {selected ? <section className="detail-panel" aria-labelledby="detail-title">
+          <div className="panel-heading"><div><p>MEDYA AYARLARI</p><h2 id="detail-title">Seçili öğe</h2></div><span className={selected.active ? 'state live' : 'state'}>{selected.active ? 'Web’de etkin' : 'Taslak'}</span></div>
+          <div className="media-preview">{selected.type === 'Video' ? <video src={source(selected.src)} controls muted /> : <img src={source(selected.src)} alt={selected.alt} />}<span>{selected.type}</span></div>
+          <div className="form-grid">
+            <label>İçerik adı<input value={selected.name} onChange={(event) => updateSelected({ name: event.target.value })} /></label>
+            <label>Medya türü<input value={selected.type} readOnly /></label>
+            <label className="full">Alternatif metin<input value={selected.alt} onChange={(event) => updateSelected({ alt: event.target.value })} placeholder="Görseli açıklayan kısa metin" /></label>
+            {selected.type === 'Fotoğraf' && <label>Gösterim süresi (sn.)<input type="number" min="3" max="20" value={selected.duration} onChange={(event) => updateSelected({ duration: Number(event.target.value) })} /></label>}
+            <label className="toggle"><input type="checkbox" checked={selected.active} onChange={(event) => updateSelected({ active: event.target.checked })} /><span>Web sliderında etkin</span></label>
+          </div>
+          <div className="save-row"><p aria-live="polite">{notice}</p><button onClick={() => { setSlides(current => current.filter(item => item.id !== selected.id)); setNotice('Banner kaldırıldı; değişikliği kaydedin.') }}>Bannerı sil</button><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div>
+        </section> : <section className="detail-panel"><p>Banner yok. Yeni medya ekleyebilirsiniz.</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></section>}
+      </div> : <section className="xinobi-editor" aria-labelledby="xinobi-u-settings">
+        <div className="panel-heading"><div><p>ANA SAYFA BANNERI</p><h2 id="xinobi-u-settings">Görsel ve banner bağlantısı</h2></div><span className="state live">Yerel önizleme</span></div>
+        <div className="xinobi-preview">{xinobiBanner ? <img src={source(xinobiBanner)} alt="XINOBI U banner önizlemesi" /> : <p>Banner kaldırıldı.</p>}</div>
+        <div className="xinobi-settings">
+          <div><h3>Banner görseli</h3><p>Banner formatı 1942 × 809 piksel. Görsel kırpılmadan gösterilir; bannerın tamamına dokunulduğunda kişiselleştirilebilir ürünler açılır.</p><button onClick={() => bannerInputRef.current?.click()}>Görseli değiştir</button><button onClick={() => setXinobiBanner('')}>Bannerı kaldır</button><input ref={bannerInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={updateXinobiBanner} hidden /></div>
+          <div><h3>Sabit bağlantı</h3><p><code>/xinobi-u</code></p><small>Bannerın tamamı ürün seçimine yönlendirir; seçilen üründen soru ekranına geçilir.</small></div>
+        </div>
+        <div className="save-row"><p aria-live="polite">{notice}</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div>
+      </section>}
+    </main>
+  </div>
+}
+
+export default ContentEditor

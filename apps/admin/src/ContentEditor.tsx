@@ -11,9 +11,8 @@ function ContentEditor({ content, products, categories, announcements, onPublish
   const [selectedId, setSelectedId] = useState(content.slides[0]?.id ?? 0)
   const [notice, setNotice] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const bannerInputRef = useRef<HTMLInputElement>(null)
   const [titaniumBanner, setTitaniumBanner] = useState(content.titaniumBanner ?? '/assets/banners/home-titanium.webp')
-  const [xinobiBanner, setXinobiBanner] = useState(content.xinobiBanner)
+  const xinobiBanner = content.xinobiBanner
   const buttonColor = content.buttonColor
   const selected = slides.find((slide) => slide.id === selectedId) ?? slides[0]
 
@@ -46,14 +45,6 @@ function ContentEditor({ content, products, categories, announcements, onPublish
       ;[next[index], next[target]] = [next[target], next[index]]
       return next
     })
-  }
-
-  async function updateXinobiBanner(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-    if (!file) return
-    try { setXinobiBanner(await uploadMedia(commerceApi, file)) } catch (error) { setNotice(error instanceof Error ? error.message : 'Yükleme başarısız.'); return }
-    setNotice(`${file.name} XINOBI U banner önizlemesine eklendi.`)
-    event.target.value = ''
   }
 
   async function saveContent() {
@@ -101,15 +92,8 @@ function ContentEditor({ content, products, categories, announcements, onPublish
           </div>
           <div className="save-row"><p aria-live="polite">{notice}</p><button onClick={() => { setSlides(current => current.filter(item => item.id !== selected.id)); setNotice('Banner kaldırıldı; değişikliği kaydedin.') }}>Bannerı sil</button><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div>
         </section> : <section className="detail-panel"><p>Banner yok. Yeni medya ekleyebilirsiniz.</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></section>}
-      </div> : <section className="xinobi-editor" aria-labelledby="xinobi-u-settings">
-        <div className="panel-heading"><div><p>ANA SAYFA BANNERI</p><h2 id="xinobi-u-settings">Görsel ve banner bağlantısı</h2></div><span className="state live">Yerel önizleme</span></div>
-        <div className="xinobi-preview">{xinobiBanner ? <img src={source(xinobiBanner)} alt="XINOBI U banner önizlemesi" /> : <p>Banner kaldırıldı.</p>}</div>
-        <div className="xinobi-settings">
-          <div><h3>Banner görseli</h3><p>Banner formatı 1942 × 809 piksel. Görsel kırpılmadan gösterilir; bannerın tamamına dokunulduğunda kişiselleştirilebilir ürünler açılır.</p><button onClick={() => bannerInputRef.current?.click()}>Görseli değiştir</button><button onClick={() => setXinobiBanner('')}>Bannerı kaldır</button><input ref={bannerInputRef} type="file" accept="image/jpeg,image/png,image/webp" onChange={updateXinobiBanner} hidden /></div>
-          <div><h3>Sabit bağlantı</h3><p><code>/xinobi-u</code></p><small>Bannerın tamamı ürün seçimine yönlendirir; seçilen üründen soru ekranına geçilir.</small></div>
-        </div>
-        <div className="save-row"><p aria-live="polite">{notice}</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div>
-      </section>}
+      </div> : <section className="xinobi-editor" aria-labelledby="xinobi-u-settings"><h2 id="xinobi-u-settings">Sabit XINOBI U alanı</h2><p>Anasayfadaki bu bölüm artık banner görseli yerine gerçek metin, düğme ve ürün önizlemesiyle gösterilir. “Tasarımını keşfet” düğmesi kişiselleştirilebilir ürünleri açar.</p><p>Bu alan için banner yüklemeniz gerekmez.</p></section>}
+
     </main>
   </div>
 }

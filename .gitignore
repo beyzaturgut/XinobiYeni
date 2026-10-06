@@ -22,3 +22,7 @@ services/api/appsettings.Local.json
 
 # Next.js static export output
 **/out/
+
+# Generated IIS preview content snapshots and copied media
+apps/web/public/commerce-preview/
+apps/web/public/assets/deploy-media/

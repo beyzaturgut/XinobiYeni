@@ -24,18 +24,18 @@ Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 | WEB-018 | AI satış asistanı | Herkes / global | Demo ürün/teklif yönlendirmesi gör | Katalog, konuşma, lead | 02,10 | Chrome konu/mesaj/bildirim/temizleme/kapalı devir otomasyonu geçti; D05/D08/D10/sağlayıcı/tam klavye/gerçek cihaz QA bekliyor |
 | WEB-019 | Kurumsal/içerik | Herkes / footer, SEO | Marka yaklaşımını ve içerik önizlemesini oku | Page, BlogPost, SEO | 02,04 | 500 px uzun Chrome görsel QA geçti; CMS/içerik onayı/interaction/gerçek cihaz QA bekliyor |
 | WEB-020 | Yasal/çerez | Herkes / footer, ilk ziyaret | Taslak belgeleri ve tercih durumlarını incele | LegalDocument, Consent | 02,04 | Chrome kapat/yeniden aç/kategori/tercih otomasyonu geçti; D10/hukuk/persistence/tam klavye/gerçek cihaz QA bekliyor |
-| ADM-001 | Dashboard | Panel rolü / giriş | Operasyon özeti | Sipariş, stok, hata, teklif | 02,03+ | Bekliyor |
-| ADM-002 | Rol/denetim/ayar | Yönetici | Yetki ve audit incele | Role, Permission, AuditLog | 02,03 | Bekliyor |
-| ADM-003 | Katalog/varyant/medya | Katalog rolü | Ürün yayınla | Product, Variant, Asset | 02,04 | D02 bekliyor |
-| ADM-004 | Fiyat/kampanya | Ticaret rolü | Fiyat ve kural yönet | Price, Campaign, Coupon | 02,04 | D02/D03 bekliyor |
-| ADM-005 | Stok/depo | Operasyon | Stok/mutabakat yönet | Inventory, Warehouse | 02,04 | D02/D03 bekliyor |
-| ADM-006 | Sipariş/kargo/iade | Operasyon | Durum işlemi | Order, Shipment, Return | 02,05 | D03 bekliyor |
-| ADM-007 | Teklif/toplu sipariş | Kurumsal satış | Teklif işle, dönüştür | Quote, CorporateOrderLink | 02,07 | D07 bekliyor |
-| ADM-008 | Tasarım/baskı | Üretim | Dosya onayla/üret | DesignVersion, PrintOutput | 02,06 | D04 bekliyor |
+| ADM-001 | Dashboard | Panel rolü / giriş | Operasyon özeti | Sipariş, stok, hata, teklif | 02,03+ | 13 kartlı siyah tema prototipi ve TST-078 hazır; kimlik/rol/API açık |
+| ADM-002 | Rol/denetim/ayar | Yönetici | Yetki ve audit incele | Role, Permission, AuditLog | 02,03 | Rol matrisi/ayar/denetim prototipi TST-086 hazır; gerçek kimlik/API yetkilendirmesi açık |
+| ADM-003 | Katalog/varyant/medya | Katalog rolü | Ürün yayınla | Product, Variant, Asset | 02,04 | Örnek liste/filtre/oluşturma, genel-varyant-medya-SEO ve TST-079 hazır; gerçek kayıt D02/API bekliyor |
+| ADM-004 | Fiyat/kampanya | Ticaret rolü | Fiyat ve kural yönet | Price, Campaign, Coupon | 02,04 | Örnek fiyat/kampanya düzenleme ve indirim önizlemesi TST-081 hazır; gerçek fiyat D02/D03/API bekliyor |
+| ADM-005 | Stok/depo | Operasyon | Stok/mutabakat yönet | Inventory, Warehouse | 02,04 | Depo/hareket/mutabakat/sayım prototipi ve TST-080 hazır; gerçek yazım D02/D03/API bekliyor |
+| ADM-006 | Sipariş/kargo/iade | Operasyon | Durum işlemi | Order, Shipment, Return | 02,05 | Örnek liste/filtre/detay TST-078 başarılı; gerçek işlemler D03/API bekliyor |
+| ADM-007 | Teklif/toplu sipariş | Kurumsal satış | Teklif işle, dönüştür | Quote, CorporateOrderLink | 02,07 | Liste/detay/değişmez revizyon prototipi TST-082 hazır; gerçek onay/dönüşüm D07/API bekliyor |
+| ADM-008 | Tasarım/baskı | Üretim | Dosya onayla/üret | DesignVersion, PrintOutput | 02,06 | Sürüm/kalite/çıktı/not prototipi TST-083 hazır; gerçek üretim D04/API bekliyor |
 | ADM-009 | CMS/SEO/bildirim | İçerik rolü | Yayınla | Page, SEO, Notification | 02,04 | D10 bekliyor |
-| ADM-010 | Mikro eşleme/hata | Entegrasyon rolü | Eşle, tekrar dene | ExternalMapping, SyncJob | 02,08 | D02/D06 bekliyor |
-| ADM-011 | Pazaryeri eşleme/hata | Kanal rolü | Kanal işlemi | ProviderEvent, Mapping | 02,09 | D02/D03/D06 bekliyor |
-| ADM-012 | AI yönetimi | AI rolü | Prompt/kaynak/limit yönet | Prompt, Knowledge, Usage | 02,10 | D08/D10 bekliyor |
+| ADM-010 | Mikro eşleme/hata | Entegrasyon rolü | Eşle, tekrar dene | ExternalMapping, SyncJob | 02,08 | Eşleme/iş/hata/uzlaştırma prototipi TST-084 hazır; gerçek D02/D06/API açık |
+| ADM-011 | Pazaryeri eşleme/hata | Kanal rolü | Kanal işlemi | ProviderEvent, Mapping | 02,09 | Üç kanal izleme/eşleme prototipi TST-084 hazır; gerçek D02/D03/D06/API açık |
+| ADM-012 | AI yönetimi | AI rolü | Prompt/kaynak/limit yönet | Prompt, Knowledge, Usage | 02,10 | Politika/kullanım/kaynak/devir prototipi TST-085 hazır; gerçek D05/D08/D10/API açık |
 | MOB-001 | Mobil ana/katalog/ürün | iOS/Android müşteri | Keşfet, varyant seç | WEB-001–004 ortak API | 02,04,11 | Bekliyor |
 | MOB-002 | Mobil editör | iOS/Android müşteri | Tasarla, kaydet | WEB-005–006 ortak API | 02,06,11 | D04/D09 bekliyor |
 | MOB-003 | Mobil sepet/ödeme | iOS/Android müşteri | Siparişi tamamla | WEB-008–010 ortak API | 02,05,11 | D03/D05/D09 bekliyor |

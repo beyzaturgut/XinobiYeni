@@ -89,21 +89,33 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex + Creative/Web Designer; WEB-001 etkileşimli yerel prototip hazırlandı |
-| Aktif faz/görev ID | Faz02 / v0.24.0 F02-A12–A14 yerel tasarım kullanıcı incelemesi; deploy yok |
-| Repo/branch/HEAD | `main` · etkileşimli prototip öncesi `6956a99`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Son güncelleme ve sorumlu | 2026-10-03 · Codex; ADM-002 rol/ayar/denetim ve TST-086 kaydedildi; yayın kullanıcıda |
+| Aktif faz/görev ID | Faz02 / v0.35.0 F02-A09 ADM-002 rol/ayar/denetim prototipi; gerçek kabul açık |
+| Repo/branch/HEAD | `main` · HEAD `acc0c99b03318aae6ec1c77908284726f5edb185`; bu oturumdaki belgeler commit edilmedi · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Yerel tasarım `http://127.0.0.1:4175/design/screens/WEB-001/prototype.html`; deploy/IIS değiştirilmedi |
-| Son test komutu ve sonucu | TST-060: masaüstü mega menü/hero/Nobi ve mobil drawer/carousel başarılı; 5 render × 15/15 görsel, overflow=false |
-| Değişen dosyalar / migration | WEB-001 HTML/CSS/JS + beş PNG, interaction renderer/testi ve TST-060; `apps/web`/migration/deploy/API değişmedi |
-| Aktif hata/yarım iş | Kullanıcı yerel prototip incelemesi ve `ORTAK TASARIM ONAY` bekleniyor. Manuel ekran okuyucu/fiziksel cihaz ve üretim uygulaması ayrı kabul |
-| Sonraki en küçük güvenli adım | Kullanıcının yerel prototip geri bildirimini al; onaydan sonra `apps/web` uygulama planı/handoff'u çıkar, deploy yapma |
+| Son çalışan uygulama komutu/URL | `pnpm --filter web build` başarılı; mobil paket `XinobiYeni-web-acc0c99.zip` hazır, RDP/IIS yayını doğrulanmadı |
+| Son test komutu ve sonucu | TST-085: admin lint/build, AI modeli/UI ve panel regresyonu başarılı; dört bölüm/dört genişlik |
+| Değişen dosyalar / migration | apps/admin AiAdmin/ai-admin-model/App/panel.css, iki test aracı ve TST-085; migration/API değişmedi |
+| Aktif hata/yarım iş | Kullanıcı yayını daha sonra yapacak; HND-01–05, gerçek rol incelemesi, fiziksel cihaz ve D kararları açık |
+| Sonraki en küçük güvenli adım | F02-A10 mobil ekran tasarımını mevcut uygulama ile karşılaştırıp eksik akışları tamamla; gerçek kimlik/yetki API aşamasında açık |
 | Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-03 | Faz02 F02-A09 / ADM-002 | `main` / `acc0c99`; çalışma ağacı | Rol matrisi, sürümlü ayar ve güvenli demo denetim kayıtları | TST-086 model/UI, build/lint ve panel regresyonu başarılı; ilk seçici testi timeout sonrası erişilebilir ad düzeltildi | `test/2026-10-03/TST-086-admin-settings.md` | F02-A10 mobil tasarım kapsamı; gerçek kimlik/API açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-012 | `main` / `acc0c99`; çalışma ağacı | Politika/istem sürümü, kullanım/hata, kaynak uygunluğu ve destek devri | TST-085 model/UI, build/lint ve panel regresyonu başarılı | `test/2026-10-03/TST-085-admin-ai.md` | ADM-002 rol/ayar/denetim; gerçek kimlik/API açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-010/011 | `main` / `acc0c99`; çalışma ağacı | Dört sağlayıcı eşleme/iş/hata/uzlaştırma izleme | TST-084 model/UI, build/lint ve panel regresyonu başarılı | `test/2026-10-03/TST-084-admin-integrations.md` | ADM-012 AI yönetimi; gerçek sağlayıcı/API açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-008 | `main` / `acc0c99`; çalışma ağacı | Tasarım/sürüm/kalite/yüz çıktısı ve demo inceleme notu | TST-083 build/lint, baskı testi ve panel regresyonu başarılı | `test/2026-10-03/TST-083-admin-print.md` | ADM-010/011 entegrasyon izleme; gerçek D06/API açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-007 | `main` / `acc0c99`; çalışma ağacı | Kurumsal talep listesi, sürüm geçmişi ve revizyon taslağı | TST-082 model/UI, build/lint ve panel regresyonu başarılı; TS import hatası düzeltildi | `test/2026-10-03/TST-082-admin-quotes.md` | ADM-008 baskı operasyonu; D04/API açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-004 | `main` / `acc0c99`; çalışma ağacı | Örnek varyant fiyatı, kampanya koşulları ve indirim önizlemesi | TST-081 hesaplama/UI, build/lint ve panel regresyonu başarılı | `test/2026-10-03/TST-081-admin-pricing.md` | ADM-007 teklif yönetimi; gerçek D07/API açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-005 | `main` / `acc0c99`; çalışma ağacı | Depo bakiyeleri, geçmiş, mutabakat ve sayım önizlemesi | TST-080 build/lint/stok; katalog/panel regresyonu başarılı | `test/2026-10-03/TST-080-admin-inventory.md` | ADM-004 fiyat/kampanya; gerçek API kapıları açık | Codex |
+| 2026-10-03 | Faz02 F02-A09 / ADM-003 | `main` / `acc0c99`; çalışma ağacı | Katalog filtre/sayaç, yeni ürün, dört bölümlü düzenleme, SKU/stok ve taslak koruması | TST-079 build/lint/katalog ve TST-078 regresyon başarılı | `test/2026-10-03/TST-079-admin-catalog.md` | ADM-005 stok/depo; D02/D03 gerçek yazım açık | Codex |
+| 2026-10-02 | Faz02 F02-A09 / ADM-001/006/009 | `main` / `acc0c99`; değişiklikler commit edilmedi | Siyah panel kabuğu, 13 kart, sipariş filtre/detay ve korunmuş içerik editörü | TST-078 build/lint ve dört genişlikte tarayıcı başarılı; iki etiket hatası düzeltildi | `test/2026-10-02/TST-078-admin-panel.md` | ADM-003 katalog/varyant prototipi; gerçek API kapıları açık | Codex |
+| 2026-10-02 | Faz02 HND-02 | `main` / `acc0c99`; çalışma ağacı | Slider/mobil header hedefleri 44 px, beş yeni E2E | Lint/build, 48/48 E2E ve diff başarılı | `test/2026-10-02/TST-077-home-touch-targets.md` | HND-01 banner gerçek oranı; yayın kullanıcıda | Codex |
+| 2026-10-02 | Faz02 F02-A06 | `main` / `acc0c99`; belgeler commit edilmedi | Handoff, 22 medya ölçü/hash envanteri ve API hedef alanları; HND-01–05 | TST-076 manifest ve mevcut üç sağlık ucu doğrulandı; diff başarılı | `design/handoff.md`, `design/assets/manifest.json`, `test/2026-10-02/TST-076-handoff.md` | HND-02 dokunma hedefleri; yayın kullanıcıda | Codex |
+| 2026-10-02 | Faz02 F02-A05 / deploy hazırlığı | `main` / `acc0c99` → belgeler çalışma ağacında | Editör/AI spec, kabul listesi ve güncel anlık durum | TST-074 build/mobil/ZIP; TST-075 belge/diff başarılı | `design/editor-spec.md`, `design/ai-spec.md`, `test/2026-10-02/TST-074-*`, `TST-075-*` | F02-A06 handoff; RDP canlı doğrulama açık | Codex |
 | 2026-10-01 | Faz02 v0.24.0 / WEB-001 interaction | `main` / `6956a99` | Mega menü/drawer, hero slider, product carousel ve Nobi paneli tasarım prototipine eklendi | TST-060: desktop/mobile interaction başarılı; 5 kırılım × 15/15 görsel, overflow=false | `design/screens/WEB-001/*`, `tools/test-web001-interactions.mjs`, `test/2026-10-01/TST-060-*` | Kullanıcı yerel inceleme/ortak tasarım onayı | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.23.1 / WEB-001 içerik yönetimi | `main` / `476255b` | Admin panelinden yönetilecek dört görsel/içerik alanı geçici `Temsili` açıklamayla ayrıştırıldı | TST-059: 5 kırılım × 14/14 görsel, overflow=false; app/deploy yok | `design/screens/WEB-001/*`, `test/2026-10-01/TST-059-*` | F02-A13/14 etkileşimli prototip/handoff | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.23.0 / F02-A12–A14 | `main` / `996a2a2` | WEB-001 ortak hi-fi HTML/CSS; Creative/Web QA revizyonları; beş responsive PNG | TST-058: 5 kırılım × 14/14 görsel, overflow=false, h1=1; app/deploy yok | `design/screens/WEB-001/*`, `tools/render-web001.mjs`, `test/2026-10-01/TST-058-*` | Kullanıcı ortak tasarım onayı | Codex + Creative Designer + Web Designer |

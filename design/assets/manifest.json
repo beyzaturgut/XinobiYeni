@@ -1,0 +1,223 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-02",
+  "note": "Local file inventory; null product/variant IDs require D02 mapping. License status is not publication approval.",
+  "assets": [
+    {
+      "path": "apps/web/public/assets/banners/home-slider-1.png",
+      "sha256": "53a0d752371419b06887fe6aa3c7ec50345f2e2f62ed44479fb29b00e44611eb",
+      "bytes": 1509969,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1942,
+      "pixelHeight": 809
+    },
+    {
+      "path": "apps/web/public/assets/banners/home-slider-2.png",
+      "sha256": "a9c12ca73a6fe9d3c4fa7875b2885e49d1e062c0d29f30f4f51b7a0e7b384727",
+      "bytes": 1575601,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1942,
+      "pixelHeight": 809
+    },
+    {
+      "path": "apps/web/public/assets/banners/home-slider-3.png",
+      "sha256": "349b056228213114567f7e00af3c453ae976cb8e6e775bfb1c450c49d371762d",
+      "bytes": 1472153,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1942,
+      "pixelHeight": 809
+    },
+    {
+      "path": "apps/web/public/assets/banners/home-xinobi-u.png",
+      "sha256": "8c7e2c0accb251f0aabc1f2506edc9439b94e4617d32aaf6c949d832439a6545",
+      "bytes": 1801382,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 2172,
+      "pixelHeight": 724
+    },
+    {
+      "path": "apps/web/public/assets/banners/xinobi-personalized-tea-makers.png",
+      "sha256": "33419d0aac3626b7f91da6d5d1d661d9ba996d9df83c2772095a46bb275dcfbf",
+      "bytes": 1723428,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1672,
+      "pixelHeight": 941
+    },
+    {
+      "path": "apps/web/public/assets/brand/xinobi-logo-white.png",
+      "sha256": "1f5d7d4d8c205938231277acd91421d278615d6706a68e8b617e6a1a2b3f5f93",
+      "bytes": 21475,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 385,
+      "pixelHeight": 333
+    },
+    {
+      "path": "apps/web/public/assets/products/air-purifier-101.webp",
+      "sha256": "3bd453b88d09b28a1bd383f13e5cda56a801fbc01b3edc0d5bffd0c884070348",
+      "bytes": 48656,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 827,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/coffee-maker-101-gold.webp",
+      "sha256": "ac73014897cceda54dbb1346a9409848bfa8009db861c83601ba04b8bdbc5c82",
+      "bytes": 70536,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1600,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/coffee-maker-101-red.webp",
+      "sha256": "bf8f48dd80bd4d30f567b7c48fbe4f36b86dd246904ed28f93b0b851b97c2227",
+      "bytes": 47182,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1600,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/coffee-maker-102.webp",
+      "sha256": "3f87fbedaf21e93e63298fed60726b15d0110b292d0b48ce6e06df1bc93fc691",
+      "bytes": 30218,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 896,
+      "pixelHeight": 1190
+    },
+    {
+      "path": "apps/web/public/assets/products/cooking-machine.webp",
+      "sha256": "80683d344cdd89ea6ae48d3b1af6b8c9f2042cb8dc4f8323748ab88c7bf46313",
+      "bytes": 46120,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1204,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/tea-maker-101-blue.webp",
+      "sha256": "da25357dd74d34295b1658ac6b87b55c28ec4f9d8f4543379efabb8971300414",
+      "bytes": 24596,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1066,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/tea-maker-101-red.webp",
+      "sha256": "1d3d9f9dd8a47c7583a9283c2f0e5d6d8db1786fdaae41190bcedec6d9fd382d",
+      "bytes": 27792,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1066,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/tea-maker-101-rose-gold.webp",
+      "sha256": "7aa532715e6346be8a58743731ab1b10d9d02e36889f152bd98a64fd0c5bd792",
+      "bytes": 27002,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1066,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/tea-maker-101-silver.webp",
+      "sha256": "e744009bbe06b088918b76d8a128c689db65323da539af3db17f97e1eaf17db1",
+      "bytes": 23310,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1066,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "apps/web/public/assets/products/toast-maker.webp",
+      "sha256": "214fcad386f18ebcff5c6ea0bed78f4d66114c4959578f4b798b75018d0a3c4a",
+      "bytes": 62788,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1599,
+      "pixelHeight": 1600
+    },
+    {
+      "path": "design/banner/.DS_Store",
+      "sha256": "4da76a0af7863bd299972d2d62dc394e7cdc04c8b4d9140d68a0fab77bd9ccd8",
+      "bytes": 6148,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null
+    },
+    {
+      "path": "design/banner/slider-1.png",
+      "sha256": "53a0d752371419b06887fe6aa3c7ec50345f2e2f62ed44479fb29b00e44611eb",
+      "bytes": 1509969,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1942,
+      "pixelHeight": 809
+    },
+    {
+      "path": "design/banner/slider-2.png",
+      "sha256": "a9c12ca73a6fe9d3c4fa7875b2885e49d1e062c0d29f30f4f51b7a0e7b384727",
+      "bytes": 1575601,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1942,
+      "pixelHeight": 809
+    },
+    {
+      "path": "design/banner/slider-3.png",
+      "sha256": "349b056228213114567f7e00af3c453ae976cb8e6e775bfb1c450c49d371762d",
+      "bytes": 1472153,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 1942,
+      "pixelHeight": 809
+    },
+    {
+      "path": "design/banner/xinobi-u-banner.png",
+      "sha256": "8c7e2c0accb251f0aabc1f2506edc9439b94e4617d32aaf6c949d832439a6545",
+      "bytes": 1801382,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null,
+      "pixelWidth": 2172,
+      "pixelHeight": 724
+    },
+    {
+      "path": "design/logo/xinobi logo beyaz.pdf",
+      "sha256": "3b3a86d2bb5c980b71bcc0c58ece4a8502597c982a3860e9693e2d617163f67a",
+      "bytes": 831224,
+      "licenseStatus": "confirmation-required",
+      "productId": null,
+      "variantId": null
+    }
+  ]
+}

@@ -75,3 +75,28 @@
 | TST-071 | 02.10.2026 | DEPLOY-003 güncel IIS tam paket bütünlüğü | Başarılı; doğru `out/` kökü, 233 girdi, ZIP CRC ve SHA-256 doğrulandı | BUILD / STATIC EXPORT / DEPLOYMENT PRECHECK | `2026-10-02/TST-071-deploy-003-package.md` |
 | TST-072 | 02.10.2026 | Çerez tercihleri ve Nobi konum ayrımı | Başarılı; çerez düğmesi sol alta taşındı, masaüstü/mobil koordinat testi ve 43/43 regresyon geçti | UI REGRESSION / RESPONSIVE / E2E / VISUAL | `2026-10-02/TST-072-cookie-nobi-position.md` |
 | TST-073 | 02.10.2026 | Mobil çerez paneli ve XINOBI U banner yerleşimi | Başarılı; 390/412 px konum, taşma ve tam kadraj testi ile 43/43 regresyon geçti; deploy alınmadı | UI REGRESSION / RESPONSIVE / E2E / VISUAL | `2026-10-02/TST-073-mobile-consent-personalize.md` |
+
+- 02.10.2026 · [TST-074 mobil deploy paketi](2026-10-02/TST-074-mobile-deploy-package.md) — Build/mobil/ZIP başarılı; canlı yayın açık.
+- 02.10.2026 · [TST-075 editör/AI spec](2026-10-02/TST-075-editor-ai-spec.md) — Belge taslağı kontrolü başarılı; rol kabulü açık.
+
+- 02.10.2026 · [TST-076 handoff bütünlüğü](2026-10-02/TST-076-handoff.md) — 22 varlık ve API durumu doğrulandı; kabul açık.
+
+- 02.10.2026 · [TST-077 ana sayfa dokunma alanları](2026-10-02/TST-077-home-touch-targets.md) — Lint/build ve 48/48 E2E başarılı.
+
+- 02.10.2026 · [TST-078 yönetim paneli](2026-10-02/TST-078-admin-panel.md) — Build/lint ve dashboard/sipariş/CMS tarayıcı kontrolleri başarılı.
+
+- 03.10.2026 · [TST-079 katalog ve varyantlar](2026-10-03/TST-079-admin-catalog.md) — Build/lint, katalog akışı ve mevcut panel regresyonu başarılı.
+
+- 03.10.2026 · [TST-080 stok/depo yönetimi](2026-10-03/TST-080-admin-inventory.md) — Build/lint, stok/mutabakat/sayım ve panel regresyonu başarılı.
+
+- 03.10.2026 · [TST-081 fiyat/kampanya yönetimi](2026-10-03/TST-081-admin-pricing.md) — Hesaplama ve UI testleri, build/lint ve panel regresyonu başarılı.
+
+- 03.10.2026 · [TST-082 kurumsal teklifler](2026-10-03/TST-082-admin-quotes.md) — Revizyon modeli/UI, build/lint ve panel regresyonu başarılı.
+
+- 03.10.2026 · [TST-083 tasarım/baskı operasyonları](2026-10-03/TST-083-admin-print.md) — Build/lint, sürüm/çıktı/not ve panel regresyonu başarılı.
+
+- 03.10.2026 · [TST-084 entegrasyon izleme](2026-10-03/TST-084-admin-integrations.md) — Model/UI, build/lint ve panel regresyonu başarılı.
+
+- 03.10.2026 · [TST-085 AI yönetimi](2026-10-03/TST-085-admin-ai.md) — Model/UI, build/lint ve panel regresyonu başarılı.
+
+- [TST-086 — ADM-002 rol, ayar ve denetim](2026-10-03/TST-086-admin-settings.md)

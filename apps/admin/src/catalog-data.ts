@@ -1,4 +1,4 @@
-export type Variant = { id: string; sku: string; color: string; stock: number; image: string }
+export type Variant = { id: string; sku: string; color: string; hex?: string; originalImage?: string; stock: number; image: string }
 export type Product = { id: string; name: string; category: string; active: boolean; description: string; seoTitle: string; personalizable?: boolean | null; variants: Variant[] }
 export const categories = ['Çay makineleri', 'Kahve makineleri', 'Hava temizleme', 'Pişirme teknolojileri']
 export const initialProducts: Product[] = [

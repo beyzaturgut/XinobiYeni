@@ -27,9 +27,9 @@ public static class LocalCommerceEndpoints
         group.MapPut("/products/{id}", async (string id, CommerceProduct product, LocalCommerceStore store) =>
         {
             if (id != product.Id || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Variants is null ||
-                (product.Active && product.Variants.Length == 0) || product.Variants.Any(v => string.IsNullOrWhiteSpace(v.Id) || string.IsNullOrWhiteSpace(v.Sku) || string.IsNullOrWhiteSpace(v.Color) || v.Stock < 0 || !ValidMedia(v.Image)) ||
+                (product.Active && product.Variants.Length == 0) || product.Variants.Any(v => string.IsNullOrWhiteSpace(v.Id) || string.IsNullOrWhiteSpace(v.Sku) || string.IsNullOrWhiteSpace(v.Color) || v.Stock < 0 || !ValidMedia(v.Image) || !ValidMedia(v.OriginalImage ?? "") || (!string.IsNullOrEmpty(v.Hex) && !Regex.IsMatch(v.Hex, "^#[a-fA-F0-9]{6}$"))) ||
                 product.Variants.Select(v => v.Id).Distinct().Count() != product.Variants.Length || product.Variants.Select(v => v.Sku.ToUpperInvariant()).Distinct().Count() != product.Variants.Length)
-                return Results.BadRequest(new { message = "Ürün adı, benzersiz SKU, geçerli görsel ve pozitif stok alanlarını kontrol edin." });
+                return Results.BadRequest(new { message = "Ürün adı, benzersiz SKU, geçerli görsel, #RRGGBB HEX kodu ve pozitif stok alanlarını kontrol edin." });
             try
             {
                 var state = await store.Update(state =>

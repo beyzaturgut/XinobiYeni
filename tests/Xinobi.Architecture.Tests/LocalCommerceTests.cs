@@ -24,7 +24,7 @@ public sealed class LocalCommerceTests : IDisposable
         using (var client = factory.CreateClient())
         {
             var seed = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
-            var product = seed.Products[0] with { Name = "Kaydedilen ürün", Variants = [seed.Products[0].Variants[0] with { Stock = 17 }] };
+            var product = seed.Products[0] with { Name = "Kaydedilen ürün", Variants = [seed.Products[0].Variants[0] with { Stock = 17, Hex = "#123456", OriginalImage = "/assets/products/original.webp" }] };
             (await client.PutAsJsonAsync(Root + "/products/" + product.Id, product)).EnsureSuccessStatusCode();
             (await client.PutAsJsonAsync(Root + "/prices/" + product.Variants[0].Id, new PriceUpdate(345678))).EnsureSuccessStatusCode();
             (await client.PutAsJsonAsync(Root + "/content", seed.Content with { Slides = [], XinobiBanner = "", ButtonColor = "#112233" })).EnsureSuccessStatusCode();
@@ -34,6 +34,8 @@ public sealed class LocalCommerceTests : IDisposable
         var state = (await secondClient.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         var saved = state.Products.Single(p => p.Name == "Kaydedilen ürün");
         Assert.Equal(17, saved.Variants[0].Stock);
+        Assert.Equal("#123456", saved.Variants[0].Hex);
+        Assert.Equal("/assets/products/original.webp", saved.Variants[0].OriginalImage);
         Assert.Equal(345678, state.Prices[saved.Variants[0].Id]);
         Assert.Empty(state.Content.Slides);
         Assert.Equal("", state.Content.XinobiBanner);
@@ -51,6 +53,11 @@ public sealed class LocalCommerceTests : IDisposable
         var seed = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         var invalid = seed.Products[0] with { Variants = [seed.Products[0].Variants[0] with { Stock = -1 }] };
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/products/" + invalid.Id, invalid)).StatusCode);
+        foreach (var variant in new[] { seed.Products[0].Variants[0] with { Hex = "red" }, seed.Products[0].Variants[0] with { OriginalImage = "https://untrusted.example/photo.jpg" } })
+        {
+            var invalidMedia = seed.Products[0] with { Variants = [variant] };
+            Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/products/" + invalidMedia.Id, invalidMedia)).StatusCode);
+        }
         client.DefaultRequestHeaders.Add("Origin", "https://untrusted.example");
         Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync(Root + "/content", seed.Content)).StatusCode);
         client.DefaultRequestHeaders.Remove("Origin");

@@ -1,4 +1,4 @@
-export type Variant = { id: string; sku: string; color: string; stock: number; image: string }
+export type Variant = { id: string; sku: string; color: string; hex?: string; originalImage?: string; stock: number; image: string }
 export type Product = { id: string; name: string; category: string; active: boolean; description: string; seoTitle: string; personalizable?: boolean | null; variants: Variant[] }
 export type Slide = { id: number; name: string; type: 'Fotoğraf' | 'Video'; src: string; alt: string; duration: number; active: boolean }
 export type Content = { slides: Slide[]; xinobiBanner: string; buttonColor: string }

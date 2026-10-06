@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../lib/commerce";
+import TitaniumFeature from '../components/titanium-feature';
 import PersonalizationFeature from '../components/personalization-feature';
 import SiteHeader from '../components/site-header';
 import styles from "./page.module.css";
@@ -68,7 +69,7 @@ export default function Home() {
     }
     return [];
   }) : enabled ? [] : fallbackCategories;
-  const titaniumBanner = state?.content.titaniumBanner ?? '/assets/banners/home-titanium.webp';
+  const titaniumImage = state?.content.titaniumImage ?? '/assets/products/titanium-bronze-gold.png';
   const [slide, setSlide] = useState(0);
   const [nobiOpen, setNobiOpen] = useState(false);
   const slideCount = slides.length;
@@ -84,7 +85,7 @@ export default function Home() {
       {slides.length > 0 && <section className={styles.hero} aria-label="Xinobi ürün tanıtımları">{slides[slide % slides.length].type === 'Video' ? <video className={styles.heroImage} style={{ width: '100%', height: '100%' }} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} autoPlay muted loop playsInline /> : <Image className={styles.heroImage} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} alt={slides[slide % slides.length].alt} fill priority sizes="100vw" />}<div className={styles.sliderDots} aria-label="Slider sayfaları">{slides.map((item, index) => <button type="button" key={item.src} className={index === slide % slides.length ? styles.activeDot : ""} onClick={() => setSlide(index)} aria-label={`${index + 1}. görsel`} aria-current={index === slide % slides.length ? "true" : undefined} />)}</div></section>}
       <PersonalizationFeature />
       <section id="kategoriler" className={styles.section} aria-labelledby="categories-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Kategoriler</p><h2 id="categories-title">Günün her anına eşlik eden<br />tasarımlar.</h2></div><Link className={styles.textLink} href="/urunler">Tümünü gör <Icon name="arrow" /></Link></div><div className={styles.categoryRail}>{categories.map((category,index) => <Link className={styles.categoryCard} href={`/urunler?category=${encodeURIComponent(category.name)}`} key={category.name}><div className={styles.collectionHeading}><span>KOLEKSİYON {String(index+1).padStart(2,'0')}</span>{category.modelCount !== undefined && <small>{category.modelCount} Model</small>}</div><h3>{category.name}</h3><p className={styles.categoryDescription}>{category.description || `${category.name} koleksiyonunu keşfedin.`}</p><div className={styles.categoryMedia}><Image src={category.image} width={600} height={600} alt={category.alt || category.name} sizes="(max-width: 760px) 90vw, 30vw" /></div><div className={styles.categoryFooter}>Modelleri Keşfet <Icon name="arrow" /></div></Link>)}</div></section>
-      {titaniumBanner && <section id="titanyum" className={styles.titaniumBanner} aria-label="Titanyum kaplamalı ürünler"><Image src={mediaUrl(titaniumBanner, commerceApi)} alt="TEA-TANIUM: Dayanıklılığın zarif hali. Titanyum kaplamalı Xinobi çay makineleri." width={1648} height={640} sizes="100vw" /></section>}
+      <TitaniumFeature image={titaniumImage ? mediaUrl(titaniumImage,commerceApi) : ''} />
       <section id="urunler" className={`${styles.section} ${styles.products}`} aria-labelledby="featured-title"><div className={styles.sectionHeader}><div><p className={styles.eyebrow}>Öne çıkanlar</p><h2 id="featured-title">Form ve işlev, tek çizgide.</h2></div><Link className={styles.textLink} href="/urunler">Tüm ürünler <Icon name="arrow" /></Link></div><div className={styles.productGrid}>{products.map((product) => <ProductCard key={product.name} product={product} />)}</div></section>
       <section className={styles.values} aria-label="Xinobi değerleri"><div><span>01</span><h3>Ürün merkezli</h3><p>Gerçek ürün, doğru varyant ve açık bilgi.<br/>Abartısız mühendislik, saf malzeme kalitesi.</p></div><div><span>02</span><h3>Size özgü</h3><p>Kişisel seçimlerinize alan açan tasarım.<br/>Yapay zekâ ile her eve biricik dokunuşlar.</p></div><div><span>03</span><h3>Tek deneyim</h3><p>Web ve mobilde aynı sakin akış.<br/>Karmaşadan uzak, pürüzsüz müşteri yolculuğu.</p></div></section>
       <section className={styles.story} id="hikaye"><p className={styles.eyebrow}>Xinobi Dünyası</p><h2>Teknoloji görünür olmak için değil,<br />hayatınıza uyum sağlamak için.</h2><Link className={styles.textLink} href="/xinobi">Hikâyemizi keşfedin <Icon name="arrow" /></Link></section>

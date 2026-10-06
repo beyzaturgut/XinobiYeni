@@ -117,7 +117,7 @@ public static class LocalCommerceEndpoints
         });
         group.MapPut("/content", async (CommerceContent content, LocalCommerceStore store) =>
         {
-            if (content.Slides is null || content.Slides.Length > 50 || !ValidMedia(content.XinobiBanner) || !ValidMedia(content.TitaniumBanner ?? "") || !Regex.IsMatch(content.ButtonColor ?? "", "^#[a-fA-F0-9]{6}$") ||
+            if (content.Slides is null || content.Slides.Length > 50 || !ValidMedia(content.XinobiBanner) || !ValidMedia(content.TitaniumBanner ?? "") || !ValidMedia(content.TitaniumImage ?? "") || !Regex.IsMatch(content.ButtonColor ?? "", "^#[a-fA-F0-9]{6}$") ||
                 content.Slides.Select(s => s.Id).Distinct().Count() != content.Slides.Length || content.Slides.Any(s => !ValidMedia(s.Src) || string.IsNullOrEmpty(s.Src) || s.Type is not ("Fotoğraf" or "Video") || (s.Type == "Fotoğraf" && (s.Duration < 3 || s.Duration > 20))))
                 return Results.BadRequest(new { message = "Banner görselleri, süreleri ve buton rengini kontrol edin." });
             try

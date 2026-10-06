@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
 const seed=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));
-const product=seed.products[0];product.variants[0].hex='#123456';product.variants[0].originalImage='/assets/products/original-test.webp';
+const product=seed.products[0];product.variants[0].hex='#123456';product.originalImage='/assets/products/original-test.webp';
 const photo=await readFile('apps/web/public'+product.variants[0].image);
 const session={id:'test-preview',status:'ready',product,variant:product.variants[0],imageUrl:'/test-art.webp'};
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
@@ -14,7 +14,7 @@ try{
  await admin.getByRole('button',{name:'Stok ve varyant',exact:true}).click();
  assert.equal(await admin.getByLabel('HEX kodu',{exact:true}).first().inputValue(),'#123456');
  await admin.getByRole('button',{name:'Medya',exact:true}).click();
- assert.equal(await admin.getByLabel('Orijinal görsel yükle',{exact:true}).count(),product.variants.length);
+ assert.equal(await admin.getByLabel('Orijinal ürün görseli yükle',{exact:true}).count(),1);
  for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1050}});let originalLoaded=false;let calls=0;const errors=[];
  page.on('pageerror',error=>errors.push(error.message));page.on('request',request=>{if(request.method()==='POST')calls++});

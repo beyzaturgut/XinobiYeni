@@ -1,7 +1,7 @@
 export type Variant = { id: string; sku: string; color: string; hex?: string; stock: number; image: string }
 export type Product = { id: string; name: string; category: string; active: boolean; description: string; seoTitle: string; personalizable?: boolean | null; originalImage?: string; variants: Variant[] }
 export type Slide = { id: number; name: string; type: 'Fotoğraf' | 'Video'; src: string; alt: string; duration: number; active: boolean }
-export type Content = { slides: Slide[]; xinobiBanner: string; buttonColor: string; categoryProducts?: Record<string, string>; titaniumBanner?: string | null; featuredProducts?: string[] | null }
+export type Content = { slides: Slide[]; xinobiBanner: string; buttonColor: string; categoryProducts?: Record<string, string>; categoryImages?: Record<string, string>; titaniumBanner?: string | null; featuredProducts?: string[] | null }
 export type Announcement = { id: string; title: string; body: string; kind: 'Haber' | 'Duyuru'; publishedAt: string }
 export type CommerceState = { announcements?: Announcement[]; categories?: string[]; products: Product[]; prices: Record<string, number>; content: Content }
 export const localApi = 'http://127.0.0.1:5003/api/v1/local-commerce'

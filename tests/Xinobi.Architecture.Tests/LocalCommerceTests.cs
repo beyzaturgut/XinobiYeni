@@ -97,12 +97,13 @@ public sealed class LocalCommerceTests : IDisposable
             category = seed.Products[0].Category; variant = seed.Products[0].Variants[1].Id;
             foreach (var selection in new[] { new Dictionary<string, string> { [category] = "unknown" }, new Dictionary<string, string> { ["Unknown category"] = variant }, new Dictionary<string, string> { [seed.Products[1].Category] = variant } })
                 Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/content", seed.Content with { CategoryProducts = selection })).StatusCode);
-            (await client.PutAsJsonAsync(Root + "/content", seed.Content with { CategoryProducts = new() { [category] = variant, [seed.Products[1].Category] = "" } })).EnsureSuccessStatusCode();
+            (await client.PutAsJsonAsync(Root + "/content", seed.Content with { CategoryProducts = new() { [category] = variant, [seed.Products[1].Category] = "" }, CategoryImages = new() { [category] = "/assets/banners/home-titanium.webp" } })).EnsureSuccessStatusCode();
         }
         using var restarted = CreateFactory();
         using var second = restarted.CreateClient();
         var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         Assert.Equal(variant, saved.Content.CategoryProducts![category]);
+        Assert.Equal("/assets/banners/home-titanium.webp", saved.Content.CategoryImages![category]);
         Assert.Equal("", saved.Content.CategoryProducts[saved.Products[1].Category]);
     }
 

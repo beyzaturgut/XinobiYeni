@@ -60,6 +60,8 @@ export default function Home() {
     const selected = state.content.categoryProducts?.[name];
     if (selected === '') return [];
     const candidates = state.products.filter(product => product.active && product.category === name);
+    const customImage = state.content.categoryImages?.[name];
+    if(customImage) return [{name,image:mediaUrl(customImage,commerceApi),alt:`${name} kategori fotoğrafı`,modelCount:candidates.length,description:candidates[0]?.description || `${name} koleksiyonunu keşfedin. Kendinize uygun modeli ve rengi seçin.`}];
     for (const product of candidates) {
       const variant = selected === undefined ? product.variants.find(variant => variant.image) : product.variants.find(variant => variant.id === selected && variant.image);
       if (variant) return [{name, image: mediaUrl(selected === undefined ? (product.originalImage || variant.image) : variant.image, commerceApi), alt: `${product.name} · ${variant.color}`, modelCount: candidates.length, description: product.description || `${name} koleksiyonunu keşfedin. Kendinize uygun modeli ve rengi seçin.`}];

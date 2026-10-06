@@ -3,21 +3,23 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xinobi.Api.Infrastructure;
 using Xinobi.Api.Infrastructure.Readiness;
 
 namespace Xinobi.Architecture.Tests;
 
-public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
+    private readonly string _dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-health-test-" + Guid.NewGuid());
 
     public ApiContractTests(WebApplicationFactory<Program> factory)
     {
-        _factory = factory;
-        _client = factory
+        _factory = factory.WithWebHostBuilder(builder => builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = _dataDirectory })));
+        _client = _factory
             .WithWebHostBuilder(builder => builder.UseEnvironment("Development"))
             .CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -148,6 +150,8 @@ public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Progr
             .GetProperty("paths")
             .TryGetProperty("/api/v1/health/ready", out _));
     }
+
+    public void Dispose() { _client.Dispose(); _factory.Dispose(); if (Directory.Exists(_dataDirectory)) Directory.Delete(_dataDirectory, true); }
 
     private sealed class ReadySqlServerProbe : ISqlServerReadinessProbe
     {

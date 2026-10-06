@@ -14,3 +14,11 @@
 **/test-results/
 **/playwright-report/
 XinobiYeni-web-*.zip
+
+# Persistent local commerce data and uploaded media
+services/api/App_Data/
+
+services/api/appsettings.Local.json
+
+# Next.js static export output
+**/out/

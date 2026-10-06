@@ -1,4 +1,8 @@
 using Microsoft.AspNetCore.WebUtilities;
+using Xinobi.Api.LocalCommerce;
+using Xinobi.Api.DesignStudio;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using Xinobi.Api.Contracts;
 using Xinobi.Api.Infrastructure;
 using Xinobi.Api.Infrastructure.Readiness;
@@ -6,6 +10,22 @@ using Xinobi.Api.Infrastructure.Readiness;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
+    builder.Services.AddSingleton<LocalCommerceStore>();
+    builder.Services.AddSingleton<QuestionBank>();
+    builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
+    builder.Services.AddSingleton<DesignSessionStore>();
+    builder.Services.AddHostedService<DesignGenerationWorker>();
+    builder.Services.AddRateLimiter(options => {
+        options.RejectionStatusCode = 429;
+        options.AddPolicy("DesignStudio", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    });
+    builder.Services.AddCors(options => options.AddPolicy("LocalCommerce", policy => policy
+        .WithOrigins("http://127.0.0.1:3000", "http://localhost:3000", "http://127.0.0.1:5173", "http://localhost:5173")
+        .AllowAnyHeader().AllowAnyMethod()));
+}
 builder.Services.AddSingleton<ISqlServerReadinessProbe, SqlServerReadinessProbe>();
 builder.Services.AddProblemDetails(options =>
 {
@@ -39,7 +59,10 @@ app.UseStatusCodePages(async statusCodeContext =>
 
     await problem.ExecuteAsync(httpContext);
 });
-app.UseHttpsRedirection();
+if (app.Environment.IsDevelopment()) { app.UseCors("LocalCommerce"); app.UseRateLimiter(); }
+else app.UseHttpsRedirection();
+app.MapLocalCommerce();
+app.MapDesignStudio();
 
 var api = app.MapGroup("/api/v1");
 

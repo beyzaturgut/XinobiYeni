@@ -22,7 +22,7 @@ const fallbackItems: Item[] = [
 
 export default function SearchCompare() {
   const { state, error, enabled } = useCommerce();
-  const items: Item[] = useMemo(() => state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, description: product.description, image: mediaUrl(product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0), features: [product.category, `${product.variants.length} renk`, product.description], href: product.id === 'DEMO-P101' ? '/urunler/cay-makinesi-101' : `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : enabled ? [] : fallbackItems, [state, enabled]);
+  const items: Item[] = useMemo(() => state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, description: product.description, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0), features: [product.category, `${product.variants.length} renk`, product.description], href: product.id === 'DEMO-P101' ? '/urunler/cay-makinesi-101' : `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : enabled ? [] : fallbackItems, [state, enabled]);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string[]>(["tea", "coffee"]);
   const normalized = query.trim().toLocaleLowerCase("tr-TR");

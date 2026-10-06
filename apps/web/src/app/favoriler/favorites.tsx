@@ -33,7 +33,7 @@ const storageKey = "xinobi-demo-favorites";
 
 export default function Favorites() {
   const { state, error, enabled } = useCommerce();
-  const products: Favorite[] = state ? state.products.filter(product => product.active).flatMap(product => product.variants.map(variant => ({ id: variant.id, name: product.name, family: product.category, color: variant.color, image: mediaUrl(variant.image, commerceApi), price: state.prices[variant.id], stock: variant.stock, href: product.id === 'DEMO-P101' ? '/urunler/cay-makinesi-101' : `/urunler/detay?id=${encodeURIComponent(product.id)}` }))) : enabled ? [] : fallbackProducts;
+  const products: Favorite[] = state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, color: `${product.variants.length} renk`, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant)=>sum+variant.stock,0), href: `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : enabled ? [] : fallbackProducts;
   const [ids, setIds] = useState<string[] | null>(null);
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -41,8 +41,8 @@ export default function Favorites() {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
-  const selected = products.filter((product) => ids?.includes(product.id));
-  function remove(id: string) { setIds((current) => { const next = (current || []).filter((item) => item !== id); localStorage.setItem(storageKey, JSON.stringify(next)); return next; }); }
+  const selected = products.filter((product) => ids?.some(id=>id===product.id || state?.products.find(item=>item.id===product.id)?.variants.some(variant=>variant.id===id)));
+  function remove(id: string) { setIds((current) => { const next = (current || []).filter((item) => item !== id && !state?.products.find(product=>product.id===id)?.variants.some(variant=>variant.id===item)); localStorage.setItem(storageKey, JSON.stringify(next)); return next; }); }
 
   return <>
     {error && <p role="alert">{error}</p>}

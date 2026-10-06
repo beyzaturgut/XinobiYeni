@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money } from "../lib/commerce";
+import SiteHeader from '../components/site-header';
 import styles from "./page.module.css";
 
 import airPurifier from "../../public/assets/products/air-purifier-101.webp";
@@ -13,7 +14,7 @@ import teaMaker from "../../public/assets/products/tea-maker-101-blue.webp";
 import toastMaker from "../../public/assets/products/toast-maker.webp";
 
 type IconName = "arrow" | "bag" | "search" | "user";
-type Product = { name: string; category: string; image: StaticImageData | string; price?: number; stock?: number; badge?: string };
+type Product = { name: string; category: string; image: StaticImageData | string; price?: number; stock?: number; badge?: string; href?: string; colorCount?: number };
 
 const fallbackSlides: { src: string; alt: string; type?: string; duration?: number }[] = [
   { src: "/assets/banners/home-slider-1.png", alt: "Kömür grisi stüdyoda beyaz Xinobi hava temizleyici" },
@@ -45,31 +46,22 @@ function NobiMark({ compact = false }: { compact?: boolean }) {
   return <svg className={compact ? styles.nobiPanelMark : styles.nobiMark} viewBox="0 0 112 108" aria-hidden="true"><path className={styles.nobiAntenna} d="M56 22V35" /><circle className={styles.nobiAntennaTip} cx="56" cy="14" r="10" /><rect className={styles.nobiShell} x="13" y="31" width="86" height="68" rx="31" /><rect className={styles.nobiFace} x="25" y="48" width="62" height="40" rx="17" /><path className={styles.nobiSmile} d="M35 68c0-7 4-11 9-11 8 0 7 15 15 15s7-15 15-15c5 0 9 4 9 11" /></svg>;
 }
 
-function Header({ categories }: { categories: { name: string }[] }) {
-  const [categoriesOpen, setCategoriesOpen] = useState(false);
-  return <header className={styles.siteHeader}>
-    <Link className={styles.brand} href="#top" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-    <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><div className={styles.categoryMenu} onMouseEnter={() => setCategoriesOpen(true)} onMouseLeave={() => setCategoriesOpen(false)}><button type="button" aria-expanded={categoriesOpen} aria-controls="home-category-menu" onClick={() => setCategoriesOpen((open) => !open)}>Kategoriler</button><div id="home-category-menu" hidden={!categoriesOpen}>{categories.map((category) => <Link href={`/urunler?category=${encodeURIComponent(category.name)}`} key={category.name}>{category.name}</Link>)}</div></div><Link href="/xinobi-u">XINOBI U</Link></nav>
-    <div className={styles.headerActions} aria-label="Hızlı işlemler"><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><Link href="/hesap/giris" aria-label="Hesabım"><Icon name="user" /></Link><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link></div>
-    <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="#kategoriler">Kategoriler</Link><Link href="/xinobi-u">XINOBI U</Link><Link href="/xinobi-u">XINOBI U</Link></nav></details>
-  </header>;
-}
 
 function ProductCard({ product }: { product: Product }) {
-  return <article className={styles.productCard}><div className={styles.productMedia}>{product.badge && <span className={styles.productBadge}>{product.badge}</span>}{product.image ? <Image className={styles.productImage} src={product.image} width={600} height={600} alt={product.name} sizes="(max-width: 760px) 88vw, 31vw" /> : <span>Görsel yok</span>}</div><p className={styles.eyebrow}>{product.category}</p><h3>{product.name}</h3><p>{money(product.price)} · {product.stock === undefined ? "Stok bilgisi bekleniyor" : product.stock > 0 ? `${product.stock} adet stokta` : "Stokta yok"}</p><Link className={styles.productLink} href="/urunler">Ürünü incele <Icon name="arrow" /></Link></article>;
+  return <Link href={product.href || '/urunler'} className={styles.productCard}><div className={styles.productMedia}>{(product.colorCount || 0) > 1 && <span className={styles.multiColorBadge}>◉ {product.colorCount} renk</span>}{product.badge && <span className={styles.productBadge}>{product.badge}</span>}{product.image ? <Image className={styles.productImage} src={product.image} width={600} height={600} alt={product.name} sizes="(max-width: 760px) 88vw, 31vw" /> : <span>Görsel yok</span>}</div><p className={styles.eyebrow}>{product.category}</p><h3>{product.name}</h3><p>{money(product.price)} · {product.stock === undefined ? "Stok bilgisi bekleniyor" : product.stock > 0 ? `${product.stock} adet stokta` : "Stokta yok"}</p><span className={styles.productLink}>Ürünü incele <Icon name="arrow" /></span></Link>;
 }
 
 export default function Home() {
   const { state, error, enabled } = useCommerce();
   const slides = state ? state.content.slides.filter(item => item.active) : enabled ? [] : fallbackSlides;
-  const products: Product[] = state ? state.products.filter(product => product.active).map(product => ({ name: product.name, category: product.category, image: mediaUrl(product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0) })) : enabled ? [] : fallbackProducts;
+  const products: Product[] = state ? state.products.filter(product => product.active).map(product => ({ name: product.name, category: product.category, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), href: `/urunler/detay?id=${encodeURIComponent(product.id)}`, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0) })) : enabled ? [] : fallbackProducts;
   const categories: {name: string; image: StaticImageData | string; alt?: string}[] = state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).flatMap(name => {
     const selected = state.content.categoryProducts?.[name];
     if (selected === '') return [];
     const candidates = state.products.filter(product => product.active && product.category === name);
     for (const product of candidates) {
       const variant = selected === undefined ? product.variants.find(variant => variant.image) : product.variants.find(variant => variant.id === selected && variant.image);
-      if (variant) return [{name, image: mediaUrl(variant.image, commerceApi), alt: `${product.name} · ${variant.color}`}];
+      if (variant) return [{name, image: mediaUrl(product.originalImage || variant.image, commerceApi), alt: `${product.name} · ${variant.color}`}];
     }
     return [];
   }) : enabled ? [] : fallbackCategories;
@@ -82,7 +74,7 @@ export default function Home() {
 
   return <div id="top" className={styles.page}>
     {error && <p role="alert">{error}</p>}
-    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a><Header categories={state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).map(name => ({name})) : enabled ? [] : fallbackCategories} />
+    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a><SiteHeader categories={state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).map(name => ({name})) : enabled ? [] : fallbackCategories} />
     <main id="main-content">
       <h1 className={styles.srOnly}>Xinobi ev teknolojileri</h1>
       {slides.length > 0 && <section className={styles.hero} aria-label="Xinobi ürün tanıtımları">{slides[slide % slides.length].type === 'Video' ? <video className={styles.heroImage} style={{ width: '100%', height: '100%' }} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} autoPlay muted loop playsInline /> : <Image className={styles.heroImage} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} alt={slides[slide % slides.length].alt} fill priority sizes="100vw" />}<div className={styles.sliderDots} aria-label="Slider sayfaları">{slides.map((item, index) => <button type="button" key={item.src} className={index === slide % slides.length ? styles.activeDot : ""} onClick={() => setSlide(index)} aria-label={`${index + 1}. görsel`} aria-current={index === slide % slides.length ? "true" : undefined} />)}</div></section>}

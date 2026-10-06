@@ -16,7 +16,7 @@ try{
  assert.equal(await catalog.locator('article').count(),state.products.filter(product=>product.active).length);
  const card=catalog.locator('article').filter({has:page.getByRole('heading',{name:product.name,exact:true})});assert.equal(await card.count(),1);
  assert.ok(decodeURIComponent(await card.locator('img').getAttribute('src')).includes(product.originalImage));
- assert.ok(await card.getByText('◉ '+product.variants.length+' renk',{exact:true}).isVisible());
+ assert.ok(await card.getByText('• '+product.variants.length+' renk',{exact:true}).isVisible());
  await card.locator('img').click();await page.waitForURL('**/urunler/detay/**');await page.getByRole('heading',{name:product.name,exact:true}).waitFor();
  assert.ok(await page.getByRole('link',{name:'Xinobi ana sayfa',exact:true}).isVisible());
  assert.ok(decodeURIComponent(await page.locator('main img').first().getAttribute('src')).includes(product.originalImage));

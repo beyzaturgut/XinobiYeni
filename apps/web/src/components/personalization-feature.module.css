@@ -2,3 +2,5 @@
 .product img,.product canvas{mix-blend-mode:multiply}.sampleQuestions h3{font-weight:650}
 
 .artworkFrame{display:block;position:relative;aspect-ratio:1;margin-top:10px;overflow:hidden;border-radius:8px}.art .artworkFrame img{position:absolute;max-width:none;width:153.26%;height:140.22%;left:-21.2%;top:-16.3%;margin:0;border-radius:0}
+
+.section{border-bottom:1px solid #ededeb;max-width:none}.copy,.visual{min-width:0}

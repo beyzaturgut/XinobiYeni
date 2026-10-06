@@ -54,7 +54,7 @@ function ProductCard({ product }: { product: Product }) {
 export default function Home() {
   const { state, error, enabled } = useCommerce();
   const slides = state ? state.content.slides.filter(item => item.active) : enabled ? [] : fallbackSlides;
-  const products: Product[] = state ? state.products.filter(product => product.active).map(product => ({ name: product.name, category: product.category, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), href: `/urunler/detay?id=${encodeURIComponent(product.id)}`, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0) })) : enabled ? [] : fallbackProducts;
+  const products: Product[] = state ? (state.content.featuredProducts == null ? state.products.filter(product => product.active).slice(0,4) : state.content.featuredProducts.flatMap(id => {const product=state.products.find(product=>product.id===id&&product.active);return product?[product]:[]})).map(product => ({ name: product.name, category: product.category, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), href: `/urunler/detay?id=${encodeURIComponent(product.id)}`, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0) })) : enabled ? [] : fallbackProducts.slice(0,4);
   const categories: {name: string; image: StaticImageData | string; alt?: string}[] = state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).flatMap(name => {
     const selected = state.content.categoryProducts?.[name];
     if (selected === '') return [];

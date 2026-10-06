@@ -18,6 +18,23 @@ public sealed class LocalCommerceTests : IDisposable
     private const string Root = "/api/v1/local-commerce";
 
     [Fact]
+    public async Task FeaturedProductsKeepOrderAndRejectDuplicatesAndUnknownProducts()
+    {
+        string[] selected;
+        using(var factory = CreateFactory())
+        using(var client = factory.CreateClient())
+        {
+            var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+            selected = state.Products.Where(p => p.Active).Take(4).Select(p => p.Id).Reverse().ToArray();
+            foreach(var invalid in new[] { new[] { "unknown" }, new[] { selected[0], selected[0] }, new[] { "a", "b", "c", "d", "e" } })
+                Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/content", state.Content with { FeaturedProducts = invalid })).StatusCode);
+            (await client.PutAsJsonAsync(Root + "/content", state.Content with { FeaturedProducts = selected })).EnsureSuccessStatusCode();
+        }
+        using var restarted = CreateFactory();using var second = restarted.CreateClient();
+        Assert.Equal(selected, (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Content.FeaturedProducts);
+    }
+
+    [Fact]
     public async Task CategoryDeletionMovesProductsPreservesDataAndSurvivesRestart()
     {
         string category, target;

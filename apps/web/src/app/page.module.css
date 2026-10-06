@@ -18,3 +18,5 @@
 .section{padding-top:56px;padding-bottom:56px}.sectionHeader{margin-bottom:28px}.story{padding-top:56px;padding-bottom:56px}
 
 .categoryCard{background:#e4e3df}.categoryCard img{mix-blend-mode:multiply}.categoryCard span{background:#e4e3df}
+
+@media(min-width:1001px){.productGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.productCard h3{font-size:20px}.productImage{object-fit:contain}}

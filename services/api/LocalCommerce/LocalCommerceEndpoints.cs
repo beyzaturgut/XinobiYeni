@@ -107,6 +107,8 @@ public static class LocalCommerceEndpoints
             {
                 return Results.Ok(await store.Update(state =>
                 {
+                    if (content.FeaturedProducts is { } featured && (featured.Length > 4 || featured.Distinct().Count() != featured.Length || featured.Any(id => !state.Products.Any(product => product.Id == id && product.Active) && !(state.Content.FeaturedProducts?.Contains(id) ?? false))))
+                        throw new ArgumentException("Öne çıkanlar için en fazla dört farklı aktif ürün seçin.");
                     if (content.CategoryProducts is { } selections && (selections.Count > 100 || selections.Any(pair =>
                         !state.Categories!.Contains(pair.Key) || (pair.Value != "" && state.Content.CategoryProducts?.GetValueOrDefault(pair.Key) != pair.Value && !state.Products.Any(p => p.Active && p.Category == pair.Key && p.Variants.Any(v => v.Id == pair.Value && !string.IsNullOrEmpty(v.Image)))))))
                         throw new ArgumentException("Kategori için aynı kategorideki aktif bir ürün görselini seçin.");

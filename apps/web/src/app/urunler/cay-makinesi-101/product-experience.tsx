@@ -3,6 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useCommerce, commerceApi, mediaUrl, money } from "../../../lib/commerce";
 import styles from "./product.module.css";
 
 import blue from "../../../../public/assets/products/tea-maker-101-blue.webp";
@@ -10,8 +11,8 @@ import red from "../../../../public/assets/products/tea-maker-101-red.webp";
 import rose from "../../../../public/assets/products/tea-maker-101-rose-gold.webp";
 import silver from "../../../../public/assets/products/tea-maker-101-silver.webp";
 
-type Variant = { id: string; name: string; swatch: string; image: StaticImageData };
-const variants: Variant[] = [
+type Variant = { id: string; name: string; swatch: string; image: StaticImageData | string; price?: number; stock?: number };
+const fallbackVariants: Variant[] = [
   { id: "blue", name: "Lacivert", swatch: "#18304d", image: blue },
   { id: "silver", name: "Gümüş gri", swatch: "#9ba0a1", image: silver },
   { id: "red", name: "Kırmızı", swatch: "#9f202b", image: red },
@@ -19,31 +20,36 @@ const variants: Variant[] = [
 ];
 
 export default function ProductExperience() {
-  const [selectedId, setSelectedId] = useState(variants[0].id);
+  const { state, error, enabled } = useCommerce();
+  const product = state?.products.find(item => item.id === 'DEMO-P101');
+  const variants: Variant[] = product?.active ? product.variants.map(variant => ({ id: variant.id, name: variant.color, swatch: '#777777', image: mediaUrl(variant.image, commerceApi), price: state?.prices[variant.id], stock: variant.stock })) : enabled ? [] : fallbackVariants;
+  const [selectedId, setSelectedId] = useState('DEMO-V101-B');
   const selected = variants.find((variant) => variant.id === selectedId) ?? variants[0];
 
+  if (enabled && !state) return <p role="status">{error || 'Ürün yükleniyor…'}</p>;
+  if (!selected) return <p role="status">Bu ürün şu anda yayında değil.</p>;
   return <>
     <section className={styles.productHero} aria-labelledby="product-title">
       <div className={styles.gallery}>
         <div className={styles.galleryToolbar}><span>Demo ürün</span><span>01 / 01</span></div>
         <div className={styles.imageStage} aria-live="polite">
           <div className={styles.halo} />
-          <Image key={selected.id} src={selected.image} alt={`Xinobi Çay Makinesi 101, ${selected.name}`} priority sizes="(max-width: 820px) 94vw, 55vw" />
+          {selected.image ? <Image key={selected.id} src={selected.image} width={700} height={700} alt={`Xinobi Çay Makinesi 101, ${selected.name}`} priority sizes="(max-width: 820px) 94vw, 55vw" /> : <span>Görsel yok</span>}
         </div>
       </div>
       <div className={styles.productInfo}>
         <nav className={styles.breadcrumb} aria-label="Sayfa yolu"><Link href="/urunler">Ürünler</Link><span aria-hidden="true">/</span><span>Çay makineleri</span></nav>
         <p className={styles.eyebrow}>Çay makineleri</p>
-        <h1 id="product-title">Çay Makinesi 101</h1>
-        <p className={styles.lead}>Çayın ritmini sade bir kullanım deneyimi ve güçlü metal yüzeylerle buluşturan Xinobi yorumu.</p>
-        <div className={styles.pendingPrice}><span>Fiyat bilgisi</span><strong>Ürün verisi bekleniyor</strong><p>D02 fiyat ve stok kaynağı kararı sonrasında güncellenecektir.</p></div>
+        <h1 id="product-title">{product?.name || "Çay Makinesi 101"}</h1>
+        <p className={styles.lead}>{product?.description || "Çayın ritmini sade bir kullanım deneyimi ve güçlü metal yüzeylerle buluşturan Xinobi yorumu."}</p>
+        <div className={styles.pendingPrice}><span>Fiyat bilgisi</span><strong>{money(selected.price)}</strong><p>{selected.stock === undefined ? "Stok bilgisi bekleniyor" : selected.stock > 0 ? `${selected.stock} adet stokta` : "Stokta yok"}</p></div>
         <fieldset className={styles.variants}>
           <legend>Renk: <strong>{selected.name}</strong></legend>
           <div>{variants.map((variant) => <button type="button" key={variant.id} aria-label={`${variant.name} rengini seç`} aria-pressed={selected.id === variant.id} className={selected.id === variant.id ? styles.selectedVariant : ""} onClick={() => setSelectedId(variant.id)}><span style={{ backgroundColor: variant.swatch }} /><small>{variant.name}</small></button>)}</div>
         </fieldset>
         <div className={styles.actions}>
           <button type="button" disabled aria-describedby="purchase-note">Satış bilgisi hazırlanıyor</button>
-          <Link href="/urunler/cay-makinesi-101/kisisellestir">Kişiselleştirme seçenekleri <span aria-hidden="true">→</span></Link>
+          <Link href={`/xinobi-u/sorular?product=DEMO-P101&variant=${encodeURIComponent(selected.id)}`}>Kişiselleştirme seçenekleri <span aria-hidden="true">→</span></Link>
         </div>
         <p id="purchase-note" className={styles.purchaseNote}>Stok ve fiyat doğrulanmadan sepete ekleme etkinleştirilmez.</p>
         <ul className={styles.summary}>

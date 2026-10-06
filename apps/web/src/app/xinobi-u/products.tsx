@@ -1,0 +1,13 @@
+'use client';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useCommerce, commerceApi, mediaUrl } from '../../lib/commerce';
+import { sessionKey } from '../../lib/design-studio';
+import styles from './studio.module.css';
+export default function PersonalizableProducts() {
+  const { state, error } = useCommerce();
+  const products = state?.products.filter(product => product.active && (product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve')))) || [];
+  return <main className={styles.main}><section className={styles.intro}><p className={styles.kicker}>XINOBI U · Sana özgü</p><h1>Bir ürün.<br />Binlerce olasılık.</h1><p>Ürününü ve rengini seç. Beş kısa soruyla sana ait tasarımın izini bulalım.</p><div className={styles.steps}><span>01 · Ürününü seç</span><span>02 · Tarzını keşfet</span><span>03 · Ürününde dene</span></div></section>
+  {error && <p className={styles.error} role="alert">{error}</p>}
+  {!state ? <p role="status">Ürünler hazırlanıyor…</p> : products.length === 0 ? <p>Şu anda kişiselleştirmeye açık bir ürün bulunmuyor.</p> : <section className={styles.grid} aria-label="Kişiselleştirilebilir ürünler">{products.flatMap(product => product.variants.filter(variant => variant.image).map(variant => <Link className={styles.product} key={variant.id} onClick={() => sessionStorage.removeItem(sessionKey(product.id, variant.id))} href={`/xinobi-u/sorular?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(variant.id)}`} aria-label={`${product.name} ${variant.color} için tasarım oluştur`}><div className={styles.productImage}><Image src={mediaUrl(variant.image, commerceApi)} alt={`${product.name}, ${variant.color}`} width={600} height={600} /></div><p>{product.category}</p><h2>{product.name}</h2><div className={styles.productBottom}><span>{variant.color}</span><strong>Tasarımını keşfet ↗</strong></div></Link>))}</section>}</main>;
+}

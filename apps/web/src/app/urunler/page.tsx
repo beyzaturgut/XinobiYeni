@@ -16,7 +16,7 @@ export default function ProductsPage() {
     <main>
       <section className={styles.intro} aria-labelledby="catalog-title">
         <p>Xinobi koleksiyonu</p>
-        <h1 id="catalog-title">Günün her anı için yalın teknoloji.</h1>
+        <h1 id="catalog-title">Ürünler</h1>
         <span>Ürünleri keşfedin, detaylarında tüm renk seçeneklerini görün.</span>
       </section>
       <Catalog />

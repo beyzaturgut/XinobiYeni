@@ -28,3 +28,6 @@ img { max-width: 100%; }
 @media (max-width: 700px) {
   header[data-mobile-three-column] { grid-template-columns: 52px minmax(0,1fr) auto; }
 }
+
+/* Keep page titles compact so the content starts near the header. */
+main h1 { font-size: clamp(24px, 2.6vw, 34px) !important; line-height: 1.2 !important; letter-spacing: -.025em !important; }

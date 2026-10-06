@@ -10,7 +10,7 @@
 .continueLink { color: #cdcdcd; font-size: .7rem; }
 .hero { padding: clamp(60px,7vw,100px) clamp(20px,7vw,110px) 55px; background: #fff; }
 .hero p { margin: 0 0 13px; color: #262626; font-size: .67rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-.hero h1 { margin: 0; font-size: clamp(3.5rem,7.5vw,7rem); font-weight: 370; letter-spacing: -.065em; line-height: .9; }
+.hero h1 { margin: 0; font-size:clamp(24px,2.6vw,34px); font-weight: 370; letter-spacing: -.065em; line-height:1.2; }
 .hero span { display: block; margin-top: 27px; color: #5d5d5d; font-size: .7rem; }
 .layout { max-width: 1450px; margin: 0 auto; padding: 55px clamp(20px,4vw,58px) 120px; display: grid; grid-template-columns: minmax(0,1fr) 370px; gap: clamp(30px,5vw,76px); align-items: start; }
 .sectionTitle { min-height: 48px; display: flex; justify-content: space-between; align-items: start; border-bottom: 1px solid #d1d1d1; }
@@ -75,3 +75,5 @@
   .assurance { grid-template-columns: 1fr; }
   .summary { padding: 25px 20px; }
 }
+
+.intro:has(h1),.hero:has(h1){padding-top:32px;padding-bottom:24px;min-height:0}.intro:has(h1)>span{margin-top:14px}

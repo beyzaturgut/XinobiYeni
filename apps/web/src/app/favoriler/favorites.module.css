@@ -10,7 +10,7 @@
 .catalogLink { color: #cdcdcd; font-size: .7rem; }
 .hero { padding: clamp(65px,8vw,115px) clamp(20px,8vw,125px) 65px; background: #fff; }
 .hero > p { margin: 0 0 14px; color: #262626; font-size: .68rem; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-.hero h1 { margin: 0; font-size: clamp(3.5rem,8vw,8rem); font-weight: 370; letter-spacing: -.065em; line-height: .9; }
+.hero h1 { margin: 0; font-size:clamp(24px,2.6vw,34px); font-weight: 370; letter-spacing: -.065em; line-height:1.2; }
 .hero > div { max-width: 620px; margin-top: 38px; padding: 16px 18px; display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 15px; border: 1px solid #c2c2c2; background: rgba(255,255,255,.45); }
 .hero > div span { padding: 6px 8px; background: #212121; color: white; font-size: .52rem; letter-spacing: .08em; text-transform: uppercase; }
 .hero > div p { margin: 0; color: #676767; font-size: .66rem; line-height: 1.5; }
@@ -34,7 +34,7 @@
 .copy a, .copy div > span { font-size: .65rem; font-weight: 600; }
 .empty { min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: white; }
 .empty > span { color: #787878; font-size: 4rem; font-weight: 300; }
-.empty h2 { margin: 16px 0 8px; font-size: clamp(1.7rem,4vw,2.7rem); font-weight: 420; }
+.empty h2 { margin: 16px 0 8px; font-size:clamp(24px,2.6vw,34px); font-weight: 420; }
 .empty p { margin: 0; color: #5d5d5d; }
 .empty a { margin-top: 25px; padding: 14px 20px; background: #fff; color: #242424; font-size: .72rem; font-weight: 650; ;box-shadow:inset 0 0 0 1px #d6d6d6}
 
@@ -51,3 +51,5 @@
   .grid { grid-template-columns: 1fr; }
   .content { padding-inline: 18px; }
 }
+
+.intro:has(h1),.hero:has(h1){padding-top:32px;padding-bottom:24px;min-height:0}.intro:has(h1)>span{margin-top:14px}

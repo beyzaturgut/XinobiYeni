@@ -22,7 +22,7 @@ const fallbackVariants: Variant[] = [
 export default function ProductExperience() {
   const { state, error, enabled } = useCommerce();
   const product = state?.products.find(item => item.id === 'DEMO-P101');
-  const variants: Variant[] = product?.active ? product.variants.map(variant => ({ id: variant.id, name: variant.color, swatch: '#777777', image: mediaUrl(variant.image, commerceApi), price: state?.prices[variant.id], stock: variant.stock })) : enabled ? [] : fallbackVariants;
+  const variants: Variant[] = product?.active ? product.variants.map(variant => ({ id: variant.id, name: variant.color, swatch: variant.hex && /^#[a-fA-F0-9]{6}$/.test(variant.hex) ? variant.hex : '', image: mediaUrl(variant.image, commerceApi), price: state?.prices[variant.id], stock: variant.stock })) : enabled ? [] : fallbackVariants;
   const [selectedId, setSelectedId] = useState('DEMO-V101-B');
   const selected = variants.find((variant) => variant.id === selectedId) ?? variants[0];
 
@@ -45,7 +45,7 @@ export default function ProductExperience() {
         <div className={styles.pendingPrice}><span>Fiyat bilgisi</span><strong>{money(selected.price)}</strong><p>{selected.stock === undefined ? "Stok bilgisi bekleniyor" : selected.stock > 0 ? `${selected.stock} adet stokta` : "Stokta yok"}</p></div>
         <fieldset className={styles.variants}>
           <legend>Renk: <strong>{selected.name}</strong></legend>
-          <div>{variants.map((variant) => <button type="button" key={variant.id} aria-label={`${variant.name} rengini seç`} aria-pressed={selected.id === variant.id} className={selected.id === variant.id ? styles.selectedVariant : ""} onClick={() => setSelectedId(variant.id)}><span style={{ backgroundColor: variant.swatch }} /><small>{variant.name}</small></button>)}</div>
+          <div>{variants.map((variant) => <button type="button" key={variant.id} aria-label={`${variant.name} rengini seç`} aria-pressed={selected.id === variant.id} className={selected.id === variant.id ? styles.selectedVariant : ""} onClick={() => setSelectedId(variant.id)}><span style={{ background: variant.swatch || undefined }} /><small>{variant.name}</small></button>)}</div>
         </fieldset>
         <div className={styles.actions}>
           <button type="button" disabled aria-describedby="purchase-note">Satış bilgisi hazırlanıyor</button>

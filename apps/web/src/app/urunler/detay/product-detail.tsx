@@ -13,10 +13,10 @@ export default function ProductDetail() {
   const variant = product?.variants.find(item => item.id === selectedId) ?? product?.variants[0];
   if (!state) return <p role="status">{error || 'Ürün yükleniyor…'}</p>;
   if (!product || !variant) return <main><p>Bu ürün şu anda yayında değil.</p><Link href="/urunler">Ürünlere dön</Link></main>;
-  return <main><section className={styles.productHero}>
+  return <main className={styles.detailPage}><section className={`${styles.productHero} ${styles.detailHero}`}>
     <div className={styles.gallery}><div className={styles.imageStage}>{variant.image ? <Image src={mediaUrl(variant.image, commerceApi)} alt={`${product.name}, ${variant.color}`} width={700} height={700} /> : <p>Görsel yok</p>}</div></div>
-    <div className={styles.productInfo}><Link href="/urunler">← Ürünler</Link><p className={styles.eyebrow}>{product.category}</p><h1>{product.name}</h1><p className={styles.lead}>{product.description}</p><div className={styles.pendingPrice}><strong>{money(state.prices[variant.id])}</strong><p>{variant.stock > 0 ? `${variant.stock} adet stokta` : 'Stokta yok'}</p></div>
-    <fieldset className={styles.variants}><legend>Renk: {variant.color}</legend><div>{product.variants.map(item => <button key={item.id} onClick={() => setSelectedId(item.id)} aria-pressed={variant.id === item.id}>{item.color}</button>)}</div></fieldset>
-    <p>SKU: {variant.sku}</p></div>
+    <div className={styles.productInfo}><Link className={styles.breadcrumb} href="/urunler">← Ürünler</Link><p className={styles.eyebrow}>{product.category}</p><h1>{product.name}</h1><p className={styles.detailSku}>SKU: {variant.sku}</p><p className={styles.lead}>{product.description}</p><div className={styles.pendingPrice}><strong>{money(state.prices[variant.id])}</strong><p>{variant.stock > 0 ? `${variant.stock} adet stokta` : 'Stokta yok'}</p></div>
+    <fieldset className={styles.variants}><legend>Renk: {variant.color}</legend><div>{product.variants.map(item => <button type="button" key={item.id} aria-label={`${item.color} rengini seç`} className={variant.id === item.id ? styles.selectedVariant : ''} onClick={() => setSelectedId(item.id)} aria-pressed={variant.id === item.id}><span style={{background: item.hex && /^#[a-fA-F0-9]{6}$/.test(item.hex) ? item.hex : undefined}} aria-hidden="true"/><small>{item.color}</small></button>)}</div></fieldset>
+    </div>
   </section>{error && <p role="alert">{error}</p>}</main>;
 }

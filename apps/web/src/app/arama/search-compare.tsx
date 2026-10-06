@@ -3,7 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { useCommerce, commerceApi, mediaUrl, money } from "../../lib/commerce";
+import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import styles from "./search.module.css";
 import teaMaker from "../../../public/assets/products/tea-maker-101-blue.webp";
 import coffeeMaker from "../../../public/assets/products/coffee-maker-101-gold.webp";
@@ -52,7 +52,7 @@ export default function SearchCompare() {
 
     <section className={styles.compare} aria-labelledby="compare-title">
       <div className={styles.sectionHeader}><div><p>Yan yana bakın</p><h2 id="compare-title">Ürün karşılaştırma</h2></div><button type="button" onClick={() => setSelected([])} disabled={!selected.length}>Tümünü temizle</button></div>
-      {compared.length ? <div className={styles.compareTable} role="region" aria-label="Seçilen ürünlerin karşılaştırması" tabIndex={0}><table><thead><tr><th>Özellik</th>{compared.map((item) => <th key={item.id}>{item.name}<button type="button" onClick={() => toggle(item.id)} aria-label={`${item.name} ürününü karşılaştırmadan çıkar`}>×</button></th>)}</tr></thead><tbody>{[0,1,2].map((index) => <tr key={index}><th>{["Kullanım", "Renk / seçenek", "Kişiselleştirme"][index]}</th>{compared.map((item) => <td key={item.id}>{item.features[index]}</td>)}</tr>)}<tr><th>Fiyat ve stok</th>{compared.map((item) => <td key={item.id}><span className={styles.waiting}>{money(item.price)} · {item.stock ? `${item.stock} adet stokta` : "Stokta yok"}</span></td>)}</tr></tbody></table></div> : <div className={styles.compareEmpty}>Karşılaştırma tablosu için yukarıdan en az bir ürün seçin.</div>}
+      {compared.length ? <div className={styles.compareTable} role="region" aria-label="Seçilen ürünlerin karşılaştırması" tabIndex={0}><table><thead><tr><th>Özellik</th>{compared.map((item) => <th key={item.id}>{item.name}<button type="button" onClick={() => toggle(item.id)} aria-label={`${item.name} ürününü karşılaştırmadan çıkar`}>×</button></th>)}</tr></thead><tbody>{[0,1,2].map((index) => <tr key={index}><th>{["Kullanım", "Renk / seçenek", "Kişiselleştirme"][index]}</th>{compared.map((item) => <td key={item.id}>{item.features[index]}</td>)}</tr>)}<tr><th>Fiyat ve stok</th>{compared.map((item) => <td key={item.id}><span className={styles.waiting}>{[money(item.price), stockText(item.stock)].filter(Boolean).join(' · ')}</span></td>)}</tr></tbody></table></div> : <div className={styles.compareEmpty}>Karşılaştırma tablosu için yukarıdan en az bir ürün seçin.</div>}
     </section>
   </>;
 }

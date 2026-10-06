@@ -3,7 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useCommerce, commerceApi, mediaUrl, money } from "../../../lib/commerce";
+import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../../lib/commerce";
 import styles from "./product.module.css";
 
 import blue from "../../../../public/assets/products/tea-maker-101-blue.webp";
@@ -42,7 +42,7 @@ export default function ProductExperience() {
         <p className={styles.eyebrow}>Çay makineleri</p>
         <h1 id="product-title">{product?.name || "Çay Makinesi 101"}</h1>
         <p className={styles.lead}>{product?.description || "Çayın ritmini sade bir kullanım deneyimi ve güçlü metal yüzeylerle buluşturan Xinobi yorumu."}</p>
-        <div className={styles.pendingPrice}><span>Fiyat bilgisi</span><strong>{money(selected.price)}</strong><p>{selected.stock === undefined ? "Stok bilgisi bekleniyor" : selected.stock > 0 ? `${selected.stock} adet stokta` : "Stokta yok"}</p></div>
+        <div className={styles.pendingPrice}><span>Fiyat bilgisi</span><strong>{money(selected.price)}</strong>{stockText(selected.stock) && <p>{stockText(selected.stock)}</p>}</div>
         <fieldset className={styles.variants}>
           <legend>Renk: <strong>{selected.name}</strong></legend>
           <div>{variants.map((variant) => <button type="button" key={variant.id} aria-label={`${variant.name} rengini seç`} aria-pressed={selected.id === variant.id} className={selected.id === variant.id ? styles.selectedVariant : ""} onClick={() => setSelectedId(variant.id)}><span style={{ background: variant.swatch || undefined }} /><small>{variant.name}</small></button>)}</div>

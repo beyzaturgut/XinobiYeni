@@ -3,7 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useCommerce, commerceApi, mediaUrl, money } from "../lib/commerce";
+import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../lib/commerce";
 import SiteHeader from '../components/site-header';
 import styles from "./page.module.css";
 
@@ -48,7 +48,7 @@ function NobiMark({ compact = false }: { compact?: boolean }) {
 
 
 function ProductCard({ product }: { product: Product }) {
-  return <Link href={product.href || '/urunler'} className={styles.productCard}><div className={styles.productMedia}>{(product.colorCount || 0) > 1 && <span className={styles.multiColorBadge}>◉ {product.colorCount} renk</span>}{product.badge && <span className={styles.productBadge}>{product.badge}</span>}{product.image ? <Image className={styles.productImage} src={product.image} width={600} height={600} alt={product.name} sizes="(max-width: 760px) 88vw, 31vw" /> : <span>Görsel yok</span>}</div><p className={styles.eyebrow}>{product.category}</p><h3>{product.name}</h3><p>{money(product.price)} · {product.stock === undefined ? "Stok bilgisi bekleniyor" : product.stock > 0 ? `${product.stock} adet stokta` : "Stokta yok"}</p><span className={styles.productLink}>Ürünü incele <Icon name="arrow" /></span></Link>;
+  return <Link href={product.href || '/urunler'} className={styles.productCard}><div className={styles.productMedia}>{(product.colorCount || 0) > 1 && <span className={styles.multiColorBadge}>◉ {product.colorCount} renk</span>}{product.badge && <span className={styles.productBadge}>{product.badge}</span>}{product.image ? <Image className={styles.productImage} src={product.image} width={600} height={600} alt={product.name} sizes="(max-width: 760px) 88vw, 31vw" /> : <span>Görsel yok</span>}</div><p className={styles.eyebrow}>{product.category}</p><h3>{product.name}</h3><p>{[money(product.price), stockText(product.stock)].filter(Boolean).join(' · ')}</p><span className={styles.productLink}>Ürünü incele <Icon name="arrow" /></span></Link>;
 }
 
 export default function Home() {

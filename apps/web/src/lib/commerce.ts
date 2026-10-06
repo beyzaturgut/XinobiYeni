@@ -22,3 +22,8 @@ export function useCommerce() {
   }, []);
   return { state, error, connected: Boolean(state), enabled: Boolean(commerceApi) };
 }
+
+export function stockText(stock?: number) {
+  if (stock === undefined || stock > 5) return '';
+  return stock > 0 ? `Son ${stock} ürün` : 'Stokta yok';
+}

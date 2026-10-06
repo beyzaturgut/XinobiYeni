@@ -3,7 +3,7 @@
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useCommerce, commerceApi, mediaUrl, money } from "../../lib/commerce";
+import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import styles from "./favorites.module.css";
 import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
 import coffeeGold from "../../../public/assets/products/coffee-maker-101-gold.webp";
@@ -50,7 +50,7 @@ export default function Favorites() {
     <section className={styles.content} aria-live="polite">
       {ids === null ? <div className={styles.loading}>Favorileriniz hazırlanıyor…</div> : selected.length ? <><div className={styles.summary}><strong>{selected.length} favori ürün</strong><button type="button" onClick={() => { localStorage.setItem(storageKey, "[]"); setIds([]); }}>Tümünü temizle</button></div><div className={styles.grid}>{selected.map((product) => <article key={product.id}>
         <div className={styles.media}>{product.image ? <Image className={product.tall ? styles.tall : ""} src={product.image} width={600} height={600} alt={`${product.name}, ${product.color}`} sizes="(max-width: 680px) 90vw, 32vw" /> : <span>Görsel yok</span>}<button type="button" onClick={() => remove(product.id)} aria-label={`${product.name} ${product.color} ürününü favorilerden çıkar`}>♥</button></div>
-        <div className={styles.copy}><p>{product.family}</p><h2>{product.name}</h2><span>{product.color}</span><div><small>{money(product.price)} · {product.stock ? `${product.stock} adet stokta` : "Stokta yok"}</small>{product.href ? <Link href={product.href}>İncele →</Link> : <span>Detay hazırlanıyor</span>}</div></div>
+        <div className={styles.copy}><p>{product.family}</p><h2>{product.name}</h2><span>{product.color}</span><div><small>{[money(product.price), stockText(product.stock)].filter(Boolean).join(' · ')}</small>{product.href ? <Link href={product.href}>İncele →</Link> : <span>Detay hazırlanıyor</span>}</div></div>
       </article>)}</div></> : <div className={styles.empty}><span aria-hidden="true">♡</span><h2>Favori listeniz henüz boş.</h2><p>Beğendiğiniz ürünleri katalogdaki kalp düğmesiyle buraya ekleyin.</p><Link href="/urunler">Ürünleri keşfet →</Link></div>}
     </section>
   </>;

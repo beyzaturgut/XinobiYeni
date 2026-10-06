@@ -89,21 +89,33 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-01 · Codex + Creative/Web Designer; WEB-001 etkileşimli yerel prototip hazırlandı |
-| Aktif faz/görev ID | Faz02 / v0.24.0 F02-A12–A14 yerel tasarım kullanıcı incelemesi; deploy yok |
-| Repo/branch/HEAD | `main` · etkileşimli prototip öncesi `6956a99`, origin/main ile eşit · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
-| Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı; geçici TCP kesintileri izlenecek |
-| Son çalışan uygulama komutu/URL | Yerel tasarım `http://127.0.0.1:4175/design/screens/WEB-001/prototype.html`; deploy/IIS değiştirilmedi |
-| Son test komutu ve sonucu | TST-060: masaüstü mega menü/hero/Nobi ve mobil drawer/carousel başarılı; 5 render × 15/15 görsel, overflow=false |
-| Değişen dosyalar / migration | WEB-001 HTML/CSS/JS + beş PNG, interaction renderer/testi ve TST-060; `apps/web`/migration/deploy/API değişmedi |
-| Aktif hata/yarım iş | Kullanıcı yerel prototip incelemesi ve `ORTAK TASARIM ONAY` bekleniyor. Manuel ekran okuyucu/fiziksel cihaz ve üretim uygulaması ayrı kabul |
-| Sonraki en küçük güvenli adım | Kullanıcının yerel prototip geri bildirimini al; onaydan sonra `apps/web` uygulama planı/handoff'u çıkar, deploy yapma |
-| Geri alma / devam noktası | `7a5b901` doğrulanmış ve pushlanmış API sözleşme testi tabanı; migration ve dış sistem yazımı yok |
+| Son güncelleme ve sorumlu | 2026-10-06 · Codex; ProductSurfaces Step 3 development Admin review; önceki kayıtlar korunur |
+| Aktif faz/görev ID | ProductSurfaces Step 3 teknik slice tamamlandı; Step 4 başlamadı. Proje Faz03 kabulü değildir |
+| Repo/branch/HEAD | `feature/product-personalization` / `acc0c99`; Step 1 ve renderer çalışma ağacı commit edilmemiş; origin eşitliği bu oturumda doğrulanmadı |
+| Geliştirme/test/canlı ortamları | Bu çalışma Windows / .NET SDK 10.0.401; fake provider ve Release build. SQL/gerçek AI/canlı ortam bu çalışma kapsamında doğrulanmadı |
+| Son çalışan uygulama komutu/URL | Kullanıcının bildirdiği yerel web/admin/API: localhost 3000/5173/5003; bu dokümantasyon oturumunda startup veya smoke yapılmadı; deploy/IIS değişmedi |
+| Son test komutu ve sonucu | TST-080–086: backend 63/63; Admin Playwright 4/4; API Release 0 uyarı/0 hata; Admin typecheck/build/lint başarılı; OpenAPI/source/mask hash korundu |
+| Değişen dosyalar / migration | Step 3: API Program + Development review contracts/orchestration/endpoints + runtime reference provider; Admin feature/proxy/App/Playwright; API review tests; Faz00/domain/test kayıtları. Migration/paket yok |
+| Aktif hata/yarım iş | Development-only fixture shared Asset/Variant resolver'a ileride bağlanacak; auth/audit, persistence, HTTP/Admin, gerçek adapter/jobs yok. D04/D05/D08/D10 ve diğer açık kararlar kapanmadı; kaynak hash farkı/eksik Analiz2 korunur |
+| Sonraki en küçük güvenli adım | Kullanıcının ProductSurfaces Step 3 incelemesini bekle; Step 4 veya gerçek provider entegrasyonu başlatma |
+| Geri alma / devam noktası | `acc0c99` + korunmuş çalışma ağacı; mevcut renderer ve önceden değiştirilmiş OpenAPI'yi revert etme. Step 1 kanıtı TST-074–076; dış işlem/migration/commit yok |
+
+### ProductSurfaces devam notu — 06.10.2026
+
+- Konuşmadaki Phase 1/2/3 özelliğin alt adımlarıdır; proje Faz01/Faz02/Faz03 kabulü değildir. Takip adı `ProductSurfaces Step 1` olarak sabitlendi.
+- Step 1 provider-neutral automatic/interactive aday revision, lineage, source-pixel Keep/Exclude doğrulaması, tam source/revision/candidate için açık approve/reject ve stale approval engeli sağlar. Interactive inference yeni sonuçtur; önceki maskeyi düzenlemez. Yeni candidate pending kalır ve mevcut onayı sessizce değiştirmez. Optional provider score yalnız sağlanan anlamıyla korunur.
+- `SourceMediaIdentity` metadata değer nesnesidir; ortak Asset sahipliği kurmaz. Gelecekte doğru ürün/varyant/Asset medya sürümüne bağlanır. Maske PrintArea veya fiziksel baskı onayı değildir; SegmentationRevision müşteri DesignVersion'ı değildir; ReviewDecision ortak AuditLog'un yerine geçmez. Reviewer ileride authenticated principal'dan alınır. Ayrıntılı sınırlar: `docs/contracts/domain-contract-draft.md` ProductSurfaces bölümü.
+- Mevcut onaylı Canvas önizleme/projeksiyon yalnız approved mask tüketir; ADR-001 Fabric.js müşteri editörü sorumluluğunu değiştirmez. Roboflow/SAM 3 segmentation PoC, ADR-002 Cloudflare görsel üretim kararından ayrıdır; production provider/medya aktarımı/saklama/maliyet/güvenlik açık kalır. Task arayüzü durable job değildir; gerçek adapter adımında ölçülen latency/provider davranışı ve ortak worker/job yönüyle yürütme stratejisi seçilir.
+- `docs/sources/README.md` kayıt hash'leri mevcut özgün/kopya çiftleriyle uyuşmuyor; özgün ve kopya içerikleri kendi aralarında aynı. Bu oturumda kaynak dosyaları veya kayıtlı hash'ler değiştirilmedi; kaynak sürüm/provenance uzlaştırması ayrı iştir.
+- Belgelerde atıf yapılan `Xinobi_Kavramsal_ve_Teknik_Analiz2.md` çalışma ağacında bulunamadı. İçeriği yeniden kurulmadı; mevcut fark matrisi doğrudan kaynak yerine kabul edilmez.
+- Step 1 UNIT/MOCK başarısı gerçek hosted entegrasyon, UAT, fiziksel baskı veya PM faz kabulü değildir. Hiçbir rol onayı veya D kararı bu kayıtla doldurulmaz.
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-06 | ProductSurfaces Step 2 | `feature/product-personalization` / `acc0c99`; commit yok | SkiaSharp 4.153.1 infrastructure decoder, dev fixture source registration, gerçek RGBA mask/source validation ve 15 yeni test case | NuGet sandbox restore başarısız, izinli tekrar başarılı; test final 39/39, Release build 0 uyarı/0 hata, diff başarılı, OpenAPI aynı | TST-077–079; `docs/contracts/domain-contract-draft.md` Step 2 sınırları/istatistikler | Kullanıcı Step 2 incelemesi; Step 3 uygulama yok | Codex |
+| 2026-10-06 | ProductSurfaces Step 1 / geriye dönük kanıt ve dokümantasyon uyumu | `feature/product-personalization` / `acc0c99`; yeni commit yok | Faz00 + domain sözleşme sınırları + test indeksi/üç tarihli rapor; uygulama/test kaynakları değişmedi | Önceki Step 1: final 24/24 test ve Release build 0 uyarı/0 hata; Debug kilit hatası/Release tekrarları TST-074'te korundu; OpenAPI hash aynı | `docs/contracts/domain-contract-draft.md`, TST-074–076 | Kullanıcı talimatıyla Step 2 kapsamını kesinleştir; uygulama başlatma | Codex |
 | 2026-10-01 | Faz02 v0.24.0 / WEB-001 interaction | `main` / `6956a99` | Mega menü/drawer, hero slider, product carousel ve Nobi paneli tasarım prototipine eklendi | TST-060: desktop/mobile interaction başarılı; 5 kırılım × 15/15 görsel, overflow=false | `design/screens/WEB-001/*`, `tools/test-web001-interactions.mjs`, `test/2026-10-01/TST-060-*` | Kullanıcı yerel inceleme/ortak tasarım onayı | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.23.1 / WEB-001 içerik yönetimi | `main` / `476255b` | Admin panelinden yönetilecek dört görsel/içerik alanı geçici `Temsili` açıklamayla ayrıştırıldı | TST-059: 5 kırılım × 14/14 görsel, overflow=false; app/deploy yok | `design/screens/WEB-001/*`, `test/2026-10-01/TST-059-*` | F02-A13/14 etkileşimli prototip/handoff | Codex + Creative Designer + Web Designer |
 | 2026-10-01 | Faz02 v0.23.0 / F02-A12–A14 | `main` / `996a2a2` | WEB-001 ortak hi-fi HTML/CSS; Creative/Web QA revizyonları; beş responsive PNG | TST-058: 5 kırılım × 14/14 görsel, overflow=false, h1=1; app/deploy yok | `design/screens/WEB-001/*`, `tools/render-web001.mjs`, `test/2026-10-01/TST-058-*` | Kullanıcı ortak tasarım onayı | Codex + Creative Designer + Web Designer |
@@ -269,3 +281,74 @@ Her yeni oturumda aşağıdaki talimatı, bu dosyayı, ilgili FazXX dosyasını,
 > Xinobi geliştirmesine kaldığı yerden devam et. Önce `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` anlık durum, kesintiden devam, açık D kararları, rol/PM kapıları ve son oturum kaydını; sonra aktif `FazXX_<konu>.md` görev ve testini oku. Kaynak kapsam ile analizi karşılaştır. Repo gerçek durumu için `git status`, son commit, son migration ve ilgili testleri doğrula; Faz00'da yazanı kanıt olmadan doğru varsayma. Aktif fazın sıradaki **tek atomik işini** uygula, yalnız o işe bağlı kodu değiştir, test/manuel kanıt üret, regresyonu kontrol et, sonuç ve başarısızlıkları Faz00'a yaz. Dış ödeme, AI, fatura veya pazaryeri işlemi yeniden denenmeden önce sağlayıcı durumunu ve idempotency kimliğini doğrula. Müşteri D kararını uydurma; erişim olmadan mock sonucu gerçek entegrasyon diye kapatma. Fazın yedi ayrı rol incelemesini ve PM'nin ayrıca nihai KABUL/RED kararını talep edilen kanıtlarla kaydet; eksikse fazı Bloke/İncelemede tut. Oturum bitmeden aktif branch/commit, değişen dosyalar, son başarılı komut/sonuç, hata, blokaj sahibi ve **sonraki tek güvenli adımı** Faz00'a işle.
 
 Bu talimat yazılımı kendi başına onaylayan bir vekil değildir. Sağlayıcı kimliği/izinleri, üretim baskı standardı, hukuk metinleri ve gerçek Xinobi iş kuralları gibi D01–D10 müşteriye ait girdiler gelene kadar ilgili canlı kapı açık kalır; bağımsız kod ve test işleri devam eder.
+
+### ProductSurfaces Step 3 — 06.10.2026 oturum kaydı
+
+- Branch/HEAD: feature/product-personalization / acc0c99; commit yok.
+- Yalnız development + explicit opt-in, process-local in-memory session/version lock, exact source/candidate kontrolü, automatic init ve yeni interactive pending revisions, approve/reject uygulandı.
+- Yerel reference provider aynı maskeyi döndürür; noktalar kaydedilir fakat AI ile yeniden hesaplama yok. Üretim auth/persistence/jobs/provider yok; renderer/Fabric.js ve asset'ler değişmedi.
+- Asset/Variant/media sınırı dev fixture üzerinden korunur. Maske PrintArea/DPI/physical production/D04 onayı değildir. D04/D05/D08/D10 açık kaldı.
+- Final kanıt TST-080–086: 63/63 backend, 4/4 Admin E2E, Release 0 uyarı/0 hata, Admin typecheck/build/lint, hash/diff. İlk compile, sandbox Event Log, NVM shim, CSS browser desteği, pointer hassasiyeti ve test-host DLL kilidi sorunları raporlarda tekrar sonuçlarıyla korundu.
+- Sonraki adım yalnız kullanıcı incelemesi; Step 4 başlamadı.
+
+### ProductSurfaces Step 4B-1 — 06.10.2026 oturum kaydı
+
+- Branch/HEAD: feature/product-personalization / acc0c99; commit yok. Bu ProductSurfaces alt adımı repository-wide Faz04 değildir.
+- Provider-neutral interface/domain korunarak infrastructure Roboflow PCS/PVS adapter, bounded COCO RLE normalization, existing Skia validation ve candidate-specific in-memory mask buffer uygulandı. Request/result HTTP yalnız mocked handler'larla sınandı.
+- Default reference provider; ExternalInferenceEnabled default false. Runtime socket-backed provider composition yoktur; flag açılsa bile outbound kapalıdır. Gerçek key okunmadı/eklenmedi/kullanılmadı. Test header'ındaki sentetik string credential değildir. Görsel dışarı gönderilmedi, gerçek inference yok, kasıtlı Roboflow kredi tüketimi sıfır.
+- External-provider mode startup/GET/page-load candidate üretmez; explicit “Aday oluştur” POST gerekir. HTTP await sırasında review gate tutulmaz; in-flight conflict, exact-source revalidation, failure/cancellation version ve önceki approval koruması vardır. Hatalarda noktalar korunur; retry yoktur.
+- TST-087 final: 111/111 backend/API, 5/5 Admin Playwright, Release 0 uyarı/0 hata, Admin typecheck/build/lint ve diff kontrolü başarılı. İlk nullable/test await compile, sandbox Event Log/browser start, NVM shim ve lint dependency sorunları düzeltme/izinli tekrar kanıtıyla kaydedildi.
+- Renderer/Fabric.js/Tea Maker asset'leri ve production Asset/Variant/PrintArea/Design sorumlulukları değişmedi. Persistence/auth/jobs yok. D04/D05/D08/D10 çözülmedi. OpenAPI hash öncesi/sonrası aynı.
+- Sonraki tek güvenli adım kullanıcı code-review/onayıdır. Deployed Roboflow wire contract hâlâ smoke doğrulaması ister. Credential configuration/use, exact görselin dış aktarımı veya gerçek inference öncesinde ayrıca açık kullanıcı onayı gerekir. Step 4B-2 başlamadı.
+
+### ProductSurfaces Step 4B-2 — single automatic Roboflow smoke test / 06.10.2026
+
+- Branch/HEAD: feature/product-personalization / acc0c99; commit yok. UserSecretsId non-secret metadata eklendi; key'i kullanıcı kendi terminalinde ayarladı ve onayladı. Value gösterilmedi veya secret dump yapılmadı.
+- Explicit limited approval: yalnız existing Tea Maker WebP, `lower kettle body`, tam bir automatic inference maksimum; interactive/second inference/retry yasak. Preflight source 1066×1600, SHA `da25357dd74d34295b1658ac6b87b55c28ec4f9d8f4543379efabb8971300414`, provider/gate/credential presence/counter=0 doğrulandı. Atomic single-request guard ve interactive rejection uygulandı; default disabled kaldı.
+- Actual requests attempted: **1**. HTTP **200**, **1529 ms**. PCS/RLE mocked wire assumptions eşleşti; parser correction yok. Returned candidate 1, selected index 0, supplied score 0.83984375. Compressed COCO RLE `[1600,1066]` -> exact RGBA PNG; validation başarılı.
+- Mask SHA `6a7fe88baf2d0b5223476f1921650433443395e917c221fc396c6f75d7d7c3db`; alpha zero/opaque/intermediate 1422315/283285/0. One pending candidate/revision, active approval null. Onay yapılmadı; second automatic, interactive ve retry yapılmadı. Exact credit consumption was not confirmed by the inference response.
+- Desktop ve 390px mobile GET-only QA: aligned=true, overflow=false, QA POST=0. Görsel lower body iyi, fakat spout dahil ve alt sınır hafif pürüzlü; candidate insan review gerektirir. Screenshot'lar `%TEMP%/xinobi-product-surfaces-step4b2-desktop.png` ve `...-mobile.png`; safe evidence JSON aynı temp dizininde. Yerel QA localhost 5015 API / 5175 Vite, tek çağrı bütçesi tükenmiş in-memory oturum; restart bu çağrıyı tekrar yetkilendirmez.
+- TST-088: 120/120 mocked/local backend/API, 5/5 Admin Playwright, Release 0 uyarı/0 hata, Admin type/build/lint ve diff/hash başarılı. İlk GET-only QA scriptinde Türkçe stdin encoding locator timeout verdi; ASCII selector ile düzeltildi, inference tekrar edilmedi.
+- Renderer/Fabric.js/source/reference assets, Asset/Variant/PrintArea/Design sorumlulukları ve OpenAPI değişmedi. D04/D05/D08/D10 açık. Production persistence/jobs/auth yok; runtime restart adayları kaybeder. Retention/training/billing miktarı teyitli değildir.
+- Sonraki tek güvenli adım pending adayın kullanıcı tarafından incelenmesidir. Interactive deployed PVS testi için ayrı açık çağrı/point/source/budget onayı gerekir. Bu oturumun inference izni tüketildi; başka çağrı yapılmayacak.
+
+### ProductSurfaces Step 4B-3 — single interactive Roboflow smoke test / 06.10.2026
+
+- Branch/HEAD: feature/product-personalization / acc0c99; commit yok. Explicit limited approval yalnız Tea Maker exact source ve Keep (420,920) / Exclude (245,730) için tek interactive call. Credential değişmedi ve server-side kaldı. Automatic inference/retry/ikinci call yok.
+- Actual interactive requests attempted: **1**; HTTP **200**, **1312 ms**. PVS top-level predictions/masks/confidence/format ve compressed COCO RLE [1600,1066] varsayımları doğrulandı; parser correction yok. Tek result, index 0, supplied score 0.9453125; score approval değildir.
+- Normalized RGBA PNG 1066×1600; SHA `7ddf567572abf6b696edba4d2a533b5f74ab2a1e9ffb85fdfca9f06c27359dbf`; alpha transparent/opaque/intermediate 1448452/257148/0. Exact source SHA `da25357dd74d34295b1658ac6b87b55c28ec4f9d8f4543379efabb8971300414` korundu; empty/full validation geçti, cleanup/resize yok.
+- Önceki automatic pending kimlik ve maskesi verified local smoke handoff ile korundu. Yeni pending interactive revision/candidate, exact lineage, candidate-specific bytes; approval null, stateVersion=5. Automatic vs interactive: 26361 changed, 26249 removed, 112 added. Spout dışarıda; ana body korunmuş. Logo işaretlerinde küçük holes ve alt kenarda hafif jaggedness insan incelemesi gerektirir.
+- Admin Düzelt/points/regenerate gerçek akışı: click başına inference yok; explicit regenerate tek POST. Desktop/390px mobile aligned, overflow yok. `%TEMP%/xinobi-step4b3-interactive-desktop.png`, `...-mobile.png`, `xinobi-step4b3-automatic-vs-interactive.png`.
+- TST-089: 126/126 mocked/local backend/API, 5/5 Admin Playwright, Release 0 uyarı/0 hata, Admin typecheck/build/lint ve diff/hash başarılı. OpenAPI SHA unchanged `01F859B52FE8543303C3201364718EEF5F0610716A78250C57FDE47B12C24FE6`.
+- Exact credit consumption was not confirmed by the inference response. Renderer/Fabric.js/assets/PrintArea/production Asset/persistence/jobs/auth değişmedi; D04/D05/D08/D10 açık.
+- Tek çağrı bütçesi tüketildi. Başka inference yok. Technical automatic + correction + pending review kanıtlandı; insan approval/code review sonraki güvenli adımdır. API restart yeni izin değildir.
+
+### ProductSurfaces Step 4C-2 — Tea Maker opt-in enclosed-hole refinement / 06.10.2026
+
+- Branch/HEAD feature/product-personalization / acc0c99; commit yok. Yalnız LOCAL deterministic işlem; gerçek Roboflow call0, credential kullanılmadı, dış medya aktarımı/kredi yok, package0.
+- `ProductSurfaces:DevelopmentReview:TeaMakerRefinementEnabled` default false; exact Tea Maker source/raw fixture ve reference provider + external/smoke gates false gerektirir. Threshold5718 inclusive/connectivity8 yalnız bu fixture policy'sidir; global default değil. Raw provider mask immutable test/development fixture olarak korunur; yeni Asset/persistence modeli yok.
+- Provider-independent refiner yalnız enclosed alpha0 components doldurur; border-connected exterior ve mevcut RGBA pikseller değişmez. Branding dependency, bottom cleanup, smoothing, generic morphology yok. Existing validation/SHA pipeline kullanılır.
+- Expected ölçümler birebir: foreground257148→262866, components5→1, enclosed holes1→0, filled1 hole/5718pixels. Exterior changed0, outer silhouette changed0. Raw SHA before/after `7ddf567572abf6b696edba4d2a533b5f74ab2a1e9ffb85fdfca9f06c27359dbf`; derived SHA `4f3fffe81e442b66808e219514d50bd2e37b7db348ef512ebcb6f649dd8deb43`.
+- New pending derived candidate + exact raw/source/algorithm/version/policy/count/checksum provenance. Raw IDs unchanged; approval null, stale/version protections retained. Admin Ham/Düzenlenmiş comparison changes visualization only; raw view blocks decisions, explicit local refine action, no threshold editor. Desktop1440/mobile390 aligned, no overflow; logo hole fixed, spout/handle/upper/base/bottom silhouette preserved.
+- TST-090: focused17/17, full backend/API148/148, Admin6/6, Release0 warnings/errors, Admin type/build/lint/diff successful. Initial test proxy header/CSS cwd/pixmap nullable issues corrected; no tests weakened or expected threshold changed. Raw/source/OpenAPI hashes preserved.
+- Evidence `%TEMP%/xinobi-step4c2-review-derived-desktop.png`, `...-mobile.png`, `xinobi-step4c2-raw-vs-derived.png`; final derived QA candidate pending, no approval. Runtime API5016/Vite5176 is local-only and inference disabled; restart resets derived state, raw regression fixture remains.
+- Renderer/Fabric.js/assets/PrintArea/Design/production Asset/persistence/jobs/auth unchanged. D04/D05/D08/D10 open. Policy stays Tea-Maker-specific; next safe step human/code review only. No inference/other product/next step begun.
+
+### ProductSurfaces Step 4D-2 — minimal local Add/Remove correction — 06.10.2026
+
+- Branch/HEAD: feature/product-personalization / acc0c99; commit yok. Yalnız development review içinde source-pixel Add/Remove strokes, zoom/pan, radius2/4/8/16, Undo/reset ve explicit yeni düzeltilmiş pending aday eklendi; full editor değil.
+- Backend `source-pixel-capsule-strokes` v1 authoritative. Parent/raw/refined immutable; exact source/session/version/parent ve bounded input/work doğrulanır. Yeni provenance parent/output checksum + ordered operations + derived IDs + fixed dev reviewer kaydeder. Approval ayrı; eski onay değişmez.
+- Çizim/zoom/pan/Undo sırasında POST0; explicit create1 local POST. Failure strokes/Undo korur, stale409 farklı adaya implicit transfer/retry yapmaz. Unsaved correction mode review/view değişimini engeller. API restart/history kaybı sürer; production persistence/auth/Asset/PrintArea/DesignVersion oluşturulmadı.
+- TST-091: 21 focused + full169/169 backend/API, Admin10/10, Release0 warnings/errors, Admin type/build/lint ve diff başarılı. Çalışan API DLL kilidi nedeniyle mevcut süreç kapatılmadan ignored `bin/step4d2/` output kullanıldı. İlk compile/sandbox/pointer scroll/refined-parent QA/lint sorunları ve düzeltmeler test kaydında.
+- Exact refined parent4f3fffe... üzerinden alt-kenar temsili human Add stroke88 pixel ekledi; output7979b30e...; pending, approvalnull. Desktop/390 mobile ve local before/after QA incelendi. Tüm sınırlar tamamlandı/ticari uygunluk onaylandı iddiası yok.
+- Roboflow calls0, credential unused, external transfer0, packages0. Renderer/Fabric.js/source/manual mask/raw fixture/OpenAPI korunur. PrintArea/D04 ve D05/D08/D10 açık. Geçici QA dosyaları test kaydında; candidate test-host restart ile kaybolur.
+- Sonraki tek güvenli adım: kullanıcı UI/QA incelemesi; yeni ürün/inference/production step başlatılmadı.
+
+### ProductSurfaces Step 5B — Development Accepted-Surface → Storefront Renderer Bridge / 06.10.2026
+
+- Yalnız development preview: explicit environment+flag gate, read-only loopback rendering bundle, exact source SHA/dimensions, manuel accepted prototype mask SHA/alignment, required branding SHA/alignment. AI ReviewDecision uydurulmadı; pending/rejected/derived adaylar yayınlanmadı.
+- Web adapter + EditorWorkspace props; selected development variant query ürün→studio→editor ve geri bağlantıda korunur. Unsupported renkler blue'ya düşmez. Same-origin versioned assets; renderer algoritmaları ve manuel/source/branding asset'leri değişmedi. Native UI/loading/unavailable korunur.
+- TST-092: 18 focused / 187 backend/API, 15 bridge+renderer / 6 mevcut web interaction-accessibility test geçti; API Release 0 warning/error, web typecheck/build/lint başarılı. 1440 desktop/390 mobile QA; outside pixel differences0, branding differences0; Next dev proxy local blue ready/silver unavailable doğrulandı.
+- Roboflow0, credential use0, image transfer0, package0; production Asset/Variant/storage/persistence/PrintArea/cart/order yok. D02/D04/D05/D08/D10 açık. Shared Catalog+Asset+approved resolver gelecekte fixture resolver'ın yerini alır; production publishability kanıtlanmadı.
+- Başlangıç API output kilidi ayrı ignored build directory ile aşıldı; mevcut Google Font build sandbox hatası izinli build ile giderildi. Test cookie/route-announcer/list-reference assertions düzeltildi; test kuralları zayıflatılmadı. Aktif normal Next dev durdurulmadan isolated preview distDir kullanıldı; Next type includes tsconfig'e eklendi.
+- OpenAPI before/after SHA `01f859b52fe8543303c3201364718eef5f0610716a78250c57fde47b12c24fe6`; manuel mask SHA `8c4ae4c1d1ab269ae2e580a83a8ba3e55a0d32766c9b7299e0f5e804f5964d06` korundu. Commit yok; next step yalnız kullanıcı QA/code review.

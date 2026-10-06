@@ -38,13 +38,11 @@
 .canvasHeading h1 { margin: 0; font-size: 1.2rem; font-weight: 500; }
 .productStage { width: min(100%,720px); min-height: 100%; margin: auto; position: relative; display: grid; place-items: center; }
 .halo { position: absolute; width: min(52vw,590px); aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.65); box-shadow: 0 25px 60px rgba(20,38,43,.08); }
-.productStage > img { width: auto; height: min(67vh,610px); max-width: 82%; position: relative; z-index: 1; object-fit: contain; mix-blend-mode: multiply; }
-.designBoard { width: 210px; height: 130px; position: absolute; z-index: 2; right: 4%; bottom: 9%; border: 1px dashed #497873; background: rgba(255,255,255,.88); box-shadow: 0 12px 30px rgba(29,50,54,.16); }
-.designBoard::before { content: "TEMSİLİ ÇALIŞMA ALANI"; position: absolute; left: 8px; top: 7px; color: #52736f; font-size: .45rem; letter-spacing: .08em; }
-.designBoard button { min-width: 130px; min-height: 28px; position: absolute; left: 35px; top: 34px; border: 1px solid transparent; background: transparent; color: #173d3a; font-size: .75rem; }
-.designBoard button.selectedObject { border-color: #0b6c68; outline: 3px solid rgba(11,108,104,.12); }
-.designBoard button:disabled { color: #586562; }
-.shape { width: 76px; height: 25px; display: inline-block; border: 2px solid #0b6c68; }
+.productPreview { width: min(82%, calc(min(67vh, 610px) * 1066 / 1600)); aspect-ratio: 1066 / 1600; position: relative; z-index: 1; }
+.productPreview > canvas { display: block; width: 100%; height: 100%; }
+.productPreview > canvas[hidden] { display: none; }
+.previewMessage { position: absolute; inset: 0; display: grid; place-items: center; padding: 18px; border: 1px solid var(--color-line); background: var(--color-surface); color: var(--color-muted); text-align: center; }
+.previewMessage p { margin: 0; font-size: .69rem; line-height: 1.5; }
 .canvasDisclaimer { margin: 0; position: absolute; left: 25px; bottom: 17px; color: #52605d; font-size: .55rem; }
 .statusBar { padding: 0 18px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid #c7cfcc; background: #f7f9f8; color: #65716e; font-size: .56rem; }
 .statusBar strong { color: #765018; }
@@ -63,6 +61,15 @@
 .layerMain strong { font-size: .63rem; }
 .layerMain small { margin-top: 2px; color: #52605d; font-size: .5rem; }
 .properties { margin-top: 12px; border-top: 7px solid #e8edeb; }
+.previewStatus { min-height: 65vh; padding: clamp(24px, 5vw, 64px); background: var(--color-paper, #f4f6f5); }
+.previewStatus h1 { font-size: clamp(1.1rem, 3vw, 1.7rem); }
+.previewStatus p { color: var(--color-muted); line-height: 1.6; }
+.previewStatus a { color: var(--color-teal); }
+.patternControls { padding-bottom: 12px; border-bottom: 7px solid #e8edeb; }
+.patternControl { margin: 14px 17px 0; }
+.patternControl label { display: flex; justify-content: space-between; gap: 8px; color: var(--color-muted); font-size: .6rem; }
+.patternControl label span { color: var(--color-teal); font-variant-numeric: tabular-nums; }
+.patternControl input { width: 100%; min-height: 28px; margin: 4px 0 0; accent-color: var(--color-teal); cursor: pointer; }
 .properties > label { margin: 18px 17px 8px; display: flex; justify-content: space-between; color: #56635f; font-size: .6rem; }
 .properties > label span { color: #9a6b29; }
 .propertyGrid { padding: 0 17px; display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
@@ -97,9 +104,8 @@
   .canvasToolbar .demoBadge { display: none; }
   .canvas { padding: 15px; }
   .canvasHeading { left: 17px; top: 15px; }
-  .productStage > img { height: 500px; max-width: 96%; }
+  .productPreview { width: min(96%, calc(500px * 1066 / 1600)); }
   .halo { width: 90vw; }
-  .designBoard { width: 180px; right: 2%; bottom: 12%; }
   .canvasDisclaimer { left: 15px; right: 15px; bottom: 10px; }
   .statusBar { min-height: 48px; }
   .layers { grid-column: 1; display: block; }

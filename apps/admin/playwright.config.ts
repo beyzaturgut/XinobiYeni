@@ -1,0 +1,15 @@
+import { defineConfig } from '../web/node_modules/@playwright/test/index.mjs'
+import path from 'node:path'
+const root = path.resolve(import.meta.dirname, '../..')
+const node = process.env.NODE_BINARY || process.execPath
+const apiBinary = process.env.PRODUCT_SURFACES_TEST_API_BINARY || 'services/api/bin/Release/net10.0/Xinobi.Api.dll'
+export default defineConfig({
+  testDir: './tests/e2e', workers: 1, use: { baseURL: 'http://127.0.0.1:5174', launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROME_EXECUTABLE || 'C:/Program Files/Google/Chrome/Application/chrome.exe' } },
+  reporter: 'list', outputDir: '../../test-results/admin-playwright',
+  webServer: [
+    { command: `dotnet "${apiBinary}"`, cwd: root, url: 'http://127.0.0.1:5017/api/v1/health/live', env: { ASPNETCORE_ENVIRONMENT: 'Development', ASPNETCORE_URLS: 'http://127.0.0.1:5017', ProductSurfaces__DevelopmentReview__Enabled: 'true', ProductSurfaces__DevelopmentReview__RepositoryRoot: root, ProductSurfaces__DevelopmentReview__TeaMakerRefinementEnabled: 'true', ProductSurfaces__Segmentation__Provider: 'reference', ProductSurfaces__Segmentation__ExternalInferenceEnabled: 'false', ProductSurfaces__Segmentation__SingleAutomaticSmokeEnabled: 'false', ProductSurfaces__Segmentation__SingleInteractiveSmokeEnabled: 'false' } },
+    { command: `dotnet "${apiBinary}"`, cwd: root, url: 'http://127.0.0.1:5019/api/v1/health/live', env: { ASPNETCORE_ENVIRONMENT: 'Development', ASPNETCORE_URLS: 'http://127.0.0.1:5019', ProductSurfaces__DevelopmentReview__Enabled: 'true', ProductSurfaces__DevelopmentReview__RepositoryRoot: root, ProductSurfaces__DevelopmentReview__TeaMakerRefinementEnabled: 'true', ProductSurfaces__Segmentation__Provider: 'reference', ProductSurfaces__Segmentation__ExternalInferenceEnabled: 'false', ProductSurfaces__Segmentation__SingleAutomaticSmokeEnabled: 'false', ProductSurfaces__Segmentation__SingleInteractiveSmokeEnabled: 'false' } },
+    { command: `dotnet "${apiBinary}"`, cwd: root, url: 'http://127.0.0.1:5013/api/v1/health/live', env: { ASPNETCORE_ENVIRONMENT: 'Development', ASPNETCORE_URLS: 'http://127.0.0.1:5013', ProductSurfaces__DevelopmentReview__Enabled: 'true', ProductSurfaces__DevelopmentReview__RepositoryRoot: root, ProductSurfaces__Segmentation__Provider: 'reference', ProductSurfaces__Segmentation__ExternalInferenceEnabled: 'false', ProductSurfaces__Segmentation__SingleAutomaticSmokeEnabled: 'false', ProductSurfaces__Segmentation__SingleInteractiveSmokeEnabled: 'false' } },
+    { command: `"${node}" node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5174 --strictPort`, cwd: path.join(root, 'apps/admin'), url: 'http://127.0.0.1:5174', env: { PRODUCT_SURFACES_API_URL: 'http://127.0.0.1:5013' } },
+  ],
+})

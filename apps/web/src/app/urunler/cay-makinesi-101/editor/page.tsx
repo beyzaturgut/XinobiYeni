@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import EditorWorkspace from "./editor-workspace";
+import AcceptedSurfaceEditor, { DevelopmentReferenceLink } from "./accepted-surface-editor";
 import styles from "./editor.module.css";
 
 export const metadata: Metadata = {
@@ -17,10 +17,10 @@ export default function AdvancedEditorPage() {
       <div className={styles.documentTitle}><span>Xinobi Studio</span><strong>İsimsiz tasarım</strong><small>Demo · Kaydedilmedi</small></div>
       <div className={styles.headerActions}>
         <Link href="/studio/ai">AI ile fikir üret</Link>
-        <Link href="/urunler/cay-makinesi-101/kisisellestir">Basit moda dön</Link>
+        <DevelopmentReferenceLink href="/urunler/cay-makinesi-101/kisisellestir">Basit moda dön</DevelopmentReferenceLink>
         <button type="button" disabled>Sepete aktar</button>
       </div>
     </header>
-    <main id="editor-workspace"><EditorWorkspace /></main>
+    <main id="editor-workspace"><AcceptedSurfaceEditor /></main>
   </div>;
 }

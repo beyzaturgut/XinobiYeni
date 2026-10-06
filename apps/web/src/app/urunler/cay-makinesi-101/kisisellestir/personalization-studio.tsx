@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import styles from "./studio.module.css";
 import teaMaker from "../../../../../public/assets/products/tea-maker-101-blue.webp";
 
@@ -15,7 +16,8 @@ const colors: ColorChoice[] = [
 ];
 const stylesList: StyleChoice[] = ["Sade", "Geometrik", "Yumuşak"];
 
-export default function PersonalizationStudio() {
+function PersonalizationStudioContent() {
+  const variant = useSearchParams().get("variant") ?? "blue";
   const [text, setText] = useState("Bana özel");
   const [style, setStyle] = useState<StyleChoice>("Sade");
   const [color, setColor] = useState(colors[0]);
@@ -27,6 +29,11 @@ export default function PersonalizationStudio() {
     setSaved(false);
   }
 
+  if (variant !== "blue") return <section className={styles.actionPanel} role="status">
+    <h1>Bu renk için geliştirme önizlemesi kullanılamıyor.</h1>
+    <p>Başka bir rengin maskesi kullanılmaz. Bu demo fiziksel baskı veya üretim onayı değildir.</p>
+    <Link href="/urunler/cay-makinesi-101">Ürüne dön</Link>
+  </section>;
   return <div className={styles.workspace}>
     <section className={styles.preview} aria-labelledby="preview-title">
       <div className={styles.previewHeader}><div><p>Adım 1 / 2</p><h1 id="preview-title">Tasarımınızı oluşturun.</h1></div><span>Demo önizleme</span></div>
@@ -64,11 +71,15 @@ export default function PersonalizationStudio() {
       <div className={styles.actionPanel}>
         <div><span>Tasarım bedeli</span><strong>Ürün verisi bekleniyor</strong></div>
         <button type="button" className={styles.saveButton} onClick={() => setSaved(true)} disabled={!text.trim()}>Demo taslağını hazırla</button>
-        <Link className={styles.editorLink} href="/urunler/cay-makinesi-101/editor">Gelişmiş editörde devam et <span aria-hidden="true">↗</span></Link>
+        <Link className={styles.editorLink} href={`/urunler/cay-makinesi-101/editor?variant=${encodeURIComponent(variant)}`}>Gelişmiş editörde devam et <span aria-hidden="true">↗</span></Link>
         <button type="button" className={styles.continueButton} disabled aria-describedby="continue-note">Siparişe devam et</button>
         <p id="continue-note">D04 baskı standardı ile fiyat/stok doğrulanmadan siparişe aktarılamaz.</p>
         <p className={styles.saveStatus} aria-live="polite">{saved ? "Demo taslağınız bu oturum için hazırlandı. Kalıcı kayıt yapılmadı." : ""}</p>
       </div>
     </aside>
   </div>;
+}
+
+export default function PersonalizationStudio() {
+  return <Suspense fallback={<p role="status">Geliştirme önizlemesi yükleniyor…</p>}><PersonalizationStudioContent /></Suspense>;
 }

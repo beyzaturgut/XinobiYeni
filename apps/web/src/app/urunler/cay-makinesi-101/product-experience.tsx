@@ -43,7 +43,7 @@ export default function ProductExperience() {
         </fieldset>
         <div className={styles.actions}>
           <button type="button" disabled aria-describedby="purchase-note">Satış bilgisi hazırlanıyor</button>
-          <Link href="/urunler/cay-makinesi-101/kisisellestir">Kişiselleştirme seçenekleri <span aria-hidden="true">→</span></Link>
+          <Link href={`/urunler/cay-makinesi-101/kisisellestir?variant=${selected.id}`}>Kişiselleştirme seçenekleri <span aria-hidden="true">→</span></Link>
         </div>
         <p id="purchase-note" className={styles.purchaseNote}>Stok ve fiyat doğrulanmadan sepete ekleme etkinleştirilmez.</p>
         <ul className={styles.summary}>

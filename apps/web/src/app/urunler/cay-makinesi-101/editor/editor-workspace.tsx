@@ -1,9 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import teaMaker from "../../../../../public/assets/products/tea-maker-101-blue.webp";
+import ProductPatternPreview, { type PatternTransform } from "./product-pattern-preview";
 import styles from "./editor.module.css";
+import { DEFAULT_CURVATURE_STRENGTH } from "./product-surface-warp";
+import type { RenderingInputs } from "./accepted-surface-api";
 
 type Layer = { id: number; type: "Metin" | "Şekil"; name: string; locked: boolean; visible: boolean };
 const initialLayers: Layer[] = [
@@ -11,11 +12,13 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace() {
+export default function EditorWorkspace({ renderingInputs }: { renderingInputs: RenderingInputs }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
   const [notice, setNotice] = useState("");
+  const [patternTransform, setPatternTransform] = useState<PatternTransform>({ x: 533, y: 1040, scale: 1.2, rotation: 0 });
+  const [curvatureStrength, setCurvatureStrength] = useState(DEFAULT_CURVATURE_STRENGTH);
 
   function toggleLayer(id: number, key: "locked" | "visible") {
     setLayers((current) => current.map((layer) => layer.id === id ? { ...layer, [key]: !layer[key] } : layer));
@@ -49,10 +52,15 @@ export default function EditorWorkspace() {
         <div className={styles.canvasHeading}><p>Çay Makinesi 101 · Lacivert</p><h1 id="canvas-title">{face}</h1></div>
         <div className={styles.productStage}>
           <div className={styles.halo} />
-          <Image src={teaMaker} alt={`Lacivert Çay Makinesi 101, ${face.toLocaleLowerCase("tr-TR")} temsili görünümü`} priority sizes="(max-width: 980px) 90vw, 52vw" />
-          <div className={styles.designBoard} aria-label="Temsili tasarım alanı">
-            {layers.filter((layer) => layer.visible).map((layer, index) => <button type="button" key={layer.id} aria-label={layer.type === "Şekil" ? layer.name : undefined} className={selected === layer.id ? styles.selectedObject : ""} onClick={() => setSelected(layer.id)} disabled={layer.locked} style={{ transform: `translate(${index * 5}px, ${index * 32}px)` }}>{layer.type === "Şekil" ? <span className={styles.shape} /> : layer.name}</button>)}
-          </div>
+          <ProductPatternPreview
+            productSrc={renderingInputs.source.url}
+            designableMaskSrc={renderingInputs.mask.url}
+            brandingOverlaySrc={renderingInputs.branding?.url}
+            patternSrc="/assets/personalization/sample-pattern.png"
+            patternTransform={patternTransform}
+            curvatureStrength={curvatureStrength}
+            alt="Çay Makinesi 101, desenli ürün önizlemesi"
+          />
         </div>
         <p className={styles.canvasDisclaimer}>Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.</p>
       </div>
@@ -67,6 +75,22 @@ export default function EditorWorkspace() {
         <button type="button" aria-label={`${layer.name} katmanının kilidini ${layer.locked ? "aç" : "kapat"}`} aria-pressed={layer.locked} onClick={() => toggleLayer(layer.id, "locked")}>{layer.locked ? "●" : "○"}</button>
       </li>)}</ul>
       <section className={styles.properties} aria-labelledby="properties-title">
+        <section className={styles.patternControls} aria-labelledby="pattern-controls-title">
+          <div className={styles.panelTitle}><div><p id="pattern-controls-title">Desen yerleşimi</p><span>Prototip önizleme</span></div></div>
+          {([
+            { key: "x", label: "Yatay konum", min: 0, max: 1066, step: 1, unit: "px" },
+            { key: "y", label: "Dikey konum", min: 0, max: 1600, step: 1, unit: "px" },
+            { key: "scale", label: "Ölçek", min: 0.25, max: 3, step: 0.05, unit: "×" },
+            { key: "rotation", label: "Dönüş", min: -180, max: 180, step: 1, unit: "°" },
+          ] as const).map(({ key, label, min, max, step, unit }) => <div className={styles.patternControl} key={key}>
+            <label htmlFor={`pattern-${key}`}>{label}<span>{patternTransform[key]} {unit}</span></label>
+            <input id={`pattern-${key}`} type="range" min={min} max={max} step={step} value={patternTransform[key]} onChange={(event) => setPatternTransform((current) => ({ ...current, [key]: Number(event.target.value) }))} />
+          </div>)}
+          <div className={styles.patternControl}>
+            <label htmlFor="pattern-curvature">Yüzey kavisi<span>{curvatureStrength}</span></label>
+            <input id="pattern-curvature" type="range" min={0} max={1} step={0.05} value={curvatureStrength} onChange={(event) => setCurvatureStrength(Number(event.target.value))} />
+          </div>
+        </section>
         <div className={styles.panelTitle}><div><p id="properties-title">Özellikler</p><span>Seçili katman</span></div></div>
         <label>Konum <span>Demo</span></label><div className={styles.propertyGrid}><button type="button" disabled>X —</button><button type="button" disabled>Y —</button></div>
         <label>Boyut ve dönüş <span>D04 bekliyor</span></label><div className={styles.propertyGrid}><button type="button" disabled>W —</button><button type="button" disabled>0°</button></div>

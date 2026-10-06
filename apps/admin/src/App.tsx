@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import './App.css'
+import ProductSurfaceReview from './features/product-surfaces/ProductSurfaceReview'
 
 type Slide = { id: number; name: string; type: 'Fotoğraf' | 'Video'; src: string; alt: string; duration: number; active: boolean }
 
@@ -10,7 +11,7 @@ const initialSlides: Slide[] = [
 ]
 
 function App() {
-  const [section, setSection] = useState<'slider' | 'xinobi-u'>('slider')
+  const [section, setSection] = useState<'slider' | 'xinobi-u' | 'surfaces'>('slider')
   const [slides, setSlides] = useState(initialSlides)
   const [selectedId, setSelectedId] = useState(1)
   const [notice, setNotice] = useState('')
@@ -61,9 +62,10 @@ function App() {
       <p>Faz02 · Yerel yönetim prototipi</p>
     </aside>
     <main className="workspace">
-      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : 'XINOBI U banner'}</h1></div><button className="preview">Site önizleme ↗</button></header>
-      <section className="status-note"><strong>Demo yönetim alanı</strong><span>Değişiklikler bu tarayıcı oturumunda önizlenir. Kalıcı kayıt ve canlı yayın, CMS API bağlantısıyla açılacaktır.</span></section>
-      {section === 'slider' ? <div className="editor-layout">
+      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'surfaces' ? 'Ürün yüzeyi inceleme' : section === 'slider' ? 'Ana sayfa slider' : 'XINOBI U banner'}</h1></div><button className="preview">Site önizleme ↗</button></header>
+      <section className="status-note"><strong>Demo yönetim alanı</strong><span>{section === 'surfaces' ? 'Yüzey incelemesi yalnız yerel geliştirme API belleğinde tutulur. API yeniden başlatıldığında sıfırlanır.' : 'Değişiklikler bu tarayıcı oturumunda önizlenir. Kalıcı kayıt ve canlı yayın, CMS API bağlantısıyla açılacaktır.'}</span></section>
+      {import.meta.env.DEV && <button className="surface-access" onClick={() => setSection(section === 'surfaces' ? 'slider' : 'surfaces')}>{section === 'surfaces' ? 'İçerik yönetimine dön' : 'Ürün yüzeyi incele (geliştirme)'}</button>}
+      {section === 'surfaces' ? <ProductSurfaceReview /> : section === 'slider' ? <div className="editor-layout">
         <section className="slides-panel" aria-labelledby="slides-title">
           <div className="panel-heading"><div><p>SLIDER ÖĞELERİ</p><h2 id="slides-title">Yayın sırası</h2></div><button onClick={() => inputRef.current?.click()}>+ Medya ekle</button><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={addMedia} hidden /></div>
           <div className="slides-list">{slides.map((slide, index) => <button key={slide.id} className={slide.id === selected.id ? 'slide-row selected' : 'slide-row'} onClick={() => setSelectedId(slide.id)}><span className="order">{String(index + 1).padStart(2, '0')}</span><span className="thumb">{slide.type === 'Video' ? <video src={slide.src} muted /> : <img src={slide.src} alt="" />}</span><span className="slide-name"><strong>{slide.name}</strong><small>{slide.type} · {slide.active ? 'Yayında' : 'Taslak'}</small></span><span aria-hidden="true">›</span></button>)}</div>

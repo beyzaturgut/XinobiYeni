@@ -4,6 +4,7 @@ import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/pla
 const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));
 state.categories=['Çay makineleri','Kahve makineleri','Hava temizleme','Pişirme teknolojileri'];
 const product=state.products[0],variant=product.variants[1];
+product.originalImage=product.variants[0].image;
 const originalContent=structuredClone(state.content);
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try{

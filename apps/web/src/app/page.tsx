@@ -61,7 +61,7 @@ export default function Home() {
     const candidates = state.products.filter(product => product.active && product.category === name);
     for (const product of candidates) {
       const variant = selected === undefined ? product.variants.find(variant => variant.image) : product.variants.find(variant => variant.id === selected && variant.image);
-      if (variant) return [{name, image: mediaUrl(product.originalImage || variant.image, commerceApi), alt: `${product.name} · ${variant.color}`}];
+      if (variant) return [{name, image: mediaUrl(selected === undefined ? (product.originalImage || variant.image) : variant.image, commerceApi), alt: `${product.name} · ${variant.color}`}];
     }
     return [];
   }) : enabled ? [] : fallbackCategories;

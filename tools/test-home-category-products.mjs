@@ -23,6 +23,17 @@ try{
  console.log('Checking homepage',width);const page=await browser.newPage({viewport:{width,height:1000}});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/api/v1/local-commerce/state',route=>route.fulfill({json:state}));await page.goto('http://127.0.0.1:3000/');
  await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();
+ if(width===1440){
+   await page.getByRole('button',{name:'Kategoriler',exact:true}).hover();
+   const menu=page.locator('#home-category-menu');await menu.waitFor({state:'visible'});
+   assert.equal(await menu.getByRole('link',{name:'XINOBI U',exact:true}).count(),0);
+   assert.equal(await menu.getByRole('link').count(),state.categories.length);
+   const coffee=menu.getByRole('link',{name:'Kahve makineleri',exact:true});assert.ok(await coffee.isVisible());
+   await coffee.click();await page.locator('button[aria-pressed="true"]').filter({hasText:'Kahve'}).waitFor();
+   const catalog=page.locator('#catalog');assert.equal(await catalog.getByRole('heading',{name:product.name,exact:true}).count(),0);
+   assert.ok(await catalog.getByRole('heading',{name:state.products[1].name,exact:true}).first().isVisible());
+   await page.goto('http://127.0.0.1:3000/');
+ }
  const cards=page.locator('#kategoriler');const image=cards.getByRole('img',{name:product.name+' · '+variant.color,exact:true});await image.waitFor();
  assert.ok(decodeURIComponent(await image.getAttribute('src')).includes(variant.image));
  assert.equal(await cards.getByRole('link',{name:'Kahve makineleri',exact:true}).count(),0);

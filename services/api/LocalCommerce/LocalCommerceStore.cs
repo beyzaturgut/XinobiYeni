@@ -5,7 +5,7 @@ namespace Xinobi.Api.LocalCommerce;
 public record CommerceVariant(string Id, string Sku, string Color, int Stock, string Image, string? Hex = null);
 public record CommerceProduct(string Id, string Name, string Category, bool Active, string Description, string SeoTitle, CommerceVariant[] Variants, bool? Personalizable = null, string? OriginalImage = null);
 public record CommerceSlide(long Id, string Name, string Type, string Src, string Alt, int Duration, bool Active);
-public record CommerceContent(CommerceSlide[] Slides, string XinobiBanner, string ButtonColor, Dictionary<string, string>? CategoryProducts = null);
+public record CommerceContent(CommerceSlide[] Slides, string XinobiBanner, string ButtonColor, Dictionary<string, string>? CategoryProducts = null, string? TitaniumBanner = null);
 public record CommerceState(CommerceProduct[] Products, Dictionary<string, long> Prices, CommerceContent Content, string[]? Categories = null);
 public record CategoryCreate(string Name);
 public record PriceUpdate(long Cents);

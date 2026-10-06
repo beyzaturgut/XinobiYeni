@@ -101,7 +101,7 @@ public sealed class LocalCommerceTests : IDisposable
             var product = seed.Products[0] with { Name = "Kaydedilen ürün", OriginalImage = "/assets/products/original.webp", Variants = [seed.Products[0].Variants[0] with { Stock = 17, Hex = "#123456" }] };
             (await client.PutAsJsonAsync(Root + "/products/" + product.Id, product)).EnsureSuccessStatusCode();
             (await client.PutAsJsonAsync(Root + "/prices/" + product.Variants[0].Id, new PriceUpdate(345678))).EnsureSuccessStatusCode();
-            (await client.PutAsJsonAsync(Root + "/content", seed.Content with { Slides = [], XinobiBanner = "", ButtonColor = "#112233" })).EnsureSuccessStatusCode();
+            (await client.PutAsJsonAsync(Root + "/content", seed.Content with { Slides = [], XinobiBanner = "", ButtonColor = "#112233", TitaniumBanner = "/assets/banners/home-titanium.webp" })).EnsureSuccessStatusCode();
         }
         using var restarted = CreateFactory();
         using var secondClient = restarted.CreateClient();
@@ -113,6 +113,7 @@ public sealed class LocalCommerceTests : IDisposable
         Assert.Equal(345678, state.Prices[saved.Variants[0].Id]);
         Assert.Empty(state.Content.Slides);
         Assert.Equal("", state.Content.XinobiBanner);
+        Assert.Equal("/assets/banners/home-titanium.webp", state.Content.TitaniumBanner);
         (await secondClient.DeleteAsync(Root + "/products/" + saved.Id)).EnsureSuccessStatusCode();
         state = (await secondClient.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         Assert.DoesNotContain(state.Products, p => p.Id == saved.Id);

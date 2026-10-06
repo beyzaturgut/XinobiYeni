@@ -12,3 +12,5 @@
 .personalizeLink{position:absolute;inset:0;display:block}.personalizeLink:focus-visible{outline:3px solid #fff;outline-offset:-6px}
 
 .hero{height:auto;aspect-ratio:1942/809;background:#fff}.heroImage{object-fit:contain}.categoryCard:hover img{transform:none}.categoryCard img{mix-blend-mode:normal}.productImage,.productCard:nth-child(2) .productImage{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;transform:none;mix-blend-mode:normal}.multiColorBadge{position:absolute;z-index:3;right:12px;top:12px;background:#fff;border:1px solid #ddd;border-radius:20px;padding:6px 10px;font-size:12px}.productCard:focus-visible{outline:2px solid #222;outline-offset:4px}.categoryMenu::after{content:"";position:absolute;top:100%;left:-20px;right:-20px;height:20px}
+
+.titaniumBanner{width:100%;background:#fff}.titaniumBanner img{display:block;width:100%;height:auto;object-fit:contain}

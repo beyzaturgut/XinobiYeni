@@ -3,13 +3,14 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { commerceApi, mediaUrl, uploadMedia, type Content, type Slide, type Product } from './commerce'
 
 function ContentEditor({ content, products, categories, onSave }: { products: Product[]; categories: string[]; content: Content; onSave: (content: Content) => Promise<void> }) {
-  const [section, setSection] = useState<'slider' | 'xinobi-u' | 'categories'>('slider')
+  const [section, setSection] = useState<'slider' | 'xinobi-u' | 'categories' | 'titanium'>('slider')
   const [categoryProducts, setCategoryProducts] = useState(content.categoryProducts ?? {})
   const [slides, setSlides] = useState(content.slides)
   const [selectedId, setSelectedId] = useState(content.slides[0]?.id ?? 0)
   const [notice, setNotice] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const bannerInputRef = useRef<HTMLInputElement>(null)
+  const [titaniumBanner, setTitaniumBanner] = useState(content.titaniumBanner ?? '/assets/banners/home-titanium.webp')
   const [xinobiBanner, setXinobiBanner] = useState(content.xinobiBanner)
   const buttonColor = content.buttonColor
   const selected = slides.find((slide) => slide.id === selectedId) ?? slides[0]
@@ -54,16 +55,20 @@ function ContentEditor({ content, products, categories, onSave }: { products: Pr
   }
 
   async function saveContent() {
-    try { await onSave({ ...content, slides, xinobiBanner, buttonColor, categoryProducts }); setNotice('İçerik kaydedildi; local web güncelleniyor.') }
+    try { await onSave({ ...content, slides, xinobiBanner, buttonColor, categoryProducts, titaniumBanner }); setNotice('İçerik kaydedildi; local web güncelleniyor.') }
     catch (error) { setNotice(error instanceof Error ? error.message : 'İçerik kaydedilemedi.') }
   }
   const source = (src: string) => mediaUrl(src, commerceApi, 'http://127.0.0.1:3000')
 
   return <div className="content-editor">
     <main className="workspace">
-      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : section === 'categories' ? 'Anasayfa kategorileri' : 'XINOBI U banner'}</h1></div><div className="content-tabs"><button aria-pressed={section === 'slider'} onClick={() => setSection('slider')}>Slider</button><button aria-pressed={section === 'xinobi-u'} onClick={() => setSection('xinobi-u')}>XINOBI U</button><button aria-pressed={section === 'categories'} onClick={() => setSection('categories')}>Kategoriler</button></div></header>
+      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : section === 'categories' ? 'Anasayfa kategorileri' : section === 'titanium' ? 'Titanyum ürünler banner’ı' : 'XINOBI U banner'}</h1></div><div className="content-tabs"><button aria-pressed={section === 'slider'} onClick={() => setSection('slider')}>Slider</button><button aria-pressed={section === 'xinobi-u'} onClick={() => setSection('xinobi-u')}>XINOBI U</button><button aria-pressed={section === 'categories'} onClick={() => setSection('categories')}>Kategoriler</button><button aria-pressed={section === 'titanium'} onClick={() => setSection('titanium')}>Titanyum banner</button></div></header>
       <section className="status-note"><strong>Ortak içerik yönetimi</strong><span>Görselleri düzenledikten sonra “Kaydet ve web’i güncelle” düğmesine basın. Kayıtlar local API’de korunur.</span></section>
-      {section === 'categories' ? <section className="xinobi-editor" aria-label="Anasayfa kategori görselleri"><h2>Anasayfada gösterilecek ürünler</h2><p>Her kategori için ürünü ve rengini seçin. Seçilen varyantın katalog görseli anasayfada kullanılır.</p><div className="home-category-settings">{categories.map(category => {
+      {section === 'titanium' ? <section className="xinobi-editor" aria-label="Titanyum banner yönetimi"><h2>Titanyum kaplamalı ürünler</h2><p>Bu banner anasayfada kategorilerin hemen altında gösterilir. Görsel kırpılmadan, kendi oranıyla gösterilir.</p><div className="titanium-preview">{titaniumBanner ? <img src={source(titaniumBanner)} alt="Titanyum ürünler banner önizlemesi" /> : <p>Banner kaldırıldı.</p>}</div><label>Titanyum banner görseli yükle<input type="file" accept="image/jpeg,image/png,image/webp" onChange={async event => {
+        const file = event.target.files?.[0]; if(!file) return
+        try { setTitaniumBanner(await uploadMedia(commerceApi, file));setNotice('Titanyum banner görseli eklendi; değişikliği kaydedin.');event.target.value='' }
+        catch(error) {setNotice(error instanceof Error ? error.message : 'Görsel yüklenemedi.')}
+      }} /></label><button onClick={() => setTitaniumBanner('')}>Titanyum banner’ı kaldır</button><button onClick={() => setTitaniumBanner('/assets/banners/home-titanium.webp')}>İlk görseli geri yükle</button><div className="save-row"><p aria-live="polite">{notice}</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div></section> : section === 'categories' ? <section className="xinobi-editor" aria-label="Anasayfa kategori görselleri"><h2>Anasayfada gösterilecek ürünler</h2><p>Her kategori için ürünü ve rengini seçin. Seçilen varyantın katalog görseli anasayfada kullanılır.</p><div className="home-category-settings">{categories.map(category => {
         const candidates = products.filter(product => product.active && product.category === category)
         const selection = categoryProducts[category]
         const selectedVariant = candidates.flatMap(product => product.variants).find(variant => variant.id === selection)

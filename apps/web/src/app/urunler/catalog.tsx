@@ -47,6 +47,8 @@ export default function Catalog() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
+      const selectedCategory = new URLSearchParams(window.location.search).get("category");
+      if (selectedCategory) setCategory(categoryLabel(selectedCategory));
       try { setFavorites(JSON.parse(localStorage.getItem(favoriteStorageKey) || "[]")); } catch { setFavorites([]); }
     }, 0);
     return () => window.clearTimeout(timer);

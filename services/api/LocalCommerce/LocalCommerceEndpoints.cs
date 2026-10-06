@@ -82,7 +82,17 @@ public static class LocalCommerceEndpoints
             if (content.Slides is null || content.Slides.Length > 50 || !ValidMedia(content.XinobiBanner) || !Regex.IsMatch(content.ButtonColor ?? "", "^#[a-fA-F0-9]{6}$") ||
                 content.Slides.Select(s => s.Id).Distinct().Count() != content.Slides.Length || content.Slides.Any(s => !ValidMedia(s.Src) || string.IsNullOrEmpty(s.Src) || s.Type is not ("Fotoğraf" or "Video") || (s.Type == "Fotoğraf" && (s.Duration < 3 || s.Duration > 20))))
                 return Results.BadRequest(new { message = "Banner görselleri, süreleri ve buton rengini kontrol edin." });
-            return Results.Ok(await store.Update(state => state with { Content = content }));
+            try
+            {
+                return Results.Ok(await store.Update(state =>
+                {
+                    if (content.CategoryProducts is { } selections && (selections.Count > 100 || selections.Any(pair =>
+                        !state.Categories!.Contains(pair.Key) || (pair.Value != "" && state.Content.CategoryProducts?.GetValueOrDefault(pair.Key) != pair.Value && !state.Products.Any(p => p.Active && p.Category == pair.Key && p.Variants.Any(v => v.Id == pair.Value && !string.IsNullOrEmpty(v.Image)))))))
+                        throw new ArgumentException("Kategori için aynı kategorideki aktif bir ürün görselini seçin.");
+                    return state with { Content = content };
+                }));
+            }
+            catch (ArgumentException error) { return Results.BadRequest(new { message = error.Message }); }
         });
         group.MapPost("/media", async (HttpRequest request, LocalCommerceStore store) =>
         {

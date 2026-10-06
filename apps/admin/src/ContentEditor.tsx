@@ -1,9 +1,10 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 
-import { commerceApi, mediaUrl, uploadMedia, type Content, type Slide } from './commerce'
+import { commerceApi, mediaUrl, uploadMedia, type Content, type Slide, type Product } from './commerce'
 
-function ContentEditor({ content, onSave }: { content: Content; onSave: (content: Content) => Promise<void> }) {
-  const [section, setSection] = useState<'slider' | 'xinobi-u'>('slider')
+function ContentEditor({ content, products, categories, onSave }: { products: Product[]; categories: string[]; content: Content; onSave: (content: Content) => Promise<void> }) {
+  const [section, setSection] = useState<'slider' | 'xinobi-u' | 'categories'>('slider')
+  const [categoryProducts, setCategoryProducts] = useState(content.categoryProducts ?? {})
   const [slides, setSlides] = useState(content.slides)
   const [selectedId, setSelectedId] = useState(content.slides[0]?.id ?? 0)
   const [notice, setNotice] = useState('')
@@ -53,16 +54,25 @@ function ContentEditor({ content, onSave }: { content: Content; onSave: (content
   }
 
   async function saveContent() {
-    try { await onSave({ slides, xinobiBanner, buttonColor }); setNotice('İçerik kaydedildi; local web güncelleniyor.') }
+    try { await onSave({ ...content, slides, xinobiBanner, buttonColor, categoryProducts }); setNotice('İçerik kaydedildi; local web güncelleniyor.') }
     catch (error) { setNotice(error instanceof Error ? error.message : 'İçerik kaydedilemedi.') }
   }
   const source = (src: string) => mediaUrl(src, commerceApi, 'http://127.0.0.1:3000')
 
   return <div className="content-editor">
     <main className="workspace">
-      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : 'XINOBI U banner'}</h1></div><div className="content-tabs"><button aria-pressed={section === 'slider'} onClick={() => setSection('slider')}>Slider</button><button aria-pressed={section === 'xinobi-u'} onClick={() => setSection('xinobi-u')}>XINOBI U</button></div></header>
+      <header className="topbar"><div><p>İÇERİK YÖNETİMİ</p><h1>{section === 'slider' ? 'Ana sayfa slider' : section === 'categories' ? 'Anasayfa kategorileri' : 'XINOBI U banner'}</h1></div><div className="content-tabs"><button aria-pressed={section === 'slider'} onClick={() => setSection('slider')}>Slider</button><button aria-pressed={section === 'xinobi-u'} onClick={() => setSection('xinobi-u')}>XINOBI U</button><button aria-pressed={section === 'categories'} onClick={() => setSection('categories')}>Kategoriler</button></div></header>
       <section className="status-note"><strong>Ortak içerik yönetimi</strong><span>Görselleri düzenledikten sonra “Kaydet ve web’i güncelle” düğmesine basın. Kayıtlar local API’de korunur.</span></section>
-      {section === 'slider' ? <div className="editor-layout">
+      {section === 'categories' ? <section className="xinobi-editor" aria-label="Anasayfa kategori görselleri"><h2>Anasayfada gösterilecek ürünler</h2><p>Her kategori için ürünü ve rengini seçin. Seçilen varyantın katalog görseli anasayfada kullanılır.</p><div className="home-category-settings">{categories.map(category => {
+        const candidates = products.filter(product => product.active && product.category === category)
+        const selection = categoryProducts[category]
+        const selectedVariant = candidates.flatMap(product => product.variants).find(variant => variant.id === selection)
+        const automaticVariant = candidates.flatMap(product => product.variants).find(variant => variant.image)
+        const preview = selection === undefined ? automaticVariant : selectedVariant
+        return <section key={category}><h3>{category}</h3><label>{category} için ürün<select aria-label={`${category} için ürün`} value={selection ?? '__automatic__'} onChange={event => setCategoryProducts(current => {
+          const next = {...current}; if(event.target.value === '__automatic__') delete next[category]; else next[category] = event.target.value; return next
+        })}><option value="__automatic__">Otomatik · İlk aktif ürün</option><option value="">Anasayfada gösterme</option>{candidates.map(product => <optgroup key={product.id} label={product.name}>{product.variants.filter(variant => variant.image).map(variant => <option key={variant.id} value={variant.id}>{product.name} · {variant.color}</option>)}</optgroup>)}{selection && !selectedVariant && <option value={selection}>Seçilen ürün artık mevcut veya aktif değil</option>}</select></label>{preview ? <img src={source(preview.image)} alt={`${category} kategori görseli · ${preview.color}`} /> : <p>{selection === '' ? 'Bu kategori anasayfada gizlenecek.' : 'Gösterilecek aktif ürün görseli yok.'}</p>}</section>
+      })}</div><div className="save-row"><p aria-live="polite">{notice}</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div></section> : section === 'slider' ? <div className="editor-layout">
         <section className="slides-panel" aria-labelledby="slides-title">
           <div className="panel-heading"><div><p>SLIDER ÖĞELERİ</p><h2 id="slides-title">Yayın sırası</h2></div><button onClick={() => inputRef.current?.click()}>+ Medya ekle</button><input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={addMedia} hidden /></div>
           <div className="slides-list">{slides.map((slide, index) => <button key={slide.id} className={slide.id === selected?.id ? 'slide-row selected' : 'slide-row'} onClick={() => setSelectedId(slide.id)}><span className="order">{String(index + 1).padStart(2, '0')}</span><span className="thumb">{slide.type === 'Video' ? <video src={source(slide.src)} muted /> : <img src={source(slide.src)} alt="" />}</span><span className="slide-name"><strong>{slide.name}</strong><small>{slide.type} · {slide.active ? 'Web’de etkin' : 'Taslak'}</small></span><span aria-hidden="true">›</span></button>)}</div>

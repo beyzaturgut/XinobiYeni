@@ -18,6 +18,26 @@ public sealed class LocalCommerceTests : IDisposable
     private const string Root = "/api/v1/local-commerce";
 
     [Fact]
+    public async Task HomepageCategorySelectionPersistsAndRejectsWrongCategoryOrVariant()
+    {
+        string category, variant;
+        using (var factory = CreateFactory())
+        using (var client = factory.CreateClient())
+        {
+            var seed = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+            category = seed.Products[0].Category; variant = seed.Products[0].Variants[1].Id;
+            foreach (var selection in new[] { new Dictionary<string, string> { [category] = "unknown" }, new Dictionary<string, string> { ["Unknown category"] = variant }, new Dictionary<string, string> { [seed.Products[1].Category] = variant } })
+                Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/content", seed.Content with { CategoryProducts = selection })).StatusCode);
+            (await client.PutAsJsonAsync(Root + "/content", seed.Content with { CategoryProducts = new() { [category] = variant, [seed.Products[1].Category] = "" } })).EnsureSuccessStatusCode();
+        }
+        using var restarted = CreateFactory();
+        using var second = restarted.CreateClient();
+        var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+        Assert.Equal(variant, saved.Content.CategoryProducts![category]);
+        Assert.Equal("", saved.Content.CategoryProducts[saved.Products[1].Category]);
+    }
+
+    [Fact]
     public async Task CategoriesPersistRejectDuplicatesAndCanBeAssignedToProducts()
     {
         using (var factory = CreateFactory())

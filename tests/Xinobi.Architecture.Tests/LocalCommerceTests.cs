@@ -18,6 +18,26 @@ public sealed class LocalCommerceTests : IDisposable
     private const string Root = "/api/v1/local-commerce";
 
     [Fact]
+    public async Task AnnouncementsPublishPersistValidateAndCanBeRemoved()
+    {
+        string id;
+        using(var factory = CreateFactory())
+        using(var client = factory.CreateClient())
+        {
+            foreach(var draft in new[] { new AnnouncementCreate("", "Metin", "Haber"), new AnnouncementCreate("Başlık", "", "Duyuru"), new AnnouncementCreate("Başlık", "Metin", "Invalid") })
+                Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync(Root + "/announcements", draft)).StatusCode);
+            (await client.PostAsJsonAsync(Root + "/announcements", new AnnouncementCreate("Yeni koleksiyon", "Titanyum ürünler yayında.", "Haber"))).EnsureSuccessStatusCode();
+            var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+            id = Assert.Single(state.Announcements!).Id;
+        }
+        using var restarted = CreateFactory();using var second = restarted.CreateClient();
+        var saved = Assert.Single((await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Announcements!);
+        Assert.Equal("Yeni koleksiyon", saved.Title);Assert.Equal("Titanyum ürünler yayında.", saved.Body);
+        (await second.DeleteAsync(Root + "/announcements/" + id)).EnsureSuccessStatusCode();
+        Assert.Empty((await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Announcements!);
+    }
+
+    [Fact]
     public async Task FeaturedProductsKeepOrderAndRejectDuplicatesAndUnknownProducts()
     {
         string[] selected;

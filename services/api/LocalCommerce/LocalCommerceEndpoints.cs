@@ -24,6 +24,23 @@ public static class LocalCommerceEndpoints
             return await next(context);
         });
         group.MapGet("/state", async (LocalCommerceStore store) => Results.Ok(await store.Read()));
+        group.MapPost("/announcements", async (AnnouncementCreate announcement, LocalCommerceStore store) =>
+        {
+            var title = announcement.Title?.Trim();var body = announcement.Body?.Trim();
+            if(string.IsNullOrWhiteSpace(title) || title.Length > 120 || string.IsNullOrWhiteSpace(body) || body.Length > 4000 || announcement.Kind is not ("Haber" or "Duyuru"))
+                return Results.BadRequest(new { message = "Başlık (en fazla 120 karakter), metin (en fazla 4000 karakter) ve tür girin." });
+            try
+            {
+                return Results.Ok(await store.Update(state =>
+                {
+                    var items = state.Announcements ?? [];
+                    if(items.Length >= 100) throw new ArgumentException("En fazla 100 haber ve duyuru yayımlanabilir. Eski kayıtları kaldırın.");
+                    return state with { Announcements = [new CommerceAnnouncement(Guid.NewGuid().ToString("N"), title, body, announcement.Kind, DateTimeOffset.UtcNow), .. items] };
+                }));
+            }
+            catch(ArgumentException error) { return Results.BadRequest(new { message = error.Message }); }
+        });
+        group.MapDelete("/announcements/{id}", async (string id, LocalCommerceStore store) => Results.Ok(await store.Update(state => state with { Announcements = (state.Announcements ?? []).Where(item => item.Id != id).ToArray() })));
         group.MapPost("/categories", async (CategoryCreate category, LocalCommerceStore store) =>
         {
             var name = category.Name?.Trim();

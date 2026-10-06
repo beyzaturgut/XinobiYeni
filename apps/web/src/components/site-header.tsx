@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {useCommerce} from '../lib/commerce';
 import styles from '../app/page.module.css';
 type IconName = 'arrow' | 'bag' | 'search' | 'user';
@@ -16,11 +16,16 @@ function Icon({ name }: { name: IconName }) {
 export default function SiteHeader({ categories: supplied }: { categories?: { name: string }[] }) {
   const {state}=useCommerce();
   const categories=supplied ?? (state?.categories ?? []).map(name=>({name}));
+  const [newsOpen,setNewsOpen]=useState(false);
+  const newsButton=useRef<HTMLButtonElement>(null);
+  const announcements=state?.announcements ?? [];
+  const closeNews=()=>{setNewsOpen(false);newsButton.current?.focus()};
   const [categoriesOpen, setCategoriesOpen] = useState(false);
-  return <header className={styles.siteHeader}>
+  return <header className={styles.siteHeader} onKeyDown={event=>{if(event.key==='Escape'&&newsOpen)closeNews()}}>
     <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
     <nav className={styles.desktopNav} aria-label="Ana menü"><Link href="/urunler">Ürünler</Link><div className={styles.categoryMenu} onMouseEnter={() => setCategoriesOpen(true)} onMouseLeave={() => setCategoriesOpen(false)}><button type="button" aria-expanded={categoriesOpen} aria-controls="home-category-menu" onClick={() => setCategoriesOpen((open) => !open)}>Kategoriler</button><div id="home-category-menu" hidden={!categoriesOpen}>{categories.map((category) => <Link href={`/urunler?category=${encodeURIComponent(category.name)}`} key={category.name}>{category.name}</Link>)}</div></div><Link href="/xinobi-u">XINOBI U</Link></nav>
-    <div className={styles.headerActions} aria-label="Hızlı işlemler"><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><Link href="/hesap/giris" aria-label="Hesabım"><Icon name="user" /></Link><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link></div>
+    <div className={styles.headerActions} aria-label="Hızlı işlemler"><Link href="/arama" aria-label="Ara"><Icon name="search" /></Link><Link href="/hesap/giris" aria-label="Hesabım"><Icon name="user" /></Link><Link href="/sepet" aria-label="Sepet"><Icon name="bag" /></Link><button ref={newsButton} className={styles.newsButton} type="button" aria-label="Haber ve duyurular" aria-expanded={newsOpen} aria-controls="news-inbox" onClick={()=>setNewsOpen(value=>!value)}><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><rect x="4" y="7" width="24" height="18" rx="2"/><path d="m5 8 11 9L27 8"/></svg>{announcements.length>0&&<span className={styles.newsBadge}>{announcements.length}</span>}</button></div>
+    <section id="news-inbox" className={styles.newsInbox} hidden={!newsOpen} aria-label="Haber ve duyuru kutusu"><div className={styles.newsHeading}><h2>Haber ve duyurular</h2><button type="button" aria-label="Duyuru kutusunu kapat" onClick={closeNews}>×</button></div>{announcements.length===0?<p>Henüz haber veya duyuru yok.</p>:announcements.map(item=><article key={item.id}><small>{item.kind} · {new Date(item.publishedAt).toLocaleDateString('tr-TR')}</small><h3>{item.title}</h3><p>{item.body}</p></article>)}</section>
     <details className={styles.mobileMenu}><summary>Menü</summary><nav aria-label="Mobil menü"><Link href="/urunler">Ürünler</Link><Link href="/#kategoriler">Kategoriler</Link><Link href="/xinobi-u">XINOBI U</Link></nav></details>
   </header>;
 }

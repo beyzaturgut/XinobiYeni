@@ -28,3 +28,5 @@
 .category-management{margin-bottom:24px;padding:20px;border:1px solid #555;border-radius:12px}.category-management h2{font-size:18px}.category-management-row{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:14px 0;border-top:1px solid #444}.category-management-row>span{flex:1;min-width:150px}.category-management-row small{display:block;margin-top:5px;color:#aaa}.category-management-row label{display:grid;gap:6px;font-size:12px}.category-management-row select{max-width:100%;padding:10px;background:#222;color:#fff;border:1px solid #666;border-radius:6px}
 
 .titanium-preview{margin:24px 0;border:1px solid #555;border-radius:10px;overflow:hidden}.titanium-preview img{display:block;width:100%;height:auto}.content-tabs{flex-wrap:wrap}
+
+.announcement-form{display:grid;gap:16px;max-width:700px}.announcement-form label{display:grid;gap:8px}.announcement-form input,.announcement-form textarea,.announcement-form select{width:100%;padding:12px;background:#222;color:#fff;border:1px solid #666;border-radius:6px}.announcement-item{padding:20px 0;border-top:1px solid #555}.announcement-item p{white-space:pre-wrap;overflow-wrap:anywhere}

@@ -1,8 +1,9 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { commerceApi, mediaUrl, uploadMedia } from './commerce'
-import { categories, type Product } from './catalog-data'
+import { categories as defaultCategories, type Product } from './catalog-data'
 
-export default function Catalog({ products, onSave, onDelete }: { products: Product[]; onSave: (product: Product) => Promise<void>; onDelete: (id: string) => Promise<void> }) {
+export default function Catalog({ products, categories = defaultCategories, onCategory, onSave, onDelete }: { categories?: string[]; onCategory: (name: string) => Promise<void>; products: Product[]; onSave: (product: Product) => Promise<void>; onDelete: (id: string) => Promise<void> }) {
+  const [categoryName, setCategoryName] = useState(''), [categoryBusy, setCategoryBusy] = useState(false), [categoryError, setCategoryError] = useState('')
   const [query, setQuery] = useState(''), [category, setCategory] = useState('Tümü'), [status, setStatus] = useState('Tümü')
   const [draft, setDraft] = useState<Product | null>(null), [tab, setTab] = useState('Genel bilgiler'), [error, setError] = useState(''), [notice, setNotice] = useState('')
   const dialog = useRef<HTMLDialogElement>(null), trigger = useRef<HTMLButtonElement | null>(null), dirty = useRef(false)
@@ -24,6 +25,13 @@ export default function Catalog({ products, onSave, onDelete }: { products: Prod
     } catch (error) { setError(error instanceof Error ? error.message : 'Kayıt başarısız.') }
   }
   return <section aria-label="Katalog yönetimi">
+    <form className="category-create" aria-label="Yeni kategori ekle" onSubmit={async event => {
+      event.preventDefault(); if (categoryBusy) return
+      setCategoryBusy(true); setCategoryError('')
+      try { await onCategory(categoryName.trim()); setNotice(`${categoryName.trim()} kategorisi eklendi.`); setCategoryName('') }
+      catch (error) { setCategoryError(error instanceof Error ? error.message : 'Kategori eklenemedi.') }
+      finally { setCategoryBusy(false) }
+    }}><label>Yeni kategori adı<input required maxLength={80} value={categoryName} placeholder="Örn. Blenderlar" onChange={event => setCategoryName(event.target.value)} /></label><button type="submit" disabled={categoryBusy || !categoryName.trim()}>{categoryBusy ? 'Ekleniyor…' : 'Kategori ekle'}</button>{categoryError && <p role="alert">{categoryError}</p>}</form>
     <div className="catalog-summary">{[['Toplam ürün', products.length], ['Aktif', products.filter(product => product.active).length], ['Pasif', products.filter(product => !product.active).length], ['Stoksuz ürün', products.filter(product => product.variants.every(variant => variant.stock === 0)).length]].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
     <div className="order-filters"><label>Ürün veya SKU ara<input value={query} onChange={event => setQuery(event.target.value)} /></label><label>Kategori<select aria-label="Kategori filtresi" value={category} onChange={event => setCategory(event.target.value)}>{['Tümü', ...categories].map(item => <option key={item}>{item}</option>)}</select></label><label>Durum<select aria-label="Ürün durum filtresi" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Aktif', 'Pasif', 'Stoksuz'].map(item => <option key={item}>{item}</option>)}</select></label><button onClick={() => { setQuery(''); setCategory('Tümü'); setStatus('Tümü') }}>Filtreleri temizle</button><button onClick={event => open({ id: `DEMO-${crypto.randomUUID()}`, name: '', category: categories[0], active: false, description: '', seoTitle: '', variants: [] }, event.currentTarget)}>Yeni ürün</button></div>
     <p role="status">{notice || `${filtered.length} örnek ürün bulundu.`}</p><div className="table-scroll"><table><caption>Örnek katalog · Local API</caption><thead><tr>{['Ürün no', 'Görsel', 'Ürün bilgileri', 'Durum', 'Varyant', 'Stok', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead><tbody>{filtered.map(product => <tr key={product.id}><th scope="row">{product.id.startsWith('DEMO-P') ? product.id : 'Yeni demo'}</th><td>{product.variants[0]?.image ? <img className="catalog-thumb" src={mediaUrl(product.variants[0].image, commerceApi, 'http://127.0.0.1:3000')} alt={`${product.name} ${product.variants[0].color}`} /> : 'Görsel yok'}</td><td><strong>{product.name}</strong><small className="catalog-category">{product.category}</small></td><td>{product.active ? 'Aktif demo' : 'Pasif demo'}</td><td>{product.variants.length}</td><td>{product.variants.reduce((sum, variant) => sum + variant.stock, 0)}</td><td><button aria-label={`${product.name} ürününü düzenle`} onClick={event => open(product, event.currentTarget)}>Düzenle</button><button onClick={async () => { if (!window.confirm(`${product.name} local katalogdan silinsin mi?`)) return; try { await onDelete(product.id); setNotice('Ürün silindi; local web güncelleniyor.') } catch (error) { setNotice(error instanceof Error ? error.message : 'Silme başarısız.') } }}>Sil</button></td></tr>)}</tbody></table></div>

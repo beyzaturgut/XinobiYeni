@@ -6,7 +6,8 @@ public record CommerceVariant(string Id, string Sku, string Color, int Stock, st
 public record CommerceProduct(string Id, string Name, string Category, bool Active, string Description, string SeoTitle, CommerceVariant[] Variants, bool? Personalizable = null, string? OriginalImage = null);
 public record CommerceSlide(long Id, string Name, string Type, string Src, string Alt, int Duration, bool Active);
 public record CommerceContent(CommerceSlide[] Slides, string XinobiBanner, string ButtonColor);
-public record CommerceState(CommerceProduct[] Products, Dictionary<string, long> Prices, CommerceContent Content);
+public record CommerceState(CommerceProduct[] Products, Dictionary<string, long> Prices, CommerceContent Content, string[]? Categories = null);
+public record CategoryCreate(string Name);
 public record PriceUpdate(long Cents);
 
 // Development-only persistence. Production commerce remains SQL Server backed.
@@ -22,8 +23,9 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     {
         var file = Path.Combine(path, "state.json");
         var source = File.Exists(file) ? file : Path.Combine(environment.ContentRootPath, "LocalCommerce", "seed.json");
-        return JsonSerializer.Deserialize<CommerceState>(await File.ReadAllTextAsync(source), JsonOptions)
+        var state = JsonSerializer.Deserialize<CommerceState>(await File.ReadAllTextAsync(source), JsonOptions)
             ?? throw new InvalidDataException("Local commerce state is invalid.");
+        return state with { Categories = (state.Categories ?? ["Çay makineleri", "Kahve makineleri", "Hava temizleme", "Pişirme teknolojileri"]).Concat(state.Products.Select(p => p.Category)).Distinct(StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true)).ToArray() };
     }
 
     public async Task<CommerceState> Read()

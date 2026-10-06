@@ -20,3 +20,5 @@
 .audit-json{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;font-size:13px}
 
 .original-product-media{margin-top:20px;padding-top:16px;border-top:1px solid #555}.original-product-media small{display:block;margin-top:10px}
+
+.category-create{display:flex;flex-wrap:wrap;align-items:end;gap:16px;margin-bottom:24px;padding:20px;border:1px solid #555;border-radius:12px}.category-create label{display:grid;gap:8px;flex:1;min-width:180px}.category-create input{padding:10px;background:#222;color:#fff;border:1px solid #666;border-radius:6px}.category-create p{width:100%;color:#ffb3b3;margin:0}

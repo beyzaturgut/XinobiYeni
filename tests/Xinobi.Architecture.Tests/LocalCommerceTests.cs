@@ -18,6 +18,28 @@ public sealed class LocalCommerceTests : IDisposable
     private const string Root = "/api/v1/local-commerce";
 
     [Fact]
+    public async Task CategoriesPersistRejectDuplicatesAndCanBeAssignedToProducts()
+    {
+        using (var factory = CreateFactory())
+        using (var client = factory.CreateClient())
+        {
+            (await client.PostAsJsonAsync(Root + "/categories", new CategoryCreate("  Blenderlar  "))).EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.Conflict, (await client.PostAsJsonAsync(Root + "/categories", new CategoryCreate("blenderlar"))).StatusCode);
+            foreach (var name in new[] { "", "Tümü", new string('a', 81) })
+                Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync(Root + "/categories", new CategoryCreate(name))).StatusCode);
+            var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+            var product = state.Products[0] with { Category = "Blenderlar" };
+            (await client.PutAsJsonAsync(Root + "/products/" + product.Id, product)).EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/products/" + product.Id, product with { Category = "Bilinmeyen" })).StatusCode);
+        }
+        using var restarted = CreateFactory();
+        using var second = restarted.CreateClient();
+        var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+        Assert.Contains("Blenderlar", saved.Categories!);
+        Assert.Equal("Blenderlar", saved.Products[0].Category);
+    }
+
+    [Fact]
     public async Task ProductPriceStockAndContentSurviveRestart()
     {
         using (var factory = CreateFactory())

@@ -24,6 +24,22 @@ public static class LocalCommerceEndpoints
             return await next(context);
         });
         group.MapGet("/state", async (LocalCommerceStore store) => Results.Ok(await store.Read()));
+        group.MapPost("/categories", async (CategoryCreate category, LocalCommerceStore store) =>
+        {
+            var name = category.Name?.Trim();
+            if (string.IsNullOrWhiteSpace(name) || name.Length > 80 || name.Any(char.IsControl) || string.Equals(name, "Tümü", StringComparison.OrdinalIgnoreCase))
+                return Results.BadRequest(new { message = "1–80 karakterlik geçerli kategori adı girin." });
+            try
+            {
+                return Results.Ok(await store.Update(state =>
+                {
+                    var comparer = StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true);
+                    if (state.Categories!.Contains(name, comparer)) throw new ArgumentException("Bu kategori zaten var.");
+                    return state with { Categories = [.. state.Categories!, name] };
+                }));
+            }
+            catch (ArgumentException error) { return Results.Conflict(new { message = error.Message }); }
+        });
         group.MapPut("/products/{id}", async (string id, CommerceProduct product, LocalCommerceStore store) =>
         {
             if (id != product.Id || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||
@@ -34,6 +50,7 @@ public static class LocalCommerceEndpoints
             {
                 var state = await store.Update(state =>
                 {
+                    if (!state.Categories!.Contains(product.Category)) throw new ArgumentException("Geçerli kategori seçin.");
                     if (state.Products.Where(p => p.Id != id).SelectMany(p => p.Variants).Any(other => product.Variants.Any(v => v.Id == other.Id || string.Equals(v.Sku, other.Sku, StringComparison.OrdinalIgnoreCase))))
                         throw new ArgumentException("SKU veya varyant kimliği başka bir üründe kullanılıyor.");
                     return state with { Products = state.Products.Any(p => p.Id == id) ? state.Products.Select(p => p.Id == id ? product : p).ToArray() : [.. state.Products, product] };

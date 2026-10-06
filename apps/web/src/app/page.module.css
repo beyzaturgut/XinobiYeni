@@ -16,3 +16,5 @@
 .titaniumBanner{width:100%;background:#fff}.titaniumBanner img{display:block;width:100%;height:auto;object-fit:contain}
 
 .section{padding-top:56px;padding-bottom:56px}.sectionHeader{margin-bottom:28px}.story{padding-top:56px;padding-bottom:56px}
+
+.categoryCard{background:#e4e3df}.categoryCard img{mix-blend-mode:multiply}.categoryCard span{background:#e4e3df}

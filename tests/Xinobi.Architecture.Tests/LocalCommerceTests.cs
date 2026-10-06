@@ -18,6 +18,38 @@ public sealed class LocalCommerceTests : IDisposable
     private const string Root = "/api/v1/local-commerce";
 
     [Fact]
+    public async Task CategoryDeletionMovesProductsPreservesDataAndSurvivesRestart()
+    {
+        string category, target;
+        CommerceProduct[] expected;
+        Dictionary<string, long> prices;
+        using (var factory = CreateFactory())
+        using (var client = factory.CreateClient())
+        {
+            var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+            category = state.Products[0].Category; target = state.Products[1].Category;
+            expected = state.Products.Select(product => product.Category == category ? product with { Category = target } : product).ToArray();
+            prices = state.Prices;
+            (await client.PutAsJsonAsync(Root + "/content", state.Content with { CategoryProducts = new() { [category] = state.Products[0].Variants[0].Id } })).EnsureSuccessStatusCode();
+            foreach(var destination in new[] { "", "?moveTo=" + Uri.EscapeDataString(category), "?moveTo=Unknown" })
+                Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync(Root + "/categories/" + Uri.EscapeDataString(category) + destination)).StatusCode);
+            Assert.Contains(category, (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Categories!);
+            (await client.DeleteAsync(Root + "/categories/" + Uri.EscapeDataString(category) + "?moveTo=" + Uri.EscapeDataString(target))).EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.NotFound, (await client.DeleteAsync(Root + "/categories/" + Uri.EscapeDataString(category))).StatusCode);
+            (await client.PostAsJsonAsync(Root + "/categories", new CategoryCreate("Boş kategori"))).EnsureSuccessStatusCode();
+            (await client.DeleteAsync(Root + "/categories/" + Uri.EscapeDataString("Boş kategori"))).EnsureSuccessStatusCode();
+        }
+        using var restarted = CreateFactory();
+        using var second = restarted.CreateClient();
+        var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+        Assert.DoesNotContain(category, saved.Categories!);
+        Assert.DoesNotContain("Boş kategori", saved.Categories!);
+        Assert.False(saved.Content.CategoryProducts!.ContainsKey(category));
+        Assert.Equal(System.Text.Json.JsonSerializer.Serialize(expected), System.Text.Json.JsonSerializer.Serialize(saved.Products));
+        Assert.Equal(prices, saved.Prices);
+    }
+
+    [Fact]
     public async Task HomepageCategorySelectionPersistsAndRejectsWrongCategoryOrVariant()
     {
         string category, variant;

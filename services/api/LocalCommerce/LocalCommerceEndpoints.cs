@@ -40,6 +40,27 @@ public static class LocalCommerceEndpoints
             }
             catch (ArgumentException error) { return Results.Conflict(new { message = error.Message }); }
         });
+        group.MapDelete("/categories/{name}", async (string name, string? moveTo, LocalCommerceStore store) =>
+        {
+            try
+            {
+                return Results.Ok(await store.Update(state =>
+                {
+                    if (!state.Categories!.Contains(name)) throw new KeyNotFoundException("Kategori bulunamadı.");
+                    var populated = state.Products.Any(product => product.Category == name);
+                    if (populated && (moveTo == name || moveTo is null || !state.Categories!.Contains(moveTo)))
+                        throw new ArgumentException("Bu kategoride ürün var. Ürünlerin taşınacağı başka bir kategori seçin.");
+                    return state with
+                    {
+                        Categories = state.Categories!.Where(category => category != name).ToArray(),
+                        Products = state.Products.Select(product => product.Category == name ? product with { Category = moveTo! } : product).ToArray(),
+                        Content = state.Content with { CategoryProducts = state.Content.CategoryProducts?.Where(pair => pair.Key != name).ToDictionary() }
+                    };
+                }));
+            }
+            catch (KeyNotFoundException error) { return Results.NotFound(new { message = error.Message }); }
+            catch (ArgumentException error) { return Results.Conflict(new { message = error.Message }); }
+        });
         group.MapPut("/products/{id}", async (string id, CommerceProduct product, LocalCommerceStore store) =>
         {
             if (id != product.Id || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||

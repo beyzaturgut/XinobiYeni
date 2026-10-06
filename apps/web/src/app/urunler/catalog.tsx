@@ -62,11 +62,12 @@ export default function Catalog() {
     });
   }
 
+  const activeCategory = categories.includes(category) ? category : 'Tümü';
   const visibleProducts = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("tr-TR");
-    const filtered = products.filter((product) => (category === "Tümü" || product.category === category) && (!normalizedQuery || `${product.name} ${product.family} ${product.color}`.toLocaleLowerCase("tr-TR").includes(normalizedQuery)));
+    const filtered = products.filter((product) => (activeCategory === "Tümü" || product.category === activeCategory) && (!normalizedQuery || `${product.name} ${product.family} ${product.color}`.toLocaleLowerCase("tr-TR").includes(normalizedQuery)));
     return [...filtered].sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "tr") || a.color.localeCompare(b.color, "tr") : a.order - b.order);
-  }, [category, query, sort, products]);
+  }, [activeCategory, query, sort, products]);
 
   return <section id="catalog" className={styles.catalog} aria-label="Ürün kataloğu">
     {error && <p role="alert">{error}</p>}
@@ -74,7 +75,7 @@ export default function Catalog() {
       <div className={styles.search}><label htmlFor="product-search">Ürünlerde ara</label><div><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg><input id="product-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ürün, kategori veya renk" /></div></div>
       <div className={styles.sort}><label htmlFor="product-sort">Sırala</label><select id="product-sort" value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Öne çıkanlar</option><option value="name">Ürün adı</option></select></div>
     </div>
-    <div className={styles.categoryBar} aria-label="Kategori filtresi">{categories.map((item) => <button type="button" key={item} className={category === item ? styles.activeCategory : ""} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}</button>)}</div>
+    <div className={styles.categoryBar} aria-label="Kategori filtresi">{categories.map((item) => <button type="button" key={item} className={activeCategory === item ? styles.activeCategory : ""} aria-pressed={activeCategory === item} onClick={() => setCategory(item)}>{item}</button>)}</div>
     <div className={styles.resultSummary} aria-live="polite"><strong>{visibleProducts.length} ürün varyantı</strong><span>Ürünler</span></div>
     {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <article className={styles.card} key={product.id}>
       <div className={styles.media}><span className={styles.demoBadge}>Xinobi</span>{product.image ? <Image className={product.tall ? styles.tallImage : ""} src={product.image} width={600} height={600} alt={`${product.name}, ${product.color}`} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /> : <span>Görsel yok</span>}</div>

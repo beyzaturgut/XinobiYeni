@@ -1,5 +1,5 @@
+import SiteHeader from "../../components/site-header";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import styles from "./yasal.module.css";
 
@@ -15,7 +15,7 @@ const documents = [
 export default function LegalPage() {
   return <div className={styles.page}>
     <a className={styles.skipLink} href="#legal-content">İçeriğe geç</a>
-    <header className={styles.header}><Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link><nav aria-label="Yasal menü"><a href="#belgeler">Belgeler</a><a href="#haklar">Haklarınız</a><a href="#iletisim">İletişim</a></nav><Link href="/">Ana sayfaya dön <span aria-hidden="true">↗</span></Link></header>
+    <SiteHeader />
     <main id="legal-content">
       <section className={styles.hero}><p>Yasal merkez · Taslak</p><h1>Bilginiz.<br />Tercihiniz.<br />Kontrolünüz.</h1><span>Bu sayfa yasal bilgi mimarisi prototipidir. Yayınlanmış hukuki metin veya açık rıza kaydı değildir.</span></section>
       <section className={styles.warning}><strong>Yayın durumu</strong><p>D10 karar sahibi, hukuk metinleri, veri sorumlusu bilgileri, saklama süreleri ve üçüncü taraf envanteri onaylanmadan bu belgeler yürürlüğe girmiş sayılmaz.</p></section>

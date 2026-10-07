@@ -10,6 +10,7 @@ using Xinobi.Api.Infrastructure.Readiness;
 using Xinobi.Persistence;
 using Xinobi.Api.Catalog;
 using Xinobi.Api.XinobiU;
+using Xinobi.Api.EmailVerification;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,9 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
     builder.Services.AddSingleton<LocalCommerceStore>();
+    builder.Services.AddSingleton(TimeProvider.System);
+    builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+    builder.Services.AddSingleton<EmailVerificationStore>();
     builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
@@ -28,6 +32,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddHostedService<DesignGenerationWorker>();
     builder.Services.AddRateLimiter(options => {
         options.RejectionStatusCode = 429;
+        options.AddPolicy("EmailVerification", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
         options.AddPolicy("DesignStudio", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     });
     builder.Services.AddCors(options => options.AddPolicy("LocalCommerce", policy => policy
@@ -73,6 +78,7 @@ app.UseStatusCodePages(async statusCodeContext =>
 if (app.Environment.IsDevelopment()) { app.UseCors("LocalCommerce"); app.UseRateLimiter(); }
 else app.UseHttpsRedirection();
 app.MapLocalCommerce();
+app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();
 app.MapXinobiU();

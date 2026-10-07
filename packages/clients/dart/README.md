@@ -47,13 +47,14 @@ Please follow the [installation procedure](#installation--usage) and then run th
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 
-final api = XinobiApiClient().getSystemApi();
+final api = XinobiApiClient().getCatalogApi();
+final String id = id_example; // String |
 
 try {
-    final response = await api.getApiHealth();
+    final response = await api.getCatalogProduct(id);
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling SystemApi->getApiHealth: $e\n");
+    print("Exception when calling CatalogApi->getCatalogProduct: $e\n");
 }
 
 ```
@@ -64,6 +65,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
+[*CatalogApi*](doc/CatalogApi.md) | [**listCatalogCategories**](doc/CatalogApi.md#listcatalogcategories) | **GET** /api/v1/catalog/categories |
+[*CatalogApi*](doc/CatalogApi.md) | [**listCatalogProducts**](doc/CatalogApi.md#listcatalogproducts) | **GET** /api/v1/catalog/products |
+[*ContentApi*](doc/ContentApi.md) | [**getHomeContent**](doc/ContentApi.md#gethomecontent) | **GET** /api/v1/content/home |
+[*ContentApi*](doc/ContentApi.md) | [**listAnnouncements**](doc/ContentApi.md#listannouncements) | **GET** /api/v1/content/announcements |
 [*SystemApi*](doc/SystemApi.md) | [**getApiHealth**](doc/SystemApi.md#getapihealth) | **GET** /api/v1/health |
 [*SystemApi*](doc/SystemApi.md) | [**getApiLiveness**](doc/SystemApi.md#getapiliveness) | **GET** /api/v1/health/live |
 [*SystemApi*](doc/SystemApi.md) | [**getApiReadiness**](doc/SystemApi.md#getapireadiness) | **GET** /api/v1/health/ready |
@@ -71,9 +77,23 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AnnouncementItem](doc/AnnouncementItem.md)
+ - [AnnouncementList](doc/AnnouncementList.md)
+ - [Availability](doc/Availability.md)
+ - [CategoryHighlight](doc/CategoryHighlight.md)
+ - [CategoryItem](doc/CategoryItem.md)
+ - [CategoryList](doc/CategoryList.md)
  - [DependencyHealth](doc/DependencyHealth.md)
  - [HealthResponse](doc/HealthResponse.md)
+ - [HomeContent](doc/HomeContent.md)
+ - [HomeSlide](doc/HomeSlide.md)
+ - [Money](doc/Money.md)
+ - [ProblemDetails](doc/ProblemDetails.md)
+ - [ProductDetail](doc/ProductDetail.md)
+ - [ProductPage](doc/ProductPage.md)
+ - [ProductSummary](doc/ProductSummary.md)
  - [ReadinessResponse](doc/ReadinessResponse.md)
+ - [VariantDetail](doc/VariantDetail.md)
 
 
 ## Documentation For Authorization

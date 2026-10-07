@@ -1,0 +1,65 @@
+namespace Xinobi.Api.Catalog;
+
+// Public read contract shared by web and mobile (/api/v1/catalog, /api/v1/content).
+// Image URLs are absolute; money is an integer amount in minor units with an ISO 4217 currency (Faz00 T-02 proposal for the API).
+
+public record Money(long AmountMinor, string Currency);
+
+/// <summary><c>Remaining</c> is only disclosed when stock is low (1–5); availability is informational, checkout re-checks it.</summary>
+public record Availability(string Status, int? Remaining);
+
+public static class AvailabilityStatuses
+{
+    public const string InStock = "in_stock";
+    public const string LowStock = "low_stock";
+    public const string OutOfStock = "out_of_stock";
+}
+
+public record CategoryItem(string Name, int ProductCount, string? ImageUrl);
+public record CategoryList(CategoryItem[] Items);
+
+public record ProductSummary(
+    string Id,
+    string Name,
+    string Category,
+    string Description,
+    string? ImageUrl,
+    bool Personalizable,
+    int ColorCount,
+    Money? PriceFrom,
+    bool InStock);
+
+public record ProductPage(ProductSummary[] Items, int Page, int PageSize, int Total);
+
+public record VariantDetail(
+    string Id,
+    string Sku,
+    string Color,
+    string? Hex,
+    string? ImageUrl,
+    Money? Price,
+    Availability Availability,
+    bool Purchasable);
+
+public record ProductDetail(
+    string Id,
+    string Name,
+    string Category,
+    string Description,
+    string SeoTitle,
+    string? ImageUrl,
+    bool Personalizable,
+    VariantDetail[] Variants);
+
+public record HomeSlide(long Id, string Type, string Url, string Alt, int DurationSeconds);
+public record CategoryHighlight(string Category, string? ImageUrl, string ImageAlt, int ProductCount, string Description);
+public record HomeContent(
+    HomeSlide[] Slides,
+    string? XinobiUBannerUrl,
+    string? FeatureImageUrl,
+    string AccentColor,
+    ProductSummary[] FeaturedProducts,
+    CategoryHighlight[] Categories);
+
+public record AnnouncementItem(string Id, string Title, string Body, string Kind, DateTimeOffset PublishedAt);
+public record AnnouncementList(AnnouncementItem[] Items);

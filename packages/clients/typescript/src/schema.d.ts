@@ -4,6 +4,86 @@
  */
 
 export interface paths {
+    "/api/v1/catalog/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListCatalogCategories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListCatalogProducts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetCatalogProduct"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/content/home": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetHomeContent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/content/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListAnnouncements"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -56,6 +136,39 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AnnouncementItem: {
+            id: string;
+            title: string;
+            body: string;
+            kind: string;
+            /** Format: date-time */
+            publishedAt: string;
+        };
+        AnnouncementList: {
+            items: components["schemas"]["AnnouncementItem"][];
+        };
+        Availability: {
+            status: string;
+            /** Format: int32 */
+            remaining: null | number;
+        };
+        CategoryHighlight: {
+            category: string;
+            imageUrl: null | string;
+            imageAlt: string;
+            /** Format: int32 */
+            productCount: number;
+            description: string;
+        };
+        CategoryItem: {
+            name: string;
+            /** Format: int32 */
+            productCount: number;
+            imageUrl: null | string;
+        };
+        CategoryList: {
+            items: components["schemas"]["CategoryItem"][];
+        };
         DependencyHealth: {
             name: string;
             isReady: boolean;
@@ -68,6 +181,67 @@ export interface components {
             timestampUtc: string;
             requestId: string;
         };
+        HomeContent: {
+            slides: components["schemas"]["HomeSlide"][];
+            xinobiUBannerUrl: null | string;
+            featureImageUrl: null | string;
+            accentColor: string;
+            featuredProducts: components["schemas"]["ProductSummary"][];
+            categories: components["schemas"]["CategoryHighlight"][];
+        };
+        HomeSlide: {
+            /** Format: int64 */
+            id: number;
+            type: string;
+            url: string;
+            alt: string;
+            /** Format: int32 */
+            durationSeconds: number;
+        };
+        Money: {
+            /** Format: int64 */
+            amountMinor: number;
+            currency: string;
+        };
+        ProblemDetails: {
+            type?: null | string;
+            title?: null | string;
+            /** Format: int32 */
+            status?: null | number;
+            detail?: null | string;
+            instance?: null | string;
+        };
+        ProductDetail: {
+            id: string;
+            name: string;
+            category: string;
+            description: string;
+            seoTitle: string;
+            imageUrl: null | string;
+            personalizable: boolean;
+            variants: components["schemas"]["VariantDetail"][];
+        };
+        ProductPage: {
+            items: components["schemas"]["ProductSummary"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+            /** Format: int32 */
+            total: number;
+        };
+        ProductSummary: {
+            id: string;
+            name: string;
+            category: string;
+            description: string;
+            imageUrl: null | string;
+            personalizable: boolean;
+            /** Format: int32 */
+            colorCount: number;
+            priceFrom: null | components["schemas"]["Money"];
+            inStock: boolean;
+        };
         ReadinessResponse: {
             service: string;
             status: string;
@@ -75,6 +249,16 @@ export interface components {
             timestampUtc: string;
             requestId: string;
             checks: components["schemas"]["DependencyHealth"][];
+        };
+        VariantDetail: {
+            id: string;
+            sku: string;
+            color: string;
+            hex: null | string;
+            imageUrl: null | string;
+            price: null | components["schemas"]["Money"];
+            availability: components["schemas"]["Availability"];
+            purchasable: boolean;
         };
     };
     responses: never;
@@ -85,6 +269,159 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    ListCatalogCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryList"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListCatalogProducts: {
+        parameters: {
+            query?: {
+                category?: string;
+                q?: string;
+                personalizable?: boolean;
+                page?: number;
+                pageSize?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductPage"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetCatalogProduct: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductDetail"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetHomeContent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HomeContent"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListAnnouncements: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnnouncementList"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     GetApiHealth: {
         parameters: {
             query?: never;

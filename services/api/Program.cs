@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.WebUtilities;
 using Xinobi.Api.LocalCommerce;
 using Xinobi.Api.DesignStudio;
@@ -7,14 +8,19 @@ using Xinobi.Api.Contracts;
 using Xinobi.Api.Infrastructure;
 using Xinobi.Api.Infrastructure.Readiness;
 using Xinobi.Persistence;
+using Xinobi.Api.Catalog;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+// Numbers travel as JSON numbers only, so the contract and generated clients type them as plain integers.
+builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
 if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
     builder.Services.AddSingleton<LocalCommerceStore>();
+    builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
     builder.Services.AddSingleton<DesignSessionStore>();
@@ -28,6 +34,8 @@ if (builder.Environment.IsDevelopment())
         .AllowAnyHeader().AllowAnyMethod()));
 }
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
+// Outside Development the catalog answers 503 until the SQL Server source exists (Faz03 03.11).
+builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
 builder.Services.AddSingleton<ISqlServerReadinessProbe, SqlServerReadinessProbe>();
 builder.Services.AddProblemDetails(options =>
 {
@@ -65,6 +73,7 @@ if (app.Environment.IsDevelopment()) { app.UseCors("LocalCommerce"); app.UseRate
 else app.UseHttpsRedirection();
 app.MapLocalCommerce();
 app.MapDesignStudio();
+app.MapCatalog();
 
 var api = app.MapGroup("/api/v1");
 

@@ -14,21 +14,73 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:xinobi_api_client/src/date_serializer.dart';
 import 'package:xinobi_api_client/src/model/date.dart';
 
+import 'package:xinobi_api_client/src/model/announcement_item.dart';
+import 'package:xinobi_api_client/src/model/announcement_list.dart';
+import 'package:xinobi_api_client/src/model/availability.dart';
+import 'package:xinobi_api_client/src/model/category_highlight.dart';
+import 'package:xinobi_api_client/src/model/category_item.dart';
+import 'package:xinobi_api_client/src/model/category_list.dart';
 import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
+import 'package:xinobi_api_client/src/model/home_content.dart';
+import 'package:xinobi_api_client/src/model/home_slide.dart';
+import 'package:xinobi_api_client/src/model/money.dart';
+import 'package:xinobi_api_client/src/model/problem_details.dart';
+import 'package:xinobi_api_client/src/model/product_detail.dart';
+import 'package:xinobi_api_client/src/model/product_page.dart';
+import 'package:xinobi_api_client/src/model/product_summary.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
+import 'package:xinobi_api_client/src/model/variant_detail.dart';
 
 part 'serializers.g.dart';
 
 @SerializersFor([
+  AnnouncementItem,
+  AnnouncementList,
+  Availability,
+  CategoryHighlight,
+  CategoryItem,
+  CategoryList,
   DependencyHealth,
   HealthResponse,
+  HomeContent,
+  HomeSlide,
+  Money,
+  ProblemDetails,
+  ProductDetail,
+  ProductPage,
+  ProductSummary,
   ReadinessResponse,
+  VariantDetail,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ProductSummary)]),
+        () => ListBuilder<ProductSummary>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(CategoryItem)]),
+        () => ListBuilder<CategoryItem>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(DependencyHealth)]),
         () => ListBuilder<DependencyHealth>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AnnouncementItem)]),
+        () => ListBuilder<AnnouncementItem>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(VariantDetail)]),
+        () => ListBuilder<VariantDetail>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(HomeSlide)]),
+        () => ListBuilder<HomeSlide>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(CategoryHighlight)]),
+        () => ListBuilder<CategoryHighlight>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

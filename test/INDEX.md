@@ -116,3 +116,5 @@
 - 07.10.2026 · [TST-091 Faz03 çekirdek şema](2026-10-07/TST-091-faz03-initial-core-schema.md) — İlk migration, idempotent/geri alma script'i ve 12 yeni test; 38/38 başarılı. XinobiYeniDB'ye uygulama BLOKE: SQL portu 64019 dışarıdan kapalı.
 
 - 07.10.2026 · [TST-092 Dyson header ölçüleri](2026-10-07/TST-092-dyson-header-metrics.md) — Header ölçüleri dyson.com.tr ile eşlendi; lint/build, 16 yerel araç başarılı. Web e2e 29/48; 19 başarısızlık header'dan önce de aynı (4 kontrast, 15 eski test).
+
+- 07.10.2026 · [TST-093 ortak katalog API sözleşmesi](2026-10-07/TST-093-catalog-api-contract.md) — 5 salt okunur uç, TS/Dart istemcileri; .NET 54/54, Dart 3/3, Flutter temiz, kayma 0, gerçek veriyle duman testi başarılı.

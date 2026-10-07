@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Xinobi.Api.EmailVerification;
@@ -91,7 +92,7 @@ public sealed class EmailVerificationTests
     [Fact]
     public async Task PreviewFlowWorksWithoutCredentialsAndStillValidatesCodes()
     {
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
+        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => { builder.UseEnvironment("Development"); builder.ConfigureServices(services => { services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender, PreviewVerificationEmailSender>(); }); builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string,string?> { ["Email:DeliveryMode"] = "Preview" })); });
         using var client = factory.CreateClient();
         var response = await client.PostAsJsonAsync("/api/v1/email-verification/start", new { email = "preview@example.com" });
         response.EnsureSuccessStatusCode();
@@ -101,6 +102,15 @@ public sealed class EmailVerificationTests
         var confirm = await client.PostAsJsonAsync("/api/v1/email-verification/confirm", new { id = challenge.Id, email = challenge.Email, code = challenge.PreviewCode });
         confirm.EnsureSuccessStatusCode();
         Assert.Equal(HttpStatusCode.TooManyRequests, (await client.PostAsJsonAsync("/api/v1/email-verification/confirm", new { id = challenge.Id, email = challenge.Email, code = challenge.PreviewCode })).StatusCode);
+    }
+    [Fact]
+    public async Task SmtpWithoutCredentialsFailsWithoutAttemptingDelivery()
+    {
+        IVerificationEmailSender sender = new SmtpVerificationEmailSender(new ConfigurationBuilder().Build());
+        Assert.False(sender.IsConfigured);
+        Assert.False(sender.IsPreview);
+        var error = await Assert.ThrowsAsync<EmailVerificationException>(() => sender.Send("person@example.com", "123456", CancellationToken.None));
+        Assert.Equal(503, error.Status);
     }
     [Fact]
     public async Task DemoVerificationIsUnavailableInProduction()

@@ -25,6 +25,8 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton(TimeProvider.System);
     if (builder.Configuration["Email:DeliveryMode"] == "Preview")
         builder.Services.AddSingleton<IVerificationEmailSender, PreviewVerificationEmailSender>();
+    else if (builder.Configuration["Email:DeliveryMode"] == "Smtp")
+        builder.Services.AddSingleton<IVerificationEmailSender, SmtpVerificationEmailSender>();
     else
         builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
     builder.Services.AddSingleton<EmailVerificationStore>();

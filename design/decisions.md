@@ -57,3 +57,11 @@ Dyson'ın marka tipi kamuya açık bir font lisansı olarak doğrulanamadığı 
 - Sıra: logo (en solda, 44 px yükseklik; mobil 40 px) → Ürünler · Kategoriler · XINOBI U · Xinobi dünyası → arama ve ikonlar sağda. Logo ile menü arası 40 px.
 - "Kurumsal teklif" ve "Destek" header'dan çıkarıldı. Erişim: ana sayfa footer bağlantıları ve Nobi asistan düğmesi; footer'ın tüm sayfalara eklenmesi web tasarım onayında ayrıca kararlaştırılacak.
 - Menü, arama kutusu, ikon ve mobil ölçüleri DES-HDR-01 ile aynı kalır.
+
+## DES-MOB-01 — Mobil arayüz web tasarımından türetildi (07.10.2026)
+
+- **Bağlam:** Proje sahibi mobil işe başlamak istedi; WEB TASARIM ONAY müşteri değişiklikleri nedeniyle ertelendi (F02-A17) ve ayrı iOS/Android tasarımı (F02-A10) henüz yok.
+- **Karar:** Flutter ekranları onay bekleyen mevcut web tasarımından türetildi: tek şerit siyah header (64 px, logo 40 px, beyaz arama kutusu), Jost başlık + Inter gövde, web renk paleti, ürün kartı (◉ N renk rozeti, kısaltılmış ad, fiyat), web ana sayfa sırası. Mobil gezinme için web'in hamburger menüsü yerine platforma uygun alt sekme çubuğu (Ana sayfa, Ürünler, XINOBI U) kullanıldı.
+- **Tek kaynak:** Renk, font ve header ölçüleri `design/tokens.json` (v0.3.0) içinde; `pnpm tokens:mobile` Dart tokenlarını üretir, Flutter testi uyumu denetler. Müşteri tasarım değişikliği geldiğinde önce tokenlar değişir, web ve mobil birlikte güncellenir.
+- **Bilinen sınır:** Admin'deki slider ve XINOBI U görselleri yazı içeren geniş masaüstü bannerları (~2,5:1). Mobil bunları 2,4:1 kadrajda gösterir; dikey mobil görsel alanı Faz04 slider medyası işiyle eklenmelidir.
+- **Durum:** Geçici; F02-A10 mobil tasarım teslimi ve web tasarım onayıyla birlikte yeniden değerlendirilir.

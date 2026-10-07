@@ -17,7 +17,8 @@
     "test:local-commerce": "node tools/test-local-commerce.mjs",
     "dev:local:background": "node tools/start-local.mjs",
     "test:xinobi-u": "node tools/test-xinobi-u.mjs",
-    "test:free-preview": "node tools/test-free-product-preview.mjs"
+    "test:free-preview": "node tools/test-free-product-preview.mjs",
+    "tokens:mobile": "node tools/generate-mobile-tokens.mjs"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "2.40.1"

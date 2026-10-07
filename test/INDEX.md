@@ -120,3 +120,5 @@
 - 07.10.2026 · [TST-093 ortak katalog API sözleşmesi](2026-10-07/TST-093-catalog-api-contract.md) — 5 salt okunur uç, TS/Dart istemcileri; .NET 54/54, Dart 3/3, Flutter temiz, kayma 0, gerçek veriyle duman testi başarılı.
 
 - 07.10.2026 · [TST-094 XINOBI U oturum sözleşmesi](2026-10-07/TST-094-xinobi-u-api-contract.md) — 5 uç sözleşmede, korumalar aynen, Production'da 503; .NET 58/58, Dart 4/4, Flutter temiz, kayma 0; ücretli çağrı yok.
+
+- 07.10.2026 · [TST-095 Flutter iskeleti ve katalog ekranları](2026-10-07/TST-095-flutter-app-skeleton.md) — Riverpod/go_router, tokenlardan tema, 4 ekran; flutter analyze temiz, 10/10 test; Android emülatöründe gerçek veriyle doğrulandı; 3 taşma ve 1 erişilebilirlik hatası düzeltildi.

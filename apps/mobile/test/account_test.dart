@@ -76,8 +76,8 @@ class FakeAccounts implements AccountRepository {
   }
 }
 
-Future<(FakeAccounts, MemoryTokens)> pumpAccount(WidgetTester tester, {String? storedRefresh}) async {
-  SharedPreferences.setMockInitialValues({});
+Future<(FakeAccounts, MemoryTokens)> pumpAccount(WidgetTester tester, {String? storedRefresh, bool keepPreferences = false}) async {
+  if (!keepPreferences) SharedPreferences.setMockInitialValues({});
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);

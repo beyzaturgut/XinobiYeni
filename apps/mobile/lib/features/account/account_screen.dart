@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
+import '../favorites/favorites.dart';
 import 'auth.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -51,6 +53,8 @@ class _Profile extends ConsumerWidget {
           ]),
         ),
         const SizedBox(height: 16),
+        const _FavoritesLink(),
+        const SizedBox(height: 16),
         Text('Siparişlerin ve adreslerin, ödeme ve sipariş altyapısı tamamlanınca burada görünecek.', style: text.bodySmall),
         const SizedBox(height: 24),
         OutlinedButton(onPressed: () => ref.read(authProvider.notifier).logout(), child: const Text('Çıkış yap')),
@@ -81,7 +85,29 @@ class _AccessFormsState extends State<_AccessForms> {
         ),
         const SizedBox(height: 20),
         register ? const _RegisterForm() : const _LoginForm(),
+        const SizedBox(height: 24),
+        const _FavoritesLink(),
       ]);
+}
+
+/// Favourites live on the device, so they are reachable signed in or not.
+class _FavoritesLink extends ConsumerWidget {
+  const _FavoritesLink();
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(favoritesProvider).length;
+    return Material(
+      color: XinobiTokens.surface,
+      shape: const Border.fromBorderSide(BorderSide(color: XinobiTokens.line)),
+      child: ListTile(
+        leading: const Icon(Icons.favorite_border),
+        title: const Text('Favorilerim'),
+        subtitle: Text(count == 0 ? 'Henüz favori yok' : '$count ürün'),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => context.push('/favoriler'),
+      ),
+    );
+  }
 }
 
 InputDecoration _field(String label, {Widget? suffix, String? helper}) => InputDecoration(

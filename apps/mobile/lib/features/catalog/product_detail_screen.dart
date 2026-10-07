@@ -7,6 +7,7 @@ import '../../app/design_tokens.g.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import '../cart/cart.dart';
+import '../favorites/favorite_button.dart';
 import 'catalog_repository.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
@@ -29,6 +30,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         foregroundColor: XinobiTokens.onHeader,
         toolbarHeight: XinobiTokens.headerHeight,
         title: Text(product.asData?.value.name ?? ''),
+        actions: [
+          if (product.asData?.value case final detail?) FavoriteButton(productId: detail.id, productName: detail.name, color: XinobiTokens.onHeader),
+        ],
       ),
       body: product.when(
         loading: () => const LoadingView(),

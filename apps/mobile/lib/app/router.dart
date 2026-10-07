@@ -8,6 +8,7 @@ import '../features/cart/cart_screen.dart';
 
 import '../features/catalog/product_detail_screen.dart';
 import '../features/catalog/products_screen.dart';
+import '../features/favorites/favorites_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/xinobi_u/questionnaire_screen.dart';
 import '../features/xinobi_u/xinobi_u_screen.dart';
@@ -34,6 +35,7 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
             StatefulShellBranch(routes: [GoRoute(path: '/hesap', builder: (context, state) => const AccountScreen())]),
           ],
         ),
+        GoRoute(path: '/favoriler', builder: (context, state) => const FavoritesScreen()),
         GoRoute(path: '/urunler/:id', builder: (context, state) => ProductDetailScreen(productId: state.pathParameters['id']!)),
         GoRoute(
           path: '/xinobi-u/anket',

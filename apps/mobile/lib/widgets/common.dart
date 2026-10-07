@@ -4,6 +4,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../app/design_tokens.g.dart';
 import '../core/formatting.dart';
+import '../features/favorites/favorite_button.dart';
 
 /// Network image with a neutral placeholder; product photos are contained, never cropped (web rule).
 class RemoteImage extends StatelessWidget {
@@ -69,8 +70,9 @@ class EmptyView extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product, this.onTap});
+  const ProductCard({super.key, required this.product, this.onTap, this.showFavorite = true});
   final ProductSummary product;
+  final bool showFavorite;
   /// Defaults to the product detail page.
   final VoidCallback? onTap;
 
@@ -79,7 +81,8 @@ class ProductCard extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     void open() => onTap != null ? onTap!() : context.push('/urunler/${Uri.encodeComponent(product.id)}');
     // The merged label replaces the children's semantics, so the tap action is restated for screen readers.
-    return Semantics(
+    // The heart sits outside that merge so it stays its own control.
+    final card = Semantics(
       button: true,
       label: '${product.name}, ${formatMoney(product.priceFrom)}${product.inStock ? '' : ', stokta yok'}',
       onTap: open,
@@ -123,14 +126,19 @@ class ProductCard extends StatelessWidget {
         ),
       ),
     );
+    if (!showFavorite) return card;
+    return Stack(children: [
+      Positioned.fill(child: card),
+      Positioned(top: 4, right: 4, child: FavoriteButton(productId: product.id, productName: product.name, onImage: true)),
+    ]);
   }
 }
 
 /// Two-column product grid sized for phones; switches to three columns on wide screens.
-SliverGrid productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap}) => SliverGrid(
+SliverGrid productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true}) => SliverGrid(
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 260, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.52),
       delegate: SliverChildBuilderDelegate(
-        (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index])),
+        (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite),
         childCount: products.length,
       ),
     );

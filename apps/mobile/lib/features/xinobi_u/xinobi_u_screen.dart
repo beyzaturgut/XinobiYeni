@@ -39,7 +39,7 @@ class XinobiUScreen extends ConsumerWidget {
               : [
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 0, XinobiTokens.gutterMobile, 32),
-                    sliver: productGrid(page.items.toList(), onTap: (product) => context.push('/xinobi-u/anket?urun=${Uri.encodeQueryComponent(product.id)}')),
+                    sliver: productGrid(page.items.toList(), onTap: (product) => context.push('/xinobi-u/anket?urun=${Uri.encodeQueryComponent(product.id)}'), showFavorite: false),
                   ),
                 ],
         ),

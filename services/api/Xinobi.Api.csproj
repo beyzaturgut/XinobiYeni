@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\shared\Xinobi.SharedKernel\Xinobi.SharedKernel.csproj" />
+    <ProjectReference Include="..\shared\Xinobi.Persistence\Xinobi.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

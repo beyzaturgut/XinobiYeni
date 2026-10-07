@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Xinobi.Api.Contracts;
 using Xinobi.Api.Infrastructure;
 using Xinobi.Api.Infrastructure.Readiness;
+using Xinobi.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,7 @@ if (builder.Environment.IsDevelopment())
         .WithOrigins("http://127.0.0.1:3000", "http://localhost:3000", "http://127.0.0.1:5173", "http://localhost:5173")
         .AllowAnyHeader().AllowAnyMethod()));
 }
+builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
 builder.Services.AddSingleton<ISqlServerReadinessProbe, SqlServerReadinessProbe>();
 builder.Services.AddProblemDetails(options =>
 {

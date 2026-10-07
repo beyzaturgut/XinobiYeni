@@ -70,7 +70,7 @@ API: `/api/v1/auth/register|login|refresh|logout|password-reset`, `/api/v1/admin
 | Job/outbox/medya | Fake dış sağlayıcıyla kesinti, tekrar, iki worker, imzasız/bozuk dosya | Seçilen nesne depo ve işleyici ortamında erişim/restore prova |
 | Web/panel/mobil temel | Tasarım el teslimi ve ortak API istemcisi; cihaz duman testi | Gerçek mobil sertifikalar ve dağıtım hedefi sonraki fazlarda |
 
-**Mevcut durum notu (2026-10-07):** 03.01, 03.02 ve CI kısmen yapıldı. 03.03–03.08 (kimlik, rol, ilk migration, audit, outbox/inbox, medya soyutlaması) henüz yok; repoda DbContext veya migration bulunmuyor. Faz04–06/10 için yazılan demo kod bu çekirdeğe bağlanmadan ilgili faz kabulüne girmez.
+**Mevcut durum notu (2026-10-07):** 03.01, 03.02 ve CI kısmen yapıldı. **03.05 kod tarafı tamam** (TST-091): `services/shared/Xinobi.Persistence`, migration `InitialCore`, `infra/db/migrations/0001_InitialCore.{idempotent,rollback}.sql`; XinobiYeniDB'ye uygulama SQL portu erişimi açılınca yapılacak. Oturum, barındırma ve depolama kararları ADR-004'te. 03.03, 03.04, 03.06–03.08 henüz yok. Faz04–06/10 için yazılan demo kod bu çekirdeğe bağlanmadan ilgili faz kabulüne girmez.
 
 **Geçiş:** 03.01–03.12 kanıtları, CI, migration/restore sonucu, OpenAPI sürümü, kullanıcı sahipliği negatif testleri, `docs/decisions` ve Faz00 kaldığı yerden devam kaydı tamamlanır. Test erişimi olmayan bir sağlayıcıyı gerçek çalışıyor saymayın; erişim sahibi, eksik izin, bloklanan test ve plan Faz00'a yazılır. D01 nedeniyle değişen yollar açıklanır. D02/D10 açık ise ilgili gerçek veri yazımı ve saklama politikasına bağımlı iş koşullu tutulur.
 

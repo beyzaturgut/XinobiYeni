@@ -80,16 +80,16 @@ Faz03–06 belgeleri aşağıdaki kararları "Faz00'da sabitlenir" diye buraya b
 |---|---|---|---|---|
 | T-01 | API sürüm öneki ve son yol düzeni (`/api/v1`) | 03–10 | BE + Full Stack | Kısmi · health uçlarında kullanılıyor; iş uçlarında ADR yok |
 | T-02 | Para formatı: minör birim tam sayı mı, `decimal(19,4)` + ISO para birimi mi | 04,05,07,08,09 | BE + DBA | Açık |
-| T-03 | Web/mobil oturum taşıma (HttpOnly cookie + CSRF / bearer + refresh) | 03,05,11 | BE + FE + CTO | Açık |
+| T-03 | Web/mobil oturum taşıma (HttpOnly cookie + CSRF / bearer + refresh) | 03,05,11 | BE + FE + CTO | **Karar · 07.10.2026** · karma: web/panel cookie+CSRF, Flutter access+rotating refresh (ADR-004) |
 | T-04 | Editör tuval birimi (mm / normalize) ve geometri test vektörü konumu | 06,10,11 | FE + BE + Creative | Açık |
-| T-05 | Barındırma: Windows Server/IIS mi, başka hedef mi; dev/test/prod ayrımı | 03,11 | CTO + Full Stack + proje sahibi | Açık · önizleme IIS/RDP ile yayınlanıyor, ADR yok |
-| T-06 | Nesne depolama sağlayıcısı (Docker'sız), CDN ve medya türev üretimi | 03,04,06,10 | CTO + DBA | Açık · şu an yerel disk |
+| T-05 | Barındırma: Windows Server/IIS mi, başka hedef mi; dev/test/prod ayrımı | 03,11 | CTO + Full Stack + proje sahibi | **Karar · 07.10.2026** · mevcut Windows Server + IIS (ADR-004); SQL portu erişim yöntemi açık |
+| T-06 | Nesne depolama sağlayıcısı (Docker'sız), CDN ve medya türev üretimi | 03,04,06,10 | CTO + DBA | **Karar · 07.10.2026** · sunucu diski, web kökü dışında, `IFileStorage` arayüzü arkasında (ADR-004); CDN/türev açık |
 | T-07 | Yüklenen dosya için zararlı içerik tarama aracı | 03,06,07 | BE + CTO | Açık |
 | T-08 | Gözlemlenebilirlik: log, metrik, iz, alarm kanalı ve saklama | 03,08,09,11 | Full Stack + CTO | Açık |
 | T-09 | Özellik bayrağı mekanizması (XINOBI U, Nobi, sağlayıcı adaptörleri) | 03,10,11 | BE + Full Stack | Açık |
 | T-10 | CI güvenlik taraması: SAST, bağımlılık ve sır taraması aracı | 03,11 | Full Stack + CTO | Açık |
 | T-11 | Performans ve yük testi aracı, ölçülecek başlangıç hedefleri (Analiz2 §20.1) | 03,11 | Full Stack + PM | Açık |
-| T-12 | Önerilen ama repoda olmayan yollar: `infra/db/migrations`, `infra/dev`, `packages/ui`, `docs/runbooks`; gerçek karşılıklar | 03–11 | Full Stack | Açık · repoda `packages/{clients,commerce,contracts}` var |
+| T-12 | Önerilen ama repoda olmayan yollar: `infra/db/migrations`, `infra/dev`, `packages/ui`, `docs/runbooks`; gerçek karşılıklar | 03–11 | Full Stack | **Kısmi** · EF migration'ları `services/shared/Xinobi.Persistence/Migrations`, gözden geçirilmiş SQL `infra/db/migrations`, runbook'lar `docs/runbooks` (07.10.2026); `infra/dev`, `packages/ui` açık |
 
 ## 4. Müşteri kararları ve blokaj kaydı
 
@@ -122,21 +122,22 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-07 · Claude Code; 37 commitlik kayıt açığı geri dolduruldu, TST-088 HEAD doğrulaması, ADR-003 ve ADR-002 Ek A yazıldı |
-| Aktif faz/görev ID | Resmi olarak Faz02 (kabul açık). Fiilen Faz04/05/06/10 işlevleri Development demo olarak kodlandı (ADR-003, ADR-002 Ek A); bunlar ilgili faz kabulü değildir |
+| Son güncelleme ve sorumlu | 2026-10-07 · Claude Code; ADR-003/ADR-002 Ek A onaylandı; ADR-004 (T-03/T-05/T-06) yazıldı; Faz03 03.05 çekirdek şema ve ilk migration (TST-091) |
+| Aktif faz/görev ID | **Faz03 / 03.05** çekirdek şema: kod ve testler tamam, XinobiYeniDB'ye uygulama BLOKE (SQL portu). Faz02 kabulü ayrıca açık |
 | Repo/branch/HEAD | `main` · uygulama kodu `0a18bba`; belge commitleri üstte · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı ama uygulama henüz SQL Server kullanmıyor; Development verisi `services/api/App_Data/local-commerce/` dosya deposunda; canlı önizleme IIS `109.104.120.91:8014` |
 | Son çalışan uygulama komutu/URL | `pnpm dev:local` (API 5003, web 3000, admin 5173). DEPLOY-004 paketi `XinobiYeni-web-c323e13.zip` hazır, IIS'e aktarılmadı; c323e13 sonrası web değişiklikleri pakette yok |
-| Son test komutu ve sonucu | TST-090: çalışan servislerde 22 yerel test aracı **22/22 başarılı** (beş eski test güncellendi, free-preview kalıcı fixture'a geçti). TST-088: mimari testler 26/26, admin/web lint+build başarılı |
-| Değişen dosyalar / migration | `acc0c99..0a18bba`: 231 dosya; API `LocalCommerce`, `DesignStudio`; admin ticaret/içerik modülleri; web katalog, XINOBI U, sepet, demo hesap/ödeme, header. Migration yok |
-| Aktif hata/yarım iş | Faz03 çekirdeği yok (03.03–03.08); ADR-003 ve ADR-002 Ek A proje sahibi onayı bekliyor; DEPLOY-004 IIS smoke yapılmadı; HND-01–05, `design/a11y-audit.md`, gerçek rol incelemesi ve D kararları açık |
-| Sonraki en küçük güvenli adım | Proje sahibinden ADR-003 ve ADR-002 Ek A onayı; ardından Faz03 03.12 teknik kararları (T-03/T-05/T-06 öncelikli) ve 03.11 SQL Server geçişi. Bilinen yan etki: `test-local-commerce` her çalıştırmada iki kayıtsız test görseli bırakır (TST-090) |
+| Son test komutu ve sonucu | TST-091: .NET testleri 38/38, Release derlemesi ve OpenAPI kayması temiz; DB uygulaması BLOKE. TST-090: yerel uçtan uca 22/22 |
+| Değişen dosyalar / migration | Yeni `services/shared/Xinobi.Persistence` (DbContext, migration `20261007090524_InitialCore`), `infra/db/migrations/0001_InitialCore.{idempotent,rollback}.sql`, `PersistenceModelTests`, `dotnet-tools.json`, runbook. Migration **hiçbir veritabanına uygulanmadı** |
+| Aktif hata/yarım iş | SQL Server `109.104.120.91:64019` dışarıdan erişilemiyor (IIS 8014 erişilebilir); migration uygulaması bekliyor. Faz03 03.03/03.04/03.06–03.08 yok; DEPLOY-004 IIS smoke yapılmadı; HND-01–05, `design/a11y-audit.md`, gerçek rol incelemesi ve D kararları açık |
+| Sonraki en küçük güvenli adım | Sunucu sahibi 64019 erişimini açınca `docs/runbooks/database-migrations.md` ile 0001'i XinobiYeniDB'ye uygula ve tekrar çalıştırma kanıtı al. Bu arada bağımsız iş: 03.04 rol/yetki kataloğu ve süper yönetici bootstrap'i |
 | Geri alma / devam noktası | `0a18bba` (TST-088 ile doğrulanmış uygulama kodu); migration ve dış sistem yazımı yok; Cloudflare'a yalnız TST-XINOBI-U-live'daki iki üretim çağrısı yapıldı |
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-07 | Faz03 03.05 + ADR-004 | `main` / `a05264c` → bu commit | Proje sahibi ADR-003 ve ADR-002 Ek A'yı onayladı; T-03/T-05/T-06 kararları ADR-004; `Xinobi.Persistence` projesi, 12 tablolu çekirdek şema, ilk migration, idempotent ve geri alma script'leri, runbook | TST-091: 38/38 test, Release temiz; XinobiYeniDB uygulaması BLOKE (TCP 64019 zaman aşımı) | `test/2026-10-07/TST-091-*`, `docs/decisions/ADR-004-*` | SQL erişimi açılınca migration uygula; 03.04 | Claude Code |
 | 2026-10-07 | Test bakımı | `main` / `4abc8e5` → bu commit | `tools/test-{local-commerce,home-navigation-feedback,product-listing,home-category-products,xinobi-u,free-product-preview}.mjs` güncel davranışa uyarlandı; uygulama kodu değişmedi; oturumda oluşan 8 test görseli scratchpad'e taşındı | TST-090: 22/22 başarılı; `state.json` değişmedi; ücretli çağrı yok | `test/2026-10-07/TST-090-stale-test-updates.md` | ADR onayı; Faz03 03.12 | Claude Code |
 | 2026-10-07 | Uçtan uca regresyon | `main` / `0ff8f38` → bu commit | Çalışan servislerde 22 test aracı; `state.json` yedeklenip sonra hash ile doğrulandı | TST-089: 16 başarılı / 6 başarısız; başarısızlıklar eski test (5) ve süresi dolmuş oturum (1); ücretli çağrı yok, veri değişmedi | `test/2026-10-07/TST-089-local-e2e-regression.md` | Beş testi güncelle, free-preview fixture'ını kalıcı yap | Claude Code |
 | 2026-10-07 | Faz00 kayıt açığı | `main` / `a97650b` → bu commit | 37 commit aşağıya geri dolduruldu; ADR-003 yazıldı; ADR-002'ye Ek A eklendi; iki numarasız 06.10 raporu indekse alındı | TST-088: dotnet test 26/26, admin/web lint+build başarılı | `test/2026-10-07/TST-088-*`, `docs/decisions/ADR-003-*` | ADR onayı; uçtan uca yerel testler | Claude Code |
@@ -248,8 +249,8 @@ Tek sonraki işlem:
 |---|---|---|---|---|---|
 | ADR-001 / 2026-09-29 | Next.js web, React/Vite panel, ASP.NET Core/EF/MS SQL, Flutter mobil, modüler monolit + worker/outbox-inbox; Docker yok | Proje sahibi kararları, analiz §6 ve temsili CTO incelemesi | Faz03–11; `docs/decisions/ADR-001-teknoloji-omurgasi.md` | Araç/build ve gerçek SQL testi bekliyor; ADR ile geri dönüş | Proje sahibi onayladı / uygulama kanıtı bekliyor |
 
-| ADR-003 / 2026-10-07 | Development'ta SQL Server yerine `services/api/App_Data/local-commerce/state.json` dosya deposu ve tarayıcı localStorage demo hesap/sipariş kaydı; yalnız Development/loopback | Faz03 çekirdeği olmadan demo ilerletme | Faz03–05/10; `docs/decisions/ADR-003-gecici-yerel-ticaret-deposu.md` | TST-088; SQL Server'a geçiş Faz03 03.11 | **Yazıldı** · proje sahibi onayı bekliyor |
-| ADR-002 Ek A / 2026-10-07 | Cloudflare Workers AI gerçek adaptörü ve ücretli çağrı Faz10 kapısından (D05/D08/D10, PoC) önce eklendi (`3db452e`); yalnız Development/loopback, 30/gün | Kullanıcı isteğiyle XINOBI U canlı denemesi | Faz10 10.01A–10.05; `docs/decisions/ADR-002-cloudflare-workers-ai.md` Ek A | TST-XINOBI-U-live; onaylanmazsa özellik bayrağıyla kapatılır | **Yazıldı** · proje sahibi onayı bekliyor |
+| ADR-003 / 2026-10-07 | Development'ta SQL Server yerine `services/api/App_Data/local-commerce/state.json` dosya deposu ve tarayıcı localStorage demo hesap/sipariş kaydı; yalnız Development/loopback | Faz03 çekirdeği olmadan demo ilerletme | Faz03–05/10; `docs/decisions/ADR-003-gecici-yerel-ticaret-deposu.md` | TST-088; SQL Server'a geçiş Faz03 03.11 | **Proje sahibi onayladı · 07.10.2026** |
+| ADR-002 Ek A / 2026-10-07 | Cloudflare Workers AI gerçek adaptörü ve ücretli çağrı Faz10 kapısından (D05/D08/D10, PoC) önce eklendi (`3db452e`); yalnız Development/loopback, 30/gün | Kullanıcı isteğiyle XINOBI U canlı denemesi | Faz10 10.01A–10.05; `docs/decisions/ADR-002-cloudflare-workers-ai.md` Ek A | TST-XINOBI-U-live; yalnız Development; production'a Faz10 kapısıyla | **Proje sahibi onayladı · 07.10.2026** |
 
 **Plan–kod sapma kaydı (2026-10-07 incelemesi):** (1) Faz03'ün EF Core DbContext/migration, kimlik, rol, audit ve outbox çekirdeği henüz yok; web ve panelin büyük kısmı geçici dosya deposu üzerinde çalışıyor. (2) Faz02 aktifken Faz04/05/06/10 işlevleri demo olarak kodlandı; bu kodlar ilgili fazın kabulü sayılmaz, faz başlarken yeniden doğrulanır. (3) Faz02'nin zorunlu çıktısı `design/a11y-audit.md` yok; BRIEF / ORTAK TASARIM / WEB TASARIM onayları bu tabloya işlenmedi. Bu üç madde kapanmadan ilgili faz kapısı açılmaz.
 

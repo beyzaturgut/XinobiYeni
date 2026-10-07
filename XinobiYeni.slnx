@@ -4,6 +4,7 @@
     <Project Path="services/api/Xinobi.Api.csproj" />
   </Folder>
   <Folder Name="/services/shared/">
+    <Project Path="services/shared/Xinobi.Persistence/Xinobi.Persistence.csproj" />
     <Project Path="services/shared/Xinobi.SharedKernel/Xinobi.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/services/worker/">

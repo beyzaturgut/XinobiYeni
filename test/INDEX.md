@@ -112,3 +112,5 @@
 - 07.10.2026 · [TST-089 yerel uçtan uca regresyon](2026-10-07/TST-089-local-e2e-regression.md) — 22 araçtan 16 başarılı, 6 başarısız: 5 eski test (kasıtlı UI değişiklikleri), 1 süresi dolmuş oturum; ürün hatası bulunmadı, kullanıcı verisi değişmedi.
 
 - 07.10.2026 · [TST-090 eski testlerin güncellenmesi](2026-10-07/TST-090-stale-test-updates.md) — Beş eski test güncel davranışa uyarlandı, free-preview kalıcı fixture'a geçti; 22/22 başarılı, kullanıcı verisi değişmedi, ücretli çağrı yok.
+
+- 07.10.2026 · [TST-091 Faz03 çekirdek şema](2026-10-07/TST-091-faz03-initial-core-schema.md) — İlk migration, idempotent/geri alma script'i ve 12 yeni test; 38/38 başarılı. XinobiYeniDB'ye uygulama BLOKE: SQL portu 64019 dışarıdan kapalı.

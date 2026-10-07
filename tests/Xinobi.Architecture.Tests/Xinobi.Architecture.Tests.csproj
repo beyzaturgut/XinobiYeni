@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="../../services/api/Xinobi.Api.csproj" />
     <ProjectReference Include="../../services/shared/Xinobi.SharedKernel/Xinobi.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\services\shared\Xinobi.Persistence\Xinobi.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

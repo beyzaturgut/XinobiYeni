@@ -178,6 +178,50 @@ public sealed class AccountTests : IDisposable
     }
 
     [Fact]
+    public async Task WebSessionUsesHttpOnlyCookiesWithCsrfHeader()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+        await Register(client, password: "web-parola-12");
+        var login = new LoginAccount("ayse@example.com", "web-parola-12");
+
+        var noHeader = await client.PostAsJsonAsync("/api/v1/auth/web/login", login);
+        Assert.Equal(HttpStatusCode.Forbidden, noHeader.StatusCode);
+        Assert.Equal("csrf_required", await Code(noHeader));
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/web/login") { Content = JsonContent.Create(login) };
+        request.Headers.Add("X-Xinobi-Csrf", "1");
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var cookies = response.Headers.GetValues("Set-Cookie").ToArray();
+        Assert.Contains(cookies, c => c.StartsWith("xinobi_at=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase) && c.Contains("samesite=lax", StringComparison.OrdinalIgnoreCase) && c.Contains("path=/api/v1"));
+        Assert.Contains(cookies, c => c.StartsWith("xinobi_rt=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase) && c.Contains("path=/api/v1/auth/web"));
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Token", body, StringComparison.OrdinalIgnoreCase);
+        var access = cookies.Single(c => c.StartsWith("xinobi_at=")).Split(';')[0];
+        var refresh = cookies.Single(c => c.StartsWith("xinobi_rt=")).Split(';')[0];
+
+        async Task<HttpResponseMessage> Send(HttpMethod method, string path, string cookie, bool csrf)
+        {
+            using var message = new HttpRequestMessage(method, path);
+            message.Headers.Add("Cookie", cookie);
+            if (csrf) message.Headers.Add("X-Xinobi-Csrf", "1");
+            if (method == HttpMethod.Post) message.Content = JsonContent.Create(new { });
+            return await client.SendAsync(message);
+        }
+
+        Assert.Equal(HttpStatusCode.OK, (await Send(HttpMethod.Get, "/api/v1/me", access, csrf: false)).StatusCode);
+        var refreshed = await Send(HttpMethod.Post, "/api/v1/auth/web/refresh", refresh, csrf: true);
+        refreshed.EnsureSuccessStatusCode();
+        var newRefresh = refreshed.Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("xinobi_rt=")).Split(';')[0];
+        Assert.NotEqual(refresh, newRefresh);
+        var logout = await Send(HttpMethod.Post, "/api/v1/auth/web/logout", newRefresh, csrf: true);
+        Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
+        Assert.Contains(logout.Headers.GetValues("Set-Cookie"), c => c.StartsWith("xinobi_rt=;") && c.Contains("expires=Thu, 01 Jan 1970", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Send(HttpMethod.Post, "/api/v1/auth/web/refresh", newRefresh, csrf: true)).StatusCode);
+    }
+
+    [Fact]
     public async Task TestsNeverUseARealEmailSender()
     {
         using var factory = Factory();

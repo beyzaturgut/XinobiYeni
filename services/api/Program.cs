@@ -46,7 +46,8 @@ if (builder.Environment.IsDevelopment())
     });
     builder.Services.AddCors(options => options.AddPolicy("LocalCommerce", policy => policy
         .WithOrigins("http://127.0.0.1:3000", "http://localhost:3000", "http://127.0.0.1:5173", "http://localhost:5173")
-        .AllowAnyHeader().AllowAnyMethod()));
+        // Credentials let the web session cookie travel to the API; origins stay an explicit allow-list.
+        .AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 }
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
 // Outside Development the catalog answers 503 until the SQL Server source exists (Faz03 03.11).

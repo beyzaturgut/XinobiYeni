@@ -128,3 +128,5 @@
 - 07.10.2026 · [TST-097 mobil sepet](2026-10-07/TST-097-mobile-cart.md) — Web ile aynı sepet kuralları, `maxQuantity` sözleşmesi; .NET 70/70, Flutter 20/20, Dart 4/4; emülatörde kopya veriyle sepete ekleme ve toplam doğrulandı; kullanıcı verisi değişmedi.
 
 - 07.10.2026 · [TST-098 ortak hesap API'si ve mobil hesap](2026-10-07/TST-098-account-api-mobile.md) — Kayıt/giriş/yenileme/çıkış/profil, jetonlar özetli; .NET 77/77, Flutter 25/25; emülatörde üyelik ve oturum geri yükleme doğrulandı. Olay: ilk koşuda testlerden 5 gerçek doğrulama e-postası `ayse@example.com`'a gitti; düzeltildi ve güvenceye alındı.
+
+- 07.10.2026 · [TST-099 web hesabı ortak API'ye geçti](2026-10-07/TST-099-web-account-api.md) — HttpOnly cookie + CSRF başlığı; .NET 78/78; gerçek tarayıcıda kayıt, yenilemede oturum, çıkış; mobilde açılan hesapla web girişi başarılı. Dev API yeniden başlatılmalı.

@@ -28,12 +28,54 @@ public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOpti
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var header = Request.Headers.Authorization.ToString();
-        if (!header.StartsWith("Bearer ", StringComparison.Ordinal)) return AuthenticateResult.NoResult();
-        var account = await store.FindByAccessToken(header["Bearer ".Length..].Trim());
+        string? token = header.StartsWith("Bearer ", StringComparison.Ordinal) ? header["Bearer ".Length..].Trim() : null;
+        if (token is null && Request.Cookies.TryGetValue(WebSessionCookies.Access, out var cookie))
+        {
+            // Cookie sessions (web) must prove same-origin intent on state-changing requests (ADR-004 CSRF).
+            if (!HttpMethods.IsGet(Request.Method) && !HttpMethods.IsHead(Request.Method) && !WebSessionCookies.HasCsrfHeader(Request)) return AuthenticateResult.NoResult();
+            token = cookie;
+        }
+        if (token is null) return AuthenticateResult.NoResult();
+        var account = await store.FindByAccessToken(token);
         if (account is null) return AuthenticateResult.Fail("invalid_token");
         var identity = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, account.Id), new Claim(ClaimTypes.Email, account.Email), new Claim(ClaimTypes.Name, account.Name)], SchemeName);
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName));
     }
+}
+
+/// <summary>
+/// Web session cookies (ADR-004 T-03): HttpOnly, SameSite=Lax, Secure on HTTPS. Tokens never reach JavaScript; every cookie
+/// write and cookie-authenticated change requires the <c>X-Xinobi-Csrf</c> header, which other sites cannot send without CORS.
+/// </summary>
+public static class WebSessionCookies
+{
+    public const string Access = "xinobi_at";
+    public const string Refresh = "xinobi_rt";
+    public const string CsrfHeader = "X-Xinobi-Csrf";
+
+    public static bool HasCsrfHeader(HttpRequest request) => request.Headers[CsrfHeader] == "1";
+
+    public static void Write(HttpContext http, IssuedTokens tokens)
+    {
+        http.Response.Cookies.Append(Access, tokens.AccessToken, Options(http, "/api/v1", tokens.AccessTokenExpiresAt));
+        http.Response.Cookies.Append(Refresh, tokens.RefreshToken, Options(http, "/api/v1/auth/web", tokens.RefreshTokenExpiresAt));
+    }
+
+    public static void Clear(HttpContext http)
+    {
+        http.Response.Cookies.Delete(Access, Options(http, "/api/v1", null));
+        http.Response.Cookies.Delete(Refresh, Options(http, "/api/v1/auth/web", null));
+    }
+
+    private static CookieOptions Options(HttpContext http, string path, DateTimeOffset? expires) => new()
+    {
+        HttpOnly = true,
+        Secure = http.Request.IsHttps,
+        SameSite = SameSiteMode.Lax,
+        Path = path,
+        Expires = expires,
+        IsEssential = true,
+    };
 }
 
 public static class AccountEndpoints
@@ -109,6 +151,60 @@ public static class AccountEndpoints
             })
             .WithName("RefreshSession")
             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        var web = auth.MapGroup("/web");
+        web.AddEndpointFilter(async (context, next) => WebSessionCookies.HasCsrfHeader(context.HttpContext.Request)
+            ? await next(context)
+            : Problem(StatusCodes.Status403Forbidden, "csrf_required", "İstek doğrulanamadı. Sayfayı yenileyip tekrar dene."));
+
+        web.MapPost("/register", async Task<Results<Ok<AccountProfile>, ProblemHttpResult>> (RegisterAccount request, HttpContext http, IAccountStore accounts) =>
+            {
+                var name = AccountRules.ValidName(request.Name);
+                var email = AccountRules.NormalizeEmail(request.Email);
+                AccountRules.ValidatePassword(request.Password);
+                var verification = http.RequestServices.GetService<EmailVerificationStore>() ?? throw new AccountUnavailableException();
+                await verification.Confirm(new ConfirmEmailVerification(request.VerificationId, email, request.VerificationCode));
+                var account = await accounts.Register(name, email, request.Password);
+                WebSessionCookies.Write(http, await accounts.IssueTokens(account.Id));
+                return TypedResults.Ok(Profile(account));
+            })
+            .WithName("RegisterWebAccount");
+
+        web.MapPost("/login", async Task<Results<Ok<AccountProfile>, ProblemHttpResult>> (LoginAccount request, HttpContext http, IAccountStore accounts) =>
+            {
+                string email;
+                try { email = AccountRules.NormalizeEmail(request.Email); }
+                catch (AccountException) { return InvalidCredentials(); }
+                var account = request.Password is { Length: > 0 and <= AccountRules.MaxPasswordLength } ? await accounts.Login(email, request.Password) : null;
+                if (account is null) return InvalidCredentials();
+                WebSessionCookies.Write(http, await accounts.IssueTokens(account.Id));
+                return TypedResults.Ok(Profile(account));
+            })
+            .WithName("LoginWebAccount");
+
+        web.MapPost("/refresh", async Task<Results<Ok<AccountProfile>, ProblemHttpResult>> (HttpContext http, IAccountStore accounts) =>
+            {
+                try
+                {
+                    var (account, tokens) = await accounts.Refresh(http.Request.Cookies[WebSessionCookies.Refresh] ?? "");
+                    WebSessionCookies.Write(http, tokens);
+                    return TypedResults.Ok(Profile(account));
+                }
+                catch (AccountException)
+                {
+                    WebSessionCookies.Clear(http);
+                    throw;
+                }
+            })
+            .WithName("RefreshWebSession");
+
+        web.MapPost("/logout", async Task<NoContent> (HttpContext http, IAccountStore accounts) =>
+            {
+                if (http.Request.Cookies[WebSessionCookies.Refresh] is { Length: > 0 } refresh) await accounts.Revoke(refresh);
+                WebSessionCookies.Clear(http);
+                return TypedResults.NoContent();
+            })
+            .WithName("LogoutWebSession");
 
         auth.MapPost("/logout", async Task<NoContent> (LogoutSession request, IAccountStore accounts) =>
             {

@@ -29,12 +29,12 @@ function AuthModal({mode,onClose}: {mode:'login'|'register';onClose:()=>void}) {
   </dialog>;
 }
 export default function AccountDashboard(){
-  const {user,orders}=useDemoCommerce();
+  const {user,orders,ready}=useDemoCommerce();
   const [mode,setMode]=useState<'login'|'register'|null>(null);
   return <div className={styles.shell}>
     <div className={styles.titleRow}>
-      <div><p className={styles.eyebrow}><span className={styles.brandDot}/>XINOBI Üye Portalı</p><h1>Hesabım</h1><p className={styles.caption}>Bu tarayıcıda saklanan deneme hesabı.</p></div>
-      <p className={styles.session}><span className={user?styles.activeDot:styles.inactiveDot}/>{user?'Oturum açık':'Aktif oturum bulunamadı'}</p>
+      <div><p className={styles.eyebrow}><span className={styles.brandDot}/>XINOBI Üye Portalı</p><h1>Hesabım</h1><p className={styles.caption}>Web ve mobilde aynı Xinobi hesabı.</p></div>
+      <p className={styles.session}><span className={user?styles.activeDot:styles.inactiveDot}/>{!ready?'Oturum kontrol ediliyor…':user?'Oturum açık':'Aktif oturum bulunamadı'}</p>
     </div>
     <div className={styles.cardArea}>
       <section className={styles.card} aria-label={user?'Hesap özeti':'Hesabına giriş yap'}>
@@ -50,7 +50,7 @@ export default function AccountDashboard(){
             <h2>Hesabına giriş yap</h2><p className={styles.description}>Kayıt ol veya giriş yap; siparişlerini, favorilerini ve sepetini tek bir yerden yönet.</p>
             <div className={styles.actions}><button className={styles.primary} onClick={()=>setMode('login')}>Giriş yap <Icon name="arrow"/></button><button className={styles.secondary} onClick={()=>setMode('register')}>Hesap oluştur</button></div>
           </>}
-          <div className={styles.storage}><p><Icon name="lock"/><strong>Yerel deneme hesabı</strong></p><p>Yalnızca bu tarayıcıda saklanır. Gerçek hesabındaki parolayı kullanma.</p><p>Hesabın ve siparişlerin cihazlar arasında eşitlenmez.</p></div>
+          <div className={styles.storage}><p><Icon name="lock"/><strong>Geliştirme ortamı hesabı</strong></p><p>Hesabın Xinobi sunucusunda tutulur; web ve mobil uygulamada aynı hesapla giriş yaparsın. Başka hizmetlerde kullandığın parolayı kullanma.</p><p>Deneme siparişlerin şimdilik yalnızca bu tarayıcıda saklanır.</p></div>
         </div>
       </section>
     </div>

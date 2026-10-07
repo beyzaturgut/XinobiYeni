@@ -61,7 +61,7 @@ Kontroller: `node tools/test-xinobi-u-direct-questions.mjs`, `node tools/test-ca
 
 ### Tarayıcıda demo alışveriş
 
-`/hesap/giris` üzerinde demo kayıt/giriş, `/hesap` üzerinde çıkış ve `/hesap/siparisler` üzerinde deneme sipariş geçmişi kullanılabilir. Demo kullanıcıları, tuzlanmış PBKDF2 parola özetleri ve siparişler `xinobi-demo-commerce-v1` localStorage kaydında tutulur. Bu bir üretim kimlik doğrulama sistemi değildir; yalnız deneme parolası kullanın. Aynı tarayıcıdaki kayıtlar değiştirilebilir ve cihazlar arasında eşitlenmez.
+`/hesap/giris` üzerinde kayıt/giriş, `/hesap` üzerinde çıkış ve `/hesap/siparisler` üzerinde deneme sipariş geçmişi kullanılabilir. Hesaplar web ve mobilde ortaktır: `/api/v1/auth` (e-posta kodu, kayıt, giriş, yenileme, çıkış) ve `/api/v1/me`. Web oturumu HttpOnly cookie + `X-Xinobi-Csrf` başlığı, mobil oturum Keychain/Keystore'daki dönen yenileme jetonu ile taşınır (ADR-004). Geliştirmede hesaplar `services/api/App_Data/local-commerce/identity/accounts.json` içinde (parola ve jetonlar yalnız özet olarak) tutulur; diğer ortamlarda uçlar SQL Server kimlik deposu gelene kadar 503 döner. Testler e-posta göndericisini DI'da önizleme göndericisiyle değiştirmelidir: `appsettings.Local.json` test yapılandırmasından sonra yüklenir ve gerçek SMTP seçebilir. Deneme siparişleri hâlâ yalnız tarayıcıda, hesap kimliğine bağlı saklanır.
 
 Geçerli sepetten `/odeme` sayfasına geçilir. Başarısız senaryo sipariş oluşturmaz; başarılı senaryo fiyat/renk/adet anlık görüntüsünü demo sipariş olarak kaydeder ve sepeti boşaltır. Kart bilgisi, gerçek tahsilat, sunucu siparişi veya stok düşümü yoktur. Teslimat formu deneme içindir ve adres kaydedilmez. Uçtan uca kontrol: `node tools/test-demo-commerce.mjs`.
 

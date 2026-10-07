@@ -5,9 +5,10 @@ import {demoAccess} from '../../../lib/demo-commerce';
 import {startEmailVerification, type VerificationChallenge} from '../../../lib/email-verification';
 import styles from './account.module.css';
 
-export default function AccountAccess() {
+type AccountAccessProps = {initialMode?: 'login'|'register'; embedded?: boolean; onAuthenticated?: () => void};
+export default function AccountAccess({initialMode='login', embedded=false, onAuthenticated}: AccountAccessProps = {}) {
   const router = useRouter();
-  const [mode, setMode] = useState<'login'|'register'>('login');
+  const [mode, setMode] = useState<'login'|'register'>(initialMode);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [challenge, setChallenge] = useState<VerificationChallenge|null>(null);
@@ -17,7 +18,8 @@ export default function AccountAccess() {
   function reset(nextMode: 'login'|'register') {
     setMode(nextMode); setError(''); setChallenge(null); setPending(null); setNotice('');
   }
-  return <div className={styles.layout}>
+  function complete() {if(onAuthenticated)onAuthenticated();else router.push('/hesap');}
+  return <div className={`${styles.layout} ${embedded?styles.embedded:''}`}>
     <section className={styles.story}><h1>Hesabın</h1><p>Kayıt ol, giriş yap ve siparişlerini görüntüle.</p><small>Yalnız bu tarayıcıda saklanır. Gerçek hesabındaki parolayı kullanma.</small></section>
     <section className={styles.formPanel}>
       <div className={styles.tabs}><button disabled={busy} onClick={()=>reset('login')}>Giriş</button><button disabled={busy} onClick={()=>reset('register')}>Yeni hesap</button></div>
@@ -31,7 +33,7 @@ export default function AccountAccess() {
           setBusy(true); setError('');
           try {
             await demoAccess('register',pending.name,pending.email,pending.password,{id:challenge.id,code});
-            setPending(null); router.push('/hesap');
+            setPending(null); complete();
           } catch(error) {setError(error instanceof Error?error.message:'İşlem tamamlanamadı.');}
           finally {setBusy(false);}
         }}>
@@ -54,7 +56,7 @@ export default function AccountAccess() {
         try{
           if(mode==='register'){
             setChallenge(await startEmailVerification(values.email));setPending(values);setRetryAt(Date.now()+60000);
-          }else{await demoAccess('login',values.name,values.email,values.password);router.push('/hesap');}
+          }else{await demoAccess('login',values.name,values.email,values.password);complete();}
         }catch(error){setError(error instanceof Error?error.message:'İşlem tamamlanamadı.');}
         finally{setBusy(false);}
       }}>

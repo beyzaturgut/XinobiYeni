@@ -1,48 +1,41 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
+import SiteHeader from "../../components/site-header";
+import CommerceFooter from "../../components/commerce-footer";
 import coffeeMaker from "../../../public/assets/products/coffee-maker-101-gold.webp";
 import teaMaker from "../../../public/assets/products/tea-maker-101-blue.webp";
 import styles from "./xinobi.module.css";
 
 export const metadata: Metadata = {
-  title: "Xinobi Dünyası | Tasarım yaklaşımımız",
-  description: "Xinobi'nin gündelik ritüelleri yalın, kişisel ve anlaşılır teknolojiyle buluşturan tasarım yaklaşımını keşfedin.",
+  title: "Xinobi Dünyası | Hakkımızda",
+  description: "Xinobi, ileri teknolojiyi, zarif tasarımı ve güvenilir kaliteyi bir araya getiren premium küçük ev aletleri markasıdır. Xinobi U ve Premium Products yaklaşımımızı keşfedin.",
 };
-
-const principles = [
-  { no: "01", title: "Sessiz işlev", copy: "Teknoloji kendini göstermek için değil, günlük akışı kolaylaştırmak için çalışır." },
-  { no: "02", title: "Kalıcı sadelik", copy: "Gereksiz ayrıntıları azaltır, malzeme ve kullanımı görünür bırakırız." },
-  { no: "03", title: "Kişisel alan", copy: "Seçili ürünlerde renk ve tasarım seçenekleriyle kullanıcıya söz hakkı veririz." },
-];
 
 export default function XinobiPage() {
   return <div className={styles.page}>
     <a className={styles.skipLink} href="#content">İçeriğe geç</a>
-    <header className={styles.header}>
-      <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav aria-label="Kurumsal menü"><Link href="#yaklasim">Yaklaşımımız</Link><Link href="#ilkeler">İlkeler</Link><Link href="#notlar">Xinobi notları</Link></nav>
-      <Link className={styles.productsLink} href="/urunler">Ürünleri keşfet <span aria-hidden="true">↗</span></Link>
-    </header>
-
+    <SiteHeader />
     <main id="content">
       <section className={styles.hero} aria-labelledby="hero-title">
-        <div className={styles.heroCopy}><p>Xinobi dünyası</p><h1 id="hero-title">Günün ritmine uyum sağlayan teknoloji.</h1><span>Ev teknolojilerini daha anlaşılır, daha kişisel ve daha sakin bir deneyime dönüştürmek için tasarlıyoruz.</span></div>
-        <div className={styles.heroVisual}><div className={styles.orbit} /><Image src={teaMaker} alt="Lacivert Xinobi çay makinesi" priority sizes="(max-width: 760px) 94vw, 50vw" /></div>
+        <div className={styles.heroCopy}><p className={styles.kicker}>Xinobi dünyası · Hakkımızda</p><h1 id="hero-title">Teknolojiyi tasarımla, tasarımı sizin tarzınızla buluşturuyoruz.</h1><p className={styles.lead}>Xinobi, modern yaşamın ihtiyaçlarından ilham alarak ileri teknolojiyi, zarif tasarımı ve güvenilir kaliteyi bir araya getiren premium küçük ev aletleri markasıdır.</p></div>
+        <div className={styles.heroVisual}><Image src={teaMaker} alt="Lacivert Xinobi çay makinesi" priority sizes="(max-width: 760px) 90vw, 45vw" /></div>
       </section>
-
-      <section id="yaklasim" className={styles.statement} aria-labelledby="approach-title"><p>Yaklaşımımız</p><h2 id="approach-title">İyi tasarım, gözünüzü değil gününüzü yormaz.</h2><div><span>Xinobi için yalınlık yalnızca bir görünüm değil; ürünü anlamayı, kullanmayı ve yaşam alanına katmayı kolaylaştıran bir karardır.</span><span>Bu sayfadaki marka anlatısı Faz02 prototip içeriğidir. Nihai kurumsal metinler içerik sahibi onayı ve Faz04 CMS yayınıyla kesinleşir.</span></div></section>
-
-      <section id="ilkeler" className={styles.principles} aria-labelledby="principles-title"><div className={styles.sectionHeading}><p>Tasarım ilkeleri</p><h2 id="principles-title">Azaltılmış form.<br />Güçlü karakter.</h2></div><div className={styles.principleGrid}>{principles.map((item) => <article key={item.no}><span>{item.no}</span><h3>{item.title}</h3><p>{item.copy}</p></article>)}</div></section>
-
-      <section className={styles.material} aria-labelledby="material-title"><div className={styles.materialVisual}><Image src={coffeeMaker} alt="Gold detaylı Xinobi kahve makinesi" sizes="(max-width: 760px) 100vw, 52vw" /></div><div className={styles.materialCopy}><p>Malzeme ve renk</p><h2 id="material-title">Yaşam alanına karışan, karakterini koruyan.</h2><span>Metal yüzeyler, dengeli renkler ve sade kontroller; ürünün hem yakından hem de bulunduğu mekânın bütünü içinde iyi hissettirmesi için bir araya gelir.</span><Link href="/urunler">Koleksiyonu incele <b aria-hidden="true">→</b></Link></div></section>
-
-      <section id="notlar" className={styles.notes} aria-labelledby="notes-title"><div className={styles.sectionHeading}><p>Xinobi notları</p><h2 id="notes-title">Tasarım ve gündelik yaşam üzerine.</h2></div><div className={styles.noteGrid}><article><Image src={airPurifier} alt="Xinobi hava temizleyici" sizes="(max-width: 760px) 92vw, 46vw" /><div><span>Yaşam · Yakında</span><h3>Evde daha sakin bir teknoloji dili</h3><p>Bu içerik kartı görsel hiyerarşi prototipidir; henüz yayınlanmış bir yazı değildir.</p></div></article><article className={styles.emptyNote}><span>CMS yayını bekleniyor</span><h3>Yeni hikâyeler için ayrılmış alan.</h3><p>Blog, referans ve kampanya içerikleri Faz04 yayın akışı tamamlanınca yalnızca onaylı içerikten beslenecek.</p></article></div></section>
-
-      <section className={styles.cta}><p>Bir ürünle başlayın</p><h2>Gündelik ritüelinize uygun Xinobi&apos;yi bulun.</h2><div><Link href="/urunler">Ürünleri keşfet</Link><Link href="/asistan">Asistana danış</Link></div></section>
+      <section className={styles.introduction} aria-label="Xinobi yaklaşımı">
+        <p>Bizim için bir ürün yalnızca işlevini yerine getiren bir cihaz değil; yaşam alanının bir parçası, kişisel tarzın bir yansıması ve günlük yaşamı daha keyifli hale getiren bir deneyimdir.</p>
+        <p>Bu anlayışla Xinobi&apos;yi iki temel yaklaşım üzerine inşa ediyoruz: Xinobi U ve Premium Products.</p>
+        <nav className={styles.sectionNav} aria-label="Xinobi dünyası bölümleri"><Link href="#xinobi-u">Xinobi U ↗</Link><Link href="#premium-products">Premium Products ↗</Link><Link href="#inovasyon">Bizim İçin İnovasyon ↗</Link></nav>
+      </section>
+      <section id="xinobi-u" className={styles.personalization} aria-labelledby="personalization-title">
+        <div className={styles.sectionCopy}><p className={styles.kicker}>01 · Kişiselleştirilmiş tasarım</p><h2 id="personalization-title">Xinobi U</h2><p>Her insanın yaşam tarzı, zevki ve beklentisi farklıdır. Xinobi U, bu farklılıkları merkeze alan kişiselleştirilmiş tasarım yaklaşımımızdır.</p><p>Farklı renk, malzeme, yüzey ve tasarım alternatifleriyle kullanıcıların kendi tarzlarını ürünlerine yansıtabilmelerini ve yaşam alanlarıyla uyumlu seçimler yapabilmelerini hedefliyoruz.</p><p className={styles.emphasis}>Çünkü bir ürün, ancak size ait hissettirdiğinde özel kılar.</p><Link className={styles.textLink} href="/xinobi-u">Xinobi U&apos;yu keşfet →</Link></div>
+        <div className={styles.designVisual}><span className={styles.designLabel}>Sizin tarzınız. Sizin Xinobi&apos;niz.</span><Image src="/assets/banners/xinobi-personalized-tea-makers.png" alt="Farklı tasarımlarla kişiselleştirilmiş Xinobi çay makineleri" width={1200} height={800} sizes="(max-width: 760px) 90vw, 45vw" /></div>
+      </section>
+      <section id="premium-products" className={styles.premium} aria-labelledby="premium-title">
+        <div className={styles.productVisual}><Image src={coffeeMaker} alt="Gold detaylı Xinobi kahve makinesi" sizes="(max-width: 760px) 90vw, 45vw" /></div>
+        <div className={styles.sectionCopy}><p className={styles.kicker}>02 · Teknoloji, tasarım ve kalite</p><h2 id="premium-title">Premium Products</h2><p>Xinobi ürünleri; ileri teknoloji, zarif tasarım ve güvenilir kalite anlayışıyla geliştirilir.</p><p>Minimal ve zamansız tasarım çizgisini akıllı teknolojilerle bir araya getirerek yalnızca yüksek performans sunan değil, aynı zamanda bulunduğu yaşam alanına değer katan ürünler tasarlıyoruz.</p><p>Her detayda kullanım kolaylığını, estetiği ve kaliteyi bir arada düşünerek premium deneyimi günlük yaşamın doğal bir parçası haline getirmeyi amaçlıyoruz.</p><Link className={styles.textLink} href="/urunler">Ürünleri keşfet →</Link></div>
+      </section>
+      <section id="inovasyon" className={styles.innovation} aria-labelledby="innovation-title"><p className={styles.kicker}>İnsan odaklı teknoloji</p><h2 id="innovation-title">Bizim İçin İnovasyon</h2><div><p>Xinobi&apos;de inovasyonu yalnızca yeni teknolojiler geliştirmek olarak görmüyoruz. İnovasyonun, teknolojiyi insan ihtiyaçlarıyla doğru şekilde buluşturmak olduğuna inanıyoruz.</p><p>Kişiselleştirilebilir tasarım ile premium ürün anlayışını bir araya getirerek, kullanıcıların kendi tarzlarını yansıtabildiği ve her kullanımda farkını hissettiren ürünler geliştiriyoruz.</p></div></section>
     </main>
-
-    <footer className={styles.footer}><Link href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} /></Link><p>Gündelik ritüeller için sessiz teknoloji.</p><nav aria-label="Alt menü"><Link href="/urunler">Ürünler</Link><Link href="/kurumsal/teklif">Kurumsal teklif</Link><Link href="/asistan">Xinobi Asistan</Link></nav><span>© 2026 Xinobi · Faz02 prototipi</span></footer>
+    <CommerceFooter />
   </div>;
 }

@@ -16,7 +16,7 @@
 ## Gerçek Cloudflare uçtan uca (proje sahibi onayıyla)
 
 - Emülatörde XINOBI U → ürün → (o sırada var olan) renk → 5 soru (Renk, Ruh hâli, Doğa, Görsel yoğunluk, Tarz) → özet → üretim. Sunucu görseli 13 sn'de üretti (11:01:12→11:01:25, oturum `00c47c51`); uygulama 22 sn içinde "İşte sana özel yorum" ekranına geçti.
-- **Beklenmeyen ek üretimler:** sonuç ekranından sonra, betiklerim dokunuş göndermezken uygulama emülatörde yeni anketler açtı ve iki anket daha yanıtlanıp üretildi (`e0809ccd` 11:02:32, `9c34e22e` 11:03:55). Bugünkü sağlayıcı çağrısı toplam **3** (günlük sınır 30). Seçilen seçenekler betik deseniyle uyuşmuyor; emülatör penceresinin kullanıcı tarafından kullanılmış olabileceği proje sahibine soruldu, yanıt bekleniyor. Uygulama kodunda üretimi kendiliğinden başlatan yol yok (widget testi tek düğme basışında tek çağrıyı doğrular). Uygulama, emülatör ve geçici API hemen durduruldu.
+- **Beklenmeyen ek üretimler:** sonuç ekranından sonra, betiklerim dokunuş göndermezken uygulama emülatörde yeni anketler açtı ve iki anket daha yanıtlanıp üretildi (`e0809ccd` 11:02:32, `9c34e22e` 11:03:55). Bugünkü sağlayıcı çağrısı toplam **3** (günlük sınır 30). Seçilen seçenekler betik deseniyle uyuşmuyordu. **Çözüldü (07.10.2026):** proje sahibi bu iki üretimi emülatör penceresinden kendisinin yaptığını teyit etti; uygulama hatası yok. Uygulama kodunda üretimi kendiliğinden başlatan yol yok (widget testi tek düğme basışında tek çağrıyı doğrular). Uygulama, emülatör ve geçici API hemen durduruldu.
 - Sonuç ekranının emülatör görüntüsü bu nedenle alınamadı; sonuç ekranı widget testinde doğrulandı.
 
 ## Komut ve sonuç
@@ -39,4 +39,4 @@ Kayma: üretim tekrarı                                          → değişen d
 
 ## Etki ve sonraki adım
 
-XINOBI U web ve mobilde renk sormadan aynı kuralla çalışıyor. Sonraki: dev API yeniden başlatılınca `test-xinobi-u.mjs`; ek üretimlerin nedeni netleşince gerekirse önlem.
+XINOBI U web ve mobilde renk sormadan aynı kuralla çalışıyor. Sonraki: dev API yeniden başlatılınca `test-xinobi-u.mjs`.

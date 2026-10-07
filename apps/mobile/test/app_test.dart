@@ -31,7 +31,8 @@ VariantDetail _variant(String id, String color, String hex, {int? price, require
   ..price = price == null ? null : _try(price).toBuilder()
   ..availability.status = status
   ..availability.remaining = remaining
-  ..purchasable = price != null && status != 'out_of_stock');
+  ..purchasable = price != null && status != 'out_of_stock'
+  ..maxQuantity = status == 'out_of_stock' ? 0 : (remaining ?? 8));
 
 class FakeCatalog implements CatalogRepository {
   int homeCalls = 0;

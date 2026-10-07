@@ -22,6 +22,7 @@ void main() {
           'price': {'amountMinor': 280000, 'currency': 'TRY'},
           'availability': {'status': 'low_stock', 'remaining': 4},
           'purchasable': true,
+          'maxQuantity': 4,
         },
         {
           'id': 'DEMO-V102-G',
@@ -32,6 +33,7 @@ void main() {
           'price': null,
           'availability': {'status': 'out_of_stock', 'remaining': 0},
           'purchasable': false,
+          'maxQuantity': 0,
         },
       ],
     };
@@ -45,6 +47,7 @@ void main() {
     expect(red.price?.currency, 'TRY');
     expect(red.availability.status, 'low_stock');
     expect(red.availability.remaining, 4);
+    expect(red.maxQuantity, 4);
     final gold = product.variants.last;
     expect(gold.price, isNull);
     expect(gold.purchasable, isFalse);

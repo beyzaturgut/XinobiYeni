@@ -346,6 +346,8 @@ export interface components {
             price: null | components["schemas"]["Money"];
             availability: components["schemas"]["Availability"];
             purchasable: boolean;
+            /** Format: int32 */
+            maxQuantity: number;
         };
         XinobiUAnswer: {
             questionId: string;

@@ -23,6 +23,8 @@ class _$VariantDetail extends VariantDetail {
   final Availability availability;
   @override
   final bool purchasable;
+  @override
+  final int maxQuantity;
 
   factory _$VariantDetail([void Function(VariantDetailBuilder)? updates]) =>
       (VariantDetailBuilder()..update(updates))._build();
@@ -35,7 +37,8 @@ class _$VariantDetail extends VariantDetail {
       this.imageUrl,
       this.price,
       required this.availability,
-      required this.purchasable})
+      required this.purchasable,
+      required this.maxQuantity})
       : super._();
   @override
   VariantDetail rebuild(void Function(VariantDetailBuilder) updates) =>
@@ -55,7 +58,8 @@ class _$VariantDetail extends VariantDetail {
         imageUrl == other.imageUrl &&
         price == other.price &&
         availability == other.availability &&
-        purchasable == other.purchasable;
+        purchasable == other.purchasable &&
+        maxQuantity == other.maxQuantity;
   }
 
   @override
@@ -69,6 +73,7 @@ class _$VariantDetail extends VariantDetail {
     _$hash = $jc(_$hash, price.hashCode);
     _$hash = $jc(_$hash, availability.hashCode);
     _$hash = $jc(_$hash, purchasable.hashCode);
+    _$hash = $jc(_$hash, maxQuantity.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -83,7 +88,8 @@ class _$VariantDetail extends VariantDetail {
           ..add('imageUrl', imageUrl)
           ..add('price', price)
           ..add('availability', availability)
-          ..add('purchasable', purchasable))
+          ..add('purchasable', purchasable)
+          ..add('maxQuantity', maxQuantity))
         .toString();
   }
 }
@@ -126,6 +132,10 @@ class VariantDetailBuilder
   bool? get purchasable => _$this._purchasable;
   set purchasable(bool? purchasable) => _$this._purchasable = purchasable;
 
+  int? _maxQuantity;
+  int? get maxQuantity => _$this._maxQuantity;
+  set maxQuantity(int? maxQuantity) => _$this._maxQuantity = maxQuantity;
+
   VariantDetailBuilder() {
     VariantDetail._defaults(this);
   }
@@ -141,6 +151,7 @@ class VariantDetailBuilder
       _price = $v.price?.toBuilder();
       _availability = $v.availability.toBuilder();
       _purchasable = $v.purchasable;
+      _maxQuantity = $v.maxQuantity;
       _$v = null;
     }
     return this;
@@ -176,6 +187,8 @@ class VariantDetailBuilder
             availability: availability.build(),
             purchasable: BuiltValueNullFieldError.checkNotNull(
                 purchasable, r'VariantDetail', 'purchasable'),
+            maxQuantity: BuiltValueNullFieldError.checkNotNull(
+                maxQuantity, r'VariantDetail', 'maxQuantity'),
           );
     } catch (_) {
       late String _$failedField;

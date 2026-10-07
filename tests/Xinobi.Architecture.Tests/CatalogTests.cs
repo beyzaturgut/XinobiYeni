@@ -73,10 +73,12 @@ public sealed class CatalogTests : IDisposable
         Assert.Equal(AvailabilityStatuses.InStock, blue.Availability.Status);
         Assert.Null(blue.Availability.Remaining);
         Assert.True(blue.Purchasable);
+        Assert.Equal(8, blue.MaxQuantity);
         Assert.StartsWith("http://localhost:3000/assets/", blue.ImageUrl);
         var unpriced = product.Variants.Single(variant => variant.Id == "DEMO-V101-S");
         Assert.Null(unpriced.Price);
         Assert.False(unpriced.Purchasable);
+        Assert.Equal(0, unpriced.MaxQuantity);
         var coffee = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P102"))!;
         Assert.Equal(new Availability(AvailabilityStatuses.LowStock, 4), coffee.Variants.Single(variant => variant.Id == "DEMO-V102-R").Availability);
         foreach (var missing in new[] { "unknown", "DEMO-P103" })
@@ -129,6 +131,13 @@ public sealed class CatalogTests : IDisposable
     [InlineData(6, "in_stock", null)]
     public void AvailabilityOnlyDisclosesLowStockCounts(int stock, string status, int? remaining) =>
         Assert.Equal(new Availability(status, remaining), CatalogProjection.AvailabilityFor(stock));
+
+    [Theory]
+    [InlineData(-3, 0)]
+    [InlineData(0, 0)]
+    [InlineData(8, 8)]
+    [InlineData(250, 99)]
+    public void CartLimitFollowsStockUpTo99(int stock, int expected) => Assert.Equal(expected, CatalogProjection.MaxQuantityFor(stock));
 
     [Theory]
     [InlineData("/api/v1/local-commerce/media/a.png", null, "http://api.test:5003/api/v1/local-commerce/media/a.png")]

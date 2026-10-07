@@ -16,6 +16,10 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
     public static bool IsPersonalizable(CommerceProduct product) =>
         product.Personalizable ?? (product.Category.Contains("Çay", StringComparison.Ordinal) || product.Category.Contains("Kahve", StringComparison.Ordinal));
 
+    public const int CartLineLimit = 99;
+
+    public static int MaxQuantityFor(int stock) => Math.Clamp(stock, 0, CartLineLimit);
+
     public static Availability AvailabilityFor(int stock) => stock switch
     {
         <= 0 => new(AvailabilityStatuses.OutOfStock, 0),
@@ -46,7 +50,7 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
             {
                 var price = PriceOf(variant);
                 return new VariantDetail(variant.Id, variant.Sku, variant.Color, variant.Hex, resolveUrl(variant.Image), price,
-                    AvailabilityFor(variant.Stock), price is not null && variant.Stock > 0);
+                    AvailabilityFor(variant.Stock), price is not null && variant.Stock > 0, MaxQuantityFor(variant.Stock));
             }).ToArray())
         : null;
 

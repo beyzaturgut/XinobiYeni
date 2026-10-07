@@ -31,6 +31,7 @@ public record ProductSummary(
 
 public record ProductPage(ProductSummary[] Items, int Page, int PageSize, int Total);
 
+/// <summary><c>MaxQuantity</c> is the most a cart may hold (stock, capped at 99, as the web cart enforces); checkout re-checks stock.</summary>
 public record VariantDetail(
     string Id,
     string Sku,
@@ -39,7 +40,8 @@ public record VariantDetail(
     string? ImageUrl,
     Money? Price,
     Availability Availability,
-    bool Purchasable);
+    bool Purchasable,
+    int MaxQuantity);
 
 public record ProductDetail(
     string Id,

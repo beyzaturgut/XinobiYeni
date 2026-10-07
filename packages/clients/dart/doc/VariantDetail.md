@@ -16,5 +16,6 @@ Name | Type | Description | Notes
 **price** | [**Money**](Money.md) |  |
 **availability** | [**Availability**](Availability.md) |  |
 **purchasable** | **bool** |  |
+**maxQuantity** | **int** |  |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

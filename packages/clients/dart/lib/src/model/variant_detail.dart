@@ -21,6 +21,7 @@ part 'variant_detail.g.dart';
 /// * [price]
 /// * [availability]
 /// * [purchasable]
+/// * [maxQuantity]
 @BuiltValue()
 abstract class VariantDetail implements Built<VariantDetail, VariantDetailBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -46,6 +47,9 @@ abstract class VariantDetail implements Built<VariantDetail, VariantDetailBuilde
 
   @BuiltValueField(wireName: r'purchasable')
   bool get purchasable;
+
+  @BuiltValueField(wireName: r'maxQuantity')
+  int get maxQuantity;
 
   VariantDetail._();
 
@@ -109,6 +113,11 @@ class _$VariantDetailSerializer implements PrimitiveSerializer<VariantDetail> {
     yield serializers.serialize(
       object.purchasable,
       specifiedType: const FullType(bool),
+    );
+    yield r'maxQuantity';
+    yield serializers.serialize(
+      object.maxQuantity,
+      specifiedType: const FullType(int),
     );
   }
 
@@ -191,6 +200,13 @@ class _$VariantDetailSerializer implements PrimitiveSerializer<VariantDetail> {
             specifiedType: const FullType(bool),
           ) as bool;
           result.purchasable = valueDes;
+          break;
+        case r'maxQuantity':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(int),
+          ) as int;
+          result.maxQuantity = valueDes;
           break;
         default:
           unhandled.add(key);

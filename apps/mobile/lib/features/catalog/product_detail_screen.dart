@@ -6,6 +6,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 import '../../app/design_tokens.g.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
+import '../cart/cart.dart';
 import 'catalog_repository.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
@@ -66,6 +67,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       _Swatch(variant: variant, selected: variant.id == selected.id, onTap: () => setState(() => selectedVariantId = variant.id)),
                   ]),
                 ],
+                if (variants.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: selected.purchasable ? () => _addToCart(detail, selected) : null,
+                      child: Text(selected.purchasable ? 'Sepete ekle' : selected.price == null ? 'Şu anda satın alınamaz' : 'Stokta yok'),
+                    ),
+                  ),
+                ],
                 if (detail.personalizable && variants.isNotEmpty && selected.imageUrl != null) ...[
                   const SizedBox(height: 24),
                   SizedBox(
@@ -92,12 +103,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
+  Future<void> _addToCart(ProductDetail product, VariantDetail variant) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity);
+      messenger.showSnackBar(SnackBar(
+        content: Text('${product.name} · ${variant.color} sepete eklendi.'),
+        action: SnackBarAction(label: 'Sepete git', onPressed: () => context.go('/sepet')),
+      ));
+    } on CartException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
   static final _none = VariantDetail((b) => b
     ..id = ''
     ..sku = ''
     ..color = ''
     ..availability.status = 'out_of_stock'
-    ..purchasable = false);
+    ..purchasable = false
+    ..maxQuantity = 0);
 }
 
 class _Swatch extends StatelessWidget {

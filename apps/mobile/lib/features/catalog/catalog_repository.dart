@@ -34,6 +34,7 @@ class ProductQuery {
 class CatalogException implements Exception {
   const CatalogException(this.message);
   final String message;
+  static const notFoundMessage = 'Bu ürün artık yayında değil.';
   @override
   String toString() => message;
 }
@@ -63,7 +64,7 @@ class ApiCatalogRepository implements CatalogRepository {
       ));
 
   @override
-  Future<ProductDetail> product(String id) => _call(() => _catalog.getCatalogProduct(id: id), notFound: 'Bu ürün artık yayında değil.');
+  Future<ProductDetail> product(String id) => _call(() => _catalog.getCatalogProduct(id: id), notFound: CatalogException.notFoundMessage);
 
   Future<T> _call<T>(Future<Response<T>> Function() request, {String? notFound}) async {
     try {

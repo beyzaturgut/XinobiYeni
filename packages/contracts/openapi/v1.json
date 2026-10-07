@@ -1035,7 +1035,8 @@
           "imageUrl",
           "price",
           "availability",
-          "purchasable"
+          "purchasable",
+          "maxQuantity"
         ],
         "type": "object",
         "properties": {
@@ -1075,6 +1076,10 @@
           },
           "purchasable": {
             "type": "boolean"
+          },
+          "maxQuantity": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

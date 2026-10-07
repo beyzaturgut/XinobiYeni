@@ -81,7 +81,12 @@ class ApiCatalogRepository implements CatalogRepository {
 }
 
 final apiClientProvider = Provider<XinobiApiClient>((ref) => XinobiApiClient(
-      basePathOverride: apiBaseUrl(isAndroid: !kIsWeb && Platform.isAndroid),
+      // The generated 3 s receive timeout is too short for calls that wait on SMTP (e-mail verification); same limit as the web.
+      dio: Dio(BaseOptions(
+        baseUrl: apiBaseUrl(isAndroid: !kIsWeb && Platform.isAndroid),
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 20),
+      )),
       // Auth interceptors are added with real sign-in (Faz03 03.03, ADR-004).
       interceptors: const [],
     ));

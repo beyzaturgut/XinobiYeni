@@ -65,6 +65,9 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
       if (existing != null) {
         try {
           current = await repository.session(existing);
+          // A finished design is not reopened from the product card: the user gets new questions (web rule).
+          // Unfinished questionnaires resume and running jobs keep polling.
+          if (current.status == 'ready' || current.status == 'failed') current = null;
         } on XinobiUException catch (error) {
           if (!error.sessionGone) rethrow;
           await store.forgetSession(widget.productId, widget.variantId);

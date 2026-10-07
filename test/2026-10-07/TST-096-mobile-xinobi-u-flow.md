@@ -40,3 +40,8 @@ Kayma: üretim tekrarı                                          → değişen d
 ## Etki ve sonraki adım
 
 XINOBI U web ve mobilde renk sormadan aynı kuralla çalışıyor. Sonraki: dev API yeniden başlatılınca `test-xinobi-u.mjs`.
+
+## Ek: dev API yeniden başlatıldıktan sonra (07.10.2026 ~16:20)
+
+- `node tools/test-xinobi-u.mjs` ilk koşuda **başarısız** oldu (satır 75): biten bir tasarımdan sonra aynı ürün kartı yeni anket yerine eski oturumu açıyordu. Neden: kaldırılan renk ekranının "Sorulara başla" düğmesi kayıtlı oturumu siliyordu; README kuralı "ürün kartına tıklamak yeni anket açar, yenilemek korur". Düzeltme: web ürün kartı tıklamada kayıtlı oturumu siler; mobilde tamamlanmış/başarısız tasarım üründen yeniden açılmaz (yarım anket devam eder, süren üretim beklenir). Tekrar: `test-xinobi-u` ve `test-xinobi-u-direct-questions` başarılı; Flutter 16/16 (1 yeni test). Sağlayıcı çağrısı yapılmadı.
+- `node tools/test-shared-header.mjs` başarısız: başka oturumun `20cc424` (hesap portalı ve giriş penceresi) değişikliğinden sonra `/hesap/giris` sayfasında header yok; diğer 7 rotada "Sepet" bağlantısı mevcut. Bu çalışmanın kapsamı dışında; değiştirilmedi, sahibinin kararı bekleniyor.

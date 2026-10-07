@@ -151,6 +151,15 @@ void main() {
     expect(find.text('Birlikte şekillenen beş tercih.'), findsOneWidget);
   });
 
+  testWidgets('a finished design is not reopened; the product starts new questions', (tester) async {
+    final fake = FakeXinobiU();
+    fake.sessions['done'] = _session('done', status: 'ready', answers: {for (var i = 0; i < 5; i++) 'q$i': 'q$i-o0'});
+    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:': 'done'});
+    await pumpQuestionnaire(tester, fake);
+    expect(fake.created, 1);
+    expect(find.text('Soru 1 / 5'), findsOneWidget);
+  });
+
   testWidgets('an expired stored session starts a new questionnaire', (tester) async {
     SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:': 'old'});
     final fake = FakeXinobiU()..expired.add('old');

@@ -126,3 +126,5 @@
 - 07.10.2026 · [TST-096 mobil XINOBI U ve renk adımının kaldırılması](2026-10-07/TST-096-mobile-xinobi-u-flow.md) — Mobil anket akışı, gerçek Cloudflare ile 13 sn üretim; bugün 3 sağlayıcı çağrısı (1 test + 2 proje sahibinin emülatördeki denemesi); renk adımı web+mobilden kaldırıldı; .NET 66/66, Flutter 15/15, Dart 4/4; web XINOBI U e2e dev API yeniden başlatılmayı bekliyor.
 
 - 07.10.2026 · [TST-097 mobil sepet](2026-10-07/TST-097-mobile-cart.md) — Web ile aynı sepet kuralları, `maxQuantity` sözleşmesi; .NET 70/70, Flutter 20/20, Dart 4/4; emülatörde kopya veriyle sepete ekleme ve toplam doğrulandı; kullanıcı verisi değişmedi.
+
+- 07.10.2026 · [TST-098 ortak hesap API'si ve mobil hesap](2026-10-07/TST-098-account-api-mobile.md) — Kayıt/giriş/yenileme/çıkış/profil, jetonlar özetli; .NET 77/77, Flutter 25/25; emülatörde üyelik ve oturum geri yükleme doğrulandı. Olay: ilk koşuda testlerden 5 gerçek doğrulama e-postası `ayse@example.com`'a gitti; düzeltildi ve güvenceye alındı.

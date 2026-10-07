@@ -10,6 +10,8 @@ using Xinobi.Api.Infrastructure.Readiness;
 using Xinobi.Persistence;
 using Xinobi.Api.Catalog;
 using Xinobi.Api.XinobiU;
+using Xinobi.Api.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Xinobi.Api.EmailVerification;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -30,6 +32,7 @@ if (builder.Environment.IsDevelopment())
     else
         builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
     builder.Services.AddSingleton<EmailVerificationStore>();
+    builder.Services.AddSingleton<IAccountStore, DevFileAccountStore>();
     builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
@@ -38,6 +41,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddRateLimiter(options => {
         options.RejectionStatusCode = 429;
         options.AddPolicy("EmailVerification", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+        options.AddPolicy("Account", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
         options.AddPolicy("DesignStudio", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "local", _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
     });
     builder.Services.AddCors(options => options.AddPolicy("LocalCommerce", policy => policy
@@ -47,6 +51,10 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
 // Outside Development the catalog answers 503 until the SQL Server source exists (Faz03 03.11).
 builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
+builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
+builder.Services.TryAddSingleton(TimeProvider.System);
+builder.Services.AddAuthentication(AccountTokenHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, AccountTokenHandler>(AccountTokenHandler.SchemeName, null);
+builder.Services.AddAuthorization();
 builder.Services.AddSingleton<ISqlServerReadinessProbe, SqlServerReadinessProbe>();
 builder.Services.AddProblemDetails(options =>
 {
@@ -82,11 +90,14 @@ app.UseStatusCodePages(async statusCodeContext =>
 });
 if (app.Environment.IsDevelopment()) { app.UseCors("LocalCommerce"); app.UseRateLimiter(); }
 else app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapLocalCommerce();
 app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();
 app.MapXinobiU();
+app.MapAccounts();
 
 var api = app.MapGroup("/api/v1");
 

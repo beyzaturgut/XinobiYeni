@@ -14,8 +14,11 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:xinobi_api_client/src/date_serializer.dart';
 import 'package:xinobi_api_client/src/model/date.dart';
 
+import 'package:xinobi_api_client/src/model/account_email_verification.dart';
+import 'package:xinobi_api_client/src/model/account_profile.dart';
 import 'package:xinobi_api_client/src/model/announcement_item.dart';
 import 'package:xinobi_api_client/src/model/announcement_list.dart';
+import 'package:xinobi_api_client/src/model/auth_session.dart';
 import 'package:xinobi_api_client/src/model/availability.dart';
 import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
@@ -25,12 +28,17 @@ import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
 import 'package:xinobi_api_client/src/model/home_content.dart';
 import 'package:xinobi_api_client/src/model/home_slide.dart';
+import 'package:xinobi_api_client/src/model/login_account.dart';
+import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:xinobi_api_client/src/model/problem_details.dart';
 import 'package:xinobi_api_client/src/model/product_detail.dart';
 import 'package:xinobi_api_client/src/model/product_page.dart';
 import 'package:xinobi_api_client/src/model/product_summary.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
+import 'package:xinobi_api_client/src/model/refresh_session.dart';
+import 'package:xinobi_api_client/src/model/register_account.dart';
+import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_generation_request.dart';
@@ -44,8 +52,11 @@ import 'package:xinobi_api_client/src/model/xinobi_u_variant.dart';
 part 'serializers.g.dart';
 
 @SerializersFor([
+  AccountEmailVerification,
+  AccountProfile,
   AnnouncementItem,
   AnnouncementList,
+  AuthSession,
   Availability,
   CategoryHighlight,
   CategoryItem,
@@ -55,12 +66,17 @@ part 'serializers.g.dart';
   HealthResponse,
   HomeContent,
   HomeSlide,
+  LoginAccount,
+  LogoutSession,
   Money,
   ProblemDetails,
   ProductDetail,
   ProductPage,
   ProductSummary,
   ReadinessResponse,
+  RefreshSession,
+  RegisterAccount,
+  StartAccountEmailVerification,
   VariantDetail,
   XinobiUAnswer,
   XinobiUGenerationRequest,

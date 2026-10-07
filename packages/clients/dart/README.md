@@ -47,14 +47,13 @@ Please follow the [installation procedure](#installation--usage) and then run th
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 
-final api = XinobiApiClient().getCatalogApi();
-final String id = id_example; // String |
+final api = XinobiApiClient().getAccountApi();
 
 try {
-    final response = await api.getCatalogProduct(id);
+    final response = await api.getMyAccount();
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling CatalogApi->getCatalogProduct: $e\n");
+    print("Exception when calling AccountApi->getMyAccount: $e\n");
 }
 
 ```
@@ -65,6 +64,12 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
+[*AccountApi*](doc/AccountApi.md) | [**logoutSession**](doc/AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
+[*AccountApi*](doc/AccountApi.md) | [**refreshSession**](doc/AccountApi.md#refreshsession) | **POST** /api/v1/auth/refresh |
+[*AccountApi*](doc/AccountApi.md) | [**registerAccount**](doc/AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
+[*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogCategories**](doc/CatalogApi.md#listcatalogcategories) | **GET** /api/v1/catalog/categories |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogProducts**](doc/CatalogApi.md#listcatalogproducts) | **GET** /api/v1/catalog/products |
@@ -82,8 +87,11 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AccountEmailVerification](doc/AccountEmailVerification.md)
+ - [AccountProfile](doc/AccountProfile.md)
  - [AnnouncementItem](doc/AnnouncementItem.md)
  - [AnnouncementList](doc/AnnouncementList.md)
+ - [AuthSession](doc/AuthSession.md)
  - [Availability](doc/Availability.md)
  - [CategoryHighlight](doc/CategoryHighlight.md)
  - [CategoryItem](doc/CategoryItem.md)
@@ -93,12 +101,17 @@ Class | Method | HTTP request | Description
  - [HealthResponse](doc/HealthResponse.md)
  - [HomeContent](doc/HomeContent.md)
  - [HomeSlide](doc/HomeSlide.md)
+ - [LoginAccount](doc/LoginAccount.md)
+ - [LogoutSession](doc/LogoutSession.md)
  - [Money](doc/Money.md)
  - [ProblemDetails](doc/ProblemDetails.md)
  - [ProductDetail](doc/ProductDetail.md)
  - [ProductPage](doc/ProductPage.md)
  - [ProductSummary](doc/ProductSummary.md)
  - [ReadinessResponse](doc/ReadinessResponse.md)
+ - [RefreshSession](doc/RefreshSession.md)
+ - [RegisterAccount](doc/RegisterAccount.md)
+ - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [VariantDetail](doc/VariantDetail.md)
  - [XinobiUAnswer](doc/XinobiUAnswer.md)
  - [XinobiUGenerationRequest](doc/XinobiUGenerationRequest.md)

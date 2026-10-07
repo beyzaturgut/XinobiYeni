@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/account/account_screen.dart';
 import '../features/cart/cart.dart';
 import '../features/cart/cart_screen.dart';
 
@@ -11,7 +12,7 @@ import '../features/home/home_screen.dart';
 import '../features/xinobi_u/questionnaire_screen.dart';
 import '../features/xinobi_u/xinobi_u_screen.dart';
 
-/// Four tabs keep their own navigation stacks; product detail opens above the tabs so Android back returns to the list.
+/// Five tabs keep their own navigation stacks; product detail opens above the tabs so Android back returns to the list.
 GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
       initialLocation: initialLocation,
       routes: [
@@ -30,6 +31,7 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
             ]),
             StatefulShellBranch(routes: [GoRoute(path: '/xinobi-u', builder: (context, state) => const XinobiUScreen())]),
             StatefulShellBranch(routes: [GoRoute(path: '/sepet', builder: (context, state) => const CartScreen())]),
+            StatefulShellBranch(routes: [GoRoute(path: '/hesap', builder: (context, state) => const AccountScreen())]),
           ],
         ),
         GoRoute(path: '/urunler/:id', builder: (context, state) => ProductDetailScreen(productId: state.pathParameters['id']!)),
@@ -65,6 +67,7 @@ class _Shell extends ConsumerWidget {
               label: 'Sepet',
               tooltip: count > 0 ? 'Sepet, $count ürün' : 'Sepet',
             ),
+            const NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Hesap'),
           ],
         ),
       );

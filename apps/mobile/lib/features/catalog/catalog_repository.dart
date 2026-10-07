@@ -13,6 +13,7 @@ abstract interface class CatalogRepository {
   Future<CategoryList> categories();
   Future<ProductPage> products(ProductQuery query);
   Future<ProductDetail> product(String id);
+  Future<AnnouncementList> announcements();
 }
 
 @immutable
@@ -51,6 +52,9 @@ class ApiCatalogRepository implements CatalogRepository {
 
   @override
   Future<HomeContent> home() => _call(() => _content.getHomeContent());
+
+  @override
+  Future<AnnouncementList> announcements() => _call(() => _content.listAnnouncements());
 
   @override
   Future<CategoryList> categories() => _call(() => _catalog.listCatalogCategories());

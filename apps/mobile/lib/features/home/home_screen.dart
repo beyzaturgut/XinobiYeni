@@ -21,7 +21,7 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final home = ref.watch(homeProvider);
     return Scaffold(
-      appBar: XinobiHeader(onSearch: () => context.go('/urunler?ara=1')),
+      appBar: const XinobiHeader(),
       body: home.when(
         loading: () => const LoadingView(),
         error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(homeProvider)),

@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../app/design_tokens.g.dart';
-import '../app/theme.dart';
+import '../features/news/news.dart';
 
-/// Single 64px black strip matching the web header (DES-HDR-01 rev.1): logo on the left, search field to its right.
-class XinobiHeader extends StatelessWidget implements PreferredSizeWidget {
-  const XinobiHeader({super.key, this.onSearch, this.leading});
-
-  final VoidCallback? onSearch;
-  final Widget? leading;
+/// Single 64px black strip (DES-HDR-01 rev.1, mobile revision): logo on the left; favourites and news on the right.
+/// Search lives in the Ürünler tab.
+class XinobiHeader extends ConsumerWidget implements PreferredSizeWidget {
+  const XinobiHeader({super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(XinobiTokens.headerHeight);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadAnnouncementsProvider);
     return Material(
       color: XinobiTokens.header,
       child: SafeArea(
@@ -22,42 +23,35 @@ class XinobiHeader extends StatelessWidget implements PreferredSizeWidget {
         child: SizedBox(
           height: XinobiTokens.headerHeight,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: XinobiTokens.gutterMobile),
+            padding: const EdgeInsets.only(left: XinobiTokens.gutterMobile, right: 4),
             child: Row(
               children: [
-                if (leading != null) ...[leading!, const SizedBox(width: 8)],
                 Semantics(
                   label: 'Xinobi',
                   image: true,
                   child: Image.asset('assets/brand/xinobi-logo-white.png', height: XinobiTokens.headerLogoHeightMobile, excludeFromSemantics: true),
                 ),
-                const SizedBox(width: 24),
-                if (onSearch != null)
-                  Expanded(
-                    child: Semantics(
-                      button: true,
-                      label: 'Ara',
-                      child: InkWell(
-                        onTap: onSearch,
-                        borderRadius: BorderRadius.circular(XinobiTokens.headerSearchRadius),
-                        child: Container(
-                          height: XinobiTokens.headerSearchHeight,
-                          padding: const EdgeInsets.only(left: 10),
-                          decoration: BoxDecoration(
-                            color: XinobiTokens.surface,
-                            borderRadius: BorderRadius.circular(XinobiTokens.headerSearchRadius),
-                          ),
-                          child: Row(children: [
-                            const Icon(Icons.search, size: 18, color: XinobiTokens.ink),
-                            const SizedBox(width: 10),
-                            ExcludeSemantics(child: Text('Ara', style: jost(16, color: XinobiTokens.searchPlaceholder))),
-                          ]),
-                        ),
-                      ),
+                const Spacer(),
+                IconButton(
+                  tooltip: 'Favorilerim',
+                  color: XinobiTokens.onHeader,
+                  icon: const Icon(Icons.favorite_border),
+                  onPressed: () => context.push('/favoriler'),
+                ),
+                IconButton(
+                  tooltip: unread > 0 ? 'Haber ve duyurular, $unread yeni' : 'Haber ve duyurular',
+                  color: XinobiTokens.onHeader,
+                  // The tooltip already says the count; the badge text would otherwise replace the button's name.
+                  icon: ExcludeSemantics(
+                    child: Badge(
+                      isLabelVisible: unread > 0,
+                      label: Text('$unread'),
+                      backgroundColor: XinobiTokens.danger,
+                      child: const Icon(Icons.mail_outline),
                     ),
-                  )
-                else
-                  const Spacer(),
+                  ),
+                  onPressed: () => context.push('/duyurular'),
+                ),
               ],
             ),
           ),

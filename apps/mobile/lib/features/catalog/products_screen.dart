@@ -56,7 +56,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
     final products = ref.watch(productsProvider(query));
     final categories = ref.watch(categoriesProvider).asData?.value.items.where((item) => item.productCount > 0).toList() ?? const [];
     return Scaffold(
-      appBar: XinobiHeader(onSearch: searchFocus.requestFocus),
+      appBar: const XinobiHeader(),
       body: CustomScrollView(slivers: [
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 20, XinobiTokens.gutterMobile, 8),

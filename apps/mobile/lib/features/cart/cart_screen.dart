@@ -18,7 +18,7 @@ class CartScreen extends ConsumerWidget {
     final items = ref.watch(cartItemsProvider);
     final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: XinobiHeader(onSearch: () => context.go('/urunler?ara=1')),
+      appBar: const XinobiHeader(),
       body: lines.isEmpty
           ? Center(
               child: Padding(

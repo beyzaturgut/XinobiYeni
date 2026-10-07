@@ -65,6 +65,7 @@ Dyson'ın marka tipi kamuya açık bir font lisansı olarak doğrulanamadığı 
 - **Tek kaynak:** Renk, font ve header ölçüleri `design/tokens.json` (v0.3.0) içinde; `pnpm tokens:mobile` Dart tokenlarını üretir, Flutter testi uyumu denetler. Müşteri tasarım değişikliği geldiğinde önce tokenlar değişir, web ve mobil birlikte güncellenir.
 - **Bilinen sınır:** Admin'deki slider ve XINOBI U görselleri yazı içeren geniş masaüstü bannerları (~2,5:1). Mobil bunları 2,4:1 kadrajda gösterir; dikey mobil görsel alanı Faz04 slider medyası işiyle eklenmelidir.
 - **Durum:** Geçici; F02-A10 mobil tasarım teslimi ve web tasarım onayıyla birlikte yeniden değerlendirilir.
+- **rev.1 (07.10.2026, proje sahibi):** Mobil header'dan arama kutusu kaldırıldı; sağda Favorilerim (kalp) ve Haber ve duyurular (zarf, okunmamış sayısı rozetiyle) düğmeleri var. Arama Ürünler sekmesindeki arama alanında. Web header'ı değişmedi.
 
 ## DES-XU-01 — XINOBI U'da renk seçimi kaldırıldı (07.10.2026)
 

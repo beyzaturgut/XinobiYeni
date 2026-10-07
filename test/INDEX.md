@@ -134,3 +134,5 @@
 - 07.10.2026 · [TST-100 rol/yetki kataloğu](2026-10-07/TST-100-roles-permissions.md) — 17 kaynak, `super_admin`, `RequirePermission`, varsayılan ret (herkese açık alanlar açık liste), konsoldan bir kez süper yönetici; .NET 82/82.
 
 - 07.10.2026 · [TST-101 mobil favoriler](2026-10-07/TST-101-mobile-favorites.md) — Web ile aynı cihaz içi biçim; kart ve ürün sayfasında kalp, `/favoriler`, Hesap bağlantısı; Flutter 30/30; emülatörde doğrulandı.
+
+- 07.10.2026 · [TST-102 mobil header ve duyurular](2026-10-07/TST-102-mobile-header-news.md) — Arama kaldırıldı, favoriler + duyurular header'da; okunmamış rozeti; Flutter 34/34; emülatörde doğrulandı.

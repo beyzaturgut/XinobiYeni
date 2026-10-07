@@ -38,6 +38,10 @@ class FakeCatalog implements CatalogRepository {
   int homeCalls = 0;
   bool failHome = false;
   final queries = <ProductQuery>[];
+  List<AnnouncementItem> news = [];
+
+  @override
+  Future<AnnouncementList> announcements() async => AnnouncementList((b) => b.items.addAll(news));
 
   @override
   Future<HomeContent> home() async {

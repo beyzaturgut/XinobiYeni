@@ -1,11 +1,9 @@
-/* Header metrics follow dyson.com.tr as measured on 07.10.2026 (owner request): 53px utility strip incl. 1px #333 rule, 64px masthead,
-   1270px max content, 14px/18px utility links, 16px/24px nav, 245×34 search, 24px icons; single 64px row at ≤1024px. Font: Jost (open, Futura-like). */
+/* Header metrics follow the dyson.com.tr masthead measured on 07.10.2026 (owner request): one 64px strip, 1270px max content,
+   16px/24px light nav, 245×34 search, 24px icons. Owner revision: utility strip removed, logo enlarged to 44px (40px mobile). Font: Jost. */
 .siteHeader{position:relative;z-index:30;background:#000;color:#fff;font-family:var(--font-header);font-weight:300}
-.inner{width:min(1270px,calc(100% - 128px));margin-inline:auto;display:flex;align-items:center;justify-content:space-between;height:100%}
-.utility{height:53px;border-bottom:1px solid #333;box-sizing:border-box}
-.brand{display:flex;align-items:center;height:28px;flex-shrink:0}.brand img{width:auto;height:28px;object-fit:contain}
-.topNav{display:flex;align-items:center;gap:24px;font-size:14px;line-height:18px}.topNav a{padding-block:13px;color:#fff}
-.masthead{height:64px}
+.bar{height:64px}
+.inner{width:min(1270px,calc(100% - 128px));margin-inline:auto;display:flex;align-items:center;gap:40px;height:100%}
+.brand{display:flex;align-items:center;height:44px;flex-shrink:0}.brand img{width:auto;height:44px;object-fit:contain}
 .desktopNav{display:flex;align-items:center;gap:12px;font-size:16px;line-height:24px;white-space:nowrap}
 .desktopNav>a,.categoryMenu>button{padding-block:20px;font:inherit;font-weight:300}
 .desktopNav>a{margin-right:10px}
@@ -13,20 +11,20 @@
 .chevron{width:10px;height:6px;flex-shrink:0}
 .categoryMenu>div{position:absolute;top:100%;left:0;width:440px;max-height:60vh;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:0 24px;padding:22px;background:#fff;color:#222;box-shadow:0 15px 35px #0003;font-size:16px}.categoryMenu>div[hidden]{display:none}.categoryMenu>div a{padding:14px 0;border-bottom:1px solid #ddd;white-space:normal}
 /* Icons are 24px with a 44px touch target (HND-02); negative edge margin keeps the visible icon flush with the content edge. */
-.headerActions{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-right:-10px}
+.headerActions{display:flex;align-items:center;gap:4px;flex-shrink:0;margin-left:auto;margin-right:-10px}
 .headerActions>a:not(.search),.newsButton{width:44px;height:44px;flex-shrink:0;display:grid;place-items:center;color:#fff}.headerActions>a:not(.search) svg,.newsButton svg{width:24px;height:24px}
 .search{display:flex;align-items:center;width:245px;height:34px;box-sizing:border-box;padding-left:10px;margin-right:10px;border-radius:4px;background:#fff;color:#000;font-size:16px;font-weight:300}.search svg{width:18px;height:18px;flex-shrink:0}.search span{padding-left:10px;color:#757575}
 .newsButton{position:relative;border:0;background:none;cursor:pointer}.newsBadge{position:absolute;right:4px;top:4px;background:#fff;color:#000;border-radius:12px;font-size:10px;min-width:17px;padding:2px 4px}
 .newsInbox{position:absolute;right:24px;top:calc(100% + 8px);width:min(410px,calc(100vw - 32px));max-height:65vh;overflow:auto;padding:20px;background:#fff;color:#222;border:1px solid #ddd;box-shadow:0 15px 40px #0002;z-index:45;font-family:var(--font-ui);font-weight:400}.newsInbox[hidden]{display:none}.newsHeading{display:flex;align-items:center;justify-content:space-between;gap:16px}.newsHeading h2{font-size:18px;margin:0}.newsHeading button{width:40px;height:40px;border:0;background:#fff;font-size:24px;cursor:pointer}.newsInbox article{border-top:1px solid #ddd;padding:16px 0}.newsInbox small{font-size:11px;color:#777}.newsInbox h3{font-size:16px;margin:8px 0}.newsInbox p{white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.6}
 .mobileMenu{display:none}
 .siteHeader a:focus-visible,.siteHeader button:focus-visible,.mobileMenu summary:focus-visible{outline:2px solid currentColor;outline-offset:4px}
-/* ≤1024px: one 64px row — menu (16px), logo (24px high), search, icons; 50px side padding, 25px at ≤600px. */
+/* ≤1024px: one 64px row — menu (16px), logo (40px high), search, icons; 50px side padding, 25px at ≤600px. */
 @media(max-width:1024px){
  .siteHeader{display:flex;align-items:center;height:64px;padding-inline:50px}
- .utility,.masthead,.inner{display:contents}
- .topNav,.desktopNav,.headerActions>a.desktopOnly{display:none}
+ .bar,.inner{display:contents}
+ .desktopNav,.headerActions>a.desktopOnly{display:none}
  .mobileMenu{display:block;order:1;margin-right:16px}
- .brand{order:2;height:24px;margin-right:32px}.brand img{height:24px}
+ .brand{order:2;height:40px;margin-right:24px}.brand img{height:40px}
  .headerActions{order:3;flex:1;min-width:0;justify-content:flex-end}
  .search{width:245px;flex-shrink:1;min-width:0}
  .mobileMenu summary{width:16px;height:48px;display:flex;align-items:center;cursor:pointer;list-style:none}.mobileMenu summary::-webkit-details-marker{display:none}.mobileMenu summary svg{width:16px;height:12px}

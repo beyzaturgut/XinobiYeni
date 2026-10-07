@@ -49,3 +49,11 @@ Dyson'ın marka tipi kamuya açık bir font lisansı olarak doğrulanamadığı 
 - **Uygulanan değerler:** üst şerit 53 px (52 + 1 px `#333` çizgi); ana şerit 64 px; içerik en fazla 1270 px, en az 64 px kenar; üst bağlantılar 14/18 px, ağırlık 300, aralık 24 px; menü 16/24 px, ağırlık 300, açılır ok 10×6 px, aralık 22/12 px; logo yüksekliği 28 px (mobil 24 px); arama kutusu 245×34 px, beyaz, köşe 4 px, ikon 18 px, yer tutucu `#757575` 16 px; ikonlar 24 px, aralık 24 px. ≤1024 px: tek 64 px şerit, kenar 50 px (≤600 px'de 25 px), 16 px hamburger.
 - **Font:** Dyson Futura lisanslı ve kullanılamaz; header için açık lisanslı, Futura'dan esinlenen **Jost** (Google Fonts, latin-ext) kullanıldı. Sayfa gövdesi Inter'de kaldı. K-10 "sayfalarda aynı font" ilkesi açısından header'ın farklı font kullanması proje sahibinin onayına sunuldu; tüm siteye geçiş ayrıca kararlaştırılabilir.
 - **Bilinçli farklar:** Xinobi logosu kare oranlı olduğu için 28 px yükseklikte genişliği 32 px (Dyson 74 px). Hesap, favori ve duyuru ikonları korundu; mobilde hesap ve favori hamburger menüye taşındı, duyuru ikonu kaldı; bu yüzden 390 px'de arama kutusu 157 px (Dyson 173 px). İkonlar görsel olarak 24 px, dokunma alanı 44 px (HND-02).
+
+### DES-HDR-01 revizyon 1 — Tek şerit header (07.10.2026)
+
+- **Karar sahibi:** Proje sahibi ("üst header alanını tek şeride indir, logoyu en sola koy, Xinobi dünyasını XINOBI U yanına yaz, üst satırdaki diğer şeyleri sil; logo çok küçük kaldı").
+- Üst şerit (53 px) kaldırıldı; header tek 64 px şerit (Dyson ana şerit ölçüsü korunur).
+- Sıra: logo (en solda, 44 px yükseklik; mobil 40 px) → Ürünler · Kategoriler · XINOBI U · Xinobi dünyası → arama ve ikonlar sağda. Logo ile menü arası 40 px.
+- "Kurumsal teklif" ve "Destek" header'dan çıkarıldı. Erişim: ana sayfa footer bağlantıları ve Nobi asistan düğmesi; footer'ın tüm sayfalara eklenmesi web tasarım onayında ayrıca kararlaştırılacak.
+- Menü, arama kutusu, ikon ve mobil ölçüleri DES-HDR-01 ile aynı kalır.

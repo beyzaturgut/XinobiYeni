@@ -6,13 +6,15 @@ const navLabels = async () => {
   const header = page.locator("header").first();
   return {
     main: await header.getByRole("navigation", { name: "Ana menü" }).locator(":scope > a, :scope > div > button").allTextContents(),
-    corporate: await header.getByRole("navigation", { name: "Kurumsal menü" }).getByRole("link").allTextContents(),
+    corporateMenus: await header.getByRole("navigation", { name: "Kurumsal menü" }).count(),
   };
 };
 await page.goto("http://127.0.0.1:3000", { waitUntil: "networkidle" });
 const home = await navLabels();
-if (home.main.join("|") !== "Ürünler|Kategoriler|XINOBI U") throw new Error(`Home navigation is incorrect: ${home.main.join("|")}`);
-if (home.corporate.join("|") !== "Xinobi dünyası|Kurumsal teklif|Destek") throw new Error(`Corporate navigation is incorrect: ${home.corporate.join("|")}`);
+if (home.main.join("|") !== "Ürünler|Kategoriler|XINOBI U|Xinobi dünyası") throw new Error(`Home navigation is incorrect: ${home.main.join("|")}`);
+if (home.corporateMenus !== 0) throw new Error("Header must be a single strip without the corporate menu");
+const header = page.locator("header").first();
+if ((await header.locator("img").first().boundingBox()).height < 40) throw new Error("Header logo must be at least 40px high");
 const mainNav = page.locator("header").first().getByRole("navigation", { name: "Ana menü" });
 await mainNav.getByRole("button", { name: "Kategoriler" }).hover();
 const menu = page.locator("#home-category-menu");
@@ -22,5 +24,5 @@ if ((await menu.getByRole("link", { name: "XINOBI U", exact: true }).count()) !=
 await page.goto("http://127.0.0.1:3000/urunler", { waitUntil: "networkidle" });
 const products = await navLabels();
 if (products.main.join("|") !== home.main.join("|")) throw new Error(`Product page header differs: ${products.main.join("|")}`);
-console.log("web navigation: shared header main/corporate menus, category hover dropdown, same header on product page = OK");
+console.log("web navigation: single-strip header, logo size, Xinobi dünyası beside XINOBI U, category hover dropdown, same header on product page = OK");
 await browser.close();

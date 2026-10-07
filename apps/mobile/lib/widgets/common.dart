@@ -69,13 +69,15 @@ class EmptyView extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product});
+  const ProductCard({super.key, required this.product, this.onTap});
   final ProductSummary product;
+  /// Defaults to the product detail page.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    void open() => context.push('/urunler/${Uri.encodeComponent(product.id)}');
+    void open() => onTap != null ? onTap!() : context.push('/urunler/${Uri.encodeComponent(product.id)}');
     // The merged label replaces the children's semantics, so the tap action is restated for screen readers.
     return Semantics(
       button: true,
@@ -125,7 +127,10 @@ class ProductCard extends StatelessWidget {
 }
 
 /// Two-column product grid sized for phones; switches to three columns on wide screens.
-SliverGrid productGrid(List<ProductSummary> products) => SliverGrid(
+SliverGrid productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap}) => SliverGrid(
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 260, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.52),
-      delegate: SliverChildBuilderDelegate((context, index) => ProductCard(product: products[index]), childCount: products.length),
+      delegate: SliverChildBuilderDelegate(
+        (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index])),
+        childCount: products.length,
+      ),
     );

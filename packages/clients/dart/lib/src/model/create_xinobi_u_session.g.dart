@@ -10,7 +10,7 @@ class _$CreateXinobiUSession extends CreateXinobiUSession {
   @override
   final String productId;
   @override
-  final String variantId;
+  final String? variantId;
   @override
   final String clientId;
 
@@ -19,9 +19,7 @@ class _$CreateXinobiUSession extends CreateXinobiUSession {
       (CreateXinobiUSessionBuilder()..update(updates))._build();
 
   _$CreateXinobiUSession._(
-      {required this.productId,
-      required this.variantId,
-      required this.clientId})
+      {required this.productId, this.variantId, required this.clientId})
       : super._();
   @override
   CreateXinobiUSession rebuild(
@@ -110,8 +108,7 @@ class CreateXinobiUSessionBuilder
         _$CreateXinobiUSession._(
           productId: BuiltValueNullFieldError.checkNotNull(
               productId, r'CreateXinobiUSession', 'productId'),
-          variantId: BuiltValueNullFieldError.checkNotNull(
-              variantId, r'CreateXinobiUSession', 'variantId'),
+          variantId: variantId,
           clientId: BuiltValueNullFieldError.checkNotNull(
               clientId, r'CreateXinobiUSession', 'clientId'),
         );

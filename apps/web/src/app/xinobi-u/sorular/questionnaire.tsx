@@ -8,7 +8,8 @@ import { browserId, designRequest, rememberSession, sessionKey, studioAsset, typ
 import styles from '../studio.module.css';
 export default function Questionnaire() {
   const params = useSearchParams(); const router = useRouter();
-  const product = params.get('product') || 'DEMO-P101', variant = params.get('variant') || 'DEMO-V101-B';
+  // Colour is not chosen (the pattern covers the body); without `variant` the server uses the first photographed variant.
+  const product = params.get('product') || 'DEMO-P101', variant = params.get('variant') || '';
   const [session, setSession] = useState<DesignSession | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0), [error, setError] = useState(''), [busy, setBusy] = useState(false), [revision, setRevision] = useState(0);
@@ -23,14 +24,15 @@ export default function Questionnaire() {
       if (existing) {
         try { return await designRequest<DesignSession>(`/sessions/${existing}`); } catch { sessionStorage.removeItem(sessionKey(product, variant)); }
       }
-      return designRequest<DesignSession>('/sessions', 'POST', { productId: product, variantId: variant, browserId: browserId() });
+      return designRequest<DesignSession>('/sessions', 'POST', { productId: product, variantId: variant || null, browserId: browserId() });
     }
     const key = `${product}:${variant}:${revision}`;
     if (startingKey.current !== key) { startingKey.current = key; starting.current = null; }
     starting.current ??= load();
     starting.current.then(data => {
       if (!active) return;
-      rememberSession(data); setSession(data);
+      // Also remember it under the requested key (variant may be empty) so a reload resumes the same questionnaire.
+      rememberSession(data); sessionStorage.setItem(sessionKey(product, variant), data.id); setSession(data);
       const saved = data.answers.length ? Object.fromEntries(data.answers.map(answer => [answer.questionId, answer.optionId])) : JSON.parse(sessionStorage.getItem(`xinobi-u-answers:${data.id}`) || '{}');
       setAnswers(saved); setError('');
     }).catch(error => { if (active) setError(error instanceof Error ? error.message : 'Sorular yüklenemedi.'); });
@@ -67,7 +69,7 @@ export default function Questionnaire() {
   const question = session.questions[step];
   const complete = session.questions.every(q => Boolean(answers[q.id]));
   const generating = status === 'queued' || status === 'running';
-  return <main className={styles.main}><div className={styles.questionLayout}><aside className={styles.selection}><div className={styles.selectionImage}><Image src={mediaUrl(session.variant.image, commerceApi)} alt={`${session.product.name}, ${session.variant.color}`} width={500} height={600} /></div><p className={styles.kicker}>Seçtiğin ürün</p><h2>{session.product.name}</h2><p>{session.variant.color}</p><Link href="/xinobi-u">Başka ürün seç ↗</Link></aside><section className={styles.questionPanel} aria-live="polite">
+  return <main className={styles.main}><div className={styles.questionLayout}><aside className={styles.selection}><div className={styles.selectionImage}><Image src={mediaUrl(session.variant.image, commerceApi)} alt={session.product.name} width={500} height={600} /></div><p className={styles.kicker}>Seçtiğin ürün</p><h2>{session.product.name}</h2><Link href="/xinobi-u">Başka ürün seç ↗</Link></aside><section className={styles.questionPanel} aria-live="polite">
     {status === 'questionnaire' && <button className={styles.freshQuestions} onClick={restart} disabled={busy}>Yeni sorular seç ↻</button>}
     {error && <p className={styles.error} role="alert">{error}</p>}
     {generating ? <div className={styles.result}><p className={styles.kicker}>Tercihlerin tasarıma dönüşüyor</p><h1>Tasarımın hazırlanıyor.</h1><div className={styles.loader} /><p>Bu işlem biraz sürebilir. Sayfayı yenilesen de aynı üretime devam edebilirsin.</p></div> : status === 'failed' ? <div className={styles.result}><h1>Tasarım tamamlanamadı.</h1><p role="alert">{session.errorMessage}</p><button className={styles.primary} onClick={restart}>Yeni bir tasarım yolculuğu başlat</button></div> : status === 'ready' && session.imageUrl ? <div className={styles.result}><p className={styles.kicker}>Senin cevapların. Senin tasarımın.</p><h1>İşte sana özel yorum.</h1><Image className={styles.artwork} src={studioAsset(session.imageUrl)} alt="Yanıtlarına göre AI ile oluşturulan tasarım" width={800} height={800} unoptimized /><p>AI ile oluşturuldu. Şimdi seçtiğin üründe nasıl göründüğüne bak.</p><button className={styles.primary} onClick={() => { rememberSession(session); router.push('/xinobi-u/onizleme'); }}>Ürünümde dene ↗</button><button className={styles.secondary} onClick={restart}>Yeni sorularla keşfet</button></div> : step < 5 ? <>

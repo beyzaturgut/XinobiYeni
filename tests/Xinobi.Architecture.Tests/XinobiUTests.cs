@@ -78,6 +78,23 @@ public sealed class XinobiUTests : IDisposable
     }
 
     [Fact]
+    public async Task SessionWithoutColourUsesTheFirstPhotographedVariant()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        foreach (var variant in new string?[] { null, "" })
+        {
+            var response = await client.PostAsJsonAsync(Root + "/sessions", new CreateXinobiUSession("DEMO-P101", variant, Guid.NewGuid().ToString()));
+            response.EnsureSuccessStatusCode();
+            var session = (await response.Content.ReadFromJsonAsync<XinobiUSession>())!;
+            Assert.Equal("DEMO-V101-B", session.Variant.Id);
+            Assert.Equal(5, session.Questions.Length);
+        }
+        var unknown = await client.PostAsJsonAsync(Root + "/sessions", new CreateXinobiUSession("DEMO-P101", "missing", Guid.NewGuid().ToString()));
+        Assert.Equal(HttpStatusCode.BadRequest, unknown.StatusCode);
+    }
+
+    [Fact]
     public async Task GenerationIsIdempotentAndServesTheImage()
     {
         using var factory = Factory();

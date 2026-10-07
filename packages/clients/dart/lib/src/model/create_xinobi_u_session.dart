@@ -20,7 +20,7 @@ abstract class CreateXinobiUSession implements Built<CreateXinobiUSession, Creat
   String get productId;
 
   @BuiltValueField(wireName: r'variantId')
-  String get variantId;
+  String? get variantId;
 
   @BuiltValueField(wireName: r'clientId')
   String get clientId;
@@ -54,9 +54,9 @@ class _$CreateXinobiUSessionSerializer implements PrimitiveSerializer<CreateXino
       specifiedType: const FullType(String),
     );
     yield r'variantId';
-    yield serializers.serialize(
+    yield object.variantId == null ? null : serializers.serialize(
       object.variantId,
-      specifiedType: const FullType(String),
+      specifiedType: const FullType.nullable(String),
     );
     yield r'clientId';
     yield serializers.serialize(
@@ -96,8 +96,9 @@ class _$CreateXinobiUSessionSerializer implements PrimitiveSerializer<CreateXino
         case r'variantId':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(String),
-          ) as String;
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
           result.variantId = valueDes;
           break;
         case r'clientId':

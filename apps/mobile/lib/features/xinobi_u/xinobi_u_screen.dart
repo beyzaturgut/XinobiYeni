@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
 import '../catalog/catalog_repository.dart';
 
-/// XINOBI U entry: lists every personalizable product (K-18). The question flow is the next mobile task.
+/// XINOBI U entry: lists every personalizable product (K-18); a product opens the questions directly. Colour is not asked:
+/// the pattern covers the body, so the server uses the product's first photographed variant for the preview.
 class XinobiUScreen extends ConsumerWidget {
   const XinobiUScreen({super.key});
 
@@ -37,7 +39,7 @@ class XinobiUScreen extends ConsumerWidget {
               : [
                   SliverPadding(
                     padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 0, XinobiTokens.gutterMobile, 32),
-                    sliver: productGrid(page.items.toList()),
+                    sliver: productGrid(page.items.toList(), onTap: (product) => context.push('/xinobi-u/anket?urun=${Uri.encodeQueryComponent(product.id)}')),
                   ),
                 ],
         ),

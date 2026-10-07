@@ -683,7 +683,10 @@
             "type": "string"
           },
           "variantId": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "clientId": {
             "type": "string"

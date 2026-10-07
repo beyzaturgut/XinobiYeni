@@ -1,4 +1,11 @@
-import {Suspense} from 'react';
-import SiteHeader from '../../../components/site-header';
-import ColorSelection from './color-selection';
-export default function Page(){return <><SiteHeader/><Suspense fallback={<p>Ürün yükleniyor…</p>}><ColorSelection/></Suspense></>}
+'use client';
+import {Suspense, useEffect} from 'react';
+import {useRouter, useSearchParams} from 'next/navigation';
+
+// The colour step was removed (the pattern covers the body); old links go straight to the questions.
+function Redirect(){
+  const router=useRouter();const product=useSearchParams().get('product');
+  useEffect(()=>{router.replace(product?`/xinobi-u/sorular?product=${encodeURIComponent(product)}`:'/xinobi-u')},[router,product]);
+  return <p role="status">Sorulara yönlendiriliyorsun…</p>;
+}
+export default function Page(){return <Suspense fallback={null}><Redirect/></Suspense>}

@@ -8,7 +8,8 @@ namespace Xinobi.Api.XinobiU;
 
 // Public XINOBI U contract for web and mobile. `ClientId` is a random per-install (or per-browser) UUID; no personal data is collected.
 public record XinobiUStatus(bool GenerationAvailable, string QuestionBankVersion, int QuestionCount);
-public record CreateXinobiUSession(string ProductId, string VariantId, string ClientId);
+/// <summary>Omit <c>VariantId</c> to let the server pick the product's first photographed variant (colour does not affect the design).</summary>
+public record CreateXinobiUSession(string ProductId, string? VariantId, string ClientId);
 public record XinobiUAnswer(string QuestionId, string OptionId);
 public record XinobiUGenerationRequest(XinobiUAnswer[] Answers);
 public record XinobiUOption(string Id, string Label);

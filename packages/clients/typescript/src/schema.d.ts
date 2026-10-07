@@ -251,7 +251,7 @@ export interface components {
         };
         CreateXinobiUSession: {
             productId: string;
-            variantId: string;
+            variantId: null | string;
             clientId: string;
         };
         DependencyHealth: {

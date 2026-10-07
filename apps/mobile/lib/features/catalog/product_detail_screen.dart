@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
@@ -64,6 +65,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     for (final variant in variants)
                       _Swatch(variant: variant, selected: variant.id == selected.id, onTap: () => setState(() => selectedVariantId = variant.id)),
                   ]),
+                ],
+                if (detail.personalizable && variants.isNotEmpty && selected.imageUrl != null) ...[
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton(
+                      onPressed: () => context.push('/xinobi-u/anket?urun=${Uri.encodeQueryComponent(detail.id)}&renk=${Uri.encodeQueryComponent(selected.id)}'),
+                      child: Text('${selected.color} rengini XINOBI U ile kişiselleştir'),
+                    ),
+                  ),
                 ],
                 if (detail.description.isNotEmpty) ...[
                   const SizedBox(height: 24),

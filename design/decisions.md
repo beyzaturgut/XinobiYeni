@@ -65,3 +65,10 @@ Dyson'ın marka tipi kamuya açık bir font lisansı olarak doğrulanamadığı 
 - **Tek kaynak:** Renk, font ve header ölçüleri `design/tokens.json` (v0.3.0) içinde; `pnpm tokens:mobile` Dart tokenlarını üretir, Flutter testi uyumu denetler. Müşteri tasarım değişikliği geldiğinde önce tokenlar değişir, web ve mobil birlikte güncellenir.
 - **Bilinen sınır:** Admin'deki slider ve XINOBI U görselleri yazı içeren geniş masaüstü bannerları (~2,5:1). Mobil bunları 2,4:1 kadrajda gösterir; dikey mobil görsel alanı Faz04 slider medyası işiyle eklenmelidir.
 - **Durum:** Geçici; F02-A10 mobil tasarım teslimi ve web tasarım onayıyla birlikte yeniden değerlendirilir.
+
+## DES-XU-01 — XINOBI U'da renk seçimi kaldırıldı (07.10.2026)
+
+- **Karar sahibi:** Proje sahibi ("hangi renkten devam edersiniz kısmını hem web hem mobil için kaldır; üzerine uygulanan desenden ötürü renk fark etmiyor").
+- Ürün kartı doğrudan beş soruya gider. Oturum açılırken renk gönderilmezse sunucu, önizleme fotoğrafı için ürünün görseli olan ilk rengini kullanır. Ürün detayından "XINOBI U ile kişiselleştir" ile gelinirse orada seçili renk kullanılır; bu ayrı bir adım değildir.
+- Soru ekranında renk adı gösterilmez. Eski `/xinobi-u/renk` bağlantıları sorulara yönlenir.
+- Sözleşme: `CreateXinobiUSession.variantId` ve web'in `/api/v1/design-studio/sessions` isteğindeki `variantId` isteğe bağlı.

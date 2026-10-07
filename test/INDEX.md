@@ -122,3 +122,5 @@
 - 07.10.2026 · [TST-094 XINOBI U oturum sözleşmesi](2026-10-07/TST-094-xinobi-u-api-contract.md) — 5 uç sözleşmede, korumalar aynen, Production'da 503; .NET 58/58, Dart 4/4, Flutter temiz, kayma 0; ücretli çağrı yok.
 
 - 07.10.2026 · [TST-095 Flutter iskeleti ve katalog ekranları](2026-10-07/TST-095-flutter-app-skeleton.md) — Riverpod/go_router, tokenlardan tema, 4 ekran; flutter analyze temiz, 10/10 test; Android emülatöründe gerçek veriyle doğrulandı; 3 taşma ve 1 erişilebilirlik hatası düzeltildi.
+
+- 07.10.2026 · [TST-096 mobil XINOBI U ve renk adımının kaldırılması](2026-10-07/TST-096-mobile-xinobi-u-flow.md) — Mobil anket akışı, gerçek Cloudflare ile 13 sn üretim; bugün 3 sağlayıcı çağrısı (2'si beklenmeyen, inceleniyor); renk adımı web+mobilden kaldırıldı; .NET 66/66, Flutter 15/15, Dart 4/4; web XINOBI U e2e dev API yeniden başlatılmayı bekliyor.

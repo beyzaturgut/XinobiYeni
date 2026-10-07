@@ -6,7 +6,8 @@ using Xinobi.Api.LocalCommerce;
 
 namespace Xinobi.Api.DesignStudio;
 
-public record CreateDesignSession(string ProductId, string VariantId, string BrowserId);
+/// <summary><c>VariantId</c> is optional: the pattern covers the body, so colour no longer matters and the first variant with a photo is used for the preview.</summary>
+public record CreateDesignSession(string ProductId, string? VariantId, string BrowserId);
 public record GenerateDesignRequest(DesignAnswer[] Answers);
 public record DesignSession(string Id, string BrowserId, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt, CommerceProduct Product, CommerceVariant Variant, string BankVersion, SessionQuestion[] Questions)
 {
@@ -52,7 +53,10 @@ public sealed class DesignSessionStore(LocalCommerceStore commerce, QuestionBank
         if (!Guid.TryParse(request.BrowserId, out _)) throw new ArgumentException("Geçerli bir tarayıcı oturumu gerekli.");
         var products = await commerce.Read();
         var product = products.Products.SingleOrDefault(p => p.Id == request.ProductId && Eligible(p)) ?? throw new ArgumentException("Bu ürün kişiselleştirmeye açık değil.");
-        var variant = product.Variants.SingleOrDefault(v => v.Id == request.VariantId && !string.IsNullOrWhiteSpace(v.Image)) ?? throw new ArgumentException("Geçerli bir ürün görseli seçin.");
+        var variant = (string.IsNullOrWhiteSpace(request.VariantId)
+            ? product.Variants.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v.Image))
+            : product.Variants.SingleOrDefault(v => v.Id == request.VariantId && !string.IsNullOrWhiteSpace(v.Image)))
+            ?? throw new ArgumentException("Bu ürün için geçerli bir ürün görseli yok.");
         await gate.WaitAsync();
         try
         {

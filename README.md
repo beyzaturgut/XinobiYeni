@@ -55,9 +55,9 @@ Yeni/açısı farklı admin fotoğrafları için otomatik kusursuz yüzey tahmin
 
 ### Ürün rengi ve sepet
 
-XINOBI U ürün seçimi ardından `/xinobi-u/renk` ekranında kullanıcı renk seçer; sorular bu varyant kimliğiyle başlatılır. Ürün detayındaki “Sepete ekle” seçilen varyantı `xinobi-cart-v1` anahtarıyla tarayıcıda saklar. Sepet fiyatları ve stok uygunluğu güncel commerce içeriğinden okunur; fiyatı olmayan veya stoksuz varyantlar eklenemez. Mevcut stok azalırsa sepet kullanıcıdan adedi azaltmasını ister. Sepet gerçek ödeme almaz ve sunucuda stok rezervasyonu yapmaz; aşağıdaki demo ödeme akışına bağlanır.
+XINOBI U'da renk seçimi yoktur: desen ürün gövdesini kapladığı için renk sonucu değiştirmez. Ürün kartı doğrudan sorulara gider; sunucu önizleme için ürünün görseli olan ilk rengini kullanır (ürün detayından başlanırsa oradaki seçili renk kullanılır). Eski `/xinobi-u/renk` bağlantıları sorulara yönlenir. Ürün detayındaki “Sepete ekle” seçilen varyantı `xinobi-cart-v1` anahtarıyla tarayıcıda saklar. Sepet fiyatları ve stok uygunluğu güncel commerce içeriğinden okunur; fiyatı olmayan veya stoksuz varyantlar eklenemez. Mevcut stok azalırsa sepet kullanıcıdan adedi azaltmasını ister. Sepet gerçek ödeme almaz ve sunucuda stok rezervasyonu yapmaz; aşağıdaki demo ödeme akışına bağlanır.
 
-Kontroller: `node tools/test-studio-color-selection.mjs`, `node tools/test-cart.mjs` (izole test verileri; Cloudflare üretim çağrısı yok).
+Kontroller: `node tools/test-xinobi-u-direct-questions.mjs`, `node tools/test-cart.mjs` (izole test verileri; Cloudflare üretim çağrısı yok).
 
 ### Tarayıcıda demo alışveriş
 

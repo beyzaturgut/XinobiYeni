@@ -6,20 +6,15 @@ const api='http://127.0.0.1:5003/api/v1/design-studio';
 const fixture = await readFile('apps/web/public/assets/banners/home-slider-2.png');
 let generated=0;
 const commerce=await (await fetch('http://127.0.0.1:5003/api/v1/local-commerce/state')).json();
-// Picks the first personalizable product and its first color, so the test does not depend on catalog names.
+// Picks the first personalizable product, so the test does not depend on catalog names. There is no colour step;
+// the server picks the product's first photographed variant, which the session reports.
 async function startDesign(page){
  const card=page.getByRole('link',{name:/ için tasarım oluştur$/}).first();
  const productName=(await card.getAttribute('aria-label')).replace(/ için tasarım oluştur$/,'');
+ assert.ok(commerce.products.some(item=>item.name===productName),'XINOBI U ürünü API kaydında yok: '+productName);
  await card.click();
- await page.waitForURL('**/renk/**');
- const consent=page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true});if(await consent.isVisible())await consent.click();
- await page.getByRole('radio').first().check();
- const start=page.getByRole('link',{name:'Sorulara başla',exact:false});
- const variantId=new URL(await start.getAttribute('href'),'http://localhost').searchParams.get('variant');
- const product=commerce.products.find(item=>item.name===productName);assert.ok(product,'XINOBI U ürünü API kaydında yok: '+productName);
- const variant=product.variants.find(item=>item.id===variantId);assert.ok(variant,'Seçilen renk API kaydında yok: '+variantId);
- await start.click();
- return {productName,color:variant.color};
+ await page.waitForURL('**/sorular/**');
+ return {productName};
 }
 try {
  for(const width of [1440,390]){
@@ -71,7 +66,7 @@ try {
   await page.getByRole('button',{name:'AI ile tasarımımı oluştur ✦',exact:true}).click();
   await page.getByRole('heading',{name:'İşte sana özel yorum.'}).waitFor();
   await page.getByRole('button',{name:'Ürünümde dene ↗',exact:true}).click();
-  await page.getByRole('img',{name:`${choice.productName} ${choice.color} üzerinde AI tasarımının dijital önizlemesi`,exact:true}).waitFor();
+  await page.getByRole('img',{name:new RegExp(`^${choice.productName.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')} .+ üzerinde AI tasarımının dijital önizlemesi$`)}).waitFor();
   assert.equal(await page.locator('canvas').evaluate(canvas=>canvas.width>0&&canvas.height>0),true);
   const download=page.waitForEvent('download');await page.getByRole('button',{name:'Ürün önizlemesini indir',exact:true}).click();assert.equal((await download).suggestedFilename(),'xinobi-u-urun-onizlemesi.png');
   await page.screenshot({path:`/tmp/xinobi-u-preview-${width}.png`,fullPage:true});

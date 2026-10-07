@@ -23,6 +23,7 @@ type ProductPatternPreviewProps = {
   brandingOverlaySrc?: string;
   patternSrc: string;
   placementMode?: "pattern" | "artwork";
+  onArtworkMove?: (x: number, y: number) => void;
   patternTransform: PatternTransform;
   curvatureStrength?: number;
   alt: string;
@@ -72,7 +73,9 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+  const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
+  const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
@@ -143,8 +146,39 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     if (branding) context.drawImage(branding, 0, 0);
   }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode]);
 
+  // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.
+  const draggable = placementMode === "artwork" && !!onArtworkMove && status === "ready";
+  function sourcePoint(event: React.PointerEvent<HTMLCanvasElement>) {
+    const rect=event.currentTarget.getBoundingClientRect();
+    return {x:(event.clientX-rect.left)*SOURCE_WIDTH/rect.width,y:(event.clientY-rect.top)*SOURCE_HEIGHT/rect.height};
+  }
+  function hit(point:{x:number;y:number}) {
+    if(!draggable || !result?.assets || point.x<0 || point.y<0 || point.x>=SOURCE_WIDTH || point.y>=SOURCE_HEIGHT)return false;
+    return result.assets.patternBuffer.getContext("2d")!.getImageData(Math.floor(point.x),Math.floor(point.y),1,1).data[3]>32;
+  }
+  function endDrag(event: React.PointerEvent<HTMLCanvasElement>) {
+    if(drag.current?.pointerId!==event.pointerId)return;
+    drag.current=null;setCursor(hit(sourcePoint(event))?"grab":"auto");
+    if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
+  }
   return <div className={styles.productPreview} aria-busy={status === "loading"}>
-    <canvas ref={canvasRef} width={SOURCE_WIDTH} height={SOURCE_HEIGHT} role="img" aria-label={alt} hidden={status !== "ready"} />
+    <canvas ref={canvasRef} width={SOURCE_WIDTH} height={SOURCE_HEIGHT} role="img" aria-label={alt} hidden={status !== "ready"}
+      style={draggable ? {touchAction:"none",cursor} : undefined}
+      onPointerDown={event=>{
+        if(event.button!==0 || !event.isPrimary || !hit(sourcePoint(event)))return;
+        const point=sourcePoint(event);drag.current={pointerId:event.pointerId,startX:point.x,startY:point.y,x,y};
+        event.currentTarget.setPointerCapture(event.pointerId);setCursor("grabbing");event.preventDefault();
+      }}
+      onPointerMove={event=>{
+        const point=sourcePoint(event),active=drag.current;
+        if(active && active.pointerId===event.pointerId && draggable){
+          onArtworkMove!(Math.max(0,Math.min(SOURCE_WIDTH,active.x+point.x-active.startX)),Math.max(0,Math.min(SOURCE_HEIGHT,active.y+point.y-active.startY)));
+        }else if(draggable)setCursor(hit(point)?"grab":"auto");
+      }}
+      onPointerUp={endDrag} onPointerCancel={endDrag}
+      onLostPointerCapture={()=>{drag.current=null;setCursor("auto")}}
+      onPointerLeave={()=>{if(!drag.current)setCursor("auto")}}
+    />
     {status !== "ready" && <div className={styles.previewMessage} role={status === "error" ? "alert" : "status"}>
       <p>{status === "error" ? "Ürün önizlemesi yüklenemedi. Lütfen sayfayı yenileyin." : "Ürün önizlemesi hazırlanıyor…"}</p>
     </div>}

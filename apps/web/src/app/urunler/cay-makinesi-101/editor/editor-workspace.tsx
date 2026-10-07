@@ -58,6 +58,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
             brandingOverlaySrc={renderingInputs.branding?.url}
             patternSrc={patternSrc}
             placementMode={placementMode}
+            onArtworkMove={placementMode === "artwork" ? (x,y)=>setPatternTransform(current=>({...current,x,y})) : undefined}
             patternTransform={patternTransform}
             curvatureStrength={curvatureStrength}
             alt="Çay Makinesi 101, desenli ürün önizlemesi"

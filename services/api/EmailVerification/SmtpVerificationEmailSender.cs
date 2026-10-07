@@ -23,7 +23,13 @@ public sealed class SmtpVerificationEmailSender(IConfiguration configuration) : 
         timeout.CancelAfter(TimeSpan.FromSeconds(20));
         try
         {
-            using var client = new SmtpClient { Timeout = 20000 };
+            using var client = new SmtpClient
+            {
+                Timeout = 20000,
+                // Keep certificate/hostname validation. Local environments without working
+                // revocation lookups can opt out of that lookup alone.
+                CheckCertificateRevocation = configuration.GetValue("Email:Smtp:CheckCertificateRevocation", true)
+            };
             var port = configuration.GetValue("Email:Smtp:Port", 587);
             // Require encryption; do not allow opportunistic or plaintext authentication.
             await client.ConnectAsync(configuration["Email:Smtp:Host"]!, port,

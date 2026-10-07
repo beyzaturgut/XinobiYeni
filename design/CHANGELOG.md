@@ -1,5 +1,77 @@
 # Faz02 tasarım değişiklikleri
 
+## 0.35.0 - 03.10.2026
+
+- ADM-002 rol matrisi, sürümlü demo sistem ayarları ve güvenli alanlı denetim geçmişi eklendi.
+- Tanımsız yetki reddi, sabit demo yönetici rolü, sürüm çakışması ve önce/sonra kayıtları doğrulandı.
+- Model/UI, build/lint ve panel regresyonu başarılı; gerçek kimlik ve API erişim kontrolü açık.
+
+## 0.34.0 - 03.10.2026
+
+- ADM-012 politika/istem sürümleri, kullanım/hata, bilgi kaynağı uygunluğu ve destek devri prototipi eklendi.
+- Bilinmeyen ücret ve taslak/onaysız/süresi dolmuş kaynaklar doğru ayrıldı.
+- Model/UI, build/lint ve panel regresyonu başarılı; gerçek Cloudflare çağrısı veya destek devri açılmadı.
+
+## 0.33.0 - 03.10.2026
+
+- ADM-010/011 dört sağlayıcı eşleme, senkronizasyon hata/iş ve uzlaştırma prototipleri eklendi.
+- Sağlayıcıya göre eşleme benzersizliği, belirsiz sonuçta önce sorgula ve eksik dış veri davranışları tanımlandı.
+- Model/UI, build/lint ve panel regresyonu başarılı; dış çağrı veya gerçek retry açılmadı.
+
+## 0.32.0 - 03.10.2026
+
+- ADM-008 tasarım/sipariş sürüm bağı, kalite bulguları ve yüz bazlı çıktı durumları eklendi.
+- Başarısız iş tekrar planı ve sürüme bağlı demo inceleme notları; gerçek render/onay/indirme kapalı.
+- Build/lint, dört genişlikte baskı testi ve panel regresyonu başarılı.
+
+## 0.31.0 - 03.10.2026
+
+- ADM-007 kurumsal teklif listesi/detay/sürüm geçmişi ve son sürümden demo revizyon oluşturma eklendi.
+- Eski satır snapshotları korunur; fiyat/adet/geçerlilik/koşul/gerekçe ve temel sürüm doğrulanır.
+- Model/UI, build/lint ve panel regresyonu geçti; gerçek müşteri gönderimi/onay/sipariş dönüşümü açılmadı.
+
+## 0.30.0 - 03.10.2026
+
+- ADM-004 varyant örnek fiyatları, kampanya taslağı ve tarih/kanal/varyant/minimum/kupon koşullu indirim önizlemesi eklendi.
+- Kuruş tamsayısı ve BigInt yüzde hesabıyla sınır/yuvarlama testleri eklendi.
+- Build/lint, hesaplama/UI ve panel regresyonu geçti; gerçek ticari fiyat/kupon/yayın açılmadı.
+
+## 0.29.0 - 03.10.2026
+
+- ADM-005 depo bazlı örnek bakiyeler, hareketler, katalog mutabakatı ve sayım farkı önizlemesi eklendi.
+- Yeni varyant eşlemesi bilinmiyor olarak korunur; önizleme gerçek stok veya audit oluşturmaz.
+- Build/lint, stok testi ve katalog/panel regresyonu başarılı; gerçek D02/D03/API kabulü açık.
+
+## 0.28.0 - 03.10.2026
+
+- ADM-003 katalog/varyant listesi, arama/filtre/sayaç, ürün oluşturma ve dört bölümlü düzenleme uygulandı.
+- SKU/stok doğrulama, varyant medya eşliği, oturum taslağı ve kaydedilmemiş değişiklik koruması eklendi.
+- Build/lint, katalog tarayıcı testi ve panel regresyonu geçti. Gerçek API ve canlı yayın yapılmadı.
+
+## 0.27.0 - 02.10.2026
+
+- Yönetim paneli siyah yatay kabuk/dar ikon şeridiyle genişletildi: ADM-001 dashboard, ADM-006 örnek sipariş liste/detay, korunmuş ADM-009 içerik editörü.
+- Dashboard boş/hata ve kart düzeni; sipariş filtreleri, native modal ve odak dönüşü uygulandı.
+- Build/lint ve dört genişlikte tarayıcı testi geçti; gerçek API/rol/kabul açık.
+
+## 0.26.1 - 02.10.2026
+
+- HND-02 slider hedefleri 44×44 px; küçük görünen noktalar korundu. Mobil arama/sepet/menü hedefleri büyütüldü.
+- Beş genişlikte tıklama/klavye/taşma senaryosu eklendi; toplam 48/48 E2E, lint ve build başarılı.
+- Yayın ve paket yenileme yapılmadı.
+
+## 0.26.0 - 02.10.2026
+
+- F02-A06 handoff taslağı, 22 dosyalık ölçü/hash envanteri ve hedef API alan eşlemesi eklendi.
+- HND-01–05: mobil banner oranı, dokunma hedefleri, ticari API, lisans/kimlik ve eksik kabul kanıtları kaydedildi.
+- Yayın kullanıcı tarafından sonra yapılacak; bu oturumda canlı işlem yok.
+
+## 0.25.0 - 02.10.2026
+
+- F02-A05 editör/AI davranış sözleşmeleri eklendi: sürüm, alan/katman, hata, retry, dört aday, erişilebilirlik ve mobil eşlik.
+- Mevcut demo ile hedef davranış ayrıldı; D04/D05/D08/D09/D10 ve gerçek rol kabulü açık tutuldu.
+- Kod, migration ve sağlayıcı çağrısı değişmedi.
+
 ## 0.24.0 - 01.10.2026
 
 - WEB-001 tasarım prototipine masaüstü mega menü, mobil drawer, üç slaytlı hero, duraklat/ileri/geri kontrolleri, mobil ürün carousel ve Nobi açılır paneli eklendi.

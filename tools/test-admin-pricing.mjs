@@ -1,0 +1,20 @@
+import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:4190/');await page.getByRole('button',{name:'Fiyat ve kampanyalar',exact:true}).click();assert.equal(await page.locator('tbody tr').count(),4);assert.equal(await page.getByText('Tanımlanmadı',{exact:true}).count(),1);
+ await page.getByRole('button',{name:'DEMO-TEA-BLUE fiyatını düzenle'}).click();await page.getByLabel('Örnek fiyat (TRY)').fill('1.234');await page.getByRole('button',{name:'Örnek fiyatı uygula'}).click();assert.equal(await page.getByRole('alert').isVisible(),true);
+ await page.getByLabel('Örnek fiyat (TRY)').fill('100,05');await page.getByRole('button',{name:'Örnek fiyatı uygula'}).click();
+ await page.getByRole('button',{name:'Dashboard',exact:true}).click();await page.getByRole('button',{name:'Fiyat ve kampanyalar',exact:true}).click();assert.equal(await page.getByText('₺100,05',{exact:true}).isVisible(),true);
+ await page.getByRole('button',{name:'Kampanyalar',exact:true}).click();await page.getByRole('button',{name:'Örnek yüzde 10 kampanyasını düzenle'}).click();await page.getByLabel('Minimum tutar (TRY)').fill('0');await page.getByLabel('İndirim değeri').fill('101');await page.getByRole('button',{name:'Kampanya taslağını uygula'}).click();assert.equal(await page.getByRole('alert').isVisible(),true);
+ await page.getByLabel('İndirim değeri').fill('10');await page.getByRole('button',{name:'Kampanya taslağını uygula'}).click();
+ await page.getByRole('button',{name:'İndirim önizlemesi',exact:true}).click();await page.getByLabel('Önizleme kampanyası').selectOption('DEMO-C1');await page.getByLabel('Önizleme kuponu').fill('DEMO10');assert.equal(await page.locator('.price-preview').getByText('₺90,04',{exact:true}).isVisible(),true);
+ await page.getByLabel('Önizleme kanalı').selectOption('Kurumsal');assert.equal(await page.getByText('Satış kanalı uygun değil.',{exact:true}).isVisible(),true);
+ await page.getByLabel('Önizleme kanalı').selectOption('Web');await page.getByLabel('Önizleme tarihi').fill('2026-11-01');assert.equal(await page.getByText('Seçili tarih kampanya dışında.',{exact:true}).isVisible(),true);
+ await page.getByLabel('Önizleme varyantı').selectOption('DEMO-V103-W');assert.equal(await page.getByText('Seçili varyantın örnek fiyatı tanımlı değil.',{exact:true}).isVisible(),true);
+ await page.getByRole('button',{name:'Kampanyalar',exact:true}).click();await page.getByRole('button',{name:'Yeni kampanya taslağı'}).click();await page.getByLabel('Kampanya adı').fill('Örnek sabit');await page.getByLabel('İndirim türü').selectOption('fixed');await page.getByLabel('İndirim değeri').fill('999');await page.getByLabel('Başlangıç',{exact:true}).fill('2026-10-01');await page.getByLabel('Bitiş',{exact:true}).fill('2026-10-31');await page.getByLabel('Demo önizlemede etkin').check();await page.getByRole('button',{name:'Kampanya taslağını uygula'}).click();assert.equal(await page.locator('tbody tr').count(),2);
+ await page.screenshot({path:'test/2026-10-03/TST-081-pricing-desktop.png',fullPage:true});
+ for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});for(const tab of ['Varyant fiyatları','Kampanyalar','İndirim önizlemesi']){await page.getByRole('button',{name:tab,exact:true}).click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth),false,`${width} ${tab}`)}}
+ await page.setViewportSize({width:390,height:900});await page.screenshot({path:'test/2026-10-03/TST-081-pricing-mobile.png',fullPage:true});assert.deepEqual(errors,[]);console.log('pricing UI: unknown price, edit/validation, session persistence, campaigns, preview eligibility, 4 widths = OK');
+}finally{await browser.close()}

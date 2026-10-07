@@ -1,70 +1,70 @@
-.page { min-height: 100vh; background: #e9eeeb; color: #16242a; }
+.page { min-height: 100vh; background: #fff; color: #212121; }
 .skipLink { position: fixed; left: 16px; top: -80px; z-index: 30; padding: 12px 18px; background: white; color: #111; }
 .skipLink:focus { top: 0; }
-.header { min-height: 82px; padding: 0 clamp(18px,3.5vw,54px); display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 28px; background: #101b20; color: white; }
+.header { min-height: 82px; padding: 0 clamp(18px,3.5vw,54px); display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 28px; background: #191919; color: white; }
 .brand { width: 62px; height: 68px; overflow: hidden; }
 .brand img { width: 58px; height: auto; }
 .headerTitle { display: flex; align-items: baseline; gap: 14px; }
-.headerTitle span { color: #8cd5cd; font-size: .7rem; font-weight: 650; letter-spacing: .11em; text-transform: uppercase; }
+.headerTitle span { color: #c5c5c5; font-size: .7rem; font-weight: 650; letter-spacing: .11em; text-transform: uppercase; }
 .headerTitle strong { font-size: .82rem; font-weight: 450; }
-.closeLink { display: flex; align-items: center; gap: 13px; color: #c5d0cd; font-size: .75rem; }
-.closeLink span { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #52605e; border-radius: 50%; color: white; font-size: 1.2rem; }
+.closeLink { display: flex; align-items: center; gap: 13px; color: #cdcdcd; font-size: .75rem; }
+.closeLink span { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #5d5d5d; border-radius: 50%; color: white; font-size: 1.2rem; }
 .workspace { min-height: calc(100vh - 82px); display: grid; grid-template-columns: minmax(0,1.45fr) minmax(390px,.55fr); }
 .preview { min-width: 0; padding: clamp(28px,4vw,60px); display: flex; flex-direction: column; }
 .previewHeader { display: flex; justify-content: space-between; align-items: start; gap: 28px; }
-.previewHeader p { margin: 0 0 8px; color: #0b6c68; font-size: .68rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
-.previewHeader h1 { margin: 0; font-size: clamp(2.2rem,4vw,4.7rem); font-weight: 380; letter-spacing: -.055em; line-height: .95; }
-.previewHeader > span { padding: 8px 11px; border: 1px solid #bdc8c5; color: #52605d; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
+.previewHeader p { margin: 0 0 8px; color: #262626; font-size: .68rem; font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
+.previewHeader h1 { margin: 0; font-size:clamp(24px,2.6vw,34px); font-weight: 380; letter-spacing: -.055em; line-height:1.2; }
+.previewHeader > span { padding: 8px 11px; border: 1px solid #c5c5c5; color: #5d5d5d; font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
 .productStage { min-height: 580px; flex: 1; position: relative; display: grid; place-items: center; overflow: hidden; }
 .halo { position: absolute; width: min(48vw,650px); aspect-ratio: 1; border-radius: 50%; background: rgba(255,255,255,.72); box-shadow: 0 28px 80px rgba(30,47,51,.1); }
 .productStage > img { width: auto; height: min(67vh,650px); max-width: 75%; position: relative; z-index: 1; object-fit: contain; mix-blend-mode: multiply; }
 .previewCard { width: clamp(210px,24vw,330px); min-height: 130px; padding: 18px 20px; position: absolute; right: clamp(12px,3vw,54px); bottom: clamp(18px,4vw,60px); z-index: 2; display: flex; flex-direction: column; justify-content: center; background: rgba(16,27,32,.96); color: white; box-shadow: 0 18px 48px rgba(20,35,40,.2); }
-.previewCard > span { color: #8cd5cd; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; }
+.previewCard > span { color: #c5c5c5; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; }
 .previewCard strong { margin: 10px 0 8px; overflow-wrap: anywhere; font-size: clamp(1.1rem,2vw,1.8rem); font-weight: 500; line-height: 1.05; }
 .previewCard strong[data-style="Geometrik"] { font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .previewCard strong[data-style="Yumuşak"] { font-weight: 350; font-style: italic; letter-spacing: .015em; }
-.previewCard small { color: #9eaaa7; font-size: .56rem; line-height: 1.4; }
-.previewNotice { padding: 15px 18px; display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; border: 1px solid #c4cdca; background: rgba(255,255,255,.5); }
-.previewNotice > span { width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid #73817e; border-radius: 50%; font-size: .7rem; }
-.previewNotice p { margin: 0; color: #65716f; font-size: .67rem; line-height: 1.5; }
-.previewNotice strong { color: #16242a; }
+.previewCard small { color: #a7a7a7; font-size: .56rem; line-height: 1.4; }
+.previewNotice { padding: 15px 18px; display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; border: 1px solid #cbcbcb; background: rgba(255,255,255,.5); }
+.previewNotice > span { width: 24px; height: 24px; display: grid; place-items: center; border: 1px solid #7e7e7e; border-radius: 50%; font-size: .7rem; }
+.previewNotice p { margin: 0; color: #6e6e6e; font-size: .67rem; line-height: 1.5; }
+.previewNotice strong { color: #212121; }
 .controls { padding: clamp(32px,4vw,58px); background: white; box-shadow: -18px 0 45px rgba(30,47,51,.07); }
-.controlHeader { padding-bottom: 26px; border-bottom: 1px solid #d8dfdc; }
+.controlHeader { padding-bottom: 26px; border-bottom: 1px solid #dddddd; }
 .controlHeader p { margin: 0 0 5px; font-size: 1.22rem; font-weight: 520; }
-.controlHeader span { color: #667370; font-size: .72rem; }
-.controlSection { padding: 28px 0; border-bottom: 1px solid #d8dfdc; }
+.controlHeader span { color: #707070; font-size: .72rem; }
+.controlSection { padding: 28px 0; border-bottom: 1px solid #dddddd; }
 .sectionTitle { margin-bottom: 17px; display: flex; align-items: center; gap: 10px; }
-.sectionTitle > span { color: #0b6c68; font-size: .65rem; }
+.sectionTitle > span { color: #262626; font-size: .65rem; }
 .sectionTitle h2 { margin: 0; font-size: .84rem; font-weight: 650; }
-.controlSection label { display: block; margin-bottom: 8px; color: #677370; font-size: .68rem; }
-.controlSection input { width: 100%; height: 48px; padding: 0 13px; border: 1px solid #bdc7c4; color: #16242a; }
-.fieldHint { margin-top: 8px; display: flex; justify-content: space-between; color: #52605d; font-size: .6rem; }
+.controlSection label { display: block; margin-bottom: 8px; color: #707070; font-size: .68rem; }
+.controlSection input { width: 100%; height: 48px; padding: 0 13px; border: 1px solid #c5c5c5; color: #212121; }
+.fieldHint { margin-top: 8px; display: flex; justify-content: space-between; color: #5d5d5d; font-size: .6rem; }
 .styleChoices { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
-.styleChoices button { min-width: 0; min-height: 72px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #cbd3d1; background: white; cursor: pointer; }
-.styleChoices button:hover { border-color: #52605d; }
-.styleChoices button.selectedChoice { border: 2px solid #16242a; }
+.styleChoices button { min-width: 0; min-height: 72px; display: grid; place-items: center; align-content: center; gap: 5px; border: 1px solid #d1d1d1; background: white; cursor: pointer; }
+.styleChoices button:hover { border-color: #5d5d5d; }
+.styleChoices button.selectedChoice { border: 2px solid #212121; }
 .styleChoices strong { font-size: 1rem; font-weight: 450; }
 .styleChoices button[data-style="Geometrik"] strong { font-weight: 750; letter-spacing: .08em; }
 .styleChoices button[data-style="Yumuşak"] strong { font-style: italic; font-weight: 350; }
-.styleChoices span { color: #65716f; font-size: .6rem; }
+.styleChoices span { color: #6e6e6e; font-size: .6rem; }
 .colorChoices { display: flex; gap: 10px; }
-.colorChoices button { min-width: 76px; padding: 9px 7px; display: grid; place-items: center; gap: 6px; border: 1px solid #cbd3d1; background: white; cursor: pointer; }
-.colorChoices button.selectedColor { border: 2px solid #16242a; padding: 8px 6px; }
-.colorChoices button > span { width: 25px; height: 25px; border: 1px solid #adb8b5; border-radius: 50%; }
-.colorChoices small { color: #65716f; font-size: .55rem; }
+.colorChoices button { min-width: 76px; padding: 9px 7px; display: grid; place-items: center; gap: 6px; border: 1px solid #d1d1d1; background: white; cursor: pointer; }
+.colorChoices button.selectedColor { border: 2px solid #212121; padding: 8px 6px; }
+.colorChoices button > span { width: 25px; height: 25px; border: 1px solid #b5b5b5; border-radius: 50%; }
+.colorChoices small { color: #6e6e6e; font-size: .55rem; }
 .actionPanel { padding-top: 28px; }
 .actionPanel > div { margin-bottom: 22px; display: flex; justify-content: space-between; gap: 14px; }
-.actionPanel > div span { color: #52605d; font-size: .68rem; }
+.actionPanel > div span { color: #5d5d5d; font-size: .68rem; }
 .actionPanel > div strong { font-size: .76rem; font-weight: 550; }
 .saveButton, .continueButton, .editorLink { width: 100%; min-height: 50px; border: 0; font-size: .78rem; font-weight: 650; }
-.saveButton { background: #0b6c68; color: white; cursor: pointer; }
-.saveButton:hover { background: #085954; }
-.saveButton:disabled { background: #cfd7d4; cursor: not-allowed; }
-.editorLink { margin-top: 9px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #16242a; color: #16242a; }
-.editorLink:hover { background: #eef2f0; }
-.continueButton { margin-top: 9px; background: #dfe4e2; color: #52605d; cursor: not-allowed; }
-.actionPanel > p { margin: 9px 0 0; color: #52605d; font-size: .6rem; line-height: 1.45; }
-.actionPanel .saveStatus { min-height: 32px; color: #176b45; }
+.saveButton { background: #fff; color: #242424; cursor: pointer; ;box-shadow:inset 0 0 0 1px #d6d6d6}
+.saveButton:hover { background: #fff; ;box-shadow:inset 0 0 0 1px #d6d6d6}
+.saveButton:disabled { background: #fff; cursor: not-allowed; ;box-shadow:inset 0 0 0 1px #d6d6d6}
+.editorLink { margin-top: 9px; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid #212121; color: #212121; }
+.editorLink:hover { background: #fff; }
+.continueButton { margin-top: 9px; background: #fff; color: #5d5d5d; cursor: not-allowed; }
+.actionPanel > p { margin: 9px 0 0; color: #5d5d5d; font-size: .6rem; line-height: 1.45; }
+.actionPanel .saveStatus { min-height: 32px; color: #262626; }
 
 @media (max-width: 1050px) {
   .workspace { grid-template-columns: 1fr; }

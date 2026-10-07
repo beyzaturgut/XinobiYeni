@@ -1,6 +1,6 @@
 # Faz02 açık kabul listesi
 
-Tarih: 01.10.2026  
+Tarih: 02.10.2026
 Durum: **Devam — Faz02 kapanışına hazır değil**
 
 Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kanıtıyla karşılaştırır. Otomatik test başarısı gerçek iş sahibi, rol veya PM kabulü yerine geçmez.
@@ -25,11 +25,11 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 |---|---|---|---|
 | F02-A01 | 390 px gerçek telefon ve tablet QA | Fiziksel cihaz ekran görüntüsü, taşma/dokunma/klavye sonucu | FE + Creative; web kritik rotalarını gerçek cihazda doğrula |
 | F02-A02 | Manuel ekran okuyucu kontrolü | VoiceOver ve TalkBack temel akış tutanağı | FE; ana menü, form, ürün, editör ve ödeme kabuğunu incele |
-| F02-A05 | Editör ve AI ayrıntılı spec | `design/editor-spec.md`, `design/ai-spec.md` | Creative + FE + BE |
-| F02-A06 | Handoff paketi | `design/handoff.md`, medya/lisans, ölçü ve API alan eşlemesi | Creative → FE; BE/DBA/Full Stack incelemesi |
+| F02-A05 | Editör ve AI ayrıntılı spec taslakları hazır | `design/editor-spec.md`, `design/ai-spec.md`; TST-075 | Creative + FE + BE incelemesi ve uygulama kabulü bekliyor |
+| F02-A06 | Handoff taslağı ve 22 dosyalık medya manifesti hazır | `design/handoff.md`, `design/assets/manifest.json`; TST-076 | FE/Creative/BE/DBA/Full Stack kabulü ve HND-01–05 açık |
 | F02-A07 | Erişilebilirlik tutanağı | `design/a11y-audit.md`; kontrast, odak, reduced-motion ve manuel sonuçlar | FE |
 | F02-A08 | Düzenlenebilir ekran kaynakları/çıktıları | `design/screens/` altında web, panel ve mobil kaynak/PNG/PDF | Creative |
-| F02-A09 | Yönetim paneli yüksek doğruluk ekranları | ADM-001–012 durumları; yetki/boş/hata/yeniden dene | Creative + FE; Faz03–04 sözleşmeleriyle hizala |
+| F02-A09 | Panel kabuğu, ADM-001/002/003/004/005/006/007/008/010/011/012 ve içerik editörü prototipi hazır | TST-078–086; gerçek yetki/API ve rol/PM kabulü açık | Creative + FE; sonraki F02-A10 mobil tasarım kapsamı |
 | F02-A10 | Flutter iOS/Android referans ekranları | MOB-001–007 iOS/Android; güvenli alan/geri/klavye/düşük bağlantı | Creative + Flutter geliştirici |
 | F02-A12 | Ortak yaratıcı yön ve kullanıcı seçimi | Creative + Web Designer'ın Dyson'dan yalnız ilke alan tek ortak tasarımı; sürümlü `ORTAK TASARIM ONAY` kaydı | Creative + Web Designer + proje sahibi |
 | F02-A13 | Global web IA ve navigasyon | Header/mega menü/footer/Nobi; route tipografi ve focus davranışı | Web Designer + FE |

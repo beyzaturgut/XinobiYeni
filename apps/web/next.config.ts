@@ -19,7 +19,8 @@ export default function config(phase: string): NextConfig {
     output: undefined,
     distDir: ".next/product-surfaces-preview",
     async rewrites() {
-      return [{
+      return [{ source: "/api/v1/dev/product-surfaces/commerce/:product/:variant/rendering-inputs/", destination: "http://127.0.0.1:"+port+"/api/v1/dev/product-surfaces/commerce/:product/:variant/rendering-inputs" },
+        { source: "/api/v1/design-studio/sessions/:id/image", destination: "http://127.0.0.1:"+port+"/api/v1/design-studio/sessions/:id/image" }, {
         source: "/api/v1/dev/product-surfaces/:product/:variant/rendering-inputs/",
         destination: `http://127.0.0.1:${port}/api/v1/dev/product-surfaces/:product/:variant/rendering-inputs`,
       }];

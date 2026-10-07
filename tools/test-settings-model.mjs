@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {initialAdminState,allowed,changeRole,changeSettings} from '../apps/admin/src/settings-model.ts';
+const before=JSON.stringify(initialAdminState);
+assert.equal(allowed(initialAdminState.roles[0],'unknown','read'),false);
+assert.equal(allowed(initialAdminState.roles[0],'catalog','delete'),false);
+assert.ok(changeRole(initialAdminState,'admin',[]).error);
+assert.ok(changeRole(initialAdminState,'operator',['bad.read']).error);
+assert.ok(changeRole(initialAdminState,'operator',['orders.read','orders.read']).error);
+assert.ok(changeSettings(initialAdminState,0,4,true).error);
+for(const n of [-1,1.5,NaN,10001])assert.ok(changeSettings(initialAdminState,1,n,true).error);
+const first=changeSettings(initialAdminState,1,8,false).state;
+assert.equal(first.settings.revision,2);assert.equal(first.audit.length,1);
+const second=changeRole(first,'operator',['orders.read','orders.write']).state;
+assert.equal(second.audit.length,2);assert.deepEqual(second.audit[0],first.audit[0]);
+assert.equal(JSON.stringify(initialAdminState),before);
+assert.deepEqual(Object.keys(second.audit[1].after),['permissions']);
+console.log('Settings model: default deny, locked role, validation, revision conflict, immutable safe audit OK');

@@ -27,9 +27,15 @@ test('local API review, corrections, regeneration, approval/rejection and mobile
   await page.getByRole('button', { name: 'Düzelt', exact: true }).click()
   const image = page.locator('.surface-image-rect')
   const box = (await image.boundingBox())!
+  const preview = page.getByTestId('surface-preview')
+  await preview.evaluate(el => el.addEventListener('click', event => { el.setAttribute('data-test-client-x', String((event as MouseEvent).clientX)); el.setAttribute('data-test-client-y', String((event as MouseEvent).clientY)) }, { once: true }))
   await image.click({ position: { x: box.width / 2, y: box.height / 2 } })
   const marker = page.getByTestId('surface-point').first()
-  expect(Number(await marker.getAttribute('data-x'))).toBeCloseTo(533, 0)
+  // Compare against the actual dispatched CSS coordinate, not an assumed fractional pointer coordinate.
+  const rect = (await preview.boundingBox())!
+  const expected = clickToSource(Number(await preview.getAttribute('data-test-client-x')), Number(await preview.getAttribute('data-test-client-y')), 1066, 1600, { left: rect.x, top: rect.y, width: rect.width, height: rect.height })!
+  expect(Number(await marker.getAttribute('data-x'))).toBeCloseTo(expected.x, 8)
+  expect(Number(await marker.getAttribute('data-y'))).toBeCloseTo(expected.y, 8)
   // Browser pointer dispatch rounds to CSS pixels; allow at most one displayed pixel.
   expect(Math.abs(Number(await marker.getAttribute('data-y')) - 800)).toBeLessThan(1600 / box.height)
   await page.getByRole('button', { name: 'Noktaları temizle' }).click()
@@ -91,7 +97,7 @@ test('review loading and error states', async ({ page }) => {
   await page.route('**/review', async route => { await wait; await route.abort() })
   await page.goto('/')
   await page.getByRole('button', { name: 'Ürün yüzeyi incele (geliştirme)' }).click()
-  await expect(page.getByRole('status')).toContainText('yükleniyor')
+  await expect(page.locator('.surface-panel').getByRole('status')).toContainText('yükleniyor')
   release()
   await expect(page.getByRole('alert')).toContainText('İnceleme yüklenemedi')
 })

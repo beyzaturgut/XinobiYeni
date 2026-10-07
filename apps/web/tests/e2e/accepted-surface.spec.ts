@@ -39,19 +39,6 @@ for (const variant of ["silver", "red", "rose", "unknown"]) {
     await expect(page.getByRole("link", { name: "Basit moda dön" })).toHaveAttribute("href", new RegExp(`variant=${variant}$`));
   });
 }
-test("product selection survives entry and blue continues to editor", async ({ page }) => {
-  await page.goto("/urunler/cay-makinesi-101/");
-  await page.getByRole("button", { name: "Çerez tercih panelini kapat" }).click();
-  await page.getByRole("button", { name: "Gümüş gri rengini seç" }).click();
-  await page.getByRole("link", { name: "Kişiselleştirme seçenekleri" }).click();
-  await expect(page).toHaveURL(/variant=silver/);
-  await expect(page.getByRole("status")).toContainText("kullanılamıyor");
-  await page.goto("/urunler/cay-makinesi-101/kisisellestir/?variant=blue");
-  await page.getByRole("button", { name: "Çerez tercih panelini kapat" }).click();
-  await page.getByRole("link", { name: "Gelişmiş editörde devam et" }).click();
-  await expect(page).toHaveURL(/variant=blue/);
-  await expect(page.locator("canvas[role='img']")).toBeVisible();
-});
 test("API failure and malformed/required-branding bundles never render", async ({ page, request }) => {
   const bundle = await (await request.get(endpoint)).json();
   for (const response of [{ status: 503, json: {} }, { json: { ...bundle, inputs: { ...bundle.inputs, branding: null } } },

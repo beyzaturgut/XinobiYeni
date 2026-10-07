@@ -10,13 +10,13 @@ http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://127.0.0.1:3010');
     if (req.method !== 'GET') { res.writeHead(405).end(); return; }
-    if (/^\/api\/v1\/dev\/product-surfaces\/[a-z0-9-]+\/[a-z0-9-]+\/rendering-inputs$/.test(url.pathname)) {
+    if (url.pathname === '/api/v1/local-commerce/state' || /^\/api\/v1\/dev\/product-surfaces\/(?:commerce\/)?[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+\/rendering-inputs$/.test(url.pathname)) {
       const response = await fetch(`http://127.0.0.1:${apiPort}` + url.pathname);
       res.writeHead(response.status, { 'Content-Type': response.headers.get('content-type') || 'application/json', 'Cache-Control': 'no-store' });
       res.end(Buffer.from(await response.arrayBuffer())); return;
     }
     let file = path.resolve(root, '.' + decodeURIComponent(url.pathname));
-    if (!file.startsWith(root + path.sep)) { res.writeHead(404).end(); return; }
+    if (file !== root && !file.startsWith(root + path.sep)) { res.writeHead(404).end(); return; }
     if (url.pathname.endsWith('/')) file = path.join(file, 'index.html');
     else if (!path.extname(file)) file = path.join(file, 'index.html');
     const bytes = await readFile(file);

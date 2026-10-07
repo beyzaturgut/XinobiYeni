@@ -1,0 +1,2939 @@
+{
+  "version": "xinobi-u-1",
+  "axes": [
+    {
+      "id": "nature",
+      "label": "Doğa"
+    },
+    {
+      "id": "mood",
+      "label": "Ruh hâli"
+    },
+    {
+      "id": "color",
+      "label": "Renk"
+    },
+    {
+      "id": "visual",
+      "label": "Görsel yoğunluk"
+    },
+    {
+      "id": "style",
+      "label": "Tarz"
+    }
+  ],
+  "questions": [
+    {
+      "id": "nature-01-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğal ortamdan ilham almak istersin?"
+    },
+    {
+      "id": "nature-01-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğal ortamdan ilham almak istersin?"
+    },
+    {
+      "id": "nature-01-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğal ortamdan ilham almak istersin?"
+    },
+    {
+      "id": "nature-01-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğal ortamdan ilham almak istersin?"
+    },
+    {
+      "id": "nature-01-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğal ortamdan ilham almak istersin?"
+    },
+    {
+      "id": "nature-02-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında doğanın hangi yüzü öne çıksın?"
+    },
+    {
+      "id": "nature-02-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende doğanın hangi yüzü öne çıksın?"
+    },
+    {
+      "id": "nature-02-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda doğanın hangi yüzü öne çıksın?"
+    },
+    {
+      "id": "nature-02-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde doğanın hangi yüzü öne çıksın?"
+    },
+    {
+      "id": "nature-02-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda doğanın hangi yüzü öne çıksın?"
+    },
+    {
+      "id": "nature-03-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi manzaranın izini görmek istersin?"
+    },
+    {
+      "id": "nature-03-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi manzaranın izini görmek istersin?"
+    },
+    {
+      "id": "nature-03-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi manzaranın izini görmek istersin?"
+    },
+    {
+      "id": "nature-03-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi manzaranın izini görmek istersin?"
+    },
+    {
+      "id": "nature-03-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi manzaranın izini görmek istersin?"
+    },
+    {
+      "id": "nature-04-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında sana yakın gelen doğal doku hangisi?"
+    },
+    {
+      "id": "nature-04-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende sana yakın gelen doğal doku hangisi?"
+    },
+    {
+      "id": "nature-04-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda sana yakın gelen doğal doku hangisi?"
+    },
+    {
+      "id": "nature-04-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde sana yakın gelen doğal doku hangisi?"
+    },
+    {
+      "id": "nature-04-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda sana yakın gelen doğal doku hangisi?"
+    },
+    {
+      "id": "nature-05-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi açık hava hissi yaşasın?"
+    },
+    {
+      "id": "nature-05-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi açık hava hissi yaşasın?"
+    },
+    {
+      "id": "nature-05-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi açık hava hissi yaşasın?"
+    },
+    {
+      "id": "nature-05-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi açık hava hissi yaşasın?"
+    },
+    {
+      "id": "nature-05-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi açık hava hissi yaşasın?"
+    },
+    {
+      "id": "nature-06-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında doğadan hangi iz dikkatini çeksin?"
+    },
+    {
+      "id": "nature-06-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende doğadan hangi iz dikkatini çeksin?"
+    },
+    {
+      "id": "nature-06-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda doğadan hangi iz dikkatini çeksin?"
+    },
+    {
+      "id": "nature-06-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde doğadan hangi iz dikkatini çeksin?"
+    },
+    {
+      "id": "nature-06-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda doğadan hangi iz dikkatini çeksin?"
+    },
+    {
+      "id": "nature-07-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğal ritim seni temsil eder?"
+    },
+    {
+      "id": "nature-07-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğal ritim seni temsil eder?"
+    },
+    {
+      "id": "nature-07-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğal ritim seni temsil eder?"
+    },
+    {
+      "id": "nature-07-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğal ritim seni temsil eder?"
+    },
+    {
+      "id": "nature-07-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğal ritim seni temsil eder?"
+    },
+    {
+      "id": "nature-08-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hayalindeki kaçış noktası neresi olsun?"
+    },
+    {
+      "id": "nature-08-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hayalindeki kaçış noktası neresi olsun?"
+    },
+    {
+      "id": "nature-08-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hayalindeki kaçış noktası neresi olsun?"
+    },
+    {
+      "id": "nature-08-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hayalindeki kaçış noktası neresi olsun?"
+    },
+    {
+      "id": "nature-08-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hayalindeki kaçış noktası neresi olsun?"
+    },
+    {
+      "id": "nature-09-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğa yolculuğunun hatırası olsun?"
+    },
+    {
+      "id": "nature-09-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğa yolculuğunun hatırası olsun?"
+    },
+    {
+      "id": "nature-09-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğa yolculuğunun hatırası olsun?"
+    },
+    {
+      "id": "nature-09-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğa yolculuğunun hatırası olsun?"
+    },
+    {
+      "id": "nature-09-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğa yolculuğunun hatırası olsun?"
+    },
+    {
+      "id": "nature-10-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi peyzajın çizgileri yer alsın?"
+    },
+    {
+      "id": "nature-10-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi peyzajın çizgileri yer alsın?"
+    },
+    {
+      "id": "nature-10-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi peyzajın çizgileri yer alsın?"
+    },
+    {
+      "id": "nature-10-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi peyzajın çizgileri yer alsın?"
+    },
+    {
+      "id": "nature-10-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi peyzajın çizgileri yer alsın?"
+    },
+    {
+      "id": "nature-11-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında doğaya açılan penceren neyi göstersin?"
+    },
+    {
+      "id": "nature-11-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende doğaya açılan penceren neyi göstersin?"
+    },
+    {
+      "id": "nature-11-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda doğaya açılan penceren neyi göstersin?"
+    },
+    {
+      "id": "nature-11-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde doğaya açılan penceren neyi göstersin?"
+    },
+    {
+      "id": "nature-11-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda doğaya açılan penceren neyi göstersin?"
+    },
+    {
+      "id": "nature-12-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğal oluşum başrolü alsın?"
+    },
+    {
+      "id": "nature-12-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğal oluşum başrolü alsın?"
+    },
+    {
+      "id": "nature-12-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğal oluşum başrolü alsın?"
+    },
+    {
+      "id": "nature-12-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğal oluşum başrolü alsın?"
+    },
+    {
+      "id": "nature-12-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğal oluşum başrolü alsın?"
+    },
+    {
+      "id": "nature-13-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğa hissini evine taşımak istersin?"
+    },
+    {
+      "id": "nature-13-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğa hissini evine taşımak istersin?"
+    },
+    {
+      "id": "nature-13-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğa hissini evine taşımak istersin?"
+    },
+    {
+      "id": "nature-13-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğa hissini evine taşımak istersin?"
+    },
+    {
+      "id": "nature-13-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğa hissini evine taşımak istersin?"
+    },
+    {
+      "id": "nature-14-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi çevrenin renk ve şekilleri buluşsun?"
+    },
+    {
+      "id": "nature-14-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi çevrenin renk ve şekilleri buluşsun?"
+    },
+    {
+      "id": "nature-14-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi çevrenin renk ve şekilleri buluşsun?"
+    },
+    {
+      "id": "nature-14-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi çevrenin renk ve şekilleri buluşsun?"
+    },
+    {
+      "id": "nature-14-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi çevrenin renk ve şekilleri buluşsun?"
+    },
+    {
+      "id": "nature-15-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında doğadan seçeceğin ilk ilham ne olur?"
+    },
+    {
+      "id": "nature-15-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende doğadan seçeceğin ilk ilham ne olur?"
+    },
+    {
+      "id": "nature-15-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda doğadan seçeceğin ilk ilham ne olur?"
+    },
+    {
+      "id": "nature-15-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde doğadan seçeceğin ilk ilham ne olur?"
+    },
+    {
+      "id": "nature-15-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda doğadan seçeceğin ilk ilham ne olur?"
+    },
+    {
+      "id": "nature-16-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğal dünyanın içinde kaybolmak istersin?"
+    },
+    {
+      "id": "nature-16-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğal dünyanın içinde kaybolmak istersin?"
+    },
+    {
+      "id": "nature-16-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğal dünyanın içinde kaybolmak istersin?"
+    },
+    {
+      "id": "nature-16-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğal dünyanın içinde kaybolmak istersin?"
+    },
+    {
+      "id": "nature-16-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğal dünyanın içinde kaybolmak istersin?"
+    },
+    {
+      "id": "nature-17-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında bir doğa yürüyüşünün hangi izi kalsın?"
+    },
+    {
+      "id": "nature-17-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende bir doğa yürüyüşünün hangi izi kalsın?"
+    },
+    {
+      "id": "nature-17-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda bir doğa yürüyüşünün hangi izi kalsın?"
+    },
+    {
+      "id": "nature-17-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde bir doğa yürüyüşünün hangi izi kalsın?"
+    },
+    {
+      "id": "nature-17-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda bir doğa yürüyüşünün hangi izi kalsın?"
+    },
+    {
+      "id": "nature-18-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğal atmosfer gözünü dinlendirsin?"
+    },
+    {
+      "id": "nature-18-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğal atmosfer gözünü dinlendirsin?"
+    },
+    {
+      "id": "nature-18-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğal atmosfer gözünü dinlendirsin?"
+    },
+    {
+      "id": "nature-18-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğal atmosfer gözünü dinlendirsin?"
+    },
+    {
+      "id": "nature-18-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğal atmosfer gözünü dinlendirsin?"
+    },
+    {
+      "id": "nature-19-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi manzarayı her gün yeniden keşfetmek istersin?"
+    },
+    {
+      "id": "nature-19-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi manzarayı her gün yeniden keşfetmek istersin?"
+    },
+    {
+      "id": "nature-19-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi manzarayı her gün yeniden keşfetmek istersin?"
+    },
+    {
+      "id": "nature-19-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi manzarayı her gün yeniden keşfetmek istersin?"
+    },
+    {
+      "id": "nature-19-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi manzarayı her gün yeniden keşfetmek istersin?"
+    },
+    {
+      "id": "nature-20-1",
+      "axis": "nature",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi doğal sahnenin soyut yorumu olsun?"
+    },
+    {
+      "id": "nature-20-2",
+      "axis": "nature",
+      "text": "Her baktığında sana iyi gelecek desende hangi doğal sahnenin soyut yorumu olsun?"
+    },
+    {
+      "id": "nature-20-3",
+      "axis": "nature",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi doğal sahnenin soyut yorumu olsun?"
+    },
+    {
+      "id": "nature-20-4",
+      "axis": "nature",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi doğal sahnenin soyut yorumu olsun?"
+    },
+    {
+      "id": "nature-20-5",
+      "axis": "nature",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi doğal sahnenin soyut yorumu olsun?"
+    },
+    {
+      "id": "mood-01-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi duygunun izi olsun?"
+    },
+    {
+      "id": "mood-01-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi duygunun izi olsun?"
+    },
+    {
+      "id": "mood-01-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi duygunun izi olsun?"
+    },
+    {
+      "id": "mood-01-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi duygunun izi olsun?"
+    },
+    {
+      "id": "mood-01-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi duygunun izi olsun?"
+    },
+    {
+      "id": "mood-02-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında sana hangi ruh hâlini hatırlatsın?"
+    },
+    {
+      "id": "mood-02-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende sana hangi ruh hâlini hatırlatsın?"
+    },
+    {
+      "id": "mood-02-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda sana hangi ruh hâlini hatırlatsın?"
+    },
+    {
+      "id": "mood-02-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde sana hangi ruh hâlini hatırlatsın?"
+    },
+    {
+      "id": "mood-02-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda sana hangi ruh hâlini hatırlatsın?"
+    },
+    {
+      "id": "mood-03-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında güne hangi hisle eşlik etsin?"
+    },
+    {
+      "id": "mood-03-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende güne hangi hisle eşlik etsin?"
+    },
+    {
+      "id": "mood-03-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda güne hangi hisle eşlik etsin?"
+    },
+    {
+      "id": "mood-03-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde güne hangi hisle eşlik etsin?"
+    },
+    {
+      "id": "mood-03-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda güne hangi hisle eşlik etsin?"
+    },
+    {
+      "id": "mood-04-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında bakınca nasıl hissetmek istersin?"
+    },
+    {
+      "id": "mood-04-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende bakınca nasıl hissetmek istersin?"
+    },
+    {
+      "id": "mood-04-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda bakınca nasıl hissetmek istersin?"
+    },
+    {
+      "id": "mood-04-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde bakınca nasıl hissetmek istersin?"
+    },
+    {
+      "id": "mood-04-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda bakınca nasıl hissetmek istersin?"
+    },
+    {
+      "id": "mood-05-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında iç dünyandaki hangi ton öne çıksın?"
+    },
+    {
+      "id": "mood-05-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende iç dünyandaki hangi ton öne çıksın?"
+    },
+    {
+      "id": "mood-05-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda iç dünyandaki hangi ton öne çıksın?"
+    },
+    {
+      "id": "mood-05-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde iç dünyandaki hangi ton öne çıksın?"
+    },
+    {
+      "id": "mood-05-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda iç dünyandaki hangi ton öne çıksın?"
+    },
+    {
+      "id": "mood-06-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi duygusal atmosfer kurulsun?"
+    },
+    {
+      "id": "mood-06-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi duygusal atmosfer kurulsun?"
+    },
+    {
+      "id": "mood-06-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi duygusal atmosfer kurulsun?"
+    },
+    {
+      "id": "mood-06-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi duygusal atmosfer kurulsun?"
+    },
+    {
+      "id": "mood-06-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi duygusal atmosfer kurulsun?"
+    },
+    {
+      "id": "mood-07-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında günlük enerjinin hangi yönü yansısın?"
+    },
+    {
+      "id": "mood-07-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende günlük enerjinin hangi yönü yansısın?"
+    },
+    {
+      "id": "mood-07-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda günlük enerjinin hangi yönü yansısın?"
+    },
+    {
+      "id": "mood-07-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde günlük enerjinin hangi yönü yansısın?"
+    },
+    {
+      "id": "mood-07-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda günlük enerjinin hangi yönü yansısın?"
+    },
+    {
+      "id": "mood-08-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi his uzun süre yanında kalsın?"
+    },
+    {
+      "id": "mood-08-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi his uzun süre yanında kalsın?"
+    },
+    {
+      "id": "mood-08-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi his uzun süre yanında kalsın?"
+    },
+    {
+      "id": "mood-08-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi his uzun süre yanında kalsın?"
+    },
+    {
+      "id": "mood-08-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi his uzun süre yanında kalsın?"
+    },
+    {
+      "id": "mood-09-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi duyguyu görünür kılalım?"
+    },
+    {
+      "id": "mood-09-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi duyguyu görünür kılalım?"
+    },
+    {
+      "id": "mood-09-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi duyguyu görünür kılalım?"
+    },
+    {
+      "id": "mood-09-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi duyguyu görünür kılalım?"
+    },
+    {
+      "id": "mood-09-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi duyguyu görünür kılalım?"
+    },
+    {
+      "id": "mood-10-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında sana yakın gelen duygusal ritim ne?"
+    },
+    {
+      "id": "mood-10-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende sana yakın gelen duygusal ritim ne?"
+    },
+    {
+      "id": "mood-10-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda sana yakın gelen duygusal ritim ne?"
+    },
+    {
+      "id": "mood-10-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde sana yakın gelen duygusal ritim ne?"
+    },
+    {
+      "id": "mood-10-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda sana yakın gelen duygusal ritim ne?"
+    },
+    {
+      "id": "mood-11-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hayalindeki anın duygusu ne olsun?"
+    },
+    {
+      "id": "mood-11-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hayalindeki anın duygusu ne olsun?"
+    },
+    {
+      "id": "mood-11-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hayalindeki anın duygusu ne olsun?"
+    },
+    {
+      "id": "mood-11-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hayalindeki anın duygusu ne olsun?"
+    },
+    {
+      "id": "mood-11-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hayalindeki anın duygusu ne olsun?"
+    },
+    {
+      "id": "mood-12-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi hissi yeniden yaşamak istersin?"
+    },
+    {
+      "id": "mood-12-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi hissi yeniden yaşamak istersin?"
+    },
+    {
+      "id": "mood-12-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi hissi yeniden yaşamak istersin?"
+    },
+    {
+      "id": "mood-12-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi hissi yeniden yaşamak istersin?"
+    },
+    {
+      "id": "mood-12-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi hissi yeniden yaşamak istersin?"
+    },
+    {
+      "id": "mood-13-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında ortamın ruhuna hangi duygu eklensin?"
+    },
+    {
+      "id": "mood-13-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende ortamın ruhuna hangi duygu eklensin?"
+    },
+    {
+      "id": "mood-13-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda ortamın ruhuna hangi duygu eklensin?"
+    },
+    {
+      "id": "mood-13-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde ortamın ruhuna hangi duygu eklensin?"
+    },
+    {
+      "id": "mood-13-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda ortamın ruhuna hangi duygu eklensin?"
+    },
+    {
+      "id": "mood-14-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi iç sesinin karşılığı olsun?"
+    },
+    {
+      "id": "mood-14-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi iç sesinin karşılığı olsun?"
+    },
+    {
+      "id": "mood-14-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi iç sesinin karşılığı olsun?"
+    },
+    {
+      "id": "mood-14-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi iç sesinin karşılığı olsun?"
+    },
+    {
+      "id": "mood-14-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi iç sesinin karşılığı olsun?"
+    },
+    {
+      "id": "mood-15-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında sana hangi duygusal alanı açsın?"
+    },
+    {
+      "id": "mood-15-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende sana hangi duygusal alanı açsın?"
+    },
+    {
+      "id": "mood-15-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda sana hangi duygusal alanı açsın?"
+    },
+    {
+      "id": "mood-15-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde sana hangi duygusal alanı açsın?"
+    },
+    {
+      "id": "mood-15-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda sana hangi duygusal alanı açsın?"
+    },
+    {
+      "id": "mood-16-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi ruh hâli seni en iyi anlatsın?"
+    },
+    {
+      "id": "mood-16-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi ruh hâli seni en iyi anlatsın?"
+    },
+    {
+      "id": "mood-16-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi ruh hâli seni en iyi anlatsın?"
+    },
+    {
+      "id": "mood-16-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi ruh hâli seni en iyi anlatsın?"
+    },
+    {
+      "id": "mood-16-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi ruh hâli seni en iyi anlatsın?"
+    },
+    {
+      "id": "mood-17-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında tasarımın duygusal ağırlığı nereye eğilsin?"
+    },
+    {
+      "id": "mood-17-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende tasarımın duygusal ağırlığı nereye eğilsin?"
+    },
+    {
+      "id": "mood-17-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda tasarımın duygusal ağırlığı nereye eğilsin?"
+    },
+    {
+      "id": "mood-17-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde tasarımın duygusal ağırlığı nereye eğilsin?"
+    },
+    {
+      "id": "mood-17-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda tasarımın duygusal ağırlığı nereye eğilsin?"
+    },
+    {
+      "id": "mood-18-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi hisle bağ kurmak istersin?"
+    },
+    {
+      "id": "mood-18-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende hangi hisle bağ kurmak istersin?"
+    },
+    {
+      "id": "mood-18-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi hisle bağ kurmak istersin?"
+    },
+    {
+      "id": "mood-18-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi hisle bağ kurmak istersin?"
+    },
+    {
+      "id": "mood-18-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi hisle bağ kurmak istersin?"
+    },
+    {
+      "id": "mood-19-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında günün sonunda hangi duygu kalsın?"
+    },
+    {
+      "id": "mood-19-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende günün sonunda hangi duygu kalsın?"
+    },
+    {
+      "id": "mood-19-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda günün sonunda hangi duygu kalsın?"
+    },
+    {
+      "id": "mood-19-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde günün sonunda hangi duygu kalsın?"
+    },
+    {
+      "id": "mood-19-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda günün sonunda hangi duygu kalsın?"
+    },
+    {
+      "id": "mood-20-1",
+      "axis": "mood",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında kişisel hikâyenin hangi duygusu canlansın?"
+    },
+    {
+      "id": "mood-20-2",
+      "axis": "mood",
+      "text": "Her baktığında sana iyi gelecek desende kişisel hikâyenin hangi duygusu canlansın?"
+    },
+    {
+      "id": "mood-20-3",
+      "axis": "mood",
+      "text": "Ürününü sana özel kılan kompozisyonda kişisel hikâyenin hangi duygusu canlansın?"
+    },
+    {
+      "id": "mood-20-4",
+      "axis": "mood",
+      "text": "Yaşam alanının havasını yansıtan görselde kişisel hikâyenin hangi duygusu canlansın?"
+    },
+    {
+      "id": "mood-20-5",
+      "axis": "mood",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda kişisel hikâyenin hangi duygusu canlansın?"
+    },
+    {
+      "id": "color-01-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi renk ailesini seçersin?"
+    },
+    {
+      "id": "color-01-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi renk ailesini seçersin?"
+    },
+    {
+      "id": "color-01-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi renk ailesini seçersin?"
+    },
+    {
+      "id": "color-01-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi renk ailesini seçersin?"
+    },
+    {
+      "id": "color-01-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi renk ailesini seçersin?"
+    },
+    {
+      "id": "color-02-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında renklerin genel havası nasıl olsun?"
+    },
+    {
+      "id": "color-02-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende renklerin genel havası nasıl olsun?"
+    },
+    {
+      "id": "color-02-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda renklerin genel havası nasıl olsun?"
+    },
+    {
+      "id": "color-02-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde renklerin genel havası nasıl olsun?"
+    },
+    {
+      "id": "color-02-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda renklerin genel havası nasıl olsun?"
+    },
+    {
+      "id": "color-03-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi palet sana daha yakın?"
+    },
+    {
+      "id": "color-03-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi palet sana daha yakın?"
+    },
+    {
+      "id": "color-03-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi palet sana daha yakın?"
+    },
+    {
+      "id": "color-03-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi palet sana daha yakın?"
+    },
+    {
+      "id": "color-03-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi palet sana daha yakın?"
+    },
+    {
+      "id": "color-04-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi renk birlikteliği öne çıksın?"
+    },
+    {
+      "id": "color-04-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi renk birlikteliği öne çıksın?"
+    },
+    {
+      "id": "color-04-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi renk birlikteliği öne çıksın?"
+    },
+    {
+      "id": "color-04-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi renk birlikteliği öne çıksın?"
+    },
+    {
+      "id": "color-04-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi renk birlikteliği öne çıksın?"
+    },
+    {
+      "id": "color-05-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında baktıkça görmek isteyeceğin tonlar hangileri?"
+    },
+    {
+      "id": "color-05-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende baktıkça görmek isteyeceğin tonlar hangileri?"
+    },
+    {
+      "id": "color-05-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda baktıkça görmek isteyeceğin tonlar hangileri?"
+    },
+    {
+      "id": "color-05-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde baktıkça görmek isteyeceğin tonlar hangileri?"
+    },
+    {
+      "id": "color-05-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda baktıkça görmek isteyeceğin tonlar hangileri?"
+    },
+    {
+      "id": "color-06-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi renk dünyası seni temsil eder?"
+    },
+    {
+      "id": "color-06-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi renk dünyası seni temsil eder?"
+    },
+    {
+      "id": "color-06-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi renk dünyası seni temsil eder?"
+    },
+    {
+      "id": "color-06-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi renk dünyası seni temsil eder?"
+    },
+    {
+      "id": "color-06-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi renk dünyası seni temsil eder?"
+    },
+    {
+      "id": "color-07-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında ana renk yaklaşımın ne olsun?"
+    },
+    {
+      "id": "color-07-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende ana renk yaklaşımın ne olsun?"
+    },
+    {
+      "id": "color-07-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda ana renk yaklaşımın ne olsun?"
+    },
+    {
+      "id": "color-07-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde ana renk yaklaşımın ne olsun?"
+    },
+    {
+      "id": "color-07-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda ana renk yaklaşımın ne olsun?"
+    },
+    {
+      "id": "color-08-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tonlar yaşam alanına uyum sağlar?"
+    },
+    {
+      "id": "color-08-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi tonlar yaşam alanına uyum sağlar?"
+    },
+    {
+      "id": "color-08-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tonlar yaşam alanına uyum sağlar?"
+    },
+    {
+      "id": "color-08-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tonlar yaşam alanına uyum sağlar?"
+    },
+    {
+      "id": "color-08-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tonlar yaşam alanına uyum sağlar?"
+    },
+    {
+      "id": "color-09-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında renkle bırakmak istediğin iz hangisi?"
+    },
+    {
+      "id": "color-09-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende renkle bırakmak istediğin iz hangisi?"
+    },
+    {
+      "id": "color-09-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda renkle bırakmak istediğin iz hangisi?"
+    },
+    {
+      "id": "color-09-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde renkle bırakmak istediğin iz hangisi?"
+    },
+    {
+      "id": "color-09-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda renkle bırakmak istediğin iz hangisi?"
+    },
+    {
+      "id": "color-10-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında gözünün aradığı renk dengesi ne?"
+    },
+    {
+      "id": "color-10-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende gözünün aradığı renk dengesi ne?"
+    },
+    {
+      "id": "color-10-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda gözünün aradığı renk dengesi ne?"
+    },
+    {
+      "id": "color-10-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde gözünün aradığı renk dengesi ne?"
+    },
+    {
+      "id": "color-10-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda gözünün aradığı renk dengesi ne?"
+    },
+    {
+      "id": "color-11-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi renk harmonisiyle başlayalım?"
+    },
+    {
+      "id": "color-11-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi renk harmonisiyle başlayalım?"
+    },
+    {
+      "id": "color-11-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi renk harmonisiyle başlayalım?"
+    },
+    {
+      "id": "color-11-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi renk harmonisiyle başlayalım?"
+    },
+    {
+      "id": "color-11-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi renk harmonisiyle başlayalım?"
+    },
+    {
+      "id": "color-12-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında kişisel renk imzan hangisi olsun?"
+    },
+    {
+      "id": "color-12-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende kişisel renk imzan hangisi olsun?"
+    },
+    {
+      "id": "color-12-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda kişisel renk imzan hangisi olsun?"
+    },
+    {
+      "id": "color-12-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde kişisel renk imzan hangisi olsun?"
+    },
+    {
+      "id": "color-12-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda kişisel renk imzan hangisi olsun?"
+    },
+    {
+      "id": "color-13-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi paletin yeniden yorumlanmasını istersin?"
+    },
+    {
+      "id": "color-13-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi paletin yeniden yorumlanmasını istersin?"
+    },
+    {
+      "id": "color-13-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi paletin yeniden yorumlanmasını istersin?"
+    },
+    {
+      "id": "color-13-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi paletin yeniden yorumlanmasını istersin?"
+    },
+    {
+      "id": "color-13-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi paletin yeniden yorumlanmasını istersin?"
+    },
+    {
+      "id": "color-14-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tonları yan yana görmek istersin?"
+    },
+    {
+      "id": "color-14-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi tonları yan yana görmek istersin?"
+    },
+    {
+      "id": "color-14-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tonları yan yana görmek istersin?"
+    },
+    {
+      "id": "color-14-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tonları yan yana görmek istersin?"
+    },
+    {
+      "id": "color-14-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tonları yan yana görmek istersin?"
+    },
+    {
+      "id": "color-15-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında renklerin kuracağı hikâye nasıl başlasın?"
+    },
+    {
+      "id": "color-15-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende renklerin kuracağı hikâye nasıl başlasın?"
+    },
+    {
+      "id": "color-15-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda renklerin kuracağı hikâye nasıl başlasın?"
+    },
+    {
+      "id": "color-15-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde renklerin kuracağı hikâye nasıl başlasın?"
+    },
+    {
+      "id": "color-15-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda renklerin kuracağı hikâye nasıl başlasın?"
+    },
+    {
+      "id": "color-16-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi renk atmosferinin içinde kalmak istersin?"
+    },
+    {
+      "id": "color-16-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi renk atmosferinin içinde kalmak istersin?"
+    },
+    {
+      "id": "color-16-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi renk atmosferinin içinde kalmak istersin?"
+    },
+    {
+      "id": "color-16-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi renk atmosferinin içinde kalmak istersin?"
+    },
+    {
+      "id": "color-16-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi renk atmosferinin içinde kalmak istersin?"
+    },
+    {
+      "id": "color-17-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tonların sohbeti ilgini çeker?"
+    },
+    {
+      "id": "color-17-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi tonların sohbeti ilgini çeker?"
+    },
+    {
+      "id": "color-17-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tonların sohbeti ilgini çeker?"
+    },
+    {
+      "id": "color-17-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tonların sohbeti ilgini çeker?"
+    },
+    {
+      "id": "color-17-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tonların sohbeti ilgini çeker?"
+    },
+    {
+      "id": "color-18-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi renk ailesini günlük hayatına taşırsın?"
+    },
+    {
+      "id": "color-18-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende hangi renk ailesini günlük hayatına taşırsın?"
+    },
+    {
+      "id": "color-18-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi renk ailesini günlük hayatına taşırsın?"
+    },
+    {
+      "id": "color-18-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi renk ailesini günlük hayatına taşırsın?"
+    },
+    {
+      "id": "color-18-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi renk ailesini günlük hayatına taşırsın?"
+    },
+    {
+      "id": "color-19-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görselin temel renk karakteri ne olsun?"
+    },
+    {
+      "id": "color-19-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende görselin temel renk karakteri ne olsun?"
+    },
+    {
+      "id": "color-19-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda görselin temel renk karakteri ne olsun?"
+    },
+    {
+      "id": "color-19-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde görselin temel renk karakteri ne olsun?"
+    },
+    {
+      "id": "color-19-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görselin temel renk karakteri ne olsun?"
+    },
+    {
+      "id": "color-20-1",
+      "axis": "color",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında sana özel paletin hangi yönden ilerlesin?"
+    },
+    {
+      "id": "color-20-2",
+      "axis": "color",
+      "text": "Her baktığında sana iyi gelecek desende sana özel paletin hangi yönden ilerlesin?"
+    },
+    {
+      "id": "color-20-3",
+      "axis": "color",
+      "text": "Ürününü sana özel kılan kompozisyonda sana özel paletin hangi yönden ilerlesin?"
+    },
+    {
+      "id": "color-20-4",
+      "axis": "color",
+      "text": "Yaşam alanının havasını yansıtan görselde sana özel paletin hangi yönden ilerlesin?"
+    },
+    {
+      "id": "color-20-5",
+      "axis": "color",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda sana özel paletin hangi yönden ilerlesin?"
+    },
+    {
+      "id": "visual-01-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görselin ne kadar yoğun olmasını istersin?"
+    },
+    {
+      "id": "visual-01-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende görselin ne kadar yoğun olmasını istersin?"
+    },
+    {
+      "id": "visual-01-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda görselin ne kadar yoğun olmasını istersin?"
+    },
+    {
+      "id": "visual-01-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde görselin ne kadar yoğun olmasını istersin?"
+    },
+    {
+      "id": "visual-01-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görselin ne kadar yoğun olmasını istersin?"
+    },
+    {
+      "id": "visual-02-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında şekiller yüzeyi nasıl doldursun?"
+    },
+    {
+      "id": "visual-02-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende şekiller yüzeyi nasıl doldursun?"
+    },
+    {
+      "id": "visual-02-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda şekiller yüzeyi nasıl doldursun?"
+    },
+    {
+      "id": "visual-02-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde şekiller yüzeyi nasıl doldursun?"
+    },
+    {
+      "id": "visual-02-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda şekiller yüzeyi nasıl doldursun?"
+    },
+    {
+      "id": "visual-03-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi kompozisyon yaklaşımını seçersin?"
+    },
+    {
+      "id": "visual-03-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende hangi kompozisyon yaklaşımını seçersin?"
+    },
+    {
+      "id": "visual-03-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi kompozisyon yaklaşımını seçersin?"
+    },
+    {
+      "id": "visual-03-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi kompozisyon yaklaşımını seçersin?"
+    },
+    {
+      "id": "visual-03-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi kompozisyon yaklaşımını seçersin?"
+    },
+    {
+      "id": "visual-04-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında desenin ritmi nasıl ilerlesin?"
+    },
+    {
+      "id": "visual-04-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende desenin ritmi nasıl ilerlesin?"
+    },
+    {
+      "id": "visual-04-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda desenin ritmi nasıl ilerlesin?"
+    },
+    {
+      "id": "visual-04-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde desenin ritmi nasıl ilerlesin?"
+    },
+    {
+      "id": "visual-04-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda desenin ritmi nasıl ilerlesin?"
+    },
+    {
+      "id": "visual-05-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında ayrıntı ve boşluk nasıl dengelensin?"
+    },
+    {
+      "id": "visual-05-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende ayrıntı ve boşluk nasıl dengelensin?"
+    },
+    {
+      "id": "visual-05-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda ayrıntı ve boşluk nasıl dengelensin?"
+    },
+    {
+      "id": "visual-05-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde ayrıntı ve boşluk nasıl dengelensin?"
+    },
+    {
+      "id": "visual-05-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda ayrıntı ve boşluk nasıl dengelensin?"
+    },
+    {
+      "id": "visual-06-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında ilk bakışta nasıl bir görsel etki olsun?"
+    },
+    {
+      "id": "visual-06-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende ilk bakışta nasıl bir görsel etki olsun?"
+    },
+    {
+      "id": "visual-06-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda ilk bakışta nasıl bir görsel etki olsun?"
+    },
+    {
+      "id": "visual-06-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde ilk bakışta nasıl bir görsel etki olsun?"
+    },
+    {
+      "id": "visual-06-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda ilk bakışta nasıl bir görsel etki olsun?"
+    },
+    {
+      "id": "visual-07-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi düzen gözünü daha çok dinlendirir?"
+    },
+    {
+      "id": "visual-07-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende hangi düzen gözünü daha çok dinlendirir?"
+    },
+    {
+      "id": "visual-07-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi düzen gözünü daha çok dinlendirir?"
+    },
+    {
+      "id": "visual-07-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi düzen gözünü daha çok dinlendirir?"
+    },
+    {
+      "id": "visual-07-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi düzen gözünü daha çok dinlendirir?"
+    },
+    {
+      "id": "visual-08-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi desen akışı sana yakın?"
+    },
+    {
+      "id": "visual-08-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende hangi desen akışı sana yakın?"
+    },
+    {
+      "id": "visual-08-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi desen akışı sana yakın?"
+    },
+    {
+      "id": "visual-08-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi desen akışı sana yakın?"
+    },
+    {
+      "id": "visual-08-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi desen akışı sana yakın?"
+    },
+    {
+      "id": "visual-09-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında motifler nasıl bir ilişki kursun?"
+    },
+    {
+      "id": "visual-09-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende motifler nasıl bir ilişki kursun?"
+    },
+    {
+      "id": "visual-09-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda motifler nasıl bir ilişki kursun?"
+    },
+    {
+      "id": "visual-09-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde motifler nasıl bir ilişki kursun?"
+    },
+    {
+      "id": "visual-09-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda motifler nasıl bir ilişki kursun?"
+    },
+    {
+      "id": "visual-10-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görsel ağırlık nasıl dağılsın?"
+    },
+    {
+      "id": "visual-10-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende görsel ağırlık nasıl dağılsın?"
+    },
+    {
+      "id": "visual-10-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda görsel ağırlık nasıl dağılsın?"
+    },
+    {
+      "id": "visual-10-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde görsel ağırlık nasıl dağılsın?"
+    },
+    {
+      "id": "visual-10-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görsel ağırlık nasıl dağılsın?"
+    },
+    {
+      "id": "visual-11-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi ayrıntı seviyesi seni temsil eder?"
+    },
+    {
+      "id": "visual-11-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende hangi ayrıntı seviyesi seni temsil eder?"
+    },
+    {
+      "id": "visual-11-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi ayrıntı seviyesi seni temsil eder?"
+    },
+    {
+      "id": "visual-11-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi ayrıntı seviyesi seni temsil eder?"
+    },
+    {
+      "id": "visual-11-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi ayrıntı seviyesi seni temsil eder?"
+    },
+    {
+      "id": "visual-12-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında yüzeyde nasıl bir hareket hissedilsin?"
+    },
+    {
+      "id": "visual-12-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende yüzeyde nasıl bir hareket hissedilsin?"
+    },
+    {
+      "id": "visual-12-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda yüzeyde nasıl bir hareket hissedilsin?"
+    },
+    {
+      "id": "visual-12-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde yüzeyde nasıl bir hareket hissedilsin?"
+    },
+    {
+      "id": "visual-12-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda yüzeyde nasıl bir hareket hissedilsin?"
+    },
+    {
+      "id": "visual-13-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görselin merkezinde nasıl bir düzen olsun?"
+    },
+    {
+      "id": "visual-13-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende görselin merkezinde nasıl bir düzen olsun?"
+    },
+    {
+      "id": "visual-13-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda görselin merkezinde nasıl bir düzen olsun?"
+    },
+    {
+      "id": "visual-13-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde görselin merkezinde nasıl bir düzen olsun?"
+    },
+    {
+      "id": "visual-13-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görselin merkezinde nasıl bir düzen olsun?"
+    },
+    {
+      "id": "visual-14-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi şekil yerleşimini tercih edersin?"
+    },
+    {
+      "id": "visual-14-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende hangi şekil yerleşimini tercih edersin?"
+    },
+    {
+      "id": "visual-14-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi şekil yerleşimini tercih edersin?"
+    },
+    {
+      "id": "visual-14-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi şekil yerleşimini tercih edersin?"
+    },
+    {
+      "id": "visual-14-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi şekil yerleşimini tercih edersin?"
+    },
+    {
+      "id": "visual-15-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında desenin görsel temposu ne olsun?"
+    },
+    {
+      "id": "visual-15-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende desenin görsel temposu ne olsun?"
+    },
+    {
+      "id": "visual-15-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda desenin görsel temposu ne olsun?"
+    },
+    {
+      "id": "visual-15-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde desenin görsel temposu ne olsun?"
+    },
+    {
+      "id": "visual-15-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda desenin görsel temposu ne olsun?"
+    },
+    {
+      "id": "visual-16-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında uzaktan bakınca nasıl okunmasını istersin?"
+    },
+    {
+      "id": "visual-16-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende uzaktan bakınca nasıl okunmasını istersin?"
+    },
+    {
+      "id": "visual-16-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda uzaktan bakınca nasıl okunmasını istersin?"
+    },
+    {
+      "id": "visual-16-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde uzaktan bakınca nasıl okunmasını istersin?"
+    },
+    {
+      "id": "visual-16-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda uzaktan bakınca nasıl okunmasını istersin?"
+    },
+    {
+      "id": "visual-17-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında yakından keşfedilecek ayrıntılar nasıl olsun?"
+    },
+    {
+      "id": "visual-17-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende yakından keşfedilecek ayrıntılar nasıl olsun?"
+    },
+    {
+      "id": "visual-17-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda yakından keşfedilecek ayrıntılar nasıl olsun?"
+    },
+    {
+      "id": "visual-17-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde yakından keşfedilecek ayrıntılar nasıl olsun?"
+    },
+    {
+      "id": "visual-17-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda yakından keşfedilecek ayrıntılar nasıl olsun?"
+    },
+    {
+      "id": "visual-18-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında boş alanların rolü nasıl şekillensin?"
+    },
+    {
+      "id": "visual-18-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende boş alanların rolü nasıl şekillensin?"
+    },
+    {
+      "id": "visual-18-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda boş alanların rolü nasıl şekillensin?"
+    },
+    {
+      "id": "visual-18-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde boş alanların rolü nasıl şekillensin?"
+    },
+    {
+      "id": "visual-18-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda boş alanların rolü nasıl şekillensin?"
+    },
+    {
+      "id": "visual-19-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında yüzeyde hangi yoğunluk dengesi kurulsun?"
+    },
+    {
+      "id": "visual-19-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende yüzeyde hangi yoğunluk dengesi kurulsun?"
+    },
+    {
+      "id": "visual-19-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda yüzeyde hangi yoğunluk dengesi kurulsun?"
+    },
+    {
+      "id": "visual-19-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde yüzeyde hangi yoğunluk dengesi kurulsun?"
+    },
+    {
+      "id": "visual-19-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda yüzeyde hangi yoğunluk dengesi kurulsun?"
+    },
+    {
+      "id": "visual-20-1",
+      "axis": "visual",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görsel anlatımın akışı nasıl olsun?"
+    },
+    {
+      "id": "visual-20-2",
+      "axis": "visual",
+      "text": "Her baktığında sana iyi gelecek desende görsel anlatımın akışı nasıl olsun?"
+    },
+    {
+      "id": "visual-20-3",
+      "axis": "visual",
+      "text": "Ürününü sana özel kılan kompozisyonda görsel anlatımın akışı nasıl olsun?"
+    },
+    {
+      "id": "visual-20-4",
+      "axis": "visual",
+      "text": "Yaşam alanının havasını yansıtan görselde görsel anlatımın akışı nasıl olsun?"
+    },
+    {
+      "id": "visual-20-5",
+      "axis": "visual",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görsel anlatımın akışı nasıl olsun?"
+    },
+    {
+      "id": "style-01-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi sanat dili seni temsil eder?"
+    },
+    {
+      "id": "style-01-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi sanat dili seni temsil eder?"
+    },
+    {
+      "id": "style-01-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi sanat dili seni temsil eder?"
+    },
+    {
+      "id": "style-01-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi sanat dili seni temsil eder?"
+    },
+    {
+      "id": "style-01-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi sanat dili seni temsil eder?"
+    },
+    {
+      "id": "style-02-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tasarım tarzına yakınsın?"
+    },
+    {
+      "id": "style-02-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi tasarım tarzına yakınsın?"
+    },
+    {
+      "id": "style-02-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tasarım tarzına yakınsın?"
+    },
+    {
+      "id": "style-02-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tasarım tarzına yakınsın?"
+    },
+    {
+      "id": "style-02-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tasarım tarzına yakınsın?"
+    },
+    {
+      "id": "style-03-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında çizgilerin karakteri nasıl olsun?"
+    },
+    {
+      "id": "style-03-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende çizgilerin karakteri nasıl olsun?"
+    },
+    {
+      "id": "style-03-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda çizgilerin karakteri nasıl olsun?"
+    },
+    {
+      "id": "style-03-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde çizgilerin karakteri nasıl olsun?"
+    },
+    {
+      "id": "style-03-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda çizgilerin karakteri nasıl olsun?"
+    },
+    {
+      "id": "style-04-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi estetik yorum öne çıksın?"
+    },
+    {
+      "id": "style-04-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi estetik yorum öne çıksın?"
+    },
+    {
+      "id": "style-04-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi estetik yorum öne çıksın?"
+    },
+    {
+      "id": "style-04-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi estetik yorum öne çıksın?"
+    },
+    {
+      "id": "style-04-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi estetik yorum öne çıksın?"
+    },
+    {
+      "id": "style-05-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi görsel üslupla anlatılmak istersin?"
+    },
+    {
+      "id": "style-05-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi görsel üslupla anlatılmak istersin?"
+    },
+    {
+      "id": "style-05-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi görsel üslupla anlatılmak istersin?"
+    },
+    {
+      "id": "style-05-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi görsel üslupla anlatılmak istersin?"
+    },
+    {
+      "id": "style-05-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi görsel üslupla anlatılmak istersin?"
+    },
+    {
+      "id": "style-06-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında sanatçı hangi yaklaşımı benimsesin?"
+    },
+    {
+      "id": "style-06-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende sanatçı hangi yaklaşımı benimsesin?"
+    },
+    {
+      "id": "style-06-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda sanatçı hangi yaklaşımı benimsesin?"
+    },
+    {
+      "id": "style-06-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde sanatçı hangi yaklaşımı benimsesin?"
+    },
+    {
+      "id": "style-06-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda sanatçı hangi yaklaşımı benimsesin?"
+    },
+    {
+      "id": "style-07-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi çizim tekniğinin hissi kalsın?"
+    },
+    {
+      "id": "style-07-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi çizim tekniğinin hissi kalsın?"
+    },
+    {
+      "id": "style-07-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi çizim tekniğinin hissi kalsın?"
+    },
+    {
+      "id": "style-07-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi çizim tekniğinin hissi kalsın?"
+    },
+    {
+      "id": "style-07-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi çizim tekniğinin hissi kalsın?"
+    },
+    {
+      "id": "style-08-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi stilin çağdaş yorumu olsun?"
+    },
+    {
+      "id": "style-08-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi stilin çağdaş yorumu olsun?"
+    },
+    {
+      "id": "style-08-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi stilin çağdaş yorumu olsun?"
+    },
+    {
+      "id": "style-08-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi stilin çağdaş yorumu olsun?"
+    },
+    {
+      "id": "style-08-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi stilin çağdaş yorumu olsun?"
+    },
+    {
+      "id": "style-09-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tasarım diliyle bağ kurarsın?"
+    },
+    {
+      "id": "style-09-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi tasarım diliyle bağ kurarsın?"
+    },
+    {
+      "id": "style-09-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tasarım diliyle bağ kurarsın?"
+    },
+    {
+      "id": "style-09-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tasarım diliyle bağ kurarsın?"
+    },
+    {
+      "id": "style-09-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tasarım diliyle bağ kurarsın?"
+    },
+    {
+      "id": "style-10-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi estetik dünya içinde yer almak istersin?"
+    },
+    {
+      "id": "style-10-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi estetik dünya içinde yer almak istersin?"
+    },
+    {
+      "id": "style-10-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi estetik dünya içinde yer almak istersin?"
+    },
+    {
+      "id": "style-10-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi estetik dünya içinde yer almak istersin?"
+    },
+    {
+      "id": "style-10-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi estetik dünya içinde yer almak istersin?"
+    },
+    {
+      "id": "style-11-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi üslup evinin karakterine uyar?"
+    },
+    {
+      "id": "style-11-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi üslup evinin karakterine uyar?"
+    },
+    {
+      "id": "style-11-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi üslup evinin karakterine uyar?"
+    },
+    {
+      "id": "style-11-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi üslup evinin karakterine uyar?"
+    },
+    {
+      "id": "style-11-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi üslup evinin karakterine uyar?"
+    },
+    {
+      "id": "style-12-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görselin sanatsal kimliği ne olsun?"
+    },
+    {
+      "id": "style-12-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende görselin sanatsal kimliği ne olsun?"
+    },
+    {
+      "id": "style-12-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda görselin sanatsal kimliği ne olsun?"
+    },
+    {
+      "id": "style-12-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde görselin sanatsal kimliği ne olsun?"
+    },
+    {
+      "id": "style-12-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görselin sanatsal kimliği ne olsun?"
+    },
+    {
+      "id": "style-13-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi stil her gün yeniden ilgini çeker?"
+    },
+    {
+      "id": "style-13-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi stil her gün yeniden ilgini çeker?"
+    },
+    {
+      "id": "style-13-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi stil her gün yeniden ilgini çeker?"
+    },
+    {
+      "id": "style-13-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi stil her gün yeniden ilgini çeker?"
+    },
+    {
+      "id": "style-13-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi stil her gün yeniden ilgini çeker?"
+    },
+    {
+      "id": "style-14-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi biçim dili sana daha özgü?"
+    },
+    {
+      "id": "style-14-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi biçim dili sana daha özgü?"
+    },
+    {
+      "id": "style-14-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi biçim dili sana daha özgü?"
+    },
+    {
+      "id": "style-14-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi biçim dili sana daha özgü?"
+    },
+    {
+      "id": "style-14-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi biçim dili sana daha özgü?"
+    },
+    {
+      "id": "style-15-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında tasarımın ifade biçimi nasıl şekillensin?"
+    },
+    {
+      "id": "style-15-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende tasarımın ifade biçimi nasıl şekillensin?"
+    },
+    {
+      "id": "style-15-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda tasarımın ifade biçimi nasıl şekillensin?"
+    },
+    {
+      "id": "style-15-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde tasarımın ifade biçimi nasıl şekillensin?"
+    },
+    {
+      "id": "style-15-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda tasarımın ifade biçimi nasıl şekillensin?"
+    },
+    {
+      "id": "style-16-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi sanat yaklaşımı sana iyi gelir?"
+    },
+    {
+      "id": "style-16-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi sanat yaklaşımı sana iyi gelir?"
+    },
+    {
+      "id": "style-16-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi sanat yaklaşımı sana iyi gelir?"
+    },
+    {
+      "id": "style-16-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi sanat yaklaşımı sana iyi gelir?"
+    },
+    {
+      "id": "style-16-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi sanat yaklaşımı sana iyi gelir?"
+    },
+    {
+      "id": "style-17-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tarzın ince ayrıntılarını görmek istersin?"
+    },
+    {
+      "id": "style-17-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi tarzın ince ayrıntılarını görmek istersin?"
+    },
+    {
+      "id": "style-17-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tarzın ince ayrıntılarını görmek istersin?"
+    },
+    {
+      "id": "style-17-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tarzın ince ayrıntılarını görmek istersin?"
+    },
+    {
+      "id": "style-17-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tarzın ince ayrıntılarını görmek istersin?"
+    },
+    {
+      "id": "style-18-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında kişisel estetik imzan hangisi olsun?"
+    },
+    {
+      "id": "style-18-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende kişisel estetik imzan hangisi olsun?"
+    },
+    {
+      "id": "style-18-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda kişisel estetik imzan hangisi olsun?"
+    },
+    {
+      "id": "style-18-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde kişisel estetik imzan hangisi olsun?"
+    },
+    {
+      "id": "style-18-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda kişisel estetik imzan hangisi olsun?"
+    },
+    {
+      "id": "style-19-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında görselin son dokunuşu hangi üsluptan gelsin?"
+    },
+    {
+      "id": "style-19-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende görselin son dokunuşu hangi üsluptan gelsin?"
+    },
+    {
+      "id": "style-19-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda görselin son dokunuşu hangi üsluptan gelsin?"
+    },
+    {
+      "id": "style-19-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde görselin son dokunuşu hangi üsluptan gelsin?"
+    },
+    {
+      "id": "style-19-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda görselin son dokunuşu hangi üsluptan gelsin?"
+    },
+    {
+      "id": "style-20-1",
+      "axis": "style",
+      "text": "Günlük ritüellerine eşlik edecek tasarımında hangi tarzla kalıcı bir bağ kurmak istersin?"
+    },
+    {
+      "id": "style-20-2",
+      "axis": "style",
+      "text": "Her baktığında sana iyi gelecek desende hangi tarzla kalıcı bir bağ kurmak istersin?"
+    },
+    {
+      "id": "style-20-3",
+      "axis": "style",
+      "text": "Ürününü sana özel kılan kompozisyonda hangi tarzla kalıcı bir bağ kurmak istersin?"
+    },
+    {
+      "id": "style-20-4",
+      "axis": "style",
+      "text": "Yaşam alanının havasını yansıtan görselde hangi tarzla kalıcı bir bağ kurmak istersin?"
+    },
+    {
+      "id": "style-20-5",
+      "axis": "style",
+      "text": "Uzun süre kullanmak isteyeceğin tasarımda hangi tarzla kalıcı bir bağ kurmak istersin?"
+    }
+  ],
+  "options": {
+    "nature": [
+      {
+        "id": "forest",
+        "prompt": "layered woodland leaves, organic forest canopy",
+        "labels": [
+          "Ormanın dinginliği",
+          "Yaprakların arasında",
+          "Yeşil bir orman yolu",
+          "Ağaçların sakin ritmi"
+        ]
+      },
+      {
+        "id": "ocean",
+        "prompt": "ocean currents and gentle wave contours",
+        "labels": [
+          "Denizin akışı",
+          "Dalgaların ritmi",
+          "Ufka uzanan su",
+          "Okyanus çizgileri"
+        ]
+      },
+      {
+        "id": "mountain",
+        "prompt": "mountain silhouettes and rocky contours",
+        "labels": [
+          "Dağların gücü",
+          "Zirvelerin çizgisi",
+          "Kayalıkların dengesi",
+          "Yükseklerin sessizliği"
+        ]
+      },
+      {
+        "id": "desert",
+        "prompt": "rolling desert dunes, sand textures",
+        "labels": [
+          "Kum tepelerinin ritmi",
+          "Çölün yalınlığı",
+          "Rüzgârın kumdaki izi",
+          "Yumuşak kum kıvrımları"
+        ]
+      },
+      {
+        "id": "garden",
+        "prompt": "botanical blossoms and subtle petal shapes",
+        "labels": [
+          "Çiçeklerin zarafeti",
+          "Bir bahçenin izleri",
+          "Taç yaprakların ahengi",
+          "Çiçek açan bir dünya"
+        ]
+      },
+      {
+        "id": "sky",
+        "prompt": "cloud wisps and airy sky currents",
+        "labels": [
+          "Gökyüzünün açıklığı",
+          "Bulutların hafifliği",
+          "Havada süzülen çizgiler",
+          "Ufkun ferahlığı"
+        ]
+      },
+      {
+        "id": "river",
+        "prompt": "meandering river lines and smooth pebbles",
+        "labels": [
+          "Nehirlerin yolu",
+          "Akarsuyun kıvrımları",
+          "Suyun taşlarla buluşması",
+          "Kıyıların akışkanlığı"
+        ]
+      },
+      {
+        "id": "cosmos",
+        "prompt": "abstract star fields and cosmic arcs",
+        "labels": [
+          "Yıldızların dünyası",
+          "Gece göğünün izleri",
+          "Kozmik bir yolculuk",
+          "Uzayın sonsuzluğu"
+        ]
+      }
+    ],
+    "mood": [
+      {
+        "id": "calm",
+        "prompt": "serene, tranquil, gentle atmosphere",
+        "labels": [
+          "Sakin ve dingin",
+          "Huzurlu bir akış",
+          "Sessiz bir denge",
+          "Yavaşlayan bir ritim"
+        ]
+      },
+      {
+        "id": "joy",
+        "prompt": "joyful, optimistic, playful atmosphere",
+        "labels": [
+          "Neşeli ve canlı",
+          "İç açan bir enerji",
+          "Gülümseten bir ruh",
+          "Pozitif bir hareket"
+        ]
+      },
+      {
+        "id": "bold",
+        "prompt": "confident, bold, expressive atmosphere",
+        "labels": [
+          "Güçlü ve kararlı",
+          "Cesur bir ifade",
+          "Kendinden emin",
+          "Net ve etkileyici"
+        ]
+      },
+      {
+        "id": "dream",
+        "prompt": "dreamy, imaginative, poetic atmosphere",
+        "labels": [
+          "Hayalperest ve şiirsel",
+          "Düşlerin peşinde",
+          "Yumuşak bir hayal",
+          "Masalsı bir his"
+        ]
+      },
+      {
+        "id": "nostalgia",
+        "prompt": "warm, nostalgic, familiar atmosphere",
+        "labels": [
+          "Sıcak ve tanıdık",
+          "Anıları çağrıştıran",
+          "Nostaljik bir dokunuş",
+          "İçten bir sıcaklık"
+        ]
+      },
+      {
+        "id": "curious",
+        "prompt": "curious, adventurous, exploratory atmosphere",
+        "labels": [
+          "Meraklı ve keşifçi",
+          "Yeni yollar arayan",
+          "Keşfin heyecanı",
+          "Sürprizlere açık"
+        ]
+      },
+      {
+        "id": "balanced",
+        "prompt": "balanced, grounded, harmonious atmosphere",
+        "labels": [
+          "Dengeli ve uyumlu",
+          "Ayakları yere basan",
+          "Ölçülü bir ahenk",
+          "Kararlı bir huzur"
+        ]
+      },
+      {
+        "id": "energetic",
+        "prompt": "dynamic, fresh, uplifting atmosphere",
+        "labels": [
+          "Hareketli ve dinamik",
+          "Taze bir başlangıç",
+          "Canlandıran bir tempo",
+          "Enerjisi yüksek"
+        ]
+      }
+    ],
+    "color": [
+      {
+        "id": "neutral",
+        "prompt": "ivory, white, charcoal, subtle warm grey",
+        "labels": [
+          "Beyaz ve antrasit",
+          "Nötr tonların dengesi",
+          "Fildişi ve kömür grisi",
+          "Sade siyah-beyaz"
+        ]
+      },
+      {
+        "id": "earth",
+        "prompt": "terracotta, sand, burnt umber, cream",
+        "labels": [
+          "Toprak ve kum",
+          "Sıcak toprak tonları",
+          "Terrakota ve krem",
+          "Doğal kahverengi paleti"
+        ]
+      },
+      {
+        "id": "blue",
+        "prompt": "navy, ocean blue, pale blue, white",
+        "labels": [
+          "Mavinin katmanları",
+          "Lacivert ve açık mavi",
+          "Deniz mavisi ve beyaz",
+          "Serin mavi tonları"
+        ]
+      },
+      {
+        "id": "pastel",
+        "prompt": "dusty rose, lavender, powder blue, ivory",
+        "labels": [
+          "Yumuşak pasteller",
+          "Pudra ve lavanta",
+          "Hafif pastel dengesi",
+          "Soluk pembe ve mavi"
+        ]
+      },
+      {
+        "id": "warm",
+        "prompt": "coral, amber, muted red, peach",
+        "labels": [
+          "Mercan ve kehribar",
+          "Sıcak gün batımı",
+          "Kırmızı ve şeftali",
+          "Güneşten ilham alan tonlar"
+        ]
+      },
+      {
+        "id": "green",
+        "prompt": "sage green, olive, moss, cream",
+        "labels": [
+          "Adaçayı ve zeytin",
+          "Doğal yeşil tonları",
+          "Yosun ve krem",
+          "Yumuşak botanik palet"
+        ]
+      },
+      {
+        "id": "jewel",
+        "prompt": "emerald, sapphire, amethyst, restrained gold",
+        "labels": [
+          "Mücevher tonları",
+          "Zümrüt ve safir",
+          "Derin renklerin ışıltısı",
+          "Ametist ve altın dokunuşu"
+        ]
+      },
+      {
+        "id": "mono",
+        "prompt": "single charcoal hue, varied lightness, white",
+        "labels": [
+          "Tek rengin katmanları",
+          "Monokrom bir dünya",
+          "Bir tonun farklı ışıkları",
+          "Tek renkli yalınlık"
+        ]
+      }
+    ],
+    "visual": [
+      {
+        "id": "airy",
+        "prompt": "very sparse motifs, generous negative space, low detail density",
+        "labels": [
+          "Bol boşluk, az detay",
+          "Nefes alan bir düzen",
+          "Seyrek ve hafif çizgiler",
+          "Yalın bir yoğunluk"
+        ]
+      },
+      {
+        "id": "balanced",
+        "prompt": "medium detail density, evenly spaced organic motifs",
+        "labels": [
+          "Dengeli motif dağılımı",
+          "Ölçülü ayrıntılar",
+          "Boşluk ve desen dengesi",
+          "Orta yoğunlukta bir akış"
+        ]
+      },
+      {
+        "id": "rich",
+        "prompt": "intricate layered detail, dense but legible all-over pattern",
+        "labels": [
+          "Zengin ve katmanlı",
+          "Keşfedilecek çok ayrıntı",
+          "Yoğun ama dengeli desen",
+          "İnce detayların birlikteliği"
+        ]
+      },
+      {
+        "id": "focal",
+        "prompt": "one clear focal motif with quiet surrounding negative space",
+        "labels": [
+          "Tek güçlü odak",
+          "Merkezde bir imza",
+          "Bir motif etrafında denge",
+          "Sakin zeminde güçlü şekil"
+        ]
+      },
+      {
+        "id": "flow",
+        "prompt": "flowing diagonal curves, rhythmic medium density",
+        "labels": [
+          "Akışkan bir ritim",
+          "Yüzeyi dolaşan kıvrımlar",
+          "Hareket hissi veren çizgiler",
+          "Diyagonal bir akış"
+        ]
+      },
+      {
+        "id": "repeat",
+        "prompt": "seamless repeating motifs, orderly medium density",
+        "labels": [
+          "Tekrarlayan motifler",
+          "Düzenli desen ritmi",
+          "Kesintisiz bir örüntü",
+          "Uyumlu tekrarlar"
+        ]
+      },
+      {
+        "id": "asymmetric",
+        "prompt": "asymmetric composition, medium detail density",
+        "labels": [
+          "Asimetrik bir denge",
+          "Beklenmedik yerleşimler",
+          "Serbest bir kompozisyon",
+          "Dengeli düzensizlik"
+        ]
+      },
+      {
+        "id": "layer",
+        "prompt": "translucent overlapping shapes, medium-high detail density",
+        "labels": [
+          "Üst üste gelen katmanlar",
+          "Saydam şekillerin diyaloğu",
+          "Derinlikli bir düzen",
+          "Katmanların yumuşak geçişi"
+        ]
+      }
+    ],
+    "style": [
+      {
+        "id": "minimal",
+        "prompt": "minimalist contemporary graphic art",
+        "labels": [
+          "Modern ve minimal",
+          "Yalın çağdaş çizgiler",
+          "Az çizgiyle güçlü ifade",
+          "Sade bir tasarım dili"
+        ]
+      },
+      {
+        "id": "watercolor",
+        "prompt": "delicate watercolor painting, soft pigment textures",
+        "labels": [
+          "Sulu boya dokusu",
+          "Yumuşak boya geçişleri",
+          "Akışkan suluboya",
+          "Fırçanın hafif izleri"
+        ]
+      },
+      {
+        "id": "geometry",
+        "prompt": "precise geometric graphic design",
+        "labels": [
+          "Geometrik bir dünya",
+          "Net şekillerin dengesi",
+          "Çizgi ve açıların ahengi",
+          "Keskin geometrik ritim"
+        ]
+      },
+      {
+        "id": "ink",
+        "prompt": "fine ink line illustration, delicate hand drawn strokes",
+        "labels": [
+          "İnce mürekkep çizgileri",
+          "El çiziminin izleri",
+          "Zarif çizgi sanatı",
+          "Mürekkeple yalın anlatım"
+        ]
+      },
+      {
+        "id": "retro",
+        "prompt": "refined mid-century retro graphic design",
+        "labels": [
+          "Zamansız retro",
+          "Geçmişten modern izler",
+          "Orta yüzyıl estetiği",
+          "Nostaljik grafik dili"
+        ]
+      },
+      {
+        "id": "abstract",
+        "prompt": "contemporary abstract painting, expressive shapes",
+        "labels": [
+          "Soyut ve özgür",
+          "Şekillerle serbest anlatım",
+          "Çağdaş soyut yorum",
+          "Özgür biçimlerin hikâyesi"
+        ]
+      },
+      {
+        "id": "engraving",
+        "prompt": "detailed vintage engraving lines",
+        "labels": [
+          "Gravürün inceliği",
+          "İşlenmiş çizgi dokusu",
+          "Zarif oyma sanatı",
+          "Klasik gravür ritmi"
+        ]
+      },
+      {
+        "id": "scandi",
+        "prompt": "Scandinavian clean organic graphic design",
+        "labels": [
+          "İskandinav sadeliği",
+          "Doğal ve yalın formlar",
+          "Kuzeyin sakin estetiği",
+          "Organik modern çizgiler"
+        ]
+      }
+    ]
+  }
+}

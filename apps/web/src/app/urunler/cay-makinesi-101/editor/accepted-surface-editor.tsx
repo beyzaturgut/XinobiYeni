@@ -14,33 +14,37 @@ function PreviewStatus({ error = false, children }: { error?: boolean; children:
     <Link href="/urunler/cay-makinesi-101">Ürüne dön</Link>
   </section>;
 }
-function AcceptedSurfaceLoader({ variant }: { variant: string }) {
+function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc }: { variant: string; commerceProduct?: string; patternSrc?: string }) {
   const [state, setState] = useState<{ variant: string; inputs?: RenderingInputs | null; error?: boolean }>({ variant });
   useEffect(() => {
     const controller = new AbortController();
-    loadAcceptedSurface(variant, controller.signal).then(inputs => {
+    loadAcceptedSurface(variant, controller.signal, commerceProduct).then(inputs => {
       if (!controller.signal.aborted) setState({ variant, inputs });
     }).catch(() => { if (!controller.signal.aborted) setState({ variant, error: true }); });
     return () => controller.abort();
-  }, [variant]);
+  }, [variant, commerceProduct]);
   if (state.variant !== variant || (state.inputs === undefined && !state.error))
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi.</PreviewStatus>;
   if (!state.inputs) return <PreviewStatus>Bu renk için geliştirme önizlemesi kullanılamıyor.</PreviewStatus>;
-  return <EditorWorkspace renderingInputs={state.inputs} />;
+  return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} />;
 }
 function AcceptedSurfaceRoute() {
-  const variant = useSearchParams().get("variant") ?? "blue";
+  const query = useSearchParams();
+  const variant = query.get("variant") ?? "blue";
+  const commerceProduct = query.get("product") ?? undefined;
   // A changed reference starts a fresh load; an earlier bundle is never reused while loading.
-  return <AcceptedSurfaceLoader key={variant} variant={variant} />;
+  return <AcceptedSurfaceLoader key={commerceProduct+":"+variant} variant={variant} commerceProduct={commerceProduct} />;
 }
 function ReferenceLink({ href, children }: { href: string; children: React.ReactNode }) {
-  const variant = useSearchParams().get("variant") ?? "blue";
-  return <Link href={`${href}?variant=${encodeURIComponent(variant)}`}>{children}</Link>;
+  const query = useSearchParams();
+  const variant = query.get("variant") ?? "blue";
+  const commerceProduct = query.get("product") ?? undefined;
+  return <Link href={href+"?variant="+encodeURIComponent(variant)+(commerceProduct ? "&product="+encodeURIComponent(commerceProduct) : "")}>{children}</Link>;
 }
 export function DevelopmentReferenceLink({ href, children }: { href: string; children: React.ReactNode }) {
   return <Suspense fallback={<Link href="/urunler/cay-makinesi-101">{children}</Link>}><ReferenceLink href={href}>{children}</ReferenceLink></Suspense>;
 }
-export default function AcceptedSurfaceEditor() {
-  return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}><AcceptedSurfaceRoute /></Suspense>;
+export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string } = {}) {
+  return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} /> : <AcceptedSurfaceRoute />}</Suspense>;
 }

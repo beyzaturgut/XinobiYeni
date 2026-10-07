@@ -1,4 +1,5 @@
 using System.Net;
+using Xinobi.Api.LocalCommerce;
 using System.Security.Cryptography;
 using Xinobi.Api.Infrastructure.MediaValidation;
 
@@ -18,6 +19,20 @@ public sealed class DevelopmentAcceptedSurface(string repositoryRoot)
     public const string SourceSha = "da25357dd74d34295b1658ac6b87b55c28ec4f9d8f4543379efabb8971300414";
     public const string MaskSha = "8c4ae4c1d1ab269ae2e580a83a8ba3e55a0d32766c9b7299e0f5e804f5964d06";
     public const string BrandingSha = "7f2337118d63980f4e3e36ad502bc2b92d0df88821a60d96dcfef1469dda1c88";
+
+    public const string CommerceRoute = "/api/v1/dev/product-surfaces/commerce/{productReference}/{variantReference}/rendering-inputs";
+    public async Task<DevelopmentSurfaceBundle> ResolveCommerce(LocalCommerceStore commerce, string productReference, string variantReference)
+    {
+        var unavailable = new DevelopmentSurfaceBundle("development-preview", productReference, variantReference, false, null);
+        if (productReference != "DEMO-P101" || variantReference != "DEMO-V101-B") return unavailable;
+        var state = await commerce.Read();
+        var product = state.Products.SingleOrDefault(p => p.Id == productReference && p.Active);
+        var variant = product?.Variants.SingleOrDefault(v => v.Id == variantReference);
+        // Explicit development association; color/dimensions alone never establish identity.
+        if (variant?.Image != "/assets/products/tea-maker-101-blue.webp") return unavailable;
+        var accepted = Resolve(DevelopmentTeaMakerMedia.ProductReference, DevelopmentTeaMakerMedia.VariantReference);
+        return unavailable with { PreviewAvailable = accepted.PreviewAvailable, Inputs = accepted.Inputs };
+    }
 
     public DevelopmentSurfaceBundle Resolve(string productReference, string variantReference)
     {
@@ -58,6 +73,13 @@ public static class DevelopmentAcceptedSurfaceEndpoints
     public static void MapDevelopmentAcceptedSurface(this WebApplication app, string repositoryRoot)
     {
         var resolver = new DevelopmentAcceptedSurface(repositoryRoot);
+        app.MapGet(DevelopmentAcceptedSurface.CommerceRoute, async (HttpContext context, LocalCommerceStore commerce, string productReference, string variantReference) =>
+        {
+            if (context.Connection.RemoteIpAddress is { } remote && !IPAddress.IsLoopback(remote) ||
+                context.Request.Host.Host is not ("localhost" or "127.0.0.1" or "::1")) return Results.NotFound();
+            context.Response.Headers.CacheControl = "no-store";
+            return Results.Ok(await resolver.ResolveCommerce(commerce, productReference, variantReference));
+        }).WithTags("DevelopmentProductSurfaces");
         app.MapGet(DevelopmentAcceptedSurface.Route, (HttpContext context, string productReference, string variantReference) =>
         {
             if (context.Connection.RemoteIpAddress is { } remote && !IPAddress.IsLoopback(remote) ||

@@ -1,0 +1,18 @@
+import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1000}});page.setDefaultTimeout(10000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:4190/');await page.getByRole('button',{name:'Kurumsal teklifler',exact:true}).click();assert.equal(await page.locator('tbody tr').count(),2);
+ await page.getByLabel('Firma veya teklif ara').fill('DEMO-Q1002');assert.equal(await page.locator('tbody tr').count(),1);await page.getByRole('button',{name:'Filtreleri temizle'}).click();await page.getByLabel('Teklif durum filtresi').selectOption('İnceleniyor');assert.equal(await page.locator('tbody tr').count(),1);await page.getByRole('button',{name:'Filtreleri temizle'}).click();
+ await page.getByRole('button',{name:'DEMO-Q1001 teklif detayını aç'}).click();const oldRows=await page.locator('.quote-detail tbody').textContent();
+ await page.getByRole('button',{name:'Son sürümden revizyon oluştur'}).click();await page.getByLabel('Satır 1 adet').fill('0');await page.getByRole('button',{name:'Demo revizyonunu kaydet'}).click();assert.equal(await page.getByRole('alert').isVisible(),true);
+ await page.getByLabel('Satır 1 adet').fill('25');await page.getByLabel('Satır 1 birim fiyat').fill('100,05');await page.getByLabel('Revizyon gerekçesi').fill('Adet ve örnek fiyat güncellendi');await page.getByRole('button',{name:'Demo revizyonunu kaydet'}).click();assert.equal(await page.getByRole('button',{name:'Sürüm 2',exact:true}).isVisible(),true);
+ assert.equal(await page.getByText('Örnek ürün toplamı: ₺2.501,25',{exact:true}).isVisible(),true);
+ await page.getByRole('button',{name:'Sürüm 1',exact:true}).click();assert.equal(await page.locator('.quote-detail tbody').textContent(),oldRows);
+ await page.getByRole('button',{name:'Son sürümden revizyon oluştur'}).click();assert.equal(await page.getByLabel('Satır 1 adet').inputValue(),'25');page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Revizyondan vazgeç'}).click();assert.equal(await page.getByRole('button',{name:'Sürüm 3',exact:true}).count(),0);
+ await page.getByRole('button',{name:'Dashboard',exact:true}).click();await page.getByRole('button',{name:'Kurumsal teklifler',exact:true}).click();await page.getByRole('button',{name:'DEMO-Q1001 teklif detayını aç'}).click();assert.equal(await page.getByRole('button',{name:'Sürüm 2',exact:true}).getAttribute('aria-pressed'),'true');
+ await page.screenshot({path:'test/2026-10-03/TST-082-quotes-desktop.png',fullPage:true});
+ for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth),false);await page.getByRole('button',{name:'Son sürümden revizyon oluştur'}).click();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>document.documentElement.clientWidth),false);page.once('dialog',d=>d.accept());await page.getByRole('button',{name:'Revizyondan vazgeç'}).click();}
+ await page.setViewportSize({width:390,height:900});await page.screenshot({path:'test/2026-10-03/TST-082-quotes-mobile.png',fullPage:true});assert.deepEqual(errors,[]);console.log('quotes UI: filters, immutable versions, validation, cents totals, latest-base draft, cancel, navigation, 4 widths = OK');
+}finally{await browser.close()}

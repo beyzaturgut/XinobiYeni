@@ -1,0 +1,24 @@
+import { useState } from 'react'
+const periods = ['Bugün', 'Dün', 'Bu Hafta', 'Geçen Hafta', 'Bu Ay', 'Geçen Ay', 'Bu Yıl', 'Geçen Yıl', 'Tüm Zamanlar']
+const widgets = [
+  { id: 'orders', title: 'Siparişler' }, { id: 'sales', title: 'Satış Performansı' }, { id: 'cart', title: 'Sepet Özeti' },
+  { id: 'chart', title: 'Satış Grafiği' }, { id: 'visitors', title: 'Aktif Ziyaretçiler' }, { id: 'payments', title: 'Ödeme Yöntemleri' },
+  { id: 'shipping', title: 'Kargo Firmaları' }, { id: 'customers', title: 'Müşteri İstatistikleri' }, { id: 'channels', title: 'Satış Kanalları' },
+  { id: 'conversion', title: 'Dönüşüm Oranları' }, { id: 'traffic', title: 'Trafik Kaynakları' }, { id: 'bestsellers', title: 'Çok Satanlar' }, { id: 'stock', title: 'Kritik Stok Seviyeleri' },
+]
+const key = 'xinobi:admin:demo:dashboard-layout:v1'
+function loadOrder(): string[] {
+  try { const stored: unknown = JSON.parse(localStorage.getItem(key) || 'null'); if (Array.isArray(stored) && stored.length === widgets.length && new Set(stored).size === widgets.length && stored.every(id => widgets.some(widget => widget.id === id))) return stored } catch { /* Varsayılan düzen. */ }
+  return widgets.map(widget => widget.id)
+}
+export default function Dashboard({ onOrders }: { onOrders: () => void }) {
+  const [period, setPeriod] = useState('Bu Hafta'), [mode, setMode] = useState('demo'), [order, setOrder] = useState(loadOrder), [notice, setNotice] = useState('')
+  function move(id: string, direction: number) {
+    const next = [...order], index = next.indexOf(id), target = index + direction
+    if (target < 0 || target >= next.length) return
+    ;[next[index], next[target]] = [next[target], next[index]]; setOrder(next)
+    try { localStorage.setItem(key, JSON.stringify(next)); setNotice('Demo kart düzeni bu tarayıcıda saklandı.') } catch { setNotice('Kart taşındı; depolama kullanılamadığı için düzen saklanmadı.') }
+  }
+  return <section aria-label="Dashboard"><div className="periods" role="group" aria-label="Rapor dönemi">{periods.map(item => <button key={item} aria-pressed={period === item} onClick={() => setPeriod(item)}>{item}</button>)}</div><div className="dashboard-toolbar"><p>Özet dönemi: <strong>{period}</strong> · API bağlantısı bekleniyor.</p><label htmlFor="dashboard-mode">Veri görünümü<select id="dashboard-mode" value={mode} onChange={event => setMode(event.target.value)}><option value="demo">Örnek veri</option><option value="empty">Boş sonuç</option><option value="error">Hata durumu</option></select></label></div><p className="layout-note" role="status">{notice || 'Kartları yukarı/aşağı düğmeleriyle sıralayabilirsiniz. Düzen yalnız demo çalışma alanına aittir.'}</p>
+    <div className="dashboard-grid">{order.map((id, index) => { const widget = widgets.find(item => item.id === id)!; return <section className={`widget ${id === 'chart' ? 'wide-widget' : ''}`} key={id} aria-labelledby={`widget-${id}`}><header><h2 id={`widget-${id}`}>{widget.title}</h2><div><button disabled={index === 0} aria-label={`${widget.title} kartını yukarı taşı`} onClick={() => move(id, -1)}>↑</button><button disabled={index === order.length - 1} aria-label={`${widget.title} kartını aşağı taşı`} onClick={() => move(id, 1)}>↓</button></div></header><div className="widget-body">{mode === 'error' ? <div className="widget-error"><strong>Özet yüklenemedi</strong><p>Örnek bağlantı hatası; tutar ve sayaçlar bilinmiyor.</p><button onClick={() => setMode('demo')}>Demo veriyi yeniden göster</button></div> : mode === 'empty' ? <div className="empty-widget"><strong>Bu dönemde kayıt yok</strong><p>Boş sonuç önizlemesi · {period}</p></div> : id === 'orders' ? <><div className="metric"><strong>12</strong><span>Örnek sipariş</span></div><dl><div><dt>Yeni</dt><dd>7</dd></div><div><dt>Hazırlanıyor</dt><dd>5</dd></div></dl><button onClick={onOrders}>Sipariş listesini aç →</button></> : id === 'sales' ? <><div className="metric"><strong>₺24.800</strong><span>Örnek satış toplamı</span></div><dl><div><dt>Örnek sipariş adedi</dt><dd>12</dd></div><div><dt>Finansal mutabakat</dt><dd>Bekliyor</dd></div></dl><p className="muted">D02/D03 sonrası dönem, vergi ve iade hesabı tanımlanacak.</p></> : id === 'chart' ? <><div className="demo-bars" aria-hidden="true">{[2, 4, 3, 7, 5, 8, 6].map((value, i) => <div key={i}><span style={{ height: `${value * 10}%` }} /><small>{i + 1}</small></div>)}</div><p className="muted">Örnek sipariş adedi; dönem seçimiyle gerçek hesaplama yapılmaz.</p><details><summary>Grafik verisini metin olarak göster</summary><p>Örnek günler 1–7: 2, 4, 3, 7, 5, 8, 6 sipariş.</p></details></> : <div className="empty-widget"><span aria-hidden="true">◫</span><strong>Veri kaynağı bağlı değil</strong><p>Gerçek API sözleşmesiyle etkinleşecek.</p></div>}</div></section> })}</div></section>
+}

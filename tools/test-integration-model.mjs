@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {validateMapping,initialMappings,retryPlan,initialJobs} from '../apps/admin/src/integration-model.ts';
+const ids=['DEMO-V101-B','DEMO-V102-R'];
+assert.equal(validateMapping(initialMappings[0],initialMappings,ids),'');
+assert.ok(validateMapping({id:'new',provider:'Mikro',variantId:'DEMO-V101-B',externalId:'new'},initialMappings,ids));
+assert.ok(validateMapping({id:'new',provider:'Mikro',variantId:'DEMO-V102-R',externalId:' DEMO-MIKRO-TEA '},initialMappings,ids));
+assert.equal(validateMapping({id:'new',provider:'N11',variantId:'DEMO-V101-B',externalId:'DEMO-MIKRO-TEA'},initialMappings,ids),'');
+assert.ok(validateMapping({id:'new',provider:'N11',variantId:'missing',externalId:'x'},initialMappings,ids));
+assert.ok(validateMapping({id:'new',provider:'N11',variantId:ids[0],externalId:' '},initialMappings,ids));
+assert.match(retryPlan(initialJobs[0]),/Sonuç doğrulanmadan yeniden aktarım başlatılmaz/);
+assert.match(retryPlan(initialJobs[2]),/Kalıcı veri/);assert.match(retryPlan(initialJobs[3]),/yeni iş oluşturulmaz/);assert.match(retryPlan(initialJobs[4]),/yeniden üretilmez/);
+console.log('integration model: provider-scoped uniqueness, orphan mapping, unknown/dead-letter/queued/success retry plans = OK');

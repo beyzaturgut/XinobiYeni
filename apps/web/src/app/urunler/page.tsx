@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import SiteHeader from "../../components/site-header";
 import Link from "next/link";
 import Catalog from "./catalog";
 import styles from "./catalog.module.css";
@@ -12,16 +12,12 @@ export const metadata: Metadata = {
 export default function ProductsPage() {
   return <div className={styles.page}>
     <a className={styles.skipLink} href="#catalog">Ürünlere geç</a>
-    <header className={styles.header}>
-      <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <nav aria-label="Ürün sayfası menüsü"><Link href="/">Ana sayfa</Link><Link href="/urunler" aria-current="page">Ürünler</Link><Link href="/arama">Ara ve karşılaştır</Link><Link href="/#kisisellestirme">XINOBI U</Link></nav>
-      <Link className={styles.backLink} href="/favoriler">Favorilerim <span aria-hidden="true">♡</span></Link>
-    </header>
+    <SiteHeader />
     <main>
       <section className={styles.intro} aria-labelledby="catalog-title">
         <p>Xinobi koleksiyonu</p>
-        <h1 id="catalog-title">Günün her anı için yalın teknoloji.</h1>
-        <span>Demo katalog · Fiyat ve stok verileri D02 kararı sonrasında bağlanacaktır.</span>
+        <h1 id="catalog-title">Ürünler</h1>
+        <span>Ürünleri keşfedin, detaylarında tüm renk seçeneklerini görün.</span>
       </section>
       <Catalog />
     </main>

@@ -1,0 +1,52 @@
+import { useState } from 'react'
+import type { Product } from './catalog-data'
+
+const warehouses = [{ id: 'DEMO-W1', name: 'Merkez depo' }, { id: 'DEMO-W2', name: 'Sevkiyat deposu' }]
+const balances = [
+  { variantId: 'DEMO-V101-B', warehouseId: 'DEMO-W1', physical: 8, reserved: 2, available: 6 },
+  { variantId: 'DEMO-V101-B', warehouseId: 'DEMO-W2', physical: 4, reserved: 2, available: 2 },
+  { variantId: 'DEMO-V101-R', warehouseId: 'DEMO-W1', physical: 0, reserved: 0, available: 0 },
+  { variantId: 'DEMO-V102-R', warehouseId: 'DEMO-W1', physical: 6, reserved: 1, available: 5 },
+  { variantId: 'DEMO-V103-W', warehouseId: 'DEMO-W2', physical: 0, reserved: 0, available: 0 },
+]
+const movements = [
+  { id: 'DEMO-M1', variantId: 'DEMO-V101-B', warehouseId: 'DEMO-W1', date: '03.10.2026 10:00', type: 'Giriş', before: 5, after: 8, reason: 'Örnek teslim alma', actor: 'Demo operasyon' },
+  { id: 'DEMO-M2', variantId: 'DEMO-V102-R', warehouseId: 'DEMO-W1', date: '03.10.2026 09:00', type: 'Çıkış', before: 8, after: 6, reason: 'Örnek sevkiyat', actor: 'Demo operasyon' },
+]
+
+export default function Inventory({ products, onSave }: { products: Product[]; onSave: (product: Product) => Promise<void> }) {
+  const [tab, setTab] = useState('Web stokları'), [query, setQuery] = useState(''), [warehouse, setWarehouse] = useState('Tümü')
+  const [onlyMismatch, setOnlyMismatch] = useState(false), [count, setCount] = useState(''), [balanceKey, setBalanceKey] = useState(''), [reason, setReason] = useState(''), [result, setResult] = useState(''), [error, setError] = useState('')
+  const variants = products.flatMap(product => product.variants.map(variant => ({ ...variant, productName: product.name })))
+  const relevant = variants.filter(variant => `${variant.sku} ${variant.color} ${variant.productName}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
+  const stockRows = balances.filter(balance => relevant.some(variant => variant.id === balance.variantId) && (warehouse === 'Tümü' || balance.warehouseId === warehouse))
+  const comparisons = relevant.map(variant => {
+    const rows = balances.filter(balance => balance.variantId === variant.id)
+    return { ...variant, depotTotal: rows.length ? rows.reduce((sum, row) => sum + row.available, 0) : null }
+  }).filter(row => !onlyMismatch || row.depotTotal === null || row.depotTotal !== row.stock)
+  const history = movements.filter(movement => relevant.some(variant => variant.id === movement.variantId) && (warehouse === 'Tümü' || movement.warehouseId === warehouse))
+  function simulate() {
+    setError(''); setResult('')
+    const balance = balances.find(row => `${row.variantId}:${row.warehouseId}` === balanceKey)
+    if (!balance) { setError('Sayım için ürün ve depo seçin.'); return }
+    if (count.trim() === '' || !Number.isSafeInteger(Number(count)) || Number(count) < 0) { setError('Sayım adedi sıfır veya pozitif tam sayı olmalı.'); return }
+    if (!reason.trim()) { setError('Sayım farkı için açıklama girin.'); return }
+    const difference = Number(count) - balance.physical
+    setResult(`Örnek fiziksel stok: ${balance.physical} → ${Number(count)}. Sayım farkı: ${difference > 0 ? '+' : ''}${difference}. Rezervasyon: ${balance.reserved}. Bu yalnız önizlemedir; hareket veya stok kaydı oluşturulmadı.${Number(count) < balance.reserved ? ' Sayım rezervasyondan düşük; operasyon incelemesi gerekir.' : ''}`)
+  }
+  return <section aria-label="Stok ve depo yönetimi">
+    <p className="panel-notice">Fiziksel, rezerve ve satılabilir stok ayrı örnek alanlardır. Satılabilir değerler örnek depo verisinden okunur; gerçek rezervasyon kuralı D02/D03 ile belirlenecek.</p>
+    <div className="catalog-tabs" role="group" aria-label="Stok bölümleri">{['Web stokları', 'Depo stokları', 'Hareket geçmişi', 'Mutabakat', 'Sayım önizlemesi'].map(item => <button key={item} aria-pressed={tab === item} onClick={() => setTab(item)}>{item}</button>)}</div>
+    {tab !== 'Sayım önizlemesi' && <div className="order-filters"><label>Ürün, SKU veya renk ara<input value={query} onChange={event => setQuery(event.target.value)} /></label>{tab !== 'Mutabakat' && <label>Depo<select aria-label="Depo filtresi" value={warehouse} onChange={event => setWarehouse(event.target.value)}><option>Tümü</option>{warehouses.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label>}<button onClick={() => { setQuery(''); setWarehouse('Tümü'); setOnlyMismatch(false) }}>Filtreleri temizle</button></div>}
+    {tab === 'Web stokları' && <><p>Bu stoklar local web’de gösterilir. Depo ve rezervasyon sekmeleri ayrı örnek veridir.</p>{products.map(product => <fieldset key={product.id}><legend>{product.name}</legend>{product.variants.map(variant => <form key={variant.id} onSubmit={async event => {
+      event.preventDefault(); const input = event.currentTarget.elements.namedItem('stock') as HTMLInputElement; const stock = Number(input.value)
+      if (!Number.isSafeInteger(stock) || stock < 0) { setError('Stok sıfır veya pozitif tam sayı olmalı.'); return }
+      try { await onSave({ ...product, variants: product.variants.map(item => item.id === variant.id ? { ...item, stock } : item) }); setResult(`${variant.sku} stoğu kaydedildi.`); setError('') }
+      catch (error) { setError(error instanceof Error ? error.message : 'Stok kaydedilemedi.') }
+    }}><label>{variant.color} · {variant.sku}<input key={`${variant.id}-${variant.stock}`} aria-label={`${variant.sku} web stoğu`} name="stock" type="number" min="0" step="1" defaultValue={variant.stock} required /></label><button>Stoğu kaydet</button></form>)}</fieldset>)}{error && <p role="alert">{error}</p>}{result && <p role="status">{result}</p>}</>}
+    {tab === 'Depo stokları'  && <><p role="status">{stockRows.length} örnek depo bakiyesi · Kaynak zamanı: 03.10.2026 10:00</p><div className="table-scroll"><table><caption>Depo bazında örnek stoklar</caption><thead><tr>{['Ürün / varyant', 'SKU', 'Depo', 'Fiziksel', 'Rezerve', 'Satılabilir'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead><tbody>{stockRows.map(row => { const variant = variants.find(item => item.id === row.variantId)!; return <tr key={`${row.variantId}:${row.warehouseId}`}><th scope="row">{variant.productName} · {variant.color}</th><td>{variant.sku}</td><td>{warehouses.find(item => item.id === row.warehouseId)?.name}</td><td>{row.physical}</td><td>{row.reserved}</td><td>{row.available}</td></tr> })}</tbody></table></div>{stockRows.length === 0 && <p>Filtrelere uygun depo bakiyesi yok.</p>}<p className="muted">Yeni veya silinmiş varyantlar için bakiye uydurulmaz. Depo eşlemesi olmayanlar Mutabakat bölümünde gösterilir.</p></>}
+    {tab === 'Hareket geçmişi' && <><div className="table-scroll"><table><caption>Örnek hareketler · gerçek audit değildir</caption><thead><tr>{['Referans / zaman', 'SKU', 'Depo', 'Tür', 'Önce', 'Sonra', 'Neden', 'Aktör'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead><tbody>{history.map(row => <tr key={row.id}><th scope="row">{row.id}<small className="catalog-category">{row.date}</small></th><td>{variants.find(item => item.id === row.variantId)?.sku}</td><td>{warehouses.find(item => item.id === row.warehouseId)?.name}</td><td>{row.type}</td><td>{row.before}</td><td>{row.after}</td><td>{row.reason}</td><td>{row.actor}</td></tr>)}</tbody></table></div>{history.length === 0 && <p>Filtrelere uygun hareket yok.</p>}</>}
+    {tab === 'Mutabakat' && <><label className="inventory-check"><input type="checkbox" checked={onlyMismatch} onChange={event => setOnlyMismatch(event.target.checked)} />Yalnız farkları ve eksik eşlemeleri göster</label><div className="table-scroll"><table><caption>Katalog demo stoğu ile tüm depoların satılabilir toplamı</caption><thead><tr>{['SKU', 'Katalog demo stoğu', 'Depo satılabilir toplamı', 'Fark', 'Durum'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead><tbody>{comparisons.map(row => <tr key={row.id}><th scope="row">{row.sku}</th><td>{row.stock}</td><td>{row.depotTotal ?? 'Bilinmiyor'}</td><td>{row.depotTotal === null ? '—' : row.depotTotal - row.stock}</td><td>{row.depotTotal === null ? 'Depo eşlemesi yok' : row.depotTotal === row.stock ? 'Uyumlu örnek' : 'Fark var'}</td></tr>)}</tbody></table></div>{comparisons.length === 0 && <p>Filtrelere uygun mutabakat satırı yok.</p>}<p className="muted">Farklar otomatik düzeltilmez; Mikro/pazaryeri sorgusu veya stok yazımı yapılmaz.</p></>}
+    {tab === 'Sayım önizlemesi' && <div className="catalog-form"><label>Ürün ve depo<select aria-label="Sayım ürün ve depo" value={balanceKey} onChange={event => { setBalanceKey(event.target.value); setResult(''); setError('') }}><option value="">Seçin</option>{balances.filter(row => variants.some(variant => variant.id === row.variantId)).map(row => <option key={`${row.variantId}:${row.warehouseId}`} value={`${row.variantId}:${row.warehouseId}`}>{variants.find(item => item.id === row.variantId)?.sku} · {warehouses.find(item => item.id === row.warehouseId)?.name}</option>)}</select></label><label>Sayılan fiziksel adet<input type="number" min="0" step="1" value={count} onChange={event => { setCount(event.target.value); setResult('') }} /></label><label>Sayım açıklaması<textarea rows={3} maxLength={500} value={reason} onChange={event => { setReason(event.target.value); setResult('') }} /></label><button onClick={simulate}>Farkı önizle</button>{error && <p className="catalog-error" role="alert">{error}</p>}{result && <p role="status">{result}</p>}<button disabled>Gerçek stok düzeltmesi · D02/D03/API bekleniyor</button></div>}
+  </section>
+}

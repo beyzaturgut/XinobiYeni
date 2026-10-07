@@ -39,7 +39,7 @@ test('local opt-in refinement: raw/derived comparison preserves exact review tar
   await expect(raw).toHaveCSS('background-color', 'rgb(255, 255, 255)')
   await raw.click()
   await expect(raw).toHaveAttribute('aria-pressed', 'true')
-  await expect(raw).toHaveCSS('background-color', 'rgb(11, 108, 104)')
+  await expect(raw).toHaveCSS('background-color', 'rgb(34, 34, 34)')
   await expect(page.getByRole('button', { name: 'Onayla', exact: true })).toBeDisabled()
   await expect(page.getByRole('button', { name: 'Reddet', exact: true })).toBeDisabled()
   await expect(page.getByTestId('candidate-id')).toHaveText(target!)

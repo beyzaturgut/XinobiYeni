@@ -58,7 +58,7 @@ Bu bölüm ProductSurfaces Step 1 temelinin proje sözlüğüne eşlemesidir; ye
 
 `services/api/Features/ProductSurfaces` içinde provider bağımsız automatic/interactive request-result, source kimliği, surface intent, candidate metadata/provenance/isteğe bağlı anlamı korunmuş provider score, yeni revision/lineage ve açık approve/reject bulunur. Interactive sonuç önceki maskeyi değiştirmez; önceki candidate yalnız lineage bağlamıdır. Keep/Exclude noktaları kaynak piksellerindedir; negatif/sınır dışı/sonlu olmayan değerler reddedilir. Candidate otomatik onaylanmaz; yeni candidate mevcut onayı değiştirmez. Onay tam candidate/revision ve kaynak kimliğini hedefler; stale kaynak kullanılamaz.
 
-Kimlik doğrulaması bu adımda media version + SHA-256 + boyut metadata eşitliğidir; yetkili güncel kimliği ortak medya katmanı ileride sağlamalıdır. Gerçek PNG decode/alpha/alignment doğrulaması henüz yoktur. Fake provider yalnız testlerdedir. Roboflow adapter, HTTP/Admin UI, persistence, storage, migration ve job uygulaması yoktur. Kanıt: TST-074–076; sonuçlar geriye dönük kaydedilmiş UNIT/MOCK ve BUILD kanıtıdır, gerçek entegrasyon veya faz kabulü değildir.
+Kimlik doğrulaması bu adımda media version + SHA-256 + boyut metadata eşitliğidir; yetkili güncel kimliği ortak medya katmanı ileride sağlamalıdır. Gerçek PNG decode/alpha/alignment doğrulaması henüz yoktur. Fake provider yalnız testlerdedir. Roboflow adapter, HTTP/Admin UI, persistence, storage, migration ve job uygulaması yoktur. Kanıt: TST-087–089; sonuçlar geriye dönük kaydedilmiş UNIT/MOCK ve BUILD kanıtıdır, gerçek entegrasyon veya faz kabulü değildir.
 
 ### ProductSurfaces Step 2 — development medya ve gerçek maske doğrulaması
 
@@ -70,7 +70,7 @@ Kimlik doğrulaması bu adımda media version + SHA-256 + boyut metadata eşitli
 
 `ValidatedAlignedMask.ForSource` başka source/version/checksum için candidate metadata kullanımını reddeder. Test fixture provider'ı doğrulanmış metadata'yı Step 1 automatic/interactive akışına verir; yeni revision/candidate pending kalır, önceki candidate/onay değiştirilmez. PNG'nin kendi içinde source provenance bilgisi yoktur: boundSource güvenilir onboarding çağıranından gelmelidir. Aynı boyut tek başına semantik crop/yön/doğru ürün geometry kanıtı değildir; insan incelemesi ve exact Asset ilişkilendirmesi gerekir. Step 2 structural/source-bound doğrulaması D04 veya production onayı vermez.
 
-Kanıt TST-077–079: Step 1 + Step 2 toplam 39/39 UNIT/MOCK test, Release API build 0 uyarı/0 hata. HTTP/Admin, Roboflow/SAM, jobs, persistence/storage ve üretim Asset/PrintArea/Design uygulaması eklenmedi; renderer/Fabric.js değişmedi. Açık D kararları ve sağlayıcı yürütme stratejisi açık kalır.
+Kanıt TST-090–092: Step 1 + Step 2 toplam 39/39 UNIT/MOCK test, Release API build 0 uyarı/0 hata. HTTP/Admin, Roboflow/SAM, jobs, persistence/storage ve üretim Asset/PrintArea/Design uygulaması eklenmedi; renderer/Fabric.js değişmedi. Açık D kararları ve sağlayıcı yürütme stratejisi açık kalır.
 
 # ProductSurfaces Step 3 — yerel inceleme dikey dilimi
 
@@ -89,7 +89,7 @@ HTTP kökü: `/api/v1/admin/dev/product-surfaces/tea-maker-101-blue`.
 GET `/review`, POST `/revisions`, POST `/revisions/{revisionId}/candidates/{candidateId}/review`, GET `/source`, GET `/revisions/{revisionId}/candidates/{candidateId}/mask`.
 Malformed JSON/izin verilmeyen client alanları 400; semantik koordinat/istem hataları 422; bilinmeyen fixture/hedef 404; stale source/session/version/decision 409. Problem Details `requestId` ve `timestampUtc` taşır. Dosya yolları ve stack trace dönmez.
 
-Kanıt: TST-080–086. Yeni paket yok. Production auth veya AI entegrasyonu kabulü yapılmadı.
+Kanıt: TST-093–099. Yeni paket yok. Production auth veya AI entegrasyonu kabulü yapılmadı.
 
 ## ProductSurfaces Step 4B-1 — yalnız mocked HTTP Roboflow adapter
 
@@ -104,7 +104,7 @@ Kanıt: TST-080–086. Yeni paket yok. Production auth veya AI entegrasyonu kabu
 - Short critical section state/source/input kontrolü ve revision başlangıcını yapar; provider çağrısı gate çıktıktan sonra başlar. HTTP await lock tutmaz; in-flight mutasyonlar 409 verir. Completion source/state tekrar doğrular, byte binding/display commit yapar. Başarı/hata/cancellation version ilerletir; önceki approval değişmez. Admin hata sonrası read-only refresh yapar, noktaları korur; karar/inference otomatik tekrar gönderilmez.
 - Bounded 60 saniye deadline, cancellation, safe provider error kodları ve response limitleri vardır. Raw error body/key/base64/header exception veya Problem Details'e taşınmaz; adapter request loglamaz. Provider timeout önerisi/SLA doğrulanmış değildir. Production auth/jobs/persistence yoktur.
 
-Kanıt TST-087: 111/111 backend/API regresyon; 5/5 Admin Playwright; Release 0 uyarı/0 hata; Admin typecheck/build/lint başarılı; OpenAPI unchanged. D04/D05/D08/D10 açık kaldı. Gelecekte gerçek execution exact source image'ı dış sağlayıcıya aktarır; retention/training koşulları henüz teyitli değildir. Credential configuration/use, dış medya transferi ve kredi tüketebilecek inference için kullanıcıdan ayrı açık onay gerekir. Smoke-test entry point eklenmedi.
+Kanıt TST-100: 111/111 backend/API regresyon; 5/5 Admin Playwright; Release 0 uyarı/0 hata; Admin typecheck/build/lint başarılı; OpenAPI unchanged. D04/D05/D08/D10 açık kaldı. Gelecekte gerçek execution exact source image'ı dış sağlayıcıya aktarır; retention/training koşulları henüz teyitli değildir. Credential configuration/use, dış medya transferi ve kredi tüketebilecek inference için kullanıcıdan ayrı açık onay gerekir. Smoke-test entry point eklenmedi.
 
 ### ProductSurfaces Step 4B-2 — single automatic Roboflow smoke test
 
@@ -115,6 +115,6 @@ Kullanıcı ayrı açık izinle yalnız Tea Maker source, `lower kettle body` pr
 - Normalize RGBA PNG 1066×1600; SHA-256 `6a7fe88baf2d0b5223476f1921650433443395e917c221fc396c6f75d7d7c3db`. Alpha min/max 0/255; transparent 1422315, opaque 283285, intermediate 0. Existing Step 2 empty/full/source validation geçti. Representation conversion dışında source re-encode/resize/crop/rotate/smoothing/morphology yapılmadı.
 - Exactly one automatic pending revision/candidate development byte buffer'a bağlandı; active approval null. Review source `dev:tea-maker-101:blue:source:v1`, SHA `da25357dd74d34295b1658ac6b87b55c28ec4f9d8f4543379efabb8971300414`; ürün/varyant/Asset fixture sınırı korundu. Teknik desktop/390px mobile alignment ve overflow kontrolleri geçti. Görsel kalite: lower body iyi ayrıldı, spout da dahil; alt boundary hafif pürüzlü. Bu candidate insan approval'ı almadı, PrintArea/üretim/D04 onayı değildir.
 - GET-only safe `/smoke-evidence` yalnız enabled smoke development oturumunda bulunur; key/header/image payload/raw provider response içermez. Credential presence boolean, source identity, HTTP/shape/selection/mask/alpha kanıtı vardır. Exact credit consumption was not confirmed by the inference response.
-- TST-088: smoke sonrası 120/120 mocked/local backend/API, 5/5 reference/mock Admin Playwright, API Release 0 uyarı/0 hata ve Admin type/build/lint başarılı. Test config smoke/external flags false, provider reference; SingleAutomaticSmokeTests yalnız explicit mock transport kullanır. OpenAPI korunmuştur. Yeni paket, production persistence/auth/jobs veya renderer bağlantısı yok.
+- TST-101: smoke sonrası 120/120 mocked/local backend/API, 5/5 reference/mock Admin Playwright, API Release 0 uyarı/0 hata ve Admin type/build/lint başarılı. Test config smoke/external flags false, provider reference; SingleAutomaticSmokeTests yalnız explicit mock transport kullanır. OpenAPI korunmuştur. Yeni paket, production persistence/auth/jobs veya renderer bağlantısı yok.
 
 Interactive PVS deployed wire contract henüz doğrulanmadı. Interactive deneyi, noktalar, yeni request budget ve dış transfer için yeni açık kullanıcı onayı gerekir; bu adımda interactive/ikinci automatic/retry yapılmadı. D04/D05/D08/D10 açık, retention/training şartları çözülmedi.

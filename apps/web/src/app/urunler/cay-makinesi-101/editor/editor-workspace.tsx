@@ -12,7 +12,7 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace({ renderingInputs }: { renderingInputs: RenderingInputs }) {
+export default function EditorWorkspace({ renderingInputs, patternSrc = "/assets/personalization/sample-pattern.png" }: { renderingInputs: RenderingInputs; patternSrc?: string }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
@@ -56,7 +56,7 @@ export default function EditorWorkspace({ renderingInputs }: { renderingInputs: 
             productSrc={renderingInputs.source.url}
             designableMaskSrc={renderingInputs.mask.url}
             brandingOverlaySrc={renderingInputs.branding?.url}
-            patternSrc="/assets/personalization/sample-pattern.png"
+            patternSrc={patternSrc}
             patternTransform={patternTransform}
             curvatureStrength={curvatureStrength}
             alt="Çay Makinesi 101, desenli ürün önizlemesi"

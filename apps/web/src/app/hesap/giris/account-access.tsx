@@ -1,31 +1,6 @@
-"use client";
-
-import { useState } from "react";
-import styles from "./account.module.css";
-
-type Mode = "login" | "register" | "reset";
-
-export default function AccountAccess() {
-  const [mode, setMode] = useState<Mode>("login");
-  const [visible, setVisible] = useState(false);
-  const copy = mode === "login" ? { kicker: "Tekrar hoş geldiniz", title: "Hesabınıza giriş yapın.", action: "Giriş yap" } : mode === "register" ? { kicker: "Xinobi'ye katılın", title: "Yeni hesabınızı oluşturun.", action: "Hesap oluştur" } : { kicker: "Hesap kurtarma", title: "Parolanızı yenileyin.", action: "Yenileme bağlantısı gönder" };
-
-  return <div className={styles.layout}>
-    <section className={styles.story}><div><p>Xinobi hesabı</p><h1>Seçimleriniz, tasarımlarınız ve siparişleriniz tek yerde.</h1></div><ul><li><span>01</span>Favorilerinizi cihazlarınız arasında koruyun.</li><li><span>02</span>Kişisel tasarımlarınıza yeniden ulaşın.</li><li><span>03</span>Sipariş ve teslimat durumunuzu izleyin.</li></ul><small>Bu özellikler kimlik ve iş API&apos;leri tamamlandıktan sonra etkinleşecektir.</small></section>
-    <section className={styles.formPanel} aria-labelledby="access-title">
-      <div className={styles.tabs} role="tablist" aria-label="Hesap işlemi"><button type="button" role="tab" aria-selected={mode === "login"} onClick={() => setMode("login")}>Giriş</button><button type="button" role="tab" aria-selected={mode === "register"} onClick={() => setMode("register")}>Yeni hesap</button></div>
-      <p className={styles.kicker}>{copy.kicker}</p><h2 id="access-title">{copy.title}</h2>
-      <div className={styles.demoNotice}><strong>Arayüz prototipi</strong><span>Form verileri gönderilmez; gerçek kullanıcı veya oturum oluşturulmaz.</span></div>
-      <form onSubmit={(event) => event.preventDefault()}>
-        {mode === "register" && <label>Ad soyad<input type="text" autoComplete="name" placeholder="Adınız ve soyadınız" /></label>}
-        <label>E-posta adresi<input type="email" autoComplete="email" placeholder="ornek@eposta.com" /></label>
-        {mode !== "reset" && <label>Parola<div className={styles.password}><input type={visible ? "text" : "password"} autoComplete={mode === "login" ? "current-password" : "new-password"} placeholder="En az 8 karakter" /><button type="button" onClick={() => setVisible(!visible)} aria-label={visible ? "Parolayı gizle" : "Parolayı göster"}>{visible ? "Gizle" : "Göster"}</button></div></label>}
-        {mode === "register" && <label className={styles.consent}><input type="checkbox" /><span>Üyelik koşullarını ve gizlilik bildirimini okudum. <small>D10 yasal metni bekleniyor.</small></span></label>}
-        <button className={styles.submit} type="submit" disabled>{copy.action}</button>
-      </form>
-      {mode === "login" && <button className={styles.textAction} type="button" onClick={() => setMode("reset")}>Parolamı unuttum</button>}
-      {mode === "reset" && <button className={styles.textAction} type="button" onClick={() => setMode("login")}>Giriş ekranına dön</button>}
-      <p className={styles.blocker}>Kimlik API&apos;si, e-posta sağlayıcısı, brute-force koruması ve D10 metinleri tamamlanmadan işlem açılamaz.</p>
-    </section>
-  </div>;
-}
+'use client';
+import {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {demoAccess} from '../../../lib/demo-commerce';
+import styles from './account.module.css';
+export default function AccountAccess(){const router=useRouter();const [mode,setMode]=useState<'login'|'register'>('login');const [busy,setBusy]=useState(false);const [error,setError]=useState('');return <div className={styles.layout}><section className={styles.story}><h1>Demo hesabın</h1><p>Kayıt ol, giriş yap ve deneme siparişlerini görüntüle.</p><small>Yalnız bu tarayıcıda saklanır. Gerçek hesabındaki parolayı kullanma.</small></section><section className={styles.formPanel}><div className={styles.tabs}><button onClick={()=>{setMode('login');setError('')}}>Giriş</button><button onClick={()=>{setMode('register');setError('')}}>Yeni hesap</button></div><h2>{mode==='login'?'Demo giriş':'Demo kayıt'}</h2><form key={mode} onSubmit={async event=>{event.preventDefault();if(busy)return;setBusy(true);setError('');const data=new FormData(event.currentTarget);try{await demoAccess(mode,String(data.get('name')||''),String(data.get('email')),String(data.get('password')));router.push('/hesap')}catch(error){setError(error instanceof Error?error.message:'İşlem tamamlanamadı.')}finally{setBusy(false)}}}>{mode==='register'&&<label>Ad soyad<input name="name" required autoComplete="name" maxLength={100}/></label>}<label>E-posta adresi<input type="email" name="email" required autoComplete="email" maxLength={254}/></label><label>Demo parola<input name="password" type="password" required minLength={8} autoComplete={mode==='login'?'current-password':'new-password'}/></label><button className={styles.submit} disabled={busy}>{busy?'Bekle…':mode==='login'?'Giriş yap':'Hesap oluştur'}</button></form>{error&&<p role="alert">{error}</p>}<p>Demo hesabın ve siparişlerin cihazlar arasında eşitlenmez.</p></section></div>}

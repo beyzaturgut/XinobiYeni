@@ -55,6 +55,12 @@ Yeni/açısı farklı admin fotoğrafları için otomatik kusursuz yüzey tahmin
 
 ### Ürün rengi ve sepet
 
-XINOBI U ürün seçimi ardından `/xinobi-u/renk` ekranında kullanıcı renk seçer; sorular bu varyant kimliğiyle başlatılır. Ürün detayındaki “Sepete ekle” seçilen varyantı `xinobi-cart-v1` anahtarıyla tarayıcıda saklar. Sepet fiyatları ve stok uygunluğu güncel commerce içeriğinden okunur; fiyatı olmayan veya stoksuz varyantlar eklenemez. Mevcut stok azalırsa sepet kullanıcıdan adedi azaltmasını ister. Bu aşama ödeme almaz, sipariş oluşturmaz ve sunucuda stok rezervasyonu yapmaz.
+XINOBI U ürün seçimi ardından `/xinobi-u/renk` ekranında kullanıcı renk seçer; sorular bu varyant kimliğiyle başlatılır. Ürün detayındaki “Sepete ekle” seçilen varyantı `xinobi-cart-v1` anahtarıyla tarayıcıda saklar. Sepet fiyatları ve stok uygunluğu güncel commerce içeriğinden okunur; fiyatı olmayan veya stoksuz varyantlar eklenemez. Mevcut stok azalırsa sepet kullanıcıdan adedi azaltmasını ister. Sepet gerçek ödeme almaz ve sunucuda stok rezervasyonu yapmaz; aşağıdaki demo ödeme akışına bağlanır.
 
 Kontroller: `node tools/test-studio-color-selection.mjs`, `node tools/test-cart.mjs` (izole test verileri; Cloudflare üretim çağrısı yok).
+
+### Tarayıcıda demo alışveriş
+
+`/hesap/giris` üzerinde demo kayıt/giriş, `/hesap` üzerinde çıkış ve `/hesap/siparisler` üzerinde deneme sipariş geçmişi kullanılabilir. Demo kullanıcıları, tuzlanmış PBKDF2 parola özetleri ve siparişler `xinobi-demo-commerce-v1` localStorage kaydında tutulur. Bu bir üretim kimlik doğrulama sistemi değildir; yalnız deneme parolası kullanın. Aynı tarayıcıdaki kayıtlar değiştirilebilir ve cihazlar arasında eşitlenmez.
+
+Geçerli sepetten `/odeme` sayfasına geçilir. Başarısız senaryo sipariş oluşturmaz; başarılı senaryo fiyat/renk/adet anlık görüntüsünü demo sipariş olarak kaydeder ve sepeti boşaltır. Kart bilgisi, gerçek tahsilat, sunucu siparişi veya stok düşümü yoktur. Teslimat formu deneme içindir ve adres kaydedilmez. Uçtan uca kontrol: `node tools/test-demo-commerce.mjs`.

@@ -1,0 +1,6 @@
+'use client';
+import Image,{type StaticImageData} from 'next/image';
+import Link from 'next/link';
+import {useRef} from 'react';
+import styles from './category-gallery.module.css';
+export default function CategoryGallery({categories}:{categories:{name:string;image:StaticImageData|string;alt?:string}[]}){const rail=useRef<HTMLDivElement>(null);return <section id="kategoriler" className={styles.section} aria-label="Kategoriler"><div className={styles.wrapper}><div ref={rail} className={styles.rail}>{categories.map(category=><Link className={styles.card} href={`/urunler?category=${encodeURIComponent(category.name)}`} key={category.name}><div className={styles.media}><Image src={category.image} width={600} height={600} alt={category.alt||category.name} sizes="(max-width: 600px) 42vw, (max-width: 1000px) 28vw, 15vw"/></div><h3>{category.name}</h3></Link>)}</div>{categories.length>0&&<button type="button" className={styles.next} aria-label="Sonraki kategorileri göster" onClick={()=>{const node=rail.current;if(node)node.scrollTo({left:node.scrollLeft+node.clientWidth>=node.scrollWidth-2?0:node.scrollLeft+node.clientWidth*.8,behavior:'smooth'})}}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><path d="m9 4 8 8-8 8"/></svg></button>}</div></section>}

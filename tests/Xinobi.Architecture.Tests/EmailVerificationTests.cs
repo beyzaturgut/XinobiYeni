@@ -89,6 +89,20 @@ public sealed class EmailVerificationTests
         Assert.Equal(HttpStatusCode.Forbidden, (await client.PostAsJsonAsync("/api/v1/email-verification/start", new { email = "other@example.com" })).StatusCode);
     }
     [Fact]
+    public async Task PreviewFlowWorksWithoutCredentialsAndStillValidatesCodes()
+    {
+        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.UseEnvironment("Development"));
+        using var client = factory.CreateClient();
+        var response = await client.PostAsJsonAsync("/api/v1/email-verification/start", new { email = "preview@example.com" });
+        response.EnsureSuccessStatusCode();
+        var challenge = (await response.Content.ReadFromJsonAsync<VerificationChallenge>())!;
+        Assert.Matches("^[0-9]{6}$", challenge.PreviewCode!);
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/v1/email-verification/confirm", new { id = challenge.Id, email = challenge.Email, code = "bad" })).StatusCode);
+        var confirm = await client.PostAsJsonAsync("/api/v1/email-verification/confirm", new { id = challenge.Id, email = challenge.Email, code = challenge.PreviewCode });
+        confirm.EnsureSuccessStatusCode();
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await client.PostAsJsonAsync("/api/v1/email-verification/confirm", new { id = challenge.Id, email = challenge.Email, code = challenge.PreviewCode })).StatusCode);
+    }
+    [Fact]
     public async Task DemoVerificationIsUnavailableInProduction()
     {
         using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.UseEnvironment("Production"));

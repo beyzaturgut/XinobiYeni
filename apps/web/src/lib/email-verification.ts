@@ -1,6 +1,6 @@
 'use client';
 
-export type VerificationChallenge = {id: string; email: string; expiresAt: string};
+export type VerificationChallenge = {id: string; email: string; expiresAt: string; previewCode?: string};
 const api = process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_API_URL ||
   (process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5003/api/v1/email-verification' : '');
 

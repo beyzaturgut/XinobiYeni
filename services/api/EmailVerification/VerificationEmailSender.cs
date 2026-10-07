@@ -6,7 +6,16 @@ namespace Xinobi.Api.EmailVerification;
 public interface IVerificationEmailSender
 {
     bool IsConfigured { get; }
+    bool IsPreview => false;
     Task Send(string email, string code, CancellationToken cancellationToken);
+}
+
+// Registered only in Development when preview delivery is explicitly selected.
+public sealed class PreviewVerificationEmailSender : IVerificationEmailSender
+{
+    public bool IsConfigured => true;
+    public bool IsPreview => true;
+    public Task Send(string email, string code, CancellationToken cancellationToken) => Task.CompletedTask;
 }
 
 public sealed class EmailVerificationException(string message, int status = 400) : Exception(message)

@@ -23,7 +23,8 @@ export default function AccountAccess() {
       <div className={styles.tabs}><button disabled={busy} onClick={()=>reset('login')}>Giriş</button><button disabled={busy} onClick={()=>reset('register')}>Yeni hesap</button></div>
       <h2>{challenge?'E-postanı doğrula':mode==='login'?'Giriş yap':'Hesap oluştur'}</h2>
       {challenge && pending ? <>
-        <p>{challenge.email} adresine gönderilen 6 haneli kodu gir. Kod 10 dakika geçerlidir.</p>
+        {challenge.previewCode ? <p role="status">Geçici doğrulama modu: e-posta gönderilmedi. {challenge.email} için deneme kodun: <strong>{challenge.previewCode}</strong>. Bu işlem e-posta adresinin sana ait olduğunu doğrulamaz.</p> : <p>{challenge.email} adresine gönderilen 6 haneli kodu gir.</p>}
+        <p>Kod 10 dakika geçerlidir.</p>
         <form onSubmit={async event=>{
           event.preventDefault(); if(busy)return;
           const code = String(new FormData(event.currentTarget).get('code') || '');
@@ -40,7 +41,7 @@ export default function AccountAccess() {
         <button disabled={busy} onClick={async()=>{
           if(Date.now()<retryAt){setError('Yeni kod istemek için bir dakika bekle.');return;}
           setBusy(true);setError('');setNotice('');
-          try{setChallenge(await startEmailVerification(pending.email));setRetryAt(Date.now()+60000);setNotice('Yeni doğrulama kodu gönderildi.');}
+          try{const next=await startEmailVerification(pending.email);setChallenge(next);setRetryAt(Date.now()+60000);setNotice(next.previewCode?'Yeni deneme kodu oluşturuldu.':'Yeni doğrulama kodu gönderildi.');}
           catch(error){setError(error instanceof Error?error.message:'Kod gönderilemedi.');}
           finally{setBusy(false);}
         }}>Kodu tekrar gönder</button>

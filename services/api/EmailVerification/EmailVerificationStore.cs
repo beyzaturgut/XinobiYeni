@@ -4,7 +4,8 @@ using System.Text;
 
 namespace Xinobi.Api.EmailVerification;
 
-public record VerificationChallenge(string Id, string Email, DateTimeOffset ExpiresAt);
+public record VerificationChallenge(string Id, string Email, DateTimeOffset ExpiresAt,
+    [property: System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)] string? PreviewCode = null);
 public record StartEmailVerification(string Email);
 public record ConfirmEmailVerification(string Id, string Email, string Code);
 
@@ -44,7 +45,7 @@ public sealed class EmailVerificationStore(IVerificationEmailSender sender, Time
             await sender.Send(email, code, cancellationToken);
             foreach (var key in entries.Where(pair => pair.Value.Email == email).Select(pair => pair.Key).ToArray()) entries.Remove(key);
             entries[id] = new(email, Hash(id, code), now.AddMinutes(10), now);
-            return new(id, email, now.AddMinutes(10));
+            return new(id, email, now.AddMinutes(10), sender.IsPreview ? code : null);
         }
         finally { gate.Release(); }
     }

@@ -23,7 +23,10 @@ if (builder.Environment.IsDevelopment())
     builder.Configuration.AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true);
     builder.Services.AddSingleton<LocalCommerceStore>();
     builder.Services.AddSingleton(TimeProvider.System);
-    builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+    if (builder.Configuration["Email:DeliveryMode"] == "Preview")
+        builder.Services.AddSingleton<IVerificationEmailSender, PreviewVerificationEmailSender>();
+    else
+        builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
     builder.Services.AddSingleton<EmailVerificationStore>();
     builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
     builder.Services.AddSingleton<QuestionBank>();

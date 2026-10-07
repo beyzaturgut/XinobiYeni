@@ -40,3 +40,12 @@ Dyson'ın marka tipi kamuya açık bir font lisansı olarak doğrulanamadığı 
 - Demo ürünlerin satış adları, varyantları ve kullanım hakkı doğrulanmalı.
 - D02 gelince ürün/varyant verisi; D04 gelince kişiselleştirme/baskı alanı gerçek sözleşmeye bağlanmalı.
 - Dar telefon, tablet ve masaüstü görsel regresyonu TST raporuyla tamamlanmalı.
+
+## DES-HDR-01 — Header ölçüleri dyson.com.tr ile eşlendi (07.10.2026)
+
+- **Karar sahibi:** Proje sahibi (sohbet talebi: "header alanının font ve puntolarını … aynısı olsun; şerit kalınlığı ve her şeyin boyutu aynı olsun").
+- **Önceki kural ile ilişki:** Faz02, Dyson'ı yalnız ilke referansı sayıyor ve birebir düzen kopyalanmasını yasaklıyordu. Proje sahibi bu kuralı **yalnız global header için** değiştirdi. Dyson'ın logosu, metinleri, görselleri ve lisanslı font dosyası kullanılmadı; yalnız ölçüler eşlendi.
+- **Ölçüm:** 07.10.2026'da Chrome headless ile dyson.com.tr hesaplanmış stilleri; 1920–390 px arasında 13 genişlik.
+- **Uygulanan değerler:** üst şerit 53 px (52 + 1 px `#333` çizgi); ana şerit 64 px; içerik en fazla 1270 px, en az 64 px kenar; üst bağlantılar 14/18 px, ağırlık 300, aralık 24 px; menü 16/24 px, ağırlık 300, açılır ok 10×6 px, aralık 22/12 px; logo yüksekliği 28 px (mobil 24 px); arama kutusu 245×34 px, beyaz, köşe 4 px, ikon 18 px, yer tutucu `#757575` 16 px; ikonlar 24 px, aralık 24 px. ≤1024 px: tek 64 px şerit, kenar 50 px (≤600 px'de 25 px), 16 px hamburger.
+- **Font:** Dyson Futura lisanslı ve kullanılamaz; header için açık lisanslı, Futura'dan esinlenen **Jost** (Google Fonts, latin-ext) kullanıldı. Sayfa gövdesi Inter'de kaldı. K-10 "sayfalarda aynı font" ilkesi açısından header'ın farklı font kullanması proje sahibinin onayına sunuldu; tüm siteye geçiş ayrıca kararlaştırılabilir.
+- **Bilinçli farklar:** Xinobi logosu kare oranlı olduğu için 28 px yükseklikte genişliği 32 px (Dyson 74 px). Hesap, favori ve duyuru ikonları korundu; mobilde hesap ve favori hamburger menüye taşındı, duyuru ikonu kaldı; bu yüzden 390 px'de arama kutusu 157 px (Dyson 173 px). İkonlar görsel olarak 24 px, dokunma alanı 44 px (HND-02).

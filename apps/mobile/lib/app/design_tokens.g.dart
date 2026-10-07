@@ -2,21 +2,24 @@
 import 'package:flutter/painting.dart';
 
 abstract final class XinobiTokens {
-  static const String version = '0.3.0';
-  static const Color ink = Color(0xFF16242A);
-  static const Color muted = Color(0xFF52605D);
-  static const Color canvas = Color(0xFFF3F3EF);
+  static const String version = '0.4.0';
+  static const Color ink = Color(0xFF242424);
+  static const Color muted = Color(0xFF5B5B5B);
+  static const Color canvas = Color(0xFFFFFFFF);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color deep = Color(0xFF101B20);
-  static const Color teal = Color(0xFF0B6C68);
-  static const Color tealHover = Color(0xFF085954);
-  static const Color line = Color(0xFFD8DEDC);
+  static const Color deep = Color(0xFF171717);
+  static const Color teal = Color(0xFF262626);
+  static const Color tealHover = Color(0xFF111111);
+  static const Color line = Color(0xFFDEDEDE);
   static const Color focus = Color(0xFFEFC34A);
   static const Color danger = Color(0xFFB3261E);
   static const Color success = Color(0xFF176B45);
   static const Color header = Color(0xFF000000);
   static const Color onHeader = Color(0xFFFFFFFF);
   static const Color searchPlaceholder = Color(0xFF757575);
+  static const Color cta = Color(0xFFFF0029);
+  static const Color ctaHover = Color(0xFFDB0023);
+  static const Color mediaWarm = Color(0xFFE4E3DF);
   static const String headerFamily = 'Jost';
   static const double headerWeight = 300;
   static const String bodyFamily = 'Inter';

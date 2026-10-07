@@ -68,6 +68,8 @@ flutter:
 
   assets:
     - assets/brand/xinobi-logo-white.png
+    # XINOBI U home section artwork, same files as the web (apps/web/public/assets/studio).
+    - assets/home/
 
   # Open-licence fonts (SIL OFL 1.1; licence texts in assets/fonts). Jost matches the web header, Inter the body text.
   fonts:

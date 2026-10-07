@@ -105,7 +105,6 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
             content.Slides.Where(slide => slide.Active)
                 .Select(slide => new HomeSlide(slide.Id, slide.Type == "Video" ? "video" : "image", resolveUrl(slide.Src) ?? "", slide.Alt, slide.Duration))
                 .ToArray(),
-            resolveUrl(content.XinobiBanner),
             resolveUrl(content.TitaniumImage ?? content.TitaniumBanner),
             content.ButtonColor,
             featured.Select(Summary).ToArray(),

@@ -7,8 +7,9 @@ import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
 import '../catalog/catalog_repository.dart';
+import 'home_sections.dart';
 
-/// Home follows the web order (Analiz2 §5.1): slider → XINOBI U → categories → featured products.
+/// Home follows the web home (apps/web/src/app/page.tsx): slider → XINOBI U → categories → titanium → featured → values and story.
 ///
 /// Admin uploads wide desktop banners (~2.5:1) with text baked in; until a mobile image field exists (Faz04 slider media),
 /// mobile shows them close to their own ratio so the text is not cropped.
@@ -29,40 +30,16 @@ class HomeScreen extends ConsumerWidget {
           onRefresh: () => ref.refresh(homeProvider.future),
           child: CustomScrollView(slivers: [
             if (content.slides.isNotEmpty) SliverToBoxAdapter(child: _Slider(slides: content.slides.toList())),
-            if (content.xinobiUBannerUrl != null)
-              SliverToBoxAdapter(
-                child: Semantics(
-                  button: true,
-                  label: 'XINOBI U ile ürününü kişiselleştir',
-                  onTap: () => context.go('/xinobi-u'),
-                  excludeSemantics: true,
-                  child: InkWell(
-                    onTap: () => context.go('/xinobi-u'),
-                    child: AspectRatio(aspectRatio: _bannerAspect, child: RemoteImage(content.xinobiUBannerUrl, fit: BoxFit.cover)),
-                  ),
-                ),
-              ),
-            if (content.categories.isNotEmpty) ...[
-              _sectionTitle(context, 'Kategoriler'),
-              SliverToBoxAdapter(child: _CategoryRail(categories: content.categories.toList())),
-            ],
-            if (content.featuredProducts.isNotEmpty) ...[
-              _sectionTitle(context, 'Öne çıkanlar'),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 0, XinobiTokens.gutterMobile, 32),
-                sliver: productGrid(content.featuredProducts.toList()),
-              ),
-            ],
+            const SliverToBoxAdapter(child: XinobiUFeature()),
+            if (content.categories.isNotEmpty) SliverToBoxAdapter(child: _CategoryRail(categories: content.categories.toList())),
+            SliverToBoxAdapter(child: TitaniumFeature(imageUrl: content.featureImageUrl)),
+            if (content.featuredProducts.isNotEmpty) SliverToBoxAdapter(child: FeaturedProducts(products: content.featuredProducts.toList())),
+            const SliverToBoxAdapter(child: ValuesAndStory()),
           ]),
         ),
       ),
     );
   }
-
-  Widget _sectionTitle(BuildContext context, String title) => SliverPadding(
-        padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 28, XinobiTokens.gutterMobile, 12),
-        sliver: SliverToBoxAdapter(child: Semantics(header: true, child: Text(title, style: Theme.of(context).textTheme.titleLarge))),
-      );
 }
 
 class _Slider extends StatefulWidget {
@@ -131,34 +108,42 @@ class _CategoryRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 188,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: XinobiTokens.gutterMobile),
-        itemCount: categories.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          final category = categories[i];
-          void open() => context.go('/urunler?kategori=${Uri.encodeQueryComponent(category.category)}');
-          return Semantics(
-            button: true,
-            label: '${category.category}, ${category.productCount} ürün',
-            onTap: open,
-            excludeSemantics: true,
-            child: InkWell(
+    // Web under 600 px: 42vw square photos on warm gray, name below, 20 px apart, no section heading.
+    final size = MediaQuery.sizeOf(context).width * .42;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 30),
+      child: SizedBox(
+        height: size + 64,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: XinobiTokens.gutterMobile),
+          itemCount: categories.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 20),
+          itemBuilder: (context, i) {
+            final category = categories[i];
+            void open() => context.go('/urunler?kategori=${Uri.encodeQueryComponent(category.category)}');
+            return Semantics(
+              button: true,
+              label: '${category.category}, ${category.productCount} ürün',
               onTap: open,
-              child: SizedBox(
-                width: 128,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  SizedBox(width: 128, height: 128, child: ColoredBox(color: const Color(0xFFECECE8), child: RemoteImage(category.imageUrl))),
-                  const SizedBox(height: 8),
-                  Expanded(child: Text(category.category, maxLines: 2, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodyMedium)),
-                ]),
+              excludeSemantics: true,
+              child: InkWell(
+                onTap: open,
+                child: SizedBox(
+                  width: size,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: SizedBox.square(dimension: size, child: ColoredBox(color: XinobiTokens.mediaWarm, child: RemoteImage(category.imageUrl))),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(category.category, maxLines: 2, overflow: TextOverflow.ellipsis, style: inter(17, weight: 600, height: 1.5, letterSpacing: -.025, color: const Color(0xFF303030))),
+                  ]),
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

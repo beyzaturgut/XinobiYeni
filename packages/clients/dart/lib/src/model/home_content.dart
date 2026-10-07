@@ -16,7 +16,6 @@ part 'home_content.g.dart';
 ///
 /// Properties:
 /// * [slides]
-/// * [xinobiUBannerUrl]
 /// * [featureImageUrl]
 /// * [accentColor]
 /// * [featuredProducts]
@@ -25,9 +24,6 @@ part 'home_content.g.dart';
 abstract class HomeContent implements Built<HomeContent, HomeContentBuilder> {
   @BuiltValueField(wireName: r'slides')
   BuiltList<HomeSlide> get slides;
-
-  @BuiltValueField(wireName: r'xinobiUBannerUrl')
-  String? get xinobiUBannerUrl;
 
   @BuiltValueField(wireName: r'featureImageUrl')
   String? get featureImageUrl;
@@ -68,11 +64,6 @@ class _$HomeContentSerializer implements PrimitiveSerializer<HomeContent> {
     yield serializers.serialize(
       object.slides,
       specifiedType: const FullType(BuiltList, [FullType(HomeSlide)]),
-    );
-    yield r'xinobiUBannerUrl';
-    yield object.xinobiUBannerUrl == null ? null : serializers.serialize(
-      object.xinobiUBannerUrl,
-      specifiedType: const FullType.nullable(String),
     );
     yield r'featureImageUrl';
     yield object.featureImageUrl == null ? null : serializers.serialize(
@@ -123,14 +114,6 @@ class _$HomeContentSerializer implements PrimitiveSerializer<HomeContent> {
             specifiedType: const FullType(BuiltList, [FullType(HomeSlide)]),
           ) as BuiltList<HomeSlide>;
           result.slides.replace(valueDes);
-          break;
-        case r'xinobiUBannerUrl':
-          final valueDes = serializers.deserialize(
-            value,
-            specifiedType: const FullType.nullable(String),
-          ) as String?;
-          if (valueDes == null) continue;
-          result.xinobiUBannerUrl = valueDes;
           break;
         case r'featureImageUrl':
           final valueDes = serializers.deserialize(

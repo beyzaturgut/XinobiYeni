@@ -110,18 +110,22 @@ Future<FakeCatalog> pumpApp(WidgetTester tester, {String location = '/', FakeCat
 void main() {
   testWidgets('home shows categories and featured products from the contract', (tester) async {
     await pumpApp(tester);
-    expect(find.text('Kategoriler'), findsOneWidget);
-    expect(find.text('Öne çıkanlar'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Kahve Makinesi 101'), 200, scrollable: find.byType(Scrollable).first);
-    expect(find.text('Çay Makinesi 101'), findsOneWidget);
+    // Same sections and copy as the web home.
+    expect(find.text('Sen anlat.\nAI tasarlasın.'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Çay makineleri'), 300, scrollable: find.byType(Scrollable).first);
+    // Screen readers can activate merged tiles, not just see them.
+    expect(tester.getSemantics(find.bySemanticsLabel('Çay makineleri, 1 ürün')), isSemantics(isButton: true, hasTapAction: true));
+    await tester.scrollUntilVisible(find.text('Form ve işlev, tek çizgide.'), 300, scrollable: find.byType(Scrollable).first);
+    expect(find.text('ÖNE ÇIKANLAR'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Çay Makinesi 101'), 200, scrollable: find.byType(Scrollable).first);
     expect(find.text('₺2.400,00'), findsOneWidget);
-    expect(find.text('◉ 2 renk'), findsOneWidget);
-    expect(find.text('Stokta yok'), findsOneWidget);
+    expect(find.text('• 2 renk'), findsOneWidget);
+    expect(find.text('Kahve Makinesi 101'), findsOneWidget, reason: 'The second featured card sits next to the first.');
+    expect(tester.getSemantics(find.bySemanticsLabel('Çay Makinesi 101, ₺2.400,00')), isSemantics(isButton: true, hasTapAction: true));
+    await tester.scrollUntilVisible(find.text('Teknoloji görünür olmak için değil, hayatınıza uyum sağlamak için.'), 300, scrollable: find.byType(Scrollable).first);
+    expect(find.text('Ürün merkezli'), findsOneWidget);
     expect(find.text('Ana sayfa'), findsOneWidget);
     expect(find.text('XINOBI U'), findsWidgets);
-    // Screen readers can activate merged tiles, not just see them.
-    expect(tester.getSemantics(find.bySemanticsLabel('Çay Makinesi 101, ₺2.400,00')), isSemantics(isButton: true, hasTapAction: true));
-    expect(tester.getSemantics(find.bySemanticsLabel('Çay makineleri, 1 ürün')), isSemantics(isButton: true, hasTapAction: true));
   });
 
   testWidgets('home failure offers a working retry', (tester) async {
@@ -132,7 +136,8 @@ void main() {
     await tester.tap(find.text('Tekrar dene'));
     await tester.pumpAndSettle();
     expect(fake.homeCalls, 2);
-    expect(find.text('Öne çıkanlar'), findsOneWidget);
+    expect(find.text('ÖNE ÇIKANLAR'), findsNothing, reason: 'Below the fold; the page loaded instead of the error.');
+    expect(find.text('Sen anlat.\nAI tasarlasın.'), findsOneWidget);
   });
 
   testWidgets('product list filters by category chip', (tester) async {

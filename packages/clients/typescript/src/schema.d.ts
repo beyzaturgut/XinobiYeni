@@ -488,7 +488,6 @@ export interface components {
         };
         HomeContent: {
             slides: components["schemas"]["HomeSlide"][];
-            xinobiUBannerUrl: null | string;
             featureImageUrl: null | string;
             accentColor: string;
             featuredProducts: components["schemas"]["ProductSummary"][];

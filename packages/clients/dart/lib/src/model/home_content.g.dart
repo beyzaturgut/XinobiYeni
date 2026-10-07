@@ -10,8 +10,6 @@ class _$HomeContent extends HomeContent {
   @override
   final BuiltList<HomeSlide> slides;
   @override
-  final String? xinobiUBannerUrl;
-  @override
   final String? featureImageUrl;
   @override
   final String accentColor;
@@ -25,7 +23,6 @@ class _$HomeContent extends HomeContent {
 
   _$HomeContent._(
       {required this.slides,
-      this.xinobiUBannerUrl,
       this.featureImageUrl,
       required this.accentColor,
       required this.featuredProducts,
@@ -43,7 +40,6 @@ class _$HomeContent extends HomeContent {
     if (identical(other, this)) return true;
     return other is HomeContent &&
         slides == other.slides &&
-        xinobiUBannerUrl == other.xinobiUBannerUrl &&
         featureImageUrl == other.featureImageUrl &&
         accentColor == other.accentColor &&
         featuredProducts == other.featuredProducts &&
@@ -54,7 +50,6 @@ class _$HomeContent extends HomeContent {
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, slides.hashCode);
-    _$hash = $jc(_$hash, xinobiUBannerUrl.hashCode);
     _$hash = $jc(_$hash, featureImageUrl.hashCode);
     _$hash = $jc(_$hash, accentColor.hashCode);
     _$hash = $jc(_$hash, featuredProducts.hashCode);
@@ -67,7 +62,6 @@ class _$HomeContent extends HomeContent {
   String toString() {
     return (newBuiltValueToStringHelper(r'HomeContent')
           ..add('slides', slides)
-          ..add('xinobiUBannerUrl', xinobiUBannerUrl)
           ..add('featureImageUrl', featureImageUrl)
           ..add('accentColor', accentColor)
           ..add('featuredProducts', featuredProducts)
@@ -83,11 +77,6 @@ class HomeContentBuilder implements Builder<HomeContent, HomeContentBuilder> {
   ListBuilder<HomeSlide> get slides =>
       _$this._slides ??= ListBuilder<HomeSlide>();
   set slides(ListBuilder<HomeSlide>? slides) => _$this._slides = slides;
-
-  String? _xinobiUBannerUrl;
-  String? get xinobiUBannerUrl => _$this._xinobiUBannerUrl;
-  set xinobiUBannerUrl(String? xinobiUBannerUrl) =>
-      _$this._xinobiUBannerUrl = xinobiUBannerUrl;
 
   String? _featureImageUrl;
   String? get featureImageUrl => _$this._featureImageUrl;
@@ -118,7 +107,6 @@ class HomeContentBuilder implements Builder<HomeContent, HomeContentBuilder> {
     final $v = _$v;
     if ($v != null) {
       _slides = $v.slides.toBuilder();
-      _xinobiUBannerUrl = $v.xinobiUBannerUrl;
       _featureImageUrl = $v.featureImageUrl;
       _accentColor = $v.accentColor;
       _featuredProducts = $v.featuredProducts.toBuilder();
@@ -147,7 +135,6 @@ class HomeContentBuilder implements Builder<HomeContent, HomeContentBuilder> {
       _$result = _$v ??
           _$HomeContent._(
             slides: slides.build(),
-            xinobiUBannerUrl: xinobiUBannerUrl,
             featureImageUrl: featureImageUrl,
             accentColor: BuiltValueNullFieldError.checkNotNull(
                 accentColor, r'HomeContent', 'accentColor'),

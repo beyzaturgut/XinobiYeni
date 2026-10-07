@@ -55,9 +55,12 @@ public record ProductDetail(
 
 public record HomeSlide(long Id, string Type, string Url, string Alt, int DurationSeconds);
 public record CategoryHighlight(string Category, string? ImageUrl, string ImageAlt, int ProductCount, string Description);
+/// <summary>
+/// The XINOBI U home section is a fixed designed block on web and mobile (06.10.2026), so there is no banner image here.
+/// <c>FeatureImageUrl</c> is the editable titanium feature photo.
+/// </summary>
 public record HomeContent(
     HomeSlide[] Slides,
-    string? XinobiUBannerUrl,
     string? FeatureImageUrl,
     string AccentColor,
     ProductSummary[] FeaturedProducts,

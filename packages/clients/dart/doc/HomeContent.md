@@ -9,7 +9,6 @@ import 'package:xinobi_api_client/api.dart';
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **slides** | [**BuiltList&lt;HomeSlide&gt;**](HomeSlide.md) |  |
-**xinobiUBannerUrl** | **String** |  |
 **featureImageUrl** | **String** |  |
 **accentColor** | **String** |  |
 **featuredProducts** | [**BuiltList&lt;ProductSummary&gt;**](ProductSummary.md) |  |

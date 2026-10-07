@@ -73,3 +73,11 @@ Dyson'ın marka tipi kamuya açık bir font lisansı olarak doğrulanamadığı 
 - Ürün kartı doğrudan beş soruya gider. Oturum açılırken renk gönderilmezse sunucu, önizleme fotoğrafı için ürünün görseli olan ilk rengini kullanır. Ürün detayından "XINOBI U ile kişiselleştir" ile gelinirse orada seçili renk kullanılır; bu ayrı bir adım değildir.
 - Soru ekranında renk adı gösterilmez. Eski `/xinobi-u/renk` bağlantıları sorulara yönlenir.
 - Sözleşme: `CreateXinobiUSession.variantId` ve web'in `/api/v1/design-studio/sessions` isteğindeki `variantId` isteğe bağlı.
+
+## DES-SYNC-01 — Mobil, web'in güncel tasarımından değil eski kaynaktan türetilmişti (07.10.2026)
+
+- **Bulgu (proje sahibi):** Mobilde web'de artık olmayan yeşil palet ve eski XINOBI U bannerı görünüyordu.
+- **Kök neden:** (1) Web paleti 06.10.2026'da (`d7870f0`) doğrudan `globals.css` içinde siyah-beyaza çevrildi; `design/tokens.json` 0.3.0'da kaldı. Mobil tokenlar bu dosyadan üretildiği için eski yeşil geldi. (2) Web ana sayfasında XINOBI U resim bannerı tasarlanmış bölümle değiştirildi (`529c107`, `7e96a8e`) ve admin'deki banner sekmesi kaldırıldı (`92913f0`); ancak eski görsel `state.json`'da kaldı ve katalog sözleşmesi (`xinobiUBannerUrl`) onu yayımlamaya devam etti. Mobil ekranlar çalışan web arayüzüyle karşılaştırılmadan, token dosyası ve veri modelinden kuruldu.
+- **Karar:** `design/tokens.json` 0.4.0 web paletine eşitlendi (+ `cta`, `ctaHover`, `mediaWarm`). `pnpm lint` artık `tools/check-design-tokens.mjs` ile web paleti ve token dosyası ayrışırsa başarısız olur. `xinobiUBannerUrl` sözleşmeden kaldırıldı. Mobil ana sayfa web sırası ve metinleriyle yeniden kuruldu: slider → XINOBI U bölümü → kategoriler → titanyum → öne çıkanlar → değerler ve Xinobi dünyası.
+- **Kural:** Mobil ekran yazmadan önce aynı web ekranı 390 px'te görüntülenip karşılaştırılır; tasarım değişikliği önce token dosyasına, sonra web ve mobile işlenir.
+

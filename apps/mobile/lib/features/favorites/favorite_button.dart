@@ -20,14 +20,19 @@ class FavoriteButton extends ConsumerWidget {
     final button = IconButton(
       tooltip: favorite ? removeLabel ?? '$productName ürününü favorilerden çıkar' : '$productName ürününü favorilere ekle',
       isSelected: favorite,
-      color: favorite ? XinobiTokens.danger : color ?? XinobiTokens.ink,
+      // Black and white like the web catalog: a filled heart, never a coloured one.
+      color: color ?? XinobiTokens.ink,
       icon: const Icon(Icons.favorite_border),
       selectedIcon: const Icon(Icons.favorite),
       onPressed: () => ref.read(favoritesProvider.notifier).toggle(productId),
     );
     if (!onImage) return button;
     return DecoratedBox(
-      decoration: BoxDecoration(color: XinobiTokens.surface.withValues(alpha: 0.92), shape: BoxShape.circle),
+      decoration: BoxDecoration(
+        color: XinobiTokens.surface.withValues(alpha: 0.9),
+        shape: BoxShape.circle,
+        border: Border.all(color: favorite ? XinobiTokens.teal : const Color(0xFFCCCCCC)),
+      ),
       child: button,
     );
   }

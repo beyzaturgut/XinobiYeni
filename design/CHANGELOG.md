@@ -1,5 +1,10 @@
 # Faz02 tasarım değişiklikleri
 
+## Tokenlar 0.4.0 - 07.10.2026
+
+- Renkler web'in siyah-beyaz paletine eşitlendi (06.10 web değişikliği token dosyasına işlenmemişti); `cta` #FF0029, `ctaHover` #DB0023, `mediaWarm` #E4E3DF eklendi.
+- `pnpm lint` token dosyası ile web paletini karşılaştırır (DES-SYNC-01).
+
 ## 0.35.0 - 03.10.2026
 
 - ADM-002 rol matrisi, sürümlü demo sistem ayarları ve güvenli alanlı denetim geçmişi eklendi.

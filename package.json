@@ -11,14 +11,15 @@
     "contracts:generate:typescript": "pnpm --filter @xinobi/api-client generate",
     "contracts:generate:dart": "openapi-generator-cli generate -i packages/contracts/openapi/v1.json -g dart-dio -o packages/clients/dart -t tools/openapi-templates/dart --global-property=apiTests=false,modelTests=false --additional-properties=pubName=xinobi_api_client,pubVersion=0.1.0,pubPublishTo=none,pubLibrary=xinobi_api_client,serializationLibrary=built_value && node tools/normalize-generated-clients.mjs",
     "contracts:check": "pnpm contracts:generate && git diff --exit-code -- packages && test -z \"$(git status --porcelain -- packages)\"",
-    "lint": "pnpm --recursive --if-present lint",
+    "lint": "pnpm tokens:check && pnpm --recursive --if-present lint",
     "test": "pnpm --recursive --if-present test",
     "dev:local": "node tools/dev-local.mjs",
     "test:local-commerce": "node tools/test-local-commerce.mjs",
     "dev:local:background": "node tools/start-local.mjs",
     "test:xinobi-u": "node tools/test-xinobi-u.mjs",
     "test:free-preview": "node tools/test-free-product-preview.mjs",
-    "tokens:mobile": "node tools/generate-mobile-tokens.mjs"
+    "tokens:mobile": "node tools/generate-mobile-tokens.mjs",
+    "tokens:check": "node tools/check-design-tokens.mjs"
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "2.40.1"

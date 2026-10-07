@@ -17,7 +17,7 @@ class RemoteImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final placeholder = Container(
-      color: const Color(0xFFECECE8),
+      color: XinobiTokens.mediaWarm,
       alignment: Alignment.center,
       child: const Icon(Icons.image_outlined, color: XinobiTokens.muted),
     );

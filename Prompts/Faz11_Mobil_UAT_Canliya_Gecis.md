@@ -41,6 +41,10 @@ Web Designer ve Creative Designer, Analiz2 ana sayfa/XINOBI U/Nobi hiyerarşisin
 | 11.10 | Staging verisi ve sağlayıcı test durumu teyit edilir, Xinobi gerçek iş sahibi UAT imzalar; dağıtım/rollback runbook ile web/API/worker/mobil üretim sürümleri hazırlanır. | Üretim checklist'i, imza, migration/yedek, sır referansları, sağlık ve geri alma eşiği Faz00'da. |
 | 11.11 | PM'nin ayrı üretim öncesi `GO/NO-GO` yetkilendirmesi sonrasında kontrollü canlı dağıtım, smoke ve sağlayıcı mutabakatı; mağaza metin/görsel/izin, gizlilik ve release teslimi. | Web/API/worker canlı; iOS/Android mağaza gönderimi ve yayın/onay bağlantıları/sonuçları ayrı kanıtlı, red varsa düzeltilip yeniden gönderilmiş. |
 | 11.12 | Operasyon eğitimi, panel/ürün/AI/entegrasyon/sipariş/baskı kullanım rehberi, erişim devri, bakım ve hata devralma; Faz00 kapanışı. | Eğitime katılım ve runbook, gerçek ekip yedi onayı ve PM zorunlu nihai karar. |
+| 11.13 | **Teknik dokümantasyon teslimi** (kapsam teslim kalemi): mimari genel bakış ve ADR dizini, OpenAPI referansı ve istemci üretimi, veri modeli ve migration geçmişi, kurulum/ortam ve sır yönetimi, dağıtım/rollback, yedek/restore, kuyruk yeniden işleme, Mikro ve pazaryeri runbook'ları, AI sağlayıcı ve limit yönetimi, güvenlik ve erişim devri, panel kullanıcı kılavuzu. | Her belge repoda sürümlü, sahibi ve son doğrulama tarihi var; iş sahibi teslim alındığını imzalar. |
+| 11.14 | **Geçiş günü (cutover) planı:** Faz01 01.17 envanterine göre ilk veri yüklemesi, Faz08/09 eşleme mutabakatı, pazaryeri stok yazma devri ve dondurma penceresi, eski site URL 301 haritası, DNS/TLS geçişi, özellik bayraklarıyla kademeli açılış ve geri dönüş eşiği. | Staging'de tam prova; geçiş günü kontrol listesi ve sorumlular Faz00'da; çift satış ve kayıp sipariş olmadığı mutabakatla gösterilir. |
+| 11.15 | **Güvenlik ve yük testleri:** Faz00 T-10/T-11 araçlarıyla OWASP ASVS hedef seviyesine göre güvenlik doğrulaması, bağımsız sızma testi (iş sahibi kararıyla iç veya dış), D14/Faz01 01.18 hedeflerine karşı yük testi. | Kritik/yüksek bulgular kapalı veya PM risk kabulüyle kayıtlı; yük testi raporu hedeflerle karşılaştırmalı. |
+| 11.16 | **Bakım ve destek devri (D14):** Garanti süresi, hata öncelik sınıfları ve yanıt/düzeltme süreleri, sürüm ve bağımlılık güncelleme takvimi, aylık işletim maliyet raporu. | D14 kararı ve imzalı destek sözleşmesi Faz00'da; karar yoksa proje kapanış kapısı bloke. |
 
 Üretim öncesi `GO/NO-GO` operasyonel dağıtım iznidir; Faz11'in **nihai PM KABUL/RED kararı** canlı ve iki mağaza yayın kanıtı, UAT ve altı rol incelemesi tamamlandıktan sonra ayrıca verilir. İlk izin nihai kabul yerine geçmez.
 
@@ -59,6 +63,7 @@ Web Designer ve Creative Designer, Analiz2 ana sayfa/XINOBI U/Nobi hiyerarşisin
 | Mobil yaşam döngüsü | Temiz yükleme, izin ret/kabul, foreground/background, kesilen ağ ve geri dönüş, düşük bellek/bağlantı, push açılışı; gerçek iOS ve Android cihazda test. |
 | Güvenlik | API/panel rol ve nesne yetkisi, dosya erişimi, upload tür/boyut, webhook doğrulama, CSRF/oturum, sır taraması, log maskeleme, bağımlılık ve uygulama güvenliği kontrolü; kritik açıklar kapanır. |
 | Performans ve kurtarma | Müşteri onaylı trafik ve eşzamanlı checkout/editör/AI senaryosu, p95/hata hedefleri D01 kapasite kararıyla ölçülür; gözlemlenebilir alarmlar, backup, restore, RPO/RTO ve rollback provası kayıtlıdır. |
+| Yasal yükümlülük (D11) | Her kanalda sözleşme onayı sürümüyle siparişte; İYS izni olmayan kullanıcıya ticari ileti yok; ETBİS kaydı ve e-Fatura/e-Arşiv akışı gerçek test belgesiyle doğrulanmış. |
 | İçerik ve erişim | Responsive web, SEO canonical/sitemap, analitik rıza, ekran okuyucu/klavye/kontrast, kurumsal/yasal metinler ve mobil mağaza veri açıklamaları D10'a uygun. |
 
 **Ayrım:** Sözleşme fixture testleri `MOCK`, erişimli sağlayıcı testleri `SANDBOX`, canlı smoke `LIVE` olarak kaydedilir. Bir sağlayıcı, mağaza hesabı veya gerçek mobil cihaz yoksa ilgili satır `Bloke`, sahibi ve etkilediği kabul Faz00'dadır. Gerçek kredi kartı, müşteri verisi veya üretim API anahtarı test loglarına alınmaz.
@@ -85,6 +90,8 @@ Faz00'dan son doğrulanmış commit, iOS/Android build numarası ve dağıtım k
 | Sr. Backend Developer | API, ödeme ve entegrasyon/AI güvenli tutarlılık | BEKLİYOR |
 | DB Admin | Migration, mutabakat, yedek-restore, veri erişimi | BEKLİYOR |
 | Sr. Full Stack Developer | İki cihaz, üç kanal, staging-canlı smoke/rollback | BEKLİYOR |
+| Web Designer (ek zorunlu rol) | Analiz2 hiyerarşisinin iOS/Android ve canlı web'e uygulanışı | BEKLİYOR |
+| CTO Advisor (ek zorunlu rol) | Barındırma, güvenlik/yük testi sonucu, işletim maliyeti ve bakım devri | BEKLİYOR |
 | **Proje Yöneticisi — zorunlu nihai kapı** | **Altı onay, müşteri UAT, tüm D kararları, canlı/mağaza kanıtı ve Faz00; eksikte RED ve düzeltme** | **BEKLİYOR** |
 
 Plan belgesi incelemesi uygulama veya müşteri onayı sayılmaz. Faz11 ve proje ancak gerçek kanıt ve **ayrı PM kararı** ile `Tamamlandı` durumuna geçer.

@@ -28,6 +28,11 @@ K0/K1 kapılarını müşteri kanıtlarıyla kapatmak; D01–D10 kararlarını s
 12. **Plan ve kapı:** Modüllerin bağımlılık sırasını, gerekli kişi/ortam kapasitesini, tasarım teslim ritmini, test sahiplerini ve her fazın kanıt dosyasını PM takvime bağlar. Gerekli girdisi olmayan iş `blokeli`; bağımsız işler ilerleyebilir. Tüm açık kararlar Faz00'a `ID, sahibi, etki, sonraki eylem, tarih, kanıt` ile aktarılır.
 13. **Analiz2 yaratıcı keşif eki:** K-01–K-21'i mevcut ekran ve fazlarla ayrı fark matrisine bağla. Hedef kitle, marka konumlandırma, yetkili logo, gerçek ürün/varyant medyası ve lisansları, fotoğraf/video gereksinimi, XINOBI U ve Nobi görsel kişiliği ile görsel başarı ölçütlerini Creative Designer ve Web Designer brief'ine ekle. Dyson yalnız ürün merkezli hiyerarşi, sade yüzey, güçlü hero, kısa ve kanıtlanabilir fayda ile net CTA referansıdır; logo, metin, varlık, font veya birebir düzen kopyalanmaz.
 14. **AI-P01 sağlayıcı kararı:** Proje sahibi 01.10.2026'da Cloudflare Workers AI'ı onayladı. CTO Advisor Faz10 öncesi seçilecek Cloudflare modelinin görsel üretim/düzenleme, dört aday kalitesi, veri işleme, ticari lisans, fiyat/kota, gecikme, gözlemlenebilirlik ve çıkış koşullarını resmi kaynaklarla doğrular. Sağlayıcı seçimi D05/D08'in diğer maliyet, kota, içerik ve veri kararlarını otomatik kapatmaz; entegrasyon Faz10 sırasındadır.
+15. **İş planı, sprint ve teslim takvimi:** Kapsamın "proje iş planı" ve "sprint ve teslim takvimi" maddeleri için PM; her faz/alt iş için tahmini süre, sprint uzunluğu, gerçek kişi kapasitesi, bağımlılık yolu, kilometre taşları ve müşteri inceleme tarihlerini hazırlar; Faz00 §1 takvim tablosuna işler. Blokeli işler takvimde karar tarihine bağlanır. Takvim proje sahibinin onayı olmadan kesin sayılmaz.
+16. **Türkiye e-ticaret yükümlülükleri (D11):** Hukuk ve muhasebeyle mesafeli satış sözleşmesi ve ön bilgilendirme formunun ödeme öncesi onay ve sürüm saklama kuralı; ETBİS kaydı; İYS kapsamında SMS/e-posta ticari ileti izni ve izin kaydı; e-Fatura/e-Arşiv'in Mikro'da mı, entegratörde mi, uygulamada mı kesileceği; pazaryeri siparişlerinde fatura sorumluluğu belgelenir. Sonuç Faz05/07/08/11'e bağlanır.
+17. **Mevcut veri ve geçiş envanteri:** Pazaryerlerindeki mevcut ürün/varyant/SKU, müşteri ve açık sipariş verisinin hacmi, kalitesi ve ilk yükleme yöntemi; varsa eski web sitesi URL'leri (301 haritası için); canlıya geçiş gününde stok çift satışını önleme yaklaşımı. Çıktı Faz04/08/09/11'in ilk yükleme ve geçiş planına girdi olur.
+18. **Kalite hedefleri ve maliyet (D14):** Analiz2 §20.1 başlangıç mühendislik hedefleri (sayfa performansı, API p95, hata oranı, eşzamanlı kullanıcı, kullanılabilirlik) müşteriyle ölçülebilir değere dönüştürülür; RPO/RTO ile birlikte Faz00'a yazılır. Altyapı ve sağlayıcıların aylık maliyet tahmini, proje sonrası bakım/garanti ve hata düzeltme süreleri proje sahibiyle kararlaştırılır.
+19. **Analiz2 açık kararları:** K-13 "Market hesabı" anlamı (D12) ve "Desenler" menüsünün içerik/lisans/satın alma modeli (D13) iş sahibine sorulur; yanıt gelene kadar ekran veya veri modeli uydurulmaz. Siyah tema panel dokümanındaki kapsam dışı modüller (hızlı satış, bayi, puan/bakiye, tema motoru, sosyal giriş) için alma/almama kararı Faz00 §4'e yazılır.
 
 ## Karar defteri ve blokaj koşulu
 
@@ -43,6 +48,10 @@ K0/K1 kapılarını müşteri kanıtlarıyla kapatmak; D01–D10 kararlarını s
 | D08 | AI kota/içerik/alternatif/çıktı/maliyet | Xinobi ürün; AI üretim kabulü |
 | D09 | Mobil editör eşliği, cihaz, push ve mağaza hesabı | Ürün + mobil sorumlusu; mobil yayın |
 | D10 | Hukuki metin/rıza ve saklama | Xinobi hukuk/operasyon; ilgili metinlerin yayını ve canlı kabul |
+| D11 | Mesafeli satış/ön bilgilendirme onayı, ETBİS, İYS, e-Fatura/e-Arşiv sorumluluğu | Hukuk + muhasebe; checkout canlı kabulü, bildirim gönderimi, Mikro fatura akışı |
+| D12 | K-13 "Market hesabı" anlamı | Ürün sahibi; ilgili ekran/hesap modeli |
+| D13 | "Desenler" içerik/lisans/satın alma modeli | Ürün sahibi + Creative; Desenler sayfası ve editör şablon bağı |
+| D14 | Bakım/garanti/SLA ve aylık işletim maliyet tavanı | Proje sahibi + PM; Faz11 devir ve canlı kabul |
 
 Karar kaydı formatı: `ID | soru | seçenekler | seçilen karar | kaynak kanıt/bağlantı | müşteri karar sahibi | tarih | etkilediği faz/API/veri/ekran | alternatif/geri dönüş | durum`. Süresi gelen ama yanıtlanmamış karar açık kalır; PM, iş sahibinin yerine varsayımı imzalamaz. Test sağlayıcısı yoksa mock ile geliştirme kanıtı üretilebilir, gerçek entegrasyon kabulü bloke kalır.
 
@@ -56,6 +65,8 @@ Karar kaydı formatı: `ID | soru | seçenekler | seçilen karar | kaynak kanıt
 | F01-T04 | Ödeme callback'i iki kez gelir / havale bekler | D03 şemasında tekil sonuç, rezervasyon ve geçiş tanımlı |
 | F01-T05 | Baskı alanı ve teklif dönüşümü sorulur | D04/D07 fiziksel örnek ve müşteri onayı veya açık blokaj vardır |
 | F01-T06 | Pazaryeri erişimi yok, mobil editör belirsiz | D06/D09 ilgili geliştirme/test ve yayın kapısı blokeli, bağımsız işler planlı |
+| F01-T07 | Takvim ve sprint planı istenir | Faz00 §1 takviminde her faz için tarih/kapasite veya karar tarihine bağlı `Belirlenmedi` gerekçesi |
+| F01-T08 | Sipariş ödemesi ve bildirim yasal yükümlülüğü sorulur | D11 sahibi ve kararı ya da açık blokaj; Faz05/08 bağlantısı |
 
 ## Teslim kanıtları
 
@@ -81,5 +92,6 @@ Bu tablo görevlendirme ve bekleyen incelemeyi gösterir; gerçek çalışan imz
 | Sr. Backend Developer | API, ödeme/sipariş/entegrasyon taslakları | Beklemede | — |
 | DBA | Ana kayıt, veri bütünlüğü, taşıma ve saklama | Beklemede | — |
 | Sr. Full Stack Developer | Web/mobil/API uygulanabilirliği, ortam ve dağıtım | Beklemede | — |
+| CTO Advisor (ek zorunlu rol) | AI-P01 doğrulaması, barındırma/nesne depolama adayları, maliyet ve çıkış planı | Beklemede | — |
 
 **PM nihai onay kapısı:** Yedi rolün değerlendirmesi, müşteri kararları ve blokajlar Faz00'a bağlandıktan sonra PM `KABUL / RED`, tarih ve kanıt referansını yazar. Bağımsız keşif işleri açık kararlarla sürse de blokeli uygulama işi kabul edilmez. Şu an **beklemede**; PM onayı olmadan Faz01 kapatılmaz.

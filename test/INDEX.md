@@ -100,3 +100,5 @@
 - 03.10.2026 · [TST-085 AI yönetimi](2026-10-03/TST-085-admin-ai.md) — Model/UI, build/lint ve panel regresyonu başarılı.
 
 - [TST-086 — ADM-002 rol, ayar ve denetim](2026-10-03/TST-086-admin-settings.md)
+
+- 07.10.2026 · [TST-087 faz eksiklik maddeleri](2026-10-07/TST-087-phase-gap-update.md) — Faz00–Faz11 belge revizyonu; diff temiz, işaretler tutarlı, kod değişmedi.

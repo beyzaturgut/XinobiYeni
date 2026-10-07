@@ -23,7 +23,9 @@ Kurumsal müşterinin ürün, adet, logo/tasarım, termin ve teslimat gereksinim
 6. **E-posta ve teslim izi:** Talep alındı, bilgi talebi, teklif gönderildi/revizyon, kabul ve gerekiyorsa toplu sipariş teyidi için müşteri onaylı şablon ve tetikleyicileri hazırla. E-posta işini yerel işlemle outbox'a yaz; arka plan işleyicisi sağlayıcı kimliği, deneme, hata, yeniden gönderim ve teslim bilgisini izlesin. Başarısız e-posta talebi/siparişi yok etmez; panel uyarısı ve yetkili tekrar deneme sunar. Şablonda kişisel veri ve ek indirme bağlantısının ömrü D10'a tabidir.
 7. **Onaylı teklif → sipariş:** D07'de tanımlanan kabul kanıtını ve teklif sürümünü doğrula; tutarı sipariş servisinin sunucu hesaplama kuralları ve D02/D03 ile uyumlu olarak yeniden teyit et. Miktar, stok/üretim/termin, teslimat, vergi ve ödeme koşullarında fark varsa belirlenmiş onay akışına geri dön; gizlice sipariş oluşturma. Başarılı komut tek `Order` ve `CorporateOrderLink` oluşturur; kanal `kurumsal`, teklif sürümü ve satır anlık görüntüsü korunur. Tekrarlı istek / ağ kesintisi / eşzamanlı iki operatör aynı sonucu döndürür. Siparişe dönüşümden sonraki kargo, muhasebe, iptal/iade merkezi sipariş ve entegrasyon aşamalarının aynı kurallarıyla izlenir; kapsamdaki toplu sipariş listesi panelde yer alır.
 8. **Mobil ve kanal doğrulaması:** Kaynaktaki iOS/Android kurumsal talep akışları ortak API'ye bağlanır; bekleyen yükleme, hata ve yeniden dene hallerini gösterir. Pazaryerinden gelen bir alıcıyı talep sahibi üye hesabına otomatik bağlama. Mobil teslim diğer fazda planlandıysa Faz00'da bağımlılık açık kalır ve Faz07 bütün proje kapanışı için gereken çapraz test işaretlenir.
-9. **İşletim/rapor:** Talep, gönderilen teklif, revizyon, kabul/red ve dönüşen toplu siparişin temel adetlerini/yaşını panelde göster. E-posta başarısızlığı, uzun süre bekleyen talep ve yinelenen dönüşüm denemeleri izlenebilir olsun. Bu raporlar temel operasyon ihtiyacıyla sınırlıdır.
+9. **Kurumsal müşteri başvurusu:** Kapsamdaki "kurumsal müşteri başvurusu" için firma, yetkili ve vergi bilgileriyle hesap başvurusu; panelde `başvuru → inceleniyor → onaylandı/reddedildi/bilgi bekleniyor` akışı, onaylanan başvurudan `Company` kaydı ve yetkili kullanıcının firmaya bağlanması. Onaysız başvuru teklif talebi açmayı engellemez (D07'ye göre misafir talep de mümkün olabilir) ama kurumsal hesap görünümünü açmaz. Vergi numarası biçim doğrulaması yapılır; aynı vergi numarasıyla mükerrer firma oluşmaz.
+10. **Teklifsiz toplu sipariş talebi:** Kapsam "toplu sipariş talebi", "toplu sipariş yönetimi" ve "toplu sipariş sistemi"ni teklif talebinden ayrı kalem olarak sayar. D07'de şu iki model arasında karar alınır: (a) liste/kurumsal fiyattan doğrudan çok satırlı toplu sipariş talebi, operatör teyidiyle siparişe dönüşür; (b) her toplu sipariş zorunlu olarak teklif sürecinden geçer. Karar (a) ise ayrı `BulkOrderRequest` akışı, adet bazlı fiyat/stok/termin kontrolü ve panelde toplu sipariş talep listesi uygulanır; (b) ise web ve mobilde "toplu sipariş talebi" girişi teklif formuna önceden doldurulmuş biçimde yönlenir ve bu Faz00'a karar olarak yazılır. Hiçbir modelde talep otomatik tahsilat yaratmaz.
+11. **İşletim/rapor:** Talep, gönderilen teklif, revizyon, kabul/red ve dönüşen toplu siparişin temel adetlerini/yaşını panelde göster. E-posta başarısızlığı, uzun süre bekleyen talep ve yinelenen dönüşüm denemeleri izlenebilir olsun. Bu raporlar temel operasyon ihtiyacıyla sınırlıdır.
 
 ## Test ve UAT senaryoları
 
@@ -40,6 +42,8 @@ Kurumsal müşterinin ürün, adet, logo/tasarım, termin ve teslimat gereksinim
 | F07-T08 | Onay sonrası fiyat/stok/termin değişir veya teklif süresi biter | D03/D07 onay/geçiş kuralı çalışır; sessizce eski tutarla sipariş açılmaz |
 | F07-T09 | Web ve gerçek iOS/Android cihazında talep açılır | Aynı API, talep ID ve dosya durumu; kanal bazlı ekran/erişim kanıtı |
 | F07-T10 | Siparişe dönüşen teklifte kargo, Mikro ve iptal/iade ilerler | Merkezi siparişten aynı kayıt izlenir; ilgili sonraki fazın bütünleşik testi bağlanır |
+| F07-T11 | Kurumsal başvuru yapılır, aynı vergi numarasıyla ikinci başvuru gelir | Tek firma kaydı; onay/red auditli; onaysız hesapta kurumsal görünüm kapalı |
+| F07-T12 | Toplu sipariş talebi D07 modeline göre açılır | (a) modelinde tek talep ve operatör teyidiyle tek sipariş; (b) modelinde teklif formuna doğru ön doldurma; iki modelde de otomatik tahsilat yok |
 
 ## Teslim kanıtları
 
@@ -52,7 +56,8 @@ Kurumsal müşterinin ürün, adet, logo/tasarım, termin ve teslimat gereksinim
 
 | Konu | Sahip | Açıkken etkisi |
 |---|---|---|
-| D07 onay, fiyat, geçerlilik, hesap ve dönüşüm | Kurumsal satış | Dönüşüm API'si ve kabulü blokeli |
+| D07 onay, fiyat, geçerlilik, hesap ve dönüşüm; toplu sipariş modeli (a/b) ve kurumsal başvuru onayı | Kurumsal satış | Dönüşüm API'si, toplu sipariş akışı ve kabulü blokeli |
+| D11 kurumsal siparişte e-Fatura ve sözleşme yükümlülüğü | Hukuk + muhasebe | Kurumsal siparişin canlı kabulü blokeli |
 | D02/D03 stok, fiyat ve sipariş ödeme koşulu | Operasyon/satış | Sipariş kesinleştirme blokeli |
 | D04 logo/baskı kalitesi ve insan onayı | Ürün/üretim | Baskılı kurumsal satırın üretim kabulü blokeli |
 | D05 e-posta sağlayıcısı | Xinobi + PM | Gerçek e-posta teslimatı blokeli |

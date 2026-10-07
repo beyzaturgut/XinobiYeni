@@ -20,7 +20,8 @@ Analiz2 K-12 ve K-14–K-21 için Web Designer iki ayrı giriş yolunu tasarlar:
 4. Kalite kontrolü orijinal piksel çözünürlüğünü fiziksel baskı ölçüsüne karşı hesaplar; tarayıcı uyarısı kullanıcıya anlaşılır bilgi verir, sunucu kritik kuralı tekrar uygular. D04'ün ürüne özel eşikleri ve operatör istisna/onay politikası ayrı konfigürasyonda tutulur. Ön/arka alanların baskı operatörü tarafından ayrı çıktısı alınır.
 5. Tasarım `Design → DesignVersion → DesignLayer` olarak sürümlenir. Kaydetme yeni değişmez sürüm üretir, eşzamanlı eski sürüm kaydı 409 ile çatışma gösterir. Undo/redo açık editör oturumunda işlemleri geri sarar; kalıcı geçmiş sürümler ayrı saklanır. Sipariş satırı `designVersionId`, varyant ve fiyat farkının değişmez anlık görüntüsünü taşır; sonradan tasarım düzenleme eski siparişi ve baskı dosyasını değiştirmez.
 6. Sepete eklemeden önce backend ürün/varyant/alan, medya sahipliği, sınır, DPI, font lisansı ve güncel fiyat farkını doğrular. Sepet anlık görüntüsünün süresi/yeniden doğrulaması Faz05 sözleşmesindedir. Checkout aynı sürümü yeniden doğrular ve sipariş satırına sabitler. Çıktı işlemi beklerken operatör “hazır” görmez; çıktı üretilmezse denetlenebilir hata ve güvenli yeniden deneme vardır. Dosya yalnız ilgili operatör yetkisiyle indirilebilir.
-7. AI'dan üretilmiş görsel gelecek fazda `Asset` olarak alınır ve ayrı görsel katmana konur; katmanlı içerik vaat edilmez. İçerik/medya lisansı, kabul edilen dosya formatları ve notun baskı dosyasına işlenip işlenmeyeceği D04 ürün kararıdır.
+7. **Kullanıcının yüklediği görsel ve logo:** Teknik kontrollerin (MIME, boyut, zararlı içerik) yanında içerik uygunluğu ve hak kontrolü yapılır. Kullanıcı yükleme sırasında görselin kullanım hakkına sahip olduğunu açıkça beyan eder; beyan sürümü ve zamanı tasarım sürümüne bağlanır. Uygunsuz içerik (şiddet, müstehcenlik, nefret, açık marka/telif ihlali şüphesi) otomatik moderasyonla veya baskı öncesi operatör incelemesiyle işaretlenir. İşaretli tasarım "baskıya hazır" olamaz, müşteriye gerekçe bildirilir. Moderasyon aracı ve operatör onay politikası D04/D10 ile kararlaştırılır; AI çıktısı moderasyonu Faz10'dadır.
+8. AI'dan üretilmiş görsel gelecek fazda `Asset` olarak alınır ve ayrı görsel katmana konur; katmanlı içerik vaat edilmez. İçerik/medya lisansı, kabul edilen dosya formatları ve notun baskı dosyasına işlenip işlenmeyeceği D04 ürün kararıdır.
 
 ## 4. Somut geliştirme iş listesi
 
@@ -55,6 +56,7 @@ Analiz2 K-12 ve K-14–K-21 için Web Designer iki ayrı giriş yolunu tasarlar:
 | Sepet sonrası tasarımı değiştir | Sipariş/sepette bağlanan eski sürüm kendiliğinden güncellenmez; yeni sürüm açık eylemle bağlanır. |
 | Baskı işleyicisi hata/zaman aşımı | Sipariş kaydı kaybolmaz; çıktı başarısız görünür, güvenli yeniden deneme aynı sürüm için izlenir, indirilemeyen dosya “hazır” gösterilmez. |
 | Başka müşteri veya yetkisiz personel dosyayı ister | API 403/404 verir; kısa süreli indirme adresi yetki sonrası üretilir, denetim izi tutulur. |
+| Kullanıcı hak beyanı vermeden veya uygunsuz görsel yükler | Hak beyanı yoksa görsel tasarıma eklenmez; uygunsuz işaretli tasarım sepete/baskıya gidemez, operatör kararı auditlidir. |
 | Geçmiş siparişin baskı alanı sonra değişir | Eski siparişin çıktı alanı o siparişte kayıtlı kural sürümünden yeniden üretilebilir; yeni alan yalnız yeni tasarımlara uygulanır. |
 
 **Kabul kapısı:** Xinobi ürün/üretim yetkilisi D04 baskı örneği ve eşikleriyle gerçek baskı dosyası önizleme uyumunu onaylar; basit ve gelişmiş akış, ön/arka/çok alanlı tasarım, sürüm, sepet/checkout/sipariş ve panel indirme uçtan uca gösterilir. Webde ve mobil API sözleşme testlerinde aynı tasarım sürümü kullanılır; mobil uygulama gerçek cihaz kabulü kendi fazında ayrıca kapanır. Kritik taşma/çözünürlük/güvenlik hatası açıksa faz kapatılmaz.
@@ -71,4 +73,5 @@ Her imza Faz00 içinde tarih, gerçek kişi, kanıt bağlantısı, açık bulgu 
 - [ ] Sr. Backend Developer — şema, sahiplik, render tekrar güvenliği, doğrulama ve sipariş bağını onayladı.
 - [ ] DB Admin — sürüm bütünlüğü, alan anlık görüntüsü, varlık/çıktı referansı ve migration'ı onayladı.
 - [ ] Sr. Full Stack Developer — web/panel/API/sepet/çıktı uçtan uca akışı ve mobil sözleşme uyumunu onayladı.
+- [ ] Web Designer (ek zorunlu rol) — XINOBI U iki giriş yolu (beş soru / kendi görseli), "Temsilidir" etiketi ve önizleme etkileşiminin onaylı tasarıma uygunluğunu onayladı.
 - [ ] Proje Yöneticisi — **zorunlu nihai onay**; altı inceleme, D04 üretim kararı, gerçek baskı örneği ve kabul kanıtlarını Faz00'a işleyerek fazı kapattı.

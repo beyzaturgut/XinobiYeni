@@ -4,7 +4,7 @@
 
 ## 0. Önce bunu oku
 
-1. Kaynak sıra: müşteri kapsamı `Xinobi_Proje_Kapsami(4).md` → hazırlanan kavramsal/teknik analiz `Xinobi_Kavramsal_ve_Teknik_Analiz.md` (kalıcı dosya adı `Xinobi_Kavramsal_ve_Teknik_Analiz(1).md`) → bu Faz00 → ilgili Faz01–Faz11 → mevcut kod/ADR/gerçek test kanıtı. **Yeni depoda ilk iş**, Library'deki bu iki var olan kaynağı `docs/sources/` altına salt okunur kopya olarak alıp özgün ad, sürüm/tarih ve doğrulanmış yol eşlemesini Faz00'a yazmaktır; kaynak okunamıyorsa kapsam işini başlatma. Kaynaklar çelişirse müşteri kapsamında açık teslimi silme; çelişkiyi karar kaydına taşı.
+1. Kaynak sıra: müşteri kapsamı `Xinobi_Proje_Kapsami(4).md` → hazırlanan kavramsal/teknik analiz `Xinobi_Kavramsal_ve_Teknik_Analiz.md` (kalıcı dosya adı `Xinobi_Kavramsal_ve_Teknik_Analiz(1).md`) → bu Faz00 → ilgili Faz01–Faz11 → mevcut kod/ADR/gerçek test kanıtı. **Yeni depoda ilk iş**, Library'deki bu iki var olan kaynağı `docs/sources/` altına salt okunur kopya olarak alıp özgün ad, sürüm/tarih ve doğrulanmış yol eşlemesini Faz00'a yazmaktır; kaynak okunamıyorsa kapsam işini başlatma. Kaynaklar çelişirse müşteri kapsamında açık teslimi silme; çelişkiyi karar kaydına taşı. **Ek kaynaklar:** `Proje Yönetimi/Xinobi_Kavramsal_ve_Teknik_Analiz2.md` (K-01–K-21; Faz01/02/04/06/10/11'de bağlayıcı) ve `Proje Yönetimi/Yonetim_Paneli_Siyah_Tema_Teknik_Analiz_ve_Promptlar.md` (yalnız panel görsel dili/kabuk referansı) da `docs/sources/` altına SHA-256 ile salt okunur kopya olarak alınmalı ve sıraya müşteri kapsamı ile Analiz1'den sonra eklenmelidir. **Açık:** iki kopya henüz `docs/sources/` altında yok. Panel dokümanındaki hızlı satış, bayi/riskli müşteri, bakiye/puan, tema/CSS-JS motoru, sosyal giriş ve ödeme/kargo ayar ekranları müşteri kapsamında yoktur; ancak §4 karar kaydıyla kapsama alınır, aksi halde yalnız görsel referanstır.
 2. Çalışma başlangıcında bu dosyanın **Anlık durum**, **Blokajlar**, **Kesintiden devam** ve ilgili fazın önkoşul bölümünü oku; ardından `git status --short`, `git branch --show-current`, `git log -1 --oneline`, çalışma ortamı ve ilgili test komutlarını doğrula. Git deposu henüz yoksa Faz01'de mevcut repo/yeniden kullanım D01 kararıyla kurulacak.
 3. Değişiklikten önce görevi küçük, doğrulanabilir adıma ayır; değişiklikten sonra gerçek komutu ve sonucunu kaydet. Üretim sırlarını, erişim anahtarlarını, müşteri kişisel verilerini veya gerçek bağlantı dizelerini asla Faz00'a yazma.
 4. Bir hata/ara verme olursa yalnız **başarıyla biten** adımı işaretle; yarım dosyaları, hata mesajını ve güvenli yeniden başlatma komutunu yaz. Bir sonraki geliştirici Faz00 ile kodu karşılaştırır; kod kanıtsızsa önce doğrular.
@@ -30,6 +30,12 @@ Toplam **12 dosya: Faz00–Faz11**. Faz00 bir kere yazılıp bırakılmaz; uygul
 | Faz10 | AI tasarım ve satış asistanı/yönetimi | Faz03–04/06–07; D05/D08 | Planlandı |
 | Faz11 | iOS/Android, bütünleşik UAT, eğitim, canlı/mağaza | Önceki modüllerin kabulü; D09/D10 | Planlandı |
 
+**Takvim ve sprint planı — açık:** Müşteri kapsamı "proje iş planı" ve "sprint ve teslim takvimi"ni teslim olarak ister. Faz01 01.15 ile hazırlanacak takvim aşağıya işlenir; tarih uydurulmaz, sahipsiz satır `Belirlenmedi` kalır.
+
+| Faz | Planlanan başlangıç | Planlanan bitiş | Sprint sayısı / süresi | Kapasite (kişi/rol) | Kilometre taşı |
+|---|---|---|---|---|---|
+| 01–11 | Belirlenmedi | Belirlenmedi | Belirlenmedi | Belirlenmedi | Belirlenmedi |
+
 **Paralellik:** Mobil tasarım/Faz11 kabuğu Faz02–03'te, editör/mobile API sözleşmeleri Faz06'da başlayabilir. Faz08–10 bağlayıcılarının mock sözleşmeleri erken geliştirilebilir; gerçek uçtan uca kabul erişim ve müşteri kararına bağlıdır. Faz11'in final kapısı diğer tüm modülleri birleştirir.
 
 ## 2. Ekip, görev ayrımı ve onay
@@ -48,6 +54,8 @@ Yedi rolün her biri **20+ yıl deneyimli uzman bakışını temsil eden çalı�
 | Web Designer | Creative yönü web bilgi mimarisi, responsive wireframe, yüksek doğruluk ekran, motion ve erişilebilir etkileşim tanımına dönüştürür; kodlama öncesi kullanıcı web tasarım onayını hazırlar |
 | CTO Advisor | Teknoloji ve sağlayıcı adaylarını güvenlik, maliyet, veri işleme, taşınabilirlik ve işletim açısından karşılaştırır; ürün sahibinin onayı olmadan yığını veya sağlayıcıyı değiştirmez |
 
+**Rol sayısı netleştirmesi:** Kabul kapısındaki "yedi rol" PM, BA, Creative, FE, BE, DBA ve Full Stack'tir. **Web Designer** ve **CTO Advisor** bu yediye ek, zorunlu inceleme rolleridir: Web Designer Faz02/04/06/11, CTO Advisor Faz01/03/10/11 kapılarında ayrı `ONAY / REVİZYON / BLOKE` kaydı verir. Bu fazlarda onların kaydı yoksa PM kapıyı kapatamaz. §7 tablosu ve ilgili faz rol tabloları buna göre genişletilmiştir.
+
 **Creative → UI/UX → Frontend teslim sözleşmesi:** Designer marka konsepti, tokenlar, ekran prototipi, varlık lisansı, baskı yerleşimi ve durumları üretir. UI/UX sorumluluğunu Designer (akış/görsel) ile Frontend (etkileşim/erişilebilirlik/uygulama) ortak taşır. Frontend `handoff kabul` kaydı, eksik durum/ölçü/asset listesini Faz00'a işler; kabulden sonra bile tasarıma uymayan ekran bitmiş sayılmaz. Yedi rolün yanında ayrı bir UI/UX kadrosu varmış gibi onay yazılmaz.
 
 **İki ayrı onay türü:** (a) şimdi verilen **plan dokümanı incelemesi**, yedi temsili rolün 12 dosyanın tutarlılığına bakması; (b) gelecekte her fazın **gerçek uygulama kabulü**, kod/test/görsel kanıtı ve gerçek iş sahibinin gerekli ürün kararı. İlk tür ikinci yerine geçmez. Bir fazın onay tablosundaki boş alan `BEKLİYOR` kalır; PM dahil onaylar önceden doldurulmaz. PM ret gerekçesi ve düzeltme adımı yazar; bağımlı faza geçiş durur.
@@ -63,6 +71,25 @@ Yedi rolün her biri **20+ yıl deneyimli uzman bakışını temsil eden çalı�
 **Ortak API/veri ilkeleri:** Açıkça `/api/v1` sürümü, `requestId`, UTC zaman, tutar için para birimiyle decimal, müşteri ve panel nesne yetkisi, hatalarda kod/mesaj/alan, sayfalama; `variantId` ürün ekranından editör, sepet ve siparişe aynı kalır. Sunucu fiyat/vergi/indirim/kişiselleştirme/stok otoritesidir; `(channel, externalOrderId)`, ödeme sağlayıcı işlem ID ve checkout idempotency benzersiz; `OrderLine` anlık görüntüsü ve `DesignVersion` değişmez; outbox aynı yerel transaction'da. D02 veri sahipliği ve D03 ödeme/rezervasyon kapanmadan ilgili şema ve davranış kesinlenmez. Gereken tüm dış sistemlerde `IProviderAdapter` benzeri arayüz, mock/sandbox ve gerçek adaptör ayrılır. **Mock testi gerçek entegrasyon kabulü değildir.**
 
 **Yerel çalışma varsayımı:** Mac üzerinde SQL Server'a bağlantı yöntemi (erişilebilir geliştirme SQL Server örneği/container/uzak test sunucusu), .NET ve JS araçları Faz01'de doğrulanır; DBeaver yalnız SQL istemcisidir, sunucu değildir. Hiçbir ücretli bulut kaynağı gerçek hesap/limit kontrolü yapılmadan zorunlu sayılmaz. `.env.example` yalnız anahtar isimleri içerir. Komutların gerçek hali repo kurulduktan sonra aşağıya yazılır.
+
+### 3.1 Faz00'da sabitlenmesi gereken teknik kararlar
+
+Faz03–06 belgeleri aşağıdaki kararları "Faz00'da sabitlenir" diye buraya bırakır. Karar verilene kadar ilgili kod geçici kabul edilir; karar ADR ile kapanır ve satır güncellenir.
+
+| ID | Karar | Bağlı faz | Sahip | Durum |
+|---|---|---|---|---|
+| T-01 | API sürüm öneki ve son yol düzeni (`/api/v1`) | 03–10 | BE + Full Stack | Kısmi · health uçlarında kullanılıyor; iş uçlarında ADR yok |
+| T-02 | Para formatı: minör birim tam sayı mı, `decimal(19,4)` + ISO para birimi mi | 04,05,07,08,09 | BE + DBA | Açık |
+| T-03 | Web/mobil oturum taşıma (HttpOnly cookie + CSRF / bearer + refresh) | 03,05,11 | BE + FE + CTO | Açık |
+| T-04 | Editör tuval birimi (mm / normalize) ve geometri test vektörü konumu | 06,10,11 | FE + BE + Creative | Açık |
+| T-05 | Barındırma: Windows Server/IIS mi, başka hedef mi; dev/test/prod ayrımı | 03,11 | CTO + Full Stack + proje sahibi | Açık · önizleme IIS/RDP ile yayınlanıyor, ADR yok |
+| T-06 | Nesne depolama sağlayıcısı (Docker'sız), CDN ve medya türev üretimi | 03,04,06,10 | CTO + DBA | Açık · şu an yerel disk |
+| T-07 | Yüklenen dosya için zararlı içerik tarama aracı | 03,06,07 | BE + CTO | Açık |
+| T-08 | Gözlemlenebilirlik: log, metrik, iz, alarm kanalı ve saklama | 03,08,09,11 | Full Stack + CTO | Açık |
+| T-09 | Özellik bayrağı mekanizması (XINOBI U, Nobi, sağlayıcı adaptörleri) | 03,10,11 | BE + Full Stack | Açık |
+| T-10 | CI güvenlik taraması: SAST, bağımlılık ve sır taraması aracı | 03,11 | Full Stack + CTO | Açık |
+| T-11 | Performans ve yük testi aracı, ölçülecek başlangıç hedefleri (Analiz2 §20.1) | 03,11 | Full Stack + PM | Açık |
+| T-12 | Önerilen ama repoda olmayan yollar: `infra/db/migrations`, `infra/dev`, `packages/ui`, `docs/runbooks`; gerçek karşılıklar | 03–11 | Full Stack | Açık · repoda `packages/{clients,commerce,contracts}` var |
 
 ## 4. Müşteri kararları ve blokaj kaydı
 
@@ -80,6 +107,12 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 | D08 | AI alternatif/limit/politika/maliyet | Faz10 | Açık / ürün sahibi |
 | D09 | Mobil editör tekniği, push, mağaza hesapları | Faz11 | Açık / ürün + mobil |
 | D10 | Hukuki sayfalar, rıza, saklama | Faz04,05,10,11 | Açık / hukuk-operasyon |
+| D11 | Türkiye e-ticaret yükümlülükleri: mesafeli satış/ön bilgilendirme onayının sipariş kaydı, ETBİS, İYS ticari ileti izni, e-Fatura/e-Arşiv'i hangi sistemin keseceği | Faz05,07,08,11 | Açık / hukuk + muhasebe + Mikro sahibi |
+| D12 | K-13 "Market hesabı" ifadesinin anlamı (Analiz2'de "anlamı netleşmeli") | Faz01,05,11 | Açık / ürün sahibi |
+| D13 | "Desenler" menüsü: içerik modeli, lisans, seçme ve satın alma davranışı | Faz02,04,06 | Açık / ürün sahibi + Creative |
+| D14 | Proje sonrası bakım/garanti, hata düzeltme süresi (SLA) ve aylık sağlayıcı/altyapı maliyet tavanı | Faz01,11 | Açık / proje sahibi + PM |
+
+**Karar son tarihi kuralı:** Her açık D kararına PM bir sahip ve hedef tarih yazar. Tarih geçerse PM iş sahibine bir kez hatırlatır, ikinci kez kaçırılırsa proje sahibine taşır ve kayda `Gecikti` yazar. Bu süre boyunca yalnız bağımsız iş ve mock ilerler. Geliştirici tahmini hiçbir koşulda karar yerine geçmez; ancak proje sahibi yazılı olarak "varsayımla devam" derse varsayım, geri dönüş maliyetiyle birlikte ADR'ye yazılır.
 
 **AI-P01 sağlayıcı kararı — ONAYLANDI, 01.10.2026:** Proje sahibi AI görsel sağlayıcısı olarak **Cloudflare Workers AI** seçimini açıkça onayladı. Uygulama sağlayıcıdan bağımsız `IImageGenerationProvider` / `IImageEditingProvider` adaptör sınırını korur; model, fiyat/kota, veri işleme, ticari lisans ve bölge Faz10 başlangıcında resmi dokümanla yeniden doğrulanır. API hesabı, secret, SDK/REST adaptörü ve ücretli çağrı Faz10 sırası gelmeden eklenmez; bu karar erken entegrasyon yetkisi değildir. Ayrıntı: `docs/decisions/ADR-002-cloudflare-workers-ai.md`.
 
@@ -89,6 +122,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
+| **Kayıt açığı (2026-10-07)** | `acc0c99..0a18bba` arasındaki **37 commit** bu deftere ve `test/INDEX.md`'ye işlenmedi: yerel `state.json` ticaret deposu ve admin bağlantısı, Cloudflare tasarım işleri, XINOBI U canlı akışı ve ücretsiz yüzey önizleme, kategori/ürün/renk yönetimi, sepet, tarayıcı demo hesap/ödeme/sipariş, ortak header, IIS önizleme paketi (DEPLOY-004). Aşağıdaki satırlar o tarihten önceki durumu gösterir; sonraki oturum ilk iş olarak bu commitleri oturum kaydına ve test indeksine geri doldurmalıdır. `test/2026-10-06/` altındaki iki rapor indekste yok. |
 | Son güncelleme ve sorumlu | 2026-10-03 · Codex; ADM-002 rol/ayar/denetim ve TST-086 kaydedildi; yayın kullanıcıda |
 | Aktif faz/görev ID | Faz02 / v0.35.0 F02-A09 ADM-002 rol/ayar/denetim prototipi; gerçek kabul açık |
 | Repo/branch/HEAD | `main` · HEAD `acc0c99b03318aae6ec1c77908284726f5edb185`; bu oturumdaki belgeler commit edilmedi · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
@@ -104,6 +138,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-07 | Faz00–11 plan revizyonu | `main` / `0a18bba` → bu commit | Kapsam–faz eksiklikleri 12 faz dosyasına işlendi: ek roller, T-01–T-12, D11–D14, takvim, kayıt açığı, ADR-003/ADR-002 istisnası, mevzuat/ödeme/push/kargo, toplu sipariş, soru havuzu, cutover ve dokümantasyon | TST-087: diff temiz, işaretler tutarlı; kod/migration/deploy yok | `test/2026-10-07/TST-087-phase-gap-update.md` | 37 commitlik kayıt açığını geri doldur; ADR-003 ve ADR-002 istisnasını yaz | Claude Code |
 | 2026-10-03 | Faz02 F02-A09 / ADM-002 | `main` / `acc0c99`; çalışma ağacı | Rol matrisi, sürümlü ayar ve güvenli demo denetim kayıtları | TST-086 model/UI, build/lint ve panel regresyonu başarılı; ilk seçici testi timeout sonrası erişilebilir ad düzeltildi | `test/2026-10-03/TST-086-admin-settings.md` | F02-A10 mobil tasarım kapsamı; gerçek kimlik/API açık | Codex |
 | 2026-10-03 | Faz02 F02-A09 / ADM-012 | `main` / `acc0c99`; çalışma ağacı | Politika/istem sürümü, kullanım/hata, kaynak uygunluğu ve destek devri | TST-085 model/UI, build/lint ve panel regresyonu başarılı | `test/2026-10-03/TST-085-admin-ai.md` | ADM-002 rol/ayar/denetim; gerçek kimlik/API açık | Codex |
 | 2026-10-03 | Faz02 F02-A09 / ADM-010/011 | `main` / `acc0c99`; çalışma ağacı | Dört sağlayıcı eşleme/iş/hata/uzlaştırma izleme | TST-084 model/UI, build/lint ve panel regresyonu başarılı | `test/2026-10-03/TST-084-admin-integrations.md` | ADM-012 AI yönetimi; gerçek sağlayıcı/API açık | Codex |
@@ -206,6 +241,11 @@ Tek sonraki işlem:
 |---|---|---|---|---|---|
 | ADR-001 / 2026-09-29 | Next.js web, React/Vite panel, ASP.NET Core/EF/MS SQL, Flutter mobil, modüler monolit + worker/outbox-inbox; Docker yok | Proje sahibi kararları, analiz §6 ve temsili CTO incelemesi | Faz03–11; `docs/decisions/ADR-001-teknoloji-omurgasi.md` | Araç/build ve gerçek SQL testi bekliyor; ADR ile geri dönüş | Proje sahibi onayladı / uygulama kanıtı bekliyor |
 
+| ADR-003 / yazılmadı | Development'ta SQL Server yerine `services/api/App_Data/local-commerce/state.json` dosya deposu ve tarayıcı localStorage demo hesap/sipariş kaydı | Faz03 çekirdeği olmadan demo ilerletme | Faz03–05; API LocalCommerce, web demo-commerce | SQL Server'a geçiş görevi Faz03 03.11'de; geri dönüş planı yok | **Açık** · ADR yazılmalı ve proje sahibince onaylanmalı |
+| ADR-002 istisnası / yazılmadı | Cloudflare Workers AI gerçek adaptörü ve ücretli çağrı Faz10 kapısından (D05/D08/D10, PoC) önce eklendi (`3db452e`) | Kullanıcı isteğiyle XINOBI U canlı denemesi | Faz10 10.01A–10.05; `services/api/DesignStudio` | Yerel limit 30/gün; üretimde kapalı | **Açık** · istisna kararı ve kapsamı ADR-002'ye ek olarak yazılmalı |
+
+**Plan–kod sapma kaydı (2026-10-07 incelemesi):** (1) Faz03'ün EF Core DbContext/migration, kimlik, rol, audit ve outbox çekirdeği henüz yok; web ve panelin büyük kısmı geçici dosya deposu üzerinde çalışıyor. (2) Faz02 aktifken Faz04/05/06/10 işlevleri demo olarak kodlandı; bu kodlar ilgili fazın kabulü sayılmaz, faz başlarken yeniden doğrulanır. (3) Faz02'nin zorunlu çıktısı `design/a11y-audit.md` yok; BRIEF / ORTAK TASARIM / WEB TASARIM onayları bu tabloya işlenmedi. Bu üç madde kapanmadan ilgili faz kapısı açılmaz.
+
 Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: problem, kaynak maddesi, seçenekler, karar/sahip/tarih, güvenlik/veri etkisi, geriye dönüş, test, etkilenen fazlar. Sözleşme ya da şema değişince ilgili önceki fazın regresyonunu yeniden çalıştır; Faz00 satırı ve Faz dosyası bağlantısını güncelle.
 
 **Gerçek komut kayıtları** (kurulumdan sonra boşlukları doldur):
@@ -222,20 +262,22 @@ Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: prob
 
 İzin verilen statüler: `Planlandı`, `Devam`, `Bloke`, `İncelemede`, `RED`, `Tamamlandı`. Her fazda yedi rol ayrı ayrı `BEKLİYOR / ONAY / RED`, gerekçe, kanıt, tarih ve gerçek kişinin kimliğiyle kaydedilir. Tüm roller onaylasa bile PM'nin **ayrı nihai kararı olmadan** tamamlanmış olmaz. Ürün sahibinin D kararını PM yerine veremez.
 
-| Faz | Kod/teslim kanıtı | BA | Creative | FE | BE | DBA | Full Stack | PM nihai | Statü |
-|---|---|---|---|---|---|---|---|---|---|
-| 00 | Plan var; uygulama kabulü yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 01 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 02 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 03 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 04 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 05 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 06 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 07 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 08 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 09 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 10 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
-| 11 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| Faz | Kod/teslim kanıtı | BA | Creative | FE | BE | DBA | Full Stack | Web Des. | CTO | PM nihai | Statü |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 00 | Plan var; uygulama kabulü yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
+| 01 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Planlandı |
+| 02 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Planlandı |
+| 03 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Planlandı |
+| 04 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Planlandı |
+| 05 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
+| 06 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Planlandı |
+| 07 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
+| 08 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
+| 09 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
+| 10 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Planlandı |
+| 11 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+
+`—` o fazda ek rolün zorunlu kaydı olmadığını gösterir.
 
 PM her fazda kontrol eder: ① kaynak kapsamı ve Creative/UIUX handoff ② D kararlarının gerçek sahibi ③ kod/şema/API kanıtı ④ otomatik ve manuel test sonucu ⑤ yedi rol incelemesi ⑥ güvenlik, veri, rollback ⑦ Faz00 güncelliği. PM kendi rol incelemesini `PM-İNCELEME: ONAY/RED`, ardından ayrı nihai kararı `PM-KAPI: KABUL/RED` ve iki ayrı kanıt/tarihle aynı hücreye veya bağlantılı tutanağa yazar. Herhangi biri yoksa gerekçe yazıp `RED`; koşullu kabul ile sonraki bağımlı fazı başlatma. Plan dosyaları için ayrı temsili doküman inceleme sonucu aşağıya yazılır; uygulama tablosunu değiştirmez.
 

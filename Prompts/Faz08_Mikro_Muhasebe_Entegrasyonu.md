@@ -24,6 +24,10 @@ Bu tablo başlangıç yönünü **kaynak kapsamına göre** verir. D02 nihai kar
 | İade ve iptal | Xinobi → Mikro, durum geri bildirimi yalnız izinli alanlarda | Return ID + karar/sürüm; kredi/iade muhasebe belgesi ayrı | Sipariş iptali, stok geri dönüşü, ödeme iadesi ve muhasebe ters kaydı birbirinin otomatik eş anlamlısı değildir; D03 geçişlerine uyar. |
 | Sipariş durumu | D03/D02 yazma alanı kararına göre iki yön arasında sahipli alanlar | `source`, `externalId`, `version`, `at`; geçiş matrisi | Daha eski/geçersiz durum yerel siparişi geriye almaz, döngüsel yankı tekrar gönderilmez. |
 
+**e-Fatura / e-Arşiv (D11):** Faturanın Mikro üzerinden mi, ayrı bir e-belge entegratöründen mi, yoksa uygulamadan mı kesileceği; B2C e-Arşiv ve kurumsal e-Fatura ayrımı; pazaryeri siparişlerinde faturayı kimin kestiği ve fatura PDF/bağlantısının müşteriye nasıl ulaşacağı D11 ile kararlaştırılır. Karar yoksa "fatura verisi aktarımı" yalnız muhasebe kaydıdır, yasal e-belge üretimi sayılmaz ve canlı kabul bloke kalır.
+
+**İlk yükleme ve geçiş:** Canlıya geçişten önce Mikro'daki mevcut ürün kartları, cari ve depo kodları yerel kayıtlarla eşlenir (Faz01 01.17, Faz04 ilk katalog yüklemesi). Eşleşmeyen veya mükerrer kartlar raporlanır, otomatik birleştirilmez. Başlangıç stok ve fiyat anlık görüntüsü tek seferlik okumayla alınır, geçiş gününden önce mutabakat raporu iş sahibince onaylanır.
+
 Her alan için `docs/integrations/mikro/ownership.md` satırı: `entity.field | source of truth | direction | transform | conflict policy | last-sync SLA | approval D02`. Eşlemede kaynakta olmayan gerçek Mikro alanı tahmin edilmez. Test fiş/fatura numaraları canlıya taşınmaz.
 
 ## 3. Sırayla uygulama görevleri

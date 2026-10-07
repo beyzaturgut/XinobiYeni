@@ -36,7 +36,7 @@ Bu kayıt, `Prompts/Faz02_Tasarim_ve_UIUX.md` kabul maddelerini mevcut repo kan�
 | F02-A14 | Analiz2 sıralı ana sayfa hi-fi | Karma slider → XINOBI U → kategoriler → ürün sliderı → keşfet → Nobi | Web Designer + Creative |
 | F02-A15 | Responsive tasarım matrisi | 320/390/768/1024/1440+ ve gerçek telefon/tablet kanıtı | Web Designer + FE |
 | F02-A16 | Motion, medya ve manuel a11y | Slider/video/reduced-motion; VoiceOver/TalkBack ve klavye | Web Designer + FE |
-| F02-A17 | Web tasarım onayı ve handoff kapısı | Sürümlü `WEB TASARIM ONAY`; düzenlenebilir kaynak, annotation ve FE kabulü | Proje sahibi + Creative + Web Designer + FE |
+| F02-A17 | Web tasarım onayı ve handoff kapısı | Sürümlü `WEB TASARIM ONAY`; düzenlenebilir kaynak, annotation ve FE kabulü | **Ertelendi · 07.10.2026, proje sahibi kararı:** müşteriye bağlı tasarım değişiklikleri beklendiği için onay sonraya bırakıldı. İnceleme sayfası hazır ve kararlar orada saklanıyor: https://claude.ai/artifact/LixwKBx7BGGKFXA3K1SyUs (ad2f418 görüntüleri). Bu sürede yalnız küçük düzeltmeler ve tasarımdan bağımsız işler yapılır |
 
 ## Müşteri kararına bağlı blokajlar
 

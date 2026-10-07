@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../../lib/commerce";
+import AddToCart from '../../../components/add-to-cart';
 import styles from "./product.module.css";
 
 import blue from "../../../../public/assets/products/tea-maker-101-blue.webp";
@@ -48,10 +49,10 @@ export default function ProductExperience() {
           <div>{variants.map((variant) => <button type="button" key={variant.id} aria-label={`${variant.name} rengini seç`} aria-pressed={selected.id === variant.id} className={selected.id === variant.id ? styles.selectedVariant : ""} onClick={() => setSelectedId(variant.id)}><span style={{ background: variant.swatch || undefined }} /><small>{variant.name}</small></button>)}</div>
         </fieldset>
         <div className={styles.actions}>
-          <button type="button" disabled aria-describedby="purchase-note">Satış bilgisi hazırlanıyor</button>
+          <AddToCart productId="DEMO-P101" variantId={selected.id} stock={selected.stock ?? 0} price={selected.price}/>
           <Link href={`/xinobi-u/sorular?product=DEMO-P101&variant=${encodeURIComponent(selected.id)}`}>Kişiselleştirme seçenekleri <span aria-hidden="true">→</span></Link>
         </div>
-        <p id="purchase-note" className={styles.purchaseNote}>Stok ve fiyat doğrulanmadan sepete ekleme etkinleştirilmez.</p>
+        <p id="purchase-note" className={styles.purchaseNote}>Ödeme öncesinde fiyat ve stok sunucuda yeniden doğrulanacaktır.</p>
         <ul className={styles.summary}>
           <li><span>01</span><p><strong>Renkle eşleşen deneyim</strong>Seçiminiz görsel, editör, sepet ve siparişte aynı varyant kimliğiyle korunacak.</p></li>
           <li><span>02</span><p><strong>Ürün merkezli tasarım</strong>Malzeme ve kullanım ayrıntıları gereksiz görsel kalabalık olmadan öne çıkar.</p></li>

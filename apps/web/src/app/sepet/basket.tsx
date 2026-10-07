@@ -1,35 +1,14 @@
-"use client";
-
-import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import teaMaker from "../../../public/assets/products/tea-maker-101-blue.webp";
-import styles from "./basket.module.css";
-
-export default function Basket() {
-  const [quantity, setQuantity] = useState(1);
-  const [hasItem, setHasItem] = useState(true);
-
-  return <>
-    <section className={styles.hero}><p>Siparişe hazırlık</p><h1>Sepetim.</h1><span>Demo sepet · Sunucuya kaydedilmez ve stok ayırmaz.</span></section>
-    <section className={styles.layout}>
-      <div className={styles.lines} aria-live="polite">
-        <div className={styles.sectionTitle}><h2>Ürünler</h2><span>{hasItem ? `${quantity} ürün` : "Sepet boş"}</span></div>
-        {hasItem ? <article className={styles.line}>
-          <Link className={styles.media} href="/urunler/cay-makinesi-101"><Image src={teaMaker} alt="Lacivert Çay Makinesi 101" sizes="(max-width: 680px) 38vw, 220px" /></Link>
-          <div className={styles.lineCopy}><p>Çay makineleri</p><h2>Çay Makinesi 101</h2><dl><div><dt>Renk</dt><dd><i /> Lacivert</dd></div><div><dt>Kişiselleştirme</dt><dd>Eklenmedi</dd></div></dl><Link href="/urunler/cay-makinesi-101/kisisellestir">Kişiselleştir ↗</Link></div>
-          <div className={styles.lineActions}><div className={styles.quantity} role="group" aria-label="Ürün adedi"><button type="button" onClick={() => quantity === 1 ? setHasItem(false) : setQuantity(quantity - 1)} aria-label="Adedi azalt">−</button><output aria-live="polite">{quantity}</output><button type="button" onClick={() => setQuantity(Math.min(9, quantity + 1))} disabled={quantity === 9} aria-label="Adedi artır">+</button></div><strong>Fiyat bekleniyor</strong><button className={styles.remove} type="button" onClick={() => setHasItem(false)}>Sepetten çıkar</button></div>
-        </article> : <div className={styles.empty}><span aria-hidden="true">◇</span><h2>Sepetiniz şu anda boş.</h2><p>Ürünleri keşfederek alışverişe yeniden başlayabilirsiniz.</p><Link href="/urunler">Ürünleri keşfet →</Link></div>}
-        <div className={styles.assurance}><article><span>01</span><div><strong>Stok doğrulaması</strong><p>Gerçek stok, API bağlandıktan sonra sepete ekleme ve ödeme öncesinde yeniden kontrol edilir.</p></div></article><article><span>02</span><div><strong>Güvenli fiyat</strong><p>Fiyat, vergi ve kampanya hesabında sunucu tek otorite olacaktır.</p></div></article></div>
-      </div>
-
-      <aside className={styles.summary} aria-labelledby="summary-title">
-        <p>Sipariş özeti</p><h2 id="summary-title">Henüz hesaplanmadı.</h2>
-        <dl><div><dt>Ara toplam</dt><dd>D02 bekleniyor</dd></div><div><dt>Kişiselleştirme</dt><dd>—</dd></div><div><dt>Teslimat</dt><dd>Adres sonrası</dd></div><div className={styles.total}><dt>Toplam</dt><dd>API bekleniyor</dd></div></dl>
-        <button type="button" disabled aria-describedby="checkout-note">Ödemeye geç</button>
-        <p id="checkout-note">Fiyat, stok ve rezervasyon kuralları D02/D03 ile doğrulanmadan ödeme başlatılamaz.</p>
-        <div className={styles.blocker}><strong>İşlem güvenliği</strong><span>Bu ekranda ödeme alınmaz ve sipariş oluşturulmaz.</span></div>
-      </aside>
-    </section>
-  </>;
+'use client';
+import Image from 'next/image';
+import Link from 'next/link';
+import {useState} from 'react';
+import {useCommerce,commerceApi,mediaUrl,money,stockText} from '../../lib/commerce';
+import {useCart,setCartQuantity} from '../../lib/cart';
+import styles from './basket.module.css';
+export default function Basket(){
+ const cart=useCart(),{state,error}=useCommerce();const [notice,setNotice]=useState('');
+ const lines=cart.map(line=>{const product=state?.products.find(product=>product.id===line.productId&&product.active);const variant=product?.variants.find(variant=>variant.id===line.variantId);const price=state?.prices[line.variantId];return {...line,product,variant,price,valid:!!product&&!!variant&&price!==undefined&&price>0&&variant.stock>=line.quantity}});
+ const complete=lines.length>0&&lines.every(line=>line.valid),subtotal=lines.reduce((sum,line)=>sum+(line.price||0)*line.quantity,0);
+ function quantity(productId:string,variantId:string,count:number){try{setCartQuantity(productId,variantId,count);setNotice('')}catch(error){setNotice(error instanceof Error?error.message:'Sepet kaydedilemedi.')}}
+ return <><section className={styles.hero}><h1>Sepetim</h1><span>Seçimlerin bu tarayıcıda saklanır. Ürün eklemek stok rezervasyonu oluşturmaz.</span></section>{error&&<p role="alert">{error}</p>}<p role="status">{notice}</p><section className={styles.layout}><div className={styles.lines}><div className={styles.sectionTitle}><h2>Ürünler</h2><span>{cart.reduce((sum,line)=>sum+line.quantity,0)} ürün</span></div>{!state?<p role="status">Ürün bilgileri yükleniyor…</p>:lines.length===0?<div className={styles.empty}><h2>Sepetin boş.</h2><Link href="/urunler">Ürünleri keşfet →</Link></div>:lines.map(line=><article className={styles.line} key={line.productId+':'+line.variantId}>{line.product&&line.variant?<><Link className={styles.media} href={`/urunler/detay?id=${encodeURIComponent(line.productId)}`}>{line.variant.image&&<Image src={mediaUrl(line.variant.image,commerceApi)} alt={`${line.product.name} · ${line.variant.color}`} width={240} height={240}/>}</Link><div className={styles.lineCopy}><p>{line.product.category}</p><h2>{line.product.name}</h2><p>Renk: {line.variant.color}</p><p>{stockText(line.variant.stock)}</p>{!line.valid&&<p role="alert">{line.price===undefined?'Bu ürünün fiyatı henüz tanımlanmadı.':line.variant.stock===0?'Bu renk stokta yok.':'Sepetteki adet güncel stoktan fazla; adedi azalt.'}</p>}</div><div className={styles.lineActions}><div className={styles.quantity}><button aria-label={`${line.product.name} ${line.variant.color} adedini azalt`} onClick={()=>quantity(line.productId,line.variantId,line.quantity-1)}>−</button><output>{line.quantity}</output><button aria-label={`${line.product.name} ${line.variant.color} adedini artır`} disabled={line.quantity>=Math.min(line.variant.stock,99)} onClick={()=>quantity(line.productId,line.variantId,line.quantity+1)}>+</button></div><strong>{line.price===undefined?'Fiyat tanımlanmadı':money(line.price*line.quantity)}</strong><button onClick={()=>quantity(line.productId,line.variantId,0)}>Sepetten çıkar</button></div></>:<div><p>Bu ürün veya renk artık yayında değil.</p><button onClick={()=>quantity(line.productId,line.variantId,0)}>Sepetten çıkar</button></div>}</article>)}</div><aside className={styles.summary}><h2>Sipariş özeti</h2><dl><div><dt>Ürün toplamı</dt><dd>{complete?money(subtotal):'—'}</dd></div><div><dt>Kargo</dt><dd>Teslimat adımında hesaplanacak</dd></div></dl><button disabled>Ödeme henüz kullanılamıyor</button><p>Ödeme ve sipariş bağlantısı tamamlanınca, fiyat ve stok sunucuda yeniden doğrulanarak işlem açılacak.</p><Link href="/urunler">Alışverişe devam et →</Link></aside></section></>;
 }

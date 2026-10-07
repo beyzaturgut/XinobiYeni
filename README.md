@@ -52,3 +52,9 @@ Doğrulama: `pnpm test:xinobi-u` gerçek local soru API’sini ve masaüstü/mob
 Yeni/açısı farklı admin fotoğrafları için otomatik kusursuz yüzey tahmini yapılmaz; genel şablon ve açıklama gösterilir. Özel fotoğraflar için ek maskeler kalibre edilmelidir. Bu gerçek üretim/baskı doğrulaması değildir.
 
 `pnpm test:free-preview` önceki gerçek AI çıktısını kullanarak masaüstü/mobilde gövde değişimi, arka plan/sap/ağızlık korunması, karşılaştırma ve PNG indirmeyi kontrol eder; üretim isteği sayısının sıfır olduğunu doğrular. Desen oluşturma ise ayrı Cloudflare işlemidir; ücret durumu hesabın günlük ücretsiz kullanım kotasına bağlıdır: https://developers.cloudflare.com/workers-ai/platform/pricing/.
+
+### Ürün rengi ve sepet
+
+XINOBI U ürün seçimi ardından `/xinobi-u/renk` ekranında kullanıcı renk seçer; sorular bu varyant kimliğiyle başlatılır. Ürün detayındaki “Sepete ekle” seçilen varyantı `xinobi-cart-v1` anahtarıyla tarayıcıda saklar. Sepet fiyatları ve stok uygunluğu güncel commerce içeriğinden okunur; fiyatı olmayan veya stoksuz varyantlar eklenemez. Mevcut stok azalırsa sepet kullanıcıdan adedi azaltmasını ister. Bu aşama ödeme almaz, sipariş oluşturmaz ve sunucuda stok rezervasyonu yapmaz.
+
+Kontroller: `node tools/test-studio-color-selection.mjs`, `node tools/test-cart.mjs` (izole test verileri; Cloudflare üretim çağrısı yok).

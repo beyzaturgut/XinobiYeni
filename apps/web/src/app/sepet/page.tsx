@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "../../components/site-header";
+import CommerceFooter from "../../components/commerce-footer";
 import Basket from "./basket";
 import styles from "./basket.module.css";
 
@@ -10,5 +11,6 @@ export default function BasketPage() {
     <a className={styles.skipLink} href="#basket">Sepete geç</a>
     <SiteHeader/>
     <main id="basket"><Basket /></main>
+    <CommerceFooter />
   </div>;
 }

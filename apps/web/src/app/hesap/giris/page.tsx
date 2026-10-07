@@ -1,4 +1,3 @@
-import SiteHeader from "../../../components/site-header";
 import type { Metadata } from "next";
 import AccountAccess from "./account-access";
 import styles from "./account.module.css";
@@ -8,7 +7,6 @@ export const metadata: Metadata = { title: "Xinobi Hesabım", description: "Xino
 export default function AccountPage() {
   return <div className={styles.page}>
     <a className={styles.skipLink} href="#account-form">Hesap formuna geç</a>
-    <SiteHeader />
     <main id="account-form"><AccountAccess /></main>
   </div>;
 }

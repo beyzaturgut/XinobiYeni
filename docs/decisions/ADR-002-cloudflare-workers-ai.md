@@ -37,7 +37,7 @@ Başlangıç araştırma kaynakları:
 
 ## Ek A — Faz10 öncesi yerel entegrasyon istisnası (07.10.2026)
 
-- Durum: Uygulandı; istisnanın proje sahibince yazılı onayı bekliyor
+- Durum: Kabul edildi · proje sahibi onayı 07.10.2026 (sohbet onayı: "onaylıyorum"); yalnız Development denemesi kapsamında
 - Uygulama: 06.10.2026, `3db452e` (API), `d7870f0` (web); kanıt `test/2026-10-06/TST-XINOBI-U-live.md`
 
 **Ne oldu:** Bu ADR'deki "adaptör ve ücretli çağrı Faz10 sırasıyla eklenir" sınırına rağmen, XINOBI U akışının gerçek görselle denenmesi için kullanıcı isteğiyle Cloudflare Workers AI REST adaptörü eklendi ve iki gerçek üretim çağrısı yapıldı. D05/D08/D10 kararları ve Faz10 10.01A PoC henüz yapılmadı.

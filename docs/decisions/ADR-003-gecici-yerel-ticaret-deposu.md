@@ -1,7 +1,7 @@
 # ADR-003 — Geçici yerel ticaret deposu ve tarayıcı demo kayıtları
 
 - Tarih: 07.10.2026 (uygulama 06.10.2026, `3db452e` ve sonrası)
-- Durum: Önerildi; uygulandı, proje sahibi onayı bekliyor
+- Durum: Kabul edildi · proje sahibi onayı 07.10.2026 (sohbet onayı: "onaylıyorum")
 - Karar sahibi: Proje sahibi
 - Teknik inceleme: CTO Advisor ve DB Admin (bekliyor)
 - Etkilenen fazlar: Faz03 (03.03–03.08, 03.11), Faz04, Faz05, Faz06, Faz10
@@ -45,6 +45,6 @@ ADR-001 kalıcı veri için SQL Server ve EF Core migration'larını zorunlu kı
 
 ## Açık noktalar
 
-- Proje sahibinin bu geçici kararı onaylaması.
+- ~~Proje sahibinin bu geçici kararı onaylaması.~~ 07.10.2026'da onaylandı.
 - 03.11 geçişinin takvimi (Faz00 §1).
 - Yerel medyanın taşınacağı nesne depolama kararı (Faz00 T-06).

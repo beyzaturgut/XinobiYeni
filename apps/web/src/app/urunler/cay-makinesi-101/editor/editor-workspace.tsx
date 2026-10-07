@@ -12,12 +12,12 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace({ renderingInputs, patternSrc = "/assets/personalization/sample-pattern.png" }: { renderingInputs: RenderingInputs; patternSrc?: string }) {
+export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png" }: { renderingInputs: RenderingInputs; patternSrc?: string; placementMode?: "pattern" | "artwork" }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
   const [notice, setNotice] = useState("");
-  const [patternTransform, setPatternTransform] = useState<PatternTransform>({ x: 533, y: 1040, scale: 1.2, rotation: 0 });
+  const [patternTransform, setPatternTransform] = useState<PatternTransform>({ x: 533, y: 1040, scale: placementMode === "artwork" ? 1 : 1.2, rotation: 0 });
   const [curvatureStrength, setCurvatureStrength] = useState(DEFAULT_CURVATURE_STRENGTH);
 
   function toggleLayer(id: number, key: "locked" | "visible") {
@@ -57,6 +57,7 @@ export default function EditorWorkspace({ renderingInputs, patternSrc = "/assets
             designableMaskSrc={renderingInputs.mask.url}
             brandingOverlaySrc={renderingInputs.branding?.url}
             patternSrc={patternSrc}
+            placementMode={placementMode}
             patternTransform={patternTransform}
             curvatureStrength={curvatureStrength}
             alt="Çay Makinesi 101, desenli ürün önizlemesi"

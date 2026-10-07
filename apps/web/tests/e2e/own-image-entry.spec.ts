@@ -9,8 +9,8 @@ test("XINOBI U offers two separate exact-identity paths",async({page})=>{
  await expect(card.getByRole("link",{name:"Çay Makinesi 101 için tasarım oluştur"})).toHaveAttribute("href","/xinobi-u/sorular/?product=DEMO-P101&variant=DEMO-V101-B");
  await expect(card.locator('[data-preview-readiness="ready"]')).toBeVisible();
  await card.getByRole("link",{name:"Kendi görselini kullan"}).click();await expect(page).toHaveURL(url=>url.pathname.replace(/\/$/, "")===entry.slice(0,-1) && url.searchParams.get("product")==="DEMO-P101" && url.searchParams.get("variant")==="DEMO-V101-B");
- await expect(page.getByRole("status")).toContainText("Seçili varyantın geliştirme önizlemesi hazır");await expect(page.getByRole("status")).toContainText("Görsel ekleme adımı henüz kullanıma açık değil");
- await expect(page.locator('input[type=file],canvas')).toHaveCount(0);expect(posts).toBe(0);
+ await expect(page.getByRole("status")).toContainText("Seçili varyantın geliştirme önizlemesi hazır");await expect(page.getByLabel("Görsel seç",{exact:true})).toBeVisible();
+ await expect(page.locator('canvas')).toHaveCount(0);expect(posts).toBe(0);
  for(const width of [1440,390]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)}
 });
 for(const [product,variant] of [["DEMO-P101","DEMO-V101-R"],["DEMO-P101","DEMO-V101-S"],["DEMO-P101","DEMO-V101-G"],["DEMO-P102","DEMO-V102-R"]])test("own-image path fails closed: "+variant,async({page})=>{

@@ -5,6 +5,8 @@ import styles from "./editor.module.css";
 import { deriveProductLighting, shadePattern } from "./product-lighting";
 import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./product-surface-warp";
 
+import { containArtwork } from "./artwork-placement";
+
 const SOURCE_WIDTH = 1066;
 const SOURCE_HEIGHT = 1600;
 
@@ -20,6 +22,7 @@ type ProductPatternPreviewProps = {
   designableMaskSrc: string;
   brandingOverlaySrc?: string;
   patternSrc: string;
+  placementMode?: "pattern" | "artwork";
   patternTransform: PatternTransform;
   curvatureStrength?: number;
   alt: string;
@@ -65,12 +68,13 @@ type RenderAssets = {
   branding?: HTMLImageElement;
   patternBuffer: HTMLCanvasElement;
   lighting: ReturnType<typeof deriveProductLighting>;
+  artwork: ReturnType<typeof containArtwork>;
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc]);
+  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
   const { x, y, scale, rotation } = patternTransform;
   const validTransform = [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1;
@@ -101,26 +105,28 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
         const maskPixels = readPixels(mask);
         const lighting = deriveProductLighting(readPixels(product), maskPixels, branding ? readPixels(branding) : undefined);
         const surface = deriveBodySurface(maskPixels);
-        setResult({ assetKey, status: "ready", assets: { product, mask, pattern, branding, patternBuffer, lighting, surface } });
+        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight) : {x:533,y:1040,width:pattern.naturalWidth,height:pattern.naturalHeight};
+        setResult({ assetKey, status: "ready", assets: { product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } });
       } catch {
         if (!cancelled) setResult({ assetKey, status: "error" });
       }
     }
     void render();
     return () => { cancelled = true; };
-  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey]);
+  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode]);
 
   useLayoutEffect(() => {
     if (status !== "ready" || !result?.assets) return;
-    const { product, mask, pattern, branding, patternBuffer, lighting, surface } = result.assets;
+    const { product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } = result.assets;
     const buffer = patternBuffer.getContext("2d")!;
     const context = canvasRef.current!.getContext("2d")!;
     buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     buffer.save();
-    buffer.translate(x, y);
+    buffer.translate(placementMode === "artwork" ? artwork.x + x - 533 : x, placementMode === "artwork" ? artwork.y + y - 1040 : y);
     buffer.rotate(rotation * Math.PI / 180);
     buffer.scale(scale, scale);
-    buffer.drawImage(pattern, -pattern.naturalWidth / 2, -pattern.naturalHeight / 2);
+    if (placementMode === "artwork") buffer.drawImage(pattern, -artwork.width / 2, -artwork.height / 2, artwork.width, artwork.height);
+    else buffer.drawImage(pattern, -pattern.naturalWidth / 2, -pattern.naturalHeight / 2);
     buffer.restore();
     const patternPixels = buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     warpPattern(patternPixels, surface, curvatureStrength);
@@ -135,7 +141,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     context.drawImage(product, 0, 0);
     context.drawImage(patternBuffer, 0, 0);
     if (branding) context.drawImage(branding, 0, 0);
-  }, [result, status, x, y, scale, rotation, curvatureStrength]);
+  }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode]);
 
   return <div className={styles.productPreview} aria-busy={status === "loading"}>
     <canvas ref={canvasRef} width={SOURCE_WIDTH} height={SOURCE_HEIGHT} role="img" aria-label={alt} hidden={status !== "ready"} />

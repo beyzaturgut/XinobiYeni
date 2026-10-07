@@ -9,3 +9,5 @@
 .main{padding-top:32px}.intro{padding:0 0 28px}.intro h1{margin:12px 0;line-height:1.2}.steps{margin-top:20px}
 
 .entryActions{display:grid;gap:12px;margin-top:16px}.entryActions a{display:block;font-size:12px;line-height:1.5}.entryActions a:last-child{padding:12px;border:1px solid #ddd;border-radius:6px}.entryActions a:focus-visible{outline:3px solid #efc34a;outline-offset:3px}
+
+.localImageSelection{margin:24px 0;padding:20px;border:1px solid #ddd;border-radius:10px}.localImageSelection label{display:block;font-size:14px;font-weight:600;margin-bottom:12px}.localImageSelection input{max-width:100%;font:inherit;font-size:13px}.localImageSelection>p{font-size:12px;line-height:1.7;color:#666}

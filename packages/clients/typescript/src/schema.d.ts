@@ -84,6 +84,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/xinobi-u/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetXinobiUStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/xinobi-u/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CreateXinobiUSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/xinobi-u/sessions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetXinobiUSession"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/xinobi-u/sessions/{id}/generation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StartXinobiUGeneration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/xinobi-u/sessions/{id}/image": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetXinobiUImage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -169,6 +249,11 @@ export interface components {
         CategoryList: {
             items: components["schemas"]["CategoryItem"][];
         };
+        CreateXinobiUSession: {
+            productId: string;
+            variantId: string;
+            clientId: string;
+        };
         DependencyHealth: {
             name: string;
             isReady: boolean;
@@ -250,6 +335,8 @@ export interface components {
             requestId: string;
             checks: components["schemas"]["DependencyHealth"][];
         };
+        /** Format: binary */
+        Stream: string;
         VariantDetail: {
             id: string;
             sku: string;
@@ -259,6 +346,55 @@ export interface components {
             price: null | components["schemas"]["Money"];
             availability: components["schemas"]["Availability"];
             purchasable: boolean;
+        };
+        XinobiUAnswer: {
+            questionId: string;
+            optionId: string;
+        };
+        XinobiUGenerationRequest: {
+            answers: components["schemas"]["XinobiUAnswer"][];
+        };
+        XinobiUOption: {
+            id: string;
+            label: string;
+        };
+        XinobiUProduct: {
+            id: string;
+            name: string;
+            category: string;
+        };
+        XinobiUQuestion: {
+            id: string;
+            axis: string;
+            axisLabel: string;
+            text: string;
+            options: components["schemas"]["XinobiUOption"][];
+        };
+        XinobiUSession: {
+            id: string;
+            status: string;
+            /** Format: date-time */
+            expiresAt: string;
+            product: components["schemas"]["XinobiUProduct"];
+            variant: components["schemas"]["XinobiUVariant"];
+            questionBankVersion: string;
+            questions: components["schemas"]["XinobiUQuestion"][];
+            answers: components["schemas"]["XinobiUAnswer"][];
+            imageUrl: null | string;
+            errorCode: null | string;
+            errorMessage: null | string;
+        };
+        XinobiUStatus: {
+            generationAvailable: boolean;
+            questionBankVersion: string;
+            /** Format: int32 */
+            questionCount: number;
+        };
+        XinobiUVariant: {
+            id: string;
+            color: string;
+            hex: null | string;
+            imageUrl: null | string;
         };
     };
     responses: never;
@@ -409,6 +545,220 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnnouncementList"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetXinobiUStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["XinobiUStatus"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    CreateXinobiUSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateXinobiUSession"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["XinobiUSession"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetXinobiUSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["XinobiUSession"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    StartXinobiUGeneration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["XinobiUGenerationRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["XinobiUSession"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetXinobiUImage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": components["schemas"]["Stream"];
+                    "image/jpeg": components["schemas"]["Stream"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
             };
             /** @description Service Unavailable */

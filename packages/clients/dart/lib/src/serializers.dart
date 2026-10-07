@@ -20,6 +20,7 @@ import 'package:xinobi_api_client/src/model/availability.dart';
 import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
+import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
 import 'package:xinobi_api_client/src/model/home_content.dart';
@@ -31,6 +32,14 @@ import 'package:xinobi_api_client/src/model/product_page.dart';
 import 'package:xinobi_api_client/src/model/product_summary.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_generation_request.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_option.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_product.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_question.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_session.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_status.dart';
+import 'package:xinobi_api_client/src/model/xinobi_u_variant.dart';
 
 part 'serializers.g.dart';
 
@@ -41,6 +50,7 @@ part 'serializers.g.dart';
   CategoryHighlight,
   CategoryItem,
   CategoryList,
+  CreateXinobiUSession,
   DependencyHealth,
   HealthResponse,
   HomeContent,
@@ -52,6 +62,14 @@ part 'serializers.g.dart';
   ProductSummary,
   ReadinessResponse,
   VariantDetail,
+  XinobiUAnswer,
+  XinobiUGenerationRequest,
+  XinobiUOption,
+  XinobiUProduct,
+  XinobiUQuestion,
+  XinobiUSession,
+  XinobiUStatus,
+  XinobiUVariant,
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
@@ -71,6 +89,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<AnnouncementItem>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(XinobiUOption)]),
+        () => ListBuilder<XinobiUOption>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(VariantDetail)]),
         () => ListBuilder<VariantDetail>(),
       )
@@ -81,6 +103,14 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CategoryHighlight)]),
         () => ListBuilder<CategoryHighlight>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(XinobiUAnswer)]),
+        () => ListBuilder<XinobiUAnswer>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(XinobiUQuestion)]),
+        () => ListBuilder<XinobiUQuestion>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

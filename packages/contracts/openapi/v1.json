@@ -204,6 +204,271 @@
         }
       }
     },
+    "/api/v1/xinobi-u/status": {
+      "get": {
+        "tags": [
+          "XinobiU"
+        ],
+        "operationId": "GetXinobiUStatus",
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/XinobiUStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/xinobi-u/sessions": {
+      "post": {
+        "tags": [
+          "XinobiU"
+        ],
+        "operationId": "CreateXinobiUSession",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateXinobiUSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/XinobiUSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/xinobi-u/sessions/{id}": {
+      "get": {
+        "tags": [
+          "XinobiU"
+        ],
+        "operationId": "GetXinobiUSession",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/XinobiUSession"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/xinobi-u/sessions/{id}/generation": {
+      "post": {
+        "tags": [
+          "XinobiU"
+        ],
+        "operationId": "StartXinobiUGeneration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/XinobiUGenerationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/XinobiUSession"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/xinobi-u/sessions/{id}/image": {
+      "get": {
+        "tags": [
+          "XinobiU"
+        ],
+        "operationId": "GetXinobiUImage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              },
+              "image/jpeg": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/health": {
       "get": {
         "tags": [
@@ -403,6 +668,25 @@
             "items": {
               "$ref": "#/components/schemas/CategoryItem"
             }
+          }
+        }
+      },
+      "CreateXinobiUSession": {
+        "required": [
+          "productId",
+          "variantId",
+          "clientId"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "variantId": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
           }
         }
       },
@@ -735,6 +1019,10 @@
           }
         }
       },
+      "Stream": {
+        "type": "string",
+        "format": "binary"
+      },
       "VariantDetail": {
         "required": [
           "id",
@@ -786,6 +1074,215 @@
             "type": "boolean"
           }
         }
+      },
+      "XinobiUAnswer": {
+        "required": [
+          "questionId",
+          "optionId"
+        ],
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string"
+          },
+          "optionId": {
+            "type": "string"
+          }
+        }
+      },
+      "XinobiUGenerationRequest": {
+        "required": [
+          "answers"
+        ],
+        "type": "object",
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/XinobiUAnswer"
+            }
+          }
+        }
+      },
+      "XinobiUOption": {
+        "required": [
+          "id",
+          "label"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "XinobiUProduct": {
+        "required": [
+          "id",
+          "name",
+          "category"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
+      },
+      "XinobiUQuestion": {
+        "required": [
+          "id",
+          "axis",
+          "axisLabel",
+          "text",
+          "options"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "axis": {
+            "type": "string"
+          },
+          "axisLabel": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/XinobiUOption"
+            }
+          }
+        }
+      },
+      "XinobiUSession": {
+        "required": [
+          "id",
+          "status",
+          "expiresAt",
+          "product",
+          "variant",
+          "questionBankVersion",
+          "questions",
+          "answers",
+          "imageUrl",
+          "errorCode",
+          "errorMessage"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "product": {
+            "$ref": "#/components/schemas/XinobiUProduct"
+          },
+          "variant": {
+            "$ref": "#/components/schemas/XinobiUVariant"
+          },
+          "questionBankVersion": {
+            "type": "string"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/XinobiUQuestion"
+            }
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/XinobiUAnswer"
+            }
+          },
+          "imageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errorCode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errorMessage": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "XinobiUStatus": {
+        "required": [
+          "generationAvailable",
+          "questionBankVersion",
+          "questionCount"
+        ],
+        "type": "object",
+        "properties": {
+          "generationAvailable": {
+            "type": "boolean"
+          },
+          "questionBankVersion": {
+            "type": "string"
+          },
+          "questionCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "XinobiUVariant": {
+        "required": [
+          "id",
+          "color",
+          "hex",
+          "imageUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "hex": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "imageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
       }
     }
   },
@@ -795,6 +1292,9 @@
     },
     {
       "name": "Content"
+    },
+    {
+      "name": "XinobiU"
     },
     {
       "name": "System"

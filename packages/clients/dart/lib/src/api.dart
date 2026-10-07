@@ -12,6 +12,7 @@ import 'package:xinobi_api_client/src/auth/oauth.dart';
 import 'package:xinobi_api_client/src/api/catalog_api.dart';
 import 'package:xinobi_api_client/src/api/content_api.dart';
 import 'package:xinobi_api_client/src/api/system_api.dart';
+import 'package:xinobi_api_client/src/api/xinobi_u_api.dart';
 
 class XinobiApiClient {
   static const String basePath = r'http://localhost';
@@ -123,5 +124,11 @@ class XinobiApiClient {
   /// by doing that all interceptors will not be executed
   SystemApi getSystemApi() {
     return SystemApi(dio, serializers);
+  }
+
+  /// Get XinobiUApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  XinobiUApi getXinobiUApi() {
+    return XinobiUApi(dio, serializers);
   }
 }

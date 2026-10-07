@@ -9,6 +9,7 @@ using Xinobi.Api.Infrastructure;
 using Xinobi.Api.Infrastructure.Readiness;
 using Xinobi.Persistence;
 using Xinobi.Api.Catalog;
+using Xinobi.Api.XinobiU;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,6 +75,7 @@ else app.UseHttpsRedirection();
 app.MapLocalCommerce();
 app.MapDesignStudio();
 app.MapCatalog();
+app.MapXinobiU();
 
 var api = app.MapGroup("/api/v1");
 

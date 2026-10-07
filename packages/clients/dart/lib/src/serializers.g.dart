@@ -13,6 +13,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CategoryHighlight.serializer)
       ..add(CategoryItem.serializer)
       ..add(CategoryList.serializer)
+      ..add(CreateXinobiUSession.serializer)
       ..add(DependencyHealth.serializer)
       ..add(HealthResponse.serializer)
       ..add(HomeContent.serializer)
@@ -24,6 +25,14 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ProductSummary.serializer)
       ..add(ReadinessResponse.serializer)
       ..add(VariantDetail.serializer)
+      ..add(XinobiUAnswer.serializer)
+      ..add(XinobiUGenerationRequest.serializer)
+      ..add(XinobiUOption.serializer)
+      ..add(XinobiUProduct.serializer)
+      ..add(XinobiUQuestion.serializer)
+      ..add(XinobiUSession.serializer)
+      ..add(XinobiUStatus.serializer)
+      ..add(XinobiUVariant.serializer)
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AnnouncementItem)]),
           () => ListBuilder<AnnouncementItem>())
@@ -47,7 +56,19 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<ProductSummary>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(VariantDetail)]),
-          () => ListBuilder<VariantDetail>()))
+          () => ListBuilder<VariantDetail>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(XinobiUAnswer)]),
+          () => ListBuilder<XinobiUAnswer>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(XinobiUOption)]),
+          () => ListBuilder<XinobiUOption>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(XinobiUQuestion)]),
+          () => ListBuilder<XinobiUQuestion>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(XinobiUAnswer)]),
+          () => ListBuilder<XinobiUAnswer>()))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint

@@ -73,6 +73,11 @@ Class | Method | HTTP request | Description
 [*SystemApi*](doc/SystemApi.md) | [**getApiHealth**](doc/SystemApi.md#getapihealth) | **GET** /api/v1/health |
 [*SystemApi*](doc/SystemApi.md) | [**getApiLiveness**](doc/SystemApi.md#getapiliveness) | **GET** /api/v1/health/live |
 [*SystemApi*](doc/SystemApi.md) | [**getApiReadiness**](doc/SystemApi.md#getapireadiness) | **GET** /api/v1/health/ready |
+[*XinobiUApi*](doc/XinobiUApi.md) | [**createXinobiUSession**](doc/XinobiUApi.md#createxinobiusession) | **POST** /api/v1/xinobi-u/sessions |
+[*XinobiUApi*](doc/XinobiUApi.md) | [**getXinobiUImage**](doc/XinobiUApi.md#getxinobiuimage) | **GET** /api/v1/xinobi-u/sessions/{id}/image |
+[*XinobiUApi*](doc/XinobiUApi.md) | [**getXinobiUSession**](doc/XinobiUApi.md#getxinobiusession) | **GET** /api/v1/xinobi-u/sessions/{id} |
+[*XinobiUApi*](doc/XinobiUApi.md) | [**getXinobiUStatus**](doc/XinobiUApi.md#getxinobiustatus) | **GET** /api/v1/xinobi-u/status |
+[*XinobiUApi*](doc/XinobiUApi.md) | [**startXinobiUGeneration**](doc/XinobiUApi.md#startxinobiugeneration) | **POST** /api/v1/xinobi-u/sessions/{id}/generation |
 
 
 ## Documentation For Models
@@ -83,6 +88,7 @@ Class | Method | HTTP request | Description
  - [CategoryHighlight](doc/CategoryHighlight.md)
  - [CategoryItem](doc/CategoryItem.md)
  - [CategoryList](doc/CategoryList.md)
+ - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
  - [DependencyHealth](doc/DependencyHealth.md)
  - [HealthResponse](doc/HealthResponse.md)
  - [HomeContent](doc/HomeContent.md)
@@ -94,6 +100,14 @@ Class | Method | HTTP request | Description
  - [ProductSummary](doc/ProductSummary.md)
  - [ReadinessResponse](doc/ReadinessResponse.md)
  - [VariantDetail](doc/VariantDetail.md)
+ - [XinobiUAnswer](doc/XinobiUAnswer.md)
+ - [XinobiUGenerationRequest](doc/XinobiUGenerationRequest.md)
+ - [XinobiUOption](doc/XinobiUOption.md)
+ - [XinobiUProduct](doc/XinobiUProduct.md)
+ - [XinobiUQuestion](doc/XinobiUQuestion.md)
+ - [XinobiUSession](doc/XinobiUSession.md)
+ - [XinobiUStatus](doc/XinobiUStatus.md)
+ - [XinobiUVariant](doc/XinobiUVariant.md)
 
 
 ## Documentation For Authorization

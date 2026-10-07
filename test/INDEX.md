@@ -118,3 +118,5 @@
 - 07.10.2026 · [TST-092 Dyson header ölçüleri](2026-10-07/TST-092-dyson-header-metrics.md) — Header ölçüleri dyson.com.tr ile eşlendi; lint/build, 16 yerel araç başarılı. Web e2e 29/48; 19 başarısızlık header'dan önce de aynı (4 kontrast, 15 eski test).
 
 - 07.10.2026 · [TST-093 ortak katalog API sözleşmesi](2026-10-07/TST-093-catalog-api-contract.md) — 5 salt okunur uç, TS/Dart istemcileri; .NET 54/54, Dart 3/3, Flutter temiz, kayma 0, gerçek veriyle duman testi başarılı.
+
+- 07.10.2026 · [TST-094 XINOBI U oturum sözleşmesi](2026-10-07/TST-094-xinobi-u-api-contract.md) — 5 uç sözleşmede, korumalar aynen, Production'da 503; .NET 58/58, Dart 4/4, Flutter temiz, kayma 0; ücretli çağrı yok.

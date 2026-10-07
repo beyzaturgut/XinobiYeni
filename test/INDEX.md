@@ -108,3 +108,5 @@
 - 06.10.2026 · [Ücretsiz ürün yüzeyi önizlemesi](2026-10-06/TST-XINOBI-U-free-preview.md) — Numarasız rapor; 07.10.2026'da indekse eklendi. Masaüstü/mobil, orijinal piksel koruma ve PNG indirme başarılı; ücretli çağrı yok.
 
 - 07.10.2026 · [TST-088 kayıt açığı sonrası HEAD doğrulaması](2026-10-07/TST-088-retroactive-head-validation.md) — Mimari testler 26/26, admin/web lint ve build başarılı; uçtan uca yerel testler çalıştırılmadı.
+
+- 07.10.2026 · [TST-089 yerel uçtan uca regresyon](2026-10-07/TST-089-local-e2e-regression.md) — 22 araçtan 16 başarılı, 6 başarısız: 5 eski test (kasıtlı UI değişiklikleri), 1 süresi dolmuş oturum; ürün hatası bulunmadı, kullanıcı verisi değişmedi.

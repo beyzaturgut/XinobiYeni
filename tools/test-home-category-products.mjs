@@ -38,7 +38,7 @@ try{
  const cards=page.locator('#kategoriler');const image=cards.getByRole('img',{name:product.name+' · '+variant.color,exact:true});await image.waitFor();
  assert.ok(decodeURIComponent(await image.getAttribute('src')).includes(variant.image));
  assert.equal(await cards.getByRole('link',{name:'Kahve makineleri',exact:true}).count(),0);
- const link=image.locator('..');const target=new URL(await link.getAttribute('href'),'http://127.0.0.1:3000');assert.equal(target.pathname.replace(/\/$/,''),'/urunler');assert.equal(target.searchParams.get('category'),product.category);
+ const link=cards.getByRole('link').filter({has:page.getByRole('img',{name:product.name+' · '+variant.color,exact:true})});assert.equal(await link.count(),1);const target=new URL(await link.getAttribute('href'),'http://127.0.0.1:3000');assert.equal(target.pathname.replace(/\/$/,''),'/urunler');assert.equal(target.searchParams.get('category'),product.category);
  await page.screenshot({path:`/tmp/xinobi-home-categories-${width}.png`,fullPage:true});await link.click();
  await page.locator('button[aria-pressed="true"]').filter({hasText:'Çay'}).waitFor();assert.equal(await page.getByRole('button',{name:'Çay',exact:true}).getAttribute('aria-pressed'),'true');assert.deepEqual(errors,[]);await page.close();
  }

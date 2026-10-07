@@ -1,14 +1,20 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { chromium } from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
-const state=JSON.parse(await readFile('services/api/App_Data/local-commerce/design-studio/sessions.json','utf8'));
-const session=Object.values(state.sessions).filter(s=>s.status==='ready'&&s.variant.id==='DEMO-V101-B').at(-1);
-assert.ok(session,'Test için daha önce oluşturulmuş bir tasarım gerekli; bu test yeni görsel üretmez.');
+// Self-contained fixture: seed catalog + a simulated ready session, so the test never expires and never triggers paid generation.
+const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));
+const product=state.products.find(item=>item.id==='DEMO-P101');const variant=product?.variants.find(item=>item.id==='DEMO-V101-B');
+assert.ok(product&&variant,'Seed verisinde standart Çay Makinesi 101 Lacivert bulunmalı.');
+const session={id:'free-preview-test',status:'ready',imageUrl:'/api/v1/design-studio/sessions/free-preview-test/image',product,variant};
+const pattern=await readFile('apps/web/public/assets/banners/home-slider-2.png');
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try{
  for(const width of [1440,390]){
   const page=await browser.newPage({viewport:{width,height:1050}});
   await page.addInitScript(id=>sessionStorage.setItem('xinobi-u-selected-session',id),session.id);
+  await page.route('**/api/v1/local-commerce/state',route=>route.fulfill({json:state}));
+  await page.route('**/api/v1/design-studio/sessions/free-preview-test',route=>route.fulfill({json:session}));
+  await page.route('**/api/v1/design-studio/sessions/free-preview-test/image',route=>route.fulfill({status:200,contentType:'image/png',body:pattern,headers:{'Access-Control-Allow-Origin':'*'}}));
   let generationCalls=0;const errors=[];
   page.on('request',request=>{if(request.method()==='POST'&&request.url().endsWith('/generation'))generationCalls++});
   page.on('pageerror',error=>errors.push(error.message));

@@ -110,3 +110,5 @@
 - 07.10.2026 · [TST-088 kayıt açığı sonrası HEAD doğrulaması](2026-10-07/TST-088-retroactive-head-validation.md) — Mimari testler 26/26, admin/web lint ve build başarılı; uçtan uca yerel testler çalıştırılmadı.
 
 - 07.10.2026 · [TST-089 yerel uçtan uca regresyon](2026-10-07/TST-089-local-e2e-regression.md) — 22 araçtan 16 başarılı, 6 başarısız: 5 eski test (kasıtlı UI değişiklikleri), 1 süresi dolmuş oturum; ürün hatası bulunmadı, kullanıcı verisi değişmedi.
+
+- 07.10.2026 · [TST-090 eski testlerin güncellenmesi](2026-10-07/TST-090-stale-test-updates.md) — Beş eski test güncel davranışa uyarlandı, free-preview kalıcı fixture'a geçti; 22/22 başarılı, kullanıcı verisi değişmedi, ücretli çağrı yok.

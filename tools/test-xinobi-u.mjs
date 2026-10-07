@@ -5,6 +5,22 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const api='http://127.0.0.1:5003/api/v1/design-studio';
 const fixture = await readFile('apps/web/public/assets/banners/home-slider-2.png');
 let generated=0;
+const commerce=await (await fetch('http://127.0.0.1:5003/api/v1/local-commerce/state')).json();
+// Picks the first personalizable product and its first color, so the test does not depend on catalog names.
+async function startDesign(page){
+ const card=page.getByRole('link',{name:/ için tasarım oluştur$/}).first();
+ const productName=(await card.getAttribute('aria-label')).replace(/ için tasarım oluştur$/,'');
+ await card.click();
+ await page.waitForURL('**/renk/**');
+ const consent=page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true});if(await consent.isVisible())await consent.click();
+ await page.getByRole('radio').first().check();
+ const start=page.getByRole('link',{name:'Sorulara başla',exact:false});
+ const variantId=new URL(await start.getAttribute('href'),'http://localhost').searchParams.get('variant');
+ const product=commerce.products.find(item=>item.name===productName);assert.ok(product,'XINOBI U ürünü API kaydında yok: '+productName);
+ const variant=product.variants.find(item=>item.id===variantId);assert.ok(variant,'Seçilen renk API kaydında yok: '+variantId);
+ await start.click();
+ return {productName,color:variant.color};
+}
 try {
  for(const width of [1440,390]){
   console.log(`Kontrol: ${width}px ürün → 5 soru → tasarım → ürün önizlemesi…`);
@@ -33,7 +49,7 @@ try {
   if(width>650){await nav.first().click()}else{await page.goto('http://127.0.0.1:3000/xinobi-u')}
   await page.getByRole('heading',{name:'Bir ürün. Binlerce olasılık.'}).waitFor();
   const cookieClose=page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}); if(await cookieClose.isVisible())await cookieClose.click();
-  await page.getByRole('link',{name:'Çay Makinesi 101 Lacivert için tasarım oluştur',exact:true}).click();
+  const choice=await startDesign(page);
   await page.getByText('Soru 1 / 5',{exact:true}).waitFor();
   const firstId=await page.evaluate(()=>sessionStorage.getItem('xinobi-u-selected-session'));
   const axes=new Set();
@@ -55,12 +71,12 @@ try {
   await page.getByRole('button',{name:'AI ile tasarımımı oluştur ✦',exact:true}).click();
   await page.getByRole('heading',{name:'İşte sana özel yorum.'}).waitFor();
   await page.getByRole('button',{name:'Ürünümde dene ↗',exact:true}).click();
-  await page.getByRole('img',{name:'Çay Makinesi 101 Lacivert üzerinde AI tasarımının dijital önizlemesi',exact:true}).waitFor();
+  await page.getByRole('img',{name:`${choice.productName} ${choice.color} üzerinde AI tasarımının dijital önizlemesi`,exact:true}).waitFor();
   assert.equal(await page.locator('canvas').evaluate(canvas=>canvas.width>0&&canvas.height>0),true);
   const download=page.waitForEvent('download');await page.getByRole('button',{name:'Ürün önizlemesini indir',exact:true}).click();assert.equal((await download).suggestedFilename(),'xinobi-u-urun-onizlemesi.png');
   await page.screenshot({path:`/tmp/xinobi-u-preview-${width}.png`,fullPage:true});
   await page.goto('http://127.0.0.1:3000/xinobi-u');
-  await page.getByRole('link',{name:'Çay Makinesi 101 Lacivert için tasarım oluştur',exact:true}).click();
+  await startDesign(page);
   await page.getByText('Soru 1 / 5',{exact:true}).waitFor();
   const nextId=await page.evaluate(()=>sessionStorage.getItem('xinobi-u-selected-session'));assert.notEqual(nextId,firstId);
   assert.deepEqual(errors,[]);

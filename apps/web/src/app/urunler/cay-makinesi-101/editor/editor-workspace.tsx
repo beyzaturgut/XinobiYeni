@@ -49,7 +49,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
         <span className={styles.demoBadge}>Güvenli demo alanı</span>
       </div>
       <div className={styles.canvas}>
-        <div className={styles.canvasHeading}><p>Çay Makinesi 101 · Lacivert</p><h1 id="canvas-title">{face}</h1></div>
+        <div className={styles.canvasHeading}><p>Çay Makinesi 101 · Lacivert</p><h1 id="canvas-title">{face}</h1><span className={styles.representativeBadge}>Temsilidir</span></div>
         <div className={styles.productStage}>
           <div className={styles.halo} />
           <ProductPatternPreview

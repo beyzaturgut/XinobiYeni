@@ -112,3 +112,5 @@
 .patternControl label span { color: var(--color-teal); font-variant-numeric: tabular-nums; }
 .patternControl input { width: 100%; min-height: 28px; margin: 4px 0 0; accent-color: var(--color-teal); cursor: pointer; }
 @media(max-width:680px){.productPreview{width:min(96%,calc(500px * 1066 / 1600))}}
+
+.representativeBadge { display: inline-block; margin-top: 8px; padding: 5px 9px; border: 1px solid #b0b0b0; border-radius: 6px; background: #fff; color: #262626; font-size: .7rem; line-height: 1.4; }

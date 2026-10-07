@@ -102,3 +102,9 @@
 - [TST-086 — ADM-002 rol, ayar ve denetim](2026-10-03/TST-086-admin-settings.md)
 
 - 07.10.2026 · [TST-087 faz eksiklik maddeleri](2026-10-07/TST-087-phase-gap-update.md) — Faz00–Faz11 belge revizyonu; diff temiz, işaretler tutarlı, kod değişmedi.
+
+- 06.10.2026 · [XINOBI U yerel gerçek Cloudflare doğrulaması](2026-10-06/TST-XINOBI-U-live.md) — Numarasız rapor; 07.10.2026'da indekse eklendi. İki gerçek üretim, API 21 test, web/admin build ve uçtan uca akış başarılı.
+
+- 06.10.2026 · [Ücretsiz ürün yüzeyi önizlemesi](2026-10-06/TST-XINOBI-U-free-preview.md) — Numarasız rapor; 07.10.2026'da indekse eklendi. Masaüstü/mobil, orijinal piksel koruma ve PNG indirme başarılı; ücretli çağrı yok.
+
+- 07.10.2026 · [TST-088 kayıt açığı sonrası HEAD doğrulaması](2026-10-07/TST-088-retroactive-head-validation.md) — Mimari testler 26/26, admin/web lint ve build başarılı; uçtan uca yerel testler çalıştırılmadı.

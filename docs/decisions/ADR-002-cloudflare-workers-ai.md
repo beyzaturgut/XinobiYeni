@@ -34,3 +34,22 @@ Başlangıç araştırma kaynakları:
 - Cloudflare'ın desteklemediği bir düzenleme yeteneği varmış gibi vaat edilmez; gerekiyorsa kapsam kullanıcı kararına geri taşınır.
 - AI çıktısı doğrudan baskıya gitmez; Faz06 baskı alanı, çözünürlük, taşma ve insan kalite kapısından geçer.
 - Bu ADR, D05 erişim/sözleşme, D08 kota/maliyet/içerik ve D10 rıza/saklama kararlarını kendiliğinden kapatmaz.
+
+## Ek A — Faz10 öncesi yerel entegrasyon istisnası (07.10.2026)
+
+- Durum: Uygulandı; istisnanın proje sahibince yazılı onayı bekliyor
+- Uygulama: 06.10.2026, `3db452e` (API), `d7870f0` (web); kanıt `test/2026-10-06/TST-XINOBI-U-live.md`
+
+**Ne oldu:** Bu ADR'deki "adaptör ve ücretli çağrı Faz10 sırasıyla eklenir" sınırına rağmen, XINOBI U akışının gerçek görselle denenmesi için kullanıcı isteğiyle Cloudflare Workers AI REST adaptörü eklendi ve iki gerçek üretim çağrısı yapıldı. D05/D08/D10 kararları ve Faz10 10.01A PoC henüz yapılmadı.
+
+**Mevcut sınırlar (kodla doğrulandı):**
+
+- `CloudflareImageProvider`, `IImageGenerationProvider` arkasındadır; model `@cf/black-forest-labs/flux-1-schnell` yalnız adaptör içinde sabittir, istemciye ve dış sözleşmeye çıkmaz. `IImageEditingProvider` henüz yoktur.
+- Uçlar yalnız `Development` ortamında kayıtlıdır ve loopback dışı isteğe 403 döner; production'da bulunmaz.
+- Kimlik bilgileri git dışı `appsettings.Local.json` veya ortam değişkeninde, yalnız sunucu tarafında tutulur; yoksa gerçek üretim kapalı gösterilir.
+- Yerel günlük limit 30 üretim, tek worker sıralı işleme, 120 saniye sağlayıcı zaman aşımı; iş anket ve yanıt hash'iyle idempotenttir, belirsiz çağrı otomatik tekrarlanmaz.
+- İstemciden serbest prompt alınmaz; yanıtlar sunucuda izinli semantik tercihlere eşlenir.
+
+**Bu istisnanın kapsamadığı ve Faz10'da kapatılacaklar:** gerçek kullanıcı kimliği ve sahiplik (şu an 256-bit oturum anahtarı), girdi/çıktı moderasyonu, D10 saklama ve silme politikası, kullanıcı bazlı limit ve maliyet kaydı (`AiUsage`), panel yönetimi, ticari lisans/veri kullanımı doğrulaması ve PoC ile model seçimi. ADR-002'de araştırma adayı olarak FLUX.2 Klein 4B geçerken uygulamada flux-1-schnell kullanıldı; seçim PoC'de yeniden değerlendirilir.
+
+**Karar (önerilen):** Yerel adaptör Development denemesi olarak kalabilir; production'a, staging'e ya da müşteri verisine açılması Faz10 kapısından geçmeden yapılmaz. Proje sahibi bu istisnayı onaylamazsa adaptör özellik bayrağıyla (Faz00 T-09) kapatılır.

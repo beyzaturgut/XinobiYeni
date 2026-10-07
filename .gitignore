@@ -14,6 +14,7 @@
 **/test-results/
 **/playwright-report/
 XinobiYeni-web-*.zip
+XinobiYeni-admin-*.zip
 
 # Persistent local commerce data and uploaded media
 services/api/App_Data/

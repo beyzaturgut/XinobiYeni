@@ -6,6 +6,7 @@ import Link from "next/link";
 import EditorWorkspace from "./editor-workspace";
 import { loadAcceptedSurface, type RenderingInputs } from "./accepted-surface-api";
 import styles from "./editor.module.css";
+import { previewUnavailableMessage } from "../../../../features/product-personalization/variant-preview-readiness";
 
 function PreviewStatus({ error = false, children }: { error?: boolean; children: React.ReactNode }) {
   return <section className={styles.previewStatus} role={error ? "alert" : "status"}>
@@ -26,7 +27,7 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc }: { varia
   if (state.variant !== variant || (state.inputs === undefined && !state.error))
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi.</PreviewStatus>;
-  if (!state.inputs) return <PreviewStatus>Bu renk için geliştirme önizlemesi kullanılamıyor.</PreviewStatus>;
+  if (!state.inputs) return <PreviewStatus>{previewUnavailableMessage}</PreviewStatus>;
   return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} />;
 }
 function AcceptedSurfaceRoute() {

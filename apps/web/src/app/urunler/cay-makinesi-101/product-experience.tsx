@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../../lib/commerce";
 import styles from "./product.module.css";
+import VariantPreviewReadiness from "../../../features/product-personalization/variant-preview-readiness";
 
 import blue from "../../../../public/assets/products/tea-maker-101-blue.webp";
 import red from "../../../../public/assets/products/tea-maker-101-red.webp";
@@ -47,6 +48,7 @@ export default function ProductExperience() {
           <legend>Renk: <strong>{selected.name}</strong></legend>
           <div>{variants.map((variant) => <button type="button" key={variant.id} aria-label={`${variant.name} rengini seç`} aria-pressed={selected.id === variant.id} className={selected.id === variant.id ? styles.selectedVariant : ""} onClick={() => setSelectedId(variant.id)}><span style={{ background: variant.swatch || undefined }} /><small>{variant.name}</small></button>)}</div>
         </fieldset>
+        <VariantPreviewReadiness product="DEMO-P101" variant={selected.id} color={selected.name} />
         <div className={styles.actions}>
           <button type="button" disabled aria-describedby="purchase-note">Satış bilgisi hazırlanıyor</button>
           <Link href={`/xinobi-u/sorular?product=DEMO-P101&variant=${encodeURIComponent(selected.id)}`}>Kişiselleştirme seçenekleri <span aria-hidden="true">→</span></Link>

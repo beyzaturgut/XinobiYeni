@@ -47,7 +47,7 @@ public static class XinobiUEndpoints
     /// </summary>
     public static void MapXinobiU(this WebApplication app)
     {
-        var group = app.MapGroup("/api/v1/xinobi-u").WithTags("XinobiU");
+        var group = app.MapGroup("/api/v1/xinobi-u").WithTags("XinobiU").AllowAnonymous();
         if (app.Environment.IsDevelopment()) group.RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {

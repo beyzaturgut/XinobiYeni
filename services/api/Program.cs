@@ -14,6 +14,8 @@ using Xinobi.Api.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Xinobi.Api.EmailVerification;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,7 +57,16 @@ builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
 builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
 builder.Services.TryAddSingleton(TimeProvider.System);
 builder.Services.AddAuthentication(AccountTokenHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, AccountTokenHandler>(AccountTokenHandler.SchemeName, null);
-builder.Services.AddAuthorization();
+// Default deny (Faz03 03.04): an endpoint without its own rule needs a signed-in account; public endpoints say AllowAnonymous.
+builder.Services.AddAuthorization(options =>
+{
+    // Requests matching no endpoint stay a plain 404 instead of an authentication challenge.
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAssertion(context => context.User.Identity?.IsAuthenticated == true || context.Resource is HttpContext { } http && http.GetEndpoint() is null)
+        .Build();
+    options.AddPolicy(PermissionAuthorization.StaffPolicy, policy => policy.RequireAuthenticatedUser().RequireClaim(ClaimTypes.Role));
+});
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorization.PolicyProvider>();
 builder.Services.AddSingleton<ISqlServerReadinessProbe, SqlServerReadinessProbe>();
 builder.Services.AddProblemDetails(options =>
 {
@@ -68,9 +79,15 @@ builder.Services.AddProblemDetails(options =>
 
 var app = builder.Build();
 
+if (args.Length >= 2 && args[0] == SuperAdminBootstrap.Command)
+{
+    Environment.ExitCode = await SuperAdminBootstrap.Run(app.Services.GetRequiredService<IAccountStore>(), args[1], Console.Out);
+    return;
+}
+
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 }
 
 app.UseMiddleware<RequestCorrelationMiddleware>();
@@ -84,7 +101,8 @@ app.UseStatusCodePages(async statusCodeContext =>
         extensions: new Dictionary<string, object?>
         {
             ["requestId"] = httpContext.TraceIdentifier,
-            ["timestampUtc"] = DateTimeOffset.UtcNow
+            ["timestampUtc"] = DateTimeOffset.UtcNow,
+            ["code"] = httpContext.Response.StatusCode switch { 401 => "unauthorized", 403 => "forbidden", _ => null },
         });
 
     await problem.ExecuteAsync(httpContext);
@@ -100,7 +118,7 @@ app.MapCatalog();
 app.MapXinobiU();
 app.MapAccounts();
 
-var api = app.MapGroup("/api/v1");
+var api = app.MapGroup("/api/v1").AllowAnonymous();
 
 api.MapGet("/health", (HttpContext context) => TypedResults.Ok(new HealthResponse(
         Service: "Xinobi.Api",

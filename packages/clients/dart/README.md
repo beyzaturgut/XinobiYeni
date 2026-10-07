@@ -74,6 +74,8 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**registerAccount**](doc/AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
 [*AccountApi*](doc/AccountApi.md) | [**registerWebAccount**](doc/AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
+[*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogCategories**](doc/CatalogApi.md#listcatalogcategories) | **GET** /api/v1/catalog/categories |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogProducts**](doc/CatalogApi.md#listcatalogproducts) | **GET** /api/v1/catalog/products |
@@ -93,6 +95,7 @@ Class | Method | HTTP request | Description
 
  - [AccountEmailVerification](doc/AccountEmailVerification.md)
  - [AccountProfile](doc/AccountProfile.md)
+ - [AdminSession](doc/AdminSession.md)
  - [AnnouncementItem](doc/AnnouncementItem.md)
  - [AnnouncementList](doc/AnnouncementList.md)
  - [AuthSession](doc/AuthSession.md)
@@ -108,6 +111,7 @@ Class | Method | HTTP request | Description
  - [LoginAccount](doc/LoginAccount.md)
  - [LogoutSession](doc/LogoutSession.md)
  - [Money](doc/Money.md)
+ - [PermissionCatalogResponse](doc/PermissionCatalogResponse.md)
  - [ProblemDetails](doc/ProblemDetails.md)
  - [ProductDetail](doc/ProductDetail.md)
  - [ProductPage](doc/ProductPage.md)

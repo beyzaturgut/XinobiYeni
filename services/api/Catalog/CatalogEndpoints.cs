@@ -12,8 +12,8 @@ public static class CatalogEndpoints
     /// </summary>
     public static void MapCatalog(this IEndpointRouteBuilder app)
     {
-        var catalog = app.MapGroup("/api/v1/catalog").WithTags("Catalog");
-        var content = app.MapGroup("/api/v1/content").WithTags("Content");
+        var catalog = app.MapGroup("/api/v1/catalog").WithTags("Catalog").AllowAnonymous();
+        var content = app.MapGroup("/api/v1/content").WithTags("Content").AllowAnonymous();
         foreach (var group in new[] { catalog, content })
         {
             group.AddEndpointFilter(async (context, next) =>

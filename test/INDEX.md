@@ -130,3 +130,5 @@
 - 07.10.2026 · [TST-098 ortak hesap API'si ve mobil hesap](2026-10-07/TST-098-account-api-mobile.md) — Kayıt/giriş/yenileme/çıkış/profil, jetonlar özetli; .NET 77/77, Flutter 25/25; emülatörde üyelik ve oturum geri yükleme doğrulandı. Olay: ilk koşuda testlerden 5 gerçek doğrulama e-postası `ayse@example.com`'a gitti; düzeltildi ve güvenceye alındı.
 
 - 07.10.2026 · [TST-099 web hesabı ortak API'ye geçti](2026-10-07/TST-099-web-account-api.md) — HttpOnly cookie + CSRF başlığı; .NET 78/78; gerçek tarayıcıda kayıt, yenilemede oturum, çıkış; mobilde açılan hesapla web girişi başarılı. Dev API yeniden başlatılmalı.
+
+- 07.10.2026 · [TST-100 rol/yetki kataloğu](2026-10-07/TST-100-roles-permissions.md) — 17 kaynak, `super_admin`, `RequirePermission`, varsayılan ret (herkese açık alanlar açık liste), konsoldan bir kez süper yönetici; .NET 82/82.

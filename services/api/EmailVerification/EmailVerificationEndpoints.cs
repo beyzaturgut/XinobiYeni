@@ -9,7 +9,7 @@ public static class EmailVerificationEndpoints
     {
         // The current account UI is a browser-only demo; do not expose it as production identity.
         if (!app.Environment.IsDevelopment()) return;
-        var group = app.MapGroup("/api/v1/email-verification").ExcludeFromDescription()
+        var group = app.MapGroup("/api/v1/email-verification").ExcludeFromDescription().AllowAnonymous()
             .RequireRateLimiting("EmailVerification");
         group.AddEndpointFilter(async (context, next) =>
         {

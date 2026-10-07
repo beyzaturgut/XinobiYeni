@@ -11,6 +11,7 @@ export 'package:xinobi_api_client/src/serializers.dart';
 export 'package:xinobi_api_client/src/model/date.dart';
 
 export 'package:xinobi_api_client/src/api/account_api.dart';
+export 'package:xinobi_api_client/src/api/admin_api.dart';
 export 'package:xinobi_api_client/src/api/catalog_api.dart';
 export 'package:xinobi_api_client/src/api/content_api.dart';
 export 'package:xinobi_api_client/src/api/system_api.dart';
@@ -18,6 +19,7 @@ export 'package:xinobi_api_client/src/api/xinobi_u_api.dart';
 
 export 'package:xinobi_api_client/src/model/account_email_verification.dart';
 export 'package:xinobi_api_client/src/model/account_profile.dart';
+export 'package:xinobi_api_client/src/model/admin_session.dart';
 export 'package:xinobi_api_client/src/model/announcement_item.dart';
 export 'package:xinobi_api_client/src/model/announcement_list.dart';
 export 'package:xinobi_api_client/src/model/auth_session.dart';
@@ -33,6 +35,7 @@ export 'package:xinobi_api_client/src/model/home_slide.dart';
 export 'package:xinobi_api_client/src/model/login_account.dart';
 export 'package:xinobi_api_client/src/model/logout_session.dart';
 export 'package:xinobi_api_client/src/model/money.dart';
+export 'package:xinobi_api_client/src/model/permission_catalog_response.dart';
 export 'package:xinobi_api_client/src/model/problem_details.dart';
 export 'package:xinobi_api_client/src/model/product_detail.dart';
 export 'package:xinobi_api_client/src/model/product_page.dart';

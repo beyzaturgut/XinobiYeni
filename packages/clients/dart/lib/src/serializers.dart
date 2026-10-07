@@ -16,6 +16,7 @@ import 'package:xinobi_api_client/src/model/date.dart';
 
 import 'package:xinobi_api_client/src/model/account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/account_profile.dart';
+import 'package:xinobi_api_client/src/model/admin_session.dart';
 import 'package:xinobi_api_client/src/model/announcement_item.dart';
 import 'package:xinobi_api_client/src/model/announcement_list.dart';
 import 'package:xinobi_api_client/src/model/auth_session.dart';
@@ -31,6 +32,7 @@ import 'package:xinobi_api_client/src/model/home_slide.dart';
 import 'package:xinobi_api_client/src/model/login_account.dart';
 import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
+import 'package:xinobi_api_client/src/model/permission_catalog_response.dart';
 import 'package:xinobi_api_client/src/model/problem_details.dart';
 import 'package:xinobi_api_client/src/model/product_detail.dart';
 import 'package:xinobi_api_client/src/model/product_page.dart';
@@ -54,6 +56,7 @@ part 'serializers.g.dart';
 @SerializersFor([
   AccountEmailVerification,
   AccountProfile,
+  AdminSession,
   AnnouncementItem,
   AnnouncementList,
   AuthSession,
@@ -69,6 +72,7 @@ part 'serializers.g.dart';
   LoginAccount,
   LogoutSession,
   Money,
+  PermissionCatalogResponse,
   ProblemDetails,
   ProductDetail,
   ProductPage,
@@ -123,6 +127,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUAnswer)]),
         () => ListBuilder<XinobiUAnswer>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(String)]),
+        () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUQuestion)]),

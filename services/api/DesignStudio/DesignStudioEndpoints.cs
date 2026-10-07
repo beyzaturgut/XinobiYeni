@@ -7,7 +7,7 @@ public static class DesignStudioEndpoints
     public static void MapDesignStudio(this WebApplication app)
     {
         if (!app.Environment.IsDevelopment()) return;
-        var group = app.MapGroup("/api/v1/design-studio").WithTags("DesignStudio").RequireRateLimiting("DesignStudio");
+        var group = app.MapGroup("/api/v1/design-studio").WithTags("DesignStudio").AllowAnonymous().RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {
             var http = context.HttpContext;

@@ -13,7 +13,9 @@ public static class LocalCommerceEndpoints
     {
         // These endpoints must never be exposed by a production deployment.
         if (!app.Environment.IsDevelopment()) return;
-        var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce");
+        var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce")
+            // Development-only and loopback-only (ADR-003); the panel moves to staff permissions with the SQL store (03.11).
+            .AllowAnonymous();
         group.AddEndpointFilter(async (context, next) =>
         {
             var request = context.HttpContext;

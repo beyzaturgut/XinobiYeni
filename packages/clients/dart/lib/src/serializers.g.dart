@@ -9,6 +9,7 @@ part of 'serializers.dart';
 Serializers _$serializers = (Serializers().toBuilder()
       ..add(AccountEmailVerification.serializer)
       ..add(AccountProfile.serializer)
+      ..add(AdminSession.serializer)
       ..add(AnnouncementItem.serializer)
       ..add(AnnouncementList.serializer)
       ..add(AuthSession.serializer)
@@ -24,6 +25,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(LoginAccount.serializer)
       ..add(LogoutSession.serializer)
       ..add(Money.serializer)
+      ..add(PermissionCatalogResponse.serializer)
       ..add(ProblemDetails.serializer)
       ..add(ProductDetail.serializer)
       ..add(ProductPage.serializer)
@@ -62,6 +64,18 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ProductSummary)]),
           () => ListBuilder<ProductSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(VariantDetail)]),
           () => ListBuilder<VariantDetail>())

@@ -7,7 +7,11 @@ using Xinobi.Api.LocalCommerce;
 
 namespace Xinobi.Api.Identity;
 
-public record AccountRecord(string Id, string Name, string Email, string PasswordHash, DateTimeOffset CreatedAt);
+/// <summary><paramref name="Roles"/> is empty for customers; staff accounts carry panel roles (Faz03 03.04).</summary>
+public record AccountRecord(string Id, string Name, string Email, string PasswordHash, DateTimeOffset CreatedAt, string[]? Roles = null)
+{
+    [System.Text.Json.Serialization.JsonIgnore] public IReadOnlyCollection<string> RoleCodes => Roles ?? [];
+}
 public record IssuedTokens(string AccessToken, DateTimeOffset AccessTokenExpiresAt, string RefreshToken, DateTimeOffset RefreshTokenExpiresAt);
 
 public sealed class AccountException(string code, string message, int status = StatusCodes.Status400BadRequest) : Exception(message)
@@ -32,6 +36,9 @@ public interface IAccountStore
     Task Revoke(string refreshToken);
     Task<AccountRecord?> FindByAccessToken(string accessToken);
     Task<AccountRecord?> FindById(string accountId);
+    /// <summary>Adds <paramref name="role"/> to the account; null when no account has that e-mail.</summary>
+    Task<AccountRecord?> AssignRole(string email, string role);
+    Task<bool> AnyWithRole(string role);
 }
 
 public sealed class UnavailableAccountStore : IAccountStore
@@ -43,6 +50,8 @@ public sealed class UnavailableAccountStore : IAccountStore
     public Task Revoke(string refreshToken) => throw new AccountUnavailableException();
     public Task<AccountRecord?> FindByAccessToken(string accessToken) => Task.FromResult<AccountRecord?>(null);
     public Task<AccountRecord?> FindById(string accountId) => throw new AccountUnavailableException();
+    public Task<AccountRecord?> AssignRole(string email, string role) => throw new AccountUnavailableException();
+    public Task<bool> AnyWithRole(string role) => throw new AccountUnavailableException();
 }
 
 public static class AccountRules
@@ -203,6 +212,21 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
 
     public Task<AccountRecord?> FindById(string accountId) =>
         Locked(state => Task.FromResult(state.Accounts.FirstOrDefault(account => account.Id == accountId)));
+
+    public Task<AccountRecord?> AssignRole(string email, string role) => Locked(async state =>
+    {
+        var index = state.Accounts.FindIndex(account => account.Email == email);
+        if (index < 0) return null;
+        var account = state.Accounts[index];
+        if (!account.RoleCodes.Contains(role))
+        {
+            state.Accounts[index] = account = account with { Roles = [.. account.RoleCodes, role] };
+            await Write(state);
+        }
+        return account;
+    });
+
+    public Task<bool> AnyWithRole(string role) => Locked(state => Task.FromResult(state.Accounts.Any(account => account.RoleCodes.Contains(role))));
 
     private static AccountException Invalid() =>
         new("invalid_refresh_token", "Oturumun sona erdi. Tekrar giriş yap.", StatusCodes.Status401Unauthorized);

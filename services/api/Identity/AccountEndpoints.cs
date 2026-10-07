@@ -17,6 +17,9 @@ public record LoginAccount(string Email, string Password);
 public record RefreshSession(string RefreshToken);
 public record LogoutSession(string RefreshToken);
 public record AccountProfile(string Id, string Name, string Email, DateTimeOffset CreatedAt);
+/// <summary>What the panel may show; every action is still checked on the server.</summary>
+public record AdminSession(AccountProfile Account, IReadOnlyCollection<string> Roles, IReadOnlyCollection<string> Permissions);
+public record PermissionCatalogResponse(IReadOnlyList<string> Resources, IReadOnlyCollection<string> Permissions);
 public record AuthSession(string AccessToken, DateTimeOffset AccessTokenExpiresAt, string RefreshToken, DateTimeOffset RefreshTokenExpiresAt, AccountProfile Account);
 
 /// <summary>Bearer scheme for mobile (ADR-004 T-03): opaque access tokens looked up in <see cref="IAccountStore"/>.</summary>
@@ -38,7 +41,7 @@ public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOpti
         if (token is null) return AuthenticateResult.NoResult();
         var account = await store.FindByAccessToken(token);
         if (account is null) return AuthenticateResult.Fail("invalid_token");
-        var identity = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, account.Id), new Claim(ClaimTypes.Email, account.Email), new Claim(ClaimTypes.Name, account.Name)], SchemeName);
+        var identity = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, account.Id), new Claim(ClaimTypes.Email, account.Email), new Claim(ClaimTypes.Name, account.Name), .. PermissionAuthorization.ClaimsFor(account.RoleCodes)], SchemeName);
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName));
     }
 }
@@ -86,10 +89,11 @@ public static class AccountEndpoints
     /// </summary>
     public static void MapAccounts(this WebApplication app)
     {
-        var auth = app.MapGroup("/api/v1/auth").WithTags("Account");
+        var auth = app.MapGroup("/api/v1/auth").WithTags("Account").AllowAnonymous();
         var me = app.MapGroup("/api/v1/me").WithTags("Account").RequireAuthorization();
+        var admin = app.MapGroup("/api/v1/admin").WithTags("Admin").RequireAuthorization(PermissionAuthorization.StaffPolicy);
         if (app.Environment.IsDevelopment()) auth.RequireRateLimiting("Account");
-        foreach (var group in new[] { auth, me })
+        foreach (var group in new[] { auth, me, admin })
         {
             group.AddEndpointFilter(async (context, next) =>
             {
@@ -219,6 +223,20 @@ public static class AccountEndpoints
                     : Problem(StatusCodes.Status401Unauthorized, "invalid_token", "Oturumun sona erdi. Tekrar giriş yap."))
             .WithName("GetMyAccount")
             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        admin.MapGet("/session", async Task<Results<Ok<AdminSession>, ProblemHttpResult>> (ClaimsPrincipal user, IAccountStore accounts) =>
+                await accounts.FindById(user.FindFirstValue(ClaimTypes.NameIdentifier)!) is { } account
+                    ? TypedResults.Ok(new AdminSession(Profile(account), account.RoleCodes, Roles.PermissionsFor(account.RoleCodes)))
+                    : Problem(StatusCodes.Status401Unauthorized, "invalid_token", "Oturumun sona erdi. Tekrar giriş yap."))
+            .WithName("GetAdminSession")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
+
+        admin.MapGet("/permissions", () => TypedResults.Ok(new PermissionCatalogResponse(PermissionCatalog.Resources, PermissionCatalog.All.Order(StringComparer.Ordinal).ToArray())))
+            .RequirePermission("settings.read")
+            .WithName("GetPermissionCatalog")
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden);
     }
 
     private static AuthSession Session(AccountRecord account, IssuedTokens tokens) => new(

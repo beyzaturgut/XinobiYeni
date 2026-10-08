@@ -104,5 +104,22 @@
 @media(max-width:760px){.thumbs button{width:64px;height:64px}.stageNav{width:40px;height:40px;margin-top:-20px}}
 /* Stacked, preloaded gallery photos: a colour change only swaps visibility, with a short fade. */
 /* The new photo fades in on top (150 ms) while the previous one stays fully visible underneath, then drops out: no see-through dip. */
-.detailHero .imageStage img{animation:none}.detailHero .imageStage img.stageShown{transition:opacity .15s ease}.detailHero .imageStage img.stageHidden{transition:opacity 0s linear .15s}
+/* The previous photo leaves at once and the new one fades in on the white stage (120 ms), so the old photo never shows behind it. */
+.detailHero .imageStage{background:#fff}.detailHero .imageStage img{animation:none}.detailHero .imageStage img.stageShown{transition:opacity .12s ease}.detailHero .imageStage img.stageHidden{transition:none}
 @media (prefers-reduced-motion: reduce){.detailHero .imageStage img{transition:none}}
+
+/* Desktop product detail fits one screen: the square stage is sized from the viewport height, the info column is compact. */
+.detailDescription{margin-top:24px}
+@media(min-width:761px){
+.detailPage{padding-top:24px;padding-bottom:40px}
+.detailHero{grid-template-columns:minmax(0,min(52%,calc(100svh - 208px))) minmax(0,1fr)}
+.detailHero .imageStage{min-height:280px}
+.detailHero .productInfo{padding:0}
+.detailHero .breadcrumb{margin-bottom:12px}
+.detailHero .eyebrow{margin-bottom:8px}
+.detailHero .detailSku{margin-top:8px}
+.detailHero .pendingPrice{margin-top:18px;padding-top:14px;padding-bottom:14px}
+.detailHero .variants{margin-top:18px;padding-bottom:16px}
+.detailHero .variants legend{margin-bottom:10px}
+.detailHero .actions{margin-top:14px}
+}

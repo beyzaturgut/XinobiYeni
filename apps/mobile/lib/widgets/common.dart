@@ -8,11 +8,14 @@ import '../features/favorites/favorite_button.dart';
 
 /// Network image with a neutral placeholder; product photos are contained, never cropped (web rule).
 class RemoteImage extends StatelessWidget {
-  const RemoteImage(this.url, {super.key, this.label, this.fit = BoxFit.contain});
+  const RemoteImage(this.url, {super.key, this.label, this.fit = BoxFit.contain, this.cacheWidth});
 
   final String? url;
   final String? label;
   final BoxFit fit;
+
+  /// Decode width in physical pixels; keeps large photos small in the image cache.
+  final int? cacheWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +31,7 @@ class RemoteImage extends StatelessWidget {
       child: Image.network(
         url!,
         fit: fit,
+        cacheWidth: cacheWidth,
         excludeFromSemantics: true,
         errorBuilder: (_, _, _) => placeholder,
         loadingBuilder: (context, child, progress) => progress == null ? child : placeholder,

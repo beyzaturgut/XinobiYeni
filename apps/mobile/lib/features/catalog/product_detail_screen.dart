@@ -49,6 +49,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               images: productGallery(detail, variants.isEmpty ? null : selected),
               selected: activeImage,
               onSelected: (url) => setState(() => activeImage = url),
+              preload: [for (final variant in variants) ?variant.imageUrl],
             ),
             Padding(
               padding: const EdgeInsets.all(XinobiTokens.gutterMobile),

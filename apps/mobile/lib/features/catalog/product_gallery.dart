@@ -32,10 +32,14 @@ List<GalleryImage> productGallery(ProductDetail product, VariantDetail? variant)
 
 /// Swipeable photo stage with a thumbnail strip. [selected] is controlled by the caller so a colour change can jump to its photo.
 class ProductGallery extends StatefulWidget {
-  const ProductGallery({super.key, required this.productName, required this.images, required this.selected, required this.onSelected});
+  const ProductGallery(
+      {super.key, required this.productName, required this.images, required this.selected, required this.onSelected, this.preload = const []});
 
   final String productName;
   final List<GalleryImage> images;
+
+  /// Photos to load ahead of time (every colour's photo), so a colour change shows its photo without waiting.
+  final List<String> preload;
   final String? selected;
   final ValueChanged<String> onSelected;
 
@@ -44,7 +48,24 @@ class ProductGallery extends StatefulWidget {
 }
 
 class _ProductGalleryState extends State<ProductGallery> {
-  late final PageController pages = PageController(initialPage: index);
+  late PageController pages = PageController(initialPage: index);
+  final requested = <String>{};
+
+  /// Stage photos decode at screen width so every colour's photo fits in the image cache at once.
+  int get stageWidth => (MediaQuery.sizeOf(context).width * MediaQuery.devicePixelRatioOf(context)).round();
+
+  void precache() {
+    final width = stageWidth;
+    for (final url in {...widget.images.map((image) => image.url), ...widget.preload}) {
+      if (requested.add('$width $url')) precacheImage(ResizeImage(NetworkImage(url), width: width), context, onError: (_, _) {});
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precache();
+  }
 
   int get index {
     final found = widget.images.indexWhere((image) => image.url == widget.selected);
@@ -54,12 +75,14 @@ class _ProductGalleryState extends State<ProductGallery> {
   @override
   void didUpdateWidget(ProductGallery oldWidget) {
     super.didUpdateWidget(oldWidget);
+    precache();
     final target = index;
     if (pages.hasClients && pages.page?.round() != target) {
-      // A colour or thumbnail choice switches straight to its photo instead of sliding past the photos in between.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && pages.hasClients) pages.jumpToPage(target);
-      });
+      // A colour or thumbnail choice shows its photo in this same frame: a fresh controller starts on it, so nothing slides
+      // past and the counter never runs ahead of the photo.
+      final previous = pages;
+      pages = PageController(initialPage: target);
+      WidgetsBinding.instance.addPostFrameCallback((_) => previous.dispose());
     }
   }
 
@@ -86,10 +109,13 @@ class _ProductGalleryState extends State<ProductGallery> {
           child: Stack(children: [
             Positioned.fill(
               child: PageView.builder(
+                // Keyed by controller: a swapped controller must start fresh instead of inheriting the old scroll offset.
+                key: ObjectKey(pages),
                 controller: pages,
                 itemCount: images.length,
                 onPageChanged: (page) => widget.onSelected(images[page].url),
-                itemBuilder: (context, page) => RemoteImage(images[page].url, label: '${widget.productName}, ${images[page].label}'),
+                itemBuilder: (context, page) =>
+                    RemoteImage(images[page].url, label: '${widget.productName}, ${images[page].label}', cacheWidth: stageWidth),
               ),
             ),
             if (images.length > 1)
@@ -138,7 +164,7 @@ class _ProductGalleryState extends State<ProductGallery> {
                       borderRadius: BorderRadius.circular(XinobiTokens.radiusSmall),
                       border: Border.all(color: selected ? XinobiTokens.ink : XinobiTokens.line, width: selected ? 2 : 1),
                     ),
-                    child: RemoteImage(thumb.url),
+                    child: RemoteImage(thumb.url, cacheWidth: (72 * MediaQuery.devicePixelRatioOf(context)).round()),
                   ),
                 ),
               );

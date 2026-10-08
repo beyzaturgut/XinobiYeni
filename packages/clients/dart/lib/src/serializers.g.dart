@@ -18,7 +18,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CategoryItem.serializer)
       ..add(CategoryList.serializer)
       ..add(ChangeMyPassword.serializer)
+      ..add(ConfirmEmailChange.serializer)
       ..add(CreateXinobiUSession.serializer)
+      ..add(CustomerAddress.serializer)
+      ..add(CustomerOrder.serializer)
+      ..add(CustomerOrderLine.serializer)
+      ..add(DeleteMyAccount.serializer)
       ..add(DependencyHealth.serializer)
       ..add(HealthResponse.serializer)
       ..add(HomeContent.serializer)
@@ -27,6 +32,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(LogoutSession.serializer)
       ..add(Money.serializer)
       ..add(PermissionCatalogResponse.serializer)
+      ..add(PlaceOrder.serializer)
+      ..add(PlaceOrderItem.serializer)
       ..add(ProblemDetails.serializer)
       ..add(ProductDetail.serializer)
       ..add(ProductPage.serializer)
@@ -34,7 +41,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ReadinessResponse.serializer)
       ..add(RefreshSession.serializer)
       ..add(RegisterAccount.serializer)
+      ..add(SaveCustomerAddress.serializer)
       ..add(StartAccountEmailVerification.serializer)
+      ..add(StartEmailChange.serializer)
       ..add(UpdateMyAccount.serializer)
       ..add(VariantDetail.serializer)
       ..add(XinobiUAnswer.serializer)
@@ -52,6 +61,9 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(CategoryItem)]),
           () => ListBuilder<CategoryItem>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(CustomerOrderLine)]),
+          () => ListBuilder<CustomerOrderLine>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(DependencyHealth)]),
           () => ListBuilder<DependencyHealth>())
       ..addBuilderFactory(
@@ -63,6 +75,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(CategoryHighlight)]),
           () => ListBuilder<CategoryHighlight>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(PlaceOrderItem)]),
+          () => ListBuilder<PlaceOrderItem>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ProductSummary)]),
           () => ListBuilder<ProductSummary>())

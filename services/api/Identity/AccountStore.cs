@@ -8,7 +8,7 @@ using Xinobi.Api.LocalCommerce;
 namespace Xinobi.Api.Identity;
 
 /// <summary><paramref name="Roles"/> is empty for customers; staff accounts carry panel roles (Faz03 03.04).</summary>
-public record AccountRecord(string Id, string Name, string Email, string PasswordHash, DateTimeOffset CreatedAt, string[]? Roles = null)
+public record AccountRecord(string Id, string Name, string Email, string PasswordHash, DateTimeOffset CreatedAt, string[]? Roles = null, string? Phone = null)
 {
     [System.Text.Json.Serialization.JsonIgnore] public IReadOnlyCollection<string> RoleCodes => Roles ?? [];
 }
@@ -39,8 +39,21 @@ public interface IAccountStore
     /// <summary>Adds <paramref name="role"/> to the account; null when no account has that e-mail.</summary>
     Task<AccountRecord?> AssignRole(string email, string role);
     Task<bool> AnyWithRole(string role);
-    /// <summary>Renames the account; null when it no longer exists.</summary>
-    Task<AccountRecord?> UpdateName(string accountId, string name);
+    /// <summary>Updates the name and, when <paramref name="phone"/> is not null, the phone ("" removes it); null when the account no longer exists.</summary>
+    Task<AccountRecord?> UpdateProfile(string accountId, string name, string? phone);
+    /// <summary>Throws <c>wrong_password</c> or <c>email_taken</c>; the caller has already confirmed the code sent to <paramref name="newEmail"/>.</summary>
+    Task<AccountRecord> ChangeEmail(string accountId, string currentPassword, string newEmail);
+    /// <summary>Removes the account with its sessions, addresses and orders; false when the password is wrong.</summary>
+    Task<bool> Delete(string accountId, string currentPassword);
+    Task<bool> EmailInUse(string email);
+    Task<bool> CheckPassword(string accountId, string password);
+    Task<CustomerAddress[]> Addresses(string accountId);
+    /// <summary>Adds (<paramref name="addressId"/> null) or replaces an address; the first one and any marked default become the default.</summary>
+    Task<CustomerAddress> SaveAddress(string accountId, string? addressId, SaveCustomerAddress address);
+    Task<bool> DeleteAddress(string accountId, string addressId);
+    Task<CustomerOrder[]> Orders(string accountId);
+    /// <summary>Stores the order built by <paramref name="build"/> unless one with the same request id exists, which is returned instead.</summary>
+    Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build);
     /// <summary>False when <paramref name="currentPassword"/> is wrong. On success every session of the account is signed out.</summary>
     Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword);
 }
@@ -56,7 +69,16 @@ public sealed class UnavailableAccountStore : IAccountStore
     public Task<AccountRecord?> FindById(string accountId) => throw new AccountUnavailableException();
     public Task<AccountRecord?> AssignRole(string email, string role) => throw new AccountUnavailableException();
     public Task<bool> AnyWithRole(string role) => throw new AccountUnavailableException();
-    public Task<AccountRecord?> UpdateName(string accountId, string name) => throw new AccountUnavailableException();
+    public Task<AccountRecord?> UpdateProfile(string accountId, string name, string? phone) => throw new AccountUnavailableException();
+    public Task<AccountRecord> ChangeEmail(string accountId, string currentPassword, string newEmail) => throw new AccountUnavailableException();
+    public Task<bool> Delete(string accountId, string currentPassword) => throw new AccountUnavailableException();
+    public Task<bool> EmailInUse(string email) => throw new AccountUnavailableException();
+    public Task<bool> CheckPassword(string accountId, string password) => throw new AccountUnavailableException();
+    public Task<CustomerAddress[]> Addresses(string accountId) => throw new AccountUnavailableException();
+    public Task<CustomerAddress> SaveAddress(string accountId, string? addressId, SaveCustomerAddress address) => throw new AccountUnavailableException();
+    public Task<bool> DeleteAddress(string accountId, string addressId) => throw new AccountUnavailableException();
+    public Task<CustomerOrder[]> Orders(string accountId) => throw new AccountUnavailableException();
+    public Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build) => throw new AccountUnavailableException();
     public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => throw new AccountUnavailableException();
 }
 
@@ -97,7 +119,10 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
 {
     private sealed record RefreshEntry(string Hash, string FamilyId, string AccountId, DateTimeOffset ExpiresAt, DateTimeOffset? UsedAt, DateTimeOffset? RevokedAt);
     private sealed record AccessEntry(string Hash, string AccountId, DateTimeOffset ExpiresAt);
-    private sealed record State(List<AccountRecord> Accounts, List<RefreshEntry> RefreshTokens, List<AccessEntry> AccessTokens);
+    private sealed record StoredAddress(string AccountId, CustomerAddress Address);
+    private sealed record StoredOrder(string AccountId, string RequestId, CustomerOrder Order);
+    // Addresses and demo orders were added later; files written before have no such lists.
+    private sealed record State(List<AccountRecord> Accounts, List<RefreshEntry> RefreshTokens, List<AccessEntry> AccessTokens, List<StoredAddress>? Addresses = null, List<StoredOrder>? Orders = null);
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     private readonly PasswordHasher<AccountRecord> hasher = new();
@@ -106,9 +131,11 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
     private readonly string dummyHash = new PasswordHasher<AccountRecord>().HashPassword(null!, "xinobi-timing-equaliser");
     private string FilePath => Path.Combine(commerce.DataDirectory, "identity", "accounts.json");
 
-    private async Task<State> Read() => File.Exists(FilePath)
-        ? JsonSerializer.Deserialize<State>(await File.ReadAllTextAsync(FilePath), JsonOptions)!
-        : new([], [], []);
+    private async Task<State> Read()
+    {
+        var state = File.Exists(FilePath) ? JsonSerializer.Deserialize<State>(await File.ReadAllTextAsync(FilePath), JsonOptions)! : new([], [], []);
+        return state with { Addresses = state.Addresses ?? [], Orders = state.Orders ?? [] };
+    }
 
     private async Task Write(State state)
     {
@@ -234,13 +261,102 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
 
     public Task<bool> AnyWithRole(string role) => Locked(state => Task.FromResult(state.Accounts.Any(account => account.RoleCodes.Contains(role))));
 
-    public Task<AccountRecord?> UpdateName(string accountId, string name) => Locked(async state =>
+    public Task<AccountRecord?> UpdateProfile(string accountId, string name, string? phone) => Locked(async state =>
     {
         var index = state.Accounts.FindIndex(account => account.Id == accountId);
         if (index < 0) return null;
-        state.Accounts[index] = state.Accounts[index] with { Name = name };
+        var account = state.Accounts[index] with { Name = name };
+        if (phone is not null) account = account with { Phone = phone.Length == 0 ? null : phone };
+        state.Accounts[index] = account;
         await Write(state);
-        return state.Accounts[index];
+        return account;
+    });
+
+    public Task<bool> EmailInUse(string email) => Locked(state => Task.FromResult(state.Accounts.Any(account => account.Email == email)));
+
+    public Task<bool> CheckPassword(string accountId, string password) => Locked(state =>
+    {
+        var account = state.Accounts.FirstOrDefault(item => item.Id == accountId);
+        return Task.FromResult(account is not null && hasher.VerifyHashedPassword(account, account.PasswordHash, password) != PasswordVerificationResult.Failed);
+    });
+
+    public Task<AccountRecord> ChangeEmail(string accountId, string currentPassword, string newEmail) => Locked(async state =>
+    {
+        var index = state.Accounts.FindIndex(account => account.Id == accountId);
+        var account = index < 0 ? null : state.Accounts[index];
+        if (account is null || hasher.VerifyHashedPassword(account, account.PasswordHash, currentPassword) == PasswordVerificationResult.Failed)
+            throw new AccountException("wrong_password", "Mevcut parolan hatalı.");
+        if (state.Accounts.Any(other => other.Id != accountId && other.Email == newEmail))
+            throw new AccountException("email_taken", "Bu e-posta başka bir hesapta kullanılıyor.", StatusCodes.Status409Conflict);
+        state.Accounts[index] = account = account with { Email = newEmail };
+        await Write(state);
+        return account;
+    });
+
+    public Task<bool> Delete(string accountId, string currentPassword) => Locked(async state =>
+    {
+        var account = state.Accounts.FirstOrDefault(item => item.Id == accountId);
+        if (account is null || hasher.VerifyHashedPassword(account, account.PasswordHash, currentPassword) == PasswordVerificationResult.Failed) return false;
+        state.Accounts.Remove(account);
+        state.RefreshTokens.RemoveAll(entry => entry.AccountId == accountId);
+        state.AccessTokens.RemoveAll(entry => entry.AccountId == accountId);
+        state.Addresses!.RemoveAll(entry => entry.AccountId == accountId);
+        state.Orders!.RemoveAll(entry => entry.AccountId == accountId);
+        await Write(state);
+        return true;
+    });
+
+    public Task<CustomerAddress[]> Addresses(string accountId) => Locked(state => Task.FromResult(AddressesOf(state, accountId)));
+
+    private static CustomerAddress[] AddressesOf(State state, string accountId) =>
+        state.Addresses!.Where(entry => entry.AccountId == accountId).Select(entry => entry.Address).OrderByDescending(address => address.IsDefault).ToArray();
+
+    public Task<CustomerAddress> SaveAddress(string accountId, string? addressId, SaveCustomerAddress address) => Locked(async state =>
+    {
+        var mine = state.Addresses!.Where(entry => entry.AccountId == accountId).ToList();
+        var existing = addressId is null ? null : mine.FirstOrDefault(entry => entry.Address.Id == addressId)
+            ?? throw new AccountException("address_not_found", "Adres bulunamadı.", StatusCodes.Status404NotFound);
+        if (existing is null && mine.Count >= CustomerRules.MaxAddresses)
+            throw new AccountException("address_limit", $"En fazla {CustomerRules.MaxAddresses} adres kaydedebilirsin.", StatusCodes.Status409Conflict);
+        // The first address is always the default; the default cannot be switched off without choosing another.
+        var isDefault = address.IsDefault || mine.Count == 0 || existing is { Address.IsDefault: true };
+        var saved = new CustomerAddress(existing?.Address.Id ?? Guid.NewGuid().ToString("N"), address.Title, address.FullName, address.Phone,
+            address.City, address.District, address.Line, address.PostalCode, isDefault);
+        if (isDefault)
+            for (var i = 0; i < state.Addresses!.Count; i++)
+                if (state.Addresses[i].AccountId == accountId && state.Addresses[i].Address.IsDefault)
+                    state.Addresses[i] = state.Addresses[i] with { Address = state.Addresses[i].Address with { IsDefault = false } };
+        var index = existing is null ? -1 : state.Addresses!.FindIndex(entry => entry.AccountId == accountId && entry.Address.Id == saved.Id);
+        if (index >= 0) state.Addresses![index] = new StoredAddress(accountId, saved);
+        else state.Addresses!.Add(new StoredAddress(accountId, saved));
+        await Write(state);
+        return saved;
+    });
+
+    public Task<bool> DeleteAddress(string accountId, string addressId) => Locked(async state =>
+    {
+        var entry = state.Addresses!.FirstOrDefault(item => item.AccountId == accountId && item.Address.Id == addressId);
+        if (entry is null) return false;
+        state.Addresses!.Remove(entry);
+        // Removing the default promotes the next address so one is always preselected at checkout.
+        if (entry.Address.IsDefault && state.Addresses.FindIndex(item => item.AccountId == accountId) is var next and >= 0)
+            state.Addresses[next] = state.Addresses[next] with { Address = state.Addresses[next].Address with { IsDefault = true } };
+        await Write(state);
+        return true;
+    });
+
+    public Task<CustomerOrder[]> Orders(string accountId) => Locked(state => Task.FromResult(
+        state.Orders!.Where(entry => entry.AccountId == accountId).Select(entry => entry.Order).OrderByDescending(order => order.CreatedAt).ToArray()));
+
+    public Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build) => Locked(async state =>
+    {
+        if (state.Orders!.FirstOrDefault(entry => entry.AccountId == accountId && entry.RequestId == clientRequestId) is { } existing) return existing.Order;
+        if (state.Orders!.Count(entry => entry.AccountId == accountId) >= 200)
+            throw new AccountException("order_limit", "Demo sipariş sınırına ulaşıldı.", StatusCodes.Status409Conflict);
+        var order = build();
+        state.Orders!.Add(new StoredOrder(accountId, clientRequestId, order));
+        await Write(state);
+        return order;
     });
 
     public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => Locked(async state =>

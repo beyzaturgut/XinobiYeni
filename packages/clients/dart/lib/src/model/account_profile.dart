@@ -15,6 +15,7 @@ part 'account_profile.g.dart';
 /// * [name]
 /// * [email]
 /// * [createdAt]
+/// * [phone]
 @BuiltValue()
 abstract class AccountProfile implements Built<AccountProfile, AccountProfileBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -28,6 +29,9 @@ abstract class AccountProfile implements Built<AccountProfile, AccountProfileBui
 
   @BuiltValueField(wireName: r'createdAt')
   DateTime get createdAt;
+
+  @BuiltValueField(wireName: r'phone')
+  String? get phone;
 
   AccountProfile._();
 
@@ -72,6 +76,13 @@ class _$AccountProfileSerializer implements PrimitiveSerializer<AccountProfile> 
       object.createdAt,
       specifiedType: const FullType(DateTime),
     );
+    if (object.phone != null) {
+      yield r'phone';
+      yield serializers.serialize(
+        object.phone,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -122,6 +133,14 @@ class _$AccountProfileSerializer implements PrimitiveSerializer<AccountProfile> 
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createdAt = valueDes;
+          break;
+        case r'phone':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.phone = valueDes;
           break;
         default:
           unhandled.add(key);

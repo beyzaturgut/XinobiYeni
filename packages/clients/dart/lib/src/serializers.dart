@@ -25,7 +25,12 @@ import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
 import 'package:xinobi_api_client/src/model/change_my_password.dart';
+import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
 import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
+import 'package:xinobi_api_client/src/model/customer_address.dart';
+import 'package:xinobi_api_client/src/model/customer_order.dart';
+import 'package:xinobi_api_client/src/model/customer_order_line.dart';
+import 'package:xinobi_api_client/src/model/delete_my_account.dart';
 import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
 import 'package:xinobi_api_client/src/model/home_content.dart';
@@ -34,6 +39,8 @@ import 'package:xinobi_api_client/src/model/login_account.dart';
 import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:xinobi_api_client/src/model/permission_catalog_response.dart';
+import 'package:xinobi_api_client/src/model/place_order.dart';
+import 'package:xinobi_api_client/src/model/place_order_item.dart';
 import 'package:xinobi_api_client/src/model/problem_details.dart';
 import 'package:xinobi_api_client/src/model/product_detail.dart';
 import 'package:xinobi_api_client/src/model/product_page.dart';
@@ -41,7 +48,9 @@ import 'package:xinobi_api_client/src/model/product_summary.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
 import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
+import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
+import 'package:xinobi_api_client/src/model/start_email_change.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
@@ -67,7 +76,12 @@ part 'serializers.g.dart';
   CategoryItem,
   CategoryList,
   ChangeMyPassword,
+  ConfirmEmailChange,
   CreateXinobiUSession,
+  CustomerAddress,
+  CustomerOrder,
+  CustomerOrderLine,
+  DeleteMyAccount,
   DependencyHealth,
   HealthResponse,
   HomeContent,
@@ -76,6 +90,8 @@ part 'serializers.g.dart';
   LogoutSession,
   Money,
   PermissionCatalogResponse,
+  PlaceOrder,
+  PlaceOrderItem,
   ProblemDetails,
   ProductDetail,
   ProductPage,
@@ -83,7 +99,9 @@ part 'serializers.g.dart';
   ReadinessResponse,
   RefreshSession,
   RegisterAccount,
+  SaveCustomerAddress,
   StartAccountEmailVerification,
+  StartEmailChange,
   UpdateMyAccount,
   VariantDetail,
   XinobiUAnswer,
@@ -105,20 +123,12 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<CategoryItem>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(DependencyHealth)]),
-        () => ListBuilder<DependencyHealth>(),
-      )
-      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(AnnouncementItem)]),
         () => ListBuilder<AnnouncementItem>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUOption)]),
         () => ListBuilder<XinobiUOption>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(VariantDetail)]),
-        () => ListBuilder<VariantDetail>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(HomeSlide)]),
@@ -129,6 +139,30 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<CategoryHighlight>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(CustomerAddress)]),
+        () => ListBuilder<CustomerAddress>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(XinobiUQuestion)]),
+        () => ListBuilder<XinobiUQuestion>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PlaceOrderItem)]),
+        () => ListBuilder<PlaceOrderItem>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(DependencyHealth)]),
+        () => ListBuilder<DependencyHealth>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(VariantDetail)]),
+        () => ListBuilder<VariantDetail>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(CustomerOrderLine)]),
+        () => ListBuilder<CustomerOrderLine>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUAnswer)]),
         () => ListBuilder<XinobiUAnswer>(),
       )
@@ -137,8 +171,8 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<String>(),
       )
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(XinobiUQuestion)]),
-        () => ListBuilder<XinobiUQuestion>(),
+        const FullType(BuiltList, [FullType(CustomerOrder)]),
+        () => ListBuilder<CustomerOrder>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

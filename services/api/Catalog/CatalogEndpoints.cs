@@ -63,7 +63,7 @@ public static class CatalogEndpoints
             .WithName("ListAnnouncements");
     }
 
-    private static async Task<CatalogProjection> Project(HttpContext http, ICatalogSource source, IConfiguration configuration, IWebHostEnvironment environment) =>
+    internal static async Task<CatalogProjection> Project(HttpContext http, ICatalogSource source, IConfiguration configuration, IWebHostEnvironment environment) =>
         new(await source.ReadAsync(), path => ResolveUrl(path, http.Request, configuration["Catalog:AssetBaseUrl"], environment.IsDevelopment()));
 
     /// <summary>

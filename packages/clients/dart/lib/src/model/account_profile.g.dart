@@ -15,6 +15,8 @@ class _$AccountProfile extends AccountProfile {
   final String email;
   @override
   final DateTime createdAt;
+  @override
+  final String? phone;
 
   factory _$AccountProfile([void Function(AccountProfileBuilder)? updates]) =>
       (AccountProfileBuilder()..update(updates))._build();
@@ -23,7 +25,8 @@ class _$AccountProfile extends AccountProfile {
       {required this.id,
       required this.name,
       required this.email,
-      required this.createdAt})
+      required this.createdAt,
+      this.phone})
       : super._();
   @override
   AccountProfile rebuild(void Function(AccountProfileBuilder) updates) =>
@@ -39,7 +42,8 @@ class _$AccountProfile extends AccountProfile {
         id == other.id &&
         name == other.name &&
         email == other.email &&
-        createdAt == other.createdAt;
+        createdAt == other.createdAt &&
+        phone == other.phone;
   }
 
   @override
@@ -49,6 +53,7 @@ class _$AccountProfile extends AccountProfile {
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, email.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, phone.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -59,7 +64,8 @@ class _$AccountProfile extends AccountProfile {
           ..add('id', id)
           ..add('name', name)
           ..add('email', email)
-          ..add('createdAt', createdAt))
+          ..add('createdAt', createdAt)
+          ..add('phone', phone))
         .toString();
   }
 }
@@ -84,6 +90,10 @@ class AccountProfileBuilder
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
+  String? _phone;
+  String? get phone => _$this._phone;
+  set phone(String? phone) => _$this._phone = phone;
+
   AccountProfileBuilder() {
     AccountProfile._defaults(this);
   }
@@ -95,6 +105,7 @@ class AccountProfileBuilder
       _name = $v.name;
       _email = $v.email;
       _createdAt = $v.createdAt;
+      _phone = $v.phone;
       _$v = null;
     }
     return this;
@@ -124,6 +135,7 @@ class AccountProfileBuilder
               email, r'AccountProfile', 'email'),
           createdAt: BuiltValueNullFieldError.checkNotNull(
               createdAt, r'AccountProfile', 'createdAt'),
+          phone: phone,
         );
     replace(_$result);
     return _$result;

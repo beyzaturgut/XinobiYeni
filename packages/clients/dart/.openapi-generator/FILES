@@ -15,8 +15,13 @@ doc/CategoryHighlight.md
 doc/CategoryItem.md
 doc/CategoryList.md
 doc/ChangeMyPassword.md
+doc/ConfirmEmailChange.md
 doc/ContentApi.md
 doc/CreateXinobiUSession.md
+doc/CustomerAddress.md
+doc/CustomerOrder.md
+doc/CustomerOrderLine.md
+doc/DeleteMyAccount.md
 doc/DependencyHealth.md
 doc/HealthResponse.md
 doc/HomeContent.md
@@ -25,6 +30,8 @@ doc/LoginAccount.md
 doc/LogoutSession.md
 doc/Money.md
 doc/PermissionCatalogResponse.md
+doc/PlaceOrder.md
+doc/PlaceOrderItem.md
 doc/ProblemDetails.md
 doc/ProductDetail.md
 doc/ProductPage.md
@@ -32,7 +39,9 @@ doc/ProductSummary.md
 doc/ReadinessResponse.md
 doc/RefreshSession.md
 doc/RegisterAccount.md
+doc/SaveCustomerAddress.md
 doc/StartAccountEmailVerification.md
+doc/StartEmailChange.md
 doc/SystemApi.md
 doc/UpdateMyAccount.md
 doc/VariantDetail.md
@@ -70,8 +79,13 @@ lib/src/model/category_highlight.dart
 lib/src/model/category_item.dart
 lib/src/model/category_list.dart
 lib/src/model/change_my_password.dart
+lib/src/model/confirm_email_change.dart
 lib/src/model/create_xinobi_u_session.dart
+lib/src/model/customer_address.dart
+lib/src/model/customer_order.dart
+lib/src/model/customer_order_line.dart
 lib/src/model/date.dart
+lib/src/model/delete_my_account.dart
 lib/src/model/dependency_health.dart
 lib/src/model/health_response.dart
 lib/src/model/home_content.dart
@@ -80,6 +94,8 @@ lib/src/model/login_account.dart
 lib/src/model/logout_session.dart
 lib/src/model/money.dart
 lib/src/model/permission_catalog_response.dart
+lib/src/model/place_order.dart
+lib/src/model/place_order_item.dart
 lib/src/model/problem_details.dart
 lib/src/model/product_detail.dart
 lib/src/model/product_page.dart
@@ -87,7 +103,9 @@ lib/src/model/product_summary.dart
 lib/src/model/readiness_response.dart
 lib/src/model/refresh_session.dart
 lib/src/model/register_account.dart
+lib/src/model/save_customer_address.dart
 lib/src/model/start_account_email_verification.dart
+lib/src/model/start_email_change.dart
 lib/src/model/update_my_account.dart
 lib/src/model/variant_detail.dart
 lib/src/model/xinobi_u_answer.dart

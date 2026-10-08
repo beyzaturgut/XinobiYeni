@@ -12,10 +12,14 @@ part 'update_my_account.g.dart';
 ///
 /// Properties:
 /// * [name]
+/// * [phone]
 @BuiltValue()
 abstract class UpdateMyAccount implements Built<UpdateMyAccount, UpdateMyAccountBuilder> {
   @BuiltValueField(wireName: r'name')
   String get name;
+
+  @BuiltValueField(wireName: r'phone')
+  String? get phone;
 
   UpdateMyAccount._();
 
@@ -45,6 +49,13 @@ class _$UpdateMyAccountSerializer implements PrimitiveSerializer<UpdateMyAccount
       object.name,
       specifiedType: const FullType(String),
     );
+    if (object.phone != null) {
+      yield r'phone';
+      yield serializers.serialize(
+        object.phone,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -74,6 +85,14 @@ class _$UpdateMyAccountSerializer implements PrimitiveSerializer<UpdateMyAccount
             specifiedType: const FullType(String),
           ) as String;
           result.name = valueDes;
+          break;
+        case r'phone':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.phone = valueDes;
           break;
         default:
           unhandled.add(key);

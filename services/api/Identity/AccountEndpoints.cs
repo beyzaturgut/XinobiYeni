@@ -16,9 +16,8 @@ public record RegisterAccount(string Name, string Email, string Password, string
 public record LoginAccount(string Email, string Password);
 public record RefreshSession(string RefreshToken);
 public record LogoutSession(string RefreshToken);
-public record AccountProfile(string Id, string Name, string Email, DateTimeOffset CreatedAt);
-public record UpdateMyAccount(string Name);
-public record ChangeMyPassword(string CurrentPassword, string NewPassword);
+public record AccountProfile(string Id, string Name, string Email, DateTimeOffset CreatedAt, string? Phone = null);
+
 /// <summary>What the panel may show; every action is still checked on the server.</summary>
 public record AdminSession(AccountProfile Account, IReadOnlyCollection<string> Roles, IReadOnlyCollection<string> Permissions);
 public record PermissionCatalogResponse(IReadOnlyList<string> Resources, IReadOnlyCollection<string> Permissions);
@@ -227,7 +226,8 @@ public static class AccountEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         me.MapPatch("", async Task<Results<Ok<AccountProfile>, ProblemHttpResult>> (UpdateMyAccount request, ClaimsPrincipal user, IAccountStore accounts) =>
-                await accounts.UpdateName(user.FindFirstValue(ClaimTypes.NameIdentifier)!, AccountRules.ValidName(request.Name)) is { } account
+                await accounts.UpdateProfile(user.FindFirstValue(ClaimTypes.NameIdentifier)!, AccountRules.ValidName(request.Name),
+                        request.Phone is null ? null : request.Phone.Trim().Length == 0 ? "" : CustomerRules.ValidPhone(request.Phone)) is { } account
                     ? TypedResults.Ok(Profile(account))
                     : Problem(StatusCodes.Status401Unauthorized, "invalid_token", "Oturumun sona erdi. Tekrar giriş yap."))
             .WithName("UpdateMyAccount")
@@ -255,6 +255,8 @@ public static class AccountEndpoints
             .ProducesProblem(StatusCodes.Status401Unauthorized);
         if (app.Environment.IsDevelopment()) password.RequireRateLimiting("Account");
 
+        CustomerEndpoints.Map(me, app.Environment.IsDevelopment());
+
         admin.MapGet("/session", async Task<Results<Ok<AdminSession>, ProblemHttpResult>> (ClaimsPrincipal user, IAccountStore accounts) =>
                 await accounts.FindById(user.FindFirstValue(ClaimTypes.NameIdentifier)!) is { } account
                     ? TypedResults.Ok(new AdminSession(Profile(account), account.RoleCodes, Roles.PermissionsFor(account.RoleCodes)))
@@ -273,7 +275,9 @@ public static class AccountEndpoints
     private static AuthSession Session(AccountRecord account, IssuedTokens tokens) => new(
         tokens.AccessToken, tokens.AccessTokenExpiresAt, tokens.RefreshToken, tokens.RefreshTokenExpiresAt, Profile(account));
 
-    public static AccountProfile Profile(AccountRecord account) => new(account.Id, account.Name, account.Email, account.CreatedAt);
+    internal static ProblemHttpResult Failure(int status, string code, string title) => Problem(status, code, title);
+
+    public static AccountProfile Profile(AccountRecord account) => new(account.Id, account.Name, account.Email, account.CreatedAt, account.Phone);
 
     private static ProblemHttpResult InvalidCredentials() => Problem(StatusCodes.Status401Unauthorized, "invalid_credentials", "E-posta veya parola hatalı.");
 

@@ -48,13 +48,13 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 
 final api = XinobiApiClient().getAccountApi();
-final ChangeMyPassword changeMyPassword = ; // ChangeMyPassword |
+final SaveCustomerAddress saveCustomerAddress = ; // SaveCustomerAddress |
 
 try {
-    final response = await api.changeMyPassword(changeMyPassword);
+    final response = await api.addMyAddress(saveCustomerAddress);
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling AccountApi->changeMyPassword: $e\n");
+    print("Exception when calling AccountApi->addMyAddress: $e\n");
 }
 
 ```
@@ -65,18 +65,27 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AccountApi*](doc/AccountApi.md) | [**addMyAddress**](doc/AccountApi.md#addmyaddress) | **POST** /api/v1/me/addresses |
 [*AccountApi*](doc/AccountApi.md) | [**changeMyPassword**](doc/AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
+[*AccountApi*](doc/AccountApi.md) | [**confirmMyEmailChange**](doc/AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
+[*AccountApi*](doc/AccountApi.md) | [**deleteMyAccount**](doc/AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
+[*AccountApi*](doc/AccountApi.md) | [**deleteMyAddress**](doc/AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[*AccountApi*](doc/AccountApi.md) | [**listMyOrders**](doc/AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [*AccountApi*](doc/AccountApi.md) | [**loginWebAccount**](doc/AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
 [*AccountApi*](doc/AccountApi.md) | [**logoutSession**](doc/AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
 [*AccountApi*](doc/AccountApi.md) | [**logoutWebSession**](doc/AccountApi.md#logoutwebsession) | **POST** /api/v1/auth/web/logout |
+[*AccountApi*](doc/AccountApi.md) | [**placeMyOrder**](doc/AccountApi.md#placemyorder) | **POST** /api/v1/me/orders |
 [*AccountApi*](doc/AccountApi.md) | [**refreshSession**](doc/AccountApi.md#refreshsession) | **POST** /api/v1/auth/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**refreshWebSession**](doc/AccountApi.md#refreshwebsession) | **POST** /api/v1/auth/web/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**registerAccount**](doc/AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
 [*AccountApi*](doc/AccountApi.md) | [**registerWebAccount**](doc/AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
+[*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
+[*AccountApi*](doc/AccountApi.md) | [**updateMyAddress**](doc/AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
@@ -107,7 +116,12 @@ Class | Method | HTTP request | Description
  - [CategoryItem](doc/CategoryItem.md)
  - [CategoryList](doc/CategoryList.md)
  - [ChangeMyPassword](doc/ChangeMyPassword.md)
+ - [ConfirmEmailChange](doc/ConfirmEmailChange.md)
  - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
+ - [CustomerAddress](doc/CustomerAddress.md)
+ - [CustomerOrder](doc/CustomerOrder.md)
+ - [CustomerOrderLine](doc/CustomerOrderLine.md)
+ - [DeleteMyAccount](doc/DeleteMyAccount.md)
  - [DependencyHealth](doc/DependencyHealth.md)
  - [HealthResponse](doc/HealthResponse.md)
  - [HomeContent](doc/HomeContent.md)
@@ -116,6 +130,8 @@ Class | Method | HTTP request | Description
  - [LogoutSession](doc/LogoutSession.md)
  - [Money](doc/Money.md)
  - [PermissionCatalogResponse](doc/PermissionCatalogResponse.md)
+ - [PlaceOrder](doc/PlaceOrder.md)
+ - [PlaceOrderItem](doc/PlaceOrderItem.md)
  - [ProblemDetails](doc/ProblemDetails.md)
  - [ProductDetail](doc/ProductDetail.md)
  - [ProductPage](doc/ProductPage.md)
@@ -123,7 +139,9 @@ Class | Method | HTTP request | Description
  - [ReadinessResponse](doc/ReadinessResponse.md)
  - [RefreshSession](doc/RefreshSession.md)
  - [RegisterAccount](doc/RegisterAccount.md)
+ - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
+ - [StartEmailChange](doc/StartEmailChange.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)
  - [XinobiUAnswer](doc/XinobiUAnswer.md)

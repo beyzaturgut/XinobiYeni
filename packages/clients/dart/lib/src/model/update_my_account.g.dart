@@ -9,11 +9,13 @@ part of 'update_my_account.dart';
 class _$UpdateMyAccount extends UpdateMyAccount {
   @override
   final String name;
+  @override
+  final String? phone;
 
   factory _$UpdateMyAccount([void Function(UpdateMyAccountBuilder)? updates]) =>
       (UpdateMyAccountBuilder()..update(updates))._build();
 
-  _$UpdateMyAccount._({required this.name}) : super._();
+  _$UpdateMyAccount._({required this.name, this.phone}) : super._();
   @override
   UpdateMyAccount rebuild(void Function(UpdateMyAccountBuilder) updates) =>
       (toBuilder()..update(updates)).build();
@@ -24,20 +26,25 @@ class _$UpdateMyAccount extends UpdateMyAccount {
   @override
   bool operator ==(Object other) {
     if (identical(other, this)) return true;
-    return other is UpdateMyAccount && name == other.name;
+    return other is UpdateMyAccount &&
+        name == other.name &&
+        phone == other.phone;
   }
 
   @override
   int get hashCode {
     var _$hash = 0;
     _$hash = $jc(_$hash, name.hashCode);
+    _$hash = $jc(_$hash, phone.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
 
   @override
   String toString() {
-    return (newBuiltValueToStringHelper(r'UpdateMyAccount')..add('name', name))
+    return (newBuiltValueToStringHelper(r'UpdateMyAccount')
+          ..add('name', name)
+          ..add('phone', phone))
         .toString();
   }
 }
@@ -50,6 +57,10 @@ class UpdateMyAccountBuilder
   String? get name => _$this._name;
   set name(String? name) => _$this._name = name;
 
+  String? _phone;
+  String? get phone => _$this._phone;
+  set phone(String? phone) => _$this._phone = phone;
+
   UpdateMyAccountBuilder() {
     UpdateMyAccount._defaults(this);
   }
@@ -58,6 +69,7 @@ class UpdateMyAccountBuilder
     final $v = _$v;
     if ($v != null) {
       _name = $v.name;
+      _phone = $v.phone;
       _$v = null;
     }
     return this;
@@ -81,6 +93,7 @@ class UpdateMyAccountBuilder
         _$UpdateMyAccount._(
           name: BuiltValueNullFieldError.checkNotNull(
               name, r'UpdateMyAccount', 'name'),
+          phone: phone,
         );
     replace(_$result);
     return _$result;

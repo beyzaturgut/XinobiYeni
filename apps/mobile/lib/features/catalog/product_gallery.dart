@@ -53,10 +53,9 @@ class _ProductGalleryState extends State<ProductGallery> {
     super.didUpdateWidget(oldWidget);
     final target = index;
     if (pages.hasClients && pages.page?.round() != target) {
+      // A colour or thumbnail choice switches straight to its photo instead of sliding past the photos in between.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || !pages.hasClients) return;
-        final reduce = MediaQuery.of(context).disableAnimations;
-        reduce ? pages.jumpToPage(target) : pages.animateToPage(target, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+        if (mounted && pages.hasClients) pages.jumpToPage(target);
       });
     }
   }

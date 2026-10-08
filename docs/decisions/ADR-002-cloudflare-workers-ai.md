@@ -53,3 +53,18 @@ Başlangıç araştırma kaynakları:
 **Bu istisnanın kapsamadığı ve Faz10'da kapatılacaklar:** gerçek kullanıcı kimliği ve sahiplik (şu an 256-bit oturum anahtarı), girdi/çıktı moderasyonu, D10 saklama ve silme politikası, kullanıcı bazlı limit ve maliyet kaydı (`AiUsage`), panel yönetimi, ticari lisans/veri kullanımı doğrulaması ve PoC ile model seçimi. ADR-002'de araştırma adayı olarak FLUX.2 Klein 4B geçerken uygulamada flux-1-schnell kullanıldı; seçim PoC'de yeniden değerlendirilir.
 
 **Karar (önerilen):** Yerel adaptör Development denemesi olarak kalabilir; production'a, staging'e ya da müşteri verisine açılması Faz10 kapısından geçmeden yapılmaz. Proje sahibi bu istisnayı onaylamazsa adaptör özellik bayrağıyla (Faz00 T-09) kapatılır.
+
+## Ek B — Test sunucusunda XINOBI U istisnası (08.10.2026)
+
+- Durum: Kabul edildi · proje sahibi onayı 08.10.2026 (sohbet: "xinobi u yu aç"); yalnız test sunucusu `109.104.120.91` (web `:8014`, API `:8024`) kapsamında
+- Gerekçe: Ek A uçları yalnız Development'ta açıktı; web ve APK test sunucusunda XINOBI U'yu deneyemiyordu (anket dahil 503).
+
+**Sınırlar (kodla doğrulandı, `DesignStudioAccess`):**
+
+- Production'da varsayılan kapalıdır; yalnız `XinobiU:Enabled=true` ile açılır. Bayrak yoksa davranış Ek A ile aynıdır (503 / uç yok).
+- Açıkken loopback zorunluluğu kalkar; tarayıcı `Origin` başlığı yalnız `XinobiU:AllowedOrigins` listesindeyse (test web sitesi) kabul edilir, CORS da yalnız bu kökene açılır. Origin göndermeyen istemciler (mobil uygulama) kabul edilir; bu bir kimlik doğrulaması değildir.
+- Maliyet sınırı: sunucu genelinde günlük 30 üretim (`DesignStudio:DailyGenerationLimit`), adres başına dakikada 120 istek, tek worker, 120 sn zaman aşımı, idempotent üretim (Ek A ile aynı).
+- Ürünler test sunucusundaki katalog anlık görüntüsünden okunur; oturum ve görseller API klasörü dışındaki `DesignStudio:DataDirectory` klasöründe tutulur.
+- Cloudflare kimlik bilgileri paket veya Git'e girmez; sunucuda `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_API_TOKEN` makine ortam değişkenleridir.
+
+**Kabul edilen risk:** Uçlar kimliksiz ve internetten erişilebilir; herkes günlük limite kadar üretim tetikleyebilir ve moderasyon yoktur. Ek A'daki Faz10 maddeleri (kimlik, moderasyon, saklama, kullanıcı bazlı limit/maliyet kaydı) bu istisnayla kapanmış sayılmaz. Gerçek müşteri trafiğine açılmadan önce bayrak kapatılır veya Faz10 kapısı tamamlanır.

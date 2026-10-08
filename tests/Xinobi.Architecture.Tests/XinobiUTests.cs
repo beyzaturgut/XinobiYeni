@@ -60,6 +60,49 @@ public sealed class XinobiUTests : IDisposable
     }
 
     [Fact]
+    public async Task TestServerServesXinobiUFromTheSnapshotWhenEnabled()
+    {
+        Directory.CreateDirectory(directory);
+        var snapshot = Path.Combine(directory, "snapshot.json");
+        await File.WriteAllTextAsync(snapshot, await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../services/api/LocalCommerce/seed.json")));
+        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Production");
+            builder.UseSetting("Catalog:SnapshotPath", snapshot);
+            builder.UseSetting("Catalog:AssetBaseUrl", "http://web.test:8014");
+            builder.UseSetting("XinobiU:Enabled", "true");
+            builder.UseSetting("XinobiU:AllowedOrigins:0", "http://web.test:8014");
+            builder.UseSetting("DesignStudio:DataDirectory", Path.Combine(directory, "design"));
+            builder.ConfigureServices(services => { services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); });
+        });
+        using var client = factory.CreateClient();
+
+        Assert.Equal(500, (await client.GetFromJsonAsync<XinobiUStatus>(Root + "/status"))!.QuestionCount);
+        var session = await Create(client);
+        Assert.StartsWith("http://web.test:8014/assets/", session.Variant.ImageUrl);
+        (await client.PostAsJsonAsync(Root + $"/sessions/{session.Id}/generation", FirstOptions(session))).EnsureSuccessStatusCode();
+        XinobiUSession current = session;
+        for (var attempt = 0; attempt < 100 && current.Status != XinobiUSessionStatuses.Ready; attempt++)
+        {
+            await Task.Delay(30);
+            current = (await client.GetFromJsonAsync<XinobiUSession>(Root + "/sessions/" + session.Id))!;
+        }
+        Assert.Equal(XinobiUSessionStatuses.Ready, current.Status);
+        Assert.True(File.Exists(Path.Combine(directory, "design", "sessions.json")));
+
+        // The web (design-studio) shares the store; only the configured browser origin passes, with CORS.
+        var allowed = new HttpRequestMessage(HttpMethod.Get, "/api/v1/design-studio/status") { Headers = { { "Origin", "http://web.test:8014" } } };
+        var allowedResponse = await client.SendAsync(allowed);
+        Assert.Equal(HttpStatusCode.OK, allowedResponse.StatusCode);
+        Assert.Equal("http://web.test:8014", allowedResponse.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        var foreign = new HttpRequestMessage(HttpMethod.Get, Root + "/status") { Headers = { { "Origin", "https://evil.example" } } };
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.SendAsync(foreign)).StatusCode);
+        // Development-only commerce endpoints stay closed.
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/v1/local-commerce/state")).StatusCode);
+        Assert.Equal(1, provider.Calls);
+    }
+
+    [Fact]
     public async Task SessionCarriesFiveQuestionsAndAbsoluteVariantImage()
     {
         using var factory = Factory();

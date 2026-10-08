@@ -41,23 +41,22 @@ public static class XinobiUSessionStatuses
 public static class XinobiUEndpoints
 {
     /// <summary>
-    /// Always mapped so the contract and generated clients include it. Development serves it from the local design store with the
-    /// same safeguards as /api/v1/design-studio (loopback only, rate limit, daily limit, idempotent generation); other environments answer 503
-    /// until user identity, moderation and retention land (ADR-002 Ek A, Faz10).
+    /// Always mapped so the contract and generated clients include it. It shares the design store and safeguards of /api/v1/design-studio
+    /// (<see cref="DesignStudioAccess"/>, rate limit, daily limit, idempotent generation). Development serves it to loopback callers (ADR-002 Ek A);
+    /// the test server serves it when <c>XinobiU:Enabled</c> is set (ADR-002 Ek B); otherwise it answers 503 until user identity,
+    /// moderation and retention land (Faz10).
     /// </summary>
     public static void MapXinobiU(this WebApplication app)
     {
         var group = app.MapGroup("/api/v1/xinobi-u").WithTags("XinobiU").AllowAnonymous();
-        if (app.Environment.IsDevelopment()) group.RequireRateLimiting("DesignStudio");
+        if (DesignStudioAccess.Enabled(app.Environment, app.Configuration)) group.RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {
             var http = context.HttpContext;
             http.Response.Headers.CacheControl = "no-store";
             if (http.RequestServices.GetService<DesignSessionStore>() is null)
                 return Problem(StatusCodes.Status503ServiceUnavailable, "xinobi_u_unavailable", "XINOBI U şu anda kullanılamıyor.");
-            if (http.Connection.RemoteIpAddress is { } address && !IPAddress.IsLoopback(address)) return Results.StatusCode(StatusCodes.Status403Forbidden);
-            var origin = http.Request.Headers.Origin.ToString();
-            if (origin.Length > 0 && !LocalCommerceEndpoints.AllowedOrigin(origin)) return Results.StatusCode(StatusCodes.Status403Forbidden);
+            if (!DesignStudioAccess.Allowed(http)) return Results.StatusCode(StatusCodes.Status403Forbidden);
             try { return await next(context); }
             catch (ArgumentException error) { return Problem(StatusCodes.Status400BadRequest, "invalid_request", error.Message); }
             catch (KeyNotFoundException) { return SessionExpired(); }

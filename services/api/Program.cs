@@ -51,6 +51,21 @@ if (builder.Environment.IsDevelopment())
         // Credentials let the web session cookie travel to the API; origins stay an explicit allow-list.
         .AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 }
+// ADR-002 Ek B: the test server may open XINOBI U (off by default). Cloudflare credentials come from server environment variables.
+var xinobiUOnTestServer = !builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("XinobiU:Enabled");
+if (xinobiUOnTestServer)
+{
+    builder.Services.AddSingleton<QuestionBank>();
+    builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
+    builder.Services.AddSingleton<DesignSessionStore>();
+    builder.Services.AddHostedService<DesignGenerationWorker>();
+    builder.Services.AddRateLimiter(options => {
+        options.RejectionStatusCode = 429;
+        options.AddPolicy("DesignStudio", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions { PermitLimit = 120, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    });
+    builder.Services.AddCors(options => options.AddPolicy(DesignStudioAccess.CorsPolicy, policy => policy
+        .WithOrigins(DesignStudioAccess.AllowedOrigins(builder.Configuration)).AllowAnyHeader().WithMethods("GET", "POST")));
+}
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
 // Outside Development the catalog reads the published snapshot when one is configured, otherwise it answers 503
 // until the SQL Server source exists (Faz03 03.11).
@@ -111,7 +126,11 @@ app.UseStatusCodePages(async statusCodeContext =>
     await problem.ExecuteAsync(httpContext);
 });
 if (app.Environment.IsDevelopment()) { app.UseCors("LocalCommerce"); app.UseRateLimiter(); }
-else app.UseHttpsRedirection();
+else
+{
+    app.UseHttpsRedirection();
+    if (xinobiUOnTestServer) { app.UseCors(DesignStudioAccess.CorsPolicy); app.UseRateLimiter(); }
+}
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapLocalCommerce();

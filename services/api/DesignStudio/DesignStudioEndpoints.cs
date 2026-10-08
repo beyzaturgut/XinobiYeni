@@ -6,14 +6,12 @@ public static class DesignStudioEndpoints
 {
     public static void MapDesignStudio(this WebApplication app)
     {
-        if (!app.Environment.IsDevelopment()) return;
+        if (!DesignStudioAccess.Enabled(app.Environment, app.Configuration)) return;
         var group = app.MapGroup("/api/v1/design-studio").WithTags("DesignStudio").AllowAnonymous().RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {
             var http = context.HttpContext;
-            if (http.Connection.RemoteIpAddress is { } address && !IPAddress.IsLoopback(address)) return Results.StatusCode(403);
-            var origin = http.Request.Headers.Origin.ToString();
-            if (origin.Length > 0 && !LocalCommerceEndpoints.AllowedOrigin(origin)) return Results.StatusCode(403);
+            if (!DesignStudioAccess.Allowed(http)) return Results.StatusCode(403);
             http.Response.Headers.CacheControl = "no-store";
             try { return await next(context); }
             catch (ArgumentException error) { return Results.BadRequest(new { code = "invalid_answers", message = error.Message }); }

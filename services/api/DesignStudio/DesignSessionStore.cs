@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Channels;
+using Xinobi.Api.Catalog;
 using Xinobi.Api.LocalCommerce;
 
 namespace Xinobi.Api.DesignStudio;
@@ -29,11 +30,16 @@ public record BrowserQuestionHistory(string[] Questions, Dictionary<string, stri
 public record DesignDiskState(Dictionary<string, DesignSession> Sessions, Dictionary<string, BrowserQuestionHistory> History);
 public record SessionView(string Id, string Status, DateTimeOffset ExpiresAt, CommerceProduct Product, CommerceVariant Variant, string BankVersion, SessionQuestion[] Questions, DesignAnswer[] Answers, string? ImageUrl, string? ErrorCode, string? ErrorMessage);
 
-public sealed class DesignSessionStore(LocalCommerceStore commerce, QuestionBank bank, IImageGenerationProvider provider, IConfiguration configuration)
+/// <summary>
+/// Products come from the active catalogue source (the local store in Development, the published snapshot on the test server).
+/// Sessions and images live in <c>DesignStudio:DataDirectory</c>, by default <c>design-studio</c> under the local commerce data directory.
+/// </summary>
+public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank, IImageGenerationProvider provider, IConfiguration configuration, IWebHostEnvironment environment)
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
-    private string DirectoryPath => Path.Combine(commerce.DataDirectory, "design-studio");
+    private string DirectoryPath => configuration["DesignStudio:DataDirectory"]
+        ?? Path.Combine(configuration["LocalCommerce:DataDirectory"] ?? Path.Combine(environment.ContentRootPath, "App_Data", "local-commerce"), "design-studio");
     private string StatePath => Path.Combine(DirectoryPath, "sessions.json");
     public string AssetDirectory => Path.Combine(DirectoryPath, "assets");
     public Channel<string> Queue { get; } = Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleReader = true });
@@ -51,7 +57,7 @@ public sealed class DesignSessionStore(LocalCommerceStore commerce, QuestionBank
     public async Task<SessionView> Create(CreateDesignSession request)
     {
         if (!Guid.TryParse(request.BrowserId, out _)) throw new ArgumentException("Geçerli bir tarayıcı oturumu gerekli.");
-        var products = await commerce.Read();
+        var products = await catalog.ReadAsync();
         var product = products.Products.SingleOrDefault(p => p.Id == request.ProductId && Eligible(p)) ?? throw new ArgumentException("Bu ürün kişiselleştirmeye açık değil.");
         var variant = (string.IsNullOrWhiteSpace(request.VariantId)
             ? product.Variants.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v.Image))
@@ -99,7 +105,7 @@ public sealed class DesignSessionStore(LocalCommerceStore commerce, QuestionBank
     public async Task<SessionView> Generate(string id, GenerateDesignRequest request)
     {
         if (request.Answers is null) throw new ArgumentException("Beş yanıt gerekli.");
-        var current = await commerce.Read();
+        var current = await catalog.ReadAsync();
         await gate.WaitAsync();
         try
         {

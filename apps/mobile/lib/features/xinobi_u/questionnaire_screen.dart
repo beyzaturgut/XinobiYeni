@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,6 +7,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
+import '../catalog/catalog_repository.dart';
 import 'xinobi_u_repository.dart';
 
 enum _Phase { loading, questions, review, generating, ready, failed, error }
@@ -323,7 +325,7 @@ class _ResultState extends State<_Result> {
         child: ColoredBox(
           color: XinobiTokens.surface,
           child: onProduct
-              ? _ProductPreview(productUrl: session.variant.imageUrl, patternUrl: session.imageUrl, label: '${session.product.name} ${session.variant.color} üzerinde AI tasarımının temsili önizlemesi')
+              ? _ProductPreview(productId: session.product.id, variantId: session.variant.id, productUrl: session.variant.imageUrl, patternUrl: session.imageUrl, label: '${session.product.name} ${session.variant.color} üzerinde AI tasarımının temsili önizlemesi')
               : RemoteImage(session.imageUrl, label: 'AI tarafından üretilen desen', fit: BoxFit.cover),
         ),
       ),
@@ -336,33 +338,129 @@ class _ResultState extends State<_Result> {
   }
 }
 
-/// Simple representative overlay on the selected colour's photo. The web's calibrated surface masks are not ported yet.
-class _ProductPreview extends StatelessWidget {
-  const _ProductPreview({required this.productUrl, required this.patternUrl, required this.label});
+/// The design on the selected colour's photo, limited to the surface the admin approved for that colour (Ürün yüzeyleri).
+/// Colours without an approved mask keep the simple representative overlay.
+class _ProductPreview extends ConsumerWidget {
+  const _ProductPreview({required this.productId, required this.variantId, required this.productUrl, required this.patternUrl, required this.label});
+  final String productId;
+  final String variantId;
   final String? productUrl;
   final String? patternUrl;
   final String label;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-        label: label,
-        image: true,
-        excludeSemantics: true,
-        child: Stack(fit: StackFit.expand, children: [
-          RemoteImage(productUrl),
-          Align(
-            alignment: const Alignment(-0.08, 0.05),
-            child: FractionallySizedBox(
-              widthFactor: 0.34,
-              heightFactor: 0.42,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(XinobiTokens.radiusMedium),
-                child: Opacity(opacity: 0.88, child: RemoteImage(patternUrl, fit: BoxFit.cover)),
-              ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final variants = ref.watch(productProvider(productId)).value?.variants;
+    final mask = variants?.where((variant) => variant.id == variantId).firstOrNull?.surfaceMaskUrl;
+    return Semantics(
+      label: label,
+      image: true,
+      excludeSemantics: true,
+      child: mask != null && productUrl != null && patternUrl != null
+          ? _MaskedPreview(productUrl: productUrl!, patternUrl: patternUrl!, maskUrl: mask, fallback: _overlay())
+          : _overlay(),
+    );
+  }
+
+  Widget _overlay() => Stack(fit: StackFit.expand, children: [
+        RemoteImage(productUrl),
+        Align(
+          alignment: const Alignment(-0.08, 0.05),
+          child: FractionallySizedBox(
+            widthFactor: 0.34,
+            heightFactor: 0.42,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(XinobiTokens.radiusMedium),
+              child: Opacity(opacity: 0.88, child: RemoteImage(patternUrl, fit: BoxFit.cover)),
             ),
           ),
-        ]),
-      );
+        ),
+      ]);
+}
+
+class _MaskedPreview extends StatefulWidget {
+  const _MaskedPreview({required this.productUrl, required this.patternUrl, required this.maskUrl, required this.fallback});
+  final String productUrl;
+  final String patternUrl;
+  final String maskUrl;
+  final Widget fallback;
+  @override
+  State<_MaskedPreview> createState() => _MaskedPreviewState();
+}
+
+class _MaskedPreviewState extends State<_MaskedPreview> {
+  List<ui.Image>? images;
+  bool failed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void didUpdateWidget(_MaskedPreview old) {
+    super.didUpdateWidget(old);
+    if (old.productUrl != widget.productUrl || old.patternUrl != widget.patternUrl || old.maskUrl != widget.maskUrl) _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final loaded = await Future.wait([widget.productUrl, widget.patternUrl, widget.maskUrl].map(_image));
+      if (mounted) setState(() => images = loaded);
+    } catch (_) {
+      if (mounted) setState(() => failed = true);
+    }
+  }
+
+  static Future<ui.Image> _image(String url) {
+    final done = Completer<ui.Image>();
+    final stream = NetworkImage(url).resolve(ImageConfiguration.empty);
+    late final ImageStreamListener listener;
+    listener = ImageStreamListener((info, _) {
+      done.complete(info.image);
+      stream.removeListener(listener);
+    }, onError: (error, stack) {
+      done.completeError(error, stack);
+      stream.removeListener(listener);
+    });
+    stream.addListener(listener);
+    return done.future;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loaded = images;
+    if (failed || loaded == null) return widget.fallback;
+    return CustomPaint(painter: _MaskedPainter(loaded[0], loaded[1], loaded[2]));
+  }
+}
+
+/// Photo, then a layer of pattern with the photo multiplied in (the body keeps its shading), clipped to the approved mask.
+class _MaskedPainter extends CustomPainter {
+  _MaskedPainter(this.product, this.pattern, this.mask);
+  final ui.Image product;
+  final ui.Image pattern;
+  final ui.Image mask;
+
+  static Rect _all(ui.Image image) => Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final fitted = applyBoxFit(BoxFit.contain, Size(product.width.toDouble(), product.height.toDouble()), size);
+    final target = Alignment.center.inscribe(fitted.destination, Offset.zero & size);
+    final cover = applyBoxFit(BoxFit.cover, Size(pattern.width.toDouble(), pattern.height.toDouble()), target.size);
+    final paint = Paint()..filterQuality = FilterQuality.medium;
+    canvas.drawImageRect(product, _all(product), target, paint);
+    canvas.saveLayer(target, Paint());
+    canvas.drawImageRect(pattern, Alignment.center.inscribe(cover.source, _all(pattern)), target, paint);
+    canvas.drawImageRect(product, _all(product), target, Paint()..blendMode = BlendMode.multiply..color = const Color(0x73000000));
+    canvas.drawImageRect(mask, _all(mask), target, Paint()..blendMode = BlendMode.dstIn);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_MaskedPainter old) => old.product != product || old.pattern != pattern || old.mask != mask;
 }
 
 class _Message extends StatelessWidget {

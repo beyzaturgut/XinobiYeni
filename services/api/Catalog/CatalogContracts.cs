@@ -27,7 +27,9 @@ public record ProductSummary(
     bool Personalizable,
     int ColorCount,
     Money? PriceFrom,
-    bool InStock);
+    bool InStock,
+    /// <summary>First colour's HEX, shown as the swatch dot on catalogue cards (web rule).</summary>
+    string? SwatchHex);
 
 public record ProductPage(ProductSummary[] Items, int Page, int PageSize, int Total);
 

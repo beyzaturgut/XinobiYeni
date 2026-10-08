@@ -2454,7 +2454,8 @@
           "personalizable",
           "colorCount",
           "priceFrom",
-          "inStock"
+          "inStock",
+          "swatchHex"
         ],
         "type": "object",
         "properties": {
@@ -2495,6 +2496,12 @@
           },
           "inStock": {
             "type": "boolean"
+          },
+          "swatchHex": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

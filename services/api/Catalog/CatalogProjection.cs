@@ -40,7 +40,8 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
             product.Id, product.Name, product.Category, product.Description, CoverOf(product), IsPersonalizable(product),
             product.Variants.Length,
             prices.Length == 0 ? null : prices.MinBy(price => price.AmountMinor),
-            product.Variants.Any(variant => variant.Stock > 0));
+            product.Variants.Any(variant => variant.Stock > 0),
+            product.Variants.FirstOrDefault()?.Hex);
     }
 
     public ProductDetail? Detail(string id) => Active.FirstOrDefault(product => product.Id == id) is { } product

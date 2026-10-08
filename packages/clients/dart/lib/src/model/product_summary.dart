@@ -21,6 +21,7 @@ part 'product_summary.g.dart';
 /// * [colorCount]
 /// * [priceFrom]
 /// * [inStock]
+/// * [swatchHex]
 @BuiltValue()
 abstract class ProductSummary implements Built<ProductSummary, ProductSummaryBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -49,6 +50,9 @@ abstract class ProductSummary implements Built<ProductSummary, ProductSummaryBui
 
   @BuiltValueField(wireName: r'inStock')
   bool get inStock;
+
+  @BuiltValueField(wireName: r'swatchHex')
+  String? get swatchHex;
 
   ProductSummary._();
 
@@ -117,6 +121,11 @@ class _$ProductSummarySerializer implements PrimitiveSerializer<ProductSummary> 
     yield serializers.serialize(
       object.inStock,
       specifiedType: const FullType(bool),
+    );
+    yield r'swatchHex';
+    yield object.swatchHex == null ? null : serializers.serialize(
+      object.swatchHex,
+      specifiedType: const FullType.nullable(String),
     );
   }
 
@@ -205,6 +214,14 @@ class _$ProductSummarySerializer implements PrimitiveSerializer<ProductSummary> 
             specifiedType: const FullType(bool),
           ) as bool;
           result.inStock = valueDes;
+          break;
+        case r'swatchHex':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.swatchHex = valueDes;
           break;
         default:
           unhandled.add(key);

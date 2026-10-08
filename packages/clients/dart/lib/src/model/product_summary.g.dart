@@ -25,6 +25,8 @@ class _$ProductSummary extends ProductSummary {
   final Money? priceFrom;
   @override
   final bool inStock;
+  @override
+  final String? swatchHex;
 
   factory _$ProductSummary([void Function(ProductSummaryBuilder)? updates]) =>
       (ProductSummaryBuilder()..update(updates))._build();
@@ -38,7 +40,8 @@ class _$ProductSummary extends ProductSummary {
       required this.personalizable,
       required this.colorCount,
       this.priceFrom,
-      required this.inStock})
+      required this.inStock,
+      this.swatchHex})
       : super._();
   @override
   ProductSummary rebuild(void Function(ProductSummaryBuilder) updates) =>
@@ -59,7 +62,8 @@ class _$ProductSummary extends ProductSummary {
         personalizable == other.personalizable &&
         colorCount == other.colorCount &&
         priceFrom == other.priceFrom &&
-        inStock == other.inStock;
+        inStock == other.inStock &&
+        swatchHex == other.swatchHex;
   }
 
   @override
@@ -74,6 +78,7 @@ class _$ProductSummary extends ProductSummary {
     _$hash = $jc(_$hash, colorCount.hashCode);
     _$hash = $jc(_$hash, priceFrom.hashCode);
     _$hash = $jc(_$hash, inStock.hashCode);
+    _$hash = $jc(_$hash, swatchHex.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -89,7 +94,8 @@ class _$ProductSummary extends ProductSummary {
           ..add('personalizable', personalizable)
           ..add('colorCount', colorCount)
           ..add('priceFrom', priceFrom)
-          ..add('inStock', inStock))
+          ..add('inStock', inStock)
+          ..add('swatchHex', swatchHex))
         .toString();
   }
 }
@@ -135,6 +141,10 @@ class ProductSummaryBuilder
   bool? get inStock => _$this._inStock;
   set inStock(bool? inStock) => _$this._inStock = inStock;
 
+  String? _swatchHex;
+  String? get swatchHex => _$this._swatchHex;
+  set swatchHex(String? swatchHex) => _$this._swatchHex = swatchHex;
+
   ProductSummaryBuilder() {
     ProductSummary._defaults(this);
   }
@@ -151,6 +161,7 @@ class ProductSummaryBuilder
       _colorCount = $v.colorCount;
       _priceFrom = $v.priceFrom?.toBuilder();
       _inStock = $v.inStock;
+      _swatchHex = $v.swatchHex;
       _$v = null;
     }
     return this;
@@ -190,6 +201,7 @@ class ProductSummaryBuilder
             priceFrom: _priceFrom?.build(),
             inStock: BuiltValueNullFieldError.checkNotNull(
                 inStock, r'ProductSummary', 'inStock'),
+            swatchHex: swatchHex,
           );
     } catch (_) {
       late String _$failedField;

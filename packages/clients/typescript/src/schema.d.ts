@@ -727,6 +727,7 @@ export interface components {
             colorCount: number;
             priceFrom: null | components["schemas"]["Money"];
             inStock: boolean;
+            swatchHex: null | string;
         };
         ReadinessResponse: {
             service: string;

@@ -82,3 +82,16 @@
 .intro:has(h1),.hero:has(h1){padding-top:32px;padding-bottom:24px;min-height:0}.intro:has(h1)>span{margin-top:14px}
 
 .catalog{padding-top:24px}
+
+/* The chips now live in the toolbar grid, whose gap spaces them. */
+.toolbar .categoryBar{margin:0}.toolbar+.resultSummary{margin-top:18px}
+/* Desktop: search, category chips and sort share one row under a compact title, so products start near the top. */
+@media(min-width:901px){
+.intro:has(h1){padding:20px clamp(20px,4vw,58px) 0;max-width:1500px;margin:0 auto;box-sizing:border-box}.intro p{margin-bottom:6px}.intro:has(h1)>span{margin-top:6px}
+.catalog{padding-top:16px}
+.toolbar{grid-template-columns:minmax(220px,300px) minmax(0,1fr) 180px;grid-template-areas:"search chips sort";align-items:center;gap:16px}
+.toolbar .search{grid-area:search}.toolbar .sort{grid-area:sort}.toolbar .categoryBar{grid-area:chips;margin:0}
+.toolbarLabel{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.search>div,.sort select{height:42px}.categoryBar button{min-height:36px;padding:0 14px}
+.resultSummary{margin-top:14px;padding:10px 0}
+}

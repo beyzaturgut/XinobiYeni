@@ -9,3 +9,21 @@
 .main{padding-top:32px}.intro{padding:0 0 28px}.intro h1{margin:12px 0;line-height:1.2}.steps{margin-top:20px}
 
 .colorSelection{display:flex;flex-wrap:wrap;gap:12px;border:0;margin:24px 0;padding:0}.colorSelection legend{margin-bottom:12px}.colorSelection label{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #ddd;border-radius:8px;cursor:pointer}.colorSelection label:has(input:checked){border:2px solid #222;padding:11px}.colorSelection label>span{width:28px;height:28px;border-radius:50%;border:1px solid #ccc;background:repeating-linear-gradient(45deg,#eee,#eee 4px,#fff 4px,#fff 8px)}.colorSelection strong{font-size:14px}
+
+/* Desktop: the questionnaire, product choice and result fit one screen (checked down to 1245x623). */
+.freshQuestionsInline{border:0;border-bottom:1px solid #ddd;background:none;color:#666;font-size:12px;padding:0 0 3px;cursor:pointer}.freshQuestionsInline:hover{color:#222;border-color:#222}.freshQuestionsInline:disabled{opacity:.5;cursor:default}
+.progress{align-items:baseline}
+@media(min-width:761px){
+.main{padding-top:24px;padding-bottom:48px}
+.intro{padding:4px 0 28px}.intro h1{margin:10px 0}.steps{margin-top:16px}
+.productImage{height:clamp(200px,calc(100svh - 340px),300px)}.product>p{margin:14px 0 6px}.product h2{font-size:20px;margin-bottom:12px}
+.selection{top:16px}.selectionImage{height:clamp(200px,calc(100svh - 270px),400px)}.selection h2{font-size:22px;margin:8px 0}.selection>a{margin-top:10px}
+.questionPanel{padding-top:4px}.progressBar{margin:10px 0 22px}
+.question h1,.summary h1,.result h1{font-size:clamp(20px,2vw,28px);margin-bottom:18px}
+.options{gap:8px}.options label{min-height:56px;padding:10px 14px;gap:12px}.options .chosen{padding:9px 13px}
+.navigation{margin-top:18px}.note{margin-top:12px}
+.artwork{max-height:calc(100svh - 330px);width:auto;max-width:100%;object-fit:contain}
+.summary dl{margin:16px 0}.summary dl>div{padding:9px 0}.summary>button,.result>button{margin-top:12px}
+.previewLayout{gap:40px;align-items:start}.canvas{max-height:calc(100svh - 120px);width:auto;max-width:100%}
+.previewInfo h1{font-size:clamp(22px,2.2vw,30px);margin:6px 0}.previewInfo>p{margin:8px 0;line-height:1.55}.previewInfo>label{margin-top:12px;gap:6px}.previewInfo button,.previewInfo>a{margin-top:12px}.smallArt{width:64px;height:64px;margin-top:10px}
+}

@@ -53,3 +53,10 @@
 }
 
 .intro:has(h1),.hero:has(h1){padding-top:32px;padding-bottom:24px;min-height:0}.intro:has(h1)>span{margin-top:14px}
+
+/* Desktop: compact title and empty state so the page reads in one screen. */
+@media(min-width:761px){
+.hero:has(h1){padding:20px clamp(20px,4vw,58px) 0;max-width:1440px;margin:0 auto;box-sizing:border-box}.hero>div{margin-top:12px}
+.content{min-height:0;padding-top:20px;padding-bottom:48px}
+.empty{min-height:0;padding:40px 0}.empty>span{font-size:3rem}.empty h2{margin-top:8px}.empty a{margin-top:16px}
+}

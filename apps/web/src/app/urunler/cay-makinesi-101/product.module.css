@@ -121,5 +121,9 @@
 .detailHero .pendingPrice{margin-top:18px;padding-top:14px;padding-bottom:14px}
 .detailHero .variants{margin-top:18px;padding-bottom:16px}
 .detailHero .variants legend{margin-bottom:10px}
-.detailHero .actions{margin-top:14px}
+.detailHero .actions{margin-top:14px;gap:6px}
+.detailHero h1{font-size:clamp(22px,2.2vw,30px)}
+.detailHero .pendingPrice{margin-top:14px;padding-top:10px;padding-bottom:10px}.detailHero .pendingPrice strong{font-size:26px}
+.detailHero .variants{margin-top:14px;padding-bottom:12px}.detailHero .variants>div{gap:14px}.detailHero .variants button>span{width:40px;height:40px}
+.detailHero .actions button,.detailHero .actions a{min-height:46px}.detailHero .actions p:empty{display:none}
 }

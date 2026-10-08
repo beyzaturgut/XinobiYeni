@@ -5,21 +5,24 @@ import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 
 class GalleryImage {
-  const GalleryImage(this.url, this.label);
+  const GalleryImage(this.url, this.label, {this.colour = false});
   final String url;
   final String label;
+
+  /// The selected colour's photo: shown on the stage, left out of the thumbnail strip.
+  final bool colour;
 }
 
 /// Gallery order shared with the web (packages/commerce `productGallery`): the product photo, the selected colour's photo,
 /// then the extra photos, duplicates dropped. Choosing a colour never removes the other photos.
 List<GalleryImage> productGallery(ProductDetail product, VariantDetail? variant) {
   final items = <GalleryImage>[];
-  void add(String? url, String label) {
-    if (url != null && url.isNotEmpty && !items.any((item) => item.url == url)) items.add(GalleryImage(url, label));
+  void add(String? url, String label, {bool colour = false}) {
+    if (url != null && url.isNotEmpty && !items.any((item) => item.url == url)) items.add(GalleryImage(url, label, colour: colour));
   }
 
   add(product.originalImageUrl, 'Ürün görseli');
-  add(variant?.imageUrl, '${variant?.color ?? 'Seçili'} rengi');
+  add(variant?.imageUrl, '${variant?.color ?? 'Seçili'} rengi', colour: true);
   for (final (index, url) in product.gallery.indexed) {
     add(url, 'Ek görsel ${index + 1}');
   }
@@ -70,6 +73,8 @@ class _ProductGalleryState extends State<ProductGallery> {
   Widget build(BuildContext context) {
     final images = widget.images;
     final current = index;
+    // The strip lists the product's own photos only; colour photos are reached through the colour swatches.
+    final thumbs = images.where((image) => !image.colour).toList();
     if (images.isEmpty) {
       return AspectRatio(aspectRatio: 1, child: RemoteImage(null, label: widget.productName));
     }
@@ -105,24 +110,25 @@ class _ProductGalleryState extends State<ProductGallery> {
           ]),
         ),
       ),
-      if (images.length > 1)
+      if (images.length > 1 && thumbs.isNotEmpty)
         SizedBox(
           height: 80,
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 8, XinobiTokens.gutterMobile, 0),
             scrollDirection: Axis.horizontal,
-            itemCount: images.length,
+            itemCount: thumbs.length,
             separatorBuilder: (_, _) => const SizedBox(width: 8),
             itemBuilder: (context, position) {
-              final selected = position == current;
+              final thumb = thumbs[position];
+              final selected = thumb.url == images[current].url;
               return Semantics(
                 button: true,
                 selected: selected,
-                label: 'Görsel ${position + 1} / ${images.length}: ${images[position].label}',
+                label: '${thumb.label} göster',
                 excludeSemantics: true,
-                onTap: () => widget.onSelected(images[position].url),
+                onTap: () => widget.onSelected(thumb.url),
                 child: InkWell(
-                  onTap: () => widget.onSelected(images[position].url),
+                  onTap: () => widget.onSelected(thumb.url),
                   borderRadius: BorderRadius.circular(XinobiTokens.radiusSmall),
                   child: Container(
                     width: 72,
@@ -132,7 +138,7 @@ class _ProductGalleryState extends State<ProductGallery> {
                       borderRadius: BorderRadius.circular(XinobiTokens.radiusSmall),
                       border: Border.all(color: selected ? XinobiTokens.ink : XinobiTokens.line, width: selected ? 2 : 1),
                     ),
-                    child: RemoteImage(images[position].url),
+                    child: RemoteImage(thumb.url),
                   ),
                 ),
               );

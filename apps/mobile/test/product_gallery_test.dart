@@ -39,18 +39,21 @@ void main() {
     expect(productGallery(_product(), _product().variants.first).map((image) => image.url), ['https://cdn.test/blue.webp']);
   });
 
-  testWidgets('choosing a colour shows its photo and the product photo stays reachable', (tester) async {
+  testWidgets('choosing a colour shows its photo on the stage only; the strip keeps the product photos', (tester) async {
     await pumpApp(tester, location: '/urunler/P1', catalog: GalleryCatalog());
     Finder thumb(String label) => find.bySemanticsLabel(label);
-    expect(tester.getSemantics(thumb('Görsel 1 / 4: Ürün görseli')), isSemantics(isButton: true, isSelected: true, hasTapAction: true));
+    expect(tester.getSemantics(thumb('Ürün görseli göster')), isSemantics(isButton: true, isSelected: true, hasTapAction: true));
+    expect(thumb('Ek görsel 1 göster'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('rengi göster')), findsNothing, reason: 'Colour photos are not in the strip.');
     expect(find.text('1 / 4'), findsOneWidget);
 
     await tester.tap(find.bySemanticsLabel('Kırmızı rengini seç'));
     await tester.pumpAndSettle();
-    expect(tester.getSemantics(thumb('Görsel 2 / 4: Kırmızı rengi')), isSemantics(isButton: true, isSelected: true, hasTapAction: true));
     expect(find.text('2 / 4'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('rengi göster')), findsNothing);
+    expect(tester.getSemantics(thumb('Ürün görseli göster')), isSemantics(isButton: true, isSelected: false, hasTapAction: true));
 
-    await tester.tap(thumb('Görsel 1 / 4: Ürün görseli'));
+    await tester.tap(thumb('Ürün görseli göster'));
     await tester.pumpAndSettle();
     expect(find.text('1 / 4'), findsOneWidget);
     expect(find.text('Renk: Kırmızı'), findsOneWidget, reason: 'Looking at another photo keeps the chosen colour.');

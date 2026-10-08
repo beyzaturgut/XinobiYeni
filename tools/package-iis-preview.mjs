@@ -19,7 +19,9 @@ async function map(value){
  return value;
 }
 await writeFile(path.join(publicDir,'commerce-preview/state.json'),JSON.stringify(await map(state)));
-const build=spawnSync('pnpm',['--filter','web','build'],{stdio:'inherit',env:{...process.env,NEXT_PUBLIC_COMMERCE_API_URL:'',NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL:'/commerce-preview/state.json'}});
+// XINOBI U on the test server (ADR-002 Ek B); the API must list this site's origin in XinobiU:AllowedOrigins.
+const designApi=process.env.XINOBI_DESIGN_API_URL??'http://109.104.120.91:8024/api/v1/design-studio';
+const build=spawnSync('pnpm',['--filter','web','build'],{stdio:'inherit',env:{...process.env,NEXT_PUBLIC_COMMERCE_API_URL:'',NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL:'/commerce-preview/state.json',NEXT_PUBLIC_DESIGN_API_URL:designApi}});
 if(build.status!==0)process.exit(build.status||1);
 const out=path.join(web,'out');
 await writeFile(path.join(out,'web.config'),`<?xml version="1.0" encoding="utf-8"?><configuration><system.webServer><defaultDocument enabled="true"><files><clear/><add value="index.html"/></files></defaultDocument><staticContent><remove fileExtension=".webp"/><mimeMap fileExtension=".webp" mimeType="image/webp"/></staticContent></system.webServer></configuration>`);

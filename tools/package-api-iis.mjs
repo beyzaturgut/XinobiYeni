@@ -10,6 +10,8 @@ const commit=spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).stdout.trim
 const sha=commit.slice(0,7);
 const snapshotPath=process.env.XINOBI_CATALOG_SNAPSHOT_PATH||'C:\\inetpub\\wwwroot\\XinobiYeni\\out\\commerce-preview\\state.json';
 const assetBaseUrl=process.env.XINOBI_ASSET_BASE_URL||'http://109.104.120.91:8014';
+// XINOBI U on the test server (ADR-002 Ek B). Sessions and images live outside the api folder so a redeploy keeps them.
+const designDataDirectory=process.env.XINOBI_DESIGN_DATA_DIRECTORY||'C:\\inetpub\\wwwroot\\XinobiYeniApi\\data';
 // Resolve the macOS /var → /private/var link: NuGet otherwise sees two paths for the worktree and drops the
 // Persistence project's packages (EF Core) from the publish output.
 const temporary=await realpath(await mkdtemp(path.join(tmpdir(),'xinobi-api-package-')));
@@ -22,15 +24,15 @@ try{
  await access(path.join(output,'Microsoft.EntityFrameworkCore.SqlServer.dll')).catch(()=>{throw new Error('Publish output is missing EF Core; refusing to package an API that cannot start.');});
  for(const name of await readdir(output))if(/^appsettings\.(Development|Local).*\.json$/.test(name))await rm(path.join(output,name));
  await rm(path.join(output,'App_Data'),{recursive:true,force:true});
- await writeFile(path.join(output,'appsettings.Production.json'),JSON.stringify({Catalog:{SnapshotPath:snapshotPath,AssetBaseUrl:assetBaseUrl}},null,2)+'\n');
- await writeFile(path.join(temporary,'DEPLOY.txt'),`XINOBI — API (IIS)\nSource commit: ${commit}\n\napi/: ASP.NET Core API (net10.0, framework-dependent). Requires the .NET 10 ASP.NET Core Hosting Bundle on the server.\nCopy the contents of api/ into the IIS site's physical path; the generated web.config starts the app through AspNetCoreModuleV2.\nThe application pool should use "No Managed Code".\n\nCatalog: read-only from ${snapshotPath}\n(the snapshot the web package deploys), media from ${assetBaseUrl}. Change appsettings.Production.json if those differ.\nAccounts, cart persistence, admin writes and AI design are not available in this package: they need the SQL Server store.\nNo database, user records, API keys or SMTP credentials are included. No remote deployment was performed by creating this archive.\n`);
+ await writeFile(path.join(output,'appsettings.Production.json'),JSON.stringify({Catalog:{SnapshotPath:snapshotPath,AssetBaseUrl:assetBaseUrl},XinobiU:{Enabled:true,AllowedOrigins:[assetBaseUrl]},DesignStudio:{DataDirectory:designDataDirectory,DailyGenerationLimit:30}},null,2)+'\n');
+ await writeFile(path.join(temporary,'DEPLOY.txt'),`XINOBI — API (IIS)\nSource commit: ${commit}\n\napi/: ASP.NET Core API (net10.0, framework-dependent). Requires the .NET 10 ASP.NET Core Hosting Bundle on the server.\nCopy the contents of api/ into the IIS site's physical path; the generated web.config starts the app through AspNetCoreModuleV2.\nThe application pool should use "No Managed Code".\n\nCatalog: read-only from ${snapshotPath}\n(the snapshot the web package deploys), media from ${assetBaseUrl}. Change appsettings.Production.json if those differ.\nXINOBI U (AI design) is on for this test server: browser origin ${assetBaseUrl}, at most 30 generations per day, data in ${designDataDirectory}.\nThe application pool identity needs Modify rights on that folder. Cloudflare credentials are NOT in this package: set the machine\nenvironment variables CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN on the server, then run iisreset.\nAccounts, cart persistence and admin writes are not available in this package: they need the SQL Server store.\nNo database, user records, API keys or SMTP credentials are included. No remote deployment was performed by creating this archive.\n`);
  await mkdir(path.join(root,'paketler','mobil'),{recursive:true});
  const artifact=path.join(root,'paketler','mobil',`XinobiYeni-api-${sha}.zip`);
  const packed=path.join(temporary,'api.zip');
  run('zip',['-q','-r',packed,'api','DEPLOY.txt'],{cwd:temporary});
  await cp(packed,artifact);
  const bytes=await readFile(artifact);
- console.log(JSON.stringify({artifact,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),source:commit,snapshotPath,assetBaseUrl},null,2));
+ console.log(JSON.stringify({artifact,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),source:commit,snapshotPath,assetBaseUrl,designDataDirectory},null,2));
 }finally{
  run('git',['worktree','remove','--force',source]);
 }

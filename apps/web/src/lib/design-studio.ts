@@ -4,7 +4,8 @@ import type { Product, Variant } from '../../../../packages/commerce/client';
 export type Question = { id: string; axis: string; axisLabel: string; text: string; options: { id: string; label: string }[] };
 export type Answer = { questionId: string; optionId: string };
 export type DesignSession = { id: string; status: 'questionnaire' | 'queued' | 'running' | 'ready' | 'failed'; expiresAt: string; product: Product; variant: Variant; bankVersion: string; questions: Question[]; answers: Answer[]; imageUrl: string | null; errorCode: string | null; errorMessage: string | null };
-export const designApi = commerceApi.replace(/\/local-commerce\/?$/, '/design-studio');
+// The static test-server package reads the catalogue from a snapshot, so the design API is configured on its own (ADR-002 Ek B).
+export const designApi = process.env.NEXT_PUBLIC_DESIGN_API_URL || commerceApi.replace(/\/local-commerce\/?$/, '/design-studio');
 export async function designRequest<T>(route: string, method = 'GET', body?: unknown): Promise<T> {
   if (!designApi) throw new Error('Tasarım bağlantısı henüz hazır değil.');
   const response = await fetch(designApi + route, { method, cache: 'no-store', signal: AbortSignal.timeout(15000), headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });

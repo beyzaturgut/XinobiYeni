@@ -9,6 +9,7 @@ import '../../widgets/common.dart';
 import '../cart/cart.dart';
 import '../favorites/favorite_button.dart';
 import 'catalog_repository.dart';
+import 'product_gallery.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   const ProductDetailScreen({super.key, required this.productId});
@@ -20,6 +21,7 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   String? selectedVariantId;
+  String? activeImage;
 
   @override
   Widget build(BuildContext context) {
@@ -42,14 +44,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           final selected = variants.firstWhere((variant) => variant.id == selectedVariantId, orElse: () => variants.isEmpty ? _none : variants.first);
           final text = Theme.of(context).textTheme;
           return ListView(padding: const EdgeInsets.only(bottom: 32), children: [
-            AspectRatio(
-              aspectRatio: 1,
-              child: ColoredBox(
-                color: XinobiTokens.surface,
-                // The selected colour shows its own photo; the cover is used only before a choice (web rule).
-                child: RemoteImage(selectedVariantId == null ? detail.imageUrl ?? selected.imageUrl : selected.imageUrl,
-                    label: '${detail.name}${variants.isEmpty ? '' : ' · ${selected.color}'}'),
-              ),
+            ProductGallery(
+              productName: detail.name,
+              images: productGallery(detail, variants.isEmpty ? null : selected),
+              selected: activeImage,
+              onSelected: (url) => setState(() => activeImage = url),
             ),
             Padding(
               padding: const EdgeInsets.all(XinobiTokens.gutterMobile),
@@ -68,7 +67,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   const SizedBox(height: 10),
                   Wrap(spacing: 12, runSpacing: 12, children: [
                     for (final variant in variants)
-                      _Swatch(variant: variant, selected: variant.id == selected.id, onTap: () => setState(() => selectedVariantId = variant.id)),
+                      _Swatch(variant: variant, selected: variant.id == selected.id, onTap: () => setState(() {
+                        selectedVariantId = variant.id;
+                        // The colour's photo comes to the front; the product and extra photos stay in the strip.
+                        activeImage = variant.imageUrl ?? activeImage;
+                      })),
                   ]),
                 ],
                 if (variants.isNotEmpty) ...[

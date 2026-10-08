@@ -1,5 +1,5 @@
 export type Variant = { id: string; sku: string; color: string; hex?: string; stock: number; image: string }
-export type Product = { id: string; name: string; category: string; active: boolean; description: string; seoTitle: string; personalizable?: boolean | null; originalImage?: string; variants: Variant[] }
+export type Product = { id: string; name: string; category: string; active: boolean; description: string; seoTitle: string; personalizable?: boolean | null; originalImage?: string; gallery?: string[]; variants: Variant[] }
 export const categories = ['Çay makineleri', 'Kahve makineleri', 'Hava temizleme', 'Pişirme teknolojileri']
 export const initialProducts: Product[] = [
   { id: 'DEMO-P101', name: 'Çay Makinesi 101', category: categories[0], active: true, description: 'Örnek ürün açıklaması', seoTitle: 'Çay Makinesi 101 | Xinobi', variants: [

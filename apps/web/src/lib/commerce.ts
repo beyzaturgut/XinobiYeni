@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { commerceRequest, localApi, type CommerceState } from '../../../../packages/commerce/client';
-export { mediaUrl, money } from '../../../../packages/commerce/client';
+export { mediaUrl, money, productGallery } from '../../../../packages/commerce/client';
 export const commerceApi = process.env.NEXT_PUBLIC_COMMERCE_API_URL || (process.env.NODE_ENV === 'development' ? localApi : '');
 const snapshotUrl = process.env.NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL || '';
 export function useCommerce() {

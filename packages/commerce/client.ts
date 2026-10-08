@@ -17,8 +17,37 @@ export async function commerceRequest<T>(base: string, route: string, method = '
   }
   return response.json()
 }
-export async function uploadMedia(base: string, file: File) {
-  const form = new FormData(); form.append('file', file)
+/** Product photos are shown at most ~1400 device pixels wide; anything far larger only slows decoding (a 20 MP photo froze colour switches). */
+export const productPhotoMaxEdge = 2000
+const encode = (canvas: HTMLCanvasElement, type: string, quality: number) => new Promise<Blob | null>(resolve => canvas.toBlob(resolve, type, quality))
+/** Downscales a PNG/JPEG/WebP so its long edge is at most [maxEdge]; returns the file unchanged when it is already small or the browser cannot help. */
+export async function downscaleImage(file: File, maxEdge: number): Promise<File> {
+  if (!/^image\/(png|jpeg|webp)$/.test(file.type) || typeof createImageBitmap !== 'function') return file
+  const bitmap = await createImageBitmap(file).catch(() => null)
+  if (!bitmap) return file
+  try {
+    const scale = maxEdge / Math.max(bitmap.width, bitmap.height)
+    if (scale >= 1) return file
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(bitmap.width * scale); canvas.height = Math.round(bitmap.height * scale)
+    const context = canvas.getContext('2d')
+    if (!context) return file
+    context.imageSmoothingQuality = 'high'
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    const type = file.type === 'image/png' ? 'image/png' : 'image/webp'
+    let blob = await encode(canvas, type, 0.86)
+    if (!blob || blob.type !== type) {
+      // Safari cannot encode WebP: fall back to JPEG on white, since JPEG has no transparency.
+      context.globalCompositeOperation = 'destination-over'; context.fillStyle = '#fff'; context.fillRect(0, 0, canvas.width, canvas.height)
+      blob = await encode(canvas, 'image/jpeg', 0.88)
+    }
+    if (!blob || blob.size >= file.size) return file
+    const extension = blob.type === 'image/png' ? '.png' : blob.type === 'image/webp' ? '.webp' : '.jpg'
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + extension, { type: blob.type })
+  } finally { bitmap.close() }
+}
+export async function uploadMedia(base: string, file: File, maxEdge = 2560) {
+  const form = new FormData(); form.append('file', await downscaleImage(file, maxEdge))
   return (await commerceRequest<{ src: string }>(base, '/media', 'POST', form)).src
 }
 export function mediaUrl(source: string, base: string, assetBase = '') {

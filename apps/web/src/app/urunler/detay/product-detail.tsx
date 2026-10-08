@@ -23,11 +23,12 @@ export default function ProductDetail() {
   const step = (delta: number) => setActiveImage(images[(index + delta + images.length) % images.length].src);
   // The strip lists the product's own photos only; colour photos are reached through the colour swatches.
   const thumbs = images.filter(item => !item.colour);
-  // Every colour and gallery photo is loaded up front and stacked; switching only changes which one is visible.
-  const stage = [...new Set([...images.map(item => item.src), ...product.variants.map(item => item.image)].filter(Boolean))];
+  // Every colour and gallery photo is loaded up front and stacked in a fixed order (it must not depend on the selected colour,
+  // or the browser re-inserts the photos and the previous one flashes); switching only changes which one is on top.
+  const stage = [...new Set([product.originalImage, ...product.variants.map(item => item.image), ...(product.gallery ?? [])].filter((src): src is string => Boolean(src)))];
   return <><SiteHeader /><main className={styles.detailPage}><section className={`${styles.productHero} ${styles.detailHero}`}>
     <div className={styles.gallery} role="region" aria-roledescription="galeri" aria-label={`${product.name} görselleri`}>
-      <div className={styles.imageStage}>{shown ? stage.map(src => <Image key={src} className={src === shown.src ? styles.stageShown : styles.stageHidden} style={src === shown.src ? undefined : { opacity: 0, pointerEvents: 'none' }} src={mediaUrl(src, commerceApi)} alt={src === shown.src ? `${product.name}, ${shown.label}` : ''} aria-hidden={src === shown.src ? undefined : true} loading="eager" width={700} height={700} />) : <p>Görsel yok</p>}
+      <div className={styles.imageStage}>{shown ? stage.map(src => <Image key={src} className={src === shown.src ? styles.stageShown : styles.stageHidden} style={src === shown.src ? { opacity: 1, zIndex: 2 } : { opacity: 0, zIndex: 1, pointerEvents: 'none' }} src={mediaUrl(src, commerceApi)} alt={src === shown.src ? `${product.name}, ${shown.label}` : ''} aria-hidden={src === shown.src ? undefined : true} loading="eager" width={700} height={700} />) : <p>Görsel yok</p>}
         {images.length > 1 && <><button type="button" className={`${styles.stageNav} ${styles.stagePrev}`} aria-label="Önceki görsel" onClick={() => step(-1)}>‹</button><button type="button" className={`${styles.stageNav} ${styles.stageNext}`} aria-label="Sonraki görsel" onClick={() => step(1)}>›</button><p className={styles.stageCount} aria-live="polite">{index + 1} / {images.length}</p></>}</div>
       {images.length > 1 && thumbs.length > 0 && <ul className={styles.thumbs}>{thumbs.map(item => <li key={item.src}><button type="button" aria-label={`${item.label} göster`} aria-current={item === shown ? 'true' : undefined} onClick={() => setActiveImage(item.src)}><Image src={mediaUrl(item.src, commerceApi)} alt="" width={88} height={88} /></button></li>)}</ul>}
     </div>

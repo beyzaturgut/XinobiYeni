@@ -61,12 +61,11 @@ void main() {
     expect(find.text('Favori listen henüz boş.'), findsOneWidget);
   });
 
-  testWidgets('the account tab links to favourites while signed out', (tester) async {
+  testWidgets('signed out, the account tab shows only sign-in and registration (favourites stay in the header)', (tester) async {
     SharedPreferences.setMockInitialValues({favoritesStorageKey: jsonEncode(['P1'])});
     await pumpAccount(tester, keepPreferences: true);
-    await tester.scrollUntilVisible(find.text('Favorilerim'), 200, scrollable: find.byType(Scrollable).first);
-    expect(find.text('1 ürün'), findsOneWidget);
-    await tester.tap(find.text('Favorilerim'));
+    expect(find.text('Favorilerim'), findsNothing);
+    await tester.tap(find.byTooltip('Favorilerim'));
     await tester.pumpAndSettle();
     expect(find.text('1 favori ürün'), findsOneWidget);
   });

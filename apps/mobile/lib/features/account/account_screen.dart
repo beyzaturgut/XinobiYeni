@@ -85,8 +85,6 @@ class _AccessFormsState extends State<_AccessForms> {
         ),
         const SizedBox(height: 20),
         register ? const _RegisterForm() : const _LoginForm(),
-        const SizedBox(height: 24),
-        const _FavoritesLink(),
       ]);
 }
 

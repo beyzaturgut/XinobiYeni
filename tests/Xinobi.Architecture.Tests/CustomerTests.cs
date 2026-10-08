@@ -181,6 +181,15 @@ public sealed class CustomerTests : IDisposable
         Assert.Equal(new Money(240000, "TRY"), line.UnitPrice);
         Assert.Equal(new Money(480000, "TRY"), order.Total);
         Assert.Equal("Moda Cad. No: 1 D: 2", order.Address.Line);
+        Assert.StartsWith("http://localhost:3000/assets/", line.ImageUrl);
+        // The stored path is resolved per request: another host (e.g. the Android emulator) gets its own URL.
+        using (var fromEmulator = new HttpRequestMessage(HttpMethod.Get, "/api/v1/me/orders"))
+        {
+            fromEmulator.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            fromEmulator.Headers.Host = "10.0.2.2:5003";
+            var seen = (await (await client.SendAsync(fromEmulator)).Content.ReadFromJsonAsync<CustomerOrder[]>())!.Single();
+            Assert.StartsWith("http://10.0.2.2:3000/assets/", seen.Lines.Single().ImageUrl);
+        }
 
         var retry = (await (await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, request)).Content.ReadFromJsonAsync<CustomerOrder>())!;
         Assert.Equal(order.Id, retry.Id);

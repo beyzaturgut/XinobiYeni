@@ -75,7 +75,9 @@ public static class CustomerEndpoints
             .WithName("DeleteMyAddress")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
-        me.MapGet("/orders", async Task<Ok<CustomerOrder[]>> (ClaimsPrincipal user, IAccountStore accounts) => TypedResults.Ok(await accounts.Orders(Id(user))))
+        // Orders keep the catalogue's relative image path; it is resolved per request, so the web and the app each get a URL they can load.
+        me.MapGet("/orders", async Task<Ok<CustomerOrder[]>> (ClaimsPrincipal user, HttpContext http, IAccountStore accounts, IConfiguration configuration, IWebHostEnvironment environment) =>
+                TypedResults.Ok((await accounts.Orders(Id(user))).Select(order => WithImages(order, http, configuration, environment)).ToArray()))
             .WithName("ListMyOrders");
 
         me.MapPost("/orders", async Task<Results<Created<CustomerOrder>, ProblemHttpResult>> (PlaceOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
@@ -87,7 +89,7 @@ public static class CustomerEndpoints
                     ?? throw new AccountException("address_not_found", "Teslimat adresi bulunamadı. Bir adres seç.", StatusCodes.Status404NotFound);
                 var items = Merge(request.Items);
                 CatalogProjection catalog;
-                try { catalog = await CatalogEndpoints.Project(http, source, configuration, environment); }
+                try { catalog = new CatalogProjection(await source.ReadAsync(), path => path); }
                 catch (CatalogUnavailableException) { throw new AccountException("catalog_unavailable", "Katalog şu anda kullanılamıyor. Biraz sonra tekrar dene.", StatusCodes.Status503ServiceUnavailable); }
                 var lines = items.Select(item =>
                 {
@@ -102,13 +104,18 @@ public static class CustomerEndpoints
                 var order = await accounts.PlaceOrder(id, request.ClientRequestId, () => new CustomerOrder(
                     Guid.NewGuid().ToString("N"), $"XN-{now:yyMMdd}-{RandomNumberGenerator.GetInt32(1000, 10000)}", now, OrderStatuses.Received, address, lines,
                     new Money(lines.Sum(line => line.LineTotal.AmountMinor), lines[0].UnitPrice.Currency)));
-                return TypedResults.Created($"/api/v1/me/orders/{order.Id}", order);
+                return TypedResults.Created($"/api/v1/me/orders/{order.Id}", WithImages(order, http, configuration, environment));
             })
             .WithName("PlaceMyOrder")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
     }
+
+    private static CustomerOrder WithImages(CustomerOrder order, HttpContext http, IConfiguration configuration, IWebHostEnvironment environment) => order with
+    {
+        Lines = [.. order.Lines.Select(line => line with { ImageUrl = CatalogEndpoints.ResolveUrl(line.ImageUrl, http.Request, configuration["Catalog:AssetBaseUrl"], environment.IsDevelopment()) })],
+    };
 
     private static PlaceOrderItem[] Merge(PlaceOrderItem[]? items)
     {

@@ -52,7 +52,10 @@ if (builder.Environment.IsDevelopment())
         .AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
 }
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
-// Outside Development the catalog answers 503 until the SQL Server source exists (Faz03 03.11).
+// Outside Development the catalog reads the published snapshot when one is configured, otherwise it answers 503
+// until the SQL Server source exists (Faz03 03.11).
+if (builder.Configuration["Catalog:SnapshotPath"] is { Length: > 0 } snapshotPath)
+    builder.Services.TryAddSingleton<ICatalogSource>(new SnapshotCatalogSource(snapshotPath));
 builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
 builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
 builder.Services.TryAddSingleton(TimeProvider.System);

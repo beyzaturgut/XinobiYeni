@@ -35,6 +35,36 @@ public sealed class CatalogTests : IDisposable
     }
 
     [Fact]
+    public async Task ProductionServesTheConfiguredSnapshotReadOnly()
+    {
+        Directory.CreateDirectory(dataDirectory);
+        var snapshot = Path.Combine(dataDirectory, "snapshot.json");
+        var seed = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../services/api/LocalCommerce/seed.json"));
+        await File.WriteAllTextAsync(snapshot, seed);
+        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Production");
+            builder.UseSetting("Catalog:SnapshotPath", snapshot);
+            builder.UseSetting("Catalog:AssetBaseUrl", "http://web.test:8014/");
+        });
+        using var client = factory.CreateClient();
+
+        var page = (await client.GetFromJsonAsync<ProductPage>("/api/v1/catalog/products"))!;
+        Assert.Equal(5, page.Total);
+        var detail = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P101"))!;
+        Assert.StartsWith("http://web.test:8014/assets/", detail.Variants[0].ImageUrl);
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/content/home")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/v1/local-commerce/state")).StatusCode);
+
+        await File.WriteAllTextAsync(snapshot, seed.Replace("Çay Makinesi 101", "Çay Makinesi 202"));
+        File.SetLastWriteTimeUtc(snapshot, DateTime.UtcNow.AddMinutes(1));
+        Assert.Equal("Çay Makinesi 202", (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P101"))!.Name);
+
+        File.Delete(snapshot);
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.GetAsync("/api/v1/catalog/products")).StatusCode);
+    }
+
+    [Fact]
     public async Task ProductListHidesInactiveProductsAndPaginates()
     {
         using var factory = CreateFactory();

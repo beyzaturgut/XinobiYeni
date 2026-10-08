@@ -17,7 +17,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly string path = configuration["LocalCommerce:DataDirectory"] ?? Path.Combine(environment.ContentRootPath, "App_Data", "local-commerce");
-    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
+    internal static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     public string DataDirectory => path;
     public string MediaDirectory => Path.Combine(path, "media");
 
@@ -25,7 +25,13 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     {
         var file = Path.Combine(path, "state.json");
         var source = File.Exists(file) ? file : Path.Combine(environment.ContentRootPath, "LocalCommerce", "seed.json");
-        var state = JsonSerializer.Deserialize<CommerceState>(await File.ReadAllTextAsync(source), JsonOptions)
+        return Parse(await File.ReadAllTextAsync(source));
+    }
+
+    /// <summary>Reads a state document and completes its category list; shared with the read-only production snapshot.</summary>
+    public static CommerceState Parse(string json)
+    {
+        var state = JsonSerializer.Deserialize<CommerceState>(json, JsonOptions)
             ?? throw new InvalidDataException("Local commerce state is invalid.");
         return state with { Categories = (state.Categories ?? ["Çay makineleri", "Kahve makineleri", "Hava temizleme", "Pişirme teknolojileri"]).Concat(state.Products.Select(p => p.Category)).Distinct(StringComparer.Create(new System.Globalization.CultureInfo("tr-TR"), true)).ToArray() };
     }

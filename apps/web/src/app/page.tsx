@@ -8,6 +8,7 @@ import TitaniumFeature from '../components/titanium-feature';
 import PersonalizationFeature from '../components/personalization-feature';
 import SiteHeader from '../components/site-header';
 import CategoryGallery from '../components/category-gallery';
+import SiteFooter from "../components/site-footer";
 import styles from "./page.module.css";
 
 import airPurifier from "../../public/assets/products/air-purifier-101.webp";
@@ -91,7 +92,7 @@ export default function Home() {
       <section className={styles.values} aria-label="Xinobi değerleri"><div><span>01</span><h3>Ürün merkezli</h3><p>Gerçek ürün, doğru varyant ve açık bilgi.<br/>Abartısız mühendislik, saf malzeme kalitesi.</p></div><div><span>02</span><h3>Size özgü</h3><p>Kişisel seçimlerinize alan açan tasarım.<br/>Yapay zekâ ile her eve biricik dokunuşlar.</p></div><div><span>03</span><h3>Tek deneyim</h3><p>Web ve mobilde aynı sakin akış.<br/>Karmaşadan uzak, pürüzsüz müşteri yolculuğu.</p></div></section>
       <section className={styles.story} id="hikaye"><p className={styles.eyebrow}>Xinobi Dünyası</p><h2>Teknoloji görünür olmak için değil,<br />hayatınıza uyum sağlamak için.</h2><Link className={styles.textLink} href="/xinobi">Hikâyemizi keşfedin <Icon name="arrow" /></Link></section>
     </main>
-    <footer id="destek" className={styles.footer}><div className={styles.footerBrand}><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} /><p>Gündelik ritüeller için sessiz teknoloji.</p></div><div><h3>Ürünler</h3><Link href="/urunler">Çay makineleri</Link><Link href="/urunler">Kahve makineleri</Link><Link href="/urunler">Pişirme</Link></div><div><h3>Xinobi</h3><Link href="/xinobi-u">XINOBI U</Link><Link href="/xinobi">Hikâyemiz</Link><Link href="/kurumsal/teklif">Kurumsal</Link></div><div><h3>Destek</h3><Link href="#destek">İletişim</Link><Link href="/hesap/siparisler">Sipariş takibi</Link><Link href="/yasal">Yasal bilgiler</Link></div></footer>
+    <SiteFooter />
     <section id="nobi-panel" className={styles.nobiPanel} aria-labelledby="nobi-title" hidden={!nobiOpen}><div className={styles.nobiHead}><div><NobiMark compact /><div><p className={styles.eyebrow}>NOBI</p><h2 id="nobi-title">Size nasıl yardımcı olabilirim?</h2></div></div><button type="button" onClick={() => setNobiOpen(false)} aria-label="Nobi panelini kapat">×</button></div><p>Ürünleri keşfetmenize veya XINOBI U adımlarını anlamanıza yardımcı olabilirim.</p><div className={styles.nobiQuick}><Link href="/urunler">Çay makinesi arıyorum</Link><Link href="/xinobi-u">XINOBI U nasıl çalışır?</Link><Link href="/kurumsal/teklif">Kurumsal teklif almak istiyorum</Link></div><p className={styles.nobiDemo}>Temsili asistan · Gerçek yanıtlar Faz10’da Cloudflare Workers AI ve onaylı katalog verisiyle bağlanacak.</p></section>
     <button className={styles.nobi} type="button" aria-label="Nobi’ye sor" aria-expanded={nobiOpen} aria-controls="nobi-panel" onClick={() => setNobiOpen((open) => !open)}><NobiMark /><b>Nobi’ye sor</b></button>
   </div>;

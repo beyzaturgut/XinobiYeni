@@ -1,0 +1,8 @@
+/* Black site footer, shared by the home page and the Xinobi dünyası page. */
+.footer{background:#191919;color:#fff;padding:74px max(48px,calc((100vw - 1440px)/2 + 48px));display:grid;grid-template-columns:2fr repeat(3,1fr);gap:40px}
+.footerBrand img{width:120px;height:auto}
+.footer p{max-width:280px;color:#b4b4b4}
+.footer h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+.footer a{display:block;padding:6px 0;color:#cfcfcf;font-size:14px}
+@media(max-width:1023px){.footer{padding:60px 32px;grid-template-columns:2fr 1fr 1fr}.footerBrand+div{display:none}}
+@media(max-width:767px){.footer{padding:54px 20px 100px;grid-template-columns:1fr 1fr;gap:34px}.footerBrand{grid-column:1/-1}.footerBrand+div{display:block}}

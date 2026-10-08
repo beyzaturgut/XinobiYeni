@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import SiteHeader from "../../components/site-header";
-import CommerceFooter from "../../components/commerce-footer";
+import SiteFooter from "../../components/site-footer";
 import styles from "./xinobi.module.css";
 
 export const metadata: Metadata = {
@@ -37,6 +37,6 @@ export default function XinobiPage() {
         <p>Kişiselleştirilebilir tasarım ile premium ürün anlayışını bir araya getirerek, kullanıcıların kendi tarzlarını yansıtabildiği ve her kullanımda farkını hissettiren ürünler geliştiriyoruz.</p>
       </section>
     </main>
-    <CommerceFooter />
+    <SiteFooter />
   </div>;
 }

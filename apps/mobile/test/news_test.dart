@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
+import 'package:xinobi_mobile/features/home/home_screen.dart';
 import 'package:xinobi_mobile/features/news/news.dart';
 
 import 'app_test.dart' show FakeCatalog, pumpApp;
@@ -28,6 +29,14 @@ void main() {
     await tester.tap(find.byTooltip('Favorilerim'));
     await tester.pumpAndSettle();
     expect(find.text('Favori listen henüz boş.'), findsOneWidget);
+  });
+
+  testWidgets('tapping the header logo returns to the home page', (tester) async {
+    await pumpApp(tester, location: '/sepet');
+    expect(find.byType(HomeScreen), findsNothing);
+    await tester.tap(find.bySemanticsLabel('Xinobi, ana sayfa'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeScreen), findsOneWidget);
   });
 
   testWidgets('the badge counts unseen announcements and opening the page reads them', (tester) async {

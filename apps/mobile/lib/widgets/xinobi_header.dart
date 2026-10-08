@@ -27,9 +27,13 @@ class XinobiHeader extends ConsumerWidget implements PreferredSizeWidget {
             child: Row(
               children: [
                 Semantics(
-                  label: 'Xinobi',
-                  image: true,
-                  child: Image.asset('assets/brand/xinobi-logo-white.png', height: XinobiTokens.headerLogoHeightMobile, excludeFromSemantics: true),
+                  label: 'Xinobi, ana sayfa',
+                  button: true,
+                  excludeSemantics: true,
+                  child: InkWell(
+                    onTap: () => context.go('/'),
+                    child: Image.asset('assets/brand/xinobi-logo-white.png', height: XinobiTokens.headerLogoHeightMobile, excludeFromSemantics: true),
+                  ),
                 ),
                 const Spacer(),
                 IconButton(

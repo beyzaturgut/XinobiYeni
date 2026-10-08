@@ -1,5 +1,7 @@
 # Repository workflow
 
+- When the owner says "deploy alalım", prepare one combined ZIP containing the web storefront and admin panel. Use `node tools/package-deploy.mjs`; do not deliver separate web/admin ZIPs as the requested deployment artifact.
+
 The project owner wants completed changes committed and pushed regularly.
 
 - After each completed and validated logical change, create a focused commit and push it to the configured upstream. The owner has authorized this workflow; do not ask for permission again unless scope changes or an actual tool restriction requires it.

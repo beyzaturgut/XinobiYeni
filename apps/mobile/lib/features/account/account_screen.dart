@@ -33,7 +33,7 @@ String _date(DateTime value) {
 }
 
 String _initials(String name) {
-  final parts = name.trim().split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+  final parts = name.trim().split(RegExp(r'\s+')).where((part) => RegExp(r'^\p{L}', unicode: true).hasMatch(part)).toList();
   if (parts.isEmpty) return '?';
   return (parts.first.characters.first + (parts.length > 1 ? parts.last.characters.first : '')).toUpperCase();
 }

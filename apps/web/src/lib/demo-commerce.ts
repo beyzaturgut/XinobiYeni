@@ -4,7 +4,7 @@ import {commerceApi} from './commerce';
 
 // Accounts are real now: the shared /api/v1/auth contract (web: HttpOnly session cookies + CSRF header, ADR-004).
 // Orders stay a browser-only demo until payment and order rules (D03/D05) exist, keyed by the real account id.
-export type DemoUser={id:string;name:string;email:string};
+export type DemoUser={id:string;name:string;email:string;createdAt?:string};
 export type DemoOrder={id:string;userId:string;createdAt:string;total:number;lines:{name:string;color:string;quantity:number;price:number}[]};
 
 const api=commerceApi?commerceApi.replace(/\/local-commerce\/?$/,''):'';
@@ -67,6 +67,30 @@ export async function demoAccess(mode:'login'|'register',name:string,email:strin
     const user=await call<DemoUser>('/auth/web/login',{method:'POST',body:JSON.stringify({email,password})});
     publish({user:user??undefined,ready:true});
   }
+}
+
+/** Runs a signed-in request; an expired access cookie is refreshed once and the request retried. */
+async function signedIn<T>(path:string,init:RequestInit):Promise<T|null>{
+  try{return await call<T>(path,init)}
+  catch(error){
+    if((error as {status?:number}).status!==401)throw error;
+    try{publish({user:(await call<DemoUser>('/auth/web/refresh',{method:'POST'}))??undefined,ready:true})}
+    catch{publish({ready:true});throw new Error('Oturumun sona erdi. Tekrar giriş yap.')}
+    return call<T>(path,init);
+  }
+}
+
+export async function updateAccountName(name:string){
+  if(!name.trim())throw new Error('Ad soyad gir.');
+  const user=await signedIn<DemoUser>('/me',{method:'PATCH',body:JSON.stringify({name:name.trim()})});
+  publish({user:user??session.user,ready:true});
+}
+
+/** Signs out every other device; the server renews this browser's session cookies. */
+export async function changeAccountPassword(currentPassword:string,newPassword:string){
+  if(!currentPassword)throw new Error('Mevcut parolanı gir.');
+  if(newPassword.length<8)throw new Error('Yeni parola en az 8 karakter olmalı.');
+  await signedIn('/me/password',{method:'PUT',body:JSON.stringify({currentPassword,newPassword})});
 }
 
 export async function demoLogout(){

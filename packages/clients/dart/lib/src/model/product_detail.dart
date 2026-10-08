@@ -21,6 +21,8 @@ part 'product_detail.g.dart';
 /// * [imageUrl]
 /// * [personalizable]
 /// * [variants]
+/// * [originalImageUrl]
+/// * [gallery]
 @BuiltValue()
 abstract class ProductDetail implements Built<ProductDetail, ProductDetailBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -46,6 +48,12 @@ abstract class ProductDetail implements Built<ProductDetail, ProductDetailBuilde
 
   @BuiltValueField(wireName: r'variants')
   BuiltList<VariantDetail> get variants;
+
+  @BuiltValueField(wireName: r'originalImageUrl')
+  String? get originalImageUrl;
+
+  @BuiltValueField(wireName: r'gallery')
+  BuiltList<String> get gallery;
 
   ProductDetail._();
 
@@ -109,6 +117,16 @@ class _$ProductDetailSerializer implements PrimitiveSerializer<ProductDetail> {
     yield serializers.serialize(
       object.variants,
       specifiedType: const FullType(BuiltList, [FullType(VariantDetail)]),
+    );
+    yield r'originalImageUrl';
+    yield object.originalImageUrl == null ? null : serializers.serialize(
+      object.originalImageUrl,
+      specifiedType: const FullType.nullable(String),
+    );
+    yield r'gallery';
+    yield serializers.serialize(
+      object.gallery,
+      specifiedType: const FullType(BuiltList, [FullType(String)]),
     );
   }
 
@@ -189,6 +207,21 @@ class _$ProductDetailSerializer implements PrimitiveSerializer<ProductDetail> {
             specifiedType: const FullType(BuiltList, [FullType(VariantDetail)]),
           ) as BuiltList<VariantDetail>;
           result.variants.replace(valueDes);
+          break;
+        case r'originalImageUrl':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.originalImageUrl = valueDes;
+          break;
+        case r'gallery':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(String)]),
+          ) as BuiltList<String>;
+          result.gallery.replace(valueDes);
           break;
         default:
           unhandled.add(key);

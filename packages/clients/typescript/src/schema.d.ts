@@ -535,6 +535,8 @@ export interface components {
             imageUrl: null | string;
             personalizable: boolean;
             variants: components["schemas"]["VariantDetail"][];
+            originalImageUrl: null | string;
+            gallery: string[];
         };
         ProductPage: {
             items: components["schemas"]["ProductSummary"][];

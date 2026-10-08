@@ -16,5 +16,7 @@ Name | Type | Description | Notes
 **imageUrl** | **String** |  |
 **personalizable** | **bool** |  |
 **variants** | [**BuiltList&lt;VariantDetail&gt;**](VariantDetail.md) |  |
+**originalImageUrl** | **String** |  |
+**gallery** | **BuiltList&lt;String&gt;** |  |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

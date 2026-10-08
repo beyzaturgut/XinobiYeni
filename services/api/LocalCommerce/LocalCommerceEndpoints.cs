@@ -5,6 +5,7 @@ namespace Xinobi.Api.LocalCommerce;
 
 public static class LocalCommerceEndpoints
 {
+    public const int MaxGalleryImages = 12;
     public static bool AllowedOrigin(string origin) => origin is "http://127.0.0.1:3000" or "http://localhost:3000" or "http://127.0.0.1:5173" or "http://localhost:5173";
     private static bool ValidMedia(string source) => string.IsNullOrEmpty(source) ||
         Regex.IsMatch(source, @"^/assets/[a-zA-Z0-9/_\-.]+$") || Regex.IsMatch(source, @"^/api/v1/local-commerce/media/[a-f0-9]{32}\.(png|jpg|webp|mp4|webm)$");
@@ -83,9 +84,10 @@ public static class LocalCommerceEndpoints
         group.MapPut("/products/{id}", async (string id, CommerceProduct product, LocalCommerceStore store) =>
         {
             if (id != product.Id || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||
+                product.Gallery is { } gallery && (gallery.Length > MaxGalleryImages || gallery.Any(image => string.IsNullOrEmpty(image) || !ValidMedia(image))) ||
                 (product.Active && product.Variants.Length == 0) || product.Variants.Any(v => string.IsNullOrWhiteSpace(v.Id) || string.IsNullOrWhiteSpace(v.Sku) || string.IsNullOrWhiteSpace(v.Color) || v.Stock < 0 || !ValidMedia(v.Image) || (!string.IsNullOrEmpty(v.Hex) && !Regex.IsMatch(v.Hex, "^#[a-fA-F0-9]{6}$"))) ||
                 product.Variants.Select(v => v.Id).Distinct().Count() != product.Variants.Length || product.Variants.Select(v => v.Sku.ToUpperInvariant()).Distinct().Count() != product.Variants.Length)
-                return Results.BadRequest(new { message = "Ürün adı, benzersiz SKU, geçerli görsel, #RRGGBB HEX kodu ve pozitif stok alanlarını kontrol edin." });
+                return Results.BadRequest(new { message = $"Ürün adı, benzersiz SKU, geçerli görsel (en fazla {MaxGalleryImages} ek görsel), #RRGGBB HEX kodu ve pozitif stok alanlarını kontrol edin." });
             try
             {
                 var state = await store.Update(state =>

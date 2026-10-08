@@ -23,6 +23,10 @@ class _$ProductDetail extends ProductDetail {
   final bool personalizable;
   @override
   final BuiltList<VariantDetail> variants;
+  @override
+  final String? originalImageUrl;
+  @override
+  final BuiltList<String> gallery;
 
   factory _$ProductDetail([void Function(ProductDetailBuilder)? updates]) =>
       (ProductDetailBuilder()..update(updates))._build();
@@ -35,7 +39,9 @@ class _$ProductDetail extends ProductDetail {
       required this.seoTitle,
       this.imageUrl,
       required this.personalizable,
-      required this.variants})
+      required this.variants,
+      this.originalImageUrl,
+      required this.gallery})
       : super._();
   @override
   ProductDetail rebuild(void Function(ProductDetailBuilder) updates) =>
@@ -55,7 +61,9 @@ class _$ProductDetail extends ProductDetail {
         seoTitle == other.seoTitle &&
         imageUrl == other.imageUrl &&
         personalizable == other.personalizable &&
-        variants == other.variants;
+        variants == other.variants &&
+        originalImageUrl == other.originalImageUrl &&
+        gallery == other.gallery;
   }
 
   @override
@@ -69,6 +77,8 @@ class _$ProductDetail extends ProductDetail {
     _$hash = $jc(_$hash, imageUrl.hashCode);
     _$hash = $jc(_$hash, personalizable.hashCode);
     _$hash = $jc(_$hash, variants.hashCode);
+    _$hash = $jc(_$hash, originalImageUrl.hashCode);
+    _$hash = $jc(_$hash, gallery.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -83,7 +93,9 @@ class _$ProductDetail extends ProductDetail {
           ..add('seoTitle', seoTitle)
           ..add('imageUrl', imageUrl)
           ..add('personalizable', personalizable)
-          ..add('variants', variants))
+          ..add('variants', variants)
+          ..add('originalImageUrl', originalImageUrl)
+          ..add('gallery', gallery))
         .toString();
   }
 }
@@ -127,6 +139,15 @@ class ProductDetailBuilder
   set variants(ListBuilder<VariantDetail>? variants) =>
       _$this._variants = variants;
 
+  String? _originalImageUrl;
+  String? get originalImageUrl => _$this._originalImageUrl;
+  set originalImageUrl(String? originalImageUrl) =>
+      _$this._originalImageUrl = originalImageUrl;
+
+  ListBuilder<String>? _gallery;
+  ListBuilder<String> get gallery => _$this._gallery ??= ListBuilder<String>();
+  set gallery(ListBuilder<String>? gallery) => _$this._gallery = gallery;
+
   ProductDetailBuilder() {
     ProductDetail._defaults(this);
   }
@@ -142,6 +163,8 @@ class ProductDetailBuilder
       _imageUrl = $v.imageUrl;
       _personalizable = $v.personalizable;
       _variants = $v.variants.toBuilder();
+      _originalImageUrl = $v.originalImageUrl;
+      _gallery = $v.gallery.toBuilder();
       _$v = null;
     }
     return this;
@@ -179,12 +202,17 @@ class ProductDetailBuilder
             personalizable: BuiltValueNullFieldError.checkNotNull(
                 personalizable, r'ProductDetail', 'personalizable'),
             variants: variants.build(),
+            originalImageUrl: originalImageUrl,
+            gallery: gallery.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'variants';
         variants.build();
+
+        _$failedField = 'gallery';
+        gallery.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'ProductDetail', _$failedField, e.toString());

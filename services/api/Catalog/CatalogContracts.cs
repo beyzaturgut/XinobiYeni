@@ -51,7 +51,11 @@ public record ProductDetail(
     string SeoTitle,
     string? ImageUrl,
     bool Personalizable,
-    VariantDetail[] Variants);
+    VariantDetail[] Variants,
+    /// <summary>The product's own photo (no colour), when one was uploaded. <see cref="ImageUrl"/> falls back to a colour photo; this does not.</summary>
+    string? OriginalImageUrl,
+    /// <summary>Extra photos shared by every colour, in display order. Gallery order: original photo, selected colour's photo, these.</summary>
+    string[] Gallery);
 
 public record HomeSlide(long Id, string Type, string Url, string Alt, int DurationSeconds);
 public record CategoryHighlight(string Category, string? ImageUrl, string ImageAlt, int ProductCount, string Description);

@@ -1543,7 +1543,9 @@
           "seoTitle",
           "imageUrl",
           "personalizable",
-          "variants"
+          "variants",
+          "originalImageUrl",
+          "gallery"
         ],
         "type": "object",
         "properties": {
@@ -1575,6 +1577,18 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/VariantDetail"
+            }
+          },
+          "originalImageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "gallery": {
+            "type": "array",
+            "items": {
+              "type": "string"
             }
           }
         }

@@ -134,6 +134,27 @@ public sealed class CatalogTests : IDisposable
     }
 
     [Fact]
+    public async Task ProductGalleryKeepsTheCoverAndExtraPhotosForEveryColour()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
+        var tea = state.Products.Single(product => product.Id == "DEMO-P101");
+        var gallery = new[] { "/assets/products/tea-maker-101-red.webp", "/assets/products/tea-maker-101-silver.webp" };
+        (await client.PutAsJsonAsync("/api/v1/local-commerce/products/DEMO-P101", tea with { OriginalImage = "/assets/products/tea-maker-101-blue.webp", Gallery = gallery })).EnsureSuccessStatusCode();
+
+        var detail = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P101"))!;
+        Assert.Equal("http://localhost:3000/assets/products/tea-maker-101-blue.webp", detail.OriginalImageUrl);
+        Assert.Equal(new[] { "red", "silver" }.Select(colour => $"http://localhost:3000/assets/products/tea-maker-101-{colour}.webp"), detail.Gallery);
+        var untouched = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P102"))!;
+        Assert.Null(untouched.OriginalImageUrl);
+        Assert.Empty(untouched.Gallery);
+
+        foreach (var invalid in new[] { new[] { "javascript:alert(1)" }, new[] { "" }, Enumerable.Repeat("/assets/products/tea-maker-101-red.webp", 13).ToArray() })
+            Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync("/api/v1/local-commerce/products/DEMO-P101", tea with { Gallery = invalid })).StatusCode);
+    }
+
+    [Fact]
     public async Task HomeContentAppliesHomepageRules()
     {
         using var factory = CreateFactory();

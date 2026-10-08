@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ProductPatternPreview, { type PatternTransform } from "./product-pattern-preview";
+import ProductPatternPreview, { defaultPatternCentre, type PatternTransform } from "./product-pattern-preview";
 import styles from "./editor.module.css";
 import { DEFAULT_CURVATURE_STRENGTH } from "./product-surface-warp";
 import type { RenderingInputs } from "./accepted-surface-api";
@@ -17,7 +17,9 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
   const [notice, setNotice] = useState("");
-  const [patternTransform, setPatternTransform] = useState<PatternTransform>({ x: 533, y: 1040, scale: placementMode === "artwork" ? 1 : 1.2, rotation: 0 });
+  const { width, height } = renderingInputs;
+  const [patternTransform, setPatternTransform] = useState<PatternTransform>({ ...defaultPatternCentre(width, height), scale: placementMode === "artwork" ? 1 : 1.2, rotation: 0 });
+  const label = renderingInputs.label ?? "Çay Makinesi 101 · Lacivert";
   const [curvatureStrength, setCurvatureStrength] = useState(DEFAULT_CURVATURE_STRENGTH);
 
   function toggleLayer(id: number, key: "locked" | "visible") {
@@ -49,7 +51,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
         <span className={styles.demoBadge}>Güvenli demo alanı</span>
       </div>
       <div className={styles.canvas}>
-        <div className={styles.canvasHeading}><p>Çay Makinesi 101 · Lacivert</p><h1 id="canvas-title">{face}</h1><span className={styles.representativeBadge}>Temsilidir</span></div>
+        <div className={styles.canvasHeading}><p>{label}</p><h1 id="canvas-title">{face}</h1><span className={styles.representativeBadge}>Temsilidir</span></div>
         <div className={styles.productStage}>
           <div className={styles.halo} />
           <ProductPatternPreview
@@ -61,7 +63,9 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
             onArtworkMove={placementMode === "artwork" ? (x,y)=>setPatternTransform(current=>({...current,x,y})) : undefined}
             patternTransform={patternTransform}
             curvatureStrength={curvatureStrength}
-            alt="Çay Makinesi 101, desenli ürün önizlemesi"
+            alt={`${label}, desenli ürün önizlemesi`}
+            width={width}
+            height={height}
           />
         </div>
         <p className={styles.canvasDisclaimer}>Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.</p>
@@ -80,8 +84,8 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
         <section className={styles.patternControls} aria-labelledby="pattern-controls-title">
           <div className={styles.panelTitle}><div><p id="pattern-controls-title">Desen yerleşimi</p><span>Prototip önizleme</span></div></div>
           {([
-            { key: "x", label: "Yatay konum", min: 0, max: 1066, step: 1, unit: "px" },
-            { key: "y", label: "Dikey konum", min: 0, max: 1600, step: 1, unit: "px" },
+            { key: "x", label: "Yatay konum", min: 0, max: width, step: 1, unit: "px" },
+            { key: "y", label: "Dikey konum", min: 0, max: height, step: 1, unit: "px" },
             { key: "scale", label: "Ölçek", min: 0.25, max: 3, step: 0.05, unit: "×" },
             { key: "rotation", label: "Dönüş", min: -180, max: 180, step: 1, unit: "°" },
           ] as const).map(({ key, label, min, max, step, unit }) => <div className={styles.patternControl} key={key}>

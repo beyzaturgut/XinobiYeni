@@ -7,8 +7,11 @@ import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./pr
 
 import { containArtwork } from "./artwork-placement";
 
-const SOURCE_WIDTH = 1066;
-const SOURCE_HEIGHT = 1600;
+// Tea Maker reference size; every other product passes its own photo size (the mask is aligned to it).
+const DEFAULT_WIDTH = 1066;
+const DEFAULT_HEIGHT = 1600;
+/** Default pattern centre: middle of the width, 65% down - the lower body on the reference photo. */
+export const defaultPatternCentre = (width: number, height: number) => ({ x: Math.round(width / 2), y: Math.round(height * .65) });
 
 export type PatternTransform = {
   x: number;
@@ -27,31 +30,35 @@ type ProductPatternPreviewProps = {
   patternTransform: PatternTransform;
   curvatureStrength?: number;
   alt: string;
+  width?: number;
+  height?: number;
 };
 
 async function loadImage(src: string) {
   const image = new window.Image();
+  // Photos and masks may come from the commerce API origin in development; CORS keeps the canvas readable.
+  if (!src.startsWith("blob:") && !src.startsWith("data:")) image.crossOrigin = "anonymous";
   image.src = src;
   await image.decode();
   return image;
 }
 
-async function loadAlignedImage(src: string) {
+async function loadAlignedImage(src: string, width: number, height: number) {
   const image = await loadImage(src);
-  if (image.naturalWidth !== SOURCE_WIDTH || image.naturalHeight !== SOURCE_HEIGHT) {
+  if (image.naturalWidth !== width || image.naturalHeight !== height) {
     throw new Error("Unexpected asset dimensions");
   }
   return image;
 }
 
-function validateMaskAlpha(mask: HTMLImageElement) {
+function validateMaskAlpha(mask: HTMLImageElement, width: number, height: number) {
   const buffer = document.createElement("canvas");
-  buffer.width = SOURCE_WIDTH;
-  buffer.height = SOURCE_HEIGHT;
+  buffer.width = width;
+  buffer.height = height;
   const context = buffer.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("Canvas unavailable");
   context.drawImage(mask, 0, 0);
-  const { data } = context.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+  const { data } = context.getImageData(0, 0, width, height);
   let hasTransparentPixel = false;
   let hasDesignablePixel = false;
   for (let index = 3; index < data.length; index += 4) {
@@ -73,11 +80,12 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt, width: SOURCE_WIDTH = DEFAULT_WIDTH, height: SOURCE_HEIGHT = DEFAULT_HEIGHT }: ProductPatternPreviewProps) {
+  const centre = defaultPatternCentre(SOURCE_WIDTH, SOURCE_HEIGHT);
   const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
   const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode]);
+  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
   const { x, y, scale, rotation } = patternTransform;
   const validTransform = [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1;
@@ -88,12 +96,12 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     async function render() {
       try {
         const [product, mask, pattern, branding] = await Promise.all([
-          loadAlignedImage(productSrc),
-          loadAlignedImage(designableMaskSrc),
+          loadAlignedImage(productSrc, SOURCE_WIDTH, SOURCE_HEIGHT),
+          loadAlignedImage(designableMaskSrc, SOURCE_WIDTH, SOURCE_HEIGHT),
           loadImage(patternSrc),
-          brandingOverlaySrc ? loadAlignedImage(brandingOverlaySrc) : undefined,
+          brandingOverlaySrc ? loadAlignedImage(brandingOverlaySrc, SOURCE_WIDTH, SOURCE_HEIGHT) : undefined,
         ]);
-        validateMaskAlpha(mask);
+        validateMaskAlpha(mask, SOURCE_WIDTH, SOURCE_HEIGHT);
         if (cancelled) return;
         const patternBuffer = document.createElement("canvas");
         patternBuffer.width = SOURCE_WIDTH;
@@ -108,7 +116,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
         const maskPixels = readPixels(mask);
         const lighting = deriveProductLighting(readPixels(product), maskPixels, branding ? readPixels(branding) : undefined);
         const surface = deriveBodySurface(maskPixels);
-        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight) : {x:533,y:1040,width:pattern.naturalWidth,height:pattern.naturalHeight};
+        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight) : {...centre,width:pattern.naturalWidth,height:pattern.naturalHeight};
         setResult({ assetKey, status: "ready", assets: { product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } });
       } catch {
         if (!cancelled) setResult({ assetKey, status: "error" });
@@ -116,7 +124,8 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     }
     void render();
     return () => { cancelled = true; };
-  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- centre derives from the size, which is part of assetKey
+  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT]);
 
   useLayoutEffect(() => {
     if (status !== "ready" || !result?.assets) return;
@@ -125,7 +134,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     const context = canvasRef.current!.getContext("2d")!;
     buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     buffer.save();
-    buffer.translate(placementMode === "artwork" ? artwork.x + x - 533 : x, placementMode === "artwork" ? artwork.y + y - 1040 : y);
+    buffer.translate(placementMode === "artwork" ? artwork.x + x - centre.x : x, placementMode === "artwork" ? artwork.y + y - centre.y : y);
     buffer.rotate(rotation * Math.PI / 180);
     buffer.scale(scale, scale);
     if (placementMode === "artwork") buffer.drawImage(pattern, -artwork.width / 2, -artwork.height / 2, artwork.width, artwork.height);
@@ -144,6 +153,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     context.drawImage(product, 0, 0);
     context.drawImage(patternBuffer, 0, 0);
     if (branding) context.drawImage(branding, 0, 0);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- centre and size follow the loaded assets
   }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode]);
 
   // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.

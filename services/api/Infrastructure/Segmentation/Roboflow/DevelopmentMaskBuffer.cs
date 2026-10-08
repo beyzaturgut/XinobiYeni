@@ -49,6 +49,12 @@ public sealed class DevelopmentMaskBuffer
         }
     }
 
+    /// <summary>The bytes of a mask the provider just added, by its reference.</summary>
+    public byte[] Bytes(string maskReference)
+    {
+        lock (_gate) return _entries[maskReference].Bytes.ToArray();
+    }
+
     public ProviderSelectionEvidence? Evidence(string maskReference)
     {
         lock (_gate) return _entries[maskReference].Evidence;

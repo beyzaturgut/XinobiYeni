@@ -2713,6 +2713,12 @@
           "maxQuantity": {
             "type": "integer",
             "format": "int32"
+          },
+          "surfaceMaskUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

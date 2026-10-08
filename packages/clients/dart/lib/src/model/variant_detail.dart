@@ -22,6 +22,7 @@ part 'variant_detail.g.dart';
 /// * [availability]
 /// * [purchasable]
 /// * [maxQuantity]
+/// * [surfaceMaskUrl]
 @BuiltValue()
 abstract class VariantDetail implements Built<VariantDetail, VariantDetailBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -50,6 +51,9 @@ abstract class VariantDetail implements Built<VariantDetail, VariantDetailBuilde
 
   @BuiltValueField(wireName: r'maxQuantity')
   int get maxQuantity;
+
+  @BuiltValueField(wireName: r'surfaceMaskUrl')
+  String? get surfaceMaskUrl;
 
   VariantDetail._();
 
@@ -119,6 +123,13 @@ class _$VariantDetailSerializer implements PrimitiveSerializer<VariantDetail> {
       object.maxQuantity,
       specifiedType: const FullType(int),
     );
+    if (object.surfaceMaskUrl != null) {
+      yield r'surfaceMaskUrl';
+      yield serializers.serialize(
+        object.surfaceMaskUrl,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -207,6 +218,14 @@ class _$VariantDetailSerializer implements PrimitiveSerializer<VariantDetail> {
             specifiedType: const FullType(int),
           ) as int;
           result.maxQuantity = valueDes;
+          break;
+        case r'surfaceMaskUrl':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.surfaceMaskUrl = valueDes;
           break;
         default:
           unhandled.add(key);

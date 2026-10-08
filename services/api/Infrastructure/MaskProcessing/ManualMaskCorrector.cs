@@ -24,6 +24,31 @@ public sealed class ManualMaskCorrector
         using var codec = SKCodec.Create(data)!;
         using var bitmap = new SKBitmap(new SKImageInfo(source.Width, source.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
         if (codec.GetPixels(bitmap.Info, bitmap.GetPixels()) != SKCodecResult.Success) throw new InvalidDataException("mask_decode_failed");
+        Paint(bitmap, strokes, source);
+        return Encode(bitmap, source, outputReference);
+    }
+
+    /// <summary>Draws a mask from nothing: the strokes alone become the designable area (fully manual masking).</summary>
+    public MaskCorrectionResult StartFromStrokes(SourceMediaIdentity source, IEnumerable<MaskStroke> operations, string outputReference)
+    {
+        var strokes = MaskCorrectionRules.Snapshot(operations, source);
+        using var bitmap = new SKBitmap(new SKImageInfo(source.Width, source.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
+        bitmap.Erase(new SKColor(255, 255, 255, 0));
+        Paint(bitmap, strokes, source);
+        return Encode(bitmap, source, outputReference);
+    }
+
+    private static MaskCorrectionResult Encode(SKBitmap bitmap, SourceMediaIdentity source, string outputReference)
+    {
+        var inspector = new AlignedImageInspector();
+        using var pixmap = bitmap.PeekPixels() ?? throw new InvalidDataException("mask_raster_unavailable");
+        using var png = pixmap.Encode(SKEncodedImageFormat.Png, 100) ?? throw new InvalidDataException("mask_encode_failed");
+        var bytes = png.ToArray();
+        return new(bytes, inspector.ValidateMask(bytes, outputReference, source, source));
+    }
+
+    private static void Paint(SKBitmap bitmap, IReadOnlyList<MaskStroke> strokes, SourceMediaIdentity source)
+    {
         var pixels = bitmap.Pixels;
         long visits = 0;
         foreach (var stroke in strokes)
@@ -50,9 +75,5 @@ public sealed class ManualMaskCorrector
             }
         }
         bitmap.Pixels = pixels;
-        using var pixmap = bitmap.PeekPixels() ?? throw new InvalidDataException("mask_raster_unavailable");
-        using var png = pixmap.Encode(SKEncodedImageFormat.Png, 100) ?? throw new InvalidDataException("mask_encode_failed");
-        var bytes = png.ToArray();
-        return new(bytes, inspector.ValidateMask(bytes, outputReference, source, source));
     }
 }

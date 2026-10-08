@@ -51,7 +51,7 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
             {
                 var price = PriceOf(variant);
                 return new VariantDetail(variant.Id, variant.Sku, variant.Color, variant.Hex, resolveUrl(variant.Image), price,
-                    AvailabilityFor(variant.Stock), price is not null && variant.Stock > 0, MaxQuantityFor(variant.Stock));
+                    AvailabilityFor(variant.Stock), price is not null && variant.Stock > 0, MaxQuantityFor(variant.Stock), resolveUrl(variant.ApprovedSurfaceMask));
             }).ToArray(),
             resolveUrl(product.OriginalImage),
             (product.Gallery ?? []).Select(resolveUrl).OfType<string>().Distinct().ToArray())

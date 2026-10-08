@@ -2,7 +2,11 @@ using System.Text.Json;
 
 namespace Xinobi.Api.LocalCommerce;
 
-public record CommerceVariant(string Id, string Sku, string Color, int Stock, string Image, string? Hex = null);
+/// <summary><c>SurfaceMask</c> is the approved designable-area mask (a media path) made for <c>SurfaceImage</c>; it only applies while that is still the variant's image.</summary>
+public record CommerceVariant(string Id, string Sku, string Color, int Stock, string Image, string? Hex = null, string? SurfaceMask = null, string? SurfaceImage = null)
+{
+    public string? ApprovedSurfaceMask => !string.IsNullOrEmpty(SurfaceMask) && SurfaceImage == Image ? SurfaceMask : null;
+}
 /// <summary><c>Gallery</c> holds extra product photos shared by every colour, shown after the cover in the product gallery.</summary>
 public record CommerceProduct(string Id, string Name, string Category, bool Active, string Description, string SeoTitle, CommerceVariant[] Variants, bool? Personalizable = null, string? OriginalImage = null, string[]? Gallery = null);
 public record CommerceSlide(long Id, string Name, string Type, string Src, string Alt, int Duration, bool Active);

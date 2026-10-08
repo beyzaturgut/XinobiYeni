@@ -780,6 +780,7 @@ export interface components {
             purchasable: boolean;
             /** Format: int32 */
             maxQuantity: number;
+            surfaceMaskUrl?: null | string;
         };
         XinobiUAnswer: {
             questionId: string;

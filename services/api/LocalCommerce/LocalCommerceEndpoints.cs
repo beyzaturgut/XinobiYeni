@@ -95,6 +95,9 @@ public static class LocalCommerceEndpoints
                     if (!state.Categories!.Contains(product.Category)) throw new ArgumentException("Geçerli kategori seçin.");
                     if (state.Products.Where(p => p.Id != id).SelectMany(p => p.Variants).Any(other => product.Variants.Any(v => v.Id == other.Id || string.Equals(v.Sku, other.Sku, StringComparison.OrdinalIgnoreCase))))
                         throw new ArgumentException("SKU veya varyant kimliği başka bir üründe kullanılıyor.");
+                    // Surface masks change only through the surface approval flow; a save keeps the stored ones.
+                    var stored = state.Products.FirstOrDefault(p => p.Id == id)?.Variants.ToDictionary(v => v.Id) ?? [];
+                    product = product with { Variants = [.. product.Variants.Select(v => stored.TryGetValue(v.Id, out var old) ? v with { SurfaceMask = old.SurfaceMask, SurfaceImage = old.SurfaceImage } : v with { SurfaceMask = null, SurfaceImage = null })] };
                     return state with { Products = state.Products.Any(p => p.Id == id) ? state.Products.Select(p => p.Id == id ? product : p).ToArray() : [.. state.Products, product] };
                 });
                 return Results.Ok(state);

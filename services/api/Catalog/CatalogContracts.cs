@@ -43,7 +43,9 @@ public record VariantDetail(
     Money? Price,
     Availability Availability,
     bool Purchasable,
-    int MaxQuantity);
+    int MaxQuantity,
+    /// <summary>Approved designable-area mask for this colour's photo (RGBA PNG aligned to ImageUrl), when the admin approved one.</summary>
+    string? SurfaceMaskUrl = null);
 
 public record ProductDetail(
     string Id,

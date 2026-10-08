@@ -25,6 +25,8 @@ class _$VariantDetail extends VariantDetail {
   final bool purchasable;
   @override
   final int maxQuantity;
+  @override
+  final String? surfaceMaskUrl;
 
   factory _$VariantDetail([void Function(VariantDetailBuilder)? updates]) =>
       (VariantDetailBuilder()..update(updates))._build();
@@ -38,7 +40,8 @@ class _$VariantDetail extends VariantDetail {
       this.price,
       required this.availability,
       required this.purchasable,
-      required this.maxQuantity})
+      required this.maxQuantity,
+      this.surfaceMaskUrl})
       : super._();
   @override
   VariantDetail rebuild(void Function(VariantDetailBuilder) updates) =>
@@ -59,7 +62,8 @@ class _$VariantDetail extends VariantDetail {
         price == other.price &&
         availability == other.availability &&
         purchasable == other.purchasable &&
-        maxQuantity == other.maxQuantity;
+        maxQuantity == other.maxQuantity &&
+        surfaceMaskUrl == other.surfaceMaskUrl;
   }
 
   @override
@@ -74,6 +78,7 @@ class _$VariantDetail extends VariantDetail {
     _$hash = $jc(_$hash, availability.hashCode);
     _$hash = $jc(_$hash, purchasable.hashCode);
     _$hash = $jc(_$hash, maxQuantity.hashCode);
+    _$hash = $jc(_$hash, surfaceMaskUrl.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -89,7 +94,8 @@ class _$VariantDetail extends VariantDetail {
           ..add('price', price)
           ..add('availability', availability)
           ..add('purchasable', purchasable)
-          ..add('maxQuantity', maxQuantity))
+          ..add('maxQuantity', maxQuantity)
+          ..add('surfaceMaskUrl', surfaceMaskUrl))
         .toString();
   }
 }
@@ -136,6 +142,11 @@ class VariantDetailBuilder
   int? get maxQuantity => _$this._maxQuantity;
   set maxQuantity(int? maxQuantity) => _$this._maxQuantity = maxQuantity;
 
+  String? _surfaceMaskUrl;
+  String? get surfaceMaskUrl => _$this._surfaceMaskUrl;
+  set surfaceMaskUrl(String? surfaceMaskUrl) =>
+      _$this._surfaceMaskUrl = surfaceMaskUrl;
+
   VariantDetailBuilder() {
     VariantDetail._defaults(this);
   }
@@ -152,6 +163,7 @@ class VariantDetailBuilder
       _availability = $v.availability.toBuilder();
       _purchasable = $v.purchasable;
       _maxQuantity = $v.maxQuantity;
+      _surfaceMaskUrl = $v.surfaceMaskUrl;
       _$v = null;
     }
     return this;
@@ -189,6 +201,7 @@ class VariantDetailBuilder
                 purchasable, r'VariantDetail', 'purchasable'),
             maxQuantity: BuiltValueNullFieldError.checkNotNull(
                 maxQuantity, r'VariantDetail', 'maxQuantity'),
+            surfaceMaskUrl: surfaceMaskUrl,
           );
     } catch (_) {
       late String _$failedField;

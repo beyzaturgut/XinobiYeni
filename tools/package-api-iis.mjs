@@ -24,8 +24,8 @@ try{
  await rm(path.join(output,'App_Data'),{recursive:true,force:true});
  await writeFile(path.join(output,'appsettings.Production.json'),JSON.stringify({Catalog:{SnapshotPath:snapshotPath,AssetBaseUrl:assetBaseUrl}},null,2)+'\n');
  await writeFile(path.join(temporary,'DEPLOY.txt'),`XINOBI — API (IIS)\nSource commit: ${commit}\n\napi/: ASP.NET Core API (net10.0, framework-dependent). Requires the .NET 10 ASP.NET Core Hosting Bundle on the server.\nCopy the contents of api/ into the IIS site's physical path; the generated web.config starts the app through AspNetCoreModuleV2.\nThe application pool should use "No Managed Code".\n\nCatalog: read-only from ${snapshotPath}\n(the snapshot the web package deploys), media from ${assetBaseUrl}. Change appsettings.Production.json if those differ.\nAccounts, cart persistence, admin writes and AI design are not available in this package: they need the SQL Server store.\nNo database, user records, API keys or SMTP credentials are included. No remote deployment was performed by creating this archive.\n`);
- await mkdir(path.join(root,'paketler'),{recursive:true});
- const artifact=path.join(root,'paketler',`XinobiYeni-api-${sha}.zip`);
+ await mkdir(path.join(root,'paketler','mobil'),{recursive:true});
+ const artifact=path.join(root,'paketler','mobil',`XinobiYeni-api-${sha}.zip`);
  const packed=path.join(temporary,'api.zip');
  run('zip',['-q','-r',packed,'api','DEPLOY.txt'],{cwd:temporary});
  await cp(packed,artifact);

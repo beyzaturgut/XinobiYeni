@@ -23,7 +23,7 @@ const build=spawnSync('pnpm',['--filter','web','build'],{stdio:'inherit',env:{..
 if(build.status!==0)process.exit(build.status||1);
 const out=path.join(web,'out');
 await writeFile(path.join(out,'web.config'),`<?xml version="1.0" encoding="utf-8"?><configuration><system.webServer><defaultDocument enabled="true"><files><clear/><add value="index.html"/></files></defaultDocument><staticContent><remove fileExtension=".webp"/><mimeMap fileExtension=".webp" mimeType="image/webp"/></staticContent></system.webServer></configuration>`);
-await mkdir(path.join(root,'paketler'),{recursive:true});
-const artifact=path.join(root,'paketler',`XinobiYeni-web-${sha}.zip`);
+await mkdir(path.join(root,'paketler','web'),{recursive:true});
+const artifact=path.join(root,'paketler','web',`XinobiYeni-web-${sha}.zip`);
 const zip=spawnSync('zip',['-q','-r',artifact,'out'],{cwd:web,stdio:'inherit'});if(zip.status!==0)process.exit(zip.status||1);
 const bytes=await readFile(artifact);console.log(JSON.stringify({artifact,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),source:sha},null,2));

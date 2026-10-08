@@ -74,6 +74,20 @@ class FakeAccounts implements AccountRepository {
     if (accessToken == expiredAccess) throw const AccountException('unauthorized', 'Oturumun sona erdi. Tekrar giriş yap.');
     return profile.rebuild((b) => b.name = 'Ayşe Y.');
   }
+
+  final renames = <String>[];
+  @override
+  Future<AccountProfile> updateName(String accessToken, String name) async {
+    if (accessToken == expiredAccess) throw const AccountException('unauthorized', 'Oturumun sona erdi. Tekrar giriş yap.');
+    renames.add(name);
+    return profile.rebuild((b) => b.name = name);
+  }
+
+  @override
+  Future<AuthSession> changePassword(String accessToken, {required String current, required String next}) async {
+    if (current != 'guclu-parola-1') throw const AccountException('wrong_password', 'Mevcut parolan hatalı.');
+    return _session('pw', profile);
+  }
 }
 
 Future<(FakeAccounts, MemoryTokens)> pumpAccount(WidgetTester tester, {String? storedRefresh, bool keepPreferences = false}) async {
@@ -123,6 +137,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ayşe Yılmaz'), findsOneWidget);
     expect(tokens.value, 'refresh-login');
+    await tester.scrollUntilVisible(find.text('Çıkış yap'), 200, scrollable: find.byType(Scrollable).first);
     await tester.tap(find.text('Çıkış yap'));
     await tester.pumpAndSettle();
     expect(find.text('Hesabına giriş yap'), findsOneWidget);
@@ -165,5 +180,55 @@ void main() {
     await tester.pumpAndSettle();
     expect(accounts.refreshCount, 2);
     expect(find.text('Ayşe Y.'), findsOneWidget);
+  });
+
+  testWidgets('the signed-in account lists real settings and marks orders and addresses as coming', (tester) async {
+    await pumpAccount(tester, storedRefresh: 'refresh-old');
+    expect(find.text('AY'), findsOneWidget, reason: 'Initials avatar.');
+    expect(find.text('Profil bilgileri'), findsOneWidget);
+    expect(find.text('Parola değiştir'), findsOneWidget);
+    expect(find.text('Favorilerim'), findsNothing, reason: 'Favourites live in the header.');
+    final orders = tester.widget<ListTile>(find.ancestor(of: find.text('Siparişlerim'), matching: find.byType(ListTile)));
+    expect(orders.enabled, isFalse);
+    expect(find.text('Yakında'), findsNWidgets(2));
+  });
+
+  testWidgets('the name can be changed from profile details', (tester) async {
+    final (accounts, _) = await pumpAccount(tester, storedRefresh: 'refresh-old');
+    await tester.tap(find.text('Profil bilgileri'));
+    await tester.pumpAndSettle();
+    expect(find.text('ayse@example.com'), findsOneWidget, reason: 'E-mail is shown read-only.');
+    await tester.enterText(find.widgetWithText(TextField, 'Ad soyad'), '  ');
+    await tester.tap(find.widgetWithText(FilledButton, 'Kaydet'));
+    await tester.pumpAndSettle();
+    expect(find.text('Ad soyad gir.'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextField, 'Ad soyad'), 'Ayşe Kaya');
+    await tester.tap(find.widgetWithText(FilledButton, 'Kaydet'));
+    await tester.pumpAndSettle();
+    expect(accounts.renames, ['Ayşe Kaya']);
+    expect(find.text('Profil bilgilerin güncellendi.'), findsOneWidget);
+    expect(find.text('Ayşe Kaya'), findsOneWidget, reason: 'Back on the account tab with the new name.');
+  });
+
+  testWidgets('changing the password checks the fields and keeps this device signed in', (tester) async {
+    final (_, tokens) = await pumpAccount(tester, storedRefresh: 'refresh-old');
+    await tester.tap(find.text('Parola değiştir'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'Mevcut parola'), 'guclu-parola-1');
+    await tester.enterText(find.widgetWithText(TextField, 'Yeni parola'), 'yeni-parola-1');
+    await tester.enterText(find.widgetWithText(TextField, 'Yeni parola (tekrar)'), 'baska-parola');
+    await tester.tap(find.widgetWithText(FilledButton, 'Parolayı değiştir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Yeni parolalar eşleşmiyor.'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextField, 'Mevcut parola'), 'yanlis-parola');
+    await tester.enterText(find.widgetWithText(TextField, 'Yeni parola (tekrar)'), 'yeni-parola-1');
+    await tester.tap(find.widgetWithText(FilledButton, 'Parolayı değiştir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Mevcut parolan hatalı.'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextField, 'Mevcut parola'), 'guclu-parola-1');
+    await tester.tap(find.widgetWithText(FilledButton, 'Parolayı değiştir'));
+    await tester.pumpAndSettle();
+    expect(tokens.value, 'refresh-pw', reason: 'The new session replaces the revoked one.');
+    expect(find.text('Hesabım'), findsOneWidget);
   });
 }

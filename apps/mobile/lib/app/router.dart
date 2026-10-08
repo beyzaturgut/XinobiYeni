@@ -37,6 +37,8 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
           ],
         ),
         GoRoute(path: '/favoriler', builder: (context, state) => const FavoritesScreen()),
+        GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
+        GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),
         GoRoute(path: '/duyurular', builder: (context, state) => const NewsScreen()),
         GoRoute(path: '/urunler/:id', builder: (context, state) => ProductDetailScreen(productId: state.pathParameters['id']!)),
         GoRoute(

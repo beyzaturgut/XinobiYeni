@@ -8,7 +8,6 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
-import '../favorites/favorites.dart';
 import 'auth.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -28,6 +27,17 @@ class AccountScreen extends ConsumerWidget {
   }
 }
 
+String _date(DateTime value) {
+  final local = value.toLocal();
+  return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year}';
+}
+
+String _initials(String name) {
+  final parts = name.trim().split(RegExp(r'\s+')).where((part) => part.isNotEmpty).toList();
+  if (parts.isEmpty) return '?';
+  return (parts.first.characters.first + (parts.length > 1 ? parts.last.characters.first : '')).toUpperCase();
+}
+
 class _Profile extends ConsumerWidget {
   const _Profile({required this.profile});
   final AccountProfile profile;
@@ -35,7 +45,6 @@ class _Profile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
-    final created = profile.createdAt.toLocal();
     return RefreshIndicator(
       onRefresh: () => ref.read(authProvider.notifier).reloadProfile(),
       child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
@@ -44,23 +53,246 @@ class _Profile extends ConsumerWidget {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(color: XinobiTokens.surface, border: Border.all(color: XinobiTokens.line)),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(profile.name, style: text.titleLarge),
-            const SizedBox(height: 4),
-            Text(profile.email, style: text.bodyMedium),
-            const SizedBox(height: 8),
-            Text('Üyelik: ${created.day.toString().padLeft(2, '0')}.${created.month.toString().padLeft(2, '0')}.${created.year}', style: text.bodySmall),
+          child: Row(children: [
+            ExcludeSemantics(
+              child: CircleAvatar(
+                radius: 26,
+                backgroundColor: XinobiTokens.ink,
+                foregroundColor: XinobiTokens.surface,
+                child: Text(_initials(profile.name), style: text.titleMedium?.copyWith(color: XinobiTokens.surface)),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(profile.name, style: text.titleLarge),
+                const SizedBox(height: 2),
+                Text(profile.email, style: text.bodyMedium),
+                const SizedBox(height: 4),
+                Text('Üyelik: ${_date(profile.createdAt)}', style: text.bodySmall),
+              ]),
+            ),
           ]),
         ),
-        const SizedBox(height: 16),
-        const _FavoritesLink(),
-        const SizedBox(height: 16),
-        Text('Siparişlerin ve adreslerin, ödeme ve sipariş altyapısı tamamlanınca burada görünecek.', style: text.bodySmall),
-        const SizedBox(height: 24),
+        const _SectionTitle('Hesap bilgilerim'),
+        _MenuGroup(children: [
+          _MenuRow(icon: Icons.person_outline, title: 'Profil bilgileri', subtitle: 'Ad soyad ve e-posta', onTap: () => context.push('/hesap/profil')),
+          _MenuRow(icon: Icons.lock_outline, title: 'Parola değiştir', subtitle: 'Diğer cihazlardaki oturumların kapanır', onTap: () => context.push('/hesap/parola')),
+        ]),
+        const _SectionTitle('Alışveriş'),
+        // Not built yet: shown so the account reads complete, but honestly marked and not tappable.
+        const _MenuGroup(children: [
+          _MenuRow(icon: Icons.receipt_long_outlined, title: 'Siparişlerim', subtitle: 'Ödeme altyapısıyla birlikte burada görünecek', soon: true),
+          _MenuRow(icon: Icons.location_on_outlined, title: 'Adreslerim', subtitle: 'Teslimat adreslerin sipariş akışıyla eklenecek', soon: true),
+        ]),
+        const SizedBox(height: 28),
         OutlinedButton(onPressed: () => ref.read(authProvider.notifier).logout(), child: const Text('Çıkış yap')),
       ]),
     );
   }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle(this.title);
+  final String title;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 24, bottom: 8),
+        child: Semantics(header: true, child: Text(title.toUpperCase(), style: Theme.of(context).textTheme.bodySmall?.copyWith(letterSpacing: 1.2, fontWeight: FontWeight.w600))),
+      );
+}
+
+class _MenuGroup extends StatelessWidget {
+  const _MenuGroup({required this.children});
+  final List<Widget> children;
+  @override
+  Widget build(BuildContext context) => Material(
+        color: XinobiTokens.surface,
+        shape: const Border.fromBorderSide(BorderSide(color: XinobiTokens.line)),
+        clipBehavior: Clip.antiAlias,
+        child: Column(children: [
+          for (final (index, child) in children.indexed) ...[if (index > 0) const Divider(height: 1, color: XinobiTokens.line), child],
+        ]),
+      );
+}
+
+class _MenuRow extends StatelessWidget {
+  const _MenuRow({required this.icon, required this.title, required this.subtitle, this.onTap, this.soon = false});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+  final bool soon;
+  @override
+  Widget build(BuildContext context) => ListTile(
+        enabled: !soon,
+        leading: Icon(icon),
+        title: Text(title),
+        subtitle: Text(subtitle),
+        trailing: soon
+            ? DecoratedBox(
+                decoration: BoxDecoration(border: Border.all(color: XinobiTokens.line), borderRadius: BorderRadius.circular(999)),
+                child: Padding(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), child: Text('Yakında', style: Theme.of(context).textTheme.bodySmall)),
+              )
+            : const Icon(Icons.chevron_right),
+        onTap: soon ? null : onTap,
+      );
+}
+
+/// /hesap/profil: the name can be changed; the e-mail is the sign-in identity and stays read-only.
+class ProfileDetailsScreen extends ConsumerStatefulWidget {
+  const ProfileDetailsScreen({super.key});
+  @override
+  ConsumerState<ProfileDetailsScreen> createState() => _ProfileDetailsScreenState();
+}
+
+class _ProfileDetailsScreenState extends ConsumerState<ProfileDetailsScreen> {
+  late final TextEditingController name =
+      TextEditingController(text: switch (ref.read(authProvider)) { SignedIn(:final profile) => profile.name, _ => '' });
+  String? error;
+  bool busy = false;
+
+  @override
+  void dispose() {
+    name.dispose();
+    super.dispose();
+  }
+
+  Future<void> save() async {
+    if (name.text.trim().isEmpty) return setState(() => error = 'Ad soyad gir.');
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      await ref.read(authProvider.notifier).updateName(name.text);
+      messenger.showSnackBar(const SnackBar(content: Text('Profil bilgilerin güncellendi.')));
+      router.pop();
+    } on AccountException catch (problem) {
+      if (mounted) setState(() => error = problem.message);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    final text = Theme.of(context).textTheme;
+    return Scaffold(
+      appBar: _bar('Profil bilgileri'),
+      body: switch (auth) {
+        SignedIn(:final profile) => ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
+            TextField(controller: name, textCapitalization: TextCapitalization.words, autofillHints: const [AutofillHints.name], maxLength: 80, decoration: _field('Ad soyad')),
+            const SizedBox(height: 4),
+            Text('E-posta', style: text.bodySmall),
+            const SizedBox(height: 4),
+            Text(profile.email, style: text.bodyLarge),
+            const SizedBox(height: 4),
+            Text('E-posta adresin giriş bilgin olduğu için buradan değiştirilemez.', style: text.bodySmall),
+            _Error(error),
+            const SizedBox(height: 20),
+            FilledButton(onPressed: busy ? null : save, child: Text(busy ? 'Kaydediliyor…' : 'Kaydet')),
+          ]),
+        AuthLoading() => const LoadingView(),
+        SignedOut() => const _SignedOutNotice(),
+      },
+    );
+  }
+}
+
+/// /hesap/parola: changing the password signs out every other device; this one stays signed in.
+class ChangePasswordScreen extends ConsumerStatefulWidget {
+  const ChangePasswordScreen({super.key});
+  @override
+  ConsumerState<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
+}
+
+class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
+  final current = TextEditingController();
+  final next = TextEditingController();
+  final repeat = TextEditingController();
+  String? error;
+  bool busy = false;
+
+  @override
+  void dispose() {
+    current.dispose();
+    next.dispose();
+    repeat.dispose();
+    super.dispose();
+  }
+
+  Future<void> save() async {
+    final problem = current.text.isEmpty
+        ? 'Mevcut parolanı gir.'
+        : next.text.length < 8
+            ? 'Yeni parola en az 8 karakter olmalı.'
+            : next.text != repeat.text
+                ? 'Yeni parolalar eşleşmiyor.'
+                : null;
+    if (problem != null) return setState(() => error = problem);
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      await ref.read(authProvider.notifier).changePassword(current: current.text, next: next.text);
+      messenger.showSnackBar(const SnackBar(content: Text('Parolan değiştirildi. Diğer cihazlardaki oturumların kapatıldı.')));
+      router.pop();
+    } on AccountException catch (problem) {
+      if (mounted) setState(() => error = problem.message);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: _bar('Parola değiştir'),
+        body: switch (ref.watch(authProvider)) {
+          SignedIn() => AutofillGroup(
+              child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
+                _PasswordField(controller: current, label: 'Mevcut parola', autofill: AutofillHints.password),
+                const SizedBox(height: 12),
+                _PasswordField(controller: next, label: 'Yeni parola', helper: 'En az 8 karakter', autofill: AutofillHints.newPassword),
+                const SizedBox(height: 12),
+                _PasswordField(controller: repeat, label: 'Yeni parola (tekrar)', autofill: AutofillHints.newPassword),
+                _Error(error),
+                const SizedBox(height: 8),
+                Text('Parolan değişince diğer cihazlardaki oturumların kapanır; bu cihazda oturumun açık kalır.', style: Theme.of(context).textTheme.bodySmall),
+                const SizedBox(height: 20),
+                FilledButton(onPressed: busy ? null : save, child: Text(busy ? 'Kaydediliyor…' : 'Parolayı değiştir')),
+              ]),
+            ),
+          AuthLoading() => const LoadingView(),
+          SignedOut() => const _SignedOutNotice(),
+        },
+      );
+}
+
+PreferredSizeWidget _bar(String title) => AppBar(
+      backgroundColor: XinobiTokens.header,
+      foregroundColor: XinobiTokens.onHeader,
+      toolbarHeight: XinobiTokens.headerHeight,
+      title: Text(title),
+    );
+
+class _SignedOutNotice extends StatelessWidget {
+  const _SignedOutNotice();
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.all(XinobiTokens.gutterMobile),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Oturumun kapalı.', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          FilledButton(onPressed: () => context.go('/hesap'), child: const Text('Giriş yap')),
+        ]),
+      );
 }
 
 class _AccessForms extends StatefulWidget {
@@ -86,26 +318,6 @@ class _AccessFormsState extends State<_AccessForms> {
         const SizedBox(height: 20),
         register ? const _RegisterForm() : const _LoginForm(),
       ]);
-}
-
-/// Favourites live on the device, so they are reachable signed in or not.
-class _FavoritesLink extends ConsumerWidget {
-  const _FavoritesLink();
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final count = ref.watch(favoritesProvider).length;
-    return Material(
-      color: XinobiTokens.surface,
-      shape: const Border.fromBorderSide(BorderSide(color: XinobiTokens.line)),
-      child: ListTile(
-        leading: const Icon(Icons.favorite_border),
-        title: const Text('Favorilerim'),
-        subtitle: Text(count == 0 ? 'Henüz favori yok' : '$count ürün'),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => context.push('/favoriler'),
-      ),
-    );
-  }
 }
 
 InputDecoration _field(String label, {Widget? suffix, String? helper}) => InputDecoration(

@@ -23,6 +23,10 @@ abstract interface class AccountRepository {
   Future<AuthSession> refresh(String refreshToken);
   Future<void> logout(String refreshToken);
   Future<AccountProfile> me(String accessToken);
+  Future<AccountProfile> updateName(String accessToken, String name);
+
+  /// Signs out every other device; the returned session keeps this one signed in.
+  Future<AuthSession> changePassword(String accessToken, {required String current, required String next});
 }
 
 class ApiAccountRepository implements AccountRepository {
@@ -65,6 +69,20 @@ class ApiAccountRepository implements AccountRepository {
 
   @override
   Future<AccountProfile> me(String accessToken) => _call(() => _api.getMyAccount(headers: {'Authorization': 'Bearer $accessToken'}));
+
+  @override
+  Future<AccountProfile> updateName(String accessToken, String name) => _call(() => _api.updateMyAccount(
+        updateMyAccount: UpdateMyAccount((b) => b.name = name),
+        headers: {'Authorization': 'Bearer $accessToken'},
+      ));
+
+  @override
+  Future<AuthSession> changePassword(String accessToken, {required String current, required String next}) => _call(() => _api.changeMyPassword(
+        changeMyPassword: ChangeMyPassword((b) => b
+          ..currentPassword = current
+          ..newPassword = next),
+        headers: {'Authorization': 'Bearer $accessToken'},
+      ));
 
   Future<T> _call<T>(Future<Response<T>> Function() request) async {
     try {
@@ -173,20 +191,42 @@ class AuthController extends Notifier<AuthState> {
 
   /// Reloads the profile; an expired access token is refreshed once and the call retried.
   Future<void> reloadProfile() async {
+    final profile = await _authorized(_repository.me);
+    if (profile != null) state = SignedIn(profile);
+  }
+
+  /// Throws [AccountException] (e.g. `invalid_name`) so the form can show it.
+  Future<void> updateName(String name) async {
+    final profile = await _authorized((token) => _repository.updateName(token, name.trim()));
+    if (profile != null) state = SignedIn(profile);
+  }
+
+  /// Throws [AccountException] (`wrong_password`, `weak_password`); on success this device gets the new session.
+  Future<void> changePassword({required String current, required String next}) async {
+    final session = await _authorized((token) => _repository.changePassword(token, current: current, next: next));
+    if (session != null) await _adopt(session);
+  }
+
+  /// Runs [call] with the access token; an expired token is refreshed once and the call retried. Null when signed out meanwhile.
+  Future<T?> _authorized<T>(Future<T> Function(String accessToken) call) async {
     final token = _accessToken;
-    if (token == null) return;
+    if (token == null) return null;
     try {
-      state = SignedIn(await _repository.me(token));
+      return await call(token);
     } on AccountException catch (error) {
-      if (!error.unauthorized && error.code != 'unauthorized') rethrow;
+      if (!error.unauthorized) rethrow;
       final stored = await _tokens.refreshToken();
-      if (stored == null) return logout();
+      if (stored == null) {
+        await logout();
+        return null;
+      }
       try {
         await _adopt(await _refresh(stored));
-        state = SignedIn(await _repository.me(_accessToken!));
       } on AccountException {
         await logout();
+        return null;
       }
+      return call(_accessToken!);
     }
   }
 }

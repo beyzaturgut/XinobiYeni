@@ -1,5 +1,5 @@
 import {spawnSync} from 'node:child_process';
-import {mkdtemp,cp,writeFile,readFile} from 'node:fs/promises';
+import {mkdtemp,mkdir,cp,writeFile,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
@@ -15,7 +15,8 @@ const temporary=await mkdtemp(path.join(tmpdir(),'xinobi-admin-package-'));
 await cp(path.join(root,'apps/admin/dist'),path.join(temporary,'admin'),{recursive:true});
 await writeFile(path.join(temporary,'admin/web.config'),`<?xml version="1.0" encoding="utf-8"?>
 <configuration><system.webServer><security><access sslFlags="Ssl" /></security><defaultDocument enabled="true"><files><clear /><add value="index.html" /></files></defaultDocument></system.webServer></configuration>`);
-const artifact=path.join(root,`XinobiYeni-admin-${sha}.zip`);
+await mkdir(path.join(root,'paketler'),{recursive:true});
+const artifact=path.join(root,'paketler',`XinobiYeni-admin-${sha}.zip`);
 // Build a fresh archive so removed chunks from a previous build cannot survive.
 const archived=path.join(temporary,'package.zip');
 const zip=spawnSync('zip',['-q','-r',archived,'admin'],{cwd:temporary,stdio:'inherit'});if(zip.status!==0)process.exit(zip.status||1);

@@ -16,6 +16,7 @@
 XinobiYeni-web-*.zip
 XinobiYeni-admin-*.zip
 XinobiYeni-deploy-*.zip
+/paketler/
 
 # Persistent local commerce data and uploaded media
 services/api/App_Data/

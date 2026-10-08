@@ -48,12 +48,13 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 
 final api = XinobiApiClient().getAccountApi();
+final ChangeMyPassword changeMyPassword = ; // ChangeMyPassword |
 
 try {
-    final response = await api.getMyAccount();
+    final response = await api.changeMyPassword(changeMyPassword);
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling AccountApi->getMyAccount: $e\n");
+    print("Exception when calling AccountApi->changeMyPassword: $e\n");
 }
 
 ```
@@ -64,6 +65,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AccountApi*](doc/AccountApi.md) | [**changeMyPassword**](doc/AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [*AccountApi*](doc/AccountApi.md) | [**loginWebAccount**](doc/AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
@@ -74,6 +76,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**registerAccount**](doc/AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
 [*AccountApi*](doc/AccountApi.md) | [**registerWebAccount**](doc/AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
+[*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
@@ -103,6 +106,7 @@ Class | Method | HTTP request | Description
  - [CategoryHighlight](doc/CategoryHighlight.md)
  - [CategoryItem](doc/CategoryItem.md)
  - [CategoryList](doc/CategoryList.md)
+ - [ChangeMyPassword](doc/ChangeMyPassword.md)
  - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
  - [DependencyHealth](doc/DependencyHealth.md)
  - [HealthResponse](doc/HealthResponse.md)
@@ -120,6 +124,7 @@ Class | Method | HTTP request | Description
  - [RefreshSession](doc/RefreshSession.md)
  - [RegisterAccount](doc/RegisterAccount.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
+ - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)
  - [XinobiUAnswer](doc/XinobiUAnswer.md)
  - [XinobiUGenerationRequest](doc/XinobiUGenerationRequest.md)

@@ -39,6 +39,10 @@ public interface IAccountStore
     /// <summary>Adds <paramref name="role"/> to the account; null when no account has that e-mail.</summary>
     Task<AccountRecord?> AssignRole(string email, string role);
     Task<bool> AnyWithRole(string role);
+    /// <summary>Renames the account; null when it no longer exists.</summary>
+    Task<AccountRecord?> UpdateName(string accountId, string name);
+    /// <summary>False when <paramref name="currentPassword"/> is wrong. On success every session of the account is signed out.</summary>
+    Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword);
 }
 
 public sealed class UnavailableAccountStore : IAccountStore
@@ -52,6 +56,8 @@ public sealed class UnavailableAccountStore : IAccountStore
     public Task<AccountRecord?> FindById(string accountId) => throw new AccountUnavailableException();
     public Task<AccountRecord?> AssignRole(string email, string role) => throw new AccountUnavailableException();
     public Task<bool> AnyWithRole(string role) => throw new AccountUnavailableException();
+    public Task<AccountRecord?> UpdateName(string accountId, string name) => throw new AccountUnavailableException();
+    public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => throw new AccountUnavailableException();
 }
 
 public static class AccountRules
@@ -227,6 +233,30 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
     });
 
     public Task<bool> AnyWithRole(string role) => Locked(state => Task.FromResult(state.Accounts.Any(account => account.RoleCodes.Contains(role))));
+
+    public Task<AccountRecord?> UpdateName(string accountId, string name) => Locked(async state =>
+    {
+        var index = state.Accounts.FindIndex(account => account.Id == accountId);
+        if (index < 0) return null;
+        state.Accounts[index] = state.Accounts[index] with { Name = name };
+        await Write(state);
+        return state.Accounts[index];
+    });
+
+    public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => Locked(async state =>
+    {
+        var index = state.Accounts.FindIndex(account => account.Id == accountId);
+        var account = index < 0 ? null : state.Accounts[index];
+        if (account is null || hasher.VerifyHashedPassword(account, account.PasswordHash, currentPassword) == PasswordVerificationResult.Failed) return false;
+        state.Accounts[index] = account with { PasswordHash = hasher.HashPassword(account, newPassword) };
+        // A changed password signs out every device; the caller issues a fresh session for the one that made the change.
+        var now = clock.GetUtcNow();
+        for (var i = 0; i < state.RefreshTokens.Count; i++)
+            if (state.RefreshTokens[i].AccountId == accountId && state.RefreshTokens[i].RevokedAt is null) state.RefreshTokens[i] = state.RefreshTokens[i] with { RevokedAt = now };
+        state.AccessTokens.RemoveAll(entry => entry.AccountId == accountId);
+        await Write(state);
+        return true;
+    });
 
     private static AccountException Invalid() =>
         new("invalid_refresh_token", "Oturumun sona erdi. Tekrar giriş yap.", StatusCodes.Status401Unauthorized);

@@ -24,6 +24,7 @@ import 'package:xinobi_api_client/src/model/availability.dart';
 import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
+import 'package:xinobi_api_client/src/model/change_my_password.dart';
 import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
@@ -41,6 +42,7 @@ import 'package:xinobi_api_client/src/model/readiness_response.dart';
 import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
+import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_generation_request.dart';
@@ -64,6 +66,7 @@ part 'serializers.g.dart';
   CategoryHighlight,
   CategoryItem,
   CategoryList,
+  ChangeMyPassword,
   CreateXinobiUSession,
   DependencyHealth,
   HealthResponse,
@@ -81,6 +84,7 @@ part 'serializers.g.dart';
   RefreshSession,
   RegisterAccount,
   StartAccountEmailVerification,
+  UpdateMyAccount,
   VariantDetail,
   XinobiUAnswer,
   XinobiUGenerationRequest,

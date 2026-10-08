@@ -17,6 +17,8 @@ public record LoginAccount(string Email, string Password);
 public record RefreshSession(string RefreshToken);
 public record LogoutSession(string RefreshToken);
 public record AccountProfile(string Id, string Name, string Email, DateTimeOffset CreatedAt);
+public record UpdateMyAccount(string Name);
+public record ChangeMyPassword(string CurrentPassword, string NewPassword);
 /// <summary>What the panel may show; every action is still checked on the server.</summary>
 public record AdminSession(AccountProfile Account, IReadOnlyCollection<string> Roles, IReadOnlyCollection<string> Permissions);
 public record PermissionCatalogResponse(IReadOnlyList<string> Resources, IReadOnlyCollection<string> Permissions);
@@ -223,6 +225,35 @@ public static class AccountEndpoints
                     : Problem(StatusCodes.Status401Unauthorized, "invalid_token", "Oturumun sona erdi. Tekrar giriş yap."))
             .WithName("GetMyAccount")
             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        me.MapPatch("", async Task<Results<Ok<AccountProfile>, ProblemHttpResult>> (UpdateMyAccount request, ClaimsPrincipal user, IAccountStore accounts) =>
+                await accounts.UpdateName(user.FindFirstValue(ClaimTypes.NameIdentifier)!, AccountRules.ValidName(request.Name)) is { } account
+                    ? TypedResults.Ok(Profile(account))
+                    : Problem(StatusCodes.Status401Unauthorized, "invalid_token", "Oturumun sona erdi. Tekrar giriş yap."))
+            .WithName("UpdateMyAccount")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        // Mobile (bearer) gets its new session in the body; the web (cookie) gets new cookies and no tokens in JavaScript.
+        var password = me.MapPut("/password", async Task<Results<Ok<AuthSession>, NoContent, ProblemHttpResult>> (ChangeMyPassword request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts) =>
+            {
+                AccountRules.ValidatePassword(request.NewPassword);
+                var id = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                if (request.CurrentPassword is not { Length: > 0 and <= AccountRules.MaxPasswordLength } || !await accounts.ChangePassword(id, request.CurrentPassword, request.NewPassword))
+                    return Problem(StatusCodes.Status400BadRequest, "wrong_password", "Mevcut parolan hatalı.");
+                var tokens = await accounts.IssueTokens(id);
+                if (!http.Request.Headers.Authorization.ToString().StartsWith("Bearer ", StringComparison.Ordinal))
+                {
+                    WebSessionCookies.Write(http, tokens);
+                    return TypedResults.NoContent();
+                }
+                var account = (await accounts.FindById(id))!;
+                return TypedResults.Ok(new AuthSession(tokens.AccessToken, tokens.AccessTokenExpiresAt, tokens.RefreshToken, tokens.RefreshTokenExpiresAt, Profile(account)));
+            })
+            .WithName("ChangeMyPassword")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
+        if (app.Environment.IsDevelopment()) password.RequireRateLimiting("Account");
 
         admin.MapGet("/session", async Task<Results<Ok<AdminSession>, ProblemHttpResult>> (ClaimsPrincipal user, IAccountStore accounts) =>
                 await accounts.FindById(user.FindFirstValue(ClaimTypes.NameIdentifier)!) is { } account

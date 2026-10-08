@@ -14,6 +14,7 @@ doc/CatalogApi.md
 doc/CategoryHighlight.md
 doc/CategoryItem.md
 doc/CategoryList.md
+doc/ChangeMyPassword.md
 doc/ContentApi.md
 doc/CreateXinobiUSession.md
 doc/DependencyHealth.md
@@ -33,6 +34,7 @@ doc/RefreshSession.md
 doc/RegisterAccount.md
 doc/StartAccountEmailVerification.md
 doc/SystemApi.md
+doc/UpdateMyAccount.md
 doc/VariantDetail.md
 doc/XinobiUAnswer.md
 doc/XinobiUApi.md
@@ -67,6 +69,7 @@ lib/src/model/availability.dart
 lib/src/model/category_highlight.dart
 lib/src/model/category_item.dart
 lib/src/model/category_list.dart
+lib/src/model/change_my_password.dart
 lib/src/model/create_xinobi_u_session.dart
 lib/src/model/date.dart
 lib/src/model/dependency_health.dart
@@ -85,6 +88,7 @@ lib/src/model/readiness_response.dart
 lib/src/model/refresh_session.dart
 lib/src/model/register_account.dart
 lib/src/model/start_account_email_verification.dart
+lib/src/model/update_my_account.dart
 lib/src/model/variant_detail.dart
 lib/src/model/xinobi_u_answer.dart
 lib/src/model/xinobi_u_generation_request.dart

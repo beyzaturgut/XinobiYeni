@@ -177,6 +177,78 @@ public sealed class AccountTests : IDisposable
         }
     }
 
+    private static async Task<HttpResponseMessage> Authorized(HttpClient client, HttpMethod method, string path, string token, object? body = null)
+    {
+        using var request = new HttpRequestMessage(method, path) { Content = body is null ? null : JsonContent.Create(body) };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return await client.SendAsync(request);
+    }
+
+    [Fact]
+    public async Task AccountHolderCanRenameThemselves()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var session = await Register(client);
+        var renamed = await Authorized(client, HttpMethod.Patch, "/api/v1/me", session.AccessToken, new UpdateMyAccount("  Ayşe Kaya "));
+        renamed.EnsureSuccessStatusCode();
+        Assert.Equal("Ayşe Kaya", (await renamed.Content.ReadFromJsonAsync<AccountProfile>())!.Name);
+        Assert.Equal("Ayşe Kaya", (await (await Me(client, session.AccessToken)).Content.ReadFromJsonAsync<AccountProfile>())!.Name);
+        var empty = await Authorized(client, HttpMethod.Patch, "/api/v1/me", session.AccessToken, new UpdateMyAccount("  "));
+        Assert.Equal("invalid_name", await Code(empty));
+        using var anonymous = new HttpRequestMessage(HttpMethod.Patch, "/api/v1/me") { Content = JsonContent.Create(new UpdateMyAccount("X")) };
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(anonymous)).StatusCode);
+    }
+
+    [Fact]
+    public async Task PasswordChangeSignsOutOtherSessionsAndKeepsTheCurrentOne()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var session = await Register(client, password: "eski-parola-1");
+        var other = (await (await client.PostAsJsonAsync("/api/v1/auth/login", new LoginAccount("ayse@example.com", "eski-parola-1"))).Content.ReadFromJsonAsync<AuthSession>())!;
+
+        var wrong = await Authorized(client, HttpMethod.Put, "/api/v1/me/password", session.AccessToken, new ChangeMyPassword("yanlis-parola", "yeni-parola-1"));
+        Assert.Equal(HttpStatusCode.BadRequest, wrong.StatusCode);
+        Assert.Equal("wrong_password", await Code(wrong));
+        Assert.Equal("weak_password", await Code(await Authorized(client, HttpMethod.Put, "/api/v1/me/password", session.AccessToken, new ChangeMyPassword("eski-parola-1", "kisa"))));
+
+        var changed = await Authorized(client, HttpMethod.Put, "/api/v1/me/password", session.AccessToken, new ChangeMyPassword("eski-parola-1", "yeni-parola-1"));
+        changed.EnsureSuccessStatusCode();
+        var fresh = (await changed.Content.ReadFromJsonAsync<AuthSession>())!;
+        Assert.Equal(HttpStatusCode.OK, (await Me(client, fresh.AccessToken)).StatusCode);
+        foreach (var stale in new[] { session.AccessToken, other.AccessToken })
+            Assert.Equal(HttpStatusCode.Unauthorized, (await Me(client, stale)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshSession(other.RefreshToken))).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync("/api/v1/auth/login", new LoginAccount("ayse@example.com", "eski-parola-1"))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/v1/auth/login", new LoginAccount("ayse@example.com", "yeni-parola-1"))).StatusCode);
+    }
+
+    [Fact]
+    public async Task WebPasswordChangeRenewsCookiesAndNeedsTheCsrfHeader()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+        await Register(client, password: "web-parola-12");
+        using var login = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/web/login") { Content = JsonContent.Create(new LoginAccount("ayse@example.com", "web-parola-12")) };
+        login.Headers.Add("X-Xinobi-Csrf", "1");
+        var access = (await client.SendAsync(login)).Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("xinobi_at=")).Split(';')[0];
+
+        async Task<HttpResponseMessage> Change(bool csrf)
+        {
+            using var message = new HttpRequestMessage(HttpMethod.Put, "/api/v1/me/password") { Content = JsonContent.Create(new ChangeMyPassword("web-parola-12", "web-parola-34")) };
+            message.Headers.Add("Cookie", access);
+            if (csrf) message.Headers.Add("X-Xinobi-Csrf", "1");
+            return await client.SendAsync(message);
+        }
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Change(csrf: false)).StatusCode);
+        var changed = await Change(csrf: true);
+        Assert.Equal(HttpStatusCode.NoContent, changed.StatusCode);
+        Assert.Contains(changed.Headers.GetValues("Set-Cookie"), c => c.StartsWith("xinobi_at=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase));
+        Assert.Empty(await changed.Content.ReadAsStringAsync());
+    }
+
     [Fact]
     public async Task WebSessionUsesHttpOnlyCookiesWithCsrfHeader()
     {

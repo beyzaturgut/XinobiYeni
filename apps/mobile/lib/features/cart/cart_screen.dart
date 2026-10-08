@@ -60,15 +60,13 @@ class CartScreen extends ConsumerWidget {
                       Text('$issues satır şu anda satın alınamıyor ve toplama dahil değil.', style: text.bodySmall?.copyWith(color: XinobiTokens.danger)),
                     ],
                     const SizedBox(height: 16),
-                    // No fake checkout: payment, reservation and order rules wait for D03/D05 (Faz05).
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      color: XinobiTokens.surface,
-                      child: Text(
-                        'Ödeme adımı, ödeme sağlayıcısı ve sipariş kuralları netleşince eklenecek. Sepetin bu cihazda saklanır; web sepetiyle henüz eşitlenmez.',
-                        style: text.bodySmall,
-                      ),
+                    FilledButton(
+                      onPressed: issues == 0 && valid.isNotEmpty ? () => context.push('/odeme') : null,
+                      child: const Text('Siparişi tamamla'),
                     ),
+                    const SizedBox(height: 8),
+                    // Demo checkout: payment, reservation and order rules still wait for D03/D05 (Faz05).
+                    Text('Demo sipariş: ödeme alınmaz. Sepetin bu cihazda saklanır; web sepetiyle eşitlenmez.', style: text.bodySmall),
                   ]),
                 );
               },

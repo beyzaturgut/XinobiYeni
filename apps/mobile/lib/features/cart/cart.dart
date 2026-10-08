@@ -82,6 +82,9 @@ class CartController extends Notifier<List<CartLine>> {
   }
 
   Future<void> remove(String productId, String variantId) => setQuantity(productId, variantId, 0);
+
+  /// After a placed order.
+  Future<void> clear() => _write(const []);
 }
 
 final cartProvider = NotifierProvider<CartController, List<CartLine>>(CartController.new);

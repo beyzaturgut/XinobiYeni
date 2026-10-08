@@ -3,6 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/account/account_screen.dart';
+import '../features/account/addresses.dart';
+import '../features/account/orders.dart';
+import '../features/cart/checkout_screen.dart';
 import '../features/cart/cart.dart';
 import '../features/cart/cart_screen.dart';
 
@@ -39,6 +42,14 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(path: '/favoriler', builder: (context, state) => const FavoritesScreen()),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
         GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),
+        GoRoute(path: '/hesap/eposta', builder: (context, state) => const EmailChangeScreen()),
+        GoRoute(path: '/hesap/sil', builder: (context, state) => const DeleteAccountScreen()),
+        GoRoute(path: '/hesap/adresler', builder: (context, state) => const AddressesScreen()),
+        GoRoute(path: '/hesap/adresler/yeni', builder: (context, state) => const AddressFormScreen()),
+        GoRoute(path: '/hesap/adresler/:id', builder: (context, state) => AddressFormScreen(addressId: state.pathParameters['id'])),
+        GoRoute(path: '/hesap/siparisler', builder: (context, state) => const OrdersScreen()),
+        GoRoute(path: '/hesap/siparisler/:id', builder: (context, state) => OrderDetailScreen(orderId: state.pathParameters['id']!)),
+        GoRoute(path: '/odeme', builder: (context, state) => const CheckoutScreen()),
         GoRoute(path: '/duyurular', builder: (context, state) => const NewsScreen()),
         GoRoute(path: '/urunler/:id', builder: (context, state) => ProductDetailScreen(productId: state.pathParameters['id']!)),
         GoRoute(

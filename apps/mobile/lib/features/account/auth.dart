@@ -23,7 +23,16 @@ abstract interface class AccountRepository {
   Future<AuthSession> refresh(String refreshToken);
   Future<void> logout(String refreshToken);
   Future<AccountProfile> me(String accessToken);
-  Future<AccountProfile> updateName(String accessToken, String name);
+  /// [phone] null leaves it unchanged; an empty string removes it.
+  Future<AccountProfile> updateProfile(String accessToken, {required String name, String? phone});
+  Future<AccountEmailVerification> startEmailChange(String accessToken, String newEmail);
+  Future<AccountProfile> confirmEmailChange(String accessToken, {required String newEmail, required String verificationId, required String code, required String password});
+  Future<void> deleteAccount(String accessToken, String password);
+  Future<List<CustomerAddress>> addresses(String accessToken);
+  Future<CustomerAddress> saveAddress(String accessToken, String? id, SaveCustomerAddress address);
+  Future<void> deleteAddress(String accessToken, String id);
+  Future<List<CustomerOrder>> orders(String accessToken);
+  Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order);
 
   /// Signs out every other device; the returned session keeps this one signed in.
   Future<AuthSession> changePassword(String accessToken, {required String current, required String next});
@@ -70,11 +79,59 @@ class ApiAccountRepository implements AccountRepository {
   @override
   Future<AccountProfile> me(String accessToken) => _call(() => _api.getMyAccount(headers: {'Authorization': 'Bearer $accessToken'}));
 
+  Map<String, String> _bearer(String token) => {'Authorization': 'Bearer $token'};
+
   @override
-  Future<AccountProfile> updateName(String accessToken, String name) => _call(() => _api.updateMyAccount(
-        updateMyAccount: UpdateMyAccount((b) => b.name = name),
-        headers: {'Authorization': 'Bearer $accessToken'},
+  Future<AccountProfile> updateProfile(String accessToken, {required String name, String? phone}) => _call(() => _api.updateMyAccount(
+        updateMyAccount: UpdateMyAccount((b) => b
+          ..name = name
+          ..phone = phone),
+        headers: _bearer(accessToken),
       ));
+
+  @override
+  Future<AccountEmailVerification> startEmailChange(String accessToken, String newEmail) =>
+      _call(() => _api.startMyEmailChange(startEmailChange: StartEmailChange((b) => b.newEmail = newEmail), headers: _bearer(accessToken)));
+
+  @override
+  Future<AccountProfile> confirmEmailChange(String accessToken, {required String newEmail, required String verificationId, required String code, required String password}) =>
+      _call(() => _api.confirmMyEmailChange(
+            confirmEmailChange: ConfirmEmailChange((b) => b
+              ..newEmail = newEmail
+              ..verificationId = verificationId
+              ..verificationCode = code
+              ..currentPassword = password),
+            headers: _bearer(accessToken),
+          ));
+
+  @override
+  Future<void> deleteAccount(String accessToken, String password) =>
+      _empty(() => _api.deleteMyAccount(deleteMyAccount: DeleteMyAccount((b) => b.currentPassword = password), headers: _bearer(accessToken)));
+
+  @override
+  Future<List<CustomerAddress>> addresses(String accessToken) async => (await _call(() => _api.listMyAddresses(headers: _bearer(accessToken)))).toList();
+
+  @override
+  Future<CustomerAddress> saveAddress(String accessToken, String? id, SaveCustomerAddress address) => id == null
+      ? _call(() => _api.addMyAddress(saveCustomerAddress: address, headers: _bearer(accessToken)))
+      : _call(() => _api.updateMyAddress(id: id, saveCustomerAddress: address, headers: _bearer(accessToken)));
+
+  @override
+  Future<void> deleteAddress(String accessToken, String id) => _empty(() => _api.deleteMyAddress(id: id, headers: _bearer(accessToken)));
+
+  @override
+  Future<List<CustomerOrder>> orders(String accessToken) async => (await _call(() => _api.listMyOrders(headers: _bearer(accessToken)))).toList();
+
+  @override
+  Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order) => _call(() => _api.placeMyOrder(placeOrder: order, headers: _bearer(accessToken)));
+
+  Future<void> _empty(Future<Response<void>> Function() request) async {
+    try {
+      await request();
+    } on DioException catch (error) {
+      await _call<Never>(() => Future.error(error));
+    }
+  }
 
   @override
   Future<AuthSession> changePassword(String accessToken, {required String current, required String next}) => _call(() => _api.changeMyPassword(
@@ -195,11 +252,29 @@ class AuthController extends Notifier<AuthState> {
     if (profile != null) state = SignedIn(profile);
   }
 
-  /// Throws [AccountException] (e.g. `invalid_name`) so the form can show it.
-  Future<void> updateName(String name) async {
-    final profile = await _authorized((token) => _repository.updateName(token, name.trim()));
+  /// Throws [AccountException] (e.g. `invalid_name`, `invalid_phone`) so the form can show it.
+  Future<void> updateProfile({required String name, String? phone}) async {
+    final profile = await _authorized((token) => _repository.updateProfile(token, name: name.trim(), phone: phone?.trim()));
     if (profile != null) state = SignedIn(profile);
   }
+
+  Future<AccountEmailVerification?> startEmailChange(String newEmail) => _authorized((token) => _repository.startEmailChange(token, newEmail.trim()));
+
+  Future<void> confirmEmailChange({required String newEmail, required String verificationId, required String code, required String password}) async {
+    final profile = await _authorized((token) => _repository.confirmEmailChange(token, newEmail: newEmail.trim(), verificationId: verificationId, code: code.trim(), password: password));
+    if (profile != null) state = SignedIn(profile);
+  }
+
+  /// Deletes the account on the server, then forgets the session on this device.
+  Future<void> deleteAccount(String password) async {
+    await _authorized((token) => _repository.deleteAccount(token, password));
+    _accessToken = null;
+    await _tokens.clear();
+    state = const SignedOut();
+  }
+
+  /// For account data owned by other features (addresses, orders): runs [call] with a valid access token.
+  Future<T?> withSession<T>(Future<T> Function(AccountRepository repository, String accessToken) call) => _authorized((token) => call(_repository, token));
 
   /// Throws [AccountException] (`wrong_password`, `weak_password`); on success this device gets the new session.
   Future<void> changePassword({required String current, required String next}) async {

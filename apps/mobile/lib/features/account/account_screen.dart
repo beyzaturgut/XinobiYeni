@@ -8,6 +8,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
+import 'account_widgets.dart';
 import 'auth.dart';
 
 class AccountScreen extends ConsumerWidget {
@@ -76,17 +77,22 @@ class _Profile extends ConsumerWidget {
         ),
         const _SectionTitle('Hesap bilgilerim'),
         _MenuGroup(children: [
-          _MenuRow(icon: Icons.person_outline, title: 'Profil bilgileri', subtitle: 'Ad soyad ve e-posta', onTap: () => context.push('/hesap/profil')),
+          _MenuRow(icon: Icons.person_outline, title: 'Profil bilgileri', subtitle: 'Ad soyad, telefon ve e-posta', onTap: () => context.push('/hesap/profil')),
           _MenuRow(icon: Icons.lock_outline, title: 'Parola değiştir', subtitle: 'Diğer cihazlardaki oturumların kapanır', onTap: () => context.push('/hesap/parola')),
         ]),
         const _SectionTitle('Alışveriş'),
-        // Not built yet: shown so the account reads complete, but honestly marked and not tappable.
-        const _MenuGroup(children: [
-          _MenuRow(icon: Icons.receipt_long_outlined, title: 'Siparişlerim', subtitle: 'Ödeme altyapısıyla birlikte burada görünecek', soon: true),
-          _MenuRow(icon: Icons.location_on_outlined, title: 'Adreslerim', subtitle: 'Teslimat adreslerin sipariş akışıyla eklenecek', soon: true),
+        _MenuGroup(children: [
+          _MenuRow(icon: Icons.receipt_long_outlined, title: 'Siparişlerim', subtitle: 'Demo siparişlerin ve durumları', onTap: () => context.push('/hesap/siparisler')),
+          _MenuRow(icon: Icons.location_on_outlined, title: 'Adreslerim', subtitle: 'Teslimat adreslerin', onTap: () => context.push('/hesap/adresler')),
         ]),
         const SizedBox(height: 28),
         OutlinedButton(onPressed: () => ref.read(authProvider.notifier).logout(), child: const Text('Çıkış yap')),
+        const SizedBox(height: 8),
+        TextButton(
+          style: TextButton.styleFrom(foregroundColor: XinobiTokens.danger),
+          onPressed: () => context.push('/hesap/sil'),
+          child: const Text('Hesabımı sil'),
+        ),
       ]),
     );
   }
@@ -117,25 +123,18 @@ class _MenuGroup extends StatelessWidget {
 }
 
 class _MenuRow extends StatelessWidget {
-  const _MenuRow({required this.icon, required this.title, required this.subtitle, this.onTap, this.soon = false});
+  const _MenuRow({required this.icon, required this.title, required this.subtitle, required this.onTap});
   final IconData icon;
   final String title;
   final String subtitle;
-  final VoidCallback? onTap;
-  final bool soon;
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) => ListTile(
-        enabled: !soon,
         leading: Icon(icon),
         title: Text(title),
         subtitle: Text(subtitle),
-        trailing: soon
-            ? DecoratedBox(
-                decoration: BoxDecoration(border: Border.all(color: XinobiTokens.line), borderRadius: BorderRadius.circular(999)),
-                child: Padding(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3), child: Text('Yakında', style: Theme.of(context).textTheme.bodySmall)),
-              )
-            : const Icon(Icons.chevron_right),
-        onTap: soon ? null : onTap,
+        trailing: const Icon(Icons.chevron_right),
+        onTap: onTap,
       );
 }
 
@@ -147,14 +146,16 @@ class ProfileDetailsScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileDetailsScreenState extends ConsumerState<ProfileDetailsScreen> {
-  late final TextEditingController name =
-      TextEditingController(text: switch (ref.read(authProvider)) { SignedIn(:final profile) => profile.name, _ => '' });
+  late final AccountProfile? initial = switch (ref.read(authProvider)) { SignedIn(:final profile) => profile, _ => null };
+  late final TextEditingController name = TextEditingController(text: initial?.name ?? '');
+  late final TextEditingController phone = TextEditingController(text: localPhone(initial?.phone));
   String? error;
   bool busy = false;
 
   @override
   void dispose() {
     name.dispose();
+    phone.dispose();
     super.dispose();
   }
 
@@ -167,7 +168,7 @@ class _ProfileDetailsScreenState extends ConsumerState<ProfileDetailsScreen> {
     final messenger = ScaffoldMessenger.of(context);
     final router = GoRouter.of(context);
     try {
-      await ref.read(authProvider.notifier).updateName(name.text);
+      await ref.read(authProvider.notifier).updateProfile(name: name.text, phone: phone.text);
       messenger.showSnackBar(const SnackBar(content: Text('Profil bilgilerin güncellendi.')));
       router.pop();
     } on AccountException catch (problem) {
@@ -182,17 +183,26 @@ class _ProfileDetailsScreenState extends ConsumerState<ProfileDetailsScreen> {
     final auth = ref.watch(authProvider);
     final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: _bar('Profil bilgileri'),
+      appBar: accountBar('Profil bilgileri'),
       body: switch (auth) {
         SignedIn(:final profile) => ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
-            TextField(controller: name, textCapitalization: TextCapitalization.words, autofillHints: const [AutofillHints.name], maxLength: 80, decoration: _field('Ad soyad')),
+            TextField(controller: name, textCapitalization: TextCapitalization.words, autofillHints: const [AutofillHints.name], maxLength: 80, decoration: accountField('Ad soyad')),
             const SizedBox(height: 4),
+            TextField(
+              controller: phone,
+              keyboardType: TextInputType.phone,
+              autofillHints: const [AutofillHints.telephoneNumber],
+              decoration: accountField('Telefon (isteğe bağlı)', helper: 'Örn. 0532 123 45 67'),
+            ),
+            const SizedBox(height: 16),
             Text('E-posta', style: text.bodySmall),
             const SizedBox(height: 4),
-            Text(profile.email, style: text.bodyLarge),
-            const SizedBox(height: 4),
-            Text('E-posta adresin giriş bilgin olduğu için buradan değiştirilemez.', style: text.bodySmall),
-            _Error(error),
+            Row(children: [
+              Expanded(child: Text(profile.email, style: text.bodyLarge)),
+              TextButton(onPressed: () => context.push('/hesap/eposta'), child: const Text('Değiştir')),
+            ]),
+            Text('E-posta adresin giriş bilgin; değiştirmek için yeni adrese doğrulama kodu gönderilir.', style: text.bodySmall),
+            FormErrorText(error),
             const SizedBox(height: 20),
             FilledButton(onPressed: busy ? null : save, child: Text(busy ? 'Kaydediliyor…' : 'Kaydet')),
           ]),
@@ -253,16 +263,16 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: _bar('Parola değiştir'),
+        appBar: accountBar('Parola değiştir'),
         body: switch (ref.watch(authProvider)) {
           SignedIn() => AutofillGroup(
               child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
-                _PasswordField(controller: current, label: 'Mevcut parola', autofill: AutofillHints.password),
+                PasswordField(controller: current, label: 'Mevcut parola', autofill: AutofillHints.password),
                 const SizedBox(height: 12),
-                _PasswordField(controller: next, label: 'Yeni parola', helper: 'En az 8 karakter', autofill: AutofillHints.newPassword),
+                PasswordField(controller: next, label: 'Yeni parola', helper: 'En az 8 karakter', autofill: AutofillHints.newPassword),
                 const SizedBox(height: 12),
-                _PasswordField(controller: repeat, label: 'Yeni parola (tekrar)', autofill: AutofillHints.newPassword),
-                _Error(error),
+                PasswordField(controller: repeat, label: 'Yeni parola (tekrar)', autofill: AutofillHints.newPassword),
+                FormErrorText(error),
                 const SizedBox(height: 8),
                 Text('Parolan değişince diğer cihazlardaki oturumların kapanır; bu cihazda oturumun açık kalır.', style: Theme.of(context).textTheme.bodySmall),
                 const SizedBox(height: 20),
@@ -275,12 +285,169 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
       );
 }
 
-PreferredSizeWidget _bar(String title) => AppBar(
-      backgroundColor: XinobiTokens.header,
-      foregroundColor: XinobiTokens.onHeader,
-      toolbarHeight: XinobiTokens.headerHeight,
-      title: Text(title),
+/// /hesap/eposta: a code goes to the new address; the code and the current password confirm the change.
+class EmailChangeScreen extends ConsumerStatefulWidget {
+  const EmailChangeScreen({super.key});
+  @override
+  ConsumerState<EmailChangeScreen> createState() => _EmailChangeScreenState();
+}
+
+class _EmailChangeScreenState extends ConsumerState<EmailChangeScreen> {
+  final email = TextEditingController();
+  final code = TextEditingController();
+  final password = TextEditingController();
+  AccountEmailVerification? challenge;
+  String? error;
+  bool busy = false;
+
+  @override
+  void dispose() {
+    email.dispose();
+    code.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  Future<void> run(Future<void> Function() action) async {
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await action();
+    } on AccountException catch (problem) {
+      if (mounted) setState(() => error = problem.message);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> send() => run(() async {
+        if (!email.text.contains('@')) throw const AccountException('invalid_email', 'Geçerli bir e-posta adresi gir.');
+        final sent = await ref.read(authProvider.notifier).startEmailChange(email.text);
+        if (mounted) setState(() => challenge = sent);
+      });
+
+  Future<void> confirm() => run(() async {
+        final messenger = ScaffoldMessenger.of(context);
+        final router = GoRouter.of(context);
+        await ref.read(authProvider.notifier).confirmEmailChange(newEmail: challenge!.email, verificationId: challenge!.verificationId, code: code.text, password: password.text);
+        messenger.showSnackBar(SnackBar(content: Text('E-posta adresin ${challenge!.email} olarak güncellendi.')));
+        router.pop();
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final sent = challenge;
+    return Scaffold(
+      appBar: accountBar('E-postayı değiştir'),
+      body: switch (ref.watch(authProvider)) {
+        SignedIn() => ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
+            TextField(
+              controller: email,
+              enabled: sent == null,
+              keyboardType: TextInputType.emailAddress,
+              autofillHints: const [AutofillHints.email],
+              decoration: accountField('Yeni e-posta'),
+            ),
+            if (sent == null) ...[
+              FormErrorText(error),
+              const SizedBox(height: 16),
+              FilledButton(onPressed: busy ? null : send, child: Text(busy ? 'Gönderiliyor…' : 'Doğrulama kodu gönder')),
+            ] else ...[
+              const SizedBox(height: 12),
+              Text('${sent.email} adresine 6 haneli bir kod gönderdik.', style: text.bodyMedium),
+              if (sent.previewCode != null) Text('Geliştirme ortamı kodu: ${sent.previewCode}', style: text.bodySmall),
+              const SizedBox(height: 12),
+              TextField(controller: code, keyboardType: TextInputType.number, maxLength: 6, decoration: accountField('Doğrulama kodu')),
+              PasswordField(controller: password, label: 'Mevcut parola', autofill: AutofillHints.password),
+              FormErrorText(error),
+              const SizedBox(height: 16),
+              FilledButton(onPressed: busy ? null : confirm, child: Text(busy ? 'Kaydediliyor…' : 'E-postayı değiştir')),
+              TextButton(onPressed: busy ? null : () => setState(() => challenge = null), child: const Text('Farklı bir adres gir')),
+            ],
+          ]),
+        AuthLoading() => const LoadingView(),
+        SignedOut() => const _SignedOutNotice(),
+      },
     );
+  }
+}
+
+/// /hesap/sil: the password and an explicit confirmation delete the account with its addresses and orders.
+class DeleteAccountScreen extends ConsumerStatefulWidget {
+  const DeleteAccountScreen({super.key});
+  @override
+  ConsumerState<DeleteAccountScreen> createState() => _DeleteAccountScreenState();
+}
+
+class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
+  final password = TextEditingController();
+  bool confirmed = false;
+  bool busy = false;
+  String? error;
+
+  @override
+  void initState() {
+    super.initState();
+    password.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    password.dispose();
+    super.dispose();
+  }
+
+  Future<void> delete() async {
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      await ref.read(authProvider.notifier).deleteAccount(password.text);
+      messenger.showSnackBar(const SnackBar(content: Text('Hesabın silindi.')));
+      router.go('/hesap');
+    } on AccountException catch (problem) {
+      if (mounted) setState(() => error = problem.message);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: accountBar('Hesabımı sil'),
+        body: switch (ref.watch(authProvider)) {
+          SignedIn(:final profile) => ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
+              Text('${profile.email} hesabı kalıcı olarak silinecek.', style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 8),
+              const Text('Profil bilgilerin, adreslerin ve demo siparişlerin silinir; bütün cihazlardaki oturumların kapanır. Bu işlem geri alınamaz.'),
+              const SizedBox(height: 16),
+              PasswordField(controller: password, label: 'Mevcut parola', autofill: AutofillHints.password),
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                value: confirmed,
+                onChanged: (value) => setState(() => confirmed = value ?? false),
+                title: const Text('Hesabımın ve bilgilerimin silineceğini anladım.'),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+              FormErrorText(error),
+              const SizedBox(height: 12),
+              FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: XinobiTokens.danger),
+                onPressed: busy || !confirmed || password.text.isEmpty ? null : delete,
+                child: Text(busy ? 'Siliniyor…' : 'Hesabımı kalıcı olarak sil'),
+              ),
+            ]),
+          AuthLoading() => const LoadingView(),
+          SignedOut() => const _SignedOutNotice(),
+        },
+      );
+}
 
 class _SignedOutNotice extends StatelessWidget {
   const _SignedOutNotice();
@@ -320,54 +487,6 @@ class _AccessFormsState extends State<_AccessForms> {
       ]);
 }
 
-InputDecoration _field(String label, {Widget? suffix, String? helper}) => InputDecoration(
-      labelText: label,
-      helperText: helper,
-      suffixIcon: suffix,
-      filled: true,
-      fillColor: XinobiTokens.surface,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(XinobiTokens.headerSearchRadius)),
-    );
-
-class _PasswordField extends StatefulWidget {
-  const _PasswordField({required this.controller, required this.label, this.helper, this.autofill});
-  final TextEditingController controller;
-  final String label;
-  final String? helper;
-  final String? autofill;
-  @override
-  State<_PasswordField> createState() => _PasswordFieldState();
-}
-
-class _PasswordFieldState extends State<_PasswordField> {
-  bool hidden = true;
-  @override
-  Widget build(BuildContext context) => TextField(
-        controller: widget.controller,
-        obscureText: hidden,
-        autofillHints: widget.autofill == null ? null : [widget.autofill!],
-        decoration: _field(widget.label,
-            helper: widget.helper,
-            suffix: IconButton(
-              tooltip: hidden ? 'Parolayı göster' : 'Parolayı gizle',
-              onPressed: () => setState(() => hidden = !hidden),
-              icon: Icon(hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined),
-            )),
-      );
-}
-
-class _Error extends StatelessWidget {
-  const _Error(this.message);
-  final String? message;
-  @override
-  Widget build(BuildContext context) => message == null
-      ? const SizedBox.shrink()
-      : Padding(
-          padding: const EdgeInsets.only(top: 12),
-          child: Semantics(liveRegion: true, child: Text(message!, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: XinobiTokens.danger))),
-        );
-}
-
 class _LoginForm extends ConsumerStatefulWidget {
   const _LoginForm();
   @override
@@ -404,10 +523,10 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
   @override
   Widget build(BuildContext context) => AutofillGroup(
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: _field('E-posta')),
+          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: accountField('E-posta')),
           const SizedBox(height: 12),
-          _PasswordField(controller: password, label: 'Parola', autofill: AutofillHints.password),
-          _Error(error),
+          PasswordField(controller: password, label: 'Parola', autofill: AutofillHints.password),
+          FormErrorText(error),
           const SizedBox(height: 16),
           FilledButton(onPressed: busy ? null : submit, child: Text(busy ? 'Giriş yapılıyor…' : 'Giriş yap')),
         ]),
@@ -500,12 +619,12 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
     if (waiting == null) {
       return AutofillGroup(
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          TextField(controller: name, textCapitalization: TextCapitalization.words, autofillHints: const [AutofillHints.name], decoration: _field('Ad soyad')),
+          TextField(controller: name, textCapitalization: TextCapitalization.words, autofillHints: const [AutofillHints.name], decoration: accountField('Ad soyad')),
           const SizedBox(height: 12),
-          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: _field('E-posta')),
+          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: accountField('E-posta')),
           const SizedBox(height: 12),
-          _PasswordField(controller: password, label: 'Parola', helper: 'En az 8 karakter', autofill: AutofillHints.newPassword),
-          _Error(error),
+          PasswordField(controller: password, label: 'Parola', helper: 'En az 8 karakter', autofill: AutofillHints.newPassword),
+          FormErrorText(error),
           const SizedBox(height: 16),
           FilledButton(onPressed: busy ? null : sendCode, child: Text(busy ? 'Kod gönderiliyor…' : 'Doğrulama kodu gönder')),
         ]),
@@ -528,9 +647,9 @@ class _RegisterFormState extends ConsumerState<_RegisterForm> {
         keyboardType: TextInputType.number,
         maxLength: 6,
         autofillHints: const [AutofillHints.oneTimeCode],
-        decoration: _field('Doğrulama kodu'),
+        decoration: accountField('Doğrulama kodu'),
       ),
-      _Error(error),
+      FormErrorText(error),
       const SizedBox(height: 8),
       FilledButton(onPressed: busy ? null : create, child: Text(busy ? 'Hesap oluşturuluyor…' : 'Hesabı oluştur')),
       const SizedBox(height: 8),

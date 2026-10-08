@@ -32,7 +32,14 @@ class XinobiHeader extends ConsumerWidget implements PreferredSizeWidget {
                   excludeSemantics: true,
                   child: InkWell(
                     onTap: () => context.go('/'),
-                    child: Image.asset('assets/brand/xinobi-logo-white.png', height: XinobiTokens.headerLogoHeightMobile, excludeFromSemantics: true),
+                    // The touch target must not depend on the image having decoded.
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minWidth: XinobiTokens.headerTouchTarget, minHeight: XinobiTokens.headerTouchTarget),
+                      child: Center(
+                        widthFactor: 1,
+                        child: Image.asset('assets/brand/xinobi-logo-white.png', height: XinobiTokens.headerLogoHeightMobile, excludeFromSemantics: true),
+                      ),
+                    ),
                   ),
                 ),
                 const Spacer(),

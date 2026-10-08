@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Release keeps cleartext off except for the test server (API :8024, web media :8014), which has no HTTPS yet.
+     Remove the domain-config once the test environment serves HTTPS. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false" />
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">109.104.120.91</domain>
+    </domain-config>
+</network-security-config>

@@ -4,6 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Debug only: the local development API is plain http (emulator → 10.0.2.2:5003). Release builds keep cleartext disabled. -->
+    <!-- Debug only: the local development API is plain http (emulator → 10.0.2.2:5003). Release builds allow cleartext
+         only for the test server (res/xml/network_security_config.xml). -->
     <application android:usesCleartextTraffic="true"/>
 </manifest>

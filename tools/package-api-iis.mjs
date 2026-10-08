@@ -1,5 +1,5 @@
 import {spawnSync} from 'node:child_process';
-import {mkdtemp,mkdir,cp,writeFile,readFile,readdir,rm} from 'node:fs/promises';
+import {mkdtemp,mkdir,cp,writeFile,readFile,readdir,rm,realpath,access} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
@@ -10,13 +10,16 @@ const commit=spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).stdout.trim
 const sha=commit.slice(0,7);
 const snapshotPath=process.env.XINOBI_CATALOG_SNAPSHOT_PATH||'C:\\inetpub\\wwwroot\\XinobiYeni\\out\\commerce-preview\\state.json';
 const assetBaseUrl=process.env.XINOBI_ASSET_BASE_URL||'http://109.104.120.91:8014';
-const temporary=await mkdtemp(path.join(tmpdir(),'xinobi-api-package-'));
+// Resolve the macOS /var → /private/var link: NuGet otherwise sees two paths for the worktree and drops the
+// Persistence project's packages (EF Core) from the publish output.
+const temporary=await realpath(await mkdtemp(path.join(tmpdir(),'xinobi-api-package-')));
 const source=path.join(temporary,'source');
 const run=(command,args,options={})=>{const result=spawnSync(command,args,{stdio:'inherit',...options});if(result.status!==0)throw new Error(`${command} ${args[0]} failed (${result.status})`);};
 run('git',['worktree','add','--detach',source,commit]);
 try{
  const output=path.join(temporary,'api');
  run('dotnet',['publish',path.join(source,'services/api/Xinobi.Api.csproj'),'-c','Release','-o',output,'-p:OpenApiGenerateDocumentsOnBuild=false']);
+ await access(path.join(output,'Microsoft.EntityFrameworkCore.SqlServer.dll')).catch(()=>{throw new Error('Publish output is missing EF Core; refusing to package an API that cannot start.');});
  for(const name of await readdir(output))if(/^appsettings\.(Development|Local).*\.json$/.test(name))await rm(path.join(output,name));
  await rm(path.join(output,'App_Data'),{recursive:true,force:true});
  await writeFile(path.join(output,'appsettings.Production.json'),JSON.stringify({Catalog:{SnapshotPath:snapshotPath,AssetBaseUrl:assetBaseUrl}},null,2)+'\n');

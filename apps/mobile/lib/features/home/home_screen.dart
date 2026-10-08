@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
+import '../../app/theme.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
 import '../catalog/catalog_repository.dart';

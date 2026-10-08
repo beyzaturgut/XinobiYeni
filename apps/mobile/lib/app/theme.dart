@@ -12,6 +12,17 @@ TextStyle jost(double size, {double weight = XinobiTokens.headerWeight, double? 
       color: color,
     );
 
+/// Inter at an exact variable weight; page text on the web is Inter (Jost is only the header). [letterSpacing] is in em.
+TextStyle inter(double size, {double weight = 400, double? height, double letterSpacing = 0, Color color = XinobiTokens.ink}) => TextStyle(
+      fontFamily: XinobiTokens.bodyFamily,
+      fontSize: size,
+      height: height,
+      letterSpacing: letterSpacing * size,
+      fontVariations: [FontVariation.weight(weight)],
+      fontWeight: FontWeight.values[((weight / 100).round() - 1).clamp(0, 8)],
+      color: color,
+    );
+
 ThemeData buildTheme() {
   const scheme = ColorScheme.light(
     primary: XinobiTokens.teal,
@@ -26,9 +37,10 @@ ThemeData buildTheme() {
   return base.copyWith(
     scaffoldBackgroundColor: XinobiTokens.canvas,
     textTheme: base.textTheme.copyWith(
-      headlineSmall: jost(26, weight: 400, height: 32, color: XinobiTokens.ink),
-      titleLarge: jost(21, weight: 400, height: 28, color: XinobiTokens.ink),
-      titleMedium: jost(17, weight: 500, height: 24, color: XinobiTokens.ink),
+      // Web page titles: Inter 24/380 with tight tracking; card titles Inter 500.
+      headlineSmall: inter(24, weight: 380, height: 1.2, letterSpacing: -.025),
+      titleLarge: inter(20, weight: 420, height: 1.3, letterSpacing: -.02),
+      titleMedium: inter(17, weight: 500, height: 1.35, letterSpacing: -.02),
       bodyMedium: const TextStyle(fontSize: 15, height: 1.5, color: XinobiTokens.ink),
       bodySmall: const TextStyle(fontSize: 13, height: 1.45, color: XinobiTokens.muted),
     ),
@@ -46,8 +58,10 @@ ThemeData buildTheme() {
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         minimumSize: const Size(XinobiTokens.headerTouchTarget, 48),
+        backgroundColor: XinobiTokens.ink,
+        foregroundColor: XinobiTokens.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(XinobiTokens.radiusSmall)),
-        textStyle: jost(16, weight: 400),
+        textStyle: inter(16, weight: 600),
       ),
     ),
   );

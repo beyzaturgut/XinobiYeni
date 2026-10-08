@@ -3,22 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
+import '../../app/theme.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import '../favorites/favorite_button.dart';
 
 // Mobile versions of the web home sections (apps/web/src/components/personalization-feature.tsx,
 // titanium-feature.tsx and the featured/values/story blocks in app/page.tsx), using the web's ≤700 px values.
-
-TextStyle inter(double size, {double weight = 400, double? height, double letterSpacing = 0, Color color = XinobiTokens.ink}) => TextStyle(
-      fontFamily: XinobiTokens.bodyFamily,
-      fontSize: size,
-      height: height,
-      letterSpacing: letterSpacing * size,
-      fontVariations: [FontVariation.weight(weight)],
-      fontWeight: FontWeight.values[((weight / 100).round() - 1).clamp(0, 8)],
-      color: color,
-    );
 
 const _gutter = EdgeInsets.symmetric(horizontal: XinobiTokens.gutterMobile);
 

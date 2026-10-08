@@ -75,6 +75,27 @@
 | TST-071 | 02.10.2026 | DEPLOY-003 güncel IIS tam paket bütünlüğü | Başarılı; doğru `out/` kökü, 233 girdi, ZIP CRC ve SHA-256 doğrulandı | BUILD / STATIC EXPORT / DEPLOYMENT PRECHECK | `2026-10-02/TST-071-deploy-003-package.md` |
 | TST-072 | 02.10.2026 | Çerez tercihleri ve Nobi konum ayrımı | Başarılı; çerez düğmesi sol alta taşındı, masaüstü/mobil koordinat testi ve 43/43 regresyon geçti | UI REGRESSION / RESPONSIVE / E2E / VISUAL | `2026-10-02/TST-072-cookie-nobi-position.md` |
 | TST-073 | 02.10.2026 | Mobil çerez paneli ve XINOBI U banner yerleşimi | Başarılı; 390/412 px konum, taşma ve tam kadraj testi ile 43/43 regresyon geçti; deploy alınmadı | UI REGRESSION / RESPONSIVE / E2E / VISUAL | `2026-10-02/TST-073-mobile-consent-personalize.md` |
+| TST-087 | 06.10.2026 kayıt; önceki Step 1 koşusu | ProductSurfaces Step 1 odaklı xUnit | İlk Debug build dosya kilidiyle başarısız; Release tekrarında final 24/24 geçti | UNIT / MOCK / RETROSPECTIVE | `2026-10-06/TST-087-product-surfaces-step1-tests.md` |
+| TST-088 | 06.10.2026 kayıt; önceki Step 1 koşusu | ProductSurfaces Step 1 Release API build | Başarılı; 0 uyarı / 0 hata; OpenAPI üretimi kapalı | BUILD / RETROSPECTIVE | `2026-10-06/TST-088-product-surfaces-step1-build.md` |
+| TST-089 | 06.10.2026 kayıt; önceki Step 1 kontrolü | ProductSurfaces OpenAPI korunması | Başlangıç ve sonuç SHA-256 aynı; önceden mevcut değişiklik korundu | FILE INTEGRITY / RETROSPECTIVE | `2026-10-06/TST-089-product-surfaces-openapi-integrity.md` |
+| TST-090 | 06.10.2026 | ProductSurfaces Step 2 decode/alpha ve Step 1 regresyon | İlk 37/37, iki ek edge-case sonrası final 39/39 başarılı; gerçek asset istatistikleri kaydedildi | UNIT / MOCK / REAL ASSET | `2026-10-06/TST-090-product-surfaces-step2-tests.md` |
+| TST-091 | 06.10.2026 | ProductSurfaces Step 2 Release API build | 0 uyarı / 0 hata; OpenAPI üretimi kapalı | BUILD | `2026-10-06/TST-091-product-surfaces-step2-build.md` |
+| TST-092 | 06.10.2026 | ProductSurfaces Step 2 dosya güvenliği | OpenAPI/source/mask checksum değişmedi; diff whitespace kontrolü başarılı | FILE INTEGRITY / DIFF | `2026-10-06/TST-092-product-surfaces-step2-integrity.md` |
+
+| TST-093 | 06.10.2026 | ProductSurfaces Step 3 backend | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-093-product-surfaces-step3-backend.md` |
+| TST-094 | 06.10.2026 | ProductSurfaces Step 3 api-build | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-094-product-surfaces-step3-api-build.md` |
+| TST-095 | 06.10.2026 | ProductSurfaces Step 3 admin-types | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-095-product-surfaces-step3-admin-types.md` |
+| TST-096 | 06.10.2026 | ProductSurfaces Step 3 admin-build | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-096-product-surfaces-step3-admin-build.md` |
+| TST-097 | 06.10.2026 | ProductSurfaces Step 3 admin-lint | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-097-product-surfaces-step3-admin-lint.md` |
+| TST-098 | 06.10.2026 | ProductSurfaces Step 3 admin-e2e | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-098-product-surfaces-step3-admin-e2e.md` |
+| TST-099 | 06.10.2026 | ProductSurfaces Step 3 integrity | Final başarılı; ilk deneme/tekrar kanıtları raporda | LOCAL / DEVELOPMENT | `2026-10-06/TST-099-product-surfaces-step3-integrity.md` |
+| TST-100 | 06.10.2026 | ProductSurfaces Step 4B-1 mocked HTTP | 111/111 backend/API, 5/5 Admin, build/type/lint/diff ve OpenAPI hash başarılı; gerçek inference yok | MOCK HTTP / LOCAL API / E2E / BUILD / INTEGRITY | `2026-10-06/TST-100-product-surfaces-step4b1-mocked-http.md` |
+| TST-101 | 06.10.2026 | ProductSurfaces Step 4B-2 single automatic smoke | Tam 1 yetkili real call HTTP 200; aligned pending mask; 120/120 local backend, 5/5 Admin, build/hash başarılı; interactive/retry yok | AUTHORIZED REAL SMOKE / LOCAL VALIDATION / MOCK REGRESSION / VISUAL | `2026-10-06/TST-101-product-surfaces-step4b2-single-automatic-smoke.md` |
+| TST-102 | 06.10.2026 | ProductSurfaces Step 4B-3 single interactive smoke | Tam 1 yetkili PVS HTTP 200; aligned pending mask + exact lineage; 126/126 backend, 5/5 Admin; automatic/retry yok | AUTHORIZED REAL INTERACTIVE SMOKE / MOCK REGRESSION / VISUAL | `2026-10-06/TST-102-product-surfaces-step4b3-single-interactive-smoke.md` |
+| TST-103 | 06.10.2026 | ProductSurfaces Step 4C-2 Tea Maker opt-in refinement | 5718 enclosed pixels filled; raw/exterior/silhouette unchanged; 17 focused, 148 backend, 6 Admin passed; inference0 | LOCAL DETERMINISTIC / REAL LOCAL FIXTURE / API / E2E / BUILD / INTEGRITY | `2026-10-06/TST-103-product-surfaces-step4c2-tea-maker-refinement.md` |
+
+| TST-104 | 06.10.2026 | ProductSurfaces Step 4D-2 minimal local Add/Remove correction | 21 focused, 169 backend/API, 10 Admin passed; immutable pending derivation; local bottom QA +88px; inference0 | LOCAL HUMAN / RASTER / API / E2E / BUILD / INTEGRITY | `2026-10-06/TST-104-product-surfaces-step4d2-local-correction.md` |
+| TST-105 | 06.10.2026 | ProductSurfaces Step 5B development accepted-surface renderer bridge | 18 focused /187 backend, 15 bridge-renderer +6 existing web tests passed; exact manual/source/branding; inference0 | LOCAL MEDIA / API / WEB / PIXEL / E2E / BUILD / INTEGRITY | `2026-10-06/TST-105-product-surfaces-step5b-accepted-rendering-bridge.md` |
 
 - 02.10.2026 · [TST-074 mobil deploy paketi](2026-10-02/TST-074-mobile-deploy-package.md) — Build/mobil/ZIP başarılı; canlı yayın açık.
 - 02.10.2026 · [TST-075 editör/AI spec](2026-10-02/TST-075-editor-ai-spec.md) — Belge taslağı kontrolü başarılı; rol kabulü açık.
@@ -136,3 +157,5 @@
 - 07.10.2026 · [TST-101 mobil favoriler](2026-10-07/TST-101-mobile-favorites.md) — Web ile aynı cihaz içi biçim; kart ve ürün sayfasında kalp, `/favoriler`, Hesap bağlantısı; Flutter 30/30; emülatörde doğrulandı.
 
 - 07.10.2026 · [TST-102 mobil header ve duyurular](2026-10-07/TST-102-mobile-header-news.md) — Arama kaldırıldı, favoriler + duyurular header'da; okunmamış rozeti; Flutter 34/34; emülatörde doğrulandı.
+
+- [TST-106 — ProductSurfaces separate-worktree integration](2026-10-06/TST-106-product-surfaces-worktree-integration.md): backend214/214, Admin10/10, canonical web17/17; full web55/65 with preserved contrast/legacy expectation failures. Uncommitted merge; no inference.

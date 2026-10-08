@@ -17,7 +17,7 @@ public sealed class CloudflareImageProvider(HttpClient client, IConfiguration co
 {
     private string Account => configuration["Cloudflare:AccountId"] ?? configuration["CLOUDFLARE_ACCOUNT_ID"] ?? "";
     private string Token => configuration["Cloudflare:ApiToken"] ?? configuration["CLOUDFLARE_API_TOKEN"] ?? "";
-    public bool IsConfigured => Regex.IsMatch(Account, "^[a-fA-F0-9]{32}$") && !string.IsNullOrWhiteSpace(Token);
+    public bool IsConfigured => configuration.GetValue("DesignStudio:ExternalInferenceEnabled", true) && Regex.IsMatch(Account, "^[a-fA-F0-9]{32}$") && !string.IsNullOrWhiteSpace(Token);
     public async Task<GeneratedImage> GenerateAsync(string prompt, CancellationToken cancellationToken)
     {
         if (!IsConfigured) throw new DesignProviderException("provider_not_configured", "Cloudflare bağlantısı henüz yapılandırılmadı.");

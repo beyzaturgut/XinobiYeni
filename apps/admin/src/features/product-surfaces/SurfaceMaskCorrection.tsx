@@ -3,7 +3,7 @@ import { correctionGeometry, correctionToSource } from './source-coordinates'
 import type { MaskStroke, ReviewState } from './product-surfaces-api'
 
 // Local preview only. Authoritative PNG always comes back from the backend as a new candidate.
-function paint(data: Uint8ClampedArray, w: number, h: number, strokes: MaskStroke[]) {
+export function paint(data: Uint8ClampedArray, w: number, h: number, strokes: MaskStroke[]) {
   let visits = 0
   for (const stroke of strokes) for (let i = 0; i < Math.max(1, stroke.points.length - 1); i++) {
     const a = stroke.points[i], b = stroke.points[Math.min(i + 1, stroke.points.length - 1)]

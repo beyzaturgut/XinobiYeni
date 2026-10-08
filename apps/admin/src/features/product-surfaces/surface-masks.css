@@ -1,0 +1,38 @@
+/* Ürün yüzeyleri: variant list beside the masking editor (black-and-white panel palette). */
+.surface-masks{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
+.surface-list{display:grid;gap:12px;max-height:calc(100vh - 220px);overflow:auto;padding-right:4px}
+.surface-intro{margin:0;font-size:13px;line-height:1.5;color:#555}
+.surface-list label{display:grid;gap:6px;font-size:12px}.surface-list input{min-height:40px;padding:0 10px;border:1px solid #bbb;border-radius:4px}
+.surface-filters{display:flex;flex-wrap:wrap;gap:6px}.surface-filters button{min-height:32px;padding:0 10px;border:1px solid #ccc;border-radius:999px;background:#fff;font-size:12px;cursor:pointer}.surface-filters button[aria-pressed=true]{background:#111;color:#fff;border-color:#111}
+.surface-group{display:grid;gap:4px}.surface-group>strong{font-size:13px;margin-top:6px}
+.surface-row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 8px;border:1px solid #e3e3e3;border-radius:6px;background:#fff;text-align:left;cursor:pointer}
+.surface-row[aria-current=true]{border:2px solid #111;padding:5px 7px}.surface-row img{width:44px;height:44px;object-fit:contain;background:#f6f6f6;border-radius:4px}
+.surface-row span{font-size:13px;overflow-wrap:anywhere}
+.surface-masks em[data-status]{font-style:normal;font-size:11px;padding:2px 8px;border-radius:999px;white-space:nowrap;border:1px solid #ccc;color:#555}
+.surface-masks em[data-status=approved]{background:#1d5c37;border-color:#1d5c37;color:#fff}.surface-masks em[data-status=draft]{background:#fff4d6;border-color:#e3c46a;color:#6b5000}.surface-masks em[data-status=stale]{background:#fff0f0;border-color:#e6baba;color:#8b2424}
+.surface-empty{padding:40px;border:1px dashed #ccc;border-radius:8px;color:#666;text-align:center}
+.surface-editor{display:grid;gap:12px;min-width:0}
+.surface-editor header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}.surface-editor h2{margin:0;font-size:20px}.surface-editor header p{margin:4px 0 0;font-size:13px;color:#555}
+.surface-workspace{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+.surface-stage{position:relative;justify-self:center;max-width:100%;touch-action:none;user-select:none;background:#f6f6f6;border-radius:8px;overflow:hidden}
+.surface-stage img{display:block;max-width:100%;max-height:calc(100vh - 260px);width:auto;height:auto}
+.surface-stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.surface-stage.tool-points,.surface-stage.tool-brush{cursor:crosshair}
+.surface-stage .point{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;box-shadow:0 0 0 2px #fff}
+.point.keep{background:#1d7a45}.point.exclude{background:#b3261e}
+.surface-busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.6);font-weight:600}
+.surface-tools{display:grid;gap:12px}
+.surface-tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #ccc;border-radius:6px;overflow:hidden}.surface-tabs button{min-height:40px;border:0;background:#fff;cursor:pointer;font-size:13px}.surface-tabs button[aria-selected=true]{background:#111;color:#fff}
+.surface-panel{display:grid;gap:10px;padding:14px;border:1px solid #e3e3e3;border-radius:8px}
+.surface-panel label{display:grid;gap:6px;font-size:12px}.surface-panel input[type=text],.surface-panel input:not([type]){min-height:40px;padding:0 10px;border:1px solid #bbb;border-radius:4px}
+.surface-hint{margin:0;font-size:12px;line-height:1.5;color:#666}
+.surface-toggle{display:inline-flex;border:1px solid #ccc;border-radius:6px;overflow:hidden}.surface-toggle button{min-height:34px;padding:0 12px;border:0;background:#fff;cursor:pointer;font-size:12px}.surface-toggle button[aria-pressed=true]{background:#111;color:#fff}
+.surface-row-actions,.surface-decisions{display:flex;flex-wrap:wrap;gap:8px}
+.surface-tools button.primary,.surface-decisions .approve{min-height:42px;padding:0 16px;border:1px solid #111;border-radius:4px;background:#111;color:#fff;cursor:pointer;font-weight:600}
+.surface-row-actions button:not(.primary),.surface-decisions button:not(.approve){min-height:42px;padding:0 14px;border:1px solid #bbb;border-radius:4px;background:#fff;cursor:pointer}
+.surface-decisions .danger{color:#a32121;border-color:#e6baba}
+.surface-tools button:disabled{opacity:.45;cursor:not-allowed}
+.surface-facts{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0;font-size:12px}.surface-facts dt{color:#666}.surface-facts dd{margin:0}
+.surface-error{margin:0;padding:10px;border-radius:4px;background:#fff0f0;color:#8b2424;font-size:13px}.surface-ok{margin:0;padding:10px;border-radius:4px;background:#eef6f0;color:#1d5c37;font-size:13px}
+.surface-warning{margin:0;padding:10px 12px;border-radius:4px;background:#fff4d6;color:#6b5000;font-size:13px}
+@media(max-width:1100px){.surface-workspace{grid-template-columns:1fr}.surface-masks{grid-template-columns:1fr}.surface-list{max-height:none}}

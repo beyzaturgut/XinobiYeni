@@ -68,3 +68,17 @@ Başlangıç araştırma kaynakları:
 - Cloudflare kimlik bilgileri paket veya Git'e girmez; sunucuda `CLOUDFLARE_ACCOUNT_ID` / `CLOUDFLARE_API_TOKEN` makine ortam değişkenleridir.
 
 **Kabul edilen risk:** Uçlar kimliksiz ve internetten erişilebilir; herkes günlük limite kadar üretim tetikleyebilir ve moderasyon yoktur. Ek A'daki Faz10 maddeleri (kimlik, moderasyon, saklama, kullanıcı bazlı limit/maliyet kaydı) bu istisnayla kapanmış sayılmaz. Gerçek müşteri trafiğine açılmadan önce bayrak kapatılır veya Faz10 kapısı tamamlanır.
+
+## Ek C — Nobi satış asistanında metin modeli (09.10.2026)
+
+- Durum: Uygulandı; proje sahibinin 09.10.2026 talebiyle ("AI satış asistanı (Nobi): gerçek yanıt … yap"). Development'ta açık; test sunucusu ve production için ayrıca karar gerekir.
+- Uygulama: `services/api/Assistant/*` (`d800931`), web `components/nobi/*`; doğrulama: .NET `AssistantTests` (sahte model) ve 09.10.2026'da yerel API üzerinden tek gerçek çağrı (`@cf/meta/llama-3.1-8b-instruct`, yanıt AI kaynağıyla döndü).
+
+**Sınırlar (kodla doğrulandı):**
+
+- Model aynı Cloudflare hesabını kullanır (`Cloudflare:AccountId/ApiToken`, git dışı); `Assistant:ExternalInferenceEnabled=false` kapatır. Model adı panel politikasından gelir ve `@cf/üretici/model` biçimi dışında URL'ye girmez.
+- Modele yalnız sunucunun kurduğu yönerge, katalogdan seçilen en fazla 6 ürünün olgusu (ad, kategori, fiyat, stok metni, renk, özellik), onaylı ve süresi geçmemiş bilgi kaynakları, son 6 mesaj ve müşterinin mesajı gider. Fiyat, stok ve ürün kartları her zaman katalogdan üretilir; modelin andığı ama verilmeyen ürün kimlikleri atılır.
+- Günlük AI yanıt sınırı (varsayılan 200), konuşma başına 30 ve cihaz başına günde 100 mesaj; sınırda veya hata halinde kural tabanlı yanıt verilir. Her çağrı `AiUsage` kaydına token sayısıyla yazılır; maliyet panelde girilen birim fiyatlarla tahmin edilir, fatura değildir.
+- Konuşmalar cihaz kimliğine (veya oturum açmış hesaba) bağlıdır, 90 gün tutulur; saklanan metinde kart/kimlik numarası benzeri rakam dizileri ve e-postalar maskelenir. İletişim bırakma açık onay ister.
+
+**Açık kalanlar (Faz10 / D08 / D10):** içerik moderasyonu, saklama süresinin ve aydınlatma metninin hukuken onayı, test sunucusunda açılması (Ek B benzeri bayrak ve köken listesi), model seçimi PoC'si ve gerçek birim maliyetin sağlayıcı faturasıyla doğrulanması, WhatsApp numarası (D05).

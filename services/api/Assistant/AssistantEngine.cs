@@ -175,7 +175,10 @@ public sealed partial class AssistantEngine(AssistantStore store, ITextModelProv
     {
         if (intents.Contains(Intent.Greeting)) return policy.Greeting + " Ürün bulma, karşılaştırma, XINOBI U ile kişiselleştirme ve kurumsal alımlarda yardımcı olabilirim.";
         var parts = new List<string>();
-        if (intents.Contains(Intent.Handoff)) parts.Add("Seni ekibimize bağlayabilirim. Aşağıdan WhatsApp'a geçebilir ya da iletişim bilgilerini bırakabilirsin.");
+        if (intents.Contains(Intent.Handoff))
+            parts.Add(policy.WhatsAppNumber is null
+                ? "Seni ekibimize bağlayabilirim. İletişim bilgilerini bırakırsan en kısa sürede sana dönerler."
+                : "Seni ekibimize bağlayabilirim. Aşağıdan WhatsApp'a geçebilir ya da iletişim bilgilerini bırakabilirsin.");
         if (intents.Contains(Intent.Orders)) parts.Add("Sipariş, kargo, iptal ve iade işlemlerini Hesabım > Siparişlerim sayfasından izleyip başlatabilirsin. Ben sipariş bilgilerine erişemem.");
         if (intents.Contains(Intent.Quote)) parts.Add("Toplu ve kurumsal alımlarda adet, kişiselleştirme ve terminle birlikte kurumsal teklif formunu doldurman yeterli; satış ekibimiz birim fiyatlı teklif hazırlar.");
         if (intents.Contains(Intent.XinobiU)) parts.Add("XINOBI U ile beş kısa soruyu yanıtlıyorsun, yapay zekâ sana özel bir tasarım üretiyor ve seçtiğin ürünün üzerinde görüyorsun. Kendi görselini de yükleyebilirsin.");

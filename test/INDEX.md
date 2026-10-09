@@ -173,3 +173,5 @@
 - 09.10.2026 · [TST-111 SQL katalog hazırlığı](2026-10-09/TST-111-sql-catalog-preparation.md) — 0002 migration, SQL depo ve doğrulamalı aktarım hazır; .NET 315 geçti / 1 gerçek SQL testi atlandı. COPY_ONLY/CHECKSUM yedeği alındı, VERIFYONLY Msg262 yetki hatası nedeniyle canlı migration/aktarım bekliyor. SQL yöneticisine çalıştırılacak doğrulama dosyası hazırlandı.
 
 - 09.10.2026 · [TST-112 hesap/sipariş şeması ve yedek tekrarı](2026-10-09/TST-112-customer-schema-and-backup-retry.md) — VERIFYONLY tekrarında Msg262/3013 devam ediyor. 0003 profil/oturum/adres/sipariş migration ve script'leri hazır; .NET 321 geçti / 1 gerçek SQL testi atlandı. Canlı uygulama ve veri taşıma henüz yapılmadı.
+
+- 09.10.2026 · [TST-113 SQL migration'ları uygulandı ve yerel veri aktarıldı](2026-10-09/TST-113-sql-migrations-applied-and-local-data-transferred.md) — Proje sahibi onayıyla 0002–0004 boş DB'ye uygulandı (`-I`), ikinci çalıştırma no-op. SQL hesap ve özellik belgesi depoları, gerçek SQL testleri geçti; .NET 322 geçti / 3 atlandı. Katalog 17/69, 1 hesap, Nobi belgesi doğrulanarak aktarıldı; yerel API SQL'den okuyor.

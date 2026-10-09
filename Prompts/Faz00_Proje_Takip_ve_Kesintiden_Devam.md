@@ -442,3 +442,10 @@ Bu talimat yazılımı kendi başına onaylayan bir vekil değildir. Sağlayıc�
 Ayrı integration/product-surfaces-step5b worktree; checkpoint e325dd7 + origin/main 529c107, merge henüz commit edilmedi. Teammate commerce/Admin korunur; ProductPatternPreview tek canonical surface renderer. D kararları ve production Asset/PrintArea açık. Önceki durum tabloları tarihsel kayıttır.
 
 Integration validation — TST-106: backend214/214, Admin10/10, canonical bridge/renderer17/17; full web55/65 (5 preserved contrast + 5 legacy expectation failures). API/Web/Admin builds pass; incoming cached whitespace noted separately. Original worktree unchanged, no merge commit/push/inference. DEMO-P101/DEMO-V101-B explicit media-validated development bridge; no production IDs or D resolution.
+
+### 7–8 Ekim task dökümü ve 9 Ekim ek işleri — 09.10.2026
+
+Kullanıcı isteğiyle 7–8 Ekim işleri commit kanıtlarına bağlı tek tek tasklara dönüştürüldü: **108 task**. 9 Ekim için **17 ek task** ayrı bölümde gösterildi. Toplam **125 task**, **97 tarihsel commit**. Çok özellikli commitler ayrı tasklara bölündü; geri alınan tasarım, canlıya çıkmamış paketler ayrıştırıldı; döküm sırasında commitlenen mobil sipariş/bildirim akışı da dahil edildi. Bu kayıt faz onayı/canlı yayın beyanı değildir; task dökümü için tarihsel testler yeniden çalıştırılmadı.
+
+- [Task kayıtları](../docs/tasks/tasks-2026-10-07-09.md)
+- [İçe aktarılabilir CSV](../docs/tasks/tasks-2026-10-07-09.csv)

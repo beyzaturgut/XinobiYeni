@@ -1,0 +1,1672 @@
+﻿Task ID,Tarih,Başlık,Durum,Commit,Commit URL,Kaynak commit mesajı,İlgili dosyalar,Not
+TASK-20261007-001,2026-10-07,Tasarım sorularından önce ürün rengi seçimini ekle,Commitlendi,b344844235b2e1ac9e579751badd6e7563abd72e,https://github.com/beyzaturgut/XinobiYeni/commit/b344844235b2e1ac9e579751badd6e7563abd72e,feat(studio): require product color selection before design questions,"apps/web/src/app/xinobi-u/products.tsx
+apps/web/src/app/xinobi-u/renk/color-selection.tsx
+apps/web/src/app/xinobi-u/renk/page.tsx
+apps/web/src/app/xinobi-u/studio.module.css
+tools/test-studio-color-selection.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-002,2026-10-07,Varyant bazlı sepeti kalıcı sakla ve katalog uygunluğunu kontrol et,Commitlendi,b669eaaa1323627d403a580ed00c5ab2c861e314,https://github.com/beyzaturgut/XinobiYeni/commit/b669eaaa1323627d403a580ed00c5ab2c861e314,feat(cart): persist product variants and check catalog availability,"README.md
+apps/web/src/app/sepet/basket.tsx
+apps/web/src/app/sepet/page.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product-experience.tsx
+apps/web/src/app/urunler/detay/product-detail.tsx
+apps/web/src/components/add-to-cart.module.css
+apps/web/src/components/add-to-cart.tsx
+apps/web/src/lib/cart.ts
+tools/test-cart.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-003,2026-10-07,Müşteri sayfalarında ortak mağaza menüsünü kullan,Commitlendi,a8859d7ad0ab65e06e73a3f912f1e82719d41695,https://github.com/beyzaturgut/XinobiYeni/commit/a8859d7ad0ab65e06e73a3f912f1e82719d41695,fix(web): share storefront navigation across customer pages,"apps/web/src/app/arama/page.tsx
+apps/web/src/app/asistan/page.tsx
+apps/web/src/app/favoriler/page.tsx
+apps/web/src/app/hesap/giris/page.tsx
+apps/web/src/app/hesap/page.tsx
+apps/web/src/app/hesap/siparisler/page.tsx
+apps/web/src/app/xinobi-u/studio-header.tsx
+apps/web/src/app/yasal/page.tsx
+tools/test-shared-header.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-004,2026-10-07,"Tarayıcı deneme hesabı, ödeme ve sipariş geçmişini ekle",Commitlendi,e1911741f925103a8f5e01830b1ba7539ce33174,https://github.com/beyzaturgut/XinobiYeni/commit/e1911741f925103a8f5e01830b1ba7539ce33174,feat(demo): enable browser accounts checkout and order history,"README.md
+apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/giris/account-access.tsx
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/page.tsx
+apps/web/src/app/odeme/sonuc/page.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/app/sepet/basket.tsx
+apps/web/src/lib/cart.ts
+apps/web/src/lib/demo-commerce.ts
+tools/test-cart.mjs
+tools/test-demo-commerce.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-005,2026-10-07,Hesap alanlarını ve müşteri metinlerini düzenle,Commitlendi,3b6ff8d9d82bee40670fb048617c8e469230e0a7,https://github.com/beyzaturgut/XinobiYeni/commit/3b6ff8d9d82bee40670fb048617c8e469230e0a7,fix(web): normalize account fields and customer-facing labels,"apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/giris/account-access.tsx
+apps/web/src/app/hesap/giris/account.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/app/sepet/basket.tsx
+apps/web/src/lib/demo-commerce.ts
+tools/test-cart.mjs
+tools/test-demo-commerce.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-006,2026-10-07,Kategori görsellerini kompakt kare şeritte göster,Commitlendi,e0df44747742217e76530a941cbf3b98231d2115,https://github.com/beyzaturgut/XinobiYeni/commit/e0df44747742217e76530a941cbf3b98231d2115,feat(web): present categories in a compact square image rail,"apps/web/src/app/page.tsx
+apps/web/src/components/category-gallery.module.css
+apps/web/src/components/category-gallery.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-007,2026-10-07,ProductSurfaces geliştirmelerini web ve admin ticaret akışına birleştir,Commitlendi,2d97621b3f1ec6ebca5f0df0689040e3fffe7eea,https://github.com/beyzaturgut/XinobiYeni/commit/2d97621b3f1ec6ebca5f0df0689040e3fffe7eea,merge: integrate ProductSurfaces with current commerce web and admin,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/admin/playwright.config.ts
+apps/admin/src/App.tsx
+apps/admin/src/features/product-surfaces/product-surfaces.css
+apps/admin/tests/e2e/product-surfaces-refinement.spec.ts
+apps/admin/tests/e2e/product-surfaces.spec.ts
+apps/admin/vite.config.ts
+apps/web/next.config.ts
+apps/web/playwright.config.ts
+apps/web/src/app/urunler/cay-makinesi-101/editor/accepted-surface-api.ts
+apps/web/src/app/urunler/cay-makinesi-101/editor/accepted-surface-editor.tsx
+apps/web/src/app/urunler/cay-makinesi-101/editor/editor-workspace.tsx
+apps/web/src/app/urunler/cay-makinesi-101/editor/editor.module.css
+apps/web/src/app/urunler/cay-makinesi-101/kisisellestir/personalization-studio.tsx
+apps/web/src/app/xinobi-u/onizleme/product-preview.tsx
+apps/web/src/components/accepted-surface-sample.tsx
+apps/web/src/components/personalization-feature.module.css
+apps/web/src/components/personalization-feature.tsx
+apps/web/tests/e2e/accepted-surface.spec.ts
+apps/web/tests/e2e/commerce-surface-integration.spec.ts
+apps/web/tests/serve-export.mjs
+docs/contracts/domain-contract-draft.md
+services/api/DesignStudio/CloudflareImageProvider.cs
+services/api/Features/ProductSurfaces/Development/DevelopmentAcceptedSurface.cs
+services/api/Program.cs
+test/2026-10-06/TST-087-product-surfaces-step1-tests.md
+test/2026-10-06/TST-088-product-surfaces-step1-build.md
+test/2026-10-06/TST-089-product-surfaces-openapi-integrity.md
+test/2026-10-06/TST-090-product-surfaces-step2-tests.md
+test/2026-10-06/TST-091-product-surfaces-step2-build.md
+test/2026-10-06/TST-092-product-surfaces-step2-integrity.md
+test/2026-10-06/TST-093-product-surfaces-step3-backend.md
+test/2026-10-06/TST-094-product-surfaces-step3-api-build.md
+test/2026-10-06/TST-095-product-surfaces-step3-admin-types.md
+test/2026-10-06/TST-096-product-surfaces-step3-admin-build.md
+test/2026-10-06/TST-097-product-surfaces-step3-admin-lint.md
+test/2026-10-06/TST-098-product-surfaces-step3-admin-e2e.md
+test/2026-10-06/TST-099-product-surfaces-step3-integrity.md
+test/2026-10-06/TST-100-product-surfaces-step4b1-mocked-http.md
+test/2026-10-06/TST-101-product-surfaces-step4b2-single-automatic-smoke.md
+test/2026-10-06/TST-102-product-surfaces-step4b3-single-interactive-smoke.md
+test/2026-10-06/TST-103-product-surfaces-step4c2-tea-maker-refinement.md
+test/2026-10-06/TST-104-product-surfaces-step4d2-local-correction.md
+test/2026-10-06/TST-105-product-surfaces-step5b-accepted-rendering-bridge.md
+test/2026-10-06/TST-106-product-surfaces-worktree-integration.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/CommerceSurfaceIntegrationTests.cs
+tests/Xinobi.Architecture.Tests/DesignStudioTests.cs
+tools/test-free-product-preview.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-008,2026-10-07,Arama ve müşteri işlemleri içeren iki katlı siyah başlığı ekle,Commitlendi,bd25ad612498a5493087aa5df921155fba3270af,https://github.com/beyzaturgut/XinobiYeni/commit/bd25ad612498a5493087aa5df921155fba3270af,feat(web): add two-tier black header with search and customer actions,"apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-009,2026-10-07,Başlık satırlarını ve dikey boşlukları küçült,Commitlendi,fbbfe57b663a0f8412c0b8f3ef63658db63a8172,https://github.com/beyzaturgut/XinobiYeni/commit/fbbfe57b663a0f8412c0b8f3ef63658db63a8172,fix(web): reduce header row heights and vertical spacing,apps/web/src/components/site-header.module.css,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-010,2026-10-07,Web başlığını 112 piksele indir,Commitlendi,0a18bba23f4b6b0261599de68af261329b3a1f3f,https://github.com/beyzaturgut/XinobiYeni/commit/0a18bba23f4b6b0261599de68af261329b3a1f3f,fix(web): compact header to 112 pixels,apps/web/src/components/site-header.module.css,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-011,2026-10-07,Faz dosyalarındaki kapsam eksiklerini kaydet,Commitlendi,a97650b6d5fa1ca2e828f832508b4048f3cc0b96,https://github.com/beyzaturgut/XinobiYeni/commit/a97650b6d5fa1ca2e828f832508b4048f3cc0b96,docs(plan): record scope gaps across phase files,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+Prompts/Faz01_Kesif_ve_Kararlar.md
+Prompts/Faz02_Tasarim_ve_UIUX.md
+Prompts/Faz03_Teknik_Altyapi_Kimlik_Veritabani.md
+Prompts/Faz04_Katalog_Stok_Fiyat_Icerik_SEO.md
+Prompts/Faz05_ETicaret_Odeme_Siparis.md
+Prompts/Faz06_Kisisellestirme_Editor_Baski.md
+Prompts/Faz07_Kurumsal_Teklif_Toplu_Siparis.md
+Prompts/Faz08_Mikro_Muhasebe_Entegrasyonu.md
+Prompts/Faz09_Pazaryerleri_Merkezi_Siparis.md
+Prompts/Faz10_AI_Tasarim_Satis_Asistani.md
+Prompts/Faz11_Mobil_UAT_Canliya_Gecis.md
+test/2026-10-07/TST-087-phase-gap-update.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-012,2026-10-07,Eksik commitleri ve geçici mimari kararlarını takip kaydına işle,Commitlendi,0ff8f38b9b7097223213ed3f8a9c090aa2dbb894,https://github.com/beyzaturgut/XinobiYeni/commit/0ff8f38b9b7097223213ed3f8a9c090aa2dbb894,docs(plan): backfill unrecorded commits and record interim ADRs,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+docs/decisions/ADR-002-cloudflare-workers-ai.md
+docs/decisions/ADR-003-gecici-yerel-ticaret-deposu.md
+test/2026-10-07/TST-088-retroactive-head-validation.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-013,2026-10-07,Yerel uçtan uca regresyon sonuçlarını kaydet,Commitlendi,4abc8e5f002a02ebbf7cb04ed68e3c389ecc474b,https://github.com/beyzaturgut/XinobiYeni/commit/4abc8e5f002a02ebbf7cb04ed68e3c389ecc474b,test(e2e): record local end-to-end regression results,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+test/2026-10-07/TST-089-local-e2e-regression.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-014,2026-10-07,Eski uçtan uca testleri güncel mağaza akışına uyarla,Commitlendi,a05264c46a9aa635a655f96700d18e4774b563f7,https://github.com/beyzaturgut/XinobiYeni/commit/a05264c46a9aa635a655f96700d18e4774b563f7,test(e2e): align stale end-to-end tests with current storefront,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+test/2026-10-07/TST-090-stale-test-updates.md
+test/INDEX.md
+tools/test-free-product-preview.mjs
+tools/test-home-category-products.mjs
+tools/test-home-navigation-feedback.mjs
+tools/test-local-commerce.mjs
+tools/test-product-listing.mjs
+tools/test-xinobi-u.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-015,2026-10-07,Seçili varyant için kişiselleştirme önizleme durumunu göster,Commitlendi,7ebb340cf1619594ee97f9037a86416f7eed3fd1,https://github.com/beyzaturgut/XinobiYeni/commit/7ebb340cf1619594ee97f9037a86416f7eed3fd1,feat(personalization): show exact-variant preview readiness,"apps/web/src/app/urunler/cay-makinesi-101/editor/accepted-surface-editor.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product-experience.tsx
+apps/web/src/app/xinobi-u/products.tsx
+apps/web/src/features/product-personalization/variant-preview-readiness.tsx
+apps/web/tests/e2e/variant-preview-readiness.spec.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-016,2026-10-07,Proje sahibi kararlarını ve platform tercihlerini kaydet,Commitlendi,e7841ae29a90f06db2c0441d1e6dd593e1711603,https://github.com/beyzaturgut/XinobiYeni/commit/e7841ae29a90f06db2c0441d1e6dd593e1711603,docs(decisions): record owner approvals and platform choices,"docs/decisions/ADR-002-cloudflare-workers-ai.md
+docs/decisions/ADR-003-gecici-yerel-ticaret-deposu.md
+docs/decisions/ADR-004-oturum-barindirma-depolama.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-017,2026-10-07,SQL Server çekirdek şemasını ve ilk migration dosyasını ekle,Commitlendi,6d52883aae6ec17fdaa6943d79e81863afefa78d,https://github.com/beyzaturgut/XinobiYeni/commit/6d52883aae6ec17fdaa6943d79e81863afefa78d,feat(persistence): add core SQL Server schema and initial migration,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+Prompts/Faz03_Teknik_Altyapi_Kimlik_Veritabani.md
+XinobiYeni.slnx
+docs/runbooks/database-migrations.md
+dotnet-tools.json
+infra/db/migrations/0001_InitialCore.idempotent.sql
+infra/db/migrations/0001_InitialCore.rollback.sql
+services/api/Program.cs
+services/api/Xinobi.Api.csproj
+services/shared/Xinobi.Persistence/Entities/Identity.cs
+services/shared/Xinobi.Persistence/Entities/Operations.cs
+services/shared/Xinobi.Persistence/Migrations/20261007090524_InitialCore.Designer.cs
+services/shared/Xinobi.Persistence/Migrations/20261007090524_InitialCore.cs
+services/shared/Xinobi.Persistence/Migrations/XinobiDbContextModelSnapshot.cs
+services/shared/Xinobi.Persistence/PersistenceServiceCollectionExtensions.cs
+services/shared/Xinobi.Persistence/Xinobi.Persistence.csproj
+services/shared/Xinobi.Persistence/XinobiDbContext.cs
+test/2026-10-07/TST-091-faz03-initial-core-schema.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/PersistenceModelTests.cs
+tests/Xinobi.Architecture.Tests/Xinobi.Architecture.Tests.csproj",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-018,2026-10-07,Web başlık ölçülerini Dyson referansına uyarla,Commitlendi,4b118918ef45624a92c7ea6e849ff6c2fb1ae24d,https://github.com/beyzaturgut/XinobiYeni/commit/4b118918ef45624a92c7ea6e849ff6c2fb1ae24d,feat(web): match header metrics to the dyson.com.tr reference,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+Prompts/Faz02_Tasarim_ve_UIUX.md
+apps/web/src/app/globals.css
+apps/web/src/app/layout.tsx
+apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx
+design/decisions.md
+test/2026-10-07/TST-092-dyson-header-metrics.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-019,2026-10-07,Web başlığını büyük logolu tek şeride dönüştür,Commitlendi,ad2f418025c5fa6f3ac979ad5cd5449bd35d5720,https://github.com/beyzaturgut/XinobiYeni/commit/ad2f418025c5fa6f3ac979ad5cd5449bd35d5720,feat(web): collapse header to a single strip with a larger logo,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx
+design/decisions.md
+tools/test-home-navigation-feedback.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-020,2026-10-07,Web tasarım onay kapısının ertelenmesini kaydet,Commitlendi,7958924f954e487c9627b92cf0899c9754e5f154,https://github.com/beyzaturgut/XinobiYeni/commit/7958924f954e487c9627b92cf0899c9754e5f154,docs(design): defer the web design approval gate,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+design/faz02-open-acceptance.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-021,2026-10-07,Ortak salt okunur katalog ve içerik API sözleşmesini ekle,Commitlendi,9c3a4acc57f60f8f5c32dc477756f241a2833dcf,https://github.com/beyzaturgut/XinobiYeni/commit/9c3a4acc57f60f8f5c32dc477756f241a2833dcf,feat(api): add the shared read-only catalog and content contract,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AnnouncementItem.md
+packages/clients/dart/doc/AnnouncementList.md
+packages/clients/dart/doc/Availability.md
+packages/clients/dart/doc/CatalogApi.md
+packages/clients/dart/doc/CategoryHighlight.md
+packages/clients/dart/doc/CategoryItem.md
+packages/clients/dart/doc/CategoryList.md
+packages/clients/dart/doc/ContentApi.md
+packages/clients/dart/doc/HomeContent.md
+packages/clients/dart/doc/HomeSlide.md
+packages/clients/dart/doc/Money.md
+packages/clients/dart/doc/ProblemDetails.md
+packages/clients/dart/doc/ProductDetail.md
+packages/clients/dart/doc/ProductPage.md
+packages/clients/dart/doc/ProductSummary.md
+packages/clients/dart/doc/VariantDetail.md
+packages/clients/dart/lib/src/api.dart
+packages/clients/dart/lib/src/api/catalog_api.dart
+packages/clients/dart/lib/src/api/content_api.dart
+packages/clients/dart/lib/src/model/announcement_item.dart
+packages/clients/dart/lib/src/model/announcement_item.g.dart
+packages/clients/dart/lib/src/model/announcement_list.dart
+packages/clients/dart/lib/src/model/announcement_list.g.dart
+packages/clients/dart/lib/src/model/availability.dart
+packages/clients/dart/lib/src/model/availability.g.dart
+packages/clients/dart/lib/src/model/category_highlight.dart
+packages/clients/dart/lib/src/model/category_highlight.g.dart
+packages/clients/dart/lib/src/model/category_item.dart
+packages/clients/dart/lib/src/model/category_item.g.dart
+packages/clients/dart/lib/src/model/category_list.dart
+packages/clients/dart/lib/src/model/category_list.g.dart
+packages/clients/dart/lib/src/model/home_content.dart
+packages/clients/dart/lib/src/model/home_content.g.dart
+packages/clients/dart/lib/src/model/home_slide.dart
+packages/clients/dart/lib/src/model/home_slide.g.dart
+packages/clients/dart/lib/src/model/money.dart
+packages/clients/dart/lib/src/model/money.g.dart
+packages/clients/dart/lib/src/model/problem_details.dart
+packages/clients/dart/lib/src/model/problem_details.g.dart
+packages/clients/dart/lib/src/model/product_detail.dart
+packages/clients/dart/lib/src/model/product_detail.g.dart
+packages/clients/dart/lib/src/model/product_page.dart
+packages/clients/dart/lib/src/model/product_page.g.dart
+packages/clients/dart/lib/src/model/product_summary.dart
+packages/clients/dart/lib/src/model/product_summary.g.dart
+packages/clients/dart/lib/src/model/variant_detail.dart
+packages/clients/dart/lib/src/model/variant_detail.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/dart/test/catalog_contract_test.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogContracts.cs
+services/api/Catalog/CatalogEndpoints.cs
+services/api/Catalog/CatalogProjection.cs
+services/api/Catalog/CatalogSource.cs
+services/api/Program.cs
+test/2026-10-07/TST-093-catalog-api-contract.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/CatalogTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-022,2026-10-07,Web ve mobil için ortak XINOBI U oturum sözleşmesini ekle,Commitlendi,c070df327b226b7eaf98d3cdf94d826aac38cf15,https://github.com/beyzaturgut/XinobiYeni/commit/c070df327b226b7eaf98d3cdf94d826aac38cf15,feat(api): add the XINOBI U session contract for web and mobile,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/CreateXinobiUSession.md
+packages/clients/dart/doc/XinobiUAnswer.md
+packages/clients/dart/doc/XinobiUApi.md
+packages/clients/dart/doc/XinobiUGenerationRequest.md
+packages/clients/dart/doc/XinobiUOption.md
+packages/clients/dart/doc/XinobiUProduct.md
+packages/clients/dart/doc/XinobiUQuestion.md
+packages/clients/dart/doc/XinobiUSession.md
+packages/clients/dart/doc/XinobiUStatus.md
+packages/clients/dart/doc/XinobiUVariant.md
+packages/clients/dart/lib/src/api.dart
+packages/clients/dart/lib/src/api/xinobi_u_api.dart
+packages/clients/dart/lib/src/model/create_xinobi_u_session.dart
+packages/clients/dart/lib/src/model/create_xinobi_u_session.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_answer.dart
+packages/clients/dart/lib/src/model/xinobi_u_answer.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_generation_request.dart
+packages/clients/dart/lib/src/model/xinobi_u_generation_request.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_option.dart
+packages/clients/dart/lib/src/model/xinobi_u_option.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_product.dart
+packages/clients/dart/lib/src/model/xinobi_u_product.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_question.dart
+packages/clients/dart/lib/src/model/xinobi_u_question.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_session.dart
+packages/clients/dart/lib/src/model/xinobi_u_session.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_status.dart
+packages/clients/dart/lib/src/model/xinobi_u_status.g.dart
+packages/clients/dart/lib/src/model/xinobi_u_variant.dart
+packages/clients/dart/lib/src/model/xinobi_u_variant.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/dart/test/xinobi_u_contract_test.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Program.cs
+services/api/XinobiU/XinobiUEndpoints.cs
+test/2026-10-07/TST-094-xinobi-u-api-contract.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/XinobiUTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-023,2026-10-07,Flutter uygulama kabuğunu ve katalog ekranlarını oluştur,Commitlendi,1a3d91071057b258a0780bb91e9c1b7dcccd3940,https://github.com/beyzaturgut/XinobiYeni/commit/1a3d91071057b258a0780bb91e9c1b7dcccd3940,feat(mobile): build the Flutter shell and catalog screens,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/android/app/src/debug/AndroidManifest.xml
+apps/mobile/android/app/src/main/AndroidManifest.xml
+apps/mobile/assets/brand/xinobi-logo-white.png
+apps/mobile/assets/fonts/Inter-OFL.txt
+apps/mobile/assets/fonts/Inter-Variable.ttf
+apps/mobile/assets/fonts/Jost-OFL.txt
+apps/mobile/assets/fonts/Jost-Variable.ttf
+apps/mobile/ios/Runner/Info.plist
+apps/mobile/lib/app/design_tokens.g.dart
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/app/theme.dart
+apps/mobile/lib/core/api_config.dart
+apps/mobile/lib/core/formatting.dart
+apps/mobile/lib/features/catalog/catalog_repository.dart
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/catalog/products_screen.dart
+apps/mobile/lib/features/home/home_screen.dart
+apps/mobile/lib/features/xinobi_u/xinobi_u_screen.dart
+apps/mobile/lib/main.dart
+apps/mobile/lib/widgets/common.dart
+apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/pubspec.lock
+apps/mobile/pubspec.yaml
+apps/mobile/test/app_test.dart
+apps/mobile/test/core_test.dart
+apps/mobile/test/widget_test.dart
+design/decisions.md
+design/tokens.json
+package.json
+test/2026-10-07/TST-095-flutter-app-skeleton.md
+test/INDEX.md
+tools/generate-mobile-tokens.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-024,2026-10-07,Resend adaptörüyle kayıt ekranına e-posta kodu doğrulaması ekle,Commitlendi,2664fade369efb29093b8dd05c59bcd6d0ce83a2,https://github.com/beyzaturgut/XinobiYeni/commit/2664fade369efb29093b8dd05c59bcd6d0ce83a2,Add email verification to local demo registration with Resend sender,"README.md
+apps/web/src/app/hesap/giris/account-access.tsx
+apps/web/src/lib/demo-commerce.ts
+apps/web/src/lib/email-verification.ts
+services/api/EmailVerification/EmailVerificationEndpoints.cs
+services/api/EmailVerification/EmailVerificationStore.cs
+services/api/EmailVerification/VerificationEmailSender.cs
+services/api/Program.cs
+services/api/appsettings.Local.example.json
+tests/Xinobi.Architecture.Tests/EmailVerificationTests.cs
+tools/test-demo-commerce.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-025,2026-10-07,Gerçek gönderim olmadan geçici e-posta doğrulamasını etkinleştir,Commitlendi,1a15be86b244371dcbc2f68407a684beb22bc87b,https://github.com/beyzaturgut/XinobiYeni/commit/1a15be86b244371dcbc2f68407a684beb22bc87b,Enable development email verification preview without live delivery,"README.md
+apps/web/src/app/hesap/giris/account-access.tsx
+apps/web/src/lib/email-verification.ts
+services/api/EmailVerification/EmailVerificationStore.cs
+services/api/EmailVerification/VerificationEmailSender.cs
+services/api/Program.cs
+services/api/appsettings.Development.json
+services/api/appsettings.Local.example.json
+tests/Xinobi.Architecture.Tests/EmailVerificationTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-026,2026-10-07,Kullanıcının kendi görseliyle kişiselleştirmeye giriş akışını ekle,Commitlendi,884433f5f633a7b59488257eab88dad4450d8ec0,https://github.com/beyzaturgut/XinobiYeni/commit/884433f5f633a7b59488257eab88dad4450d8ec0,feat(personalization): add own-image entry flow,"apps/web/src/app/urunler/cay-makinesi-101/kisisellestir/personalization-studio.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product-experience.tsx
+apps/web/src/app/xinobi-u/kendi-gorselin/own-image-entry.tsx
+apps/web/src/app/xinobi-u/kendi-gorselin/page.tsx
+apps/web/src/app/xinobi-u/products.tsx
+apps/web/src/app/xinobi-u/studio.module.css
+apps/web/tests/e2e/own-image-entry.spec.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-027,2026-10-07,Hesabım portal tasarımını ve çalışan giriş/kayıt penceresini uygula,Commitlendi,20cc424e6e53ee0fbd7e1a0056ff3db3ba739cce,https://github.com/beyzaturgut/XinobiYeni/commit/20cc424e6e53ee0fbd7e1a0056ff3db3ba739cce,Apply account portal design with working registration and login modal,"README.md
+apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/app/hesap/giris/account-access.tsx
+apps/web/src/app/hesap/giris/account.module.css
+apps/web/src/app/hesap/page.tsx
+tools/test-account-portal.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-028,2026-10-07,"Giriş, kayıt ve sepet tasarımlarını mevcut ticaret akışlarına bağla",Commitlendi,ef01e7784f5f982373c2c41e68b2f0948c81e627,https://github.com/beyzaturgut/XinobiYeni/commit/ef01e7784f5f982373c2c41e68b2f0948c81e627,Apply account access and cart designs with existing commerce flows,"apps/web/src/app/hesap/giris/account-access.tsx
+apps/web/src/app/hesap/giris/account.module.css
+apps/web/src/app/hesap/giris/page.tsx
+apps/web/src/app/hesap/page.tsx
+apps/web/src/app/sepet/basket.module.css
+apps/web/src/app/sepet/basket.tsx
+apps/web/src/app/sepet/page.tsx
+apps/web/src/components/commerce-footer.tsx
+tools/test-cart.mjs
+tools/test-demo-commerce.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-029,2026-10-07,Hakkımızda belgesini Xinobi dünyası sayfasına aktar,Commitlendi,8fc1208a4cf051f154c6f2cde3284cd93d8ac597,https://github.com/beyzaturgut/XinobiYeni/commit/8fc1208a4cf051f154c6f2cde3284cd93d8ac597,Replace Xinobi world prototype with provided about us content,"apps/web/src/app/xinobi/page.tsx
+apps/web/src/app/xinobi/xinobi.module.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-030,2026-10-07,Kullanıcının yerel görselini ürün üzerinde önizle,Commitlendi,abd4add0bae6da48842af22e4f68a74aa19b7b95,https://github.com/beyzaturgut/XinobiYeni/commit/abd4add0bae6da48842af22e4f68a74aa19b7b95,feat(personalization): preview local artwork on product,"apps/web/src/app/urunler/cay-makinesi-101/editor/artwork-placement.ts
+apps/web/src/app/urunler/cay-makinesi-101/editor/editor-workspace.tsx
+apps/web/src/app/urunler/cay-makinesi-101/editor/product-pattern-preview.tsx
+apps/web/src/app/xinobi-u/kendi-gorselin/own-image-entry.tsx
+apps/web/src/app/xinobi-u/products.tsx
+apps/web/src/app/xinobi-u/studio.module.css
+apps/web/src/features/product-personalization/local-pattern-image.ts
+apps/web/src/features/product-personalization/local-pattern-preview.tsx
+apps/web/tests/e2e/local-pattern-image.spec.ts
+apps/web/tests/e2e/own-image-entry.spec.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-031,2026-10-07,Zorunlu TLS kullanan Gmail SMTP doğrulama göndericisini ekle,Commitlendi,e0d3894c5d71d9e8458e76c1282029f5f9dfe39f,https://github.com/beyzaturgut/XinobiYeni/commit/e0d3894c5d71d9e8458e76c1282029f5f9dfe39f,Add Gmail SMTP verification sender with mandatory TLS,"README.md
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/Program.cs
+services/api/Xinobi.Api.csproj
+services/api/appsettings.Local.example.json
+tests/Xinobi.Architecture.Tests/EmailVerificationTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-032,2026-10-07,Yerel SMTP sertifika iptal sorgusu hatasını gider,Commitlendi,5ed9bd49ff8edde125ca1b083085acda0c543b9d,https://github.com/beyzaturgut/XinobiYeni/commit/5ed9bd49ff8edde125ca1b083085acda0c543b9d,Allow local SMTP revocation lookup override while preserving TLS validation,"README.md
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/appsettings.Local.example.json",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-033,2026-10-07,Mobil XINOBI U akışını ekle ve ayrı renk adımını kaldır,Commitlendi,d1faf47b957f27090d1465c1ef09272d4008c891,https://github.com/beyzaturgut/XinobiYeni/commit/d1faf47b957f27090d1465c1ef09272d4008c891,feat(xinobi-u): add the mobile flow and drop the colour step,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+README.md
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/xinobi_u/questionnaire_screen.dart
+apps/mobile/lib/features/xinobi_u/xinobi_u_repository.dart
+apps/mobile/lib/features/xinobi_u/xinobi_u_screen.dart
+apps/mobile/lib/widgets/common.dart
+apps/mobile/macos/Flutter/GeneratedPluginRegistrant.swift
+apps/mobile/pubspec.lock
+apps/mobile/pubspec.yaml
+apps/mobile/test/xinobi_u_test.dart
+apps/web/src/app/xinobi-u/products.tsx
+apps/web/src/app/xinobi-u/renk/color-selection.tsx
+apps/web/src/app/xinobi-u/renk/page.tsx
+apps/web/src/app/xinobi-u/sorular/questionnaire.tsx
+design/decisions.md
+packages/clients/dart/lib/src/model/create_xinobi_u_session.dart
+packages/clients/dart/lib/src/model/create_xinobi_u_session.g.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/DesignStudio/DesignSessionStore.cs
+services/api/XinobiU/XinobiUEndpoints.cs
+test/2026-10-07/TST-096-mobile-xinobi-u-flow.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/XinobiUTests.cs
+tools/test-studio-color-selection.mjs
+tools/test-xinobi-u-direct-questions.mjs
+tools/test-xinobi-u.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-034,2026-10-07,Ek XINOBI U üretimlerinin manuel denemeden kaynaklandığını kaydet,Commitlendi,63fd96eebfdf8b412a74fbebfd0362dff4a88ee9,https://github.com/beyzaturgut/XinobiYeni/commit/63fd96eebfdf8b412a74fbebfd0362dff4a88ee9,docs(test): attribute the extra XINOBI U generations to the owner's manual trial,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+test/2026-10-07/TST-096-mobile-xinobi-u-flow.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-035,2026-10-07,Mobil uygulama simgesi olarak Xinobi logosunu kullan,Commitlendi,02221946fcf88d7a42e7e54dc4afa55807af6a19,https://github.com/beyzaturgut/XinobiYeni/commit/02221946fcf88d7a42e7e54dc4afa55807af6a19,feat(mobile): use the Xinobi logo as the app icon,"apps/mobile/android/app/src/main/res/drawable-hdpi/ic_launcher_foreground.png
+apps/mobile/android/app/src/main/res/drawable-mdpi/ic_launcher_foreground.png
+apps/mobile/android/app/src/main/res/drawable-xhdpi/ic_launcher_foreground.png
+apps/mobile/android/app/src/main/res/drawable-xxhdpi/ic_launcher_foreground.png
+apps/mobile/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_foreground.png
+apps/mobile/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+apps/mobile/android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+apps/mobile/android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+apps/mobile/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+apps/mobile/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+apps/mobile/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+apps/mobile/android/app/src/main/res/values/colors.xml
+apps/mobile/assets/icon/app-icon-foreground.png
+apps/mobile/assets/icon/app-icon.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-50x50@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-50x50@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-57x57@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-57x57@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-72x72@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-72x72@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png
+apps/mobile/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png
+apps/mobile/pubspec.lock
+apps/mobile/pubspec.yaml",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-036,2026-10-07,Ürün kartından yeni XINOBI U sorularının başlatılmasını düzelt,Commitlendi,53d80175c8156114835d2c2d8b560c5894ac73fc,https://github.com/beyzaturgut/XinobiYeni/commit/53d80175c8156114835d2c2d8b560c5894ac73fc,fix(xinobi-u): start new questions from the product card again,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/lib/features/xinobi_u/questionnaire_screen.dart
+apps/mobile/test/xinobi_u_test.dart
+apps/web/src/app/xinobi-u/products.tsx
+test/2026-10-07/TST-096-mobile-xinobi-u-flow.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-037,2026-10-07,Kişiselleştirme önizlemelerinde temsili görsel açıklamasını göster,Commitlendi,c55672b54a2ecc96821f7c794479ec001654500b,https://github.com/beyzaturgut/XinobiYeni/commit/c55672b54a2ecc96821f7c794479ec001654500b,feat(personalization): label representative previews,"apps/web/src/app/urunler/cay-makinesi-101/editor/editor-workspace.tsx
+apps/web/src/app/urunler/cay-makinesi-101/editor/editor.module.css
+apps/web/tests/e2e/representative-disclosure.spec.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-038,2026-10-07,Web sepet kurallarını kullanan mobil sepeti ekle,Commitlendi,8aa43ca97341d80047c43860429df6e4201c1c9c,https://github.com/beyzaturgut/XinobiYeni/commit/8aa43ca97341d80047c43860429df6e4201c1c9c,feat(mobile): add the cart with the web cart rules,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/cart/cart.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/catalog/catalog_repository.dart
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/test/app_test.dart
+apps/mobile/test/cart_test.dart
+packages/clients/dart/doc/VariantDetail.md
+packages/clients/dart/lib/src/model/variant_detail.dart
+packages/clients/dart/lib/src/model/variant_detail.g.dart
+packages/clients/dart/test/catalog_contract_test.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogContracts.cs
+services/api/Catalog/CatalogProjection.cs
+test/2026-10-07/TST-097-mobile-cart.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/CatalogTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-039,2026-10-07,Önizlemede yerel tasarımı sürükleyerek konumlandırmayı ekle,Commitlendi,9401386ea319898bcffea4fb7bb105a5b591b013,https://github.com/beyzaturgut/XinobiYeni/commit/9401386ea319898bcffea4fb7bb105a5b591b013,feat(personalization): drag local artwork on preview,"apps/web/src/app/urunler/cay-makinesi-101/editor/editor-workspace.tsx
+apps/web/src/app/urunler/cay-makinesi-101/editor/product-pattern-preview.tsx
+apps/web/tests/e2e/artwork-drag.spec.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-040,2026-10-07,Web ve mobil için ortak hesap API’sini ekle,Commitlendi,0eace5bd0d5313889f2f4e20b982a8784801af68,https://github.com/beyzaturgut/XinobiYeni/commit/0eace5bd0d5313889f2f4e20b982a8784801af68,feat(account): add the shared account API and mobile account tab,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/linux/flutter/generated_plugin_registrant.cc
+apps/mobile/linux/flutter/generated_plugins.cmake
+apps/mobile/macos/Flutter/GeneratedPluginRegistrant.swift
+apps/mobile/pubspec.lock
+apps/mobile/pubspec.yaml
+apps/mobile/test/account_test.dart
+apps/mobile/windows/flutter/generated_plugin_registrant.cc
+apps/mobile/windows/flutter/generated_plugins.cmake
+packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountEmailVerification.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/AuthSession.md
+packages/clients/dart/doc/LoginAccount.md
+packages/clients/dart/doc/LogoutSession.md
+packages/clients/dart/doc/RefreshSession.md
+packages/clients/dart/doc/RegisterAccount.md
+packages/clients/dart/doc/StartAccountEmailVerification.md
+packages/clients/dart/lib/src/api.dart
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_email_verification.dart
+packages/clients/dart/lib/src/model/account_email_verification.g.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/auth_session.dart
+packages/clients/dart/lib/src/model/auth_session.g.dart
+packages/clients/dart/lib/src/model/login_account.dart
+packages/clients/dart/lib/src/model/login_account.g.dart
+packages/clients/dart/lib/src/model/logout_session.dart
+packages/clients/dart/lib/src/model/logout_session.g.dart
+packages/clients/dart/lib/src/model/refresh_session.dart
+packages/clients/dart/lib/src/model/refresh_session.g.dart
+packages/clients/dart/lib/src/model/register_account.dart
+packages/clients/dart/lib/src/model/register_account.g.dart
+packages/clients/dart/lib/src/model/start_account_email_verification.dart
+packages/clients/dart/lib/src/model/start_account_email_verification.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Program.cs
+test/2026-10-07/TST-098-account-api-mobile.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/AccountTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-041,2026-10-07,Mobil hesap sekmesini ortak API’ye bağla,Commitlendi,0eace5bd0d5313889f2f4e20b982a8784801af68,https://github.com/beyzaturgut/XinobiYeni/commit/0eace5bd0d5313889f2f4e20b982a8784801af68,feat(account): add the shared account API and mobile account tab,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/linux/flutter/generated_plugin_registrant.cc
+apps/mobile/linux/flutter/generated_plugins.cmake
+apps/mobile/macos/Flutter/GeneratedPluginRegistrant.swift
+apps/mobile/pubspec.lock
+apps/mobile/pubspec.yaml
+apps/mobile/test/account_test.dart
+apps/mobile/windows/flutter/generated_plugin_registrant.cc
+apps/mobile/windows/flutter/generated_plugins.cmake
+packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountEmailVerification.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/AuthSession.md
+packages/clients/dart/doc/LoginAccount.md
+packages/clients/dart/doc/LogoutSession.md
+packages/clients/dart/doc/RefreshSession.md
+packages/clients/dart/doc/RegisterAccount.md
+packages/clients/dart/doc/StartAccountEmailVerification.md
+packages/clients/dart/lib/src/api.dart
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_email_verification.dart
+packages/clients/dart/lib/src/model/account_email_verification.g.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/auth_session.dart
+packages/clients/dart/lib/src/model/auth_session.g.dart
+packages/clients/dart/lib/src/model/login_account.dart
+packages/clients/dart/lib/src/model/login_account.g.dart
+packages/clients/dart/lib/src/model/logout_session.dart
+packages/clients/dart/lib/src/model/logout_session.g.dart
+packages/clients/dart/lib/src/model/refresh_session.dart
+packages/clients/dart/lib/src/model/refresh_session.g.dart
+packages/clients/dart/lib/src/model/register_account.dart
+packages/clients/dart/lib/src/model/register_account.g.dart
+packages/clients/dart/lib/src/model/start_account_email_verification.dart
+packages/clients/dart/lib/src/model/start_account_email_verification.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Program.cs
+test/2026-10-07/TST-098-account-api-mobile.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/AccountTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-042,2026-10-07,Web hesabını ortak sunucu hesap API'sine taşı,Commitlendi,84b580439163bad40431cc20ac199d58db9116f5,https://github.com/beyzaturgut/XinobiYeni/commit/84b580439163bad40431cc20ac199d58db9116f5,feat(account): move the web account onto the shared account API,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+README.md
+apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/lib/demo-commerce.ts
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Identity/AccountEndpoints.cs
+services/api/Program.cs
+test/2026-10-07/TST-099-web-account-api.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/AccountTests.cs
+tools/test-demo-commerce.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-043,2026-10-07,Mobil SMTP doğrulamasının bekleme süresini düzelt,Commitlendi,ec46146d5084b48c828374e18625b30b923abfd8,https://github.com/beyzaturgut/XinobiYeni/commit/ec46146d5084b48c828374e18625b30b923abfd8,fix(mobile): wait long enough for e-mail verification over SMTP,apps/mobile/lib/features/catalog/catalog_repository.dart,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-044,2026-10-07,Analiz2 ve admin tasarım referansını kaynak arşivine ekle,Commitlendi,e66bd73ac32f35a0a6fab0b00175b133432ac64d,https://github.com/beyzaturgut/XinobiYeni/commit/e66bd73ac32f35a0a6fab0b00175b133432ac64d,docs(sources): add read-only copies of Analiz2 and the admin panel reference,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+docs/sources/README.md
+docs/sources/Xinobi_Kavramsal_ve_Teknik_Analiz2.md
+docs/sources/Yonetim_Paneli_Siyah_Tema_Teknik_Analiz_ve_Promptlar.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-045,2026-10-07,IIS web paketi hazırlığını DEPLOY-005 olarak kaydet,Hazırlandı — canlı yayın değil,c5ffb267dd935a19b81edab7532a351782bc3076,https://github.com/beyzaturgut/XinobiYeni/commit/c5ffb267dd935a19b81edab7532a351782bc3076,Record prepared IIS web package for deployment 005,deployments/DEPLOY-005-current-web-package.md,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-046,2026-10-07,Varsayılan erişimi reddeden rol ve izin kataloğunu oluştur,Commitlendi,a216b1e6cae19eb10262a4bf4bc9baf33bec15ef,https://github.com/beyzaturgut/XinobiYeni/commit/a216b1e6cae19eb10262a4bf4bc9baf33bec15ef,feat(identity): add the role and permission catalog with default deny,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+Prompts/Faz03_Teknik_Altyapi_Kimlik_Veritabani.md
+docs/runbooks/super-admin-bootstrap.md
+packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AdminApi.md
+packages/clients/dart/doc/AdminSession.md
+packages/clients/dart/doc/PermissionCatalogResponse.md
+packages/clients/dart/lib/src/api.dart
+packages/clients/dart/lib/src/api/admin_api.dart
+packages/clients/dart/lib/src/model/admin_session.dart
+packages/clients/dart/lib/src/model/admin_session.g.dart
+packages/clients/dart/lib/src/model/permission_catalog_response.dart
+packages/clients/dart/lib/src/model/permission_catalog_response.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogEndpoints.cs
+services/api/DesignStudio/DesignStudioEndpoints.cs
+services/api/EmailVerification/EmailVerificationEndpoints.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/Permissions.cs
+services/api/Identity/SuperAdminBootstrap.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/Program.cs
+services/api/XinobiU/XinobiUEndpoints.cs
+test/2026-10-07/TST-100-roles-permissions.md
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/AuthorizationTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-047,2026-10-07,Mobilde cihazda saklanan favorileri ekle,Commitlendi,9b07d430345c78cc3159009a31b8f83e1c6d9991,https://github.com/beyzaturgut/XinobiYeni/commit/9b07d430345c78cc3159009a31b8f83e1c6d9991,feat(mobile): add favourites with the web's device storage,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/favorites/favorite_button.dart
+apps/mobile/lib/features/favorites/favorites.dart
+apps/mobile/lib/features/favorites/favorites_screen.dart
+apps/mobile/lib/features/xinobi_u/xinobi_u_screen.dart
+apps/mobile/lib/widgets/common.dart
+apps/mobile/test/account_test.dart
+apps/mobile/test/favorites_test.dart
+test/2026-10-07/TST-101-mobile-favorites.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-048,2026-10-07,Ürün düzenleyicisinde varyant satış fiyatını belirlemeyi ekle,Commitlendi,436829a2a293371425851480db99f3fe85c2931a,https://github.com/beyzaturgut/XinobiYeni/commit/436829a2a293371425851480db99f3fe85c2931a,Add variant sales prices directly to catalog editor,"README.md
+apps/admin/src/App.tsx
+apps/admin/src/Catalog.tsx
+apps/admin/src/panel.css
+tools/test-catalog-prices.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-049,2026-10-07,Mobil başlıkta arama yerine favori ve haber bağlantılarını göster,Commitlendi,c44013732dba079df091ea450704cf82614cc02b,https://github.com/beyzaturgut/XinobiYeni/commit/c44013732dba079df091ea450704cf82614cc02b,feat(mobile): put favourites and news in the header instead of search,"Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/catalog/catalog_repository.dart
+apps/mobile/lib/features/catalog/products_screen.dart
+apps/mobile/lib/features/home/home_screen.dart
+apps/mobile/lib/features/news/news.dart
+apps/mobile/lib/features/news/news_screen.dart
+apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/test/app_test.dart
+apps/mobile/test/news_test.dart
+design/decisions.md
+test/2026-10-07/TST-102-mobile-header-news.md
+test/INDEX.md",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-050,2026-10-07,Yönetici oturum korumalı HTTPS admin yayın paketini hazırla,Hazırlandı — canlı yayın değil,b6a41ebb5828745fb22a7e754655d86fb6407c56,https://github.com/beyzaturgut/XinobiYeni/commit/b6a41ebb5828745fb22a7e754655d86fb6407c56,Prepare HTTPS IIS admin package with staff session gate,".gitignore
+apps/admin/src/AdminAccess.tsx
+apps/admin/src/index.css
+apps/admin/src/main.tsx
+tools/package-admin-iis.mjs
+tools/test-admin-production-access.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-051,2026-10-07,Admin paketi ve üretim yayın önkoşullarını kaydet,Hazırlandı — canlı yayın değil,68c838c1e10218feb698fa63dbdfa9110897bd27,https://github.com/beyzaturgut/XinobiYeni/commit/68c838c1e10218feb698fa63dbdfa9110897bd27,Record prepared admin package and production deployment prerequisites,deployments/DEPLOY-006-admin-package.md,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261007-052,2026-10-07,Mobil ana sayfayı webin siyah-beyaz tasarımına uyarla,Commitlendi,0b028378e38e6025960adfc61b46468d6d03ff11,https://github.com/beyzaturgut/XinobiYeni/commit/0b028378e38e6025960adfc61b46468d6d03ff11,fix(design): bring the web's black-and-white palette and home to mobile,"apps/mobile/assets/home/japanese-wave-design.png
+apps/mobile/assets/home/japanese-wave-product.png
+apps/mobile/lib/app/design_tokens.g.dart
+apps/mobile/lib/features/favorites/favorite_button.dart
+apps/mobile/lib/features/home/home_screen.dart
+apps/mobile/lib/features/home/home_sections.dart
+apps/mobile/lib/widgets/common.dart
+apps/mobile/pubspec.yaml
+apps/mobile/test/app_test.dart
+design/CHANGELOG.md
+design/decisions.md
+design/tokens.json
+package.json
+packages/clients/dart/doc/HomeContent.md
+packages/clients/dart/lib/src/model/home_content.dart
+packages/clients/dart/lib/src/model/home_content.g.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogContracts.cs
+services/api/Catalog/CatalogProjection.cs
+tools/check-design-tokens.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-001,2026-10-08,Mobil başlık logosuna basınca ana sayfaya dön,Commitlendi,d23f42df943cef5c17732668c742c8a282e39fea,https://github.com/beyzaturgut/XinobiYeni/commit/d23f42df943cef5c17732668c742c8a282e39fea,feat(mobile): tapping the header logo returns to the home page,"apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/test/news_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-002,2026-10-08,Web ve admini varsayılan olarak tek deploy ZIP'inde birleştir,Hazırlandı — canlı yayın değil,34dd3d91190d929b2aff10fd0d384e7b09bdfc96,https://github.com/beyzaturgut/XinobiYeni/commit/34dd3d91190d929b2aff10fd0d384e7b09bdfc96,Prepare combined web and admin deployment archives by default,".gitignore
+AGENTS.md
+deployments/DEPLOY-007-combined-web-admin-package.md
+tools/package-deploy.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-003,2026-10-08,Mobil logoya sabit 44 piksel dokunma alanı ver,Commitlendi,6b44c17a5da00b6f6c255f3d21e0c2d8c22103ba,https://github.com/beyzaturgut/XinobiYeni/commit/6b44c17a5da00b6f6c255f3d21e0c2d8c22103ba,fix(mobile): give the header logo a fixed 44px touch target,apps/mobile/lib/widgets/xinobi_header.dart,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-004,2026-10-08,Mobilde Inter başlıkları ve siyah dolu butonları uygula,Commitlendi,e57510d5f013bdacd83d4f601ae87311c282ff2d,https://github.com/beyzaturgut/XinobiYeni/commit/e57510d5f013bdacd83d4f601ae87311c282ff2d,fix(design): use the web's Inter titles and black filled buttons on mobile,"apps/mobile/lib/app/theme.dart
+apps/mobile/lib/features/home/home_screen.dart
+apps/mobile/lib/features/home/home_sections.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-005,2026-10-08,Yayın arşivlerini paketler klasörüne taşı,Commitlendi,22ad2cf06737c05508b4fbfc8e1548629fd16873,https://github.com/beyzaturgut/XinobiYeni/commit/22ad2cf06737c05508b4fbfc8e1548629fd16873,chore(deploy): write package archives into paketler/,".gitignore
+tools/package-admin-iis.mjs
+tools/package-deploy.mjs
+tools/package-iis-preview.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-006,2026-10-08,Development dışında yayımlanmış katalog kopyasını salt okunur sun,Commitlendi,a91b0d1e6e863cc1cbf97c9241202cff9f29a73a,https://github.com/beyzaturgut/XinobiYeni/commit/a91b0d1e6e863cc1cbf97c9241202cff9f29a73a,feat(api): serve the published catalogue snapshot read-only outside Development,"services/api/Catalog/CatalogSource.cs
+services/api/LocalCommerce/LocalCommerceStore.cs
+services/api/Program.cs
+tests/Xinobi.Architecture.Tests/CatalogTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-007,2026-10-08,IIS API paketini HEAD'in temiz worktree kopyasından oluştur,Commitlendi,33781164575fcc1b2d41019316ff10d3f41aa8b0,https://github.com/beyzaturgut/XinobiYeni/commit/33781164575fcc1b2d41019316ff10d3f41aa8b0,chore(deploy): package the API for IIS from a clean worktree of HEAD,tools/package-api-iis.mjs,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-008,2026-10-08,macOS geçici dizininden API paketlenirken EF Core bağımlılığını koru,Commitlendi,5f67b30b4593357bea1c86040f10dd354426255f,https://github.com/beyzaturgut/XinobiYeni/commit/5f67b30b4593357bea1c86040f10dd354426255f,fix(deploy): keep EF Core in the API package built under macOS temp,tools/package-api-iis.mjs,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-009,2026-10-08,"Arşivleri web, mobil ve APK klasörlerine ayır",Commitlendi,e1924dd23a5399c1488a14e13df54b53bbd0a407,https://github.com/beyzaturgut/XinobiYeni/commit/e1924dd23a5399c1488a14e13df54b53bbd0a407,"chore(deploy): sort archives into paketler/web, paketler/mobil and paketler/apk","tools/build-apk.mjs
+tools/package-admin-iis.mjs
+tools/package-api-iis.mjs
+tools/package-deploy.mjs
+tools/package-iis-preview.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-010,2026-10-08,Test sunucusunda XINOBI U için kontrollü etkinleştirme ayarını ekle,Commitlendi,6de24d732fcb8e3b8f19a17c453e63701f93e19e,https://github.com/beyzaturgut/XinobiYeni/commit/6de24d732fcb8e3b8f19a17c453e63701f93e19e,feat(api): let the test server open XINOBI U behind XinobiU:Enabled (ADR-002 Ek B),"docs/decisions/ADR-002-cloudflare-workers-ai.md
+services/api/DesignStudio/DesignSessionStore.cs
+services/api/DesignStudio/DesignStudioAccess.cs
+services/api/DesignStudio/DesignStudioEndpoints.cs
+services/api/Program.cs
+services/api/XinobiU/XinobiUEndpoints.cs
+tests/Xinobi.Architecture.Tests/XinobiUTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-011,2026-10-08,Test sunucusu web ve API paketlerini XINOBI U'ya bağla,Commitlendi,649653e6eba27224b11eeb2994b8a64f6c71e0bc,https://github.com/beyzaturgut/XinobiYeni/commit/649653e6eba27224b11eeb2994b8a64f6c71e0bc,feat(deploy): connect the test-server web and API packages to XINOBI U,"apps/web/src/lib/design-studio.ts
+tools/package-api-iis.mjs
+tools/package-iis-preview.mjs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-012,2026-10-08,Tüm renklerde ortak ürün galeri fotoğrafları için API desteği ekle,Commitlendi,55bee0ba525278f9c0dc2ff5b7d3e72294c27713,https://github.com/beyzaturgut/XinobiYeni/commit/55bee0ba525278f9c0dc2ff5b7d3e72294c27713,feat(api): product gallery photos shared by every colour,"packages/clients/dart/doc/ProductDetail.md
+packages/clients/dart/lib/src/model/product_detail.dart
+packages/clients/dart/lib/src/model/product_detail.g.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogContracts.cs
+services/api/Catalog/CatalogProjection.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/LocalCommerce/LocalCommerceStore.cs
+tests/Xinobi.Architecture.Tests/CatalogTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-013,2026-10-08,Web ürün galerisini ekle,Commitlendi,b74e4a2c1d7ff404cdffba153d5f76697fbc9821,https://github.com/beyzaturgut/XinobiYeni/commit/b74e4a2c1d7ff404cdffba153d5f76697fbc9821,"feat: product gallery on web and mobile, extra photo upload in admin","apps/admin/src/Catalog.tsx
+apps/admin/src/catalog-data.ts
+apps/admin/src/panel.css
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/catalog/product_gallery.dart
+apps/mobile/test/product_gallery_test.dart
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx
+apps/web/src/lib/commerce.ts
+packages/commerce/client.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-014,2026-10-08,Mobil ürün galerisini ekle,Commitlendi,b74e4a2c1d7ff404cdffba153d5f76697fbc9821,https://github.com/beyzaturgut/XinobiYeni/commit/b74e4a2c1d7ff404cdffba153d5f76697fbc9821,"feat: product gallery on web and mobile, extra photo upload in admin","apps/admin/src/Catalog.tsx
+apps/admin/src/catalog-data.ts
+apps/admin/src/panel.css
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/catalog/product_gallery.dart
+apps/mobile/test/product_gallery_test.dart
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx
+apps/web/src/lib/commerce.ts
+packages/commerce/client.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-015,2026-10-08,Adminden ek ürün fotoğrafı yüklemeyi ekle,Commitlendi,b74e4a2c1d7ff404cdffba153d5f76697fbc9821,https://github.com/beyzaturgut/XinobiYeni/commit/b74e4a2c1d7ff404cdffba153d5f76697fbc9821,"feat: product gallery on web and mobile, extra photo upload in admin","apps/admin/src/Catalog.tsx
+apps/admin/src/catalog-data.ts
+apps/admin/src/panel.css
+apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/catalog/product_gallery.dart
+apps/mobile/test/product_gallery_test.dart
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx
+apps/web/src/lib/commerce.ts
+packages/commerce/client.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-016,2026-10-08,Mobil galeride seçilen rengin fotoğrafına doğrudan geç,Commitlendi,25efe524700708c0fde30f938d8d2facfcaf9612,https://github.com/beyzaturgut/XinobiYeni/commit/25efe524700708c0fde30f938d8d2facfcaf9612,fix(mobile): switch the gallery straight to the chosen colour's photo,apps/mobile/lib/features/catalog/product_gallery.dart,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-017,2026-10-08,Renk fotoğraflarını ortak galeri küçük görsel şeridinden ayır,Commitlendi,5746887661d6c5a32dbcd001524053dd4127529d,https://github.com/beyzaturgut/XinobiYeni/commit/5746887661d6c5a32dbcd001524053dd4127529d,fix: keep colour photos out of the gallery thumbnail strip,"apps/mobile/lib/features/catalog/product_gallery.dart
+apps/mobile/test/product_gallery_test.dart
+apps/web/src/app/urunler/detay/product-detail.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-018,2026-10-08,Web galeride renk değişiminde fotoğraf yüklenmesini beklemeyi kaldır,Commitlendi,37ce66ffc12450c041c6857f8e1a22736f52b088,https://github.com/beyzaturgut/XinobiYeni/commit/37ce66ffc12450c041c6857f8e1a22736f52b088,perf: switch colours in the product gallery without waiting for photos,"apps/mobile/lib/features/catalog/product_detail_screen.dart
+apps/mobile/lib/features/catalog/product_gallery.dart
+apps/mobile/lib/widgets/common.dart
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-019,2026-10-08,Üst üste gelen galeri fotoğraflarını görünürlük ayarıyla gizle,Commitlendi,3d26c5a1f69483f94e218e774044c886b83d4996,https://github.com/beyzaturgut/XinobiYeni/commit/3d26c5a1f69483f94e218e774044c886b83d4996,"fix(web): hide the stacked gallery photos inline, not only through the stylesheet",apps/web/src/app/urunler/detay/product-detail.tsx,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-020,2026-10-08,Web galeride renk geçişlerini akıcı hale getir,Commitlendi,40d9e4f9e6b69814dc6c3b58363925d7c9c2cea0,https://github.com/beyzaturgut/XinobiYeni/commit/40d9e4f9e6b69814dc6c3b58363925d7c9c2cea0,"fix: smooth, fast colour switches in the web gallery; downscale admin uploads","apps/admin/src/Catalog.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx
+packages/commerce/client.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-021,2026-10-08,Admin yüklemelerinde görselleri küçült,Commitlendi,40d9e4f9e6b69814dc6c3b58363925d7c9c2cea0,https://github.com/beyzaturgut/XinobiYeni/commit/40d9e4f9e6b69814dc6c3b58363925d7c9c2cea0,"fix: smooth, fast colour switches in the web gallery; downscale admin uploads","apps/admin/src/Catalog.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx
+packages/commerce/client.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-022,2026-10-08,Ürün detayını tek ekrana sığdır ve önceki fotoğrafın görünmesini engelle,Commitlendi,08c3223e38ab63956090ca8eeb129ef89c315bb3,https://github.com/beyzaturgut/XinobiYeni/commit/08c3223e38ab63956090ca8eeb129ef89c315bb3,fix(web): product detail fits one screen; no previous photo behind the new one,"apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/urunler/detay/product-detail.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-023,2026-10-08,Önemli masaüstü ekranlarını daha kompakt düzenle,Commitlendi,0689f9bb48a885bf152c421e4222ba2f353fcf42,https://github.com/beyzaturgut/XinobiYeni/commit/0689f9bb48a885bf152c421e4222ba2f353fcf42,fix(web): compact desktop layouts so key screens fit without scrolling,"apps/web/src/app/favoriler/favorites.module.css
+apps/web/src/app/sepet/basket.module.css
+apps/web/src/app/urunler/catalog.module.css
+apps/web/src/app/urunler/catalog.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product.module.css
+apps/web/src/app/xinobi-u/sorular/questionnaire.tsx
+apps/web/src/app/xinobi-u/studio.module.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-024,2026-10-08,Xinobi dünyasını yalnız metin içeren sayfa olarak yeniden tasarla,Geri alındı,8d59e967233989f3dec77d7c2d7e63cc0e0999d1,https://github.com/beyzaturgut/XinobiYeni/commit/8d59e967233989f3dec77d7c2d7e63cc0e0999d1,feat(web): redesign Xinobi dünyası (about) as a text-only page,"apps/web/src/app/xinobi/page.tsx
+apps/web/src/app/xinobi/xinobi.module.css",9c8756e ile geri alındı. Nihai sade metin uygulaması 2621e34 ile yeniden yapıldı.
+TASK-20261008-025,2026-10-08,İlk metin tabanlı Xinobi dünyası tasarımını geri al,Commitlendi,9c8756e2df321a1329d50c0387e44edcc992eb7b,https://github.com/beyzaturgut/XinobiYeni/commit/9c8756e2df321a1329d50c0387e44edcc992eb7b,"Revert ""feat(web): redesign Xinobi dünyası (about) as a text-only page""","apps/web/src/app/xinobi/page.tsx
+apps/web/src/app/xinobi/xinobi.module.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-026,2026-10-08,Hakkımızda belgesiyle sade Xinobi dünyası sayfasını oluştur,Commitlendi,2621e34bfb0b4b581d128d32dd13042973d71b6d,https://github.com/beyzaturgut/XinobiYeni/commit/2621e34bfb0b4b581d128d32dd13042973d71b6d,feat(web): plain about page with the Hakkımızda.docx text,"apps/web/src/app/xinobi/page.tsx
+apps/web/src/app/xinobi/xinobi.module.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-027,2026-10-08,Hakkımızda sayfasında ana sayfanın siyah altbilgisini kullan,Commitlendi,2566f69eba3c9f7914b887735b90e608730b1083,https://github.com/beyzaturgut/XinobiYeni/commit/2566f69eba3c9f7914b887735b90e608730b1083,feat(web): use the home page's black footer on the about page,"apps/web/src/app/page.module.css
+apps/web/src/app/page.tsx
+apps/web/src/app/xinobi/page.tsx
+apps/web/src/components/site-footer.module.css
+apps/web/src/components/site-footer.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-028,2026-10-08,Mobil giriş ve kayıt altındaki favori kutusunu kaldır,Commitlendi,866c42b2599921c8cf31f1bd2cb1b90031a80395,https://github.com/beyzaturgut/XinobiYeni/commit/866c42b2599921c8cf31f1bd2cb1b90031a80395,fix(mobile): drop the favourites box under sign-in and registration,"apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/test/favorites_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-029,2026-10-08,Hesap sahibinin ad soyadını güncellemesine izin ver,Commitlendi,32cce9b90f63a439a34473674f6dbf813df5f9f1,https://github.com/beyzaturgut/XinobiYeni/commit/32cce9b90f63a439a34473674f6dbf813df5f9f1,feat(api): account holders can rename themselves and change their password,"packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/ChangeMyPassword.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/change_my_password.dart
+packages/clients/dart/lib/src/model/change_my_password.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+tests/Xinobi.Architecture.Tests/AccountTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-030,2026-10-08,Hesap sahibinin parolasını değiştirmesine izin ver,Commitlendi,32cce9b90f63a439a34473674f6dbf813df5f9f1,https://github.com/beyzaturgut/XinobiYeni/commit/32cce9b90f63a439a34473674f6dbf813df5f9f1,feat(api): account holders can rename themselves and change their password,"packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/ChangeMyPassword.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/change_my_password.dart
+packages/clients/dart/lib/src/model/change_my_password.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+tests/Xinobi.Architecture.Tests/AccountTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-031,2026-10-08,Mobil hesap sekmesini sunucu hesap ayarlarıyla yeniden kur,Commitlendi,0518fa67d5400a3b2ab8e77a13a74be7ee1f9ae9,https://github.com/beyzaturgut/XinobiYeni/commit/0518fa67d5400a3b2ab8e77a13a74be7ee1f9ae9,feat(mobile): rebuild the account tab around real account settings,"apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-032,2026-10-08,Web hesap sayfasını sunucu hesap ayarlarıyla yeniden kur,Commitlendi,6862ef1f59b927a6d5b1a03ed728e59bb775f576,https://github.com/beyzaturgut/XinobiYeni/commit/6862ef1f59b927a6d5b1a03ed728e59bb775f576,feat(web): rebuild the signed-in account page around real settings,"apps/mobile/lib/features/account/account_screen.dart
+apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-033,2026-10-08,Telefon bilgisini güncelleme API’sini ekle,Commitlendi,1354a089adc70d0b27cd85b62a36867b2fd4453e,https://github.com/beyzaturgut/XinobiYeni/commit/1354a089adc70d0b27cd85b62a36867b2fd4453e,"feat(api): phone, e-mail change, account deletion, addresses and demo orders","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/ConfirmEmailChange.md
+packages/clients/dart/doc/CustomerAddress.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/CustomerOrderLine.md
+packages/clients/dart/doc/DeleteMyAccount.md
+packages/clients/dart/doc/PlaceOrder.md
+packages/clients/dart/doc/PlaceOrderItem.md
+packages/clients/dart/doc/SaveCustomerAddress.md
+packages/clients/dart/doc/StartEmailChange.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/confirm_email_change.dart
+packages/clients/dart/lib/src/model/confirm_email_change.g.dart
+packages/clients/dart/lib/src/model/customer_address.dart
+packages/clients/dart/lib/src/model/customer_address.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/customer_order_line.dart
+packages/clients/dart/lib/src/model/customer_order_line.g.dart
+packages/clients/dart/lib/src/model/delete_my_account.dart
+packages/clients/dart/lib/src/model/delete_my_account.g.dart
+packages/clients/dart/lib/src/model/place_order.dart
+packages/clients/dart/lib/src/model/place_order.g.dart
+packages/clients/dart/lib/src/model/place_order_item.dart
+packages/clients/dart/lib/src/model/place_order_item.g.dart
+packages/clients/dart/lib/src/model/save_customer_address.dart
+packages/clients/dart/lib/src/model/save_customer_address.g.dart
+packages/clients/dart/lib/src/model/start_email_change.dart
+packages/clients/dart/lib/src/model/start_email_change.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogEndpoints.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+tests/Xinobi.Architecture.Tests/CustomerTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-034,2026-10-08,E-posta adresi değiştirme API’sini ekle,Commitlendi,1354a089adc70d0b27cd85b62a36867b2fd4453e,https://github.com/beyzaturgut/XinobiYeni/commit/1354a089adc70d0b27cd85b62a36867b2fd4453e,"feat(api): phone, e-mail change, account deletion, addresses and demo orders","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/ConfirmEmailChange.md
+packages/clients/dart/doc/CustomerAddress.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/CustomerOrderLine.md
+packages/clients/dart/doc/DeleteMyAccount.md
+packages/clients/dart/doc/PlaceOrder.md
+packages/clients/dart/doc/PlaceOrderItem.md
+packages/clients/dart/doc/SaveCustomerAddress.md
+packages/clients/dart/doc/StartEmailChange.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/confirm_email_change.dart
+packages/clients/dart/lib/src/model/confirm_email_change.g.dart
+packages/clients/dart/lib/src/model/customer_address.dart
+packages/clients/dart/lib/src/model/customer_address.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/customer_order_line.dart
+packages/clients/dart/lib/src/model/customer_order_line.g.dart
+packages/clients/dart/lib/src/model/delete_my_account.dart
+packages/clients/dart/lib/src/model/delete_my_account.g.dart
+packages/clients/dart/lib/src/model/place_order.dart
+packages/clients/dart/lib/src/model/place_order.g.dart
+packages/clients/dart/lib/src/model/place_order_item.dart
+packages/clients/dart/lib/src/model/place_order_item.g.dart
+packages/clients/dart/lib/src/model/save_customer_address.dart
+packages/clients/dart/lib/src/model/save_customer_address.g.dart
+packages/clients/dart/lib/src/model/start_email_change.dart
+packages/clients/dart/lib/src/model/start_email_change.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogEndpoints.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+tests/Xinobi.Architecture.Tests/CustomerTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-035,2026-10-08,Hesap silme API’sini ekle,Commitlendi,1354a089adc70d0b27cd85b62a36867b2fd4453e,https://github.com/beyzaturgut/XinobiYeni/commit/1354a089adc70d0b27cd85b62a36867b2fd4453e,"feat(api): phone, e-mail change, account deletion, addresses and demo orders","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/ConfirmEmailChange.md
+packages/clients/dart/doc/CustomerAddress.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/CustomerOrderLine.md
+packages/clients/dart/doc/DeleteMyAccount.md
+packages/clients/dart/doc/PlaceOrder.md
+packages/clients/dart/doc/PlaceOrderItem.md
+packages/clients/dart/doc/SaveCustomerAddress.md
+packages/clients/dart/doc/StartEmailChange.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/confirm_email_change.dart
+packages/clients/dart/lib/src/model/confirm_email_change.g.dart
+packages/clients/dart/lib/src/model/customer_address.dart
+packages/clients/dart/lib/src/model/customer_address.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/customer_order_line.dart
+packages/clients/dart/lib/src/model/customer_order_line.g.dart
+packages/clients/dart/lib/src/model/delete_my_account.dart
+packages/clients/dart/lib/src/model/delete_my_account.g.dart
+packages/clients/dart/lib/src/model/place_order.dart
+packages/clients/dart/lib/src/model/place_order.g.dart
+packages/clients/dart/lib/src/model/place_order_item.dart
+packages/clients/dart/lib/src/model/place_order_item.g.dart
+packages/clients/dart/lib/src/model/save_customer_address.dart
+packages/clients/dart/lib/src/model/save_customer_address.g.dart
+packages/clients/dart/lib/src/model/start_email_change.dart
+packages/clients/dart/lib/src/model/start_email_change.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogEndpoints.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+tests/Xinobi.Architecture.Tests/CustomerTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-036,2026-10-08,Adres defteri API’sini ekle,Commitlendi,1354a089adc70d0b27cd85b62a36867b2fd4453e,https://github.com/beyzaturgut/XinobiYeni/commit/1354a089adc70d0b27cd85b62a36867b2fd4453e,"feat(api): phone, e-mail change, account deletion, addresses and demo orders","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/ConfirmEmailChange.md
+packages/clients/dart/doc/CustomerAddress.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/CustomerOrderLine.md
+packages/clients/dart/doc/DeleteMyAccount.md
+packages/clients/dart/doc/PlaceOrder.md
+packages/clients/dart/doc/PlaceOrderItem.md
+packages/clients/dart/doc/SaveCustomerAddress.md
+packages/clients/dart/doc/StartEmailChange.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/confirm_email_change.dart
+packages/clients/dart/lib/src/model/confirm_email_change.g.dart
+packages/clients/dart/lib/src/model/customer_address.dart
+packages/clients/dart/lib/src/model/customer_address.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/customer_order_line.dart
+packages/clients/dart/lib/src/model/customer_order_line.g.dart
+packages/clients/dart/lib/src/model/delete_my_account.dart
+packages/clients/dart/lib/src/model/delete_my_account.g.dart
+packages/clients/dart/lib/src/model/place_order.dart
+packages/clients/dart/lib/src/model/place_order.g.dart
+packages/clients/dart/lib/src/model/place_order_item.dart
+packages/clients/dart/lib/src/model/place_order_item.g.dart
+packages/clients/dart/lib/src/model/save_customer_address.dart
+packages/clients/dart/lib/src/model/save_customer_address.g.dart
+packages/clients/dart/lib/src/model/start_email_change.dart
+packages/clients/dart/lib/src/model/start_email_change.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogEndpoints.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+tests/Xinobi.Architecture.Tests/CustomerTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-037,2026-10-08,Sunucuda deneme siparişi oluşturma API’sini ekle,Commitlendi,1354a089adc70d0b27cd85b62a36867b2fd4453e,https://github.com/beyzaturgut/XinobiYeni/commit/1354a089adc70d0b27cd85b62a36867b2fd4453e,"feat(api): phone, e-mail change, account deletion, addresses and demo orders","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/AccountProfile.md
+packages/clients/dart/doc/ConfirmEmailChange.md
+packages/clients/dart/doc/CustomerAddress.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/CustomerOrderLine.md
+packages/clients/dart/doc/DeleteMyAccount.md
+packages/clients/dart/doc/PlaceOrder.md
+packages/clients/dart/doc/PlaceOrderItem.md
+packages/clients/dart/doc/SaveCustomerAddress.md
+packages/clients/dart/doc/StartEmailChange.md
+packages/clients/dart/doc/UpdateMyAccount.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/account_profile.dart
+packages/clients/dart/lib/src/model/account_profile.g.dart
+packages/clients/dart/lib/src/model/confirm_email_change.dart
+packages/clients/dart/lib/src/model/confirm_email_change.g.dart
+packages/clients/dart/lib/src/model/customer_address.dart
+packages/clients/dart/lib/src/model/customer_address.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/customer_order_line.dart
+packages/clients/dart/lib/src/model/customer_order_line.g.dart
+packages/clients/dart/lib/src/model/delete_my_account.dart
+packages/clients/dart/lib/src/model/delete_my_account.g.dart
+packages/clients/dart/lib/src/model/place_order.dart
+packages/clients/dart/lib/src/model/place_order.g.dart
+packages/clients/dart/lib/src/model/place_order_item.dart
+packages/clients/dart/lib/src/model/place_order_item.g.dart
+packages/clients/dart/lib/src/model/save_customer_address.dart
+packages/clients/dart/lib/src/model/save_customer_address.g.dart
+packages/clients/dart/lib/src/model/start_email_change.dart
+packages/clients/dart/lib/src/model/start_email_change.g.dart
+packages/clients/dart/lib/src/model/update_my_account.dart
+packages/clients/dart/lib/src/model/update_my_account.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogEndpoints.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+tests/Xinobi.Architecture.Tests/CustomerTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-038,2026-10-08,Mobil telefon bilgisi düzenlemeyi ekle,Commitlendi,31139ef6bc099faa9346de3313b8b437e712a41b,https://github.com/beyzaturgut/XinobiYeni/commit/31139ef6bc099faa9346de3313b8b437e712a41b,"feat(mobile): phone, e-mail change, account deletion, addresses and demo checkout","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/account_widgets.dart
+apps/mobile/lib/features/account/addresses.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/features/cart/cart.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/cart/checkout_screen.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-039,2026-10-08,Mobil e-posta değiştirme akışını ekle,Commitlendi,31139ef6bc099faa9346de3313b8b437e712a41b,https://github.com/beyzaturgut/XinobiYeni/commit/31139ef6bc099faa9346de3313b8b437e712a41b,"feat(mobile): phone, e-mail change, account deletion, addresses and demo checkout","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/account_widgets.dart
+apps/mobile/lib/features/account/addresses.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/features/cart/cart.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/cart/checkout_screen.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-040,2026-10-08,Mobil hesap silme akışını ekle,Commitlendi,31139ef6bc099faa9346de3313b8b437e712a41b,https://github.com/beyzaturgut/XinobiYeni/commit/31139ef6bc099faa9346de3313b8b437e712a41b,"feat(mobile): phone, e-mail change, account deletion, addresses and demo checkout","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/account_widgets.dart
+apps/mobile/lib/features/account/addresses.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/features/cart/cart.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/cart/checkout_screen.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-041,2026-10-08,Mobil adres defterini ekle,Commitlendi,31139ef6bc099faa9346de3313b8b437e712a41b,https://github.com/beyzaturgut/XinobiYeni/commit/31139ef6bc099faa9346de3313b8b437e712a41b,"feat(mobile): phone, e-mail change, account deletion, addresses and demo checkout","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/account_widgets.dart
+apps/mobile/lib/features/account/addresses.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/features/cart/cart.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/cart/checkout_screen.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-042,2026-10-08,Mobil deneme ödeme ve sipariş oluşturmayı ekle,Commitlendi,31139ef6bc099faa9346de3313b8b437e712a41b,https://github.com/beyzaturgut/XinobiYeni/commit/31139ef6bc099faa9346de3313b8b437e712a41b,"feat(mobile): phone, e-mail change, account deletion, addresses and demo checkout","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/account_widgets.dart
+apps/mobile/lib/features/account/addresses.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/features/cart/cart.dart
+apps/mobile/lib/features/cart/cart_screen.dart
+apps/mobile/lib/features/cart/checkout_screen.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-043,2026-10-08,Sipariş görsellerini sipariş veren cihazın adresinden bağımsız çöz,Commitlendi,b45060460e80b3ed507e0d1c67191cd1a8d25740,https://github.com/beyzaturgut/XinobiYeni/commit/b45060460e80b3ed507e0d1c67191cd1a8d25740,fix(api): resolve order images per request instead of storing the ordering device's URL,"services/api/Identity/CustomerEndpoints.cs
+tests/Xinobi.Architecture.Tests/CustomerTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-044,2026-10-08,Web telefon bilgisi düzenlemeyi ekle,Commitlendi,f91479feb03c275e53178276b41b17362965b0c5,https://github.com/beyzaturgut/XinobiYeni/commit/f91479feb03c275e53178276b41b17362965b0c5,"feat(web): phone, e-mail change, account deletion, addresses and server demo orders","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/app/hesap/adresler/addresses.tsx
+apps/web/src/app/hesap/adresler/page.tsx
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.module.css
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/sonuc/page.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-045,2026-10-08,Web e-posta değiştirme akışını ekle,Commitlendi,f91479feb03c275e53178276b41b17362965b0c5,https://github.com/beyzaturgut/XinobiYeni/commit/f91479feb03c275e53178276b41b17362965b0c5,"feat(web): phone, e-mail change, account deletion, addresses and server demo orders","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/app/hesap/adresler/addresses.tsx
+apps/web/src/app/hesap/adresler/page.tsx
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.module.css
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/sonuc/page.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-046,2026-10-08,Web hesap silme akışını ekle,Commitlendi,f91479feb03c275e53178276b41b17362965b0c5,https://github.com/beyzaturgut/XinobiYeni/commit/f91479feb03c275e53178276b41b17362965b0c5,"feat(web): phone, e-mail change, account deletion, addresses and server demo orders","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/app/hesap/adresler/addresses.tsx
+apps/web/src/app/hesap/adresler/page.tsx
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.module.css
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/sonuc/page.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-047,2026-10-08,Web adres defterini ekle,Commitlendi,f91479feb03c275e53178276b41b17362965b0c5,https://github.com/beyzaturgut/XinobiYeni/commit/f91479feb03c275e53178276b41b17362965b0c5,"feat(web): phone, e-mail change, account deletion, addresses and server demo orders","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/app/hesap/adresler/addresses.tsx
+apps/web/src/app/hesap/adresler/page.tsx
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.module.css
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/sonuc/page.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-048,2026-10-08,Webde sunucuya bağlı deneme siparişi oluşturmayı ekle,Commitlendi,f91479feb03c275e53178276b41b17362965b0c5,https://github.com/beyzaturgut/XinobiYeni/commit/f91479feb03c275e53178276b41b17362965b0c5,"feat(web): phone, e-mail change, account deletion, addresses and server demo orders","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/account.module.css
+apps/web/src/app/hesap/adresler/addresses.tsx
+apps/web/src/app/hesap/adresler/page.tsx
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/odeme/checkout.module.css
+apps/web/src/app/odeme/checkout.tsx
+apps/web/src/app/odeme/sonuc/page.tsx
+apps/web/src/app/odeme/sonuc/payment-result.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-049,2026-10-08,Katalog kartlarına ilk renk varyantının HEX değerini ekle,Commitlendi,c87af64338e15aa5b399dfc8a89f186529c00a10,https://github.com/beyzaturgut/XinobiYeni/commit/c87af64338e15aa5b399dfc8a89f186529c00a10,feat(api): catalogue cards carry the first colour's swatch HEX,"packages/clients/dart/doc/ProductSummary.md
+packages/clients/dart/lib/src/model/product_summary.dart
+packages/clients/dart/lib/src/model/product_summary.g.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogContracts.cs
+services/api/Catalog/CatalogProjection.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-050,2026-10-08,Hakkımızda kaynak metnini repo belgelerine ekle,Commitlendi,825b7bdecadce8db69b0958433574721617d2a96,https://github.com/beyzaturgut/XinobiYeni/commit/825b7bdecadce8db69b0958433574721617d2a96,docs: add the Hakkımızda copy used by the Xinobi dünyası page,"""Proje Y\303\266netimi/Hakk\304\261m\304\261zda.docx""",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-051,2026-10-08,Mobil release sürümünde HTTP erişimini yalnız test sunucusuyla sınırla,Commitlendi,85d37525d93155b5381ce905c364fcd945e2c2a0,https://github.com/beyzaturgut/XinobiYeni/commit/85d37525d93155b5381ce905c364fcd945e2c2a0,feat(mobile): allow cleartext only to the owner's test server in release builds,"apps/mobile/android/app/src/debug/AndroidManifest.xml
+apps/mobile/android/app/src/debug/res/xml/network_security_config.xml
+apps/mobile/android/app/src/main/AndroidManifest.xml
+apps/mobile/android/app/src/main/res/xml/network_security_config.xml",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-052,2026-10-08,Ürün kişiselleştirme dalını main'e birleştir,Commitlendi,4c5ccb702935a42b5e16e33eb22c85749335f571,https://github.com/beyzaturgut/XinobiYeni/commit/4c5ccb702935a42b5e16e33eb22c85749335f571,"merge: bring feature/product-personalization (ProductSurfaces, own-image preview) into main","Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md
+apps/admin/src/App.tsx
+apps/web/src/app/urunler/cay-makinesi-101/product-experience.tsx
+apps/web/src/app/xinobi-u/studio.module.css
+apps/web/src/components/accepted-surface-sample.tsx
+apps/web/src/components/personalization-feature.module.css
+apps/web/src/components/personalization-feature.tsx
+services/api/Features/ProductSurfaces/Development/DevelopmentAcceptedSurface.cs
+services/api/Features/ProductSurfaces/Development/ProductSurfaceReviewEndpoints.cs
+services/api/Program.cs
+services/api/Xinobi.Api.csproj
+test/INDEX.md
+tests/Xinobi.Architecture.Tests/CommerceSurfaceIntegrationTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-053,2026-10-08,"Varyant yüzeyi maskeleme, fırça düzeltmesi ve onay API'sini ekle",Commitlendi,1cdd475e4f7f1703aa39642f4f2f48dc2880ad82,https://github.com/beyzaturgut/XinobiYeni/commit/1cdd475e4f7f1703aa39642f4f2f48dc2880ad82,"feat(api): per-variant surface masking with Roboflow, brush and approval","packages/clients/dart/doc/VariantDetail.md
+packages/clients/dart/lib/src/model/variant_detail.dart
+packages/clients/dart/lib/src/model/variant_detail.g.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/Catalog/CatalogContracts.cs
+services/api/Catalog/CatalogProjection.cs
+services/api/Features/ProductSurfaces/Catalog/ProductSurfaceEndpoints.cs
+services/api/Features/ProductSurfaces/Catalog/ProductSurfaceWorkspace.cs
+services/api/Infrastructure/MaskProcessing/ManualMaskCorrector.cs
+services/api/Infrastructure/Segmentation/Roboflow/DevelopmentMaskBuffer.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/LocalCommerce/LocalCommerceStore.cs
+services/api/Program.cs
+tests/Xinobi.Architecture.Tests/ProductSurfaceWorkspaceTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-054,2026-10-08,Admin ürün yüzeyleri ve maske onay ekranını ekle,Commitlendi,cb3a3032db78f2a2adb69d07a5cf909b06f981e8,https://github.com/beyzaturgut/XinobiYeni/commit/cb3a3032db78f2a2adb69d07a5cf909b06f981e8,feat(admin): Ürün yüzeyleri - mask every product colour and approve it,"apps/admin/src/App.tsx
+apps/admin/src/features/product-surfaces/SurfaceMaskCorrection.tsx
+apps/admin/src/features/product-surfaces/SurfaceMasks.tsx
+apps/admin/src/features/product-surfaces/surface-masks.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-055,2026-10-08,Webde müşteri tasarımını admin onaylı varyant yüzeyine uygula,Commitlendi,ba166e1a8115c87989281f855618467142e01e35,https://github.com/beyzaturgut/XinobiYeni/commit/ba166e1a8115c87989281f855618467142e01e35,feat(web): apply customer designs to the admin-approved surface of any variant,"apps/web/src/app/urunler/cay-makinesi-101/editor/accepted-surface-api.ts
+apps/web/src/app/urunler/cay-makinesi-101/editor/editor-workspace.tsx
+apps/web/src/app/urunler/cay-makinesi-101/editor/product-pattern-preview.tsx",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261008-056,2026-10-08,Mobilde XINOBI U tasarımını admin onaylı yüzeye uygula,Commitlendi,84bf964cc96b7684b4dca9f1a52d934c101f06b8,https://github.com/beyzaturgut/XinobiYeni/commit/84bf964cc96b7684b4dca9f1a52d934c101f06b8,feat(mobile): place the XINOBI U design on the admin-approved surface,apps/mobile/lib/features/xinobi_u/questionnaire_screen.dart,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-001,2026-10-09,7–8 Ekim commitlerini Faz00 kaydına geriye dönük işle,Commitlendi,e00c5e124e81bac1ba68dd16721b5d686de49807,https://github.com/beyzaturgut/XinobiYeni/commit/e00c5e124e81bac1ba68dd16721b5d686de49807,docs(plan): backfill the 7–8 Oct commits into the Faz00 log,Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md,Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-002,2026-10-09,Tüm kişiselleştirilmiş XINOBI U görsellerine Temsilidir etiketi ekle,Commitlendi,7f7f31c1381c58aa92f15c34843b879386185d37,https://github.com/beyzaturgut/XinobiYeni/commit/7f7f31c1381c58aa92f15c34843b879386185d37,"feat(web): label every personalised XINOBI U image ""Temsilidir"" (K-12)","apps/web/src/app/xinobi-u/onizleme/product-preview.tsx
+apps/web/src/app/xinobi-u/sorular/questionnaire.tsx
+apps/web/src/app/xinobi-u/studio.module.css
+apps/web/src/components/personalization-feature.module.css
+apps/web/src/components/personalization-feature.tsx
+apps/web/tests/e2e/representative-disclosure.spec.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-003,2026-10-09,Sipariş kargoya verme API’sini ekle,Commitlendi,7c942ec3ce378aacce860c620899defe8a3de630,https://github.com/beyzaturgut/XinobiYeni/commit/7c942ec3ce378aacce860c620899defe8a3de630,"feat(api): order lifecycle (ship, deliver, cancel, return) and customer notifications","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/CancelMyOrder.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/Inbox.md
+packages/clients/dart/doc/InboxItem.md
+packages/clients/dart/doc/MarkNotificationsRead.md
+packages/clients/dart/doc/OrderEvent.md
+packages/clients/dart/doc/OrderOptions.md
+packages/clients/dart/doc/OrderRequest.md
+packages/clients/dart/doc/OrderRequestLine.md
+packages/clients/dart/doc/OrderShipment.md
+packages/clients/dart/doc/RegisterDevice.md
+packages/clients/dart/doc/RemoveDevice.md
+packages/clients/dart/doc/ReturnMyOrder.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/cancel_my_order.dart
+packages/clients/dart/lib/src/model/cancel_my_order.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/inbox.dart
+packages/clients/dart/lib/src/model/inbox.g.dart
+packages/clients/dart/lib/src/model/inbox_item.dart
+packages/clients/dart/lib/src/model/inbox_item.g.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.g.dart
+packages/clients/dart/lib/src/model/order_event.dart
+packages/clients/dart/lib/src/model/order_event.g.dart
+packages/clients/dart/lib/src/model/order_options.dart
+packages/clients/dart/lib/src/model/order_options.g.dart
+packages/clients/dart/lib/src/model/order_request.dart
+packages/clients/dart/lib/src/model/order_request.g.dart
+packages/clients/dart/lib/src/model/order_request_line.dart
+packages/clients/dart/lib/src/model/order_request_line.g.dart
+packages/clients/dart/lib/src/model/order_shipment.dart
+packages/clients/dart/lib/src/model/order_shipment.g.dart
+packages/clients/dart/lib/src/model/register_device.dart
+packages/clients/dart/lib/src/model/register_device.g.dart
+packages/clients/dart/lib/src/model/remove_device.dart
+packages/clients/dart/lib/src/model/remove_device.g.dart
+packages/clients/dart/lib/src/model/return_my_order.dart
+packages/clients/dart/lib/src/model/return_my_order.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+services/api/Infrastructure/DevJsonStore.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/Notifications/NotificationCenter.cs
+services/api/Notifications/NotificationEndpoints.cs
+services/api/Notifications/NotificationSenders.cs
+services/api/Notifications/SmtpMailer.cs
+services/api/Orders/OrderEndpoints.cs
+services/api/Orders/OrderLifecycle.cs
+services/api/Program.cs
+services/api/appsettings.Development.json
+tests/Xinobi.Architecture.Tests/OrderLifecycleTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-004,2026-10-09,Sipariş teslim etme API’sini ekle,Commitlendi,7c942ec3ce378aacce860c620899defe8a3de630,https://github.com/beyzaturgut/XinobiYeni/commit/7c942ec3ce378aacce860c620899defe8a3de630,"feat(api): order lifecycle (ship, deliver, cancel, return) and customer notifications","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/CancelMyOrder.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/Inbox.md
+packages/clients/dart/doc/InboxItem.md
+packages/clients/dart/doc/MarkNotificationsRead.md
+packages/clients/dart/doc/OrderEvent.md
+packages/clients/dart/doc/OrderOptions.md
+packages/clients/dart/doc/OrderRequest.md
+packages/clients/dart/doc/OrderRequestLine.md
+packages/clients/dart/doc/OrderShipment.md
+packages/clients/dart/doc/RegisterDevice.md
+packages/clients/dart/doc/RemoveDevice.md
+packages/clients/dart/doc/ReturnMyOrder.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/cancel_my_order.dart
+packages/clients/dart/lib/src/model/cancel_my_order.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/inbox.dart
+packages/clients/dart/lib/src/model/inbox.g.dart
+packages/clients/dart/lib/src/model/inbox_item.dart
+packages/clients/dart/lib/src/model/inbox_item.g.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.g.dart
+packages/clients/dart/lib/src/model/order_event.dart
+packages/clients/dart/lib/src/model/order_event.g.dart
+packages/clients/dart/lib/src/model/order_options.dart
+packages/clients/dart/lib/src/model/order_options.g.dart
+packages/clients/dart/lib/src/model/order_request.dart
+packages/clients/dart/lib/src/model/order_request.g.dart
+packages/clients/dart/lib/src/model/order_request_line.dart
+packages/clients/dart/lib/src/model/order_request_line.g.dart
+packages/clients/dart/lib/src/model/order_shipment.dart
+packages/clients/dart/lib/src/model/order_shipment.g.dart
+packages/clients/dart/lib/src/model/register_device.dart
+packages/clients/dart/lib/src/model/register_device.g.dart
+packages/clients/dart/lib/src/model/remove_device.dart
+packages/clients/dart/lib/src/model/remove_device.g.dart
+packages/clients/dart/lib/src/model/return_my_order.dart
+packages/clients/dart/lib/src/model/return_my_order.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+services/api/Infrastructure/DevJsonStore.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/Notifications/NotificationCenter.cs
+services/api/Notifications/NotificationEndpoints.cs
+services/api/Notifications/NotificationSenders.cs
+services/api/Notifications/SmtpMailer.cs
+services/api/Orders/OrderEndpoints.cs
+services/api/Orders/OrderLifecycle.cs
+services/api/Program.cs
+services/api/appsettings.Development.json
+tests/Xinobi.Architecture.Tests/OrderLifecycleTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-005,2026-10-09,Sipariş iptal yaşam döngüsünü ekle,Commitlendi,7c942ec3ce378aacce860c620899defe8a3de630,https://github.com/beyzaturgut/XinobiYeni/commit/7c942ec3ce378aacce860c620899defe8a3de630,"feat(api): order lifecycle (ship, deliver, cancel, return) and customer notifications","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/CancelMyOrder.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/Inbox.md
+packages/clients/dart/doc/InboxItem.md
+packages/clients/dart/doc/MarkNotificationsRead.md
+packages/clients/dart/doc/OrderEvent.md
+packages/clients/dart/doc/OrderOptions.md
+packages/clients/dart/doc/OrderRequest.md
+packages/clients/dart/doc/OrderRequestLine.md
+packages/clients/dart/doc/OrderShipment.md
+packages/clients/dart/doc/RegisterDevice.md
+packages/clients/dart/doc/RemoveDevice.md
+packages/clients/dart/doc/ReturnMyOrder.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/cancel_my_order.dart
+packages/clients/dart/lib/src/model/cancel_my_order.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/inbox.dart
+packages/clients/dart/lib/src/model/inbox.g.dart
+packages/clients/dart/lib/src/model/inbox_item.dart
+packages/clients/dart/lib/src/model/inbox_item.g.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.g.dart
+packages/clients/dart/lib/src/model/order_event.dart
+packages/clients/dart/lib/src/model/order_event.g.dart
+packages/clients/dart/lib/src/model/order_options.dart
+packages/clients/dart/lib/src/model/order_options.g.dart
+packages/clients/dart/lib/src/model/order_request.dart
+packages/clients/dart/lib/src/model/order_request.g.dart
+packages/clients/dart/lib/src/model/order_request_line.dart
+packages/clients/dart/lib/src/model/order_request_line.g.dart
+packages/clients/dart/lib/src/model/order_shipment.dart
+packages/clients/dart/lib/src/model/order_shipment.g.dart
+packages/clients/dart/lib/src/model/register_device.dart
+packages/clients/dart/lib/src/model/register_device.g.dart
+packages/clients/dart/lib/src/model/remove_device.dart
+packages/clients/dart/lib/src/model/remove_device.g.dart
+packages/clients/dart/lib/src/model/return_my_order.dart
+packages/clients/dart/lib/src/model/return_my_order.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+services/api/Infrastructure/DevJsonStore.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/Notifications/NotificationCenter.cs
+services/api/Notifications/NotificationEndpoints.cs
+services/api/Notifications/NotificationSenders.cs
+services/api/Notifications/SmtpMailer.cs
+services/api/Orders/OrderEndpoints.cs
+services/api/Orders/OrderLifecycle.cs
+services/api/Program.cs
+services/api/appsettings.Development.json
+tests/Xinobi.Architecture.Tests/OrderLifecycleTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-006,2026-10-09,Sipariş iade yaşam döngüsünü ekle,Commitlendi,7c942ec3ce378aacce860c620899defe8a3de630,https://github.com/beyzaturgut/XinobiYeni/commit/7c942ec3ce378aacce860c620899defe8a3de630,"feat(api): order lifecycle (ship, deliver, cancel, return) and customer notifications","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/CancelMyOrder.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/Inbox.md
+packages/clients/dart/doc/InboxItem.md
+packages/clients/dart/doc/MarkNotificationsRead.md
+packages/clients/dart/doc/OrderEvent.md
+packages/clients/dart/doc/OrderOptions.md
+packages/clients/dart/doc/OrderRequest.md
+packages/clients/dart/doc/OrderRequestLine.md
+packages/clients/dart/doc/OrderShipment.md
+packages/clients/dart/doc/RegisterDevice.md
+packages/clients/dart/doc/RemoveDevice.md
+packages/clients/dart/doc/ReturnMyOrder.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/cancel_my_order.dart
+packages/clients/dart/lib/src/model/cancel_my_order.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/inbox.dart
+packages/clients/dart/lib/src/model/inbox.g.dart
+packages/clients/dart/lib/src/model/inbox_item.dart
+packages/clients/dart/lib/src/model/inbox_item.g.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.g.dart
+packages/clients/dart/lib/src/model/order_event.dart
+packages/clients/dart/lib/src/model/order_event.g.dart
+packages/clients/dart/lib/src/model/order_options.dart
+packages/clients/dart/lib/src/model/order_options.g.dart
+packages/clients/dart/lib/src/model/order_request.dart
+packages/clients/dart/lib/src/model/order_request.g.dart
+packages/clients/dart/lib/src/model/order_request_line.dart
+packages/clients/dart/lib/src/model/order_request_line.g.dart
+packages/clients/dart/lib/src/model/order_shipment.dart
+packages/clients/dart/lib/src/model/order_shipment.g.dart
+packages/clients/dart/lib/src/model/register_device.dart
+packages/clients/dart/lib/src/model/register_device.g.dart
+packages/clients/dart/lib/src/model/remove_device.dart
+packages/clients/dart/lib/src/model/remove_device.g.dart
+packages/clients/dart/lib/src/model/return_my_order.dart
+packages/clients/dart/lib/src/model/return_my_order.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+services/api/Infrastructure/DevJsonStore.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/Notifications/NotificationCenter.cs
+services/api/Notifications/NotificationEndpoints.cs
+services/api/Notifications/NotificationSenders.cs
+services/api/Notifications/SmtpMailer.cs
+services/api/Orders/OrderEndpoints.cs
+services/api/Orders/OrderLifecycle.cs
+services/api/Program.cs
+services/api/appsettings.Development.json
+tests/Xinobi.Architecture.Tests/OrderLifecycleTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-007,2026-10-09,Müşteri bildirimleri API’sini ekle,Commitlendi,7c942ec3ce378aacce860c620899defe8a3de630,https://github.com/beyzaturgut/XinobiYeni/commit/7c942ec3ce378aacce860c620899defe8a3de630,"feat(api): order lifecycle (ship, deliver, cancel, return) and customer notifications","packages/clients/dart/.openapi-generator/FILES
+packages/clients/dart/README.md
+packages/clients/dart/doc/AccountApi.md
+packages/clients/dart/doc/CancelMyOrder.md
+packages/clients/dart/doc/CustomerOrder.md
+packages/clients/dart/doc/Inbox.md
+packages/clients/dart/doc/InboxItem.md
+packages/clients/dart/doc/MarkNotificationsRead.md
+packages/clients/dart/doc/OrderEvent.md
+packages/clients/dart/doc/OrderOptions.md
+packages/clients/dart/doc/OrderRequest.md
+packages/clients/dart/doc/OrderRequestLine.md
+packages/clients/dart/doc/OrderShipment.md
+packages/clients/dart/doc/RegisterDevice.md
+packages/clients/dart/doc/RemoveDevice.md
+packages/clients/dart/doc/ReturnMyOrder.md
+packages/clients/dart/lib/src/api/account_api.dart
+packages/clients/dart/lib/src/model/cancel_my_order.dart
+packages/clients/dart/lib/src/model/cancel_my_order.g.dart
+packages/clients/dart/lib/src/model/customer_order.dart
+packages/clients/dart/lib/src/model/customer_order.g.dart
+packages/clients/dart/lib/src/model/inbox.dart
+packages/clients/dart/lib/src/model/inbox.g.dart
+packages/clients/dart/lib/src/model/inbox_item.dart
+packages/clients/dart/lib/src/model/inbox_item.g.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.dart
+packages/clients/dart/lib/src/model/mark_notifications_read.g.dart
+packages/clients/dart/lib/src/model/order_event.dart
+packages/clients/dart/lib/src/model/order_event.g.dart
+packages/clients/dart/lib/src/model/order_options.dart
+packages/clients/dart/lib/src/model/order_options.g.dart
+packages/clients/dart/lib/src/model/order_request.dart
+packages/clients/dart/lib/src/model/order_request.g.dart
+packages/clients/dart/lib/src/model/order_request_line.dart
+packages/clients/dart/lib/src/model/order_request_line.g.dart
+packages/clients/dart/lib/src/model/order_shipment.dart
+packages/clients/dart/lib/src/model/order_shipment.g.dart
+packages/clients/dart/lib/src/model/register_device.dart
+packages/clients/dart/lib/src/model/register_device.g.dart
+packages/clients/dart/lib/src/model/remove_device.dart
+packages/clients/dart/lib/src/model/remove_device.g.dart
+packages/clients/dart/lib/src/model/return_my_order.dart
+packages/clients/dart/lib/src/model/return_my_order.g.dart
+packages/clients/dart/lib/src/serializers.dart
+packages/clients/dart/lib/src/serializers.g.dart
+packages/clients/dart/lib/xinobi_api_client.dart
+packages/clients/typescript/src/schema.d.ts
+packages/contracts/openapi/v1.json
+services/api/EmailVerification/SmtpVerificationEmailSender.cs
+services/api/Identity/AccountEndpoints.cs
+services/api/Identity/AccountStore.cs
+services/api/Identity/CustomerContracts.cs
+services/api/Identity/CustomerEndpoints.cs
+services/api/Infrastructure/DevJsonStore.cs
+services/api/LocalCommerce/LocalCommerceEndpoints.cs
+services/api/Notifications/NotificationCenter.cs
+services/api/Notifications/NotificationEndpoints.cs
+services/api/Notifications/NotificationSenders.cs
+services/api/Notifications/SmtpMailer.cs
+services/api/Orders/OrderEndpoints.cs
+services/api/Orders/OrderLifecycle.cs
+services/api/Program.cs
+services/api/appsettings.Development.json
+tests/Xinobi.Architecture.Tests/OrderLifecycleTests.cs",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-008,2026-10-09,Web sipariş takibini ekle,Commitlendi,64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,https://github.com/beyzaturgut/XinobiYeni/commit/64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,"feat(web): order tracking, cancellation, returns and a notification inbox","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/bildirimler/notification-inbox.tsx
+apps/web/src/app/hesap/bildirimler/notifications.module.css
+apps/web/src/app/hesap/bildirimler/page.tsx
+apps/web/src/app/hesap/siparisler/iade/page.tsx
+apps/web/src/app/hesap/siparisler/iade/return-request.tsx
+apps/web/src/app/hesap/siparisler/iade/return.module.css
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/hesap/siparisler/page.tsx
+apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-009,2026-10-09,Web sipariş iptal işlemini ekle,Commitlendi,64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,https://github.com/beyzaturgut/XinobiYeni/commit/64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,"feat(web): order tracking, cancellation, returns and a notification inbox","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/bildirimler/notification-inbox.tsx
+apps/web/src/app/hesap/bildirimler/notifications.module.css
+apps/web/src/app/hesap/bildirimler/page.tsx
+apps/web/src/app/hesap/siparisler/iade/page.tsx
+apps/web/src/app/hesap/siparisler/iade/return-request.tsx
+apps/web/src/app/hesap/siparisler/iade/return.module.css
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/hesap/siparisler/page.tsx
+apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-010,2026-10-09,Web iade talebi işlemini ekle,Commitlendi,64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,https://github.com/beyzaturgut/XinobiYeni/commit/64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,"feat(web): order tracking, cancellation, returns and a notification inbox","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/bildirimler/notification-inbox.tsx
+apps/web/src/app/hesap/bildirimler/notifications.module.css
+apps/web/src/app/hesap/bildirimler/page.tsx
+apps/web/src/app/hesap/siparisler/iade/page.tsx
+apps/web/src/app/hesap/siparisler/iade/return-request.tsx
+apps/web/src/app/hesap/siparisler/iade/return.module.css
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/hesap/siparisler/page.tsx
+apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-011,2026-10-09,Web bildirim gelen kutusunu ekle,Commitlendi,64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,https://github.com/beyzaturgut/XinobiYeni/commit/64276d93c95aafb5b431e08a7c9b23c6afe8bdf1,"feat(web): order tracking, cancellation, returns and a notification inbox","apps/web/src/app/hesap/account-dashboard.tsx
+apps/web/src/app/hesap/bildirimler/notification-inbox.tsx
+apps/web/src/app/hesap/bildirimler/notifications.module.css
+apps/web/src/app/hesap/bildirimler/page.tsx
+apps/web/src/app/hesap/siparisler/iade/page.tsx
+apps/web/src/app/hesap/siparisler/iade/return-request.tsx
+apps/web/src/app/hesap/siparisler/iade/return.module.css
+apps/web/src/app/hesap/siparisler/orders.module.css
+apps/web/src/app/hesap/siparisler/orders.tsx
+apps/web/src/app/hesap/siparisler/page.tsx
+apps/web/src/components/site-header.module.css
+apps/web/src/components/site-header.tsx
+apps/web/src/lib/demo-commerce.ts",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-012,2026-10-09,Admin sipariş operasyon ekranını sunucu siparişlerine bağla,Commitlendi,340f577c6ff1438acf503fdbc2057a8ca325dae9,https://github.com/beyzaturgut/XinobiYeni/commit/340f577c6ff1438acf503fdbc2057a8ca325dae9,feat(admin): real order desk and notification log,"apps/admin/src/App.tsx
+apps/admin/src/Notifications.tsx
+apps/admin/src/Orders.tsx
+apps/admin/src/panel.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-013,2026-10-09,Admin bildirim kaydı ekranını ekle,Commitlendi,340f577c6ff1438acf503fdbc2057a8ca325dae9,https://github.com/beyzaturgut/XinobiYeni/commit/340f577c6ff1438acf503fdbc2057a8ca325dae9,feat(admin): real order desk and notification log,"apps/admin/src/App.tsx
+apps/admin/src/Notifications.tsx
+apps/admin/src/Orders.tsx
+apps/admin/src/panel.css",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-014,2026-10-09,Mobil sipariş takibini ekle,Commitlendi,d69525b3c7b77305fde1f7525b46a6c25ee22013,https://github.com/beyzaturgut/XinobiYeni/commit/d69525b3c7b77305fde1f7525b46a6c25ee22013,"feat(mobile): order tracking, cancellation, returns and notifications","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/notifications.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-015,2026-10-09,Mobil sipariş iptal akışını ekle,Commitlendi,d69525b3c7b77305fde1f7525b46a6c25ee22013,https://github.com/beyzaturgut/XinobiYeni/commit/d69525b3c7b77305fde1f7525b46a6c25ee22013,"feat(mobile): order tracking, cancellation, returns and notifications","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/notifications.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-016,2026-10-09,Mobil iade talebi akışını ekle,Commitlendi,d69525b3c7b77305fde1f7525b46a6c25ee22013,https://github.com/beyzaturgut/XinobiYeni/commit/d69525b3c7b77305fde1f7525b46a6c25ee22013,"feat(mobile): order tracking, cancellation, returns and notifications","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/notifications.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.
+TASK-20261009-017,2026-10-09,Mobil bildirim gelen kutusunu ekle,Commitlendi,d69525b3c7b77305fde1f7525b46a6c25ee22013,https://github.com/beyzaturgut/XinobiYeni/commit/d69525b3c7b77305fde1f7525b46a6c25ee22013,"feat(mobile): order tracking, cancellation, returns and notifications","apps/mobile/lib/app/router.dart
+apps/mobile/lib/features/account/account_screen.dart
+apps/mobile/lib/features/account/auth.dart
+apps/mobile/lib/features/account/notifications.dart
+apps/mobile/lib/features/account/orders.dart
+apps/mobile/lib/widgets/xinobi_header.dart
+apps/mobile/test/account_test.dart",Commit kapsamındaki çalışma kaydı; canlı ortam veya nihai faz onayı iddiası değildir.

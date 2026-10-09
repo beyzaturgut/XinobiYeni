@@ -19,6 +19,12 @@ using System.Security.Claims;
 using Xinobi.Api.Features.ProductSurfaces.Development;
 using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
 
+if (args.Contains(Cm101CandidateCommand.Mode, StringComparer.Ordinal))
+{
+    Environment.ExitCode = await Cm101CandidateCommand.RunAsync(args);
+    return;
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
@@ -140,7 +146,8 @@ else
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapLocalCommerce();
-Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
+if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"))
+    Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
 app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();
@@ -189,7 +196,7 @@ api.MapGet("/health/ready", async (
     .Produces<ReadinessResponse>(StatusCodes.Status200OK)
     .Produces<ReadinessResponse>(StatusCodes.Status503ServiceUnavailable);
 
-if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("ProductSurfaces:DevelopmentReview:Enabled"))
+if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("ProductSurfaces:DevelopmentReview:Enabled") && !app.Configuration.GetValue<bool>("ProductSurfaces:Cm101AdminAutomatic:Enabled"))
 {
     var root = app.Configuration["ProductSurfaces:DevelopmentReview:RepositoryRoot"]
         ?? Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, "../.."));
@@ -226,6 +233,7 @@ if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("Product
     app.MapDevelopmentAcceptedSurface(root);
 }
 
+app.MapCm101AdminCandidate();
 app.Run();
 
 public partial class Program;

@@ -1,0 +1,2 @@
+﻿const {defineConfig}=require('./apps/web/node_modules/@playwright/test');
+module.exports=defineConfig({testDir:'./apps/web/tests/e2e',workers:1,reporter:'line',timeout:60000,use:{baseURL:'http://127.0.0.1:3032',launchOptions:{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',args:['--disable-background-networking']},viewport:{width:500,height:900}},outputDir:'./services/api/App_Data/integration-runtime/cm101-test-results'});

@@ -68,7 +68,7 @@ public sealed class RoboflowSurfaceSegmentationProvider(HttpClient client, Robof
             else predictions = root.GetProperty("predictions");
             if (predictions.ValueKind != JsonValueKind.Array || predictions.GetArrayLength() is < 1 or > 100 || (!automatic && predictions.GetArrayLength() != 1)) throw new InvalidDataException();
             var normalizer = new RoboflowMaskNormalizer();
-            var normalized = new List<(ValidatedAlignedMask Mask, byte[] Bytes, double? Score, int Order)>();
+            (ValidatedAlignedMask Mask, byte[] Bytes, double? Score, int Order)? best = null;
             int order = 0;
             foreach (var prediction in predictions.EnumerateArray())
             {
@@ -76,14 +76,17 @@ public sealed class RoboflowSurfaceSegmentationProvider(HttpClient client, Robof
                 double? score = prediction.TryGetProperty("confidence", out var value) ? value.GetDouble() : null;
                 if (score is not null && !double.IsFinite(score.Value)) throw new InvalidDataException();
                 var result = normalizer.Normalize(prediction.GetProperty("masks"), source, "dev:segmentation-mask:" + Guid.NewGuid());
-                normalized.Add((result.Mask, result.Bytes, score, order++));
+                // Validate every prediction, but retain only the best mask. Stable ties keep provider order.
+                if (best is null || (score ?? double.NegativeInfinity) > (best.Value.Score ?? double.NegativeInfinity))
+                    best = (result.Mask, result.Bytes, score, order);
+                order++;
             }
-            var selected = normalized.OrderByDescending(item => item.Score ?? double.NegativeInfinity).ThenBy(item => item.Order).First();
+            var selected = best!.Value;
             // Source snapshot must still be exact after await; no remote claim substitutes for this check.
             if (new AlignedImageInspector().InspectSource(resolveSource(source), source.MediaVersionId) != source)
                 throw new SegmentationProviderException("provider_source_mismatch", 409);
             deadline.Token.ThrowIfCancellationRequested();
-            masks.Add(selected.Mask, selected.Bytes, new ProviderSelectionEvidence(selected.Order, normalized.Count, selected.Score));
+            masks.Add(selected.Mask, selected.Bytes, new ProviderSelectionEvidence(selected.Order, order, selected.Score));
             return new SegmentationResult(source, new ProviderProvenance("roboflow", "sam3"),
                 [new ProviderMaskCandidate(selected.Mask.Metadata, selected.Score is null ? null : new ProviderScore("confidence", selected.Score.Value, "Provider segmentation score; not designability approval."))]);
         }

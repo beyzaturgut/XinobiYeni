@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Runtime.InteropServices;
 using SkiaSharp;
 using Xinobi.Api.Features.ProductSurfaces;
 using Xinobi.Api.Infrastructure.MediaValidation;
@@ -28,11 +29,19 @@ public sealed class RoboflowMaskNormalizer
             }
             if (position != pixels) throw new InvalidDataException();
             using var bitmap = new SKBitmap(new SKImageInfo(source.Width, source.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
-            var colors = new SKColor[(int)pixels];
-            for (var x = 0; x < source.Width; x++)
-                for (var y = 0; y < source.Height; y++)
-                    colors[y * source.Width + x] = new SKColor(255, 255, 255, membership[x * source.Height + y] ? (byte)255 : (byte)0);
-            bitmap.Pixels = colors;
+            // One row scratch buffer rather than another full-resolution SKColor array.
+            var row = new byte[checked(source.Width * 4)];
+            Array.Fill(row, (byte)255);
+            for (var y = 0; y < source.Height; y++)
+            {
+                for (var x = 0; x < source.Width; x++)
+                {
+                    // SKBitmap.Pixels historically clears RGB for fully transparent pixels.
+                    var value = membership[x * source.Height + y] ? (byte)255 : (byte)0;
+                    row[x * 4] = row[x * 4 + 1] = row[x * 4 + 2] = row[x * 4 + 3] = value;
+                }
+                Marshal.Copy(row, 0, IntPtr.Add(bitmap.GetPixels(), checked(y * bitmap.RowBytes)), row.Length);
+            }
             using var image = SKImage.FromBitmap(bitmap);
             using var encoded = image.Encode(SKEncodedImageFormat.Png, 100);
             var bytes = encoded.ToArray();

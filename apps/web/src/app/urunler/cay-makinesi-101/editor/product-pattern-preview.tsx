@@ -7,11 +7,8 @@ import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./pr
 
 import { containArtwork } from "./artwork-placement";
 
-// Tea Maker reference size; every other product passes its own photo size (the mask is aligned to it).
-const DEFAULT_WIDTH = 1066;
-const DEFAULT_HEIGHT = 1600;
-/** Default pattern centre: middle of the width, 65% down - the lower body on the reference photo. */
-export const defaultPatternCentre = (width: number, height: number) => ({ x: Math.round(width / 2), y: Math.round(height * .65) });
+
+
 
 export type PatternTransform = {
   x: number;
@@ -21,6 +18,8 @@ export type PatternTransform = {
 };
 
 type ProductPatternPreviewProps = {
+  sourceWidth?: number;
+  sourceHeight?: number;
   productSrc: string;
   designableMaskSrc: string;
   brandingOverlaySrc?: string;
@@ -30,35 +29,31 @@ type ProductPatternPreviewProps = {
   patternTransform: PatternTransform;
   curvatureStrength?: number;
   alt: string;
-  width?: number;
-  height?: number;
 };
 
 async function loadImage(src: string) {
   const image = new window.Image();
-  // Photos and masks may come from the commerce API origin in development; CORS keeps the canvas readable.
-  if (!src.startsWith("blob:") && !src.startsWith("data:")) image.crossOrigin = "anonymous";
   image.src = src;
   await image.decode();
   return image;
 }
 
-async function loadAlignedImage(src: string, width: number, height: number) {
+async function loadAlignedImage(src: string, SOURCE_WIDTH: number, SOURCE_HEIGHT: number) {
   const image = await loadImage(src);
-  if (image.naturalWidth !== width || image.naturalHeight !== height) {
+  if (image.naturalWidth !== SOURCE_WIDTH || image.naturalHeight !== SOURCE_HEIGHT) {
     throw new Error("Unexpected asset dimensions");
   }
   return image;
 }
 
-function validateMaskAlpha(mask: HTMLImageElement, width: number, height: number) {
+function validateMaskAlpha(mask: HTMLImageElement, SOURCE_WIDTH: number, SOURCE_HEIGHT: number) {
   const buffer = document.createElement("canvas");
-  buffer.width = width;
-  buffer.height = height;
+  buffer.width = SOURCE_WIDTH;
+  buffer.height = SOURCE_HEIGHT;
   const context = buffer.getContext("2d", { willReadFrequently: true });
   if (!context) throw new Error("Canvas unavailable");
   context.drawImage(mask, 0, 0);
-  const { data } = context.getImageData(0, 0, width, height);
+  const { data } = context.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
   let hasTransparentPixel = false;
   let hasDesignablePixel = false;
   for (let index = 3; index < data.length; index += 4) {
@@ -80,15 +75,17 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt, width: SOURCE_WIDTH = DEFAULT_WIDTH, height: SOURCE_HEIGHT = DEFAULT_HEIGHT }: ProductPatternPreviewProps) {
-  const centre = defaultPatternCentre(SOURCE_WIDTH, SOURCE_HEIGHT);
+export default function ProductPatternPreview({ sourceWidth = 1066, sourceHeight = 1600, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+  const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
+  const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
+  const centerX = sourceWidth / 2, centerY = sourceHeight * .65;
   const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
   const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT]);
+  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
   const { x, y, scale, rotation } = patternTransform;
-  const validTransform = [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1;
+  const validTransform = dimensionsValid && [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1;
   const status = !validTransform ? "error" : result?.assetKey === assetKey ? result.status : "loading";
 
   useEffect(() => {
@@ -116,7 +113,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
         const maskPixels = readPixels(mask);
         const lighting = deriveProductLighting(readPixels(product), maskPixels, branding ? readPixels(branding) : undefined);
         const surface = deriveBodySurface(maskPixels);
-        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight) : {...centre,width:pattern.naturalWidth,height:pattern.naturalHeight};
+        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight) : {x:centerX,y:centerY,width:pattern.naturalWidth,height:pattern.naturalHeight};
         setResult({ assetKey, status: "ready", assets: { product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } });
       } catch {
         if (!cancelled) setResult({ assetKey, status: "error" });
@@ -124,8 +121,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     }
     void render();
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- centre derives from the size, which is part of assetKey
-  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT]);
+  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, dimensionsValid]);
 
   useLayoutEffect(() => {
     if (status !== "ready" || !result?.assets) return;
@@ -134,11 +130,11 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     const context = canvasRef.current!.getContext("2d")!;
     buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     buffer.save();
-    buffer.translate(placementMode === "artwork" ? artwork.x + x - centre.x : x, placementMode === "artwork" ? artwork.y + y - centre.y : y);
+    buffer.translate(placementMode === "artwork" ? artwork.x + x - centerX : x, placementMode === "artwork" ? artwork.y + y - centerY : y);
     buffer.rotate(rotation * Math.PI / 180);
     buffer.scale(scale, scale);
     if (placementMode === "artwork") buffer.drawImage(pattern, -artwork.width / 2, -artwork.height / 2, artwork.width, artwork.height);
-    else buffer.drawImage(pattern, -pattern.naturalWidth / 2, -pattern.naturalHeight / 2);
+    else { const ratio = SOURCE_WIDTH / 1066; buffer.drawImage(pattern, -pattern.naturalWidth * ratio / 2, -pattern.naturalHeight * ratio / 2, pattern.naturalWidth * ratio, pattern.naturalHeight * ratio); }
     buffer.restore();
     const patternPixels = buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     warpPattern(patternPixels, surface, curvatureStrength);
@@ -153,8 +149,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     context.drawImage(product, 0, 0);
     context.drawImage(patternBuffer, 0, 0);
     if (branding) context.drawImage(branding, 0, 0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- centre and size follow the loaded assets
-  }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode]);
+  }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY]);
 
   // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.
   const draggable = placementMode === "artwork" && !!onArtworkMove && status === "ready";
@@ -171,7 +166,7 @@ export default function ProductPatternPreview({ productSrc, designableMaskSrc, b
     drag.current=null;setCursor(hit(sourcePoint(event))?"grab":"auto");
     if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
   }
-  return <div className={styles.productPreview} aria-busy={status === "loading"}>
+  return <div className={styles.productPreview} style={{aspectRatio:SOURCE_WIDTH+"/"+SOURCE_HEIGHT, "--source-aspect":String(SOURCE_WIDTH/SOURCE_HEIGHT)} as React.CSSProperties} aria-busy={status === "loading"}>
     <canvas ref={canvasRef} width={SOURCE_WIDTH} height={SOURCE_HEIGHT} role="img" aria-label={alt} hidden={status !== "ready"}
       style={draggable ? {touchAction:"none",cursor} : undefined}
       onPointerDown={event=>{

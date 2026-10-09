@@ -12,10 +12,10 @@ public sealed class DesignStudioTests : IDisposable
 {
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-design-test-" + Guid.NewGuid());
     private readonly FakeImageProvider provider = new();
-    private WebApplicationFactory<Program> Factory(int limit = 30) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(int limit = 30, bool disableLimit = false) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
-        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["DesignStudio:WorkerEnabled"] = "true", ["DesignStudio:ExternalInferenceEnabled"] = "false", ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:DailyGenerationLimit"] = limit.ToString() }));
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["DesignStudio:WorkerEnabled"] = "true", ["DesignStudio:ExternalInferenceEnabled"] = "false", ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:DailyGenerationLimit"] = limit.ToString(), ["DesignStudio:DisableGenerationLimit"] = disableLimit.ToString() }));
         builder.ConfigureServices(services => { services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); services.AddHostedService<DesignGenerationWorker>(); });
     });
     private const string Root = "/api/v1/design-studio";
@@ -35,6 +35,20 @@ public sealed class DesignStudioTests : IDisposable
             await Task.Delay(30);
         }
         throw new TimeoutException("Test image job did not complete.");
+    }
+    [Fact]
+    public async Task DevelopmentCanDisableDailyCapWithoutRemovingUsageOrIdempotency()
+    {
+        using var factory = Factory(1, true); using var client = factory.CreateClient();
+        var first = await Create(client);
+        (await client.PostAsJsonAsync(Root + "/sessions/" + first.Id + "/generation", Answers(first))).EnsureSuccessStatusCode();
+        await WaitReady(client, first);
+        var second = await Create(client);
+        (await client.PostAsJsonAsync(Root + "/sessions/" + second.Id + "/generation", Answers(second))).EnsureSuccessStatusCode();
+        await WaitReady(client, second);
+        (await client.PostAsJsonAsync(Root + "/sessions/" + second.Id + "/generation", Answers(second))).EnsureSuccessStatusCode();
+        Assert.Equal(2, provider.Calls);
+        Assert.NotNull(await client.GetFromJsonAsync<SessionView>(Root + "/sessions/" + first.Id));
     }
     [Fact]
     public async Task BankHas500QuestionsAndSessionsCoverEveryAxisWithFourChoices()
@@ -70,6 +84,10 @@ public sealed class DesignStudioTests : IDisposable
         var ready = await WaitReady(client, session);
         Assert.Equal(1, provider.Calls);
         Assert.Equal(session.Variant.Id, ready.Variant.Id);
+        var bank = factory.Services.GetRequiredService<QuestionBank>();
+        Assert.Equal(bank.BuildPrompt(session.Questions, Answers(session).Answers), provider.LastPrompt);
+        foreach (var question in session.Questions)
+            Assert.Contains(bank.Data.Options[question.Axis].Single(o => o.Id == question.Options[0].Id).Prompt, provider.LastPrompt!);
         Assert.NotNull(ready.ImageUrl);
         Assert.Equal(FakeImageProvider.Png, await client.GetByteArrayAsync(ready.ImageUrl));
         var changed = Answers(session).Answers.ToArray(); changed[0] = changed[0] with { OptionId = session.Questions[0].Options[1].Id };
@@ -120,7 +138,7 @@ public sealed class DesignStudioTests : IDisposable
     private sealed class FakeImageProvider : IImageGenerationProvider
     {
         public static byte[] Png => Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");
-        public int Calls; public bool Configured = true; public bool IsConfigured => Configured;
-        public async Task<GeneratedImage> GenerateAsync(string prompt, CancellationToken token) { Interlocked.Increment(ref Calls); Assert.Contains("No text", prompt); await Task.Delay(50, token); return new(Png, "image/png", "test-provider", "test-request"); }
+        public string? LastPrompt; public int Calls; public bool Configured = true; public bool IsConfigured => Configured;
+        public async Task<GeneratedImage> GenerateAsync(string prompt, CancellationToken token) { LastPrompt = prompt; Interlocked.Increment(ref Calls); Assert.Contains("No text", prompt); await Task.Delay(50, token); return new(Png, "image/png", "test-provider", "test-request"); }
     }
 }

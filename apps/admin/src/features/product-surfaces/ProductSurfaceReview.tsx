@@ -3,8 +3,18 @@ import { ReviewError, reviewRequest, type MaskStroke, type Point, type ReviewSta
 import { SurfaceReviewPreview } from './SurfaceReviewPreview'
 import { SurfaceMaskCorrection } from './SurfaceMaskCorrection'
 import './product-surfaces.css'
+import CatalogSourceSelection from './CatalogSourceSelection'
 
 export default function ProductSurfaceReview() {
+  const [catalogSelected, setCatalogSelected] = useState(false)
+  const [demoBusy, setDemoBusy] = useState(false)
+  return <>
+    <CatalogSourceSelection disabled={demoBusy} onSelected={setCatalogSelected} />
+    <div hidden={catalogSelected}><DemoSurfaceReview onInteractionState={setDemoBusy} /></div>
+  </>
+}
+
+function DemoSurfaceReview({ onInteractionState }: { onInteractionState: (busy: boolean) => void }) {
   const [state, setState] = useState<ReviewState | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -19,6 +29,7 @@ export default function ProductSurfaceReview() {
   const [strokes, setStrokes] = useState<MaskStroke[]>([])
   const [strokeParent, setStrokeParent] = useState<string | null>(null)
   const [strokeState, setStrokeState] = useState<ReviewState | null>(null)
+  useEffect(() => { onInteractionState(busy || correcting || localCorrection || points.length > 0 || strokes.length > 0 || !!state?.operationInProgress) }, [onInteractionState, busy, correcting, localCorrection, points.length, strokes.length, state?.operationInProgress])
   const onReady = useCallback((value: boolean) => setReady(value), [])
   useEffect(() => {
     let cancelled = false

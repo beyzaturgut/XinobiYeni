@@ -1,0 +1,10 @@
+﻿const fs=require('fs'),path=require('path'),os=require('os'),assert=require('assert'),{spawnSync}=require('child_process');
+const root=path.resolve(__dirname,'../..'),base=path.join(root,'services/api/App_Data/cm101-sam3-review');
+const p=path.join(base,'pending/cbb1dbc9-2582-45dc-85ee-6de5fd27106c'),r=path.join(base,'refinements/local-refinement-20261009-02');
+const sharp=require(path.join(root,'node_modules/.pnpm/sharp@0.35.5_@types+node@20.19.43/node_modules/sharp'));
+(async()=>{const temp=path.join(base,'manual-editor','validation-'+Date.now());fs.mkdirSync(temp,{recursive:true});
+const config={source:path.join(p,'source.webp'),original:path.join(p,'candidate-mask.png'),mask:path.join(r,'refined-mask.pending.png'),branding:path.join(r,'branding-protection.png'),sourceSha256:'wrong',output:temp};
+const file=path.join(temp,'config.json');fs.writeFileSync(file,JSON.stringify(config));let result=spawnSync(process.execPath,[path.join(__dirname,'server.cjs'),file],{encoding:'utf8'});assert.notEqual(result.status,0);assert.match(result.stderr,/checksum mismatch/);
+const tiny=path.join(temp,'wrong-dimensions.png');await sharp({create:{width:1,height:1,channels:4,background:{r:255,g:255,b:255,alpha:0}}}).png().toFile(tiny);
+config.sourceSha256='f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935';config.mask=tiny;fs.writeFileSync(file,JSON.stringify(config));result=spawnSync(process.execPath,[path.join(__dirname,'server.cjs'),file],{encoding:'utf8'});assert.notEqual(result.status,0);assert.match(result.stderr,/dimensions mismatch/);console.log('PASS: wrong source checksum and mismatched mask dimensions rejected on startup');
+})().catch(e=>{console.error(e);process.exitCode=1});

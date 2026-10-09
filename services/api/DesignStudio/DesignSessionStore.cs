@@ -122,7 +122,7 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
             if (!provider.IsConfigured) throw new DesignProviderException("provider_not_configured", "Cloudflare bağlantısı henüz yapılandırılmadı. Yanıtlarınız korunuyor.");
             if (!current.Products.Any(p => p.Id == session.Product.Id && Eligible(p) && p.Variants.Any(v => v.Id == session.Variant.Id))) throw new ArgumentException("Seçilen ürün artık kişiselleştirmeye açık değil.");
             var limit = Math.Clamp(configuration.GetValue("DesignStudio:DailyGenerationLimit", 30), 1, 100);
-            if (state.Sessions.Values.Count(s => s.StartedAt?.UtcDateTime.Date == DateTime.UtcNow.Date || s.Status == "queued") >= limit)
+            if (!(environment.IsDevelopment() && configuration.GetValue<bool>("DesignStudio:DisableGenerationLimit")) && state.Sessions.Values.Count(s => s.StartedAt?.UtcDateTime.Date == DateTime.UtcNow.Date || s.Status == "queued") >= limit)
                 throw new DesignProviderException("daily_limit", "Bugünkü görsel üretim sınırına ulaşıldı.");
             session.GenerationPrompt = prompt;
             session.Answers = request.Answers; session.RequestHash = hash; session.Status = "queued";

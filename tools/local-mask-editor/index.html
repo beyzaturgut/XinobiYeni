@@ -1,0 +1,8 @@
+﻿<!doctype html><html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Yerel maske düzeltme</title><link rel="stylesheet" href="/editor.css">
+<header><strong>Yerel maske düzeltme · Geliştirme / onaysız aday</strong><p>Kaynak ve turuncu marka koruması kilitlidir. Ekleme yalnızca özgün SAM3 bölgesinde yapılır.</p>
+<label>Araç <select id="tool"><option value="erase">Sil</option><option value="add">Ekle</option><option value="pan">Kaydır</option></select></label>
+<label>Fırça (kaynak px) <input id="brush" type="number" min="1" max="300" value="20"></label>
+<button id="undo">Geri al</button><button id="redo">Yinele</button><button id="fit">Sığdır</button>
+<label><input id="visible" type="checkbox" checked>Maske</label><label>Opaklık <input id="opacity" type="range" min="0" max="1" step=".05" value=".4"></label>
+<span id="regions"></span><button id="save">Yeni bekleyen sürümü kaydet</button><label><input id="reviewed" type="checkbox">Halka, sap, emzik ve marka sınırlarını kontrol edip düzelttim.</label><button id="approve">Maskeyi onayla</button><a id="customer" hidden target="_blank" rel="noopener">M??teri g?rsel uygulama ekran?n? a?</a><p id="status" role="status">Yükleniyor…</p></header>
+<div id="viewport"><canvas id="view"></canvas></div><script src="/editor.js"></script></html>

@@ -25,9 +25,10 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     private readonly string data = Path.Combine(Path.GetTempPath(), "xinobi-surfaces-" + Guid.NewGuid());
     private readonly FakeRoboflow roboflow = new();
 
-    private WebApplicationFactory<Program> Factory(string? key = "test-key", int limit = 50) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(string? key = "test-key", int limit = 50, bool experimental = true) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
+        builder.UseSetting("ProductSurfaces:ExperimentalCatalogWorkspace:Enabled", experimental.ToString());
         builder.UseSetting("LocalCommerce:DataDirectory", data);
         builder.UseSetting("DesignStudio:WorkerEnabled", "false");
         // Explicit values override the developer's user-secrets, so a real key is never used here.
@@ -36,6 +37,16 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         builder.ConfigureServices(services => services.Configure<HttpClientFactoryOptions>("roboflow", options =>
             options.HttpMessageHandlerBuilderActions.Add(handler => handler.PrimaryHandler = roboflow)));
     });
+
+    [Fact]
+    public async Task DisabledExperimentalWorkspaceDoesNotExposeMaskingEndpoints()
+    {
+        using var factory = Factory(experimental: false);
+        using var client = factory.CreateClient();
+        var response = await client.GetAsync(Root);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        Assert.Empty(roboflow.Calls);
+    }
 
     /// <summary>Answers SAM3 like Roboflow does: one RLE prediction covering a band of columns.</summary>
     private sealed class FakeRoboflow : HttpMessageHandler

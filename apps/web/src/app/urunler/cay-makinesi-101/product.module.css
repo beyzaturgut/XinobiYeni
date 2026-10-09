@@ -36,7 +36,7 @@
 .variants small { color: #636363; font-size: .62rem; }
 .actions { margin-top: 28px; display: grid; grid-template-columns: 1fr; gap: 10px; }
 .actions button, .actions a { min-height: 52px; padding: 0 18px; display: flex; align-items: center; justify-content: center; border: 0; font-size: .8rem; font-weight: 600; }
-.actions button { background: #fff; color: #7d7d7d; cursor: not-allowed; ;box-shadow:inset 0 0 0 1px #d6d6d6}
+.actions > button { background: #fff; color: #7d7d7d; cursor: not-allowed; ;box-shadow:inset 0 0 0 1px #d6d6d6}
 .actions a { justify-content: space-between; border: 1px solid #939393; }
 .actions a:hover { background: #fff; }
 .purchaseNote { margin: 10px 0 0; color: #5d5d5d; font-size: .65rem; }

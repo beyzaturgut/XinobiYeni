@@ -5,14 +5,14 @@ namespace Xinobi.Api.Features.ProductSurfaces.Catalog;
 
 /// <summary>
 /// Admin surface masking for every product variant, under /api/v1/local-commerce/surfaces with the same Development + loopback +
-/// admin-origin rules as the rest of local commerce (ADR-003). Moves to staff permissions with the SQL store.
+/// admin-origin rules as the rest of local commerce (ADR-003), and the staff catalog permissions (<see cref="PanelAccess"/>).
 /// </summary>
 public static class ProductSurfaceEndpoints
 {
     public static void MapProductSurfaces(this WebApplication app)
     {
         if (!app.Environment.IsDevelopment()) return;
-        var group = app.MapGroup("/api/v1/local-commerce/surfaces").WithTags("ProductSurfaces").AllowAnonymous().RequireRateLimiting("DesignStudio");
+        var group = app.MapGroup("/api/v1/local-commerce/surfaces").WithTags("ProductSurfaces").RequirePanelPermissions().RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {
             var http = context.HttpContext;

@@ -6,15 +6,26 @@ export type Content = { slides: Slide[]; xinobiBanner: string; buttonColor: stri
 export type Announcement = { id: string; title: string; body: string; kind: 'Haber' | 'Duyuru'; publishedAt: string }
 export type CommerceState = { announcements?: Announcement[]; categories?: string[]; products: Product[]; prices: Record<string, number>; content: Content }
 export const localApi = 'http://127.0.0.1:5003/api/v1/local-commerce'
+// Panel routes need the staff session cookie; the CSRF header proves the request comes from our own pages (ADR-004).
+// A static snapshot (no API base) gets a plain request so CDNs need no credentialed CORS.
+const send = (url: string, method: string, body: unknown, api: boolean) => fetch(url, {
+  method, cache: 'no-store', signal: AbortSignal.timeout(10000),
+  credentials: api ? 'include' : 'same-origin',
+  headers: { ...(body instanceof FormData || body === undefined ? {} : { 'Content-Type': 'application/json' }), ...(api ? { 'X-Xinobi-Csrf': '1' } : {}) },
+  body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
+})
 export async function commerceRequest<T>(base: string, route: string, method = 'GET', body?: unknown): Promise<T> {
-  const response = await fetch(`${base}${route}`, {
-    method, cache: 'no-store', signal: AbortSignal.timeout(10000),
-    headers: body instanceof FormData ? undefined : { 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
-  })
+  let response = await send(`${base}${route}`, method, body, Boolean(base))
+  // Access tokens live 15 minutes; renew once from the refresh cookie and retry before giving up.
+  if (response.status === 401 && base.includes('/local-commerce')) {
+    const refreshed = await fetch(`${base.replace(/\/local-commerce.*$/, '')}/auth/web/refresh`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', 'X-Xinobi-Csrf': '1' }, body: '{}' }).catch(() => null)
+    if (refreshed?.ok) response = await send(`${base}${route}`, method, body, true)
+  }
   if (!response.ok) {
     const payload = await response.json().catch(() => ({}))
-    throw new Error(payload.message || `İçerik API’si hata verdi (${response.status}).`)
+    if (response.status === 401) throw new Error('Oturumun sona erdi. Sayfayı yenileyip tekrar giriş yap.')
+    if (response.status === 403) throw new Error('Bu işlem için yetkin yok.')
+    throw new Error(payload.message || payload.title || `İçerik API’si hata verdi (${response.status}).`)
   }
   return response.json()
 }

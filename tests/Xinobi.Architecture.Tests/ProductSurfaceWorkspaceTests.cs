@@ -81,7 +81,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     public async Task RoboflowDraftCanBeCorrectedApprovedAndReachesTheCatalogue()
     {
         using var factory = Factory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var list = (await client.GetFromJsonAsync<JsonElement>(Root));
         Assert.Contains(list.EnumerateArray(), item => item.GetProperty("variantId").GetString() == "DEMO-V101-B" && item.GetProperty("status").GetString() == "none");
 
@@ -113,7 +113,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     public async Task PointsUseVisualSegmentAndTheBrushAloneCanDrawAMask()
     {
         using var factory = Factory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var pointed = await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, [new SurfacePoint(500, 800, true), new SurfacePoint(100, 100, false)])));
         Assert.Equal("roboflow-points", pointed.Draft!.Method);
         Assert.Equal("/sam3/visual_segment", roboflow.Calls.Single().Path);
@@ -130,7 +130,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     public async Task WithoutAKeyOnlyTheBrushWorksAndTheDailyLimitHolds()
     {
         using (var noKey = Factory(key: null))
-        using (var client = noKey.CreateClient())
+        using (var client = await TestStaff.Client(noKey))
         {
             var refused = await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null));
             Assert.Equal(HttpStatusCode.ServiceUnavailable, refused.StatusCode);
@@ -139,7 +139,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
             Assert.Empty(roboflow.Calls);
         }
         using var limited = Factory(limit: 1);
-        using var limitedClient = limited.CreateClient();
+        using var limitedClient = await TestStaff.Client(limited);
         await Ok(await limitedClient.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null)));
         var second = await limitedClient.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null));
         Assert.Equal(HttpStatusCode.TooManyRequests, second.StatusCode);
@@ -150,7 +150,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     public async Task ANewPhotoRetiresTheMaskAndSavesCannotForgeOne()
     {
         using var factory = Factory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null)));
         var approved = await Ok(await client.PostAsync(Tea + "/approval", null));
 

@@ -64,9 +64,11 @@ public static class PermissionAuthorization
 
     /// <summary>Requires a signed-in account holding <paramref name="permission"/>; an unknown permission fails at startup, not silently.</summary>
     public static TBuilder RequirePermission<TBuilder>(this TBuilder builder, string permission) where TBuilder : IEndpointConventionBuilder =>
-        PermissionCatalog.Exists(permission)
-            ? builder.RequireAuthorization(Prefix + permission)
-            : throw new ArgumentException($"Unknown permission '{permission}'.", nameof(permission));
+        builder.RequireAuthorization(PolicyName(permission));
+
+    /// <summary>The policy name for <paramref name="permission"/>; an unknown permission fails at startup, not silently.</summary>
+    public static string PolicyName(string permission) =>
+        PermissionCatalog.Exists(permission) ? Prefix + permission : throw new ArgumentException($"Unknown permission '{permission}'.", nameof(permission));
 
     public static IEnumerable<Claim> ClaimsFor(IReadOnlyCollection<string> roles) =>
         roles.Select(role => new Claim(ClaimTypes.Role, role))

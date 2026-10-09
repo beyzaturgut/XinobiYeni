@@ -16,13 +16,13 @@ public static class LocalCommerceEndpoints
         Regex.IsMatch(source, @"^/assets/[a-zA-Z0-9/_\-.]+$") || Regex.IsMatch(source, @"^/api/v1/local-commerce/media/[a-f0-9]{32}\.(png|jpg|webp|mp4|webm)$");
 
     /// <summary>
-    /// The panel's Development group under /api/v1/local-commerce: loopback and panel/web origins only (ADR-003); null outside
-    /// Development, where these routes must never exist. The panel moves to staff permissions with the SQL store (03.11).
+    /// The panel's Development group under /api/v1/local-commerce: loopback and panel/web origins only (ADR-003), and a staff
+    /// account with the route's permission (<see cref="PanelAccess"/>). Null outside Development, where these routes do not exist.
     /// </summary>
     public static RouteGroupBuilder? PanelGroup(WebApplication app)
     {
         if (!app.Environment.IsDevelopment()) return null;
-        var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce").AllowAnonymous().ExcludeFromDescription();
+        var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce").RequirePanelPermissions().ExcludeFromDescription();
         group.AddEndpointFilter(async (context, next) =>
         {
             var request = context.HttpContext;
@@ -42,12 +42,13 @@ public static class LocalCommerceEndpoints
     {
         // These endpoints must never be exposed by a production deployment.
         if (PanelGroup(app) is not { } group) return;
+        // The local storefront reads the catalog from here in Development; it holds no personal data.
         group.MapGet("/state", async (HttpContext http, LocalCommerceStore store) =>
         {
             var state = await store.Read();
             http.Response.Headers["X-Xinobi-Catalog-Storage"] = store.UsesSql ? "SqlServer" : "File";
             return Results.Ok(state);
-        });
+        }).AllowAnonymous();
         group.MapPost("/announcements", async (AnnouncementCreate announcement, LocalCommerceStore store) =>
         {
             var title = announcement.Title?.Trim();var body = announcement.Body?.Trim();
@@ -205,6 +206,7 @@ public static class LocalCommerceEndpoints
             if (!File.Exists(file)) return Results.NotFound();
             var type = Path.GetExtension(name) switch { ".png" => "image/png", ".jpg" => "image/jpeg", ".webp" => "image/webp", ".mp4" => "video/mp4", _ => "video/webm" };
             return Results.File(file, type, enableRangeProcessing: true);
-        });
+            // Product photos and videos are shown on the storefront.
+        }).AllowAnonymous();
     }
 }

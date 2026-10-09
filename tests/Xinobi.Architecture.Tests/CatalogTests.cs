@@ -123,7 +123,7 @@ public sealed class CatalogTests : IDisposable
     public async Task AdminChangesAppearInTheCatalogContract()
     {
         using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/DEMO-V101-S", new PriceUpdate(199900))).EnsureSuccessStatusCode();
         var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
         var tea = state.Products.Single(product => product.Id == "DEMO-P101");
@@ -137,7 +137,7 @@ public sealed class CatalogTests : IDisposable
     public async Task ProductGalleryKeepsTheCoverAndExtraPhotosForEveryColour()
     {
         using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
         var tea = state.Products.Single(product => product.Id == "DEMO-P101");
         var gallery = new[] { "/assets/products/tea-maker-101-red.webp", "/assets/products/tea-maker-101-silver.webp" };
@@ -158,7 +158,7 @@ public sealed class CatalogTests : IDisposable
     public async Task HomeContentAppliesHomepageRules()
     {
         using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
         var content = state.Content with
         {

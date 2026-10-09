@@ -18,14 +18,14 @@ const statusText: Record<Status, string> = { none: 'Maske yok', draft: 'Taslak',
 const methodText = (method: string) => method.replace('roboflow-text', 'Roboflow (tarif)').replace('roboflow-points', 'Roboflow (noktalar)').replace('approved', 'Onaylı maske').replace(/^brush$/, 'Fırça').replace(/\+brush$/, ' + fırça')
 
 async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
-  const response = await fetch(root + path, { method, headers: body === undefined ? undefined : { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) })
+  const response = await fetch(root + path, { method, credentials: 'include', headers: body === undefined ? { 'X-Xinobi-Csrf': '1' } : { 'Content-Type': 'application/json', 'X-Xinobi-Csrf': '1' }, body: body === undefined ? undefined : JSON.stringify(body) })
   const payload = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(payload.message || `Yüzey servisi hata verdi (${response.status}).`)
   return payload as T
 }
 
 async function loadAlpha(url: string, width: number, height: number) {
-  const image = new Image(); image.crossOrigin = 'anonymous'; image.src = url; await image.decode()
+  const image = new Image(); image.crossOrigin = url.includes('/surfaces/') ? 'use-credentials' : 'anonymous'; image.src = url; await image.decode()
   if (image.naturalWidth !== width || image.naturalHeight !== height) throw new Error('Maske fotoğrafla aynı boyutta değil.')
   const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height
   const context = canvas.getContext('2d', { willReadFrequently: true })!

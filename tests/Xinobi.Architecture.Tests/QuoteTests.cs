@@ -65,6 +65,7 @@ public sealed class QuoteTests : IDisposable
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
+        using var staff = await TestStaff.Client(factory);
         var quote = await Read<Quote>(await client.PostAsJsonAsync("/api/v1/quotes", Request()));
         Assert.Matches("^Q-[0-9]{6}-[0-9]{4}$", quote.Code);
         Assert.Equal((QuoteStatuses.Received, "+905321234567", 25), (quote.Status, quote.Phone, quote.Items.Single().Quantity));
@@ -76,12 +77,12 @@ public sealed class QuoteTests : IDisposable
         await Read<Quote>(await client.PostAsJsonAsync($"/api/v1/quotes/{quote.Code}/messages", new TrackQuoteMessage(quote.Email, "Renk seçenekleri neler?")));
 
         // Panel: review, answer, offer.
-        Assert.Single(await Read<Quote[]>(await client.GetAsync("/api/v1/local-commerce/quotes?status=received")));
-        await Read<Quote>(await client.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/status", new SetQuoteStatus(QuoteStatuses.Reviewing, null)));
-        await Read<Quote>(await client.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/messages", new StoreQuoteMessage("Dört renk sunabiliriz.")));
-        var missingPrice = await client.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/offer", new MakeQuoteOffer([], DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), null));
+        Assert.Single(await Read<Quote[]>(await staff.GetAsync("/api/v1/local-commerce/quotes?status=received")));
+        await Read<Quote>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/status", new SetQuoteStatus(QuoteStatuses.Reviewing, null)));
+        await Read<Quote>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/messages", new StoreQuoteMessage("Dört renk sunabiliriz.")));
+        var missingPrice = await staff.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/offer", new MakeQuoteOffer([], DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), null));
         Assert.Equal(HttpStatusCode.BadRequest, missingPrice.StatusCode);
-        var offered = await Read<Quote>(await client.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/offer", new MakeQuoteOffer([new("DEMO-P101", 199_000)], DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), "Logo baskı dahil")));
+        var offered = await Read<Quote>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/quotes/{quote.Id}/offer", new MakeQuoteOffer([new("DEMO-P101", 199_000)], DateOnly.FromDateTime(DateTime.UtcNow.AddDays(10)), "Logo baskı dahil")));
         Assert.Equal((QuoteStatuses.Offered, 25 * 199_000L), (offered.Status, offered.Offer!.Total.AmountMinor));
         Assert.Equal(["customer", "store"], offered.Messages.Select(message => message.From));
 

@@ -65,7 +65,9 @@ public sealed class AuthorizationTests : IDisposable
     public void OnlyListedAreasArePublic()
     {
         using var factory = Factory();
-        string[] publicAreas = ["/api/v1/health", "/api/v1/catalog", "/api/v1/content", "/api/v1/design-studio", "/api/v1/local-commerce",
+        string[] publicAreas = ["/api/v1/health", "/api/v1/catalog", "/api/v1/content", "/api/v1/design-studio",
+            // Development storefront catalog and product media only; the rest of the panel needs staff permissions.
+            "/api/v1/local-commerce/state", "/api/v1/local-commerce/media/",
             "/api/v1/xinobi-u", "/api/v1/email-verification", "/api/v1/auth", "/openapi",
             // Corporate quote form and tracking by code + e-mail: companies ask without an account (Faz07).
             "/api/v1/quotes",
@@ -126,6 +128,51 @@ public sealed class AuthorizationTests : IDisposable
         var catalog = (await (await Get(client, "/api/v1/admin/permissions", owner)).Content.ReadFromJsonAsync<PermissionCatalogResponse>())!;
         Assert.Equal(17, catalog.Resources.Count);
     }
+
+    [Fact]
+    public async Task ThePanelNeedsStaffWithTheRoutePermission()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var customer = await Register(client, "musteri@example.com");
+        // A staff role that grants nothing: passes the staff gate, holds no permission.
+        await Register(client, "stajyer@example.com");
+        await accounts.AssignRole("stajyer@example.com", "intern");
+        var intern = (await accounts.IssueTokens((await accounts.Login("stajyer@example.com", "guclu-parola-1"))!.Id)).AccessToken;
+        using var staff = await TestStaff.Client(factory);
+
+        foreach (var path in new[] { "/api/v1/local-commerce/orders", "/api/v1/local-commerce/quotes", "/api/v1/local-commerce/assistant/leads", "/api/v1/local-commerce/surfaces" })
+        {
+            Assert.Equal(HttpStatusCode.Unauthorized, (await Get(client, path, null)).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, path, customer)).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, path, intern)).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await staff.GetAsync(path)).StatusCode);
+        }
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/DEMO-V101-S", new { cents = 1 })).StatusCode);
+        // The local storefront still reads the catalog and media without signing in.
+        Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/local-commerce/state")).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/v1/local-commerce/media/" + new string('a', 32) + ".png")).StatusCode);
+    }
+
+    [Theory]
+    [InlineData("/api/v1/local-commerce/products/{id}", "PUT", "catalog.write")]
+    [InlineData("/api/v1/local-commerce/state", "GET", "catalog.read")]
+    [InlineData("/api/v1/local-commerce/prices/{id}", "PUT", "pricing.write")]
+    [InlineData("/api/v1/local-commerce/orders/{id}/requests/{requestId}", "POST", "orders.cancel")]
+    [InlineData("/api/v1/local-commerce/orders/{id}/shipment", "POST", "orders.write")]
+    [InlineData("/api/v1/local-commerce/reviews/{id}/moderation", "POST", "content.write")]
+    [InlineData("/api/v1/local-commerce/assistant/usage", "GET", "ai.read")]
+    [InlineData("/api/v1/local-commerce/surfaces/{p}/{v}/approval", "DELETE", "catalog.write")]
+    public void PanelRoutesMapToPermissions(string route, string method, string permission)
+    {
+        Assert.Equal(permission, Xinobi.Api.LocalCommerce.PanelAccess.PermissionFor(route, method));
+        Assert.True(PermissionCatalog.Exists(permission));
+    }
+
+    [Fact]
+    public void AnUnmappedPanelRouteFailsInsteadOfStayingOpen() =>
+        Assert.Throws<InvalidOperationException>(() => Xinobi.Api.LocalCommerce.PanelAccess.PermissionFor("/api/v1/local-commerce/new-thing", "GET"));
 
     [Fact]
     public void CatalogCoversThePanelResources()

@@ -6,6 +6,7 @@ import AdminAccess from './AdminAccess.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    {import.meta.env.PROD ? <AdminAccess><App /></AdminAccess> : <App />}
+    {/* The server checks every panel call; the gate only signs in. Local UI tests that mock the API may switch it off. */}
+    {import.meta.env.DEV && import.meta.env.VITE_ADMIN_ACCESS === 'off' ? <App /> : <AdminAccess><App /></AdminAccess>}
   </StrictMode>,
 )

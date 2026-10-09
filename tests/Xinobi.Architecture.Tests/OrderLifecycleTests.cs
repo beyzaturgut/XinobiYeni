@@ -152,6 +152,7 @@ public sealed class OrderLifecycleTests : IDisposable
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
+        using var staff = await TestStaff.Client(factory);
         var token = await Register(client, "ayse@example.com");
         var other = await Register(client, "other@example.com");
         var order = await PlaceOrder(client, token, "request-0001");
@@ -166,13 +167,13 @@ public sealed class OrderLifecycleTests : IDisposable
         Assert.Equal(14, options.ReturnWindowDays);
 
         // Panel: prepare, ship, deliver.
-        var panel = await Read<StaffOrder[]>(await client.GetAsync("/api/v1/local-commerce/orders"));
+        var panel = await Read<StaffOrder[]>(await staff.GetAsync("/api/v1/local-commerce/orders"));
         Assert.Equal("ayse@example.com", panel.Single().CustomerEmail);
-        await Read<CustomerOrder>(await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Preparing, null)));
-        var badShip = await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/shipment", new ShipOrder("Aras Kargo", "x", null));
+        await Read<CustomerOrder>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Preparing, null)));
+        var badShip = await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/shipment", new ShipOrder("Aras Kargo", "x", null));
         Assert.Equal(HttpStatusCode.BadRequest, badShip.StatusCode);
         Assert.Contains("Takip numarası", (await badShip.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("message").GetString());
-        await Read<CustomerOrder>(await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/shipment", new ShipOrder("Aras Kargo", "AR123456", null)));
+        await Read<CustomerOrder>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/shipment", new ShipOrder("Aras Kargo", "AR123456", null)));
 
         var shipped = await Read<CustomerOrder>(await Send(client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}", token));
         Assert.Equal(OrderStatuses.Shipped, shipped.Status);
@@ -180,10 +181,10 @@ public sealed class OrderLifecycleTests : IDisposable
         var notCancellable = await Send(client, HttpMethod.Post, $"/api/v1/me/orders/{order.Id}/cancellation", token, new CancelMyOrder("Diğer", null));
         Assert.Equal(HttpStatusCode.Conflict, notCancellable.StatusCode);
 
-        await Read<CustomerOrder>(await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Delivered, null)));
+        await Read<CustomerOrder>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Delivered, null)));
         var returned = await Read<CustomerOrder>(await Send(client, HttpMethod.Post, $"/api/v1/me/orders/{order.Id}/returns", token, new ReturnMyOrder("Ürün hasarlı ulaştı", null, [new("DEMO-V101-B", 1)])));
         var request = returned.Requests!.Single();
-        await Read<CustomerOrder>(await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/requests/{request.Id}", new DecideOrderRequest("approve", null)));
+        await Read<CustomerOrder>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/requests/{request.Id}", new DecideOrderRequest("approve", null)));
 
         // In-app inbox: placed, preparing, shipped, delivered, return requested, return approved — newest first.
         var inbox = await Read<Inbox>(await Send(client, HttpMethod.Get, "/api/v1/me/notifications", token));
@@ -195,7 +196,7 @@ public sealed class OrderLifecycleTests : IDisposable
         Assert.Empty((await Read<Inbox>(await Send(client, HttpMethod.Get, "/api/v1/me/notifications", other))).Items);
 
         // The outbox never mails the reserved test domain; SMS and push are previews in Development.
-        var outbox = (await client.GetFromJsonAsync<JsonElement>("/api/v1/local-commerce/notifications?channel=email")).GetProperty("items");
+        var outbox = (await staff.GetFromJsonAsync<JsonElement>("/api/v1/local-commerce/notifications?channel=email")).GetProperty("items");
         Assert.All(outbox.EnumerateArray(), item => Assert.Equal(NotificationStatuses.Skipped, item.GetProperty("status").GetString()));
     }
 

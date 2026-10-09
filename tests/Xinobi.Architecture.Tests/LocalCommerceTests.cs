@@ -21,7 +21,7 @@ public sealed class LocalCommerceTests : IDisposable
     public async Task RemovingVariantAlsoRemovesItsPriceAndPreservesRemainingPrices()
     {
         using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         var product = state.Products.First(p => p.Variants.Length > 1 && p.Variants.Any(v => state.Prices.ContainsKey(v.Id)));
         var variant = product.Variants.First(v => state.Prices.ContainsKey(v.Id));
@@ -38,7 +38,7 @@ public sealed class LocalCommerceTests : IDisposable
     {
         string id;
         using(var factory = CreateFactory())
-        using(var client = factory.CreateClient())
+        using(var client = await TestStaff.Client(factory))
         {
             foreach(var draft in new[] { new AnnouncementCreate("", "Metin", "Haber"), new AnnouncementCreate("Başlık", "", "Duyuru"), new AnnouncementCreate("Başlık", "Metin", "Invalid") })
                 Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync(Root + "/announcements", draft)).StatusCode);
@@ -46,7 +46,7 @@ public sealed class LocalCommerceTests : IDisposable
             var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
             id = Assert.Single(state.Announcements!).Id;
         }
-        using var restarted = CreateFactory();using var second = restarted.CreateClient();
+        using var restarted = CreateFactory();using var second = await TestStaff.Client(restarted);
         var saved = Assert.Single((await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Announcements!);
         Assert.Equal("Yeni koleksiyon", saved.Title);Assert.Equal("Titanyum ürünler yayında.", saved.Body);
         (await second.DeleteAsync(Root + "/announcements/" + id)).EnsureSuccessStatusCode();
@@ -58,7 +58,7 @@ public sealed class LocalCommerceTests : IDisposable
     {
         string[] selected;
         using(var factory = CreateFactory())
-        using(var client = factory.CreateClient())
+        using(var client = await TestStaff.Client(factory))
         {
             var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
             selected = state.Products.Where(p => p.Active).Take(4).Select(p => p.Id).Reverse().ToArray();
@@ -66,7 +66,7 @@ public sealed class LocalCommerceTests : IDisposable
                 Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/content", state.Content with { FeaturedProducts = invalid })).StatusCode);
             (await client.PutAsJsonAsync(Root + "/content", state.Content with { FeaturedProducts = selected })).EnsureSuccessStatusCode();
         }
-        using var restarted = CreateFactory();using var second = restarted.CreateClient();
+        using var restarted = CreateFactory();using var second = await TestStaff.Client(restarted);
         Assert.Equal(selected, (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Content.FeaturedProducts);
     }
 
@@ -77,7 +77,7 @@ public sealed class LocalCommerceTests : IDisposable
         CommerceProduct[] expected;
         Dictionary<string, long> prices;
         using (var factory = CreateFactory())
-        using (var client = factory.CreateClient())
+        using (var client = await TestStaff.Client(factory))
         {
             var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
             category = state.Products[0].Category; target = state.Products[1].Category;
@@ -93,7 +93,7 @@ public sealed class LocalCommerceTests : IDisposable
             (await client.DeleteAsync(Root + "/categories/" + Uri.EscapeDataString("Boş kategori"))).EnsureSuccessStatusCode();
         }
         using var restarted = CreateFactory();
-        using var second = restarted.CreateClient();
+        using var second = await TestStaff.Client(restarted);
         var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         Assert.DoesNotContain(category, saved.Categories!);
         Assert.DoesNotContain("Boş kategori", saved.Categories!);
@@ -107,7 +107,7 @@ public sealed class LocalCommerceTests : IDisposable
     {
         string category, variant;
         using (var factory = CreateFactory())
-        using (var client = factory.CreateClient())
+        using (var client = await TestStaff.Client(factory))
         {
             var seed = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
             category = seed.Products[0].Category; variant = seed.Products[0].Variants[1].Id;
@@ -116,7 +116,7 @@ public sealed class LocalCommerceTests : IDisposable
             (await client.PutAsJsonAsync(Root + "/content", seed.Content with { CategoryProducts = new() { [category] = variant, [seed.Products[1].Category] = "" }, CategoryImages = new() { [category] = "/assets/banners/home-titanium.webp" } })).EnsureSuccessStatusCode();
         }
         using var restarted = CreateFactory();
-        using var second = restarted.CreateClient();
+        using var second = await TestStaff.Client(restarted);
         var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         Assert.Equal(variant, saved.Content.CategoryProducts![category]);
         Assert.Equal("/assets/banners/home-titanium.webp", saved.Content.CategoryImages![category]);
@@ -127,7 +127,7 @@ public sealed class LocalCommerceTests : IDisposable
     public async Task CategoriesPersistRejectDuplicatesAndCanBeAssignedToProducts()
     {
         using (var factory = CreateFactory())
-        using (var client = factory.CreateClient())
+        using (var client = await TestStaff.Client(factory))
         {
             (await client.PostAsJsonAsync(Root + "/categories", new CategoryCreate("  Blenderlar  "))).EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.Conflict, (await client.PostAsJsonAsync(Root + "/categories", new CategoryCreate("blenderlar"))).StatusCode);
@@ -139,7 +139,7 @@ public sealed class LocalCommerceTests : IDisposable
             Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/products/" + product.Id, product with { Category = "Bilinmeyen" })).StatusCode);
         }
         using var restarted = CreateFactory();
-        using var second = restarted.CreateClient();
+        using var second = await TestStaff.Client(restarted);
         var saved = (await second.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         Assert.Contains("Blenderlar", saved.Categories!);
         Assert.Equal("Blenderlar", saved.Products[0].Category);
@@ -149,7 +149,7 @@ public sealed class LocalCommerceTests : IDisposable
     public async Task ProductPriceStockAndContentSurviveRestart()
     {
         using (var factory = CreateFactory())
-        using (var client = factory.CreateClient())
+        using (var client = await TestStaff.Client(factory))
         {
             var seed = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
             var product = seed.Products[0] with { Name = "Kaydedilen ürün", OriginalImage = "/assets/products/original.webp", Variants = [seed.Products[0].Variants[0] with { Stock = 17, Hex = "#123456" }] };
@@ -158,7 +158,7 @@ public sealed class LocalCommerceTests : IDisposable
             (await client.PutAsJsonAsync(Root + "/content", seed.Content with { Slides = [], XinobiBanner = "", ButtonColor = "#112233", TitaniumBanner = "/assets/banners/home-titanium.webp", TitaniumImage = "/assets/products/titanium-bronze-gold.png" })).EnsureSuccessStatusCode();
         }
         using var restarted = CreateFactory();
-        using var secondClient = restarted.CreateClient();
+        using var secondClient = await TestStaff.Client(restarted);
         var state = (await secondClient.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         var saved = state.Products.Single(p => p.Name == "Kaydedilen ürün");
         Assert.Equal(17, saved.Variants[0].Stock);
@@ -179,7 +179,7 @@ public sealed class LocalCommerceTests : IDisposable
     public async Task InvalidStockAndUntrustedOriginsCannotWrite()
     {
         using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var seed = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
         var invalid = seed.Products[0] with { Variants = [seed.Products[0].Variants[0] with { Stock = -1 }] };
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync(Root + "/products/" + invalid.Id, invalid)).StatusCode);
@@ -200,7 +200,7 @@ public sealed class LocalCommerceTests : IDisposable
     public async Task UploadedMediaIsSharedAndInvalidContentIsRejected()
     {
         using var factory = CreateFactory();
-        using var client = factory.CreateClient();
+        using var client = await TestStaff.Client(factory);
         var bytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");
         using var form = new MultipartFormDataContent();
         var file = new ByteArrayContent(bytes);

@@ -74,6 +74,7 @@ public sealed class ReviewTests : IDisposable
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
+        using var staff = await TestStaff.Client(factory);
         var token = await Register(client, "ayse@example.com");
         var request = new SubmitReview("DEMO-P101", 5, "Çok şık", "Rengi fotoğraftaki gibi, çay hızlı demleniyor.");
         var early = await Send(client, HttpMethod.Post, "/api/v1/me/reviews", token, request);
@@ -83,9 +84,9 @@ public sealed class ReviewTests : IDisposable
         var address = await Read<CustomerAddress>(await Send(client, HttpMethod.Post, "/api/v1/me/addresses", token,
             new SaveCustomerAddress("Ev", "Ayşe Yılmaz", "0532 123 45 67", "İstanbul", "Kadıköy", "Moda Cad. No: 1 D: 2", "34710", true)));
         var order = await Read<CustomerOrder>(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, new PlaceOrder(address.Id, [new PlaceOrderItem("DEMO-P101", "DEMO-V101-B", 1)], "request-0001")));
-        await Read<CustomerOrder>(await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/shipment", new ShipOrder("Aras Kargo", "AR123456", null)));
+        await Read<CustomerOrder>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/shipment", new ShipOrder("Aras Kargo", "AR123456", null)));
         Assert.Equal("not_purchased", await Code(await Send(client, HttpMethod.Post, "/api/v1/me/reviews", token, request)));
-        await Read<CustomerOrder>(await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Delivered, null)));
+        await Read<CustomerOrder>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Delivered, null)));
 
         Assert.Equal("invalid_rating", await Code(await Send(client, HttpMethod.Post, "/api/v1/me/reviews", token, request with { Rating = 6 })));
         Assert.Equal("invalid_body", await Code(await Send(client, HttpMethod.Post, "/api/v1/me/reviews", token, request with { Body = "kısa" })));
@@ -93,9 +94,9 @@ public sealed class ReviewTests : IDisposable
         Assert.Equal(ReviewStatuses.Pending, mine.Status);
         Assert.Empty((await client.GetFromJsonAsync<ReviewPage>("/api/v1/catalog/products/DEMO-P101/reviews"))!.Items);
 
-        var panel = await client.GetFromJsonAsync<ProductReview[]>("/api/v1/local-commerce/reviews?status=pending");
+        var panel = await staff.GetFromJsonAsync<ProductReview[]>("/api/v1/local-commerce/reviews?status=pending");
         Assert.Equal("Ayşe Y.", panel!.Single().AuthorName);
-        await Read<ProductReview>(await client.PostAsJsonAsync($"/api/v1/local-commerce/reviews/{mine.Id}/moderation", new ModerateReview(ReviewStatuses.Approved, null, "Teşekkür ederiz!")));
+        await Read<ProductReview>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/reviews/{mine.Id}/moderation", new ModerateReview(ReviewStatuses.Approved, null, "Teşekkür ederiz!")));
 
         var page = (await client.GetFromJsonAsync<ReviewPage>("/api/v1/catalog/products/DEMO-P101/reviews"))!;
         var item = page.Items.Single();
@@ -120,13 +121,14 @@ public sealed class ReviewTests : IDisposable
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
-        var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
+        using var staff = await TestStaff.Client(factory);
+        var state = (await staff.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
         var product = state.Products.First(item => item.Id == "DEMO-P101");
-        var duplicate = await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", product with { Specs = [new("Güç", "1650 W"), new("güç", "1700 W")] });
+        var duplicate = await staff.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", product with { Specs = [new("Güç", "1650 W"), new("güç", "1700 W")] });
         Assert.Equal(HttpStatusCode.BadRequest, duplicate.StatusCode);
-        var empty = await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", product with { Specs = [new("Güç", " ")] });
+        var empty = await staff.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", product with { Specs = [new("Güç", " ")] });
         Assert.Equal(HttpStatusCode.BadRequest, empty.StatusCode);
-        (await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", product with { Specs = [new(" Güç ", "1650 W"), new("Kapasite", "1,7 L")] })).EnsureSuccessStatusCode();
+        (await staff.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", product with { Specs = [new(" Güç ", "1650 W"), new("Kapasite", "1,7 L")] })).EnsureSuccessStatusCode();
         var detail = (await client.GetFromJsonAsync<ProductDetail>($"/api/v1/catalog/products/{product.Id}"))!;
         Assert.Equal([new ProductSpec("Güç", "1650 W"), new ProductSpec("Kapasite", "1,7 L")], detail.Specs);
     }

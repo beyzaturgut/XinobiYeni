@@ -72,6 +72,7 @@ public sealed class AssistantTests : IDisposable
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
+        using var staff = await TestStaff.Client(factory);
         var config = await Read<AssistantConfig>(await client.GetAsync("/api/v1/assistant/config"));
         Assert.False(config.AiAnswers);
         Assert.False(config.WhatsAppAvailable);
@@ -98,7 +99,7 @@ public sealed class AssistantTests : IDisposable
         var lead = await client.PostAsJsonAsync($"/api/v1/assistant/conversations/{reply.ConversationId}/lead", new AssistantLeadRequest(Client, "Ayşe", "ayse@example.com", null, "Toplu alım", false));
         Assert.Equal("consent_required", await Code(lead));
         await Read<AssistantLead>(await client.PostAsJsonAsync($"/api/v1/assistant/conversations/{reply.ConversationId}/lead", new AssistantLeadRequest(Client, "Ayşe", "ayse@example.com", null, "Toplu alım", true)));
-        Assert.Single(await Read<AssistantLead[]>(await client.GetAsync("/api/v1/local-commerce/assistant/leads")));
+        Assert.Single(await Read<AssistantLead[]>(await staff.GetAsync("/api/v1/local-commerce/assistant/leads")));
         var route = await Read<AssistantHandoff>(await client.PostAsJsonAsync($"/api/v1/assistant/conversations/{reply.ConversationId}/handoff", new AssistantHandoffRequest(Client)));
         Assert.Equal("lead", route.Channel);
     }
@@ -109,6 +110,7 @@ public sealed class AssistantTests : IDisposable
         model.Configured = true;
         using var factory = Factory();
         using var client = factory.CreateClient();
+        using var staff = await TestStaff.Client(factory);
         var reply = await Read<AssistantReply>(await Ask(client, "çay makinesi arıyorum"));
         Assert.Equal("ai", reply.Reply.Source);
         Assert.Equal(["DEMO-P101"], reply.Reply.Products.Select(product => product.Id));
@@ -120,19 +122,19 @@ public sealed class AssistantTests : IDisposable
 
         // The customer's message is stored masked; the model saw it as written.
         await Read<AssistantReply>(await Ask(client, "Kartım 4111 1111 1111 1111, çay makinesi", reply.ConversationId));
-        var conversation = (await Read<AssistantConversation[]>(await client.GetAsync("/api/v1/local-commerce/assistant/conversations"))).Single();
+        var conversation = (await Read<AssistantConversation[]>(await staff.GetAsync("/api/v1/local-commerce/assistant/conversations"))).Single();
         Assert.DoesNotContain("4111", string.Join(' ', conversation.Messages.Select(message => message.Text)));
 
-        var usage = await Read<AiUsageReport>(await client.GetAsync("/api/v1/local-commerce/assistant/usage"));
+        var usage = await Read<AiUsageReport>(await staff.GetAsync("/api/v1/local-commerce/assistant/usage"));
         Assert.Equal(2, usage.AiCallsToday);
         Assert.Equal((240, 80), (usage.Days.Single().InputTokens, usage.Days.Single().OutputTokens));
         Assert.False(usage.CostRatesSet);
 
         // A limit of zero turns the model off; Nobi keeps answering from the catalogue.
-        var current = (await Read<JsonElement>(await client.GetAsync("/api/v1/local-commerce/assistant/policies"))).GetProperty("items").EnumerateArray().Last();
-        var stale = await client.PostAsJsonAsync("/api/v1/local-commerce/assistant/policies", Policy(99, 0));
+        var current = (await Read<JsonElement>(await staff.GetAsync("/api/v1/local-commerce/assistant/policies"))).GetProperty("items").EnumerateArray().Last();
+        var stale = await staff.PostAsJsonAsync("/api/v1/local-commerce/assistant/policies", Policy(99, 0));
         Assert.Equal(HttpStatusCode.Conflict, stale.StatusCode);
-        await Read<AssistantPolicy>(await client.PostAsJsonAsync("/api/v1/local-commerce/assistant/policies", Policy(current.GetProperty("revision").GetInt32(), 0)));
+        await Read<AssistantPolicy>(await staff.PostAsJsonAsync("/api/v1/local-commerce/assistant/policies", Policy(current.GetProperty("revision").GetInt32(), 0)));
         var rules = await Read<AssistantReply>(await Ask(client, "kahve makinesi"));
         Assert.Equal("rules", rules.Reply.Source);
         Assert.Equal(2, model.Calls.Count);
@@ -146,13 +148,14 @@ public sealed class AssistantTests : IDisposable
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
-        var source = await Read<KnowledgeSource>(await client.PostAsJsonAsync("/api/v1/local-commerce/assistant/knowledge",
+        using var staff = await TestStaff.Client(factory);
+        var source = await Read<KnowledgeSource>(await staff.PostAsJsonAsync("/api/v1/local-commerce/assistant/knowledge",
             new SaveKnowledgeSource("Garanti koşulları", "Tüm Xinobi ürünleri iki yıl üretici garantisi altındadır; fatura ile servise başvurulur.", ["garanti", "servis"], null)));
         Assert.DoesNotContain("iki yıl", (await Read<AssistantReply>(await Ask(client, "garanti süresi nedir?"))).Reply.Text);
-        await Read<KnowledgeSource>(await client.PostAsJsonAsync($"/api/v1/local-commerce/assistant/knowledge/{source.Id}/status", new SetKnowledgeStatus(KnowledgeStatuses.Approved)));
+        await Read<KnowledgeSource>(await staff.PostAsJsonAsync($"/api/v1/local-commerce/assistant/knowledge/{source.Id}/status", new SetKnowledgeStatus(KnowledgeStatuses.Approved)));
         Assert.Contains("iki yıl", (await Read<AssistantReply>(await Ask(client, "garanti süresi nedir?"))).Reply.Text);
         // Editing sends it back to draft.
-        await Read<KnowledgeSource>(await client.PutAsJsonAsync($"/api/v1/local-commerce/assistant/knowledge/{source.Id}",
+        await Read<KnowledgeSource>(await staff.PutAsJsonAsync($"/api/v1/local-commerce/assistant/knowledge/{source.Id}",
             new SaveKnowledgeSource("Garanti koşulları", "Tüm Xinobi ürünleri üç yıl garanti altındadır; fatura ile servise başvurulur.", ["garanti"], null)));
         Assert.DoesNotContain("üç yıl", (await Read<AssistantReply>(await Ask(client, "garanti süresi nedir?"))).Reply.Text);
     }

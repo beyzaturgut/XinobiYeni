@@ -16,4 +16,3 @@ WHERE [MigrationId] = N'20261009120332_CatalogCommerce';
 
 COMMIT;
 GO
-

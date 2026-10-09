@@ -14,6 +14,7 @@ import '../account/account_widgets.dart';
 import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
 import '../compare/compare.dart';
+import 'nobi_mark.dart';
 
 class NobiException implements Exception {
   const NobiException(this.message);
@@ -262,7 +263,7 @@ class _NobiScreenState extends ConsumerState<NobiScreen> {
         backgroundColor: XinobiTokens.header,
         foregroundColor: XinobiTokens.onHeader,
         toolbarHeight: XinobiTokens.headerHeight,
-        title: const Text('Nobi'),
+        title: const Row(children: [NobiMark(width: 32), SizedBox(width: 10), Text('Nobi')]),
         actions: [if (messages.isNotEmpty) TextButton(onPressed: _reset, style: TextButton.styleFrom(foregroundColor: XinobiTokens.onHeader), child: const Text('Yeni konuşma'))],
       ),
       body: Column(children: [
@@ -431,12 +432,16 @@ class _LeadSheetState extends ConsumerState<_LeadSheet> {
 class NobiButton extends StatelessWidget {
   const NobiButton({super.key});
   @override
-  Widget build(BuildContext context) => FloatingActionButton.small(
+  Widget build(BuildContext context) => SizedBox(width: 64, height: 64, child: FloatingActionButton(
         heroTag: 'nobi',
         tooltip: 'Nobi’ye sor',
-        backgroundColor: XinobiTokens.deep,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        focusElevation: 0,
+        hoverElevation: 0,
+        highlightElevation: 0,
         foregroundColor: XinobiTokens.onHeader,
         onPressed: () => context.push('/nobi'),
-        child: const Icon(Icons.support_agent),
-      );
+        child: const NobiMark(),
+      ));
 }

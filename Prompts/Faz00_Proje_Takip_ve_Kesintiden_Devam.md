@@ -470,3 +470,7 @@ ADD-044/052/054 güncellendi. ADD-053 araştırıldı ancak ilk hata yeniden ür
 ### Web e2e’deki 19 hata — giderildi / 09.10.2026
 
 [TST-108](../test/2026-10-09/TST-108-web-regression-resolution.md): güncel tam web paketi **107/107**, atlanan/flaky 0. Web build/TypeScript ve tam lint temiz. Ana sayfa/ürün/teklif takibi/yasal kontrastları, ürün satın alma düğmesi CSS kapsamı ve dar ekranda arama/menü dokunma alanları düzeltildi. Demo kontrollere bağlı testler güncel sunucu sözleşmeleriyle, tarayıcı içi sahte verilerle doğrulanır. Test başlatıcısı doğru API adresleriyle webi yeniden derler; ekran görüntüleri Playwright çıktı dizinindedir. Gerçek posta/AI/ödeme çağrısı yapılmadı; SQL ve migration değiştirilmedi. TST-092’deki 19 hata artık aktif web blokajı değildir.
+
+### SQL bağlantı teşhisi — 09.10.2026
+
+[TST-109](../test/2026-10-09/TST-109-sql-connectivity-diagnosis.md): çalışan API başlangıçta `sql_not_configured`; `ConnectionStrings:Xinobi` hiçbir etkin yerel kaynakta yoktu. Önceki kayıtlı hedef `109.104.120.91:64019`, `XinobiYeniDB`, SQL Authentication / `xinobiyeni_app`; mevcut Keychain parolası çıktıya yazılmadan ignored Local ayara bağlandı. API/web/admin sahibi süreç yöneticisi yeniden başlatıldı. Yeni API canlı, SQL readiness `sql_timeout`; Python TCP ve `nc -vz -G 10` 64019 kontrolü timeout. SQL login/DB sorguları TCP kurulmadığı için yapılmadı. Windows TCP/IP/dinleme portu, firewall ve dış 64019 NAT/IP izinleri kontrol edilmeli. Migration/veri taşıma/SQL yazımı yapılmadı; parola ve yerel ayar commit edilmedi.

@@ -165,3 +165,5 @@
 - 09.10.2026 · [TST-107 bekleyen işler](2026-10-09/TST-107-pending-work-validation.md) — .NET 306/306, mobil 49/49 ve cihaz 5/5, Temsilidir 3/3; Tasarımlarım iki hata düzeltildi. Normal mobil APK 5003’e döndü; harici erişimler, ürün kararları ve yeniden üretilemeyen yüzey hatası açık.
 
 - 09.10.2026 · [TST-108 web regresyonlarının giderilmesi](2026-10-09/TST-108-web-regression-resolution.md) — Tam web e2e 107/107, atlanan/flaky 0; 20 rota erişilebilirlik taraması, kontrast/dokunma alanı düzeltmeleri, güncel sözleşmeli akış testleri. Build/TypeScript/lint temiz; SQL değişmedi.
+
+- 09.10.2026 · [TST-109 SQL bağlantı teşhisi](2026-10-09/TST-109-sql-connectivity-diagnosis.md) — API’de eksik SQL bağlantı ayarı Keychain ile yerelde tamamlandı; TCP 64019 iki kontrolde timeout, SQL login/DB aşamalarına ulaşılamadı. Yeniden başlatılan API SQL readiness `sql_timeout`; parola ve yerel ayar Git dışında.

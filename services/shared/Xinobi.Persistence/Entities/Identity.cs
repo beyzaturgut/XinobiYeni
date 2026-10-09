@@ -6,6 +6,8 @@ public sealed class User
     public Guid Id { get; set; }
     public required string Email { get; set; }
     public required string NormalizedEmail { get; set; }
+    public string? DisplayName { get; set; }
+    public string? Phone { get; set; }
     public string? PasswordHash { get; set; }
     public required string Kind { get; set; }
     public required string Status { get; set; }

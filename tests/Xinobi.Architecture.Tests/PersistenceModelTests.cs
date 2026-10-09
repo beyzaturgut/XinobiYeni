@@ -31,6 +31,7 @@ public sealed class PersistenceModelTests
     [InlineData(typeof(Asset), new[] { nameof(Asset.StorageKey) })]
     [InlineData(typeof(CatalogCategory), new[] { nameof(CatalogCategory.NormalizedName) })]
     [InlineData(typeof(CatalogVariant), new[] { nameof(CatalogVariant.NormalizedSku) })]
+    [InlineData(typeof(SalesOrder), new[] { nameof(SalesOrder.UserId), nameof(SalesOrder.ClientRequestId) })]
     public void IntegrityKeysAreUnique(Type entity, string[] columns)
     {
         using var context = CreateContext();
@@ -61,7 +62,7 @@ public sealed class PersistenceModelTests
     {
         using var context = CreateContext();
         var generated = context.GetService<IMigrator>().GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
-        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0002_CatalogCommerce.idempotent.sql"));
+        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0003_CustomerIdentityOrders.idempotent.sql"));
         Assert.Equal(Normalize(committed), Normalize(generated));
     }
 

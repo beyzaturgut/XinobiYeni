@@ -32,10 +32,16 @@ public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) :
     public DbSet<CatalogVariantPrice> CatalogPrices => Set<CatalogVariantPrice>();
     public DbSet<CatalogContent> CatalogContent => Set<CatalogContent>();
     public DbSet<CatalogAnnouncement> CatalogAnnouncements => Set<CatalogAnnouncement>();
+    public DbSet<AccessSession> AccessSessions => Set<AccessSession>();
+    public DbSet<RefreshSession> RefreshSessions => Set<RefreshSession>();
+    public DbSet<CustomerDeliveryAddress> CustomerAddresses => Set<CustomerDeliveryAddress>();
+    public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
+    public DbSet<SalesOrderLine> SalesOrderLines => Set<SalesOrderLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         CatalogModel.Configure(modelBuilder);
+        CustomerCommerceModel.Configure(modelBuilder);
         modelBuilder.Entity<User>(user =>
         {
             user.ToTable("Users", IdentitySchema, table =>

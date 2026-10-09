@@ -76,3 +76,15 @@ Aktarım modu HTTP dinleyicisi veya arka plan worker başlatmaz. İlk aktarım y
 `Catalog:StorageProvider=SqlServer` başka ortamda da SQL okuma kaynağını açıkça seçebilir. Panelin loopback/Development sınırı bu değişiklikte korunur; production yönetim API'sinin yetki ve kalıcı medya bağlantısı ayrı iş adımıdır. `Catalog:StorageProvider=File` yalnız bilinçli yerel geri dönüş içindir; SQL'deki yeni değişiklikler eski dosyada yoktur, otomatik geri dönüş yapılmaz.
 
 `0002_CatalogCommerce.rollback.sql` yalnız boş/test katalogda kullanılabilir, çekirdek tabloları korur; gerçek katalog varsa ileri düzeltme veya doğrulanmış restore uygulanır. Otomatik başlangıç migration'ı yoktur.
+
+## Hesap, oturum, adres ve sipariş şeması (0003)
+
+`0003_CustomerIdentityOrders.idempotent.sql` tüm geçmişi içerir. 0002'den sonra `identity.Users` tablosuna nullable `DisplayName`/`Phone` ekler; `identity.AccessSessions`, `RefreshSessions`, `CustomerAddresses`, `sales.Orders` ve `sales.OrderLines` tablolarını oluşturur. Veri backfill veya hesap taşıma yapmaz. Son migration-script eşleşme testi artık bu script'i denetler.
+
+**09.10.2026:** Tekrar edilen VERIFYONLY hâlâ Msg262/3013 ile başarısız. 0002/0003 uygulanmadı. Önce DBA yedek doğrulaması, ardından 0002 katalog uygulama/test/aktarımı tamamlanmalıdır. 0003 tek başına SQL hesap deposunu etkinleştirmez; IAccountStore SQL uygulaması ve ayrı doğrulanmış veri aktarımı sonraki iştir. Token veya parola hash'leri çıktıya alınmaz.
+
+0003 sonrası toplam 3 migration kaydı, 23 iş tablosu (12 çekirdek + 6 katalog + 5 hesap/sipariş) ve ayrı geçmiş tablosu beklenir. Aynı script ikinci kez çalıştırıldığında bu sayılar değişmemelidir. Gerçek SQL üzerinde tek varsayılan adres, aynı müşteride yinelenen istek reddi, hash oturumları, FK/satır tutarı kısıtları ve katalogdan bağımsız sipariş snapshot'ları ayrıca test edilmelidir; mevcut model testleri bu gerçek kanıtın yerine geçmez.
+
+İade/iptal ve saklama kararları D03/D10 açık kalır. Sipariş müşteri FK'sı silmeye restrict uygular; kullanıcı silmeyle tarihsel siparişleri otomatik silmek yasallaştırılmış bir karar sayılmaz. Mevcut demo akışları ödeme almaz ve gerçek stok rezervasyonu yapmaz.
+
+`0003_CustomerIdentityOrders.rollback.sql` yalnız boş/test veriyle kullanılabilir. Sipariş/oturum/adres verilerini ve yeni profil kolonlarını siler; çekirdek/katalog şemasını korur. Gerçek veri varsa ileri düzeltme/restore ve ilgili iş sahibi kararı gerekir.

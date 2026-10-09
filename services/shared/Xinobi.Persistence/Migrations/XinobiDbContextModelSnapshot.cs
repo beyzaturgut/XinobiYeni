@@ -22,6 +22,27 @@ namespace Xinobi.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AccessSession", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasColumnType("char(64)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId", "ExpiresAt");
+
+                    b.ToTable("AccessSessions", "identity");
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.Asset", b =>
                 {
                     b.Property<Guid>("Id")
@@ -343,6 +364,63 @@ namespace Xinobi.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CustomerDeliveryAddress", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<string>("District")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("nvarchar(60)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Line")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[IsDefault] = 1");
+
+                    b.ToTable("CustomerAddresses", "identity");
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.ExternalMapping", b =>
                 {
                     b.Property<long>("Id")
@@ -525,6 +603,38 @@ namespace Xinobi.Persistence.Migrations
                     b.ToTable("Permissions", "identity");
                 });
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.RefreshSession", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasColumnType("char(64)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("FamilyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("FamilyId");
+
+                    b.HasIndex("UserId", "ExpiresAt");
+
+                    b.ToTable("RefreshSessions", "identity");
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -562,6 +672,139 @@ namespace Xinobi.Persistence.Migrations
                     b.HasIndex("PermissionId");
 
                     b.ToTable("RolePermissions", "identity");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.SalesOrder", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AddressSnapshotJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ClientRequestId")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("char(3)");
+
+                    b.Property<string>("HistoryJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("RequestsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("ShipmentJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<long>("TotalCents")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Number");
+
+                    b.HasIndex("Status", "CreatedAt");
+
+                    b.HasIndex("UserId", "ClientRequestId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("Orders", "sales", t =>
+                        {
+                            t.HasCheckConstraint("CK_Orders_AddressSnapshot", "ISJSON([AddressSnapshotJson]) = 1");
+
+                            t.HasCheckConstraint("CK_Orders_History", "[HistoryJson] IS NULL OR ISJSON([HistoryJson]) = 1");
+
+                            t.HasCheckConstraint("CK_Orders_Requests", "[RequestsJson] IS NULL OR ISJSON([RequestsJson]) = 1");
+
+                            t.HasCheckConstraint("CK_Orders_Shipment", "[ShipmentJson] IS NULL OR ISJSON([ShipmentJson]) = 1");
+
+                            t.HasCheckConstraint("CK_Orders_Total", "[TotalCents] >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.SalesOrderLine", b =>
+                {
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasColumnType("char(3)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("LineTotalCents")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("ProductReference")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<long>("UnitPriceCents")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("VariantReference")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("OrderId", "Position");
+
+                    b.ToTable("OrderLines", "sales", t =>
+                        {
+                            t.HasCheckConstraint("CK_OrderLines_Amounts", "[UnitPriceCents] > 0 AND [LineTotalCents] = [UnitPriceCents] * CONVERT(bigint, [Quantity])");
+
+                            t.HasCheckConstraint("CK_OrderLines_Position", "[Position] >= 0");
+
+                            t.HasCheckConstraint("CK_OrderLines_Quantity", "[Quantity] >= 1 AND [Quantity] <= 99");
+                        });
                 });
 
             modelBuilder.Entity("Xinobi.Persistence.Entities.SyncAttempt", b =>
@@ -682,6 +925,10 @@ namespace Xinobi.Persistence.Migrations
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("datetimeoffset");
 
+                    b.Property<string>("DisplayName")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(320)
@@ -700,6 +947,10 @@ namespace Xinobi.Persistence.Migrations
                     b.Property<string>("PasswordHash")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(24)
+                        .HasColumnType("nvarchar(24)");
 
                     b.Property<byte[]>("RowVersion")
                         .IsConcurrencyToken()
@@ -749,6 +1000,15 @@ namespace Xinobi.Persistence.Migrations
                     b.ToTable("UserRoles", "identity");
                 });
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AccessSession", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogProduct", b =>
                 {
                     b.HasOne("Xinobi.Persistence.Entities.CatalogCategory", null)
@@ -776,6 +1036,24 @@ namespace Xinobi.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CustomerDeliveryAddress", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.RefreshSession", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.RolePermission", b =>
                 {
                     b.HasOne("Xinobi.Persistence.Entities.Permission", "Permission")
@@ -791,6 +1069,24 @@ namespace Xinobi.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Permission");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.SalesOrder", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.SalesOrderLine", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.SalesOrder", null)
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Xinobi.Persistence.Entities.SyncAttempt", b =>

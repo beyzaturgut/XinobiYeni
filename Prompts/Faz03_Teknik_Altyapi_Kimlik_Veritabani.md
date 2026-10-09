@@ -80,6 +80,8 @@ API: `/api/v1/auth/register|login|refresh|logout|password-reset`, `/api/v1/admin
 
 ## 7. Yedi rol kontrolü ve PM son kararı
 
+**09.10.2026 devam güncellemesi:** [TST-112](../test/2026-10-09/TST-112-customer-schema-and-backup-retry.md): VERIFYONLY tekrarında sunucu yetkisi hatası sürüyor. 0003 hesap profili, hash oturumları, adres ve sipariş şeması/migration'ı hazırlandı, .NET 321 geçti / 1 gerçek SQL testi atlandı. 0002/0003 gerçek SQL'e uygulanmadı; yerel veri ve mevcut IAccountStore değiştirilmedi. SQL hesap deposu/aktarımı, yedek doğrulama, yetki ayrımı ve restore provası hâlâ açık.
+
 Her rol ayrı bir kayıt ekler: `rol | karar: bekliyor/onay/revizyon | kanıt bağlantısı/commit | açık nokta | tarih`. Bu doküman yazıldığında tamamı **BEKLİYOR** durumundadır; otomatik veya hayali imza yoktur.
 
 | Rol | Gözden geçirilecek ölçüt | Karar |

@@ -1,14 +1,20 @@
 import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 for(const flow of ['generated','own-image'])test(flow+' personalized preview has persistent shared disclosure',async({page})=>{
+ // Test-only approved surface: never depend on or approve the owner's local records.
+ const state=JSON.parse(readFileSync('../../services/api/LocalCommerce/seed.json','utf8'));
+ const product=state.products.find((p:{id:string})=>p.id==='DEMO-P101');
+ const variant=product.variants.find((v:{id:string})=>v.id==='DEMO-V101-B');
+ variant.surfaceMask='/assets/personalization/tea-maker-101-blue-designable.png';
+ variant.surfaceImage=variant.image;
+ await page.route('**/api/v1/local-commerce/state',r=>r.fulfill({json:state}));
+ await page.route('**/commerce-preview/state.json',r=>r.fulfill({json:state}));
  if(flow==='generated'){
   const id='a'.repeat(64);await page.addInitScript(id=>sessionStorage.setItem('xinobi-u-selected-session',id),id);
-  const state=JSON.parse(readFileSync('../../services/api/LocalCommerce/seed.json','utf8'));
-  const product=state.products.find((p:{id:string})=>p.id==='DEMO-P101');
   await page.route('**/api/v1/design-studio/**',async r=>{
    expect(r.request().method()).toBe('GET');
    if(r.request().url().endsWith('/image'))await r.fulfill({contentType:'image/png',body:readFileSync('public/assets/personalization/sample-pattern.png')});
-   else await r.fulfill({json:{id,status:'ready',product,variant:product.variants[0],imageUrl:'/api/v1/design-studio/sessions/'+id+'/image'}});
+   else await r.fulfill({json:{id,status:'ready',product,variant,imageUrl:'/api/v1/design-studio/sessions/'+id+'/image'}});
   });await page.goto('/xinobi-u/onizleme/');
  }else{
   await page.goto('/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B');

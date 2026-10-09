@@ -1,0 +1,2 @@
+# Reviewed fixture bytes and manifests must survive Windows checkout unchanged.
+** -text

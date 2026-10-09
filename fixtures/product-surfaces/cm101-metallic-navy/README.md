@@ -11,7 +11,7 @@ The source is the owner's supplied XINOBI catalog product photograph. No custome
 ## Fresh-machine installation
 Use this branch in D:\XinobiYeni-integration for the existing D-only QA launcher. Install the repository's existing dependencies with its normal documented package-manager workflow; no new packages are introduced here. Build API with OpenAPI generation disabled:
 
-    dotnet build services/api -c Release -p:OpenApiGenerateDocumentsOnBuild=false -o services/api/App_Data/integration-runtime/dual-provider-api
+    dotnet build services/api -c Release -p:OpenApiGenerateDocumentsOnBuild=false -o services/api/App_Data/integration-runtime/catalog-generic-api
     node tools/install-cm101-checkpoint.cjs
     node tools/start-xinobi-qa.cjs --checkpoint-demo
 

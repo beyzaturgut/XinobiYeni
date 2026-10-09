@@ -1,3 +1,5 @@
+import CatalogReadiness from './CatalogReadiness'
+import CatalogMaskReview from './CatalogMaskReview'
 import { useEffect, useState } from 'react'
 import type { Product } from '../../commerce'
 import LocalMaskEditor from './LocalMaskEditor'
@@ -27,7 +29,7 @@ export default function CatalogSourceSelection({ disabled, onSelected }: { disab
         if (!response.ok) throw new Error('catalog_unavailable')
         const value = await response.json() as { products?: Product[] }
         if (!Array.isArray(value.products) || value.products.some(p => !p || typeof p.id !== 'string' || !p.id || typeof p.name !== 'string' || !Array.isArray(p.variants) || p.variants.some(v => !v || typeof v.id !== 'string' || !v.id || typeof v.image !== 'string')) || new Set(value.products.map(p => p.id)).size !== value.products.length || new Set(value.products.flatMap(p => p.variants.map(v => v.id))).size !== value.products.flatMap(p => p.variants).length) throw new Error('invalid_catalog')
-        if (!controller.signal.aborted) setProducts(value.products.filter(p => p.active))
+        if (!controller.signal.aborted) setProducts(value.products)
       } catch { if (!controller.signal.aborted) setCatalogError(true) }
     }
     void load(); return () => controller.abort()
@@ -56,6 +58,7 @@ export default function CatalogSourceSelection({ disabled, onSelected }: { disab
   }, [product, variant])
   return <section className="surface-panel surface-catalog-entry" aria-label="Ürün ve varyant seçimi">
     <div className="surface-controls">
+      <CatalogReadiness disabled={disabled} onSelect={(p,v)=>{setProductId(p);setVariantId(v);setSource(null);setSourceError(false);onSelected(true)}} />
       <fieldset disabled={disabled}>
         <legend>İncelenecek ürün</legend>
         <label>Ürün<select value={productId} onChange={event => { setProductId(event.target.value); setVariantId(''); setSource(null); setSourceError(false); onSelected(!!event.target.value) }}>
@@ -71,7 +74,8 @@ export default function CatalogSourceSelection({ disabled, onSelected }: { disab
       {sourceError && <p role="alert">Bu varyantın görseli doğrulanamadı. Başka bir görsel veya maske kullanılmadı.</p>}
       {source && <div data-testid="catalog-surface-source" data-product-id={source.productId} data-variant-id={source.variantId} data-image-reference={source.imageReference} data-source-sha256={source.sha256} data-source-width={source.width} data-source-height={source.height}>
         <h2>{product?.name} · {variant?.color}</h2>
-        <p>Bu katalog görseli için onaylı, kaynakla eşleşen maske bağlanmadı. Maske incelemesi ve kişiselleştirme önizlemesi açılmadı.</p>
+        <p>Maske durumu yalnızca seçili varyant ve doğrulanmış kaynak için kontrol edilir.</p>
+        <CatalogMaskReview key={source.productId+source.variantId+source.sha256} source={source} />
         <LocalMaskEditor key={source.productId + source.variantId + source.sha256} source={source} />
         <img src={source.previewUrl} alt={product?.name + ' · ' + variant?.color} draggable={false} />
       </div>}

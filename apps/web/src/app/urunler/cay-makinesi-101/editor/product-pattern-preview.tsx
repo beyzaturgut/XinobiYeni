@@ -5,6 +5,7 @@ import styles from "./editor.module.css";
 import { deriveProductLighting, shadePattern } from "./product-lighting";
 import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./product-surface-warp";
 
+import { applySurfaceInk } from "./surface-ink";
 import { containArtwork } from "./artwork-placement";
 
 
@@ -18,6 +19,8 @@ export type PatternTransform = {
 };
 
 type ProductPatternPreviewProps = {
+  surfaceTreatment?: "legacy" | "metallic-ink";
+  onRendered?: (canvas: HTMLCanvasElement) => void;
   sourceWidth?: number;
   sourceHeight?: number;
   productSrc: string;
@@ -65,6 +68,7 @@ function validateMaskAlpha(mask: HTMLImageElement, SOURCE_WIDTH: number, SOURCE_
 }
 
 type RenderAssets = {
+  sourcePixels?: ImageData;
   product: HTMLImageElement;
   mask: HTMLImageElement;
   pattern: HTMLImageElement;
@@ -75,14 +79,14 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ sourceWidth = 1066, sourceHeight = 1600, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ onRendered, surfaceTreatment = "legacy", sourceWidth = 1066, sourceHeight = 1600, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
   const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
   const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
   const centerX = sourceWidth / 2, centerY = sourceHeight * .65;
   const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
   const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight]);
+  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight, surfaceTreatment]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
   const { x, y, scale, rotation } = patternTransform;
   const validTransform = dimensionsValid && [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1;
@@ -111,21 +115,22 @@ export default function ProductPatternPreview({ sourceWidth = 1066, sourceHeight
           return buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
         };
         const maskPixels = readPixels(mask);
-        const lighting = deriveProductLighting(readPixels(product), maskPixels, branding ? readPixels(branding) : undefined);
-        const surface = deriveBodySurface(maskPixels);
-        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight) : {x:centerX,y:centerY,width:pattern.naturalWidth,height:pattern.naturalHeight};
-        setResult({ assetKey, status: "ready", assets: { product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } });
+        const sourcePixels = readPixels(product);
+        const lighting = deriveProductLighting(sourcePixels, maskPixels, branding ? readPixels(branding) : undefined);
+        const surface = deriveBodySurface(maskPixels, surfaceTreatment === "metallic-ink");
+        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight, surfaceTreatment === "metallic-ink" ? 0.6 : 0.8) : {x:centerX,y:centerY,width:pattern.naturalWidth,height:pattern.naturalHeight};
+        setResult({ assetKey, status: "ready", assets: { sourcePixels: surfaceTreatment === "metallic-ink" ? sourcePixels : undefined, product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } });
       } catch {
         if (!cancelled) setResult({ assetKey, status: "error" });
       }
     }
     void render();
     return () => { cancelled = true; };
-  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, dimensionsValid]);
+  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, dimensionsValid, surfaceTreatment]);
 
   useLayoutEffect(() => {
     if (status !== "ready" || !result?.assets) return;
-    const { product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } = result.assets;
+    const { sourcePixels, product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } = result.assets;
     const buffer = patternBuffer.getContext("2d")!;
     const context = canvasRef.current!.getContext("2d")!;
     buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
@@ -138,7 +143,8 @@ export default function ProductPatternPreview({ sourceWidth = 1066, sourceHeight
     buffer.restore();
     const patternPixels = buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     warpPattern(patternPixels, surface, curvatureStrength);
-    shadePattern(patternPixels, lighting);
+    if (surfaceTreatment === "metallic-ink" && sourcePixels) applySurfaceInk(patternPixels, sourcePixels, lighting);
+    else shadePattern(patternPixels, lighting);
     buffer.putImageData(patternPixels, 0, 0);
     // The mask stays in source coordinates; only the pattern is transformed.
     buffer.save();
@@ -149,7 +155,8 @@ export default function ProductPatternPreview({ sourceWidth = 1066, sourceHeight
     context.drawImage(product, 0, 0);
     context.drawImage(patternBuffer, 0, 0);
     if (branding) context.drawImage(branding, 0, 0);
-  }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY]);
+    onRendered?.(canvasRef.current!);
+  }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, onRendered]);
 
   // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.
   const draggable = placementMode === "artwork" && !!onArtworkMove && status === "ready";

@@ -1,0 +1,21 @@
+{
+  "version": "fe618b58-1ced-4edd-9063-6d6c49961e65",
+  "productId": "DEMO-97db48f3-afb3-4026-aa26-03deb087cd9d",
+  "variantId": "DEMO-V-459a05ef-1a88-490b-95a6-810f95e70bd5",
+  "sourceImage": "/api/v1/local-commerce/media/ddf3a412b17b4b67ab6097a99e55e76d.webp",
+  "sourceSha256": "54c9ab90a8f4ae95ffb565562d0b9f386d10c9bc86c5689f0819d65815a2d2f1",
+  "sourceVersion": "a1db28ef6fd7c92bbaaecb34bfb0d0b0acd8376686b32c662f6a3505b4499d4a",
+  "width": 5001,
+  "height": 3730,
+  "candidateId": "40a2c5cf-af79-4b41-8bcd-0da0b54d835d",
+  "target": "coffee machine designable body",
+  "maskSha256": "30abe3370d2477860b18893991f1bcc9954b19fb70e00cbf31edbdd1b8fadbcd",
+  "brandingSha256": "cdcf3f11ab155ec60d2b5e09e7d16b87d5f837f3c07ed136f26462df273d8ef8",
+  "brandingRequired": true,
+  "boundariesReviewed": true,
+  "brandingReviewed": true,
+  "updatedAt": "2026-10-09T09:22:09.271Z",
+  "acceptedAt": "2026-10-09T09:22:09.271Z",
+  "provenance": "REAL ROBOFLOW OUTPUT",
+  "approvalKind": "explicit-development-admin-review"
+}

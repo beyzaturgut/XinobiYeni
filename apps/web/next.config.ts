@@ -22,6 +22,7 @@ export default function config(phase: string): NextConfig {
     distDir: ".next/cm101-preview",
     async rewrites() {
       return [
+        { source: "/api/v1/dev/catalog-surfaces/:path*", destination: "http://127.0.0.1:3046/api/v1/dev/catalog-surfaces/:path*" },
         { source: "/api/v1/dev/cm101-approved/:path*", destination: "http://127.0.0.1:3046/api/v1/dev/cm101-approved/:path*" },
         { source: "/api/v1/local-commerce/:path*", destination: "http://127.0.0.1:5019/api/v1/local-commerce/:path*" },
         { source: "/api/v1/design-studio/:path*", destination: "http://127.0.0.1:5021/api/v1/design-studio/:path*" },

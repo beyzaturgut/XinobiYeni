@@ -49,10 +49,11 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
         <span className={styles.demoBadge}>Güvenli demo alanı</span>
       </div>
       <div className={styles.canvas}>
-        <div className={styles.canvasHeading}><p>{renderingInputs.width === 1066 ? "Çay Makinesi 101 · Lacivert" : "CM101 · Metallic Navy"}</p><h1 id="canvas-title">{face}</h1><span className={styles.representativeBadge}>Temsilidir</span></div>
+        <div className={styles.canvasHeading}><p>{renderingInputs.displayName || (renderingInputs.width === 1066 ? "Çay Makinesi 101 · Lacivert" : "CM101 · Metallic Navy")}</p><h1 id="canvas-title">{face}</h1><span className={styles.representativeBadge}>Temsilidir</span></div>
         <div className={styles.productStage}>
           <div className={styles.halo} />
           <ProductPatternPreview
+            surfaceTreatment={renderingInputs.surfaceTreatment}
             sourceWidth={renderingInputs.width}
             sourceHeight={renderingInputs.height}
             productSrc={renderingInputs.source.url}
@@ -63,7 +64,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
             onArtworkMove={placementMode === "artwork" ? (x,y)=>setPatternTransform(current=>({...current,x,y})) : undefined}
             patternTransform={patternTransform}
             curvatureStrength={curvatureStrength}
-            alt="Çay Makinesi 101, desenli ürün önizlemesi"
+            alt={(renderingInputs.displayName || "Ürün")+", desenli ürün önizlemesi"}
           />
         </div>
         <p className={styles.canvasDisclaimer}>Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.</p>

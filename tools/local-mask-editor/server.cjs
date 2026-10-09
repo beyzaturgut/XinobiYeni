@@ -37,7 +37,9 @@ async function init(){
  let count=0;for(let i=3;i<d.data.length;i+=4)if(d.data[i])count++;if(!count)throw Error('Empty mask');
  }});
  const originals=Object.fromEntries(Object.keys(bytes).map(k=>[k,hash(bytes[k])]));
+ const catalogHandler=require('./catalog-http.cjs').createCatalogHttp({root,sharp,port,adminOrigin,legacyRead:approvals.read,registry:require('./catalog-registry.cjs').createRegistry({root,sharp,catalogDirectory:config.catalogDirectory||path.join(root,'services/api/App_Data/real-catalog-qa'),directory:config.catalogSurfaceDirectory||path.join(root,'services/api/App_Data/catalog-surface-review')})});
  const server=http.createServer(async(req,res)=>{
+ if(await catalogHandler(req,res))return;
  try{
  if(req.headers.host!==`127.0.0.1:${port}`)throw Error('Invalid host');
  if(req.headers.origin&&req.headers.origin!==`http://127.0.0.1:${port}`)throw Error('Invalid origin');

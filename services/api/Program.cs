@@ -234,6 +234,7 @@ if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("Product
 }
 
 app.MapCm101AdminCandidate();
+app.MapCatalogCandidate();
 app.Run();
 
 public partial class Program;

@@ -21,7 +21,8 @@ for(const flow of ['generated','own-image'])test(flow+' personalized preview has
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });
-test('marketing and ordinary product-selection imagery have no added disclosure',async({page})=>{
- await page.goto('/');await expect(page.locator('#xinobi-u').getByText('Ürün üzerinde önizleme',{exact:true})).toBeVisible();await expect(page.getByText('Temsilidir',{exact:true})).toHaveCount(0);
+// Owner decision 09.10.2026 (K-12): every personalised XINOBI U image is labelled, including the home sample.
+test('home personalised sample is labelled; ordinary product-selection imagery is not',async({page})=>{
+ await page.goto('/');await expect(page.locator('#xinobi-u').getByText('Ürün üzerinde önizleme',{exact:true})).toBeVisible();await expect(page.locator('#xinobi-u').getByText('Temsilidir',{exact:true})).toBeVisible();
  await page.goto('/xinobi-u/');await expect(page.getByText('Temsilidir',{exact:true})).toHaveCount(0);
 });

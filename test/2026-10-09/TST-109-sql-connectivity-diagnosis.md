@@ -51,3 +51,9 @@ TCP açıldıktan sonra mevcut Keychain parolasıyla önce SQL login, ardından 
 Kaynaklar: [Microsoft bağlantı sorunları](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/troubleshoot-connecting-to-the-sql-server-database-engine?view=sql-server-ver17), [Windows Firewall](https://learn.microsoft.com/en-us/sql/database-engine/configure-windows/configure-a-windows-firewall-for-database-engine-access?view=sql-server-ver17).
 
 SQL’e veri/şema yazılmadı, migration çalıştırılmadı. Yerel gerçek ayar dosyası ve Keychain içeriği commit edilmedi.
+
+## 9 Ekim tekrar kontrolü
+
+Mevcut ayarlar ve Keychain parolası değiştirilmeden yeniden denendi. TCP bağlantısı 0,02 saniyede başarılı oldu. `master` üzerinde `SELECT ORIGINAL_LOGIN()` SQL oturumunu, `XinobiYeniDB` üzerinde `SELECT DB_NAME(), ORIGINAL_LOGIN()` hedef veritabanı erişimini doğruladı; iki sqlcmd işlemi de çıkış kodu 0 ile tamamlandı. Login `xinobiyeni_app`, hedef veritabanı `XinobiYeniDB`.
+
+Çalışan API’nin `/api/v1/health/ready` yanıtı `status: ready`, `sqlServer.isReady: true`, `code: ok` oldu (2026-10-09 11:39:50 UTC). Önceki TCP timeout bu koşuda tekrarlanmadı; ağ tarafında neyin değiştiği bu kontrollerden belirlenemez. Ek yapılandırma değişikliği, migration veya veri yazımı yapılmadı; parola çıktıya alınmadı.

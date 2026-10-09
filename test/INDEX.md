@@ -175,3 +175,5 @@
 - 09.10.2026 · [TST-112 hesap/sipariş şeması ve yedek tekrarı](2026-10-09/TST-112-customer-schema-and-backup-retry.md) — VERIFYONLY tekrarında Msg262/3013 devam ediyor. 0003 profil/oturum/adres/sipariş migration ve script'leri hazır; .NET 321 geçti / 1 gerçek SQL testi atlandı. Canlı uygulama ve veri taşıma henüz yapılmadı.
 
 - 09.10.2026 · [TST-113 SQL migration'ları uygulandı ve yerel veri aktarıldı](2026-10-09/TST-113-sql-migrations-applied-and-local-data-transferred.md) — Proje sahibi onayıyla 0002–0004 boş DB'ye uygulandı (`-I`), ikinci çalıştırma no-op. SQL hesap ve özellik belgesi depoları, gerçek SQL testleri geçti; .NET 322 geçti / 3 atlandı. Katalog 17/69, 1 hesap, Nobi belgesi doğrulanarak aktarıldı; yerel API SQL'den okuyor.
+
+- 09.10.2026 · [TST-114 panel güvenliği, dosya deposu, arka plan işleri, kişiselleştirilmiş sipariş](2026-10-09/TST-114-panel-security-storage-jobs-personalised-order.md) — Panel personel + rota izni ister; medya/tasarım `IFileStore`'da; bildirim kuyruğu sahiplenmeli ve SQL'de çalışır; kayıtlı tasarım sepete eklenip siparişe değişmez kopyayla geçer (0005 uygulandı). .NET 341 geçti / 4 atlandı, Flutter 50/50.

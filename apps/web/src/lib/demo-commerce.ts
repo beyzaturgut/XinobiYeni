@@ -31,7 +31,9 @@ function signedOut(){publish({user:undefined,ready:true,addresses:[],orders:[],i
 async function call<T>(path:string,init:RequestInit={}):Promise<T|null>{
   if(!api)throw new Error('Hesap servisi henüz kullanıma açılmadı.');
   let response:Response;
-  try{response=await fetch(api+path,{...init,credentials:'include',cache:'no-store',signal:AbortSignal.timeout(20000),headers:{'Content-Type':'application/json','X-Xinobi-Csrf':'1',...init.headers}})}
+  // FormData sets its own multipart boundary, so only JSON bodies get a Content-Type here.
+  const type:Record<string,string>=init.body instanceof FormData?{}:{'Content-Type':'application/json'};
+  try{response=await fetch(api+path,{...init,credentials:'include',cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...type,'X-Xinobi-Csrf':'1',...init.headers}})}
   catch{throw new Error('Hesap servisine ulaşılamadı. Lütfen tekrar dene.')}
   if(response.status===204)return null;
   const body=await response.json().catch(()=>null);
@@ -176,6 +178,24 @@ export async function myReviews(){return (await signedIn<MyReview[]>('/me/review
 /** Only products from a delivered order can be reviewed; a new submission replaces the earlier one and waits for moderation. */
 export async function submitReview(productId:string,rating:number,title:string,body:string){
   return (await signedIn<MyReview>('/me/reviews',{method:'POST',body:JSON.stringify({productId,rating,title:title.trim()||null,body:body.trim()})}))!;
+}
+
+export type MyDesign={id:string;kind:'ai'|'upload';name:string;productId:string;productName:string;variantId?:string|null;color?:string|null;profile:string[];imageUrl:string;createdAt:string};
+export async function myDesigns(){return (await signedIn<MyDesign[]>('/me/designs'))??[]}
+/** Copies a finished XINOBI U design into the account; it outlives the short-lived session. */
+export async function saveDesignFromSession(sessionId:string,name?:string){return (await signedIn<MyDesign>('/me/designs',{method:'POST',body:JSON.stringify({sessionId,name:name??null})}))!}
+export async function uploadDesign(file:Blob,productId:string,variantId:string|null,name?:string){
+  const form=new FormData();form.append('file',file,'tasarim');form.append('productId',productId);if(variantId)form.append('variantId',variantId);if(name)form.append('name',name);
+  return (await signedIn<MyDesign>('/me/designs/upload',{method:'POST',body:form}))!;
+}
+export async function renameDesign(id:string,name:string){return (await signedIn<MyDesign>(`/me/designs/${encodeURIComponent(id)}`,{method:'PATCH',body:JSON.stringify({name})}))!}
+export async function deleteDesign(id:string){await signedIn(`/me/designs/${encodeURIComponent(id)}`,{method:'DELETE'})}
+/** Design images need the session; they are fetched with it and shown from an object URL the caller revokes. */
+export async function designImageUrl(design:MyDesign){
+  if(!api)throw new Error('Hesap servisi kullanılamıyor.');
+  const response=await fetch(api.replace(/\/api\/v1$/,'')+design.imageUrl,{credentials:'include',cache:'no-store'});
+  if(!response.ok)throw new Error('Tasarım görseli yüklenemedi.');
+  return URL.createObjectURL(await response.blob());
 }
 
 export const orderStatusText=(status:string)=>statusTexts[status]??status;

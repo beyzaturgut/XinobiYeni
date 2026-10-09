@@ -81,6 +81,7 @@ function SignedInAccount({user,orders,addresses}:{user:DemoUser;orders:CustomerO
           <Link href="/hesap/siparisler"><Icon name="package"/><span><strong>Siparişlerim</strong><small>{orders.length?`${orders.length} demo sipariş · son: ${orders[0].number} · ${money(orders[0].total.amountMinor)}`:'Henüz siparişin yok'}</small></span><Icon name="arrow"/></Link>
           <Link href="/favoriler"><Icon name="heart"/><span><strong>Favorilerim</strong><small>Beğendiğin ürünler</small></span><Icon name="arrow"/></Link>
           <Link href="/sepet"><Icon name="bag"/><span><strong>Sepetim</strong><small>Seçtiğin ürünler ve adetleri</small></span><Icon name="arrow"/></Link>
+          <Link href="/hesap/tasarimlarim"><Icon name="heart"/><span><strong>Tasarımlarım</strong><small>XINOBI U tasarımların ve yüklediğin görseller</small></span><Icon name="arrow"/></Link>
           <Link href="/hesap/bildirimler"><Icon name="bell"/><span><strong>Bildirimlerim</strong><small>Sipariş, kargo, iptal ve iade gelişmeleri</small></span><Icon name="arrow"/></Link>
           <Link href="/hesap/adresler"><Icon name="pin"/><span><strong>Adreslerim</strong><small>{addresses.length?`${addresses.length} kayıtlı adres${addresses[0]?.isDefault?` · varsayılan: ${addresses[0].title}`:''}`:'Henüz adres eklemedin'}</small></span><Icon name="arrow"/></Link>
         </nav>

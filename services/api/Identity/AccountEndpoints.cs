@@ -266,6 +266,7 @@ public static class AccountEndpoints
         {
             Reviews.ReviewEndpoints.MapPanelReviews(panel);
             Quotes.QuoteEndpoints.MapPanelQuotes(panel);
+            Assistant.AssistantEndpoints.MapPanelAssistant(panel);
             Orders.OrderEndpoints.MapPanelOrders(panel);
             Notifications.NotificationEndpoints.MapPanelNotifications(panel);
         }

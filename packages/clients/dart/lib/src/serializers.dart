@@ -19,6 +19,17 @@ import 'package:xinobi_api_client/src/model/account_profile.dart';
 import 'package:xinobi_api_client/src/model/admin_session.dart';
 import 'package:xinobi_api_client/src/model/announcement_item.dart';
 import 'package:xinobi_api_client/src/model/announcement_list.dart';
+import 'package:xinobi_api_client/src/model/assistant_action.dart';
+import 'package:xinobi_api_client/src/model/assistant_config.dart';
+import 'package:xinobi_api_client/src/model/assistant_conversation_view.dart';
+import 'package:xinobi_api_client/src/model/assistant_handoff.dart';
+import 'package:xinobi_api_client/src/model/assistant_handoff_request.dart';
+import 'package:xinobi_api_client/src/model/assistant_lead.dart';
+import 'package:xinobi_api_client/src/model/assistant_lead_request.dart';
+import 'package:xinobi_api_client/src/model/assistant_message.dart';
+import 'package:xinobi_api_client/src/model/assistant_message_request.dart';
+import 'package:xinobi_api_client/src/model/assistant_product.dart';
+import 'package:xinobi_api_client/src/model/assistant_reply.dart';
 import 'package:xinobi_api_client/src/model/auth_session.dart';
 import 'package:xinobi_api_client/src/model/availability.dart';
 import 'package:xinobi_api_client/src/model/cancel_my_order.dart';
@@ -102,6 +113,17 @@ part 'serializers.g.dart';
   AdminSession,
   AnnouncementItem,
   AnnouncementList,
+  AssistantAction,
+  AssistantConfig,
+  AssistantConversationView,
+  AssistantHandoff,
+  AssistantHandoffRequest,
+  AssistantLead,
+  AssistantLeadRequest,
+  AssistantMessage,
+  AssistantMessageRequest,
+  AssistantProduct,
+  AssistantReply,
   AuthSession,
   Availability,
   CancelMyOrder,
@@ -187,6 +209,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<CategoryItem>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AssistantProduct)]),
+        () => ListBuilder<AssistantProduct>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(AnnouncementItem)]),
         () => ListBuilder<AnnouncementItem>(),
       )
@@ -199,8 +225,16 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<CategoryHighlight>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AssistantMessage)]),
+        () => ListBuilder<AssistantMessage>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustomerAddress)]),
         () => ListBuilder<CustomerAddress>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AssistantAction)]),
+        () => ListBuilder<AssistantAction>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUQuestion)]),

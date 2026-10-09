@@ -91,6 +91,18 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
         try { var state = await ReadCore(); return state.Sessions.TryGetValue(id, out var session) && session.ExpiresAt > DateTimeOffset.UtcNow ? View(session) : null; }
         finally { gate.Release(); }
     }
+    /// <summary>Finished generations for the AI usage report.</summary>
+    public async Task<(DateTimeOffset At, string Model, bool Success, string? Error)[]> Generations()
+    {
+        await gate.WaitAsync();
+        try
+        {
+            return [.. (await ReadCore()).Sessions.Values.Where(session => session.CompletedAt is not null)
+                .Select(session => (session.CompletedAt!.Value, session.ProviderModel ?? "@cf/black-forest-labs/flux-1-schnell", session.Status == "ready", session.ErrorCode))];
+        }
+        finally { gate.Release(); }
+    }
+
     public async Task<(string Path, string Mime)?> Asset(string id)
     {
         await gate.WaitAsync();

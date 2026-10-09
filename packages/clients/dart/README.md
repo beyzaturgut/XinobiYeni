@@ -105,6 +105,11 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**uploadMyDesign**](doc/AccountApi.md#uploadmydesign) | **POST** /api/v1/me/designs/upload |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
+[*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConfig**](doc/AssistantApi.md#getassistantconfig) | **GET** /api/v1/assistant/config |
+[*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConversation**](doc/AssistantApi.md#getassistantconversation) | **GET** /api/v1/assistant/conversations/{id} |
+[*AssistantApi*](doc/AssistantApi.md) | [**requestAssistantHandoff**](doc/AssistantApi.md#requestassistanthandoff) | **POST** /api/v1/assistant/conversations/{id}/handoff |
+[*AssistantApi*](doc/AssistantApi.md) | [**sendAssistantLead**](doc/AssistantApi.md#sendassistantlead) | **POST** /api/v1/assistant/conversations/{id}/lead |
+[*AssistantApi*](doc/AssistantApi.md) | [**sendAssistantMessage**](doc/AssistantApi.md#sendassistantmessage) | **POST** /api/v1/assistant/messages |
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogCategories**](doc/CatalogApi.md#listcatalogcategories) | **GET** /api/v1/catalog/categories |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogProducts**](doc/CatalogApi.md#listcatalogproducts) | **GET** /api/v1/catalog/products |
@@ -134,6 +139,17 @@ Class | Method | HTTP request | Description
  - [AdminSession](doc/AdminSession.md)
  - [AnnouncementItem](doc/AnnouncementItem.md)
  - [AnnouncementList](doc/AnnouncementList.md)
+ - [AssistantAction](doc/AssistantAction.md)
+ - [AssistantConfig](doc/AssistantConfig.md)
+ - [AssistantConversationView](doc/AssistantConversationView.md)
+ - [AssistantHandoff](doc/AssistantHandoff.md)
+ - [AssistantHandoffRequest](doc/AssistantHandoffRequest.md)
+ - [AssistantLead](doc/AssistantLead.md)
+ - [AssistantLeadRequest](doc/AssistantLeadRequest.md)
+ - [AssistantMessage](doc/AssistantMessage.md)
+ - [AssistantMessageRequest](doc/AssistantMessageRequest.md)
+ - [AssistantProduct](doc/AssistantProduct.md)
+ - [AssistantReply](doc/AssistantReply.md)
  - [AuthSession](doc/AuthSession.md)
  - [Availability](doc/Availability.md)
  - [CancelMyOrder](doc/CancelMyOrder.md)

@@ -12,6 +12,17 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AdminSession.serializer)
       ..add(AnnouncementItem.serializer)
       ..add(AnnouncementList.serializer)
+      ..add(AssistantAction.serializer)
+      ..add(AssistantConfig.serializer)
+      ..add(AssistantConversationView.serializer)
+      ..add(AssistantHandoff.serializer)
+      ..add(AssistantHandoffRequest.serializer)
+      ..add(AssistantLead.serializer)
+      ..add(AssistantLeadRequest.serializer)
+      ..add(AssistantMessage.serializer)
+      ..add(AssistantMessageRequest.serializer)
+      ..add(AssistantProduct.serializer)
+      ..add(AssistantReply.serializer)
       ..add(AuthSession.serializer)
       ..add(Availability.serializer)
       ..add(CancelMyOrder.serializer)
@@ -90,6 +101,15 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(AnnouncementItem)]),
           () => ListBuilder<AnnouncementItem>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(AssistantMessage)]),
+          () => ListBuilder<AssistantMessage>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(AssistantProduct)]),
+          () => ListBuilder<AssistantProduct>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(AssistantAction)]),
+          () => ListBuilder<AssistantAction>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(CategoryItem)]),
           () => ListBuilder<CategoryItem>())
       ..addBuilderFactory(
@@ -146,6 +166,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ReviewSummary)]),
           () => ListBuilder<ReviewSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

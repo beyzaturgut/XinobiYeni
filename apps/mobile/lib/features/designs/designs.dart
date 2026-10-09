@@ -39,19 +39,10 @@ class DesignsScreen extends ConsumerWidget {
   const DesignsScreen({super.key});
 
   Future<void> _rename(BuildContext context, WidgetRef ref, MyDesign design) async {
-    final controller = TextEditingController(text: design.name);
     final name = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Yeniden adlandır'),
-        content: TextField(controller: controller, maxLength: 60, autofocus: true, decoration: accountField('Tasarım adı')),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')),
-          FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Kaydet')),
-        ],
-      ),
+      builder: (context) => _RenameDesignDialog(name: design.name),
     );
-    controller.dispose();
     if (name == null || name.isEmpty) return;
     await ref.read(authProvider.notifier).withSession((repository, token) => repository.renameDesign(token, design.id, name));
     ref.invalidate(myDesignsProvider);
@@ -84,7 +75,9 @@ class DesignsScreen extends ConsumerWidget {
             ? const EmptyView('Henüz kayıtlı tasarımın yok. XINOBI U sonucunda ya da editörde “Tasarımımı kaydet” dediğinde burada görünür.')
             : GridView.builder(
                 padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, XinobiTokens.gutterMobile, XinobiTokens.gutterMobile, 96),
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 240, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.62),
+                // Reserve room for both two-line captions and the action row,
+                // including the device's accessibility text scale.
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 240, mainAxisSpacing: 12, crossAxisSpacing: 12, mainAxisExtent: 240 + MediaQuery.textScalerOf(context).scale(80) + 64),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final design = items[index];
@@ -118,4 +111,29 @@ class DesignsScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _RenameDesignDialog extends StatefulWidget {
+  const _RenameDesignDialog({required this.name});
+  final String name;
+  @override
+  State<_RenameDesignDialog> createState() => _RenameDesignDialogState();
+}
+
+class _RenameDesignDialogState extends State<_RenameDesignDialog> {
+  late final controller = TextEditingController(text: widget.name);
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Yeniden adlandır'),
+    content: TextField(controller: controller, maxLength: 60, autofocus: true, decoration: accountField('Tasarım adı')),
+    actions: [
+      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')),
+      FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Kaydet')),
+    ],
+  );
 }

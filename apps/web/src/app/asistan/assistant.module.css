@@ -3,3 +3,5 @@
 .context p,.context span,.context small{color:#555}
 
 .context li,.context nav a,.context >div{border-color:#dedede}
+
+.layout>section{padding:24px clamp(16px,3vw,40px);background:#f6f6f6}

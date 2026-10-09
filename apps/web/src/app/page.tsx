@@ -46,9 +46,6 @@ function Icon({ name }: { name: IconName }) {
   return <svg {...common}><path d="M6 16h19M19 10l6 6-6 6" /></svg>;
 }
 
-function NobiMark({ compact = false }: { compact?: boolean }) {
-  return <svg className={compact ? styles.nobiPanelMark : styles.nobiMark} viewBox="0 0 112 108" aria-hidden="true"><path className={styles.nobiAntenna} d="M56 22V35" /><circle className={styles.nobiAntennaTip} cx="56" cy="14" r="10" /><rect className={styles.nobiShell} x="13" y="31" width="86" height="68" rx="31" /><rect className={styles.nobiFace} x="25" y="48" width="62" height="40" rx="17" /><path className={styles.nobiSmile} d="M35 68c0-7 4-11 9-11 8 0 7 15 15 15s7-15 15-15c5 0 9 4 9 11" /></svg>;
-}
 
 
 function ProductCard({ product }: { product: Product }) {
@@ -73,11 +70,9 @@ export default function Home() {
   }) : enabled ? [] : fallbackCategories;
   const titaniumImage = state?.content.titaniumImage ?? '/assets/products/titanium-bronze-gold.png';
   const [slide, setSlide] = useState(0);
-  const [nobiOpen, setNobiOpen] = useState(false);
   const slideCount = slides.length;
   const slideDuration = slides[slide % Math.max(slideCount, 1)]?.duration || 6;
   useEffect(() => { if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return; const timer = window.setTimeout(() => setSlide((current) => (current + 1) % Math.max(slideCount, 1)), slideDuration * 1000); return () => window.clearTimeout(timer); }, [slideCount, slide, slideDuration]);
-  useEffect(() => { const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") setNobiOpen(false); }; document.addEventListener("keydown", closeOnEscape); return () => document.removeEventListener("keydown", closeOnEscape); }, []);
 
   return <div id="top" className={styles.page}>
     {error && <p role="alert">{error}</p>}
@@ -93,7 +88,5 @@ export default function Home() {
       <section className={styles.story} id="hikaye"><p className={styles.eyebrow}>Xinobi Dünyası</p><h2>Teknoloji görünür olmak için değil,<br />hayatınıza uyum sağlamak için.</h2><Link className={styles.textLink} href="/xinobi">Hikâyemizi keşfedin <Icon name="arrow" /></Link></section>
     </main>
     <SiteFooter />
-    <section id="nobi-panel" className={styles.nobiPanel} aria-labelledby="nobi-title" hidden={!nobiOpen}><div className={styles.nobiHead}><div><NobiMark compact /><div><p className={styles.eyebrow}>NOBI</p><h2 id="nobi-title">Size nasıl yardımcı olabilirim?</h2></div></div><button type="button" onClick={() => setNobiOpen(false)} aria-label="Nobi panelini kapat">×</button></div><p>Ürünleri keşfetmenize veya XINOBI U adımlarını anlamanıza yardımcı olabilirim.</p><div className={styles.nobiQuick}><Link href="/urunler">Çay makinesi arıyorum</Link><Link href="/xinobi-u">XINOBI U nasıl çalışır?</Link><Link href="/kurumsal/teklif">Kurumsal teklif almak istiyorum</Link></div><p className={styles.nobiDemo}>Temsili asistan · Gerçek yanıtlar Faz10’da Cloudflare Workers AI ve onaylı katalog verisiyle bağlanacak.</p></section>
-    <button className={styles.nobi} type="button" aria-label="Nobi’ye sor" aria-expanded={nobiOpen} aria-controls="nobi-panel" onClick={() => setNobiOpen((open) => !open)}><NobiMark /><b>Nobi’ye sor</b></button>
   </div>;
 }

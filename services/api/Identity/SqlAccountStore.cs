@@ -458,6 +458,14 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
             snapshot.RefreshTokens.Count(x => x.ExpiresAt > now), snapshot.AccessTokens.Count(x => x.ExpiresAt > now));
     });
 
+    /// <summary>Removes every expired session (accounts that never sign in again are never pruned on their own write).</summary>
+    public Task<int> PruneExpiredSessions() => Run(null, async db =>
+    {
+        var now = clock.GetUtcNow();
+        return await db.AccessSessions.Where(x => x.ExpiresAt <= now).ExecuteDeleteAsync()
+            + await db.RefreshSessions.Where(x => x.ExpiresAt <= now).ExecuteDeleteAsync();
+    });
+
     private static AccountException Invalid() =>
         new("invalid_refresh_token", "Oturumun sona erdi. Tekrar giriş yap.", StatusCodes.Status401Unauthorized);
 }

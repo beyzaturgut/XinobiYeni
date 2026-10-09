@@ -153,15 +153,32 @@ public sealed class NotificationCenter(FeatureDocuments documents, IConfiguratio
         return state.Items[index] = item with { Status = NotificationStatuses.Pending, Attempts = 0, NextAttemptAt = clock.GetUtcNow() };
     });
 
-    /// <summary>Delivers due outbox items once; returns how many were attempted.</summary>
+    /// <summary>How long a claimed item is reserved for the worker that claimed it; after that another worker may retry it.</summary>
+    public static readonly TimeSpan ClaimLease = TimeSpan.FromMinutes(2);
+
+    /// <summary>
+    /// Delivers due outbox items once; returns how many were attempted. Items are claimed first (their next attempt moves past the
+    /// lease) in the same locked write that reads them, so several workers or API processes never send the same message twice.
+    /// A worker that dies mid-send leaves the item to be retried after the lease: delivery is at least once, never lost.
+    /// </summary>
     public async Task<int> DeliverDue(CancellationToken cancellationToken)
     {
-        var now = clock.GetUtcNow();
-        var state = await store.Read();
-        var due = state.Items.Where(item => item.Status == NotificationStatuses.Pending && item.NextAttemptAt <= now).Take(20).ToArray();
+        var (due, devices) = await store.Update(state =>
+        {
+            var now = clock.GetUtcNow();
+            var claimed = new List<NotificationItem>();
+            for (var i = 0; i < state.Items.Count && claimed.Count < 20; i++)
+            {
+                if (state.Items[i].Status != NotificationStatuses.Pending || state.Items[i].NextAttemptAt > now) continue;
+                state.Items[i] = state.Items[i] with { NextAttemptAt = now + ClaimLease };
+                claimed.Add(state.Items[i]);
+            }
+            var accounts = claimed.Select(item => item.AccountId).ToHashSet();
+            return (claimed.ToArray(), state.Devices.Where(device => accounts.Contains(device.AccountId)).ToArray());
+        });
         foreach (var item in due)
         {
-            var tokens = state.Devices.Where(device => device.AccountId == item.AccountId).Select(device => device.Token).ToArray();
+            var tokens = devices.Where(device => device.AccountId == item.AccountId).Select(device => device.Token).ToArray();
             NotificationResult result;
             try
             {

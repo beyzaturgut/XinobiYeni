@@ -127,7 +127,11 @@ builder.Services.AddSingleton<Xinobi.Api.Quotes.QuoteStore>();
 builder.Services.AddHttpClient<Xinobi.Api.Assistant.ITextModelProvider, Xinobi.Api.Assistant.CloudflareTextModelProvider>(client => client.Timeout = TimeSpan.FromSeconds(30));
 builder.Services.AddSingleton<Xinobi.Api.Assistant.AssistantStore>();
 builder.Services.AddSingleton<Xinobi.Api.Assistant.AssistantEngine>();
-if (builder.Environment.IsDevelopment() && builder.Configuration.GetValue("Notifications:WorkerEnabled", true)) builder.Services.AddHostedService<NotificationWorker>();
+// Background work runs inside the API by default: in Development, and wherever feature state is in SQL (claims make several
+// processes safe). A deployment may run it on one dedicated process instead: Notifications:WorkerEnabled=false on the others.
+var featuresInSql = builder.Configuration["Features:StorageProvider"] == "SqlServer";
+if (builder.Configuration.GetValue("Notifications:WorkerEnabled", builder.Environment.IsDevelopment() || featuresInSql)) builder.Services.AddHostedService<NotificationWorker>();
+if (builder.Configuration.GetValue("Maintenance:WorkerEnabled", true)) builder.Services.AddHostedService<Xinobi.Api.Infrastructure.MaintenanceWorker>();
 builder.Services.AddAuthentication(AccountTokenHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, AccountTokenHandler>(AccountTokenHandler.SchemeName, null);
 // Default deny (Faz03 03.04): an endpoint without its own rule needs a signed-in account; public endpoints say AllowAnonymous.
 builder.Services.AddAuthorization(options =>

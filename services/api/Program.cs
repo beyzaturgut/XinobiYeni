@@ -38,7 +38,11 @@ if (builder.Environment.IsDevelopment())
     else
         builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
     builder.Services.AddSingleton<EmailVerificationStore>();
-    builder.Services.AddSingleton<IAccountStore, DevFileAccountStore>();
+    builder.Services.AddSingleton<DevFileAccountStore>();
+    builder.Services.AddSingleton<SqlAccountStore>();
+    // File accounts until the one-time import writes accounts-sql.enabled (or Accounts:StorageProvider decides).
+    builder.Services.AddSingleton<IAccountStore>(services => AccountStorage.UsesSql(builder.Configuration, services.GetRequiredService<LocalCommerceStore>().DataDirectory)
+        ? services.GetRequiredService<SqlAccountStore>() : services.GetRequiredService<DevFileAccountStore>());
     builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
     // Per-variant surface masking (admin); Roboflow only on an explicit admin action, key from user-secrets.
     builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceWorkspace>();
@@ -73,6 +77,26 @@ if (xinobiUOnTestServer)
     });
     builder.Services.AddCors(options => options.AddPolicy(DesignStudioAccess.CorsPolicy, policy => policy
         .WithOrigins(DesignStudioAccess.AllowedOrigins(builder.Configuration)).AllowAnyHeader().WithMethods("GET", "POST")));
+}
+// Outside Development, accounts are served only from SQL Server and only when configured explicitly; otherwise 503.
+var sqlAccountsOutsideDevelopment = !builder.Environment.IsDevelopment() && AccountStorage.Configured(builder.Configuration);
+if (sqlAccountsOutsideDevelopment)
+{
+    if (builder.Configuration["Email:DeliveryMode"] == "Smtp")
+        builder.Services.AddSingleton<IVerificationEmailSender, SmtpVerificationEmailSender>();
+    else if (builder.Configuration["Email:DeliveryMode"] is null or "Resend")
+        builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+    else
+        // Preview shows codes in responses; it must never serve real accounts.
+        throw new InvalidOperationException("Email:DeliveryMode must be Smtp or Resend outside Development.");
+    builder.Services.AddSingleton<EmailVerificationStore>();
+    builder.Services.AddSingleton<SqlAccountStore>();
+    builder.Services.AddSingleton<IAccountStore>(services => services.GetRequiredService<SqlAccountStore>());
+    builder.Services.AddRateLimiter(options => {
+        options.RejectionStatusCode = 429;
+        options.AddPolicy("EmailVerification", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions { PermitLimit = 10, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+        options.AddPolicy("Account", context => RateLimitPartition.GetFixedWindowLimiter(context.Connection.RemoteIpAddress?.ToString() ?? "unknown", _ => new FixedWindowRateLimiterOptions { PermitLimit = 20, Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    });
 }
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
 if (builder.Configuration["Catalog:StorageProvider"] == "SqlServer")
@@ -130,6 +154,13 @@ if (builder.Configuration["CatalogTransfer:ImportPath"] is { Length: > 0 } catal
     return;
 }
 
+if (builder.Configuration.GetValue<bool>("AccountTransfer:Run"))
+{
+    if (!app.Environment.IsDevelopment()) throw new InvalidOperationException("Local account import requires Development.");
+    Environment.ExitCode = await AccountTransfer.Run(app.Services, builder.Configuration.GetValue<bool>("AccountTransfer:Activate"));
+    return;
+}
+
 if (args.Length >= 2 && args[0] == SuperAdminBootstrap.Command)
 {
     Environment.ExitCode = await SuperAdminBootstrap.Run(app.Services.GetRequiredService<IAccountStore>(), args[1], Console.Out);
@@ -162,7 +193,8 @@ if (app.Environment.IsDevelopment()) { app.UseCors("LocalCommerce"); app.UseRate
 else
 {
     app.UseHttpsRedirection();
-    if (xinobiUOnTestServer) { app.UseCors(DesignStudioAccess.CorsPolicy); app.UseRateLimiter(); }
+    if (xinobiUOnTestServer) app.UseCors(DesignStudioAccess.CorsPolicy);
+    if (xinobiUOnTestServer || sqlAccountsOutsideDevelopment) app.UseRateLimiter();
 }
 app.UseAuthentication();
 app.UseAuthorization();

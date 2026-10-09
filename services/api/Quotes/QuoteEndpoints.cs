@@ -13,7 +13,7 @@ public static class QuoteEndpoints
     public static void MapPublicQuotes(this WebApplication app)
     {
         var quotes = app.MapGroup("/api/v1/quotes").WithTags("Quotes").AllowAnonymous().WithProblems();
-        if (app.Environment.IsDevelopment()) quotes.RequireRateLimiting("Account");
+        if (Identity.AccountStorage.RateLimited(app.Environment, app.Configuration)) quotes.RequireRateLimiting("Account");
 
         quotes.MapGet("/options", () => TypedResults.Ok(new QuoteOptions(QuoteStore.Purposes, QuoteStore.MinQuantity, QuoteStore.MaxQuantity, QuoteStore.MaxItems)))
             .WithName("GetQuoteOptions");

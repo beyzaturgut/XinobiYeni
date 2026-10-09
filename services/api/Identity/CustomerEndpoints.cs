@@ -14,7 +14,7 @@ namespace Xinobi.Api.Identity;
 /// </summary>
 public static class CustomerEndpoints
 {
-    public static void Map(RouteGroupBuilder me, bool development)
+    public static void Map(RouteGroupBuilder me, bool rateLimited)
     {
         var emailStart = me.MapPost("/email-verification", async Task<Results<Ok<AccountEmailVerification>, ProblemHttpResult>> (StartEmailChange request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts, CancellationToken token) =>
             {
@@ -58,7 +58,7 @@ public static class CustomerEndpoints
             })
             .WithName("DeleteMyAccount")
             .ProducesProblem(StatusCodes.Status400BadRequest);
-        if (development) foreach (var endpoint in new[] { emailStart, emailConfirm, deletion }) endpoint.RequireRateLimiting("Account");
+        if (rateLimited) foreach (var endpoint in new[] { emailStart, emailConfirm, deletion }) endpoint.RequireRateLimiting("Account");
 
         me.MapGet("/addresses", async Task<Ok<CustomerAddress[]>> (ClaimsPrincipal user, IAccountStore accounts) => TypedResults.Ok(await accounts.Addresses(Id(user))))
             .WithName("ListMyAddresses");

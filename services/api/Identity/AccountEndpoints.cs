@@ -85,15 +85,15 @@ public static class WebSessionCookies
 public static class AccountEndpoints
 {
     /// <summary>
-    /// Shared customer account contract for web and mobile. Development stores accounts in the local file store (ADR-003);
-    /// other environments answer 503 until the SQL Server identity store lands.
+    /// Shared customer account contract for web and mobile. Development uses the local file store until the SQL import switches it
+    /// (ADR-003); other environments serve accounts only with Accounts:StorageProvider=SqlServer, otherwise 503.
     /// </summary>
     public static void MapAccounts(this WebApplication app)
     {
         var auth = app.MapGroup("/api/v1/auth").WithTags("Account").AllowAnonymous();
         var me = app.MapGroup("/api/v1/me").WithTags("Account").RequireAuthorization();
         var admin = app.MapGroup("/api/v1/admin").WithTags("Admin").RequireAuthorization(PermissionAuthorization.StaffPolicy);
-        if (app.Environment.IsDevelopment()) auth.RequireRateLimiting("Account");
+        if (AccountStorage.RateLimited(app.Environment, app.Configuration)) auth.RequireRateLimiting("Account");
         foreach (var group in new[] { auth, me, admin })
         {
             group.AddEndpointFilter(async (context, next) =>
@@ -254,9 +254,9 @@ public static class AccountEndpoints
             .WithName("ChangeMyPassword")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized);
-        if (app.Environment.IsDevelopment()) password.RequireRateLimiting("Account");
+        if (AccountStorage.RateLimited(app.Environment, app.Configuration)) password.RequireRateLimiting("Account");
 
-        CustomerEndpoints.Map(me, app.Environment.IsDevelopment());
+        CustomerEndpoints.Map(me, AccountStorage.RateLimited(app.Environment, app.Configuration));
         Orders.OrderEndpoints.MapCustomerOrders(me);
         Notifications.NotificationEndpoints.MapCustomerNotifications(me);
         Reviews.ReviewEndpoints.MapCustomerReviews(me);

@@ -123,7 +123,7 @@ public static class AccountRules
     public static string Hash(string token) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
 }
 
-/// <summary>Development-only file store beside the local commerce data (ADR-003). Moves to SQL Server with 03.11.</summary>
+/// <summary>Development-only file store beside the local commerce data (ADR-003). Replaced by <see cref="SqlAccountStore"/> after the import.</summary>
 public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvider clock) : IAccountStore
 {
     private sealed record RefreshEntry(string Hash, string FamilyId, string AccountId, DateTimeOffset ExpiresAt, DateTimeOffset? UsedAt, DateTimeOffset? RevokedAt);
@@ -400,6 +400,22 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
         .Select(pair => new StaffOrder(pair.entry.Order, pair.account!.Id, pair.account.Name, pair.account.Email, pair.account.Phone))
         .OrderByDescending(item => item.Order.CreatedAt).ToArray()));
 
+    /// <summary>Everything in the file, for the one-time SQL import. Read-only; the file is left untouched.</summary>
+    public Task<AccountSnapshot> Export() => Locked(state => Task.FromResult(new AccountSnapshot(
+        [.. state.Accounts],
+        [.. state.RefreshTokens.Select(x => new AccountSnapshot.Refresh(x.Hash, x.FamilyId, x.AccountId, x.ExpiresAt, x.UsedAt, x.RevokedAt))],
+        [.. state.AccessTokens.Select(x => new AccountSnapshot.Access(x.Hash, x.AccountId, x.ExpiresAt))],
+        [.. state.Addresses!.Select(x => new AccountSnapshot.Address(x.AccountId, x.Address))],
+        [.. state.Orders!.Select(x => new AccountSnapshot.Order(x.AccountId, x.RequestId, x.Order))])));
+
     private static AccountException Invalid() =>
         new("invalid_refresh_token", "Oturumun sona erdi. Tekrar giriş yap.", StatusCodes.Status401Unauthorized);
+}
+
+public sealed record AccountSnapshot(AccountRecord[] Accounts, AccountSnapshot.Refresh[] RefreshTokens, AccountSnapshot.Access[] AccessTokens, AccountSnapshot.Address[] Addresses, AccountSnapshot.Order[] Orders)
+{
+    public sealed record Refresh(string Hash, string FamilyId, string AccountId, DateTimeOffset ExpiresAt, DateTimeOffset? UsedAt, DateTimeOffset? RevokedAt);
+    public sealed record Access(string Hash, string AccountId, DateTimeOffset ExpiresAt);
+    public sealed record Address(string AccountId, CustomerAddress Value);
+    public sealed record Order(string AccountId, string RequestId, CustomerOrder Value);
 }

@@ -20,7 +20,8 @@ PR'da Faz03 §5'teki alanlar yazılır: önceki sürüm, yeni tablo/indeks/kıs�
 
 ```bash
 export SQLCMDPASSWORD="$(security find-generic-password -s XinobiYeniDB-sql -a xinobiyeni_app -w)"
-SQL="sqlcmd -S tcp:<sunucu>,<port> -d XinobiYeniDB -U xinobiyeni_app -C -l 15 -b"
+# -I: QUOTED_IDENTIFIER ON. Olmadan filtreli indeks (0003 varsayılan adres) Msg 1934 ile düşer ve işlem geri alınır.
+SQL="sqlcmd -S tcp:<sunucu>,<port> -d XinobiYeniDB -U xinobiyeni_app -C -l 15 -b -I"
 
 # 1. Önce: mevcut durum (salt okunur)
 $SQL -Q "SELECT MigrationId FROM __EFMigrationsHistory" || echo "geçmiş tablosu yok (boş veritabanı)"
@@ -81,10 +82,30 @@ Aktarım modu HTTP dinleyicisi veya arka plan worker başlatmaz. İlk aktarım y
 
 `0003_CustomerIdentityOrders.idempotent.sql` tüm geçmişi içerir. 0002'den sonra `identity.Users` tablosuna nullable `DisplayName`/`Phone` ekler; `identity.AccessSessions`, `RefreshSessions`, `CustomerAddresses`, `sales.Orders` ve `sales.OrderLines` tablolarını oluşturur. Veri backfill veya hesap taşıma yapmaz. Son migration-script eşleşme testi artık bu script'i denetler.
 
-**09.10.2026:** Tekrar edilen VERIFYONLY hâlâ Msg262/3013 ile başarısız. 0002/0003 uygulanmadı. Önce DBA yedek doğrulaması, ardından 0002 katalog uygulama/test/aktarımı tamamlanmalıdır. 0003 tek başına SQL hesap deposunu etkinleştirmez; IAccountStore SQL uygulaması ve ayrı doğrulanmış veri aktarımı sonraki iştir. Token veya parola hash'leri çıktıya alınmaz.
+**09.10.2026 (önceki durum):** Tekrar edilen VERIFYONLY hâlâ Msg262/3013 ile başarısız; 0002/0003 bu nedenle bekletilmişti. Önce DBA yedek doğrulaması, ardından 0002 katalog uygulama/test/aktarımı tamamlanmalıdır. 0003 tek başına SQL hesap deposunu etkinleştirmez; IAccountStore SQL uygulaması ve ayrı doğrulanmış veri aktarımı sonraki iştir. Token veya parola hash'leri çıktıya alınmaz.
+
+**09.10.2026 — uygulandı (bilinçli sapma):** Proje sahibi, veritabanında iş verisi olmadığı (yalnız InitialCore, 12 boş tablo) için VERIFYONLY beklenmeden uygulamayı onayladı. Bu, yukarıdaki "doğrulanmış yedek" adımından kayıtlı bir sapmadır ve veri içeren hiçbir ortam için emsal değildir. 0002 tam uygulandı. 0003'ün ilk denemesi `-I` olmadan Msg 1934 ile düştü; işlem tamamen geri alındı (yarım nesne yok). `-I` ile yeniden uygulandı. Sonuç: 3 geçmiş kaydı, 23 iş tablosu; ikinci çalıştırma değişiklik yapmadı. Gerçek SQL testleri (`SqlCatalogIntegrationTests`, `SqlAccountIntegrationTests`) boş tablolarda geçti ve kendi kayıtlarını temizledi. Katalog ve hesap verisi **aktarılmadı**; aktarım ayrı onayla yapılır.
 
 0003 sonrası toplam 3 migration kaydı, 23 iş tablosu (12 çekirdek + 6 katalog + 5 hesap/sipariş) ve ayrı geçmiş tablosu beklenir. Aynı script ikinci kez çalıştırıldığında bu sayılar değişmemelidir. Gerçek SQL üzerinde tek varsayılan adres, aynı müşteride yinelenen istek reddi, hash oturumları, FK/satır tutarı kısıtları ve katalogdan bağımsız sipariş snapshot'ları ayrıca test edilmelidir; mevcut model testleri bu gerçek kanıtın yerine geçmez.
 
 İade/iptal ve saklama kararları D03/D10 açık kalır. Sipariş müşteri FK'sı silmeye restrict uygular; kullanıcı silmeyle tarihsel siparişleri otomatik silmek yasallaştırılmış bir karar sayılmaz. Mevcut demo akışları ödeme almaz ve gerçek stok rezervasyonu yapmaz.
 
 `0003_CustomerIdentityOrders.rollback.sql` yalnız boş/test veriyle kullanılabilir. Sipariş/oturum/adres verilerini ve yeni profil kolonlarını siler; çekirdek/katalog şemasını korur. Gerçek veri varsa ileri düzeltme/restore ve ilgili iş sahibi kararı gerekir.
+
+## Hesapları SQL'e aktarma (0003 sonrası)
+
+`SqlAccountStore` hesap, oturum (yalnız SHA-256 hash), adres ve demo siparişleri 0003 tablolarına yazar; hesap başına `sp_getapplock` ile süreçler arası kilit kullanır. SQL hatası 503 döner, dosyaya geri düşmez.
+
+Seçim:
+- Development: `App_Data/local-commerce/accounts-sql.enabled` işareti varsa veya `Accounts:StorageProvider=SqlServer` ise SQL; yoksa `identity/accounts.json`.
+- Diğer ortamlar: yalnız `Accounts:StorageProvider=SqlServer` ile. `Email:DeliveryMode` Smtp veya Resend olmalı (Preview reddedilir); hesap uçları hız sınırlıdır. Ayar yoksa hesap uçları 503 kalır.
+
+Tek seferlik aktarım (Development, API durdurulmuş, hedef hesap tabloları boş):
+
+```bash
+cd services/api
+dotnet run --no-launch-profile --environment Development -- --AccountTransfer:Run=true                          # dene: aktarır ve doğrular, işaret yazmaz
+dotnet run --no-launch-profile --environment Development -- --AccountTransfer:Run=true --AccountTransfer:Activate=true  # boş tabloda: aktar, doğrula, işareti yaz
+```
+
+İçe aktarma yalnız boş `identity.Users`/`sales.Orders`/adres/oturum tablolarında çalışır; okuyup kaynağa karşılaştırır, fark varsa tüm işlem geri alınır. Süresi dolmuş oturumlar taşınmaz. Çıktı yalnız sayılardır. Etkinleştirmede dosya aktarım sırasında değiştiyse işaret yazılmaz. `accounts.json` arşiv olarak kalır; geri dönüş için işaret dosyası silinir (SQL'e yazılan yeni kayıtlar dosyaya geri taşınmaz).

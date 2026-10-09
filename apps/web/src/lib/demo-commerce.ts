@@ -171,6 +171,13 @@ export async function placeDemoOrder(addressId:string,items:{productId:string;va
 }
 
 const statusTexts:Record<string,string>={received:'Sipariş alındı',preparing:'Hazırlanıyor',shipped:'Kargoya verildi',delivered:'Teslim edildi',cancelled:'İptal edildi',returned:'İade edildi'};
+export type MyReview={id:string;productId:string;rating:number;title?:string|null;body:string;status:'pending'|'approved'|'rejected';createdAt:string;moderationNote?:string|null};
+export async function myReviews(){return (await signedIn<MyReview[]>('/me/reviews'))??[]}
+/** Only products from a delivered order can be reviewed; a new submission replaces the earlier one and waits for moderation. */
+export async function submitReview(productId:string,rating:number,title:string,body:string){
+  return (await signedIn<MyReview>('/me/reviews',{method:'POST',body:JSON.stringify({productId,rating,title:title.trim()||null,body:body.trim()})}))!;
+}
+
 export const orderStatusText=(status:string)=>statusTexts[status]??status;
 const requestTexts:Record<string,string>={requested:'Değerlendiriliyor',approved:'Onaylandı',rejected:'Kabul edilmedi',completed:'Tamamlandı'};
 export const requestStatusText=(request:OrderRequest)=>`${request.type==='cancel'?'İptal':'İade'} talebi · ${requestTexts[request.status]??request.status}`;

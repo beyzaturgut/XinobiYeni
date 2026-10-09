@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Jost } from "next/font/google";
 import "./globals.css";
 import LegalConsent from "./legal-consent";
+import CompareTray from "../components/compare-tray";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin", "latin-ext"], display: "swap" });
 // Header typeface: open-licence geometric sans closest to the measured Dyson Futura header (owner request, 07.10.2026).
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return <html lang="tr" className={`${inter.variable} ${jost.variable}`}><body>{children}<LegalConsent /></body></html>;
+  return <html lang="tr" className={`${inter.variable} ${jost.variable}`}><body>{children}<CompareTray /><LegalConsent /></body></html>;
 }

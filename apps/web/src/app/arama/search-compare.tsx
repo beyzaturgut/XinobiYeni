@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
+import { clearCompare, maxCompare, toggleCompare, useCompare } from "../../lib/compare";
 import styles from "./search.module.css";
 import teaMaker from "../../../public/assets/products/tea-maker-101-blue.webp";
 import coffeeMaker from "../../../public/assets/products/coffee-maker-101-gold.webp";
@@ -24,14 +25,13 @@ export default function SearchCompare() {
   const { state, error, enabled } = useCommerce();
   const items: Item[] = useMemo(() => state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, description: product.description, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0), features: [product.category, `${product.variants.length} renk`, product.description], href: product.id === 'DEMO-P101' ? '/urunler/cay-makinesi-101' : `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : enabled ? [] : fallbackItems, [state, enabled]);
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<string[]>(["tea", "coffee"]);
+  // The comparison list is shared with product cards, the tray and /karsilastir.
+  const selected = useCompare();
   const normalized = query.trim().toLocaleLowerCase("tr-TR");
   const results = useMemo(() => items.filter((item) => `${item.name} ${item.family} ${item.description}`.toLocaleLowerCase("tr-TR").includes(normalized)), [normalized, items]);
   const compared = selected.map((id) => items.find((item) => item.id === id)).filter((item): item is Item => Boolean(item));
 
-  function toggle(id: string) {
-    setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : current.length < 3 ? [...current, id] : current);
-  }
+  const toggle = (id: string) => { toggleCompare(id); };
 
   return <>
     {error && <p role="alert">{error}</p>}
@@ -43,15 +43,15 @@ export default function SearchCompare() {
     </section>
 
     <section className={styles.results} aria-labelledby="results-title">
-      <div className={styles.sectionHeader}><div><p>Arama sonuçları</p><h2 id="results-title">{query ? `“${query}” için ${results.length} sonuç` : `${results.length} demo ürün`}</h2></div><span>Karşılaştırmak için en fazla 3 ürün seçin.</span></div>
-      {results.length ? <div className={styles.resultGrid}>{results.map((item) => { const active = selected.includes(item.id); const full = selected.length === 3 && !active; return <article key={item.id}>
+      <div className={styles.sectionHeader}><div><p>Arama sonuçları</p><h2 id="results-title">{query ? `“${query}” için ${results.length} sonuç` : `${results.length} demo ürün`}</h2></div><span>Karşılaştırmak için en fazla {maxCompare} ürün seçin.</span></div>
+      {results.length ? <div className={styles.resultGrid}>{results.map((item) => { const active = selected.includes(item.id); const full = selected.length === maxCompare && !active; return <article key={item.id}>
         <div className={styles.productMedia}>{item.image ? <Image className={item.tall ? styles.tall : ""} src={item.image} width={600} height={600} alt={item.name} sizes="(max-width: 680px) 88vw, 25vw" /> : <span>Görsel yok</span>}</div>
-        <div className={styles.productCopy}><p>{item.family}</p><h3>{item.name}</h3><span>{item.description}</span><div><button type="button" aria-pressed={active} disabled={full} onClick={() => toggle(item.id)}>{active ? "Karşılaştırmadan çıkar" : full ? "En fazla 3 ürün" : "Karşılaştır"}</button>{item.href ? <Link href={item.href}>İncele →</Link> : <span>Detay hazırlanıyor</span>}</div></div>
+        <div className={styles.productCopy}><p>{item.family}</p><h3>{item.name}</h3><span>{item.description}</span><div><button type="button" aria-pressed={active} disabled={full} onClick={() => toggle(item.id)}>{active ? "Karşılaştırmadan çıkar" : full ? `En fazla ${maxCompare} ürün` : "Karşılaştır"}</button>{item.href ? <Link href={item.href}>İncele →</Link> : <span>Detay hazırlanıyor</span>}</div></div>
       </article>; })}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Bu ifadeyle eşleşen ürün yok.</h2><p>Başka bir ürün adı veya kategori deneyin.</p><button type="button" onClick={() => setQuery("")}>Aramayı temizle</button></div>}
     </section>
 
     <section className={styles.compare} aria-labelledby="compare-title">
-      <div className={styles.sectionHeader}><div><p>Yan yana bakın</p><h2 id="compare-title">Ürün karşılaştırma</h2></div><button type="button" onClick={() => setSelected([])} disabled={!selected.length}>Tümünü temizle</button></div>
+      <div className={styles.sectionHeader}><div><p>Yan yana bakın</p><h2 id="compare-title">Ürün karşılaştırma</h2></div><div><Link href="/karsilastir">Ayrıntılı karşılaştırma →</Link> <button type="button" onClick={clearCompare} disabled={!selected.length}>Tümünü temizle</button></div></div>
       {compared.length ? <div className={styles.compareTable} role="region" aria-label="Seçilen ürünlerin karşılaştırması" tabIndex={0}><table><thead><tr><th>Özellik</th>{compared.map((item) => <th key={item.id}>{item.name}<button type="button" onClick={() => toggle(item.id)} aria-label={`${item.name} ürününü karşılaştırmadan çıkar`}>×</button></th>)}</tr></thead><tbody>{[0,1,2].map((index) => <tr key={index}><th>{["Kullanım", "Renk / seçenek", "Kişiselleştirme"][index]}</th>{compared.map((item) => <td key={item.id}>{item.features[index]}</td>)}</tr>)}<tr><th>Fiyat ve stok</th>{compared.map((item) => <td key={item.id}><span className={styles.waiting}>{[money(item.price), stockText(item.stock)].filter(Boolean).join(' · ')}</span></td>)}</tr></tbody></table></div> : <div className={styles.compareEmpty}>Karşılaştırma tablosu için yukarıdan en az bir ürün seçin.</div>}
     </section>
   </>;

@@ -4,6 +4,7 @@ import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
+import CompareToggle from "../../components/compare-toggle";
 import styles from "./catalog.module.css";
 
 import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
@@ -81,6 +82,7 @@ export default function Catalog() {
       <Link className={styles.cardLink} href={product.href || '/urunler'}><div className={styles.media}>{(product.colorCount || 0)>1 && <span className={styles.multiColorBadge}>◉ {product.colorCount} renk</span>}<span className={styles.demoBadge}>Xinobi</span>{product.image ? <Image className={product.tall ? styles.tallImage : ""} src={product.image} width={600} height={600} alt={`${product.name}, ${product.color}`} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /> : <span>Görsel yok</span>}</div>
 
       <div className={styles.cardBody}><p>{product.family}</p><h2>{product.name}</h2><div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{(product.colorCount || 0)>1 ? `${product.colorCount} renk seçeneği` : product.color}</span></div><div className={styles.cardFooter}><span>{money(product.price)}{stockText(product.stock) && <><br />{stockText(product.stock)}</>}</span>{product.href ? <span className={styles.inspect}>İncele <b aria-hidden="true">→</b></span> : <span>İncele →</span>}</div></div></Link>
+      {state && <div className={styles.compareButton}><CompareToggle productId={product.id} name={product.name} compact /></div>}
       <button type="button" className={styles.favoriteButton} aria-label={`${product.name} ${product.color} ürününü ${favorites.includes(product.id) ? "favorilerden çıkar" : "favorilere ekle"}`} aria-pressed={favorites.includes(product.id)} onClick={() => toggleFavorite(product.id)}><span aria-hidden="true">{favorites.includes(product.id) ? "♥" : "♡"}</span></button>
     </article>)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
   </section>;

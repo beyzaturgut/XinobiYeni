@@ -95,3 +95,5 @@
 .search>div,.sort select{height:42px}.categoryBar button{min-height:36px;padding:0 14px}
 .resultSummary{margin-top:14px;padding:10px 0}
 }
+
+.compareButton{position:absolute;top:14px;right:61px;z-index:3}

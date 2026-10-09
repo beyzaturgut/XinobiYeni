@@ -10,12 +10,28 @@ namespace Xinobi.Architecture.Tests;
 public sealed class LocalCommerceTests : IDisposable
 {
     private readonly string dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-commerce-test-" + Guid.NewGuid());
-    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = dataDirectory }));
     });
     private const string Root = "/api/v1/local-commerce";
+
+    [Fact]
+    public async Task RemovingVariantAlsoRemovesItsPriceAndPreservesRemainingPrices()
+    {
+        using var factory = CreateFactory();
+        using var client = factory.CreateClient();
+        var state = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+        var product = state.Products.First(p => p.Variants.Length > 1 && p.Variants.Any(v => state.Prices.ContainsKey(v.Id)));
+        var variant = product.Variants.First(v => state.Prices.ContainsKey(v.Id));
+        (await client.PutAsJsonAsync(Root + "/products/" + product.Id,
+            product with { Variants = product.Variants.Where(v => v.Id != variant.Id).ToArray() })).EnsureSuccessStatusCode();
+        var saved = (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!;
+        Assert.False(saved.Prices.ContainsKey(variant.Id));
+        Assert.Equal(state.Prices.Where(p => p.Key != variant.Id).ToDictionary(), saved.Prices);
+        Assert.DoesNotContain(saved.Products.SelectMany(p => p.Variants), v => v.Id == variant.Id);
+    }
 
     [Fact]
     public async Task AnnouncementsPublishPersistValidateAndCanBeRemoved()

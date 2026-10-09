@@ -20,7 +20,7 @@ public sealed class ProductSurfaceReviewApiTests
         return dir!.FullName;
     }
     private static WebApplicationFactory<Program> Factory(bool enabled = true, string environment = "Development", string? root = null, string provider = "reference", bool external = false) =>
-        new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(environment);
             builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>

@@ -25,7 +25,7 @@ public sealed class OrderLifecycleTests : IDisposable
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-order-test-" + Guid.NewGuid());
     private static readonly DateTimeOffset Now = new(2026, 10, 9, 12, 0, 0, TimeSpan.Zero);
 
-    private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("Notifications:WorkerEnabled", "false");

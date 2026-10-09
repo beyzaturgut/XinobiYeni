@@ -10,7 +10,7 @@ namespace Xinobi.Architecture.Tests;
 public sealed class ProductSurfaceCorrectionApiTests
 {
     private const string Root = DevelopmentSurfaceReview.Route;
-    private static WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(b =>
+    private static WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(b =>
     {
         b.UseEnvironment("Development"); b.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         {

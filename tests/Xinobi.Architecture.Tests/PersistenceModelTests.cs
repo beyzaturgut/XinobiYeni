@@ -29,6 +29,8 @@ public sealed class PersistenceModelTests
     [InlineData(typeof(ExternalMapping), new[] { nameof(ExternalMapping.System), nameof(ExternalMapping.EntityType), nameof(ExternalMapping.LocalId) })]
     [InlineData(typeof(ExternalMapping), new[] { nameof(ExternalMapping.System), nameof(ExternalMapping.EntityType), nameof(ExternalMapping.ExternalId) })]
     [InlineData(typeof(Asset), new[] { nameof(Asset.StorageKey) })]
+    [InlineData(typeof(CatalogCategory), new[] { nameof(CatalogCategory.NormalizedName) })]
+    [InlineData(typeof(CatalogVariant), new[] { nameof(CatalogVariant.NormalizedSku) })]
     public void IntegrityKeysAreUnique(Type entity, string[] columns)
     {
         using var context = CreateContext();
@@ -59,7 +61,7 @@ public sealed class PersistenceModelTests
     {
         using var context = CreateContext();
         var generated = context.GetService<IMigrator>().GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
-        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0001_InitialCore.idempotent.sql"));
+        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0002_CatalogCommerce.idempotent.sql"));
         Assert.Equal(Normalize(committed), Normalize(generated));
     }
 

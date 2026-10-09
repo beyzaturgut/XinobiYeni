@@ -23,6 +23,7 @@ using Xinobi.Api.Notifications;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
+builder.Services.AddSingleton<SqlCommerceStore>();
 // Numbers travel as JSON numbers only, so the contract and generated clients type them as plain integers.
 builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
 if (builder.Environment.IsDevelopment())
@@ -74,8 +75,9 @@ if (xinobiUOnTestServer)
         .WithOrigins(DesignStudioAccess.AllowedOrigins(builder.Configuration)).AllowAnyHeader().WithMethods("GET", "POST")));
 }
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
-// Outside Development the catalog reads the published snapshot when one is configured, otherwise it answers 503
-// until the SQL Server source exists (Faz03 03.11).
+if (builder.Configuration["Catalog:StorageProvider"] == "SqlServer")
+    builder.Services.Replace(ServiceDescriptor.Singleton<ICatalogSource>(services => new SqlCatalogSource(services.GetRequiredService<SqlCommerceStore>())));
+// Without an explicit SQL provider, non-Development environments use a snapshot when configured, otherwise 503.
 if (builder.Configuration["Catalog:SnapshotPath"] is { Length: > 0 } snapshotPath)
     builder.Services.TryAddSingleton<ICatalogSource>(new SnapshotCatalogSource(snapshotPath));
 builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
@@ -119,6 +121,14 @@ builder.Services.AddProblemDetails(options =>
 });
 
 var app = builder.Build();
+
+if (builder.Configuration["CatalogTransfer:ImportPath"] is { Length: > 0 } catalogImportPath)
+{
+    if (!app.Environment.IsDevelopment()) throw new InvalidOperationException("Local catalog import requires Development.");
+    Environment.ExitCode = await CatalogTransfer.Run(app.Services, catalogImportPath,
+        builder.Configuration.GetValue<bool>("CatalogTransfer:Activate"));
+    return;
+}
 
 if (args.Length >= 2 && args[0] == SuperAdminBootstrap.Command)
 {

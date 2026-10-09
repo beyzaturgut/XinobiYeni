@@ -12,7 +12,7 @@ public sealed class DesignStudioTests : IDisposable
 {
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-design-test-" + Guid.NewGuid());
     private readonly FakeImageProvider provider = new();
-    private WebApplicationFactory<Program> Factory(int limit = 30) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(int limit = 30) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["DesignStudio:WorkerEnabled"] = "true", ["DesignStudio:ExternalInferenceEnabled"] = "false", ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:DailyGenerationLimit"] = limit.ToString() }));

@@ -47,3 +47,32 @@ Faz03 §5.4: önce `__EFMigrationsHistory` ve `sys.tables` ile gerçek durumu ok
 
 - **Boş veya yalnız test verisi olan veritabanı:** `infra/db/migrations/0001_InitialCore.rollback.sql` 12 tabloyu siler ve geçmiş kaydını kaldırır. Şemaları (`identity`, `ops`, `media`) bırakır.
 - **Gerçek veri içeren veritabanı:** silici geri alma yapılmaz. İleri düzeltme (forward fix) migration'ı veya yedekten geri yükleme kararını PM verir.
+
+## Katalog migration'ı ve yerel aktarım (0002)
+
+`0002_CatalogCommerce.idempotent.sql` tüm migration geçmişini içerir; yeni boş hedefte önce çekirdeği, mevcut InitialCore hedefinde yalnız katalog şemasını oluşturur. `catalog.Categories`, `Products`, `Variants`, `VariantPrices`, `Content`, `Announcements` tablolarını ekler. SKU benzersiz, stok sıfır veya pozitif, fiyat mevcut varyanta bağlı ve 1–999999999 kuruş aralığında olmalıdır. Eksik fiyatlar üretilmez. Ürün/varyant kimlikleri ve görsel referansları korunur; görseller dosya deposunda kalır.
+
+09.10.2026 yedeği `COPY_ONLY,CHECKSUM` ile başarıyla alındı, ancak uygulama hesabında `RESTORE VERIFYONLY` yetkisi yok. **0002 henüz uygulanmadı**. SQL yöneticisi `tools/sql/verify-catalog-backup.sql` dosyasını yetkili hesabıyla çalıştırıp başarılı sonucu paylaşmalı. Microsoft [VERIFYONLY izinleri](https://learn.microsoft.com/en-us/sql/t-sql/statements/restore-statements-verifyonly-transact-sql?view=sql-server-ver16), `CREATE DATABASE` kontrolünün nedenini açıklar. Uygulama hesabına geniş sunucu yetkisi eklemek yerine doğrulamayı DBA yapabilir. VERIFYONLY başarılı olması tam restore provası değildir.
+
+Doğrulama sonrası sıra:
+
+1. Mevcut migration geçmişini ve katalog tablo/veri durumunu oku. Yalnız InitialCore varsa 0002 script'ini `sqlcmd -b` ile uygula; 2 geçmiş kaydı ve 6 katalog tablosunu doğrula. Aynı script'i tekrar çalıştırıp geçmişin değişmediğini kontrol et.
+2. **Yerel veri aktarılmadan önce**, boş katalog için gerçek SQL entegrasyon testini çalıştır. `XINOBI_TEST_SQL` bağlantıyı yalnız alt süreç ortamından alır; `XINOBI_TEST_EMPTY_CATALOG=1` açık onayı gereklidir. `dotnet test tests/Xinobi.Architecture.Tests --filter FullyQualifiedName~SqlCatalogIntegrationTests.EmptyCatalogImportConcurrencyConstraintsAndRollback`. Test her katalog tablosunun boşluğunu kontrol eder, fixture ile import/tekrar/ret, yarışan stok güncellemeleri, SQL kısıtları ve geri alma testini yapar, fixture'ı kaldırır. Katalogda tek bir mevcut kayıt varsa test veri silme bloğuna girmeden durur. Aktarılmış gerçek katalog üzerinde çalıştırılmaz.
+3. Yerel API/panel katalog yazımlarını durdur. `state.json` ve medya dizininin güvenli kopyasını al; verinin aktarım sırasında değişmemesi gerekir.
+4. Development ortamında, gerçek yerel bağlantı ayarıyla aktar:
+
+```bash
+dotnet run --project services/api --no-launch-profile -p:OpenApiGenerateDocumentsOnBuild=false -- \
+  --environment=Development \
+  --CatalogTransfer:ImportPath=/tam/yol/services/api/App_Data/local-commerce/state.json \
+  --CatalogTransfer:Activate=true
+```
+
+Aktarım modu HTTP dinleyicisi veya arka plan worker başlatmaz. İlk aktarım yalnız boş SQL kataloğuna, tek transaction içinde yapılır; SQL'den geri okunan kayıtlar JSON anlamında kaynakla aynı değilse geri alınır. Aynı kaynakla tekrar işlem no-op; farklı SQL verisinin üzerine yazılmaz. Kaynak dosya tekrar kontrol edilmeden etkinleştirme işareti oluşturulmaz. Aktarımda hata oluştuysa önce SQL ve kaynak durumunu oku; farklı kayıtları silip otomatik yeniden deneme yapma.
+
+5. Aktarım doğrulanınca yalnız ilgili veri dizininde ignored `catalog-sql.enabled` oluşturulur. Yerel servisleri yeni kodla yeniden başlat. `/api/v1/local-commerce/state` yanıtındaki `X-Xinobi-Catalog-Storage: SqlServer` ve kaynak/SQL ürün, varyant, fiyat, kategori, galeri, maske, içerik eşitliğini doğrula. Panelde bir test ürününün fiyat/stok değişimini webde ve SQL'de kontrol edip test ürününü kaldır; gerçek ürünü değiştirerek test yapma.
+6. Eski `state.json` arşivdir; sonraki katalog yazımları SQL'e gider. Deploy paketleme işareti görünce çalışan yerel API'nin SQL kataloğunu okur; API kapalıysa veya File deposundaysa eski snapshot'a düşmez. Hesap, sipariş, bildirim, tasarım ve teklif depoları bu katalog adımıyla SQL'e geçmiş sayılmaz.
+
+`Catalog:StorageProvider=SqlServer` başka ortamda da SQL okuma kaynağını açıkça seçebilir. Panelin loopback/Development sınırı bu değişiklikte korunur; production yönetim API'sinin yetki ve kalıcı medya bağlantısı ayrı iş adımıdır. `Catalog:StorageProvider=File` yalnız bilinçli yerel geri dönüş içindir; SQL'deki yeni değişiklikler eski dosyada yoktur, otomatik geri dönüş yapılmaz.
+
+`0002_CatalogCommerce.rollback.sql` yalnız boş/test katalogda kullanılabilir, çekirdek tabloları korur; gerçek katalog varsa ileri düzeltme veya doğrulanmış restore uygulanır. Otomatik başlangıç migration'ı yoktur.

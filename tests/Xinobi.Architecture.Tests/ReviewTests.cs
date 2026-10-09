@@ -21,7 +21,7 @@ public sealed class ReviewTests : IDisposable
 {
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-review-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("Notifications:WorkerEnabled", "false");

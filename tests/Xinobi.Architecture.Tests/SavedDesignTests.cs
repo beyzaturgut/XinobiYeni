@@ -20,7 +20,7 @@ public sealed class SavedDesignTests : IDisposable
     private static readonly byte[] Png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-saved-design-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("Notifications:WorkerEnabled", "false");

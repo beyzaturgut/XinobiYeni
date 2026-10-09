@@ -20,7 +20,7 @@ public sealed class AccountTests : IDisposable
 {
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-account-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> Factory(string environment = "Development") => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(string environment = "Development") => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory }));

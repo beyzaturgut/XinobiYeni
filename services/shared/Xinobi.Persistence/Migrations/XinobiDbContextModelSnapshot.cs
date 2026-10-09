@@ -127,6 +127,222 @@ namespace Xinobi.Persistence.Migrations
                     b.ToTable("AuditLogs", "ops");
                 });
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogAnnouncement", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("PublishedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Announcements", "catalog");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogCategory", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("NormalizedName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.HasKey("Name");
+
+                    b.HasIndex("NormalizedName")
+                        .IsUnique();
+
+                    b.ToTable("Categories", "catalog");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogContent", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("AnnouncementsDefined")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("HomeJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Content", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_Content_HomeJson", "ISJSON([HomeJson]) = 1");
+
+                            t.HasCheckConstraint("CK_Content_Singleton", "[Id] = 1");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogProduct", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("CategoryName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GalleryJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("OriginalImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool?>("Personalizable")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SeoTitle")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SpecsJson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryName");
+
+                    b.HasIndex("Active", "CategoryName");
+
+                    b.ToTable("Products", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_Products_GalleryJson", "[GalleryJson] IS NULL OR ISJSON([GalleryJson]) = 1");
+
+                            t.HasCheckConstraint("CK_Products_SpecsJson", "[SpecsJson] IS NULL OR ISJSON([SpecsJson]) = 1");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogVariant", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("Color")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Hex")
+                        .HasMaxLength(7)
+                        .HasColumnType("nvarchar(7)");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NormalizedSku")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProductId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("Sku")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SurfaceImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SurfaceMask")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedSku")
+                        .IsUnique();
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("Variants", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_Variants_Stock", "[Stock] >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogVariantPrice", b =>
+                {
+                    b.Property<string>("VariantId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<long>("Cents")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("VariantId");
+
+                    b.ToTable("VariantPrices", "catalog", t =>
+                        {
+                            t.HasCheckConstraint("CK_VariantPrices_Cents", "[Cents] > 0 AND [Cents] <= 999999999");
+                        });
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.ExternalMapping", b =>
                 {
                     b.Property<long>("Id")
@@ -531,6 +747,33 @@ namespace Xinobi.Persistence.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("UserRoles", "identity");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogProduct", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.CatalogCategory", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryName")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogVariant", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.CatalogProduct", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CatalogVariantPrice", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.CatalogVariant", null)
+                        .WithOne()
+                        .HasForeignKey("Xinobi.Persistence.Entities.CatalogVariantPrice", "VariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Xinobi.Persistence.Entities.RolePermission", b =>

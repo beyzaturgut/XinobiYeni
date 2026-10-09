@@ -21,7 +21,7 @@ public sealed class AuthorizationTests : IDisposable
 {
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-authorization-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory }));

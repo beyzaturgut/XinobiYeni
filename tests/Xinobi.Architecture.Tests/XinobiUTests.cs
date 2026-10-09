@@ -18,7 +18,7 @@ public sealed class XinobiUTests : IDisposable
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-u-test-" + Guid.NewGuid());
     private readonly CountingProvider provider = new();
 
-    private WebApplicationFactory<Program> Factory(string environment = "Development") => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(string environment = "Development") => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory }));
@@ -65,7 +65,7 @@ public sealed class XinobiUTests : IDisposable
         Directory.CreateDirectory(directory);
         var snapshot = Path.Combine(directory, "snapshot.json");
         await File.WriteAllTextAsync(snapshot, await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../services/api/LocalCommerce/seed.json")));
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Production");
             builder.UseSetting("Catalog:SnapshotPath", snapshot);

@@ -10,7 +10,7 @@ public sealed class CommerceSurfaceIntegrationTests : IDisposable
 {
  private readonly string data = Path.Combine(Path.GetTempPath(), "xinobi-integration-"+Guid.NewGuid());
  private static string Repo() { var dir=new DirectoryInfo(AppContext.BaseDirectory); while(dir is not null && !File.Exists(Path.Combine(dir.FullName,"XinobiYeni.slnx")))dir=dir.Parent;return dir!.FullName; }
- private WebApplicationFactory<Program> Factory(bool enabled=true,string environment="Development") => new WebApplicationFactory<Program>().WithWebHostBuilder(b=>{
+ private WebApplicationFactory<Program> Factory(bool enabled=true,string environment="Development") => new IsolatedApiFactory().WithWebHostBuilder(b=>{
   b.UseEnvironment(environment);
   // Program reads this while building services, before ConfigureAppConfiguration sources apply; UseSetting is visible then.
   b.UseSetting("DesignStudio:WorkerEnabled","false");

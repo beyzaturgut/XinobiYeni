@@ -3,9 +3,8 @@ using Xinobi.Api.LocalCommerce;
 namespace Xinobi.Api.Catalog;
 
 /// <summary>
-/// Read side behind the public catalog contract. Development reads the local file store (ADR-003); other environments
-/// read the published catalogue snapshot when <c>Catalog:SnapshotPath</c> is set, and otherwise answer 503 until the
-/// SQL Server catalog lands (Faz03 03.11 / Faz04).
+/// Read side behind the public catalog contract. Development uses the compatibility facade; an explicit SQL provider
+/// selects the relational catalog. Other environments may use the published read-only snapshot or answer 503.
 /// </summary>
 public interface ICatalogSource
 {
@@ -15,6 +14,11 @@ public interface ICatalogSource
 public sealed class CatalogUnavailableException() : Exception("Catalog source is not configured for this environment.");
 
 public sealed class LocalCommerceCatalogSource(LocalCommerceStore store) : ICatalogSource
+{
+    public Task<CommerceState> ReadAsync() => store.Read();
+}
+
+public sealed class SqlCatalogSource(SqlCommerceStore store) : ICatalogSource
 {
     public Task<CommerceState> ReadAsync() => store.Read();
 }

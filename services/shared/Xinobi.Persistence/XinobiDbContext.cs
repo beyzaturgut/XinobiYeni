@@ -26,9 +26,16 @@ public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) :
     public DbSet<SyncAttempt> SyncAttempts => Set<SyncAttempt>();
     public DbSet<ExternalMapping> ExternalMappings => Set<ExternalMapping>();
     public DbSet<Asset> Assets => Set<Asset>();
+    public DbSet<CatalogCategory> CatalogCategories => Set<CatalogCategory>();
+    public DbSet<CatalogProduct> CatalogProducts => Set<CatalogProduct>();
+    public DbSet<CatalogVariant> CatalogVariants => Set<CatalogVariant>();
+    public DbSet<CatalogVariantPrice> CatalogPrices => Set<CatalogVariantPrice>();
+    public DbSet<CatalogContent> CatalogContent => Set<CatalogContent>();
+    public DbSet<CatalogAnnouncement> CatalogAnnouncements => Set<CatalogAnnouncement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        CatalogModel.Configure(modelBuilder);
         modelBuilder.Entity<User>(user =>
         {
             user.ToTable("Users", IdentitySchema, table =>

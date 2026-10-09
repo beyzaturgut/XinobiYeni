@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Xinobi.Api.Catalog;
 
 namespace Xinobi.Api.LocalCommerce;
 
@@ -22,14 +23,16 @@ public record AnnouncementCreate(string Title, string Body, string Kind);
 public record CategoryCreate(string Name);
 public record PriceUpdate(long Cents);
 
-// Development-only persistence. Production commerce remains SQL Server backed.
-public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfiguration configuration)
+// Compatibility facade for panel, media and Development identity. SQL catalog use is explicit; files remain intact.
+public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfiguration configuration, SqlCommerceStore sql)
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly string path = configuration["LocalCommerce:DataDirectory"] ?? Path.Combine(environment.ContentRootPath, "App_Data", "local-commerce");
     internal static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     public string DataDirectory => path;
     public string MediaDirectory => Path.Combine(path, "media");
+    public bool UsesSql => configuration["Catalog:StorageProvider"] == "SqlServer"
+        || configuration["Catalog:StorageProvider"] is null && File.Exists(Path.Combine(path, "catalog-sql.enabled"));
 
     private async Task<CommerceState> ReadCore()
     {
@@ -48,6 +51,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
 
     public async Task<CommerceState> Read()
     {
+        if (UsesSql) return await sql.Read();
         await gate.WaitAsync();
         try { return await ReadCore(); }
         finally { gate.Release(); }
@@ -55,6 +59,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
 
     public async Task<CommerceState> Update(Func<CommerceState, CommerceState> change)
     {
+        if (UsesSql) return await sql.Update(change);
         await gate.WaitAsync();
         try
         {

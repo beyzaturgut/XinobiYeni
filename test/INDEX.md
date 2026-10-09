@@ -169,3 +169,5 @@
 - 09.10.2026 · [TST-109 SQL bağlantı teşhisi](2026-10-09/TST-109-sql-connectivity-diagnosis.md) — İlk kontrolde eksik ayar ve TCP timeout; ayar düzeltmesi sonrası tekrar kontrolünde TCP, SQL login, XinobiYeniDB ve API readiness başarılı. Parola ve yerel ayar Git dışında.
 
 - 09.10.2026 · [TST-110 ilk SQL migration uygulaması](2026-10-09/TST-110-initial-core-migration-application.md) — Model/script testleri 12/12; boş XinobiYeniDB’ye InitialCore uygulandı, 12 temel tablo ve 1 sürüm kaydı doğrulandı; ikinci uygulama sonucu aynı, API SQL ready. Yerel iş verileri henüz SQL’e taşınmadı.
+
+- 09.10.2026 · [TST-111 SQL katalog hazırlığı](2026-10-09/TST-111-sql-catalog-preparation.md) — 0002 migration, SQL depo ve doğrulamalı aktarım hazır; .NET 315 geçti / 1 gerçek SQL testi atlandı. COPY_ONLY/CHECKSUM yedeği alındı, VERIFYONLY Msg262 yetki hatası nedeniyle canlı migration/aktarım bekliyor. SQL yöneticisine çalıştırılacak doğrulama dosyası hazırlandı.

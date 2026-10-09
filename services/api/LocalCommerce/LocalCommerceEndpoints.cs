@@ -33,6 +33,7 @@ public static class LocalCommerceEndpoints
             try { return await next(context); }
             catch (Xinobi.Api.Infrastructure.ProblemException error) { return Results.Json(new { message = error.Message, code = error.Code }, statusCode: error.Status); }
             catch (Xinobi.Api.Identity.AccountException error) { return Results.Json(new { message = error.Message, code = error.Code }, statusCode: error.Status); }
+            catch (Xinobi.Api.Catalog.CatalogUnavailableException) { return Results.Json(new { message = "Katalog şu anda kullanılamıyor.", code = "catalog_unavailable" }, statusCode: 503); }
         });
         return group;
     }
@@ -41,7 +42,12 @@ public static class LocalCommerceEndpoints
     {
         // These endpoints must never be exposed by a production deployment.
         if (PanelGroup(app) is not { } group) return;
-        group.MapGet("/state", async (LocalCommerceStore store) => Results.Ok(await store.Read()));
+        group.MapGet("/state", async (HttpContext http, LocalCommerceStore store) =>
+        {
+            var state = await store.Read();
+            http.Response.Headers["X-Xinobi-Catalog-Storage"] = store.UsesSql ? "SqlServer" : "File";
+            return Results.Ok(state);
+        });
         group.MapPost("/announcements", async (AnnouncementCreate announcement, LocalCommerceStore store) =>
         {
             var title = announcement.Title?.Trim();var body = announcement.Body?.Trim();
@@ -101,9 +107,9 @@ public static class LocalCommerceEndpoints
             if (!ValidSpecs(product.Specs))
                 return Results.BadRequest(new { message = $"Teknik özellikler: en fazla {MaxSpecs} satır, ad 1–60 ve değer 1–200 karakter, aynı ad iki kez kullanılamaz." });
             product = product with { Specs = product.Specs?.Select(spec => new ProductSpec(spec.Name.Trim(), spec.Value.Trim())).ToArray() };
-            if (id != product.Id || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||
+            if (id != product.Id || string.IsNullOrWhiteSpace(id) || id.Length > 128 || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Description is null || product.SeoTitle is null || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||
                 product.Gallery is { } gallery && (gallery.Length > MaxGalleryImages || gallery.Any(image => string.IsNullOrEmpty(image) || !ValidMedia(image))) ||
-                (product.Active && product.Variants.Length == 0) || product.Variants.Any(v => string.IsNullOrWhiteSpace(v.Id) || string.IsNullOrWhiteSpace(v.Sku) || string.IsNullOrWhiteSpace(v.Color) || v.Stock < 0 || !ValidMedia(v.Image) || (!string.IsNullOrEmpty(v.Hex) && !Regex.IsMatch(v.Hex, "^#[a-fA-F0-9]{6}$"))) ||
+                (product.Active && product.Variants.Length == 0) || product.Variants.Any(v => string.IsNullOrWhiteSpace(v.Id) || v.Id.Length > 128 || string.IsNullOrWhiteSpace(v.Sku) || v.Sku.Length > 256 || string.IsNullOrWhiteSpace(v.Color) || v.Stock < 0 || v.Image is null || !ValidMedia(v.Image) || (!string.IsNullOrEmpty(v.Hex) && !Regex.IsMatch(v.Hex, "^#[a-fA-F0-9]{6}$"))) ||
                 product.Variants.Select(v => v.Id).Distinct().Count() != product.Variants.Length || product.Variants.Select(v => v.Sku.ToUpperInvariant()).Distinct().Count() != product.Variants.Length)
                 return Results.BadRequest(new { message = $"Ürün adı, benzersiz SKU, geçerli görsel (en fazla {MaxGalleryImages} ek görsel), #RRGGBB HEX kodu ve pozitif stok alanlarını kontrol edin." });
             try
@@ -116,7 +122,9 @@ public static class LocalCommerceEndpoints
                     // Surface masks change only through the surface approval flow; a save keeps the stored ones.
                     var stored = state.Products.FirstOrDefault(p => p.Id == id)?.Variants.ToDictionary(v => v.Id) ?? [];
                     product = product with { Variants = [.. product.Variants.Select(v => stored.TryGetValue(v.Id, out var old) ? v with { SurfaceMask = old.SurfaceMask, SurfaceImage = old.SurfaceImage } : v with { SurfaceMask = null, SurfaceImage = null })] };
-                    return state with { Products = state.Products.Any(p => p.Id == id) ? state.Products.Select(p => p.Id == id ? product : p).ToArray() : [.. state.Products, product] };
+                    var products = state.Products.Any(p => p.Id == id) ? state.Products.Select(p => p.Id == id ? product : p).ToArray() : [.. state.Products, product];
+                    var variantIds = products.SelectMany(p => p.Variants).Select(v => v.Id).ToHashSet();
+                    return state with { Products = products, Prices = state.Prices.Where(price => variantIds.Contains(price.Key)).ToDictionary() };
                 });
                 return Results.Ok(state);
             }

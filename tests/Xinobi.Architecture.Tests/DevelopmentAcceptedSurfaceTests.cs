@@ -20,7 +20,7 @@ public sealed class DevelopmentAcceptedSurfaceTests
     private static string Url(string variant = "blue") => DevelopmentAcceptedSurface.Route
         .Replace("{productReference}", "cay-makinesi-101").Replace("{variantReference}", variant);
     private static WebApplicationFactory<Program> Factory(bool enabled = true, string environment = "Development", bool review = false) =>
-        new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment(environment);
             builder.ConfigureLogging(logging => logging.ClearProviders());

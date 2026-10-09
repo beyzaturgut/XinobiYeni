@@ -2,9 +2,11 @@ import {readFile,writeFile,mkdir,copyFile} from 'node:fs/promises';
 import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
+import {readCommerceSnapshot} from './commerce-snapshot-source.mjs';
 const root=process.cwd();
 const sha=spawnSync('git',['rev-parse','--short','HEAD'],{encoding:'utf8'}).stdout.trim();
-const state=JSON.parse(await readFile('services/api/App_Data/local-commerce/state.json','utf8'));
+// Once the local catalog is migrated, its old state.json is an archive, never a deployment source.
+const state=await readCommerceSnapshot(path.join(root,'services/api/App_Data/local-commerce'));
 const web=path.join(root,'apps/web');
 const publicDir=path.join(web,'public');
 await mkdir(path.join(publicDir,'commerce-preview'),{recursive:true});

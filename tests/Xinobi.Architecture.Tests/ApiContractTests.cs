@@ -10,15 +10,19 @@ using Xinobi.Api.Infrastructure.Readiness;
 
 namespace Xinobi.Architecture.Tests;
 
-public sealed class ApiContractTests : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+public sealed class ApiContractTests : IClassFixture<IsolatedApiFactory>, IDisposable
 {
     private readonly WebApplicationFactory<Program> _factory;
     private readonly HttpClient _client;
     private readonly string _dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-health-test-" + Guid.NewGuid());
 
-    public ApiContractTests(WebApplicationFactory<Program> factory)
+    public ApiContractTests(IsolatedApiFactory factory)
     {
-        _factory = factory.WithWebHostBuilder(builder => builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = _dataDirectory })));
+        _factory = factory.WithWebHostBuilder(builder => builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["LocalCommerce:DataDirectory"] = _dataDirectory,
+            ["ConnectionStrings:Xinobi"] = ""
+        })));
         _client = _factory
             .WithWebHostBuilder(builder => builder.UseEnvironment("Development"))
             .CreateClient(new WebApplicationFactoryClientOptions

@@ -25,7 +25,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     private readonly string data = Path.Combine(Path.GetTempPath(), "xinobi-surfaces-" + Guid.NewGuid());
     private readonly FakeRoboflow roboflow = new();
 
-    private WebApplicationFactory<Program> Factory(string? key = "test-key", int limit = 50) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(string? key = "test-key", int limit = 50) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("LocalCommerce:DataDirectory", data);

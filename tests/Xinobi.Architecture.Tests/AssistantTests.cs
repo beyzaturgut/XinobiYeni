@@ -17,7 +17,7 @@ public sealed class AssistantTests : IDisposable
     private readonly FakeModel model = new();
     private static readonly string Client = Guid.NewGuid().ToString();
 
-    private WebApplicationFactory<Program> Factory() => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("Notifications:WorkerEnabled", "false");

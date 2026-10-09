@@ -74,7 +74,7 @@ public sealed class EmailVerificationTests
     public async Task HttpFlowDoesNotExposeCodeAndRejectsUntrustedOrigins()
     {
         var sender = new Sender();
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Development");
             builder.ConfigureServices(services => { services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender>(sender); });
@@ -92,7 +92,7 @@ public sealed class EmailVerificationTests
     [Fact]
     public async Task PreviewFlowWorksWithoutCredentialsAndStillValidatesCodes()
     {
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => { builder.UseEnvironment("Development"); builder.ConfigureServices(services => { services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender, PreviewVerificationEmailSender>(); }); builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string,string?> { ["Email:DeliveryMode"] = "Preview" })); });
+        using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder => { builder.UseEnvironment("Development"); builder.ConfigureServices(services => { services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender, PreviewVerificationEmailSender>(); }); builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string,string?> { ["Email:DeliveryMode"] = "Preview" })); });
         using var client = factory.CreateClient();
         var response = await client.PostAsJsonAsync("/api/v1/email-verification/start", new { email = "preview@example.com" });
         response.EnsureSuccessStatusCode();
@@ -115,7 +115,7 @@ public sealed class EmailVerificationTests
     [Fact]
     public async Task DemoVerificationIsUnavailableInProduction()
     {
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder => builder.UseEnvironment("Production"));
+        using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder => builder.UseEnvironment("Production"));
         using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
         Assert.Equal(HttpStatusCode.NotFound, (await client.PostAsJsonAsync("/api/v1/email-verification/start", new { email = "person@example.com" })).StatusCode);
     }

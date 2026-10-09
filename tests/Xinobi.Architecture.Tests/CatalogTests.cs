@@ -14,7 +14,7 @@ public sealed class CatalogTests : IDisposable
 {
     private readonly string dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-catalog-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = dataDirectory }));
@@ -41,7 +41,7 @@ public sealed class CatalogTests : IDisposable
         var snapshot = Path.Combine(dataDirectory, "snapshot.json");
         var seed = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../services/api/LocalCommerce/seed.json"));
         await File.WriteAllTextAsync(snapshot, seed);
-        using var factory = new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+        using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Production");
             builder.UseSetting("Catalog:SnapshotPath", snapshot);

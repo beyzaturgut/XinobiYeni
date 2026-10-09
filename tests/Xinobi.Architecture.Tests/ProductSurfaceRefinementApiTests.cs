@@ -11,7 +11,7 @@ namespace Xinobi.Architecture.Tests;
 public sealed class ProductSurfaceRefinementApiTests
 {
     private const string Root = DevelopmentSurfaceReview.Route;
-    private static WebApplicationFactory<Program> Factory(bool enabled = true) => new WebApplicationFactory<Program>().WithWebHostBuilder(builder =>
+    private static WebApplicationFactory<Program> Factory(bool enabled = true) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>

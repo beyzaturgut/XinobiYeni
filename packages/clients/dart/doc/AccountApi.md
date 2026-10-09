@@ -21,6 +21,7 @@ Method | HTTP request | Description
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [**listMyNotifications**](AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [**listMyOrders**](AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
+[**listMyReviews**](AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
 [**loginAccount**](AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [**loginWebAccount**](AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
 [**logoutSession**](AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
@@ -36,6 +37,7 @@ Method | HTTP request | Description
 [**returnMyOrder**](AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [**startMyEmailChange**](AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
+[**submitMyReview**](AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [**updateMyAccount**](AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [**updateMyAddress**](AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
 
@@ -500,6 +502,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BuiltList&lt;CustomerOrder&gt;**](CustomerOrder.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listMyReviews**
+> BuiltList<MyReview> listMyReviews()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.listMyReviews();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->listMyReviews: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BuiltList&lt;MyReview&gt;**](MyReview.md)
 
 ### Authorization
 
@@ -1104,6 +1143,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**AccountEmailVerification**](AccountEmailVerification.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **submitMyReview**
+> MyReview submitMyReview(submitReview)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final SubmitReview submitReview = ; // SubmitReview |
+
+try {
+    final response = api.submitMyReview(submitReview);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->submitMyReview: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **submitReview** | [**SubmitReview**](SubmitReview.md)|  |
+
+### Return type
+
+[**MyReview**](MyReview.md)
 
 ### Authorization
 

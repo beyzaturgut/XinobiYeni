@@ -204,6 +204,94 @@
         }
       }
     },
+    "/api/v1/catalog/products/{id}/reviews": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "operationId": "ListProductReviews",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewPage"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/catalog/review-summaries": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "operationId": "ListReviewSummaries",
+        "parameters": [
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewSummaryList"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/xinobi-u/status": {
       "get": {
         "tags": [
@@ -1871,6 +1959,97 @@
         }
       }
     },
+    "/api/v1/me/reviews": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ListMyReviews",
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyReview"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "SubmitMyReview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitReview"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyReview"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/session": {
       "get": {
         "tags": [
@@ -2757,6 +2936,53 @@
           }
         }
       },
+      "MyReview": {
+        "required": [
+          "id",
+          "productId",
+          "rating",
+          "title",
+          "body",
+          "status",
+          "createdAt",
+          "moderationNote"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "moderationNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "OrderEvent": {
         "required": [
           "status",
@@ -3033,7 +3259,8 @@
           "personalizable",
           "variants",
           "originalImageUrl",
-          "gallery"
+          "gallery",
+          "specs"
         ],
         "type": "object",
         "properties": {
@@ -3078,6 +3305,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "specs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductSpec"
+            }
           }
         }
       },
@@ -3107,6 +3340,21 @@
           "total": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "ProductSpec": {
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
           }
         }
       },
@@ -3164,6 +3412,56 @@
             "type": "boolean"
           },
           "swatchHex": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicReview": {
+        "required": [
+          "id",
+          "authorName",
+          "rating",
+          "title",
+          "body",
+          "color",
+          "createdAt",
+          "storeReply"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "authorName": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "type": "string"
+          },
+          "color": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "storeReply": {
             "type": [
               "null",
               "string"
@@ -3291,6 +3589,77 @@
           }
         }
       },
+      "ReviewPage": {
+        "required": [
+          "summary",
+          "items",
+          "page",
+          "pageSize"
+        ],
+        "type": "object",
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/ReviewSummary"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicReview"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "ReviewSummary": {
+        "required": [
+          "productId",
+          "average",
+          "count",
+          "distribution"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "average": {
+            "type": "number",
+            "format": "double"
+          },
+          "count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "distribution": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        }
+      },
+      "ReviewSummaryList": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReviewSummary"
+            }
+          }
+        }
+      },
       "SaveCustomerAddress": {
         "required": [
           "title",
@@ -3358,6 +3727,33 @@
       "Stream": {
         "type": "string",
         "format": "binary"
+      },
+      "SubmitReview": {
+        "required": [
+          "productId",
+          "rating",
+          "title",
+          "body"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "body": {
+            "type": "string"
+          }
+        }
       },
       "UpdateMyAccount": {
         "required": [

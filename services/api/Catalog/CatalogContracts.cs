@@ -1,3 +1,5 @@
+using Xinobi.Api.LocalCommerce;
+
 namespace Xinobi.Api.Catalog;
 
 // Public read contract shared by web and mobile (/api/v1/catalog, /api/v1/content).
@@ -59,7 +61,9 @@ public record ProductDetail(
     /// <summary>The product's own photo (no colour), when one was uploaded. <see cref="ImageUrl"/> falls back to a colour photo; this does not.</summary>
     string? OriginalImageUrl,
     /// <summary>Extra photos shared by every colour, in display order. Gallery order: original photo, selected colour's photo, these.</summary>
-    string[] Gallery);
+    string[] Gallery,
+    /// <summary>Technical properties in the admin's order; used on the product page and in comparison.</summary>
+    ProductSpec[] Specs);
 
 public record HomeSlide(long Id, string Type, string Url, string Alt, int DurationSeconds);
 public record CategoryHighlight(string Category, string? ImageUrl, string ImageAlt, int ProductCount, string Description);

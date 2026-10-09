@@ -35,6 +35,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(LogoutSession.serializer)
       ..add(MarkNotificationsRead.serializer)
       ..add(Money.serializer)
+      ..add(MyReview.serializer)
       ..add(OrderEvent.serializer)
       ..add(OrderOptions.serializer)
       ..add(OrderRequest.serializer)
@@ -46,16 +47,22 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ProblemDetails.serializer)
       ..add(ProductDetail.serializer)
       ..add(ProductPage.serializer)
+      ..add(ProductSpec.serializer)
       ..add(ProductSummary.serializer)
+      ..add(PublicReview.serializer)
       ..add(ReadinessResponse.serializer)
       ..add(RefreshSession.serializer)
       ..add(RegisterAccount.serializer)
       ..add(RegisterDevice.serializer)
       ..add(RemoveDevice.serializer)
       ..add(ReturnMyOrder.serializer)
+      ..add(ReviewPage.serializer)
+      ..add(ReviewSummary.serializer)
+      ..add(ReviewSummaryList.serializer)
       ..add(SaveCustomerAddress.serializer)
       ..add(StartAccountEmailVerification.serializer)
       ..add(StartEmailChange.serializer)
+      ..add(SubmitReview.serializer)
       ..add(UpdateMyAccount.serializer)
       ..add(VariantDetail.serializer)
       ..add(XinobiUAnswer.serializer)
@@ -109,6 +116,12 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(ProductSummary)]),
           () => ListBuilder<ProductSummary>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(PublicReview)]),
+          () => ListBuilder<PublicReview>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(ReviewSummary)]),
+          () => ListBuilder<ReviewSummary>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
       ..addBuilderFactory(
@@ -139,6 +152,9 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(ProductSpec)]),
+          () => ListBuilder<ProductSpec>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(XinobiUAnswer)]),
           () => ListBuilder<XinobiUAnswer>())
       ..addBuilderFactory(
@@ -149,7 +165,10 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<XinobiUQuestion>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(XinobiUAnswer)]),
-          () => ListBuilder<XinobiUAnswer>()))
+          () => ListBuilder<XinobiUAnswer>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(int)]),
+          () => ListBuilder<int>()))
     .build();
 
 // ignore_for_file: deprecated_member_use_from_same_package,type=lint

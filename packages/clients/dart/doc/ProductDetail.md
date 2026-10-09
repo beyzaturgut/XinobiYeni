@@ -18,5 +18,6 @@ Name | Type | Description | Notes
 **variants** | [**BuiltList&lt;VariantDetail&gt;**](VariantDetail.md) |  |
 **originalImageUrl** | **String** |  |
 **gallery** | **BuiltList&lt;String&gt;** |  |
+**specs** | [**BuiltList&lt;ProductSpec&gt;**](ProductSpec.md) |  |
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

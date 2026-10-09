@@ -6,6 +6,11 @@ namespace Xinobi.Api.LocalCommerce;
 public static class LocalCommerceEndpoints
 {
     public const int MaxGalleryImages = 12;
+    public const int MaxSpecs = 30;
+
+    private static bool ValidSpecs(ProductSpec[]? specs) => specs is null || specs.Length <= MaxSpecs
+        && specs.All(spec => spec.Name?.Trim().Length is >= 1 and <= 60 && spec.Value?.Trim().Length is >= 1 and <= 200 && !spec.Name.Any(char.IsControl) && !spec.Value.Any(char.IsControl))
+        && specs.Select(spec => spec.Name.Trim().ToLowerInvariant()).Distinct().Count() == specs.Length;
     public static bool AllowedOrigin(string origin) => origin is "http://127.0.0.1:3000" or "http://localhost:3000" or "http://127.0.0.1:5173" or "http://localhost:5173";
     private static bool ValidMedia(string source) => string.IsNullOrEmpty(source) ||
         Regex.IsMatch(source, @"^/assets/[a-zA-Z0-9/_\-.]+$") || Regex.IsMatch(source, @"^/api/v1/local-commerce/media/[a-f0-9]{32}\.(png|jpg|webp|mp4|webm)$");
@@ -93,6 +98,9 @@ public static class LocalCommerceEndpoints
         });
         group.MapPut("/products/{id}", async (string id, CommerceProduct product, LocalCommerceStore store) =>
         {
+            if (!ValidSpecs(product.Specs))
+                return Results.BadRequest(new { message = $"Teknik özellikler: en fazla {MaxSpecs} satır, ad 1–60 ve değer 1–200 karakter, aynı ad iki kez kullanılamaz." });
+            product = product with { Specs = product.Specs?.Select(spec => new ProductSpec(spec.Name.Trim(), spec.Value.Trim())).ToArray() };
             if (id != product.Id || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||
                 product.Gallery is { } gallery && (gallery.Length > MaxGalleryImages || gallery.Any(image => string.IsNullOrEmpty(image) || !ValidMedia(image))) ||
                 (product.Active && product.Variants.Length == 0) || product.Variants.Any(v => string.IsNullOrWhiteSpace(v.Id) || string.IsNullOrWhiteSpace(v.Sku) || string.IsNullOrWhiteSpace(v.Color) || v.Stock < 0 || !ValidMedia(v.Image) || (!string.IsNullOrEmpty(v.Hex) && !Regex.IsMatch(v.Hex, "^#[a-fA-F0-9]{6}$"))) ||

@@ -259,8 +259,10 @@ public static class AccountEndpoints
         CustomerEndpoints.Map(me, app.Environment.IsDevelopment());
         Orders.OrderEndpoints.MapCustomerOrders(me);
         Notifications.NotificationEndpoints.MapCustomerNotifications(me);
+        Reviews.ReviewEndpoints.MapCustomerReviews(me);
         if (LocalCommerceEndpoints.PanelGroup(app) is { } panel)
         {
+            Reviews.ReviewEndpoints.MapPanelReviews(panel);
             Orders.OrderEndpoints.MapPanelOrders(panel);
             Notifications.NotificationEndpoints.MapPanelNotifications(panel);
         }

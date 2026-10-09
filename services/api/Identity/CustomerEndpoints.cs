@@ -46,11 +46,12 @@ public static class CustomerEndpoints
             .ProducesProblem(StatusCodes.Status409Conflict);
 
         // POST rather than DELETE so the password can travel in a body every client supports.
-        var deletion = me.MapPost("/deletion", async Task<Results<NoContent, ProblemHttpResult>> (DeleteMyAccount request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts, NotificationCenter notifications) =>
+        var deletion = me.MapPost("/deletion", async Task<Results<NoContent, ProblemHttpResult>> (DeleteMyAccount request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts, NotificationCenter notifications, Reviews.ReviewStore reviews) =>
             {
                 if (request.CurrentPassword is not { Length: > 0 and <= AccountRules.MaxPasswordLength } || !await accounts.Delete(Id(user), request.CurrentPassword))
                     return AccountEndpoints.Failure(StatusCodes.Status400BadRequest, "wrong_password", "Mevcut parolan hatalı.");
                 await notifications.ForgetAccount(Id(user));
+                await reviews.ForgetAccount(Id(user));
                 WebSessionCookies.Clear(http);
                 return TypedResults.NoContent();
             })

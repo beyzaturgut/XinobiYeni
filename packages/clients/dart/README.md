@@ -77,6 +77,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [*AccountApi*](doc/AccountApi.md) | [**listMyNotifications**](doc/AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [*AccountApi*](doc/AccountApi.md) | [**listMyOrders**](doc/AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
+[*AccountApi*](doc/AccountApi.md) | [**listMyReviews**](doc/AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [*AccountApi*](doc/AccountApi.md) | [**loginWebAccount**](doc/AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
 [*AccountApi*](doc/AccountApi.md) | [**logoutSession**](doc/AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
@@ -92,6 +93,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**returnMyOrder**](doc/AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
+[*AccountApi*](doc/AccountApi.md) | [**submitMyReview**](doc/AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAddress**](doc/AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
@@ -99,6 +101,8 @@ Class | Method | HTTP request | Description
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogCategories**](doc/CatalogApi.md#listcatalogcategories) | **GET** /api/v1/catalog/categories |
 [*CatalogApi*](doc/CatalogApi.md) | [**listCatalogProducts**](doc/CatalogApi.md#listcatalogproducts) | **GET** /api/v1/catalog/products |
+[*CatalogApi*](doc/CatalogApi.md) | [**listProductReviews**](doc/CatalogApi.md#listproductreviews) | **GET** /api/v1/catalog/products/{id}/reviews |
+[*CatalogApi*](doc/CatalogApi.md) | [**listReviewSummaries**](doc/CatalogApi.md#listreviewsummaries) | **GET** /api/v1/catalog/review-summaries |
 [*ContentApi*](doc/ContentApi.md) | [**getHomeContent**](doc/ContentApi.md#gethomecontent) | **GET** /api/v1/content/home |
 [*ContentApi*](doc/ContentApi.md) | [**listAnnouncements**](doc/ContentApi.md#listannouncements) | **GET** /api/v1/content/announcements |
 [*SystemApi*](doc/SystemApi.md) | [**getApiHealth**](doc/SystemApi.md#getapihealth) | **GET** /api/v1/health |
@@ -141,6 +145,7 @@ Class | Method | HTTP request | Description
  - [LogoutSession](doc/LogoutSession.md)
  - [MarkNotificationsRead](doc/MarkNotificationsRead.md)
  - [Money](doc/Money.md)
+ - [MyReview](doc/MyReview.md)
  - [OrderEvent](doc/OrderEvent.md)
  - [OrderOptions](doc/OrderOptions.md)
  - [OrderRequest](doc/OrderRequest.md)
@@ -152,16 +157,22 @@ Class | Method | HTTP request | Description
  - [ProblemDetails](doc/ProblemDetails.md)
  - [ProductDetail](doc/ProductDetail.md)
  - [ProductPage](doc/ProductPage.md)
+ - [ProductSpec](doc/ProductSpec.md)
  - [ProductSummary](doc/ProductSummary.md)
+ - [PublicReview](doc/PublicReview.md)
  - [ReadinessResponse](doc/ReadinessResponse.md)
  - [RefreshSession](doc/RefreshSession.md)
  - [RegisterAccount](doc/RegisterAccount.md)
  - [RegisterDevice](doc/RegisterDevice.md)
  - [RemoveDevice](doc/RemoveDevice.md)
  - [ReturnMyOrder](doc/ReturnMyOrder.md)
+ - [ReviewPage](doc/ReviewPage.md)
+ - [ReviewSummary](doc/ReviewSummary.md)
+ - [ReviewSummaryList](doc/ReviewSummaryList.md)
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartEmailChange](doc/StartEmailChange.md)
+ - [SubmitReview](doc/SubmitReview.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)
  - [XinobiUAnswer](doc/XinobiUAnswer.md)

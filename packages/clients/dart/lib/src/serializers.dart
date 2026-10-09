@@ -42,6 +42,7 @@ import 'package:xinobi_api_client/src/model/login_account.dart';
 import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/mark_notifications_read.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
+import 'package:xinobi_api_client/src/model/my_review.dart';
 import 'package:xinobi_api_client/src/model/order_event.dart';
 import 'package:xinobi_api_client/src/model/order_options.dart';
 import 'package:xinobi_api_client/src/model/order_request.dart';
@@ -53,16 +54,22 @@ import 'package:xinobi_api_client/src/model/place_order_item.dart';
 import 'package:xinobi_api_client/src/model/problem_details.dart';
 import 'package:xinobi_api_client/src/model/product_detail.dart';
 import 'package:xinobi_api_client/src/model/product_page.dart';
+import 'package:xinobi_api_client/src/model/product_spec.dart';
 import 'package:xinobi_api_client/src/model/product_summary.dart';
+import 'package:xinobi_api_client/src/model/public_review.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
 import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
 import 'package:xinobi_api_client/src/model/register_device.dart';
 import 'package:xinobi_api_client/src/model/remove_device.dart';
 import 'package:xinobi_api_client/src/model/return_my_order.dart';
+import 'package:xinobi_api_client/src/model/review_page.dart';
+import 'package:xinobi_api_client/src/model/review_summary.dart';
+import 'package:xinobi_api_client/src/model/review_summary_list.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
+import 'package:xinobi_api_client/src/model/submit_review.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
@@ -105,6 +112,7 @@ part 'serializers.g.dart';
   LogoutSession,
   MarkNotificationsRead,
   Money,
+  MyReview,
   OrderEvent,
   OrderOptions,
   OrderRequest,
@@ -116,16 +124,22 @@ part 'serializers.g.dart';
   ProblemDetails,
   ProductDetail,
   ProductPage,
+  ProductSpec,
   ProductSummary,
+  PublicReview,
   ReadinessResponse,
   RefreshSession,
   RegisterAccount,
   RegisterDevice,
   RemoveDevice,
   ReturnMyOrder,
+  ReviewPage,
+  ReviewSummary,
+  ReviewSummaryList,
   SaveCustomerAddress,
   StartAccountEmailVerification,
   StartEmailChange,
+  SubmitReview,
   UpdateMyAccount,
   VariantDetail,
   XinobiUAnswer,
@@ -141,6 +155,14 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ProductSummary)]),
         () => ListBuilder<ProductSummary>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PublicReview)]),
+        () => ListBuilder<PublicReview>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(MyReview)]),
+        () => ListBuilder<MyReview>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CategoryItem)]),
@@ -187,8 +209,16 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<OrderRequestLine>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(int)]),
+        () => ListBuilder<int>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(VariantDetail)]),
         () => ListBuilder<VariantDetail>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ReviewSummary)]),
+        () => ListBuilder<ReviewSummary>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustomerOrderLine)]),
@@ -213,6 +243,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(InboxItem)]),
         () => ListBuilder<InboxItem>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ProductSpec)]),
+        () => ListBuilder<ProductSpec>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

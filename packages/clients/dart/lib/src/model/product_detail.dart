@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:xinobi_api_client/src/model/product_spec.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -23,6 +24,7 @@ part 'product_detail.g.dart';
 /// * [variants]
 /// * [originalImageUrl]
 /// * [gallery]
+/// * [specs]
 @BuiltValue()
 abstract class ProductDetail implements Built<ProductDetail, ProductDetailBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -54,6 +56,9 @@ abstract class ProductDetail implements Built<ProductDetail, ProductDetailBuilde
 
   @BuiltValueField(wireName: r'gallery')
   BuiltList<String> get gallery;
+
+  @BuiltValueField(wireName: r'specs')
+  BuiltList<ProductSpec> get specs;
 
   ProductDetail._();
 
@@ -127,6 +132,11 @@ class _$ProductDetailSerializer implements PrimitiveSerializer<ProductDetail> {
     yield serializers.serialize(
       object.gallery,
       specifiedType: const FullType(BuiltList, [FullType(String)]),
+    );
+    yield r'specs';
+    yield serializers.serialize(
+      object.specs,
+      specifiedType: const FullType(BuiltList, [FullType(ProductSpec)]),
     );
   }
 
@@ -222,6 +232,13 @@ class _$ProductDetailSerializer implements PrimitiveSerializer<ProductDetail> {
             specifiedType: const FullType(BuiltList, [FullType(String)]),
           ) as BuiltList<String>;
           result.gallery.replace(valueDes);
+          break;
+        case r'specs':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType(BuiltList, [FullType(ProductSpec)]),
+          ) as BuiltList<ProductSpec>;
+          result.specs.replace(valueDes);
           break;
         default:
           unhandled.add(key);

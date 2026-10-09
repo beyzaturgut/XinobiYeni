@@ -54,7 +54,8 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
                     AvailabilityFor(variant.Stock), price is not null && variant.Stock > 0, MaxQuantityFor(variant.Stock), resolveUrl(variant.ApprovedSurfaceMask));
             }).ToArray(),
             resolveUrl(product.OriginalImage),
-            (product.Gallery ?? []).Select(resolveUrl).OfType<string>().Distinct().ToArray())
+            (product.Gallery ?? []).Select(resolveUrl).OfType<string>().Distinct().ToArray(),
+            product.Specs ?? [])
         : null;
 
     public ProductPage Products(string? category, string? query, bool? personalizable, int page, int pageSize)

@@ -7,8 +7,13 @@ public record CommerceVariant(string Id, string Sku, string Color, int Stock, st
 {
     public string? ApprovedSurfaceMask => !string.IsNullOrEmpty(SurfaceMask) && SurfaceImage == Image ? SurfaceMask : null;
 }
-/// <summary><c>Gallery</c> holds extra product photos shared by every colour, shown after the cover in the product gallery.</summary>
-public record CommerceProduct(string Id, string Name, string Category, bool Active, string Description, string SeoTitle, CommerceVariant[] Variants, bool? Personalizable = null, string? OriginalImage = null, string[]? Gallery = null);
+/// <summary>
+/// <c>Gallery</c> holds extra product photos shared by every colour, shown after the cover in the product gallery.
+/// <c>Specs</c> are the technical properties shown on the product page and in product comparison.
+/// </summary>
+public record CommerceProduct(string Id, string Name, string Category, bool Active, string Description, string SeoTitle, CommerceVariant[] Variants, bool? Personalizable = null, string? OriginalImage = null, string[]? Gallery = null, ProductSpec[]? Specs = null);
+/// <summary>One technical property, e.g. Güç = 1650 W.</summary>
+public record ProductSpec(string Name, string Value);
 public record CommerceSlide(long Id, string Name, string Type, string Src, string Alt, int Duration, bool Active);
 public record CommerceContent(CommerceSlide[] Slides, string XinobiBanner, string ButtonColor, Dictionary<string, string>? CategoryProducts = null, string? TitaniumBanner = null, string[]? FeaturedProducts = null, Dictionary<string, string>? CategoryImages = null, string? TitaniumImage = null);
 public record CommerceState(CommerceProduct[] Products, Dictionary<string, long> Prices, CommerceContent Content, string[]? Categories = null, CommerceAnnouncement[]? Announcements = null);

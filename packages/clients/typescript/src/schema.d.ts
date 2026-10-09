@@ -84,6 +84,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/catalog/products/{id}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListProductReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/review-summaries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListReviewSummaries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/xinobi-u/status": {
         parameters: {
             query?: never;
@@ -564,6 +596,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListMyReviews"];
+        put?: never;
+        post: operations["SubmitMyReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/session": {
         parameters: {
             query?: never;
@@ -825,6 +873,18 @@ export interface components {
             amountMinor: number;
             currency: string;
         };
+        MyReview: {
+            id: string;
+            productId: string;
+            /** Format: int32 */
+            rating: number;
+            title: null | string;
+            body: string;
+            status: string;
+            /** Format: date-time */
+            createdAt: string;
+            moderationNote: null | string;
+        };
         OrderEvent: {
             status: string;
             /** Format: date-time */
@@ -900,6 +960,7 @@ export interface components {
             variants: components["schemas"]["VariantDetail"][];
             originalImageUrl: null | string;
             gallery: string[];
+            specs: components["schemas"]["ProductSpec"][];
         };
         ProductPage: {
             items: components["schemas"]["ProductSummary"][];
@@ -909,6 +970,10 @@ export interface components {
             pageSize: number;
             /** Format: int32 */
             total: number;
+        };
+        ProductSpec: {
+            name: string;
+            value: string;
         };
         ProductSummary: {
             id: string;
@@ -922,6 +987,18 @@ export interface components {
             priceFrom: null | components["schemas"]["Money"];
             inStock: boolean;
             swatchHex: null | string;
+        };
+        PublicReview: {
+            id: string;
+            authorName: string;
+            /** Format: int32 */
+            rating: number;
+            title: null | string;
+            body: string;
+            color: null | string;
+            /** Format: date-time */
+            createdAt: string;
+            storeReply: null | string;
         };
         ReadinessResponse: {
             service: string;
@@ -953,6 +1030,25 @@ export interface components {
             description: null | string;
             lines: components["schemas"]["OrderRequestLine"][];
         };
+        ReviewPage: {
+            summary: components["schemas"]["ReviewSummary"];
+            items: components["schemas"]["PublicReview"][];
+            /** Format: int32 */
+            page: number;
+            /** Format: int32 */
+            pageSize: number;
+        };
+        ReviewSummary: {
+            productId: string;
+            /** Format: double */
+            average: number;
+            /** Format: int32 */
+            count: number;
+            distribution: number[];
+        };
+        ReviewSummaryList: {
+            items: components["schemas"]["ReviewSummary"][];
+        };
         SaveCustomerAddress: {
             title: string;
             fullName: string;
@@ -971,6 +1067,13 @@ export interface components {
         };
         /** Format: binary */
         Stream: string;
+        SubmitReview: {
+            productId: string;
+            /** Format: int32 */
+            rating: number;
+            title: null | string;
+            body: string;
+        };
         UpdateMyAccount: {
             name: string;
             phone?: null | string;
@@ -1186,6 +1289,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnnouncementList"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListProductReviews: {
+        parameters: {
+            query?: {
+                page?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewPage"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListReviewSummaries: {
+        parameters: {
+            query: {
+                ids: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewSummaryList"];
                 };
             };
             /** @description Service Unavailable */
@@ -2622,6 +2789,86 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListMyReviews: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyReview"][];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SubmitMyReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SubmitReview"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyReview"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
             };
             /** @description Service Unavailable */
             503: {

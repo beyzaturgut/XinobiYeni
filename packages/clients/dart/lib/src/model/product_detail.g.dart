@@ -27,6 +27,8 @@ class _$ProductDetail extends ProductDetail {
   final String? originalImageUrl;
   @override
   final BuiltList<String> gallery;
+  @override
+  final BuiltList<ProductSpec> specs;
 
   factory _$ProductDetail([void Function(ProductDetailBuilder)? updates]) =>
       (ProductDetailBuilder()..update(updates))._build();
@@ -41,7 +43,8 @@ class _$ProductDetail extends ProductDetail {
       required this.personalizable,
       required this.variants,
       this.originalImageUrl,
-      required this.gallery})
+      required this.gallery,
+      required this.specs})
       : super._();
   @override
   ProductDetail rebuild(void Function(ProductDetailBuilder) updates) =>
@@ -63,7 +66,8 @@ class _$ProductDetail extends ProductDetail {
         personalizable == other.personalizable &&
         variants == other.variants &&
         originalImageUrl == other.originalImageUrl &&
-        gallery == other.gallery;
+        gallery == other.gallery &&
+        specs == other.specs;
   }
 
   @override
@@ -79,6 +83,7 @@ class _$ProductDetail extends ProductDetail {
     _$hash = $jc(_$hash, variants.hashCode);
     _$hash = $jc(_$hash, originalImageUrl.hashCode);
     _$hash = $jc(_$hash, gallery.hashCode);
+    _$hash = $jc(_$hash, specs.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -95,7 +100,8 @@ class _$ProductDetail extends ProductDetail {
           ..add('personalizable', personalizable)
           ..add('variants', variants)
           ..add('originalImageUrl', originalImageUrl)
-          ..add('gallery', gallery))
+          ..add('gallery', gallery)
+          ..add('specs', specs))
         .toString();
   }
 }
@@ -148,6 +154,11 @@ class ProductDetailBuilder
   ListBuilder<String> get gallery => _$this._gallery ??= ListBuilder<String>();
   set gallery(ListBuilder<String>? gallery) => _$this._gallery = gallery;
 
+  ListBuilder<ProductSpec>? _specs;
+  ListBuilder<ProductSpec> get specs =>
+      _$this._specs ??= ListBuilder<ProductSpec>();
+  set specs(ListBuilder<ProductSpec>? specs) => _$this._specs = specs;
+
   ProductDetailBuilder() {
     ProductDetail._defaults(this);
   }
@@ -165,6 +176,7 @@ class ProductDetailBuilder
       _variants = $v.variants.toBuilder();
       _originalImageUrl = $v.originalImageUrl;
       _gallery = $v.gallery.toBuilder();
+      _specs = $v.specs.toBuilder();
       _$v = null;
     }
     return this;
@@ -204,6 +216,7 @@ class ProductDetailBuilder
             variants: variants.build(),
             originalImageUrl: originalImageUrl,
             gallery: gallery.build(),
+            specs: specs.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -213,6 +226,8 @@ class ProductDetailBuilder
 
         _$failedField = 'gallery';
         gallery.build();
+        _$failedField = 'specs';
+        specs.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'ProductDetail', _$failedField, e.toString());

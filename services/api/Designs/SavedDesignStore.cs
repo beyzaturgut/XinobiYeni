@@ -14,12 +14,12 @@ public record MyDesign(string Id, string Kind, string Name, string ProductId, st
 public record SaveDesignFromSession(string SessionId, string? Name);
 public record RenameDesign(string Name);
 
-public sealed class SavedDesignStore(IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
+public sealed class SavedDesignStore(FeatureDocuments documents, TimeProvider clock)
 {
     public const int MaxPerAccount = 50;
     public const long MaxUploadBytes = 8 * 1024 * 1024;
     private sealed record State(List<SavedDesign> Designs);
-    private readonly DevJsonStore<State> store = new(DevJsonStore<State>.DataDirectory(environment, configuration), Path.Combine("designs", "designs.json"), () => new([]), "Tasarımlarım");
+    private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("designs", "designs.json"), () => new([]), "Tasarımlarım");
     private string FileDirectory => Path.Combine(store.Folder, "files");
 
     public static MyDesign View(SavedDesign design) => new(design.Id, design.Kind, design.Name, design.ProductId, design.ProductName, design.VariantId, design.Color, design.Profile,

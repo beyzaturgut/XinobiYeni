@@ -469,6 +469,34 @@ namespace Xinobi.Persistence.Migrations
                     b.ToTable("ExternalMappings", "ops");
                 });
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.FeatureDocument", b =>
+                {
+                    b.Property<string>("Name")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<string>("Json")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Name");
+
+                    b.ToTable("FeatureDocuments", "ops", t =>
+                        {
+                            t.HasCheckConstraint("CK_FeatureDocuments_Json", "ISJSON([Json]) = 1");
+                        });
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.InboxEvent", b =>
                 {
                     b.Property<string>("Provider")

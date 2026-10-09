@@ -109,3 +109,20 @@ dotnet run --no-launch-profile --environment Development -- --AccountTransfer:Ru
 ```
 
 İçe aktarma yalnız boş `identity.Users`/`sales.Orders`/adres/oturum tablolarında çalışır; okuyup kaynağa karşılaştırır, fark varsa tüm işlem geri alınır. Süresi dolmuş oturumlar taşınmaz. Çıktı yalnız sayılardır. Etkinleştirmede dosya aktarım sırasında değiştiyse işaret yazılmaz. `accounts.json` arşiv olarak kalır; geri dönüş için işaret dosyası silinir (SQL'e yazılan yeni kayıtlar dosyaya geri taşınmaz).
+
+## Özellik belgeleri (0004)
+
+`0004_FeatureDocuments.idempotent.sql` tüm geçmişi içerir ve yalnız `ops.FeatureDocuments` tablosunu ekler (ad, JSON, zaman, rowversion; JSON `ISJSON` ile denetlenir). Bildirimler, değerlendirmeler, kurumsal teklifler, kayıtlı tasarımlar ve Nobi henüz ilişkisel modele sahip değil; her biri tek JSON belgesi olarak saklanır ve yazmalar belge başına `sp_getapplock` altında yapılır. Bu geçici bir adımdır; özellik büyüdükçe kendi tablolarına taşınır. Kayıtlı tasarım görsel dosyaları bu tabloya girmez (dosya deposu ayrı iş).
+
+**09.10.2026:** Boş veritabanına `-I` ile uygulandı, ikinci çalıştırma değişiklik yapmadı: 4 geçmiş kaydı, 24 iş tablosu. `SqlFeatureDocumentTests` gerçek SQL'de üç ayrı süreç gibi davranan yazıcıyla kayıp güncelleme olmadığını doğruladı.
+
+Seçim: Development'ta `features-sql.enabled` işareti veya `Features:StorageProvider=SqlServer`; diğer ortamlarda yalnız bu ayar. Ayar yoksa Development dışında bu özellikler 503 döner.
+
+Tek seferlik aktarım (Development, API durdurulmuş, tablo boş):
+
+```bash
+cd services/api
+dotnet run --no-launch-profile --environment Development -- --FeatureTransfer:Run=true --FeatureTransfer:Activate=true
+```
+
+Mevcut JSON dosyaları okunur, geçersiz JSON varsa hiçbir şey yazılmaz; SQL'deki içerik kaynağa karşı karşılaştırılır. Dosyalar aktarım sırasında değiştiyse işaret yazılmaz. `0004_FeatureDocuments.rollback.sql` yalnız boş/test veride kullanılır.

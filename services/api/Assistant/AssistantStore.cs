@@ -10,12 +10,12 @@ namespace Xinobi.Api.Assistant;
 /// Nobi's data: policy revisions, knowledge sources, conversations (kept <see cref="RetentionDays"/> days, personal numbers masked),
 /// leads and model usage. Development file store (ADR-003); 503 elsewhere until SQL Server. Retention and texts await D10.
 /// </summary>
-public sealed partial class AssistantStore(IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
+public sealed partial class AssistantStore(FeatureDocuments documents, TimeProvider clock)
 {
     public const int RetentionDays = 90;
     public const int MaxMessageLength = 500;
     private sealed record State(List<AssistantPolicy> Policies, List<KnowledgeSource> Knowledge, List<AssistantConversation> Conversations, List<AssistantLead> Leads, List<AiUsageEntry> Usage);
-    private readonly DevJsonStore<State> store = new(DevJsonStore<State>.DataDirectory(environment, configuration), Path.Combine("assistant", "assistant.json"), () => new([], [], [], [], []), "Nobi");
+    private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("assistant", "assistant.json"), () => new([], [], [], [], []), "Nobi");
 
     public static readonly AssistantPolicy DefaultPolicy = new(1,
         """

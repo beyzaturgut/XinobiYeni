@@ -40,11 +40,11 @@ public record RegisterDevice(string Token, string Platform);
 /// in-app inbox; e-mail, SMS and push are queued and delivered by <see cref="NotificationWorker"/> with retries, so a delivery failure
 /// never undoes the order change that caused it (Analiz §6.1). Development file store (ADR-003); 503 elsewhere until SQL Server.
 /// </summary>
-public sealed class NotificationCenter(IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock, IEnumerable<INotificationChannelSender> senders)
+public sealed class NotificationCenter(FeatureDocuments documents, IConfiguration configuration, TimeProvider clock, IEnumerable<INotificationChannelSender> senders)
 {
     public const int MaxAttempts = 5;
     private sealed record State(List<NotificationItem> Items, List<DeviceRegistration> Devices);
-    private readonly DevJsonStore<State> store = new(DevJsonStore<State>.DataDirectory(environment, configuration), Path.Combine("notifications", "notifications.json"), () => new([], []), "Bildirimler");
+    private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("notifications", "notifications.json"), () => new([], []), "Bildirimler");
     private readonly Dictionary<string, INotificationChannelSender> byChannel = senders.ToDictionary(sender => sender.Channel);
 
     public string WebBaseUrl => (configuration["Web:BaseUrl"] ?? "http://localhost:3000").TrimEnd('/');

@@ -42,14 +42,14 @@ public record QuoteOptions(string[] Purposes, int MinQuantity, int MaxQuantity, 
 /// accepts or declines. A request is never a payment order; turning an accepted offer into a bulk order waits for D07.
 /// Development file store (ADR-003); 503 elsewhere until SQL Server.
 /// </summary>
-public sealed class QuoteStore(IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
+public sealed class QuoteStore(FeatureDocuments documents, TimeProvider clock)
 {
     public const int MinQuantity = 10;
     public const int MaxQuantity = 100_000;
     public const int MaxItems = 10;
     public static readonly string[] Purposes = ["Kurumsal hediye", "Ofis kullanımı", "Kampanya / promosyon", "Bayi / yeniden satış", "Diğer"];
     private sealed record State(List<Quote> Quotes);
-    private readonly DevJsonStore<State> store = new(DevJsonStore<State>.DataDirectory(environment, configuration), Path.Combine("quotes", "quotes.json"), () => new([]), "Kurumsal teklifler");
+    private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("quotes", "quotes.json"), () => new([]), "Kurumsal teklifler");
 
     private static string Text(string? value, string field, int min, int max, string message, bool multiline = false)
     {

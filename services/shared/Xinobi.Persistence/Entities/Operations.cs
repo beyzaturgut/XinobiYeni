@@ -131,3 +131,15 @@ public static class AssetStatuses
     public const string Archived = "archived";
     public static readonly string[] All = [Uploading, Ready, Rejected, Archived];
 }
+
+/// <summary>
+/// Interim home for feature state that has no relational model yet (notifications, reviews, quotes, saved designs, Nobi):
+/// one JSON document per feature, replaced as a whole under an application lock. Moves to tables as each feature matures.
+/// </summary>
+public sealed class FeatureDocument
+{
+    public required string Name { get; set; }
+    public required string Json { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+    public byte[] RowVersion { get; set; } = [];
+}

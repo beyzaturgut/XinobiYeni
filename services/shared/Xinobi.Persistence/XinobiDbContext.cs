@@ -37,6 +37,7 @@ public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) :
     public DbSet<CustomerDeliveryAddress> CustomerAddresses => Set<CustomerDeliveryAddress>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<SalesOrderLine> SalesOrderLines => Set<SalesOrderLine>();
+    public DbSet<FeatureDocument> FeatureDocuments => Set<FeatureDocument>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -167,6 +168,13 @@ public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) :
             mapping.HasIndex(x => new { x.System, x.EntityType, x.ExternalId }).IsUnique();
         });
 
+        modelBuilder.Entity<FeatureDocument>(document =>
+        {
+            document.ToTable("FeatureDocuments", OpsSchema, table => table.HasCheckConstraint("CK_FeatureDocuments_Json", "ISJSON([Json]) = 1"));
+            document.HasKey(x => x.Name);
+            document.Property(x => x.Name).HasMaxLength(64).UseCollation("Latin1_General_100_BIN2");
+            document.Property(x => x.RowVersion).IsRowVersion();
+        });
         modelBuilder.Entity<Asset>(asset =>
         {
             asset.ToTable("Assets", MediaSchema, table =>

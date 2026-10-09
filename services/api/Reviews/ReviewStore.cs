@@ -30,13 +30,13 @@ public record ModerateReview(string Status, string? Note, string? Reply);
 /// product (a new submission replaces theirs and goes back to moderation). Reviews are moderated before they are public.
 /// Development file store (ADR-003); 503 elsewhere until SQL Server.
 /// </summary>
-public sealed class ReviewStore(IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
+public sealed class ReviewStore(FeatureDocuments documents, TimeProvider clock)
 {
     public const int MaxTitle = 80;
     public const int MinBody = 10;
     public const int MaxBody = 2000;
     private sealed record State(List<ProductReview> Reviews);
-    private readonly DevJsonStore<State> store = new(DevJsonStore<State>.DataDirectory(environment, configuration), Path.Combine("reviews", "reviews.json"), () => new([]), "Değerlendirmeler");
+    private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("reviews", "reviews.json"), () => new([]), "Değerlendirmeler");
 
     public static string DisplayName(string name)
     {

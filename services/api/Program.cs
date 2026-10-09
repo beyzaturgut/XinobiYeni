@@ -107,7 +107,8 @@ if (builder.Configuration["Catalog:SnapshotPath"] is { Length: > 0 } snapshotPat
 builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
 builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
 builder.Services.TryAddSingleton(TimeProvider.System);
-// Notifications: registered everywhere so the contract lists the routes; the store answers 503 outside Development (ADR-003).
+// Feature stores are registered everywhere so the contract lists the routes; outside Development they need Features:StorageProvider=SqlServer, else 503.
+builder.Services.AddSingleton<Xinobi.Api.Infrastructure.FeatureDocuments>();
 builder.Services.AddSingleton<NotificationTexts>();
 builder.Services.AddSingleton<INotificationChannelSender, EmailNotificationSender>();
 builder.Services.AddHttpClient<SmsNotificationSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
@@ -158,6 +159,13 @@ if (builder.Configuration.GetValue<bool>("AccountTransfer:Run"))
 {
     if (!app.Environment.IsDevelopment()) throw new InvalidOperationException("Local account import requires Development.");
     Environment.ExitCode = await AccountTransfer.Run(app.Services, builder.Configuration.GetValue<bool>("AccountTransfer:Activate"));
+    return;
+}
+
+if (builder.Configuration.GetValue<bool>("FeatureTransfer:Run"))
+{
+    if (!app.Environment.IsDevelopment()) throw new InvalidOperationException("Local feature import requires Development.");
+    Environment.ExitCode = await Xinobi.Api.Infrastructure.FeatureTransfer.Run(app.Services, builder.Configuration.GetValue<bool>("FeatureTransfer:Activate"));
     return;
 }
 

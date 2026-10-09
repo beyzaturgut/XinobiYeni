@@ -449,3 +449,14 @@ Kullanıcı isteğiyle 7–8 Ekim işleri commit kanıtlarına bağlı tek tek t
 
 - [Task kayıtları](../docs/tasks/tasks-2026-10-07-09.md)
 - [İçe aktarılabilir CSV](../docs/tasks/tasks-2026-10-07-09.csv)
+
+### 9 Ekim yeni commitler, doğrulama bildirimi ve açık işler — 09.10.2026
+
+`9d00596` task dökümünden sonra gelen 14 geliştirme/karar commitinin ek kaydı (`3591c8e`–`baf83e4`): satın alma doğrulamalı değerlendirme ve teknik özellikler; web/mobil karşılaştırma; hesaba bağlı Tasarımlarım; kurumsal teklif talep/takip/mesaj/kabul-ret; kataloğa dayanan Nobi, Cloudflare metin modeli ve kural tabanlı geri dönüş; gerçek AI politika/kaynak/konuşma/iletişim/maliyet yönetimi; mobil asistan/teklif/tasarımlar/editör. Nobi gerçek metin modeli çağrısı kullanıcının bildirimine göre bir kez doğrulandı, ADR-002 Ek C (`1bfc60e`) ile kayıtlı; bu oturumda yeni sağlayıcı çağrısı yok.
+
+- [54 ek task](../docs/tasks/tasks-2026-10-09-addendum.md): 43 commit kanıtlı özellik kaydı, 11 bekleyen doğrulama/karar/yapılandırma işi. Önceki 125 kayda ek, toplam 179 task kaydı.
+- [İçe aktarılabilir ek CSV](../docs/tasks/tasks-2026-10-09-addendum.csv).
+- [Bildirilen doğrulama raporu](../test/2026-10-09/REP-20261009-owner-validation-summary.md): kullanıcı .NET 306/306, mobil 49/49, web/admin TypeScript/lint temiz; Chrome yalıtılmış 5004 API ve Preview göndericiyle denendiğini bildirdi. Son mobil `baf83e4` emülatör doğrulaması eksik. Ham loglar sağlanmadı; sonuçlar yeniden çalıştırılmadı ve faz onayı verilmedi.
+- Açık kararlar: D03 geçici 14 günlük iade/iptal kuralları; D07 kabul edilen teklifin siparişe dönüşümü; D10 Nobi konuşmalarının geçici 90 günlük saklanması/aydınlatma. WhatsApp numarası, Firebase mobil projesi ve gerçek Netgsm test erişimi eksik.
+- Bilinen test sorunları: Temsilidir/generated vakasında onaylı maske önkoşulu eksik; DevelopmentAcceptedSurfaceTests bir koşu başarısız, tekrar başarılı. İkisi de çözülmüş işaretlenmedi.
+- Kullanıcının bildirdiği emülatör 5004'e bağlı; normal kullanımda 5003'e dönüş gerekiyor. Bu kayıt sırasında local servisler, veri, maskeler veya posta kutuları değiştirilmedi.

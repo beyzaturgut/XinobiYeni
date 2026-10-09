@@ -159,3 +159,5 @@
 - 07.10.2026 · [TST-102 mobil header ve duyurular](2026-10-07/TST-102-mobile-header-news.md) — Arama kaldırıldı, favoriler + duyurular header'da; okunmamış rozeti; Flutter 34/34; emülatörde doğrulandı.
 
 - [TST-106 — ProductSurfaces separate-worktree integration](2026-10-06/TST-106-product-surfaces-worktree-integration.md): backend214/214, Admin10/10, canonical web17/17; full web55/65 with preserved contrast/legacy expectation failures. Uncommitted merge; no inference.
+
+- 09.10.2026 · [REP-20261009 — Kullanıcının paylaştığı doğrulama özeti](2026-10-09/REP-20261009-owner-validation-summary.md) — Bildirilen .NET 306/306, mobil 49/49, web/admin TypeScript ve lint; yeniden çalıştırılmadı. Son mobil emülatör doğrulaması ve iki bilinen test sorunu açık.

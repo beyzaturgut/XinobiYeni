@@ -807,6 +807,9 @@ namespace Xinobi.Persistence.Migrations
                         .HasMaxLength(120)
                         .HasColumnType("nvarchar(120)");
 
+                    b.Property<string>("PersonalizationJson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("ProductReference")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -828,6 +831,8 @@ namespace Xinobi.Persistence.Migrations
                     b.ToTable("OrderLines", "sales", t =>
                         {
                             t.HasCheckConstraint("CK_OrderLines_Amounts", "[UnitPriceCents] > 0 AND [LineTotalCents] = [UnitPriceCents] * CONVERT(bigint, [Quantity])");
+
+                            t.HasCheckConstraint("CK_OrderLines_Personalization", "[PersonalizationJson] IS NULL OR ISJSON([PersonalizationJson]) = 1");
 
                             t.HasCheckConstraint("CK_OrderLines_Position", "[Position] >= 0");
 

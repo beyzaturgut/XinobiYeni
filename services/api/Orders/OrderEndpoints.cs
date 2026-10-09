@@ -32,6 +32,12 @@ public static class OrderEndpoints
             .WithName("GetMyOrder")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
+        me.MapGet("/orders/{id}/lines/{line:int}/design", async Task<IResult> (string id, int line, ClaimsPrincipal user, IAccountStore accounts, Designs.SavedDesignStore designs) =>
+                await DesignImage((await accounts.Orders(Id(user))).FirstOrDefault(order => order.Id == id), line, designs))
+            .WithName("GetMyOrderLineDesign")
+            .Produces(StatusCodes.Status200OK, contentType: "image/png")
+            .Produces(StatusCodes.Status404NotFound);
+
         me.MapPost("/orders/{id}/cancellation", async Task<Ok<CustomerOrder>> (string id, CancelMyOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
                 NotificationCenter notifications, TimeProvider clock, IConfiguration configuration, IWebHostEnvironment environment) =>
             {
@@ -60,7 +66,10 @@ public static class OrderEndpoints
     /// <summary>Panel routes (Development panel group: loopback and panel origins only, ADR-003).</summary>
     public static void MapPanelOrders(RouteGroupBuilder panel)
     {
-        panel.MapGet("/orders", async (IAccountStore accounts) => TypedResults.Ok(await accounts.AllOrders()));
+        panel.MapGet("/orders", async (HttpContext http, IAccountStore accounts, IConfiguration configuration, IWebHostEnvironment environment) =>
+            TypedResults.Ok((await accounts.AllOrders()).Select(item => item with { Order = WithImages(item.Order, http, configuration, environment, "/api/v1/local-commerce/orders") }).ToArray()));
+        panel.MapGet("/orders/{id}/lines/{line:int}/design", async (string id, int line, IAccountStore accounts, Designs.SavedDesignStore designs) =>
+            await DesignImage((await accounts.AllOrders()).FirstOrDefault(item => item.Order.Id == id)?.Order, line, designs));
         panel.MapGet("/order-options", (IConfiguration configuration) => TypedResults.Ok(Options(configuration)));
 
         panel.MapPost("/orders/{id}/status", async (string id, SetOrderStatus request, IAccountStore accounts, NotificationCenter notifications, TimeProvider clock) =>
@@ -89,10 +98,24 @@ public static class OrderEndpoints
     private static OrderOptions Options(IConfiguration configuration) =>
         new(OrderLifecycle.CancelReasons, OrderLifecycle.ReturnReasons, OrderLifecycle.Carriers, ReturnWindowDays(configuration));
 
-    internal static CustomerOrder WithImages(CustomerOrder order, HttpContext http, IConfiguration configuration, IWebHostEnvironment environment) => order with
+    internal static CustomerOrder WithImages(CustomerOrder order, HttpContext http, IConfiguration configuration, IWebHostEnvironment environment) =>
+        WithImages(order, http, configuration, environment, "/api/v1/me/orders");
+
+    /// <summary>Catalogue images resolved for the caller; design images point at the caller's own (customer or panel) order route.</summary>
+    internal static CustomerOrder WithImages(CustomerOrder order, HttpContext http, IConfiguration configuration, IWebHostEnvironment environment, string ordersRoute) => order with
     {
-        Lines = [.. order.Lines.Select(line => line with { ImageUrl = CatalogEndpoints.ResolveUrl(line.ImageUrl, http.Request, configuration["Catalog:AssetBaseUrl"], environment.IsDevelopment()) })],
+        Lines = [.. order.Lines.Select((line, index) => line with
+        {
+            ImageUrl = CatalogEndpoints.ResolveUrl(line.ImageUrl, http.Request, configuration["Catalog:AssetBaseUrl"], environment.IsDevelopment()),
+            Personalization = line.Personalization is { } design ? design with { ImageUrl = $"{ordersRoute}/{order.Id}/lines/{index}/design" } : null,
+        })],
     };
+
+    private static async Task<IResult> DesignImage(CustomerOrder? order, int line, Designs.SavedDesignStore designs) =>
+        order is not null && line >= 0 && line < order.Lines.Length && order.Lines[line].Personalization is { } design
+            && await designs.OrderImage(order.Id, line, design.Mime) is { } file
+            ? Results.Stream(file.Content, file.ContentType)
+            : Results.NotFound();
 
     private static string Id(ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!;
 }

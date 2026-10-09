@@ -2156,6 +2156,51 @@
         }
       }
     },
+    "/api/v1/me/orders/{id}/lines/{line}/design": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "GetMyOrderLineDesign",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "line",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/v1/me/orders/{id}/cancellation": {
       "post": {
         "tags": [
@@ -3963,6 +4008,16 @@
           },
           "lineTotal": {
             "$ref": "#/components/schemas/Money"
+          },
+          "personalization": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/OrderPersonalization"
+              }
+            ]
           }
         }
       },
@@ -4373,6 +4428,35 @@
           }
         }
       },
+      "OrderPersonalization": {
+        "required": [
+          "designId",
+          "kind",
+          "name",
+          "mime"
+        ],
+        "type": "object",
+        "properties": {
+          "designId": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "mime": {
+            "type": "string"
+          },
+          "imageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
       "OrderRequest": {
         "required": [
           "id",
@@ -4539,6 +4623,12 @@
           "quantity": {
             "type": "integer",
             "format": "int32"
+          },
+          "designId": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },

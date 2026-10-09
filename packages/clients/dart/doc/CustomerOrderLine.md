@@ -16,5 +16,6 @@ Name | Type | Description | Notes
 **unitPrice** | [**Money**](Money.md) |  |
 **quantity** | **int** |  |
 **lineTotal** | [**Money**](Money.md) |  |
+**personalization** | [**OrderPersonalization**](OrderPersonalization.md) |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

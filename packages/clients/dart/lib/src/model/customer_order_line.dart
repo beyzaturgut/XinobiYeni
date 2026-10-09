@@ -3,6 +3,7 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:xinobi_api_client/src/model/order_personalization.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -20,6 +21,7 @@ part 'customer_order_line.g.dart';
 /// * [unitPrice]
 /// * [quantity]
 /// * [lineTotal]
+/// * [personalization]
 @BuiltValue()
 abstract class CustomerOrderLine implements Built<CustomerOrderLine, CustomerOrderLineBuilder> {
   @BuiltValueField(wireName: r'productId')
@@ -45,6 +47,9 @@ abstract class CustomerOrderLine implements Built<CustomerOrderLine, CustomerOrd
 
   @BuiltValueField(wireName: r'lineTotal')
   Money get lineTotal;
+
+  @BuiltValueField(wireName: r'personalization')
+  OrderPersonalization? get personalization;
 
   CustomerOrderLine._();
 
@@ -109,6 +114,13 @@ class _$CustomerOrderLineSerializer implements PrimitiveSerializer<CustomerOrder
       object.lineTotal,
       specifiedType: const FullType(Money),
     );
+    if (object.personalization != null) {
+      yield r'personalization';
+      yield serializers.serialize(
+        object.personalization,
+        specifiedType: const FullType.nullable(OrderPersonalization),
+      );
+    }
   }
 
   @override
@@ -188,6 +200,14 @@ class _$CustomerOrderLineSerializer implements PrimitiveSerializer<CustomerOrder
             specifiedType: const FullType(Money),
           ) as Money;
           result.lineTotal.replace(valueDes);
+          break;
+        case r'personalization':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(OrderPersonalization),
+          ) as OrderPersonalization?;
+          if (valueDes == null) continue;
+          result.personalization.replace(valueDes);
           break;
         default:
           unhandled.add(key);

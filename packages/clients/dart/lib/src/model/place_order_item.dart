@@ -14,6 +14,7 @@ part 'place_order_item.g.dart';
 /// * [productId]
 /// * [variantId]
 /// * [quantity]
+/// * [designId]
 @BuiltValue()
 abstract class PlaceOrderItem implements Built<PlaceOrderItem, PlaceOrderItemBuilder> {
   @BuiltValueField(wireName: r'productId')
@@ -24,6 +25,9 @@ abstract class PlaceOrderItem implements Built<PlaceOrderItem, PlaceOrderItemBui
 
   @BuiltValueField(wireName: r'quantity')
   int get quantity;
+
+  @BuiltValueField(wireName: r'designId')
+  String? get designId;
 
   PlaceOrderItem._();
 
@@ -63,6 +67,13 @@ class _$PlaceOrderItemSerializer implements PrimitiveSerializer<PlaceOrderItem> 
       object.quantity,
       specifiedType: const FullType(int),
     );
+    if (object.designId != null) {
+      yield r'designId';
+      yield serializers.serialize(
+        object.designId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -106,6 +117,14 @@ class _$PlaceOrderItemSerializer implements PrimitiveSerializer<PlaceOrderItem> 
             specifiedType: const FullType(int),
           ) as int;
           result.quantity = valueDes;
+          break;
+        case r'designId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.designId = valueDes;
           break;
         default:
           unhandled.add(key);

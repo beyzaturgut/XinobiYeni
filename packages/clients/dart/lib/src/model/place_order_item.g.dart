@@ -13,6 +13,8 @@ class _$PlaceOrderItem extends PlaceOrderItem {
   final String variantId;
   @override
   final int quantity;
+  @override
+  final String? designId;
 
   factory _$PlaceOrderItem([void Function(PlaceOrderItemBuilder)? updates]) =>
       (PlaceOrderItemBuilder()..update(updates))._build();
@@ -20,7 +22,8 @@ class _$PlaceOrderItem extends PlaceOrderItem {
   _$PlaceOrderItem._(
       {required this.productId,
       required this.variantId,
-      required this.quantity})
+      required this.quantity,
+      this.designId})
       : super._();
   @override
   PlaceOrderItem rebuild(void Function(PlaceOrderItemBuilder) updates) =>
@@ -35,7 +38,8 @@ class _$PlaceOrderItem extends PlaceOrderItem {
     return other is PlaceOrderItem &&
         productId == other.productId &&
         variantId == other.variantId &&
-        quantity == other.quantity;
+        quantity == other.quantity &&
+        designId == other.designId;
   }
 
   @override
@@ -44,6 +48,7 @@ class _$PlaceOrderItem extends PlaceOrderItem {
     _$hash = $jc(_$hash, productId.hashCode);
     _$hash = $jc(_$hash, variantId.hashCode);
     _$hash = $jc(_$hash, quantity.hashCode);
+    _$hash = $jc(_$hash, designId.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -53,7 +58,8 @@ class _$PlaceOrderItem extends PlaceOrderItem {
     return (newBuiltValueToStringHelper(r'PlaceOrderItem')
           ..add('productId', productId)
           ..add('variantId', variantId)
-          ..add('quantity', quantity))
+          ..add('quantity', quantity)
+          ..add('designId', designId))
         .toString();
   }
 }
@@ -74,6 +80,10 @@ class PlaceOrderItemBuilder
   int? get quantity => _$this._quantity;
   set quantity(int? quantity) => _$this._quantity = quantity;
 
+  String? _designId;
+  String? get designId => _$this._designId;
+  set designId(String? designId) => _$this._designId = designId;
+
   PlaceOrderItemBuilder() {
     PlaceOrderItem._defaults(this);
   }
@@ -84,6 +94,7 @@ class PlaceOrderItemBuilder
       _productId = $v.productId;
       _variantId = $v.variantId;
       _quantity = $v.quantity;
+      _designId = $v.designId;
       _$v = null;
     }
     return this;
@@ -111,6 +122,7 @@ class PlaceOrderItemBuilder
               variantId, r'PlaceOrderItem', 'variantId'),
           quantity: BuiltValueNullFieldError.checkNotNull(
               quantity, r'PlaceOrderItem', 'quantity'),
+          designId: designId,
         );
     replace(_$result);
     return _$result;

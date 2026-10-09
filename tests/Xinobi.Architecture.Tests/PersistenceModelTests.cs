@@ -62,7 +62,7 @@ public sealed class PersistenceModelTests
     {
         using var context = CreateContext();
         var generated = context.GetService<IMigrator>().GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
-        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0004_FeatureDocuments.idempotent.sql"));
+        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0005_OrderLinePersonalization.idempotent.sql"));
         Assert.Equal(Normalize(committed), Normalize(generated));
     }
 

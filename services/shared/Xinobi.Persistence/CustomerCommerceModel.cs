@@ -73,6 +73,7 @@ internal static class CustomerCommerceModel
                 table.HasCheckConstraint("CK_OrderLines_Position", "[Position] >= 0");
                 table.HasCheckConstraint("CK_OrderLines_Quantity", "[Quantity] >= 1 AND [Quantity] <= 99");
                 table.HasCheckConstraint("CK_OrderLines_Amounts", "[UnitPriceCents] > 0 AND [LineTotalCents] = [UnitPriceCents] * CONVERT(bigint, [Quantity])");
+                table.HasCheckConstraint("CK_OrderLines_Personalization", "[PersonalizationJson] IS NULL OR ISJSON([PersonalizationJson]) = 1");
             });
             line.HasKey(x => new { x.OrderId, x.Position });
             line.Property(x => x.ProductReference).HasMaxLength(128);

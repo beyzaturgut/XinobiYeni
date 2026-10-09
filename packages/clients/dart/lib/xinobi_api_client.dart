@@ -63,6 +63,7 @@ export 'package:xinobi_api_client/src/model/my_design.dart';
 export 'package:xinobi_api_client/src/model/my_review.dart';
 export 'package:xinobi_api_client/src/model/order_event.dart';
 export 'package:xinobi_api_client/src/model/order_options.dart';
+export 'package:xinobi_api_client/src/model/order_personalization.dart';
 export 'package:xinobi_api_client/src/model/order_request.dart';
 export 'package:xinobi_api_client/src/model/order_request_line.dart';
 export 'package:xinobi_api_client/src/model/order_shipment.dart';

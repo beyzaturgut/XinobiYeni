@@ -58,6 +58,7 @@ import 'package:xinobi_api_client/src/model/my_design.dart';
 import 'package:xinobi_api_client/src/model/my_review.dart';
 import 'package:xinobi_api_client/src/model/order_event.dart';
 import 'package:xinobi_api_client/src/model/order_options.dart';
+import 'package:xinobi_api_client/src/model/order_personalization.dart';
 import 'package:xinobi_api_client/src/model/order_request.dart';
 import 'package:xinobi_api_client/src/model/order_request_line.dart';
 import 'package:xinobi_api_client/src/model/order_shipment.dart';
@@ -152,6 +153,7 @@ part 'serializers.g.dart';
   MyReview,
   OrderEvent,
   OrderOptions,
+  OrderPersonalization,
   OrderRequest,
   OrderRequestLine,
   OrderShipment,

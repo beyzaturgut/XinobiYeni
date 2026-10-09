@@ -75,6 +75,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**getMyDesignImage**](doc/AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
+[*AccountApi*](doc/AccountApi.md) | [**getMyOrderLineDesign**](doc/AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
 [*AccountApi*](doc/AccountApi.md) | [**getOrderOptions**](doc/AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [*AccountApi*](doc/AccountApi.md) | [**listMyDesigns**](doc/AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
@@ -178,6 +179,7 @@ Class | Method | HTTP request | Description
  - [MyReview](doc/MyReview.md)
  - [OrderEvent](doc/OrderEvent.md)
  - [OrderOptions](doc/OrderOptions.md)
+ - [OrderPersonalization](doc/OrderPersonalization.md)
  - [OrderRequest](doc/OrderRequest.md)
  - [OrderRequestLine](doc/OrderRequestLine.md)
  - [OrderShipment](doc/OrderShipment.md)

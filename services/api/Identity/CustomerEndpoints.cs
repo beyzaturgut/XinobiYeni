@@ -48,11 +48,16 @@ public static class CustomerEndpoints
         // POST rather than DELETE so the password can travel in a body every client supports.
         var deletion = me.MapPost("/deletion", async Task<Results<NoContent, ProblemHttpResult>> (DeleteMyAccount request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts, NotificationCenter notifications, Reviews.ReviewStore reviews, Designs.SavedDesignStore designs) =>
             {
+                // Orders go with the account (current contract, D10 open), so the design copies on their lines go too.
+                var orders = await accounts.Orders(Id(user));
                 if (request.CurrentPassword is not { Length: > 0 and <= AccountRules.MaxPasswordLength } || !await accounts.Delete(Id(user), request.CurrentPassword))
                     return AccountEndpoints.Failure(StatusCodes.Status400BadRequest, "wrong_password", "Mevcut parolan hatalı.");
                 await notifications.ForgetAccount(Id(user));
                 await reviews.ForgetAccount(Id(user));
                 await designs.ForgetAccount(Id(user));
+                foreach (var order in orders)
+                    for (var line = 0; line < order.Lines.Length; line++)
+                        if (order.Lines[line].Personalization is not null) await designs.ForgetOrderImage(order.Id, line);
                 WebSessionCookies.Clear(http);
                 return TypedResults.NoContent();
             })
@@ -86,7 +91,7 @@ public static class CustomerEndpoints
             .WithName("ListMyOrders");
 
         me.MapPost("/orders", async Task<Results<Created<CustomerOrder>, ProblemHttpResult>> (PlaceOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
-                ICatalogSource source, NotificationCenter notifications, IConfiguration configuration, IWebHostEnvironment environment) =>
+                ICatalogSource source, NotificationCenter notifications, Designs.SavedDesignStore designs, IConfiguration configuration, IWebHostEnvironment environment) =>
             {
                 var id = Id(user);
                 if (request.ClientRequestId is not { Length: >= 8 and <= 80 }) throw new AccountException("invalid_request", "Sipariş isteği tanımlanamadı. Tekrar dene.");
@@ -96,23 +101,52 @@ public static class CustomerEndpoints
                 CatalogProjection catalog;
                 try { catalog = new CatalogProjection(await source.ReadAsync(), path => path); }
                 catch (CatalogUnavailableException) { throw new AccountException("catalog_unavailable", "Katalog şu anda kullanılamıyor. Biraz sonra tekrar dene.", StatusCodes.Status503ServiceUnavailable); }
-                var lines = items.Select(item =>
+                var lines = new List<CustomerOrderLine>();
+                var personalized = new List<(int Line, Designs.SavedDesign Design)>();
+                foreach (var item in items)
                 {
                     var product = catalog.Detail(item.ProductId);
                     var variant = product?.Variants.FirstOrDefault(candidate => candidate.Id == item.VariantId);
                     if (product is null || variant is null || !variant.Purchasable || variant.Price is null || item.Quantity > variant.MaxQuantity)
                         throw new AccountException("cart_changed", $"{product?.Name ?? "Bir ürün"}{(variant is null ? "" : " · " + variant.Color)} bu adette satın alınamıyor. Sepetini kontrol et.", StatusCodes.Status409Conflict);
-                    return new CustomerOrderLine(product.Id, variant.Id, product.Name, variant.Color, variant.ImageUrl ?? product.ImageUrl, variant.Price,
-                        item.Quantity, variant.Price with { AmountMinor = variant.Price.AmountMinor * item.Quantity });
-                }).ToArray();
+                    OrderPersonalization? personalization = null;
+                    if (item.DesignId is { } designId)
+                    {
+                        // The design must be the customer's own and made for this product; colour (variant) may differ.
+                        var design = await designs.Find(id, designId)
+                            ?? throw new AccountException("design_not_found", "Sepetteki tasarım bulunamadı. Tasarımlarım'dan yeniden ekle.", StatusCodes.Status409Conflict);
+                        if (!product.Personalizable)
+                            throw new AccountException("personalization_not_available", $"{product.Name} kişiselleştirilemiyor. Sepetini kontrol et.", StatusCodes.Status409Conflict);
+                        if (design.ProductId != product.Id)
+                            throw new AccountException("design_product_mismatch", $"\"{design.Name}\" tasarımı başka bir ürün için hazırlandı.", StatusCodes.Status409Conflict);
+                        personalized.Add((lines.Count, design));
+                        personalization = new OrderPersonalization(design.Id, design.Kind, design.Name, design.Mime);
+                    }
+                    lines.Add(new CustomerOrderLine(product.Id, variant.Id, product.Name, variant.Color, variant.ImageUrl ?? product.ImageUrl, variant.Price,
+                        item.Quantity, variant.Price with { AmountMinor = variant.Price.AmountMinor * item.Quantity }, personalization));
+                }
                 var now = DateTimeOffset.UtcNow;
+                var orderId = Guid.NewGuid().ToString("N");
+                // Design images are copied before the order exists so a stored order never points to a missing file.
+                foreach (var (line, design) in personalized)
+                    if (!await designs.CopyToOrder(design, orderId, line))
+                        throw new AccountException("design_not_found", $"\"{design.Name}\" tasarımının görseli bulunamadı.", StatusCodes.Status409Conflict);
                 var created = false;
-                var order = await accounts.PlaceOrder(id, request.ClientRequestId, () =>
+                CustomerOrder order;
+                try
                 {
-                    created = true;
-                    return new CustomerOrder(Guid.NewGuid().ToString("N"), $"XN-{now:yyMMdd}-{RandomNumberGenerator.GetInt32(1000, 10000)}", now, OrderStatuses.Received, address, lines,
-                        new Money(lines.Sum(line => line.LineTotal.AmountMinor), lines[0].UnitPrice.Currency), History: [new OrderEvent(OrderStatuses.Received, now, "customer", null)]);
-                });
+                    order = await accounts.PlaceOrder(id, request.ClientRequestId, () =>
+                    {
+                        created = true;
+                        return new CustomerOrder(orderId, $"XN-{now:yyMMdd}-{RandomNumberGenerator.GetInt32(1000, 10000)}", now, OrderStatuses.Received, address, [.. lines],
+                            new Money(lines.Sum(line => line.LineTotal.AmountMinor), lines[0].UnitPrice.Currency), History: [new OrderEvent(OrderStatuses.Received, now, "customer", null)]);
+                    });
+                }
+                finally
+                {
+                    // A retried request returned the earlier order (or placing failed): these copies belong to nothing.
+                    if (!created) foreach (var (line, _) in personalized) await designs.ForgetOrderImage(orderId, line);
+                }
                 // A retried request returns the stored order and must not notify twice.
                 if (created && await accounts.FindById(id) is { } account) await OrderNotifications.Send(notifications, account, order, "order_placed");
                 return TypedResults.Created($"/api/v1/me/orders/{order.Id}", OrderEndpoints.WithImages(order, http, configuration, environment));
@@ -128,8 +162,12 @@ public static class CustomerEndpoints
         if (items is not { Length: > 0 and <= CustomerRules.MaxOrderItems }) throw new AccountException("invalid_items", "Sepetin boş veya çok fazla ürün içeriyor.");
         if (items.Any(item => string.IsNullOrWhiteSpace(item.ProductId) || string.IsNullOrWhiteSpace(item.VariantId) || item.Quantity is < 1 or > 99))
             throw new AccountException("invalid_items", "Sepetteki adetleri kontrol et.");
-        return items.GroupBy(item => (item.ProductId, item.VariantId))
-            .Select(group => new PlaceOrderItem(group.Key.ProductId, group.Key.VariantId, group.Sum(item => item.Quantity))).ToArray();
+        if (items.Any(item => item.DesignId is { } design && (design.Length is 0 or > 64)))
+            throw new AccountException("invalid_items", "Sepetteki tasarımı kontrol et.");
+        // The same colour with two designs (or with none) stays as separate lines.
+        var merged = items.GroupBy(item => (item.ProductId, item.VariantId, item.DesignId))
+            .Select(group => new PlaceOrderItem(group.Key.ProductId, group.Key.VariantId, group.Sum(item => item.Quantity), group.Key.DesignId)).ToArray();
+        return merged.Any(item => item.Quantity > 99) ? throw new AccountException("invalid_items", "Sepetteki adetleri kontrol et.") : merged;
     }
 
     private static string Id(ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!;

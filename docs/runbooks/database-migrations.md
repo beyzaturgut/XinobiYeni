@@ -126,3 +126,9 @@ dotnet run --no-launch-profile --environment Development -- --FeatureTransfer:Ru
 ```
 
 Mevcut JSON dosyaları okunur, geçersiz JSON varsa hiçbir şey yazılmaz; SQL'deki içerik kaynağa karşı karşılaştırılır. Dosyalar aktarım sırasında değiştiyse işaret yazılmaz. `0004_FeatureDocuments.rollback.sql` yalnız boş/test veride kullanılır.
+
+## Kişiselleştirilmiş sipariş satırı (0005)
+
+`0005_OrderLinePersonalization.idempotent.sql` yalnız `sales.OrderLines` tablosuna nullable `PersonalizationJson` kolonu ve `ISJSON` kısıtı ekler; mevcut satırlara dokunmaz. Kayıt, satırdaki tasarımın değişmez kopyasıdır (tasarım kimliği, tür, ad, MIME). Görselin kendisi dosya deposunda `designs/files/order-<siparişId>-<satır>` anahtarıyla siparişe ait kopyadır; kayıtlı tasarım silinse de sipariş değişmez.
+
+**09.10.2026:** XinobiYeniDB'ye `-I` ile uygulandı (o anda siparişler tablosu boştu; ekleme yalnız nullable kolon). İkinci çalıştırma değişiklik yapmadı; 5 geçmiş kaydı. `PersonalisedLinesKeepTheirDesignSnapshot` gerçek SQL'de geçti ve yalnız kendi `.invalid` kayıtlarını yazıp sildi. `0005_OrderLinePersonalization.rollback.sql` kolon ve kısıtı kaldırır; kişiselleştirilmiş sipariş varsa kullanılmaz.

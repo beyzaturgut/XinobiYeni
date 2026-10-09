@@ -50,6 +50,7 @@ doc/MyDesign.md
 doc/MyReview.md
 doc/OrderEvent.md
 doc/OrderOptions.md
+doc/OrderPersonalization.md
 doc/OrderRequest.md
 doc/OrderRequestLine.md
 doc/OrderShipment.md
@@ -160,6 +161,7 @@ lib/src/model/my_design.dart
 lib/src/model/my_review.dart
 lib/src/model/order_event.dart
 lib/src/model/order_options.dart
+lib/src/model/order_personalization.dart
 lib/src/model/order_request.dart
 lib/src/model/order_request_line.dart
 lib/src/model/order_shipment.dart

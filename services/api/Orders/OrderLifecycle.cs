@@ -66,7 +66,8 @@ public static class OrderLifecycle
     /// <summary>How many of each variant can still be asked back: ordered minus what open or completed returns already cover.</summary>
     public static Dictionary<string, int> Returnable(CustomerOrder order)
     {
-        var left = order.Lines.ToDictionary(line => line.VariantId, line => line.Quantity);
+        // A colour can appear on several lines (plain and with designs); requests count units per colour.
+        var left = order.Lines.GroupBy(line => line.VariantId).ToDictionary(group => group.Key, group => group.Sum(line => line.Quantity));
         foreach (var request in order.Requests ?? [])
             if (request.Type == "return" && request.Status is not OrderRequestStatuses.Rejected)
                 foreach (var line in request.Lines)
@@ -158,7 +159,7 @@ public static class OrderLifecycle
         {
             var returned = (next.Requests ?? []).Where(item => item.Type == "return" && item.Status == OrderRequestStatuses.Completed)
                 .SelectMany(item => item.Lines).GroupBy(line => line.VariantId).ToDictionary(group => group.Key, group => group.Sum(line => line.Quantity));
-            if (order.Lines.All(line => returned.GetValueOrDefault(line.VariantId) >= line.Quantity))
+            if (order.Lines.GroupBy(line => line.VariantId).All(group => returned.GetValueOrDefault(group.Key) >= group.Sum(line => line.Quantity)))
                 next = Move(next, OrderStatuses.Returned, "panel", note, now);
         }
         return next;

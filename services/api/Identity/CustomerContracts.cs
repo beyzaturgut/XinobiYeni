@@ -13,10 +13,17 @@ public record DeleteMyAccount(string CurrentPassword);
 public record CustomerAddress(string Id, string Title, string FullName, string Phone, string City, string District, string Line, string? PostalCode, bool IsDefault);
 public record SaveCustomerAddress(string Title, string FullName, string Phone, string City, string District, string Line, string? PostalCode, bool IsDefault);
 
-public record PlaceOrderItem(string ProductId, string VariantId, int Quantity);
+/// <summary><paramref name="DesignId"/> is one of the customer's saved designs, for a personalised product (XINOBI U or own image).</summary>
+public record PlaceOrderItem(string ProductId, string VariantId, int Quantity, string? DesignId = null);
 /// <summary>Demo order: no payment is taken and stock is not reserved. <paramref name="ClientRequestId"/> makes retries return the same order.</summary>
 public record PlaceOrder(string AddressId, PlaceOrderItem[] Items, string ClientRequestId);
-public record CustomerOrderLine(string ProductId, string VariantId, string Name, string Color, string? ImageUrl, Money UnitPrice, int Quantity, Money LineTotal);
+public record CustomerOrderLine(string ProductId, string VariantId, string Name, string Color, string? ImageUrl, Money UnitPrice, int Quantity, Money LineTotal,
+    OrderPersonalization? Personalization = null);
+/// <summary>
+/// The design printed on a line, copied when the order was placed: deleting or renaming the saved design later does not change
+/// the order. <paramref name="ImageUrl"/> is filled per request (customer or panel address); the image is a representative preview.
+/// </summary>
+public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null);
 /// <summary>
 /// <paramref name="Shipment"/>, <paramref name="History"/> and <paramref name="Requests"/> were added with the order lifecycle;
 /// orders stored before have none.

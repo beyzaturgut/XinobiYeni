@@ -291,7 +291,8 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
     private static CustomerOrder Order(SalesOrder x, IEnumerable<SalesOrderLine> lines) => new(
         Id(x.Id), x.Number, x.CreatedAt, x.Status, JsonSerializer.Deserialize<CustomerAddress>(x.AddressSnapshotJson, Json)!,
         [.. lines.OrderBy(line => line.Position).Select(line => new CustomerOrderLine(line.ProductReference, line.VariantReference, line.Name, line.Color, line.ImageUrl,
-            new Money(line.UnitPriceCents, line.Currency), line.Quantity, new Money(line.LineTotalCents, line.Currency)))],
+            new Money(line.UnitPriceCents, line.Currency), line.Quantity, new Money(line.LineTotalCents, line.Currency),
+            line.PersonalizationJson is null ? null : JsonSerializer.Deserialize<OrderPersonalization>(line.PersonalizationJson, Json)))],
         new Money(x.TotalCents, x.Currency),
         x.ShipmentJson is null ? null : JsonSerializer.Deserialize<OrderShipment>(x.ShipmentJson, Json),
         x.HistoryJson is null ? null : JsonSerializer.Deserialize<OrderEvent[]>(x.HistoryJson, Json),
@@ -325,6 +326,8 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         {
             OrderId = row.Id, Position = index, ProductReference = line.ProductId, VariantReference = line.VariantId, Name = line.Name, Color = line.Color,
             ImageUrl = line.ImageUrl, UnitPriceCents = line.UnitPrice.AmountMinor, Quantity = line.Quantity, LineTotalCents = line.LineTotal.AmountMinor, Currency = line.UnitPrice.Currency,
+            // Only the snapshot is stored; the image address is built per request.
+            PersonalizationJson = line.Personalization is null ? null : JsonSerializer.Serialize(line.Personalization with { ImageUrl = null }, Json),
         }).ToArray();
         return (row, lines);
     }

@@ -19,6 +19,7 @@ Method | HTTP request | Description
 [**getMyAccount**](AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [**getMyDesignImage**](AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
+[**getMyOrderLineDesign**](AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
 [**getOrderOptions**](AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [**listMyDesigns**](AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
@@ -450,6 +451,48 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyOrderLineDesign**
+> getMyOrderLineDesign(id, line)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final int line = 56; // int |
+
+try {
+    api.getMyOrderLineDesign(id, line);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getMyOrderLineDesign: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **line** | **int**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

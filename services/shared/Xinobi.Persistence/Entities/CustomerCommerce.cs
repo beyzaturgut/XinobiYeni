@@ -68,4 +68,6 @@ public sealed class SalesOrderLine
     public int Quantity { get; set; }
     public long LineTotalCents { get; set; }
     public required string Currency { get; set; }
+    /// <summary>Snapshot of the customer's design on a personalised line (design id, kind, name, MIME); null for plain lines.</summary>
+    public string? PersonalizationJson { get; set; }
 }

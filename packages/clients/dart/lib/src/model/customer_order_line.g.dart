@@ -23,6 +23,8 @@ class _$CustomerOrderLine extends CustomerOrderLine {
   final int quantity;
   @override
   final Money lineTotal;
+  @override
+  final OrderPersonalization? personalization;
 
   factory _$CustomerOrderLine(
           [void Function(CustomerOrderLineBuilder)? updates]) =>
@@ -36,7 +38,8 @@ class _$CustomerOrderLine extends CustomerOrderLine {
       this.imageUrl,
       required this.unitPrice,
       required this.quantity,
-      required this.lineTotal})
+      required this.lineTotal,
+      this.personalization})
       : super._();
   @override
   CustomerOrderLine rebuild(void Function(CustomerOrderLineBuilder) updates) =>
@@ -57,7 +60,8 @@ class _$CustomerOrderLine extends CustomerOrderLine {
         imageUrl == other.imageUrl &&
         unitPrice == other.unitPrice &&
         quantity == other.quantity &&
-        lineTotal == other.lineTotal;
+        lineTotal == other.lineTotal &&
+        personalization == other.personalization;
   }
 
   @override
@@ -71,6 +75,7 @@ class _$CustomerOrderLine extends CustomerOrderLine {
     _$hash = $jc(_$hash, unitPrice.hashCode);
     _$hash = $jc(_$hash, quantity.hashCode);
     _$hash = $jc(_$hash, lineTotal.hashCode);
+    _$hash = $jc(_$hash, personalization.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -85,7 +90,8 @@ class _$CustomerOrderLine extends CustomerOrderLine {
           ..add('imageUrl', imageUrl)
           ..add('unitPrice', unitPrice)
           ..add('quantity', quantity)
-          ..add('lineTotal', lineTotal))
+          ..add('lineTotal', lineTotal)
+          ..add('personalization', personalization))
         .toString();
   }
 }
@@ -126,6 +132,12 @@ class CustomerOrderLineBuilder
   MoneyBuilder get lineTotal => _$this._lineTotal ??= MoneyBuilder();
   set lineTotal(MoneyBuilder? lineTotal) => _$this._lineTotal = lineTotal;
 
+  OrderPersonalizationBuilder? _personalization;
+  OrderPersonalizationBuilder get personalization =>
+      _$this._personalization ??= OrderPersonalizationBuilder();
+  set personalization(OrderPersonalizationBuilder? personalization) =>
+      _$this._personalization = personalization;
+
   CustomerOrderLineBuilder() {
     CustomerOrderLine._defaults(this);
   }
@@ -141,6 +153,7 @@ class CustomerOrderLineBuilder
       _unitPrice = $v.unitPrice.toBuilder();
       _quantity = $v.quantity;
       _lineTotal = $v.lineTotal.toBuilder();
+      _personalization = $v.personalization?.toBuilder();
       _$v = null;
     }
     return this;
@@ -177,6 +190,7 @@ class CustomerOrderLineBuilder
             quantity: BuiltValueNullFieldError.checkNotNull(
                 quantity, r'CustomerOrderLine', 'quantity'),
             lineTotal: lineTotal.build(),
+            personalization: _personalization?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -186,6 +200,8 @@ class CustomerOrderLineBuilder
 
         _$failedField = 'lineTotal';
         lineTotal.build();
+        _$failedField = 'personalization';
+        _personalization?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'CustomerOrderLine', _$failedField, e.toString());

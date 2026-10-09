@@ -16,6 +16,15 @@ public sealed class EmptySqlAccountsFactAttribute : FactAttribute
     }
 }
 
+public sealed class SqlWritesFactAttribute : FactAttribute
+{
+    public SqlWritesFactAttribute()
+    {
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("XINOBI_TEST_SQL")))
+            Skip = "Explicit SQL connection required; never reads local real credentials.";
+    }
+}
+
 /// <summary>The SQL account store keeps the file store's rules: tokens, rotation, addresses, idempotent orders and the one-time import.</summary>
 public sealed class SqlAccountIntegrationTests
 {
@@ -113,6 +122,41 @@ public sealed class SqlAccountIntegrationTests
             await db.Users.Where(x => x.NormalizedEmail.EndsWith("@xinobi-test.invalid")).ExecuteDeleteAsync();
             await db.Roles.Where(x => x.Code == "super_admin" && !db.UserRoles.Any(r => r.RoleId == x.Id)).ExecuteDeleteAsync();
             await cleanup.CommitAsync();
+        }
+    }
+
+    /// <summary>Runs beside real data: only rows of the reserved .invalid domain are written and removed.</summary>
+    [SqlWritesFact]
+    public async Task PersonalisedLinesKeepTheirDesignSnapshot()
+    {
+        var services = new ServiceCollection();
+        services.AddXinobiPersistence(Environment.GetEnvironmentVariable("XINOBI_TEST_SQL")!);
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<SqlAccountStore>();
+        await using var provider = services.BuildServiceProvider();
+        var store = provider.GetRequiredService<SqlAccountStore>();
+        await using var scope = provider.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<XinobiDbContext>();
+        var email = $"tasarim-{Guid.NewGuid():N}@xinobi-test.invalid";
+        try
+        {
+            var account = await store.Register("Ayşe", email, "guclu-parola-1");
+            var address = await store.SaveAddress(account.Id, null, Home);
+            var plain = NewOrder(address);
+            var design = new OrderPersonalization(Guid.NewGuid().ToString("N"), "ai", "Mavi dalgalar", "image/png", ImageUrl: "/ignored");
+            var order = plain with { Lines = [plain.Lines[0], plain.Lines[0] with { Quantity = 1, LineTotal = plain.Lines[0].UnitPrice, Personalization = design }],
+                Total = plain.Total with { AmountMinor = plain.Total.AmountMinor + plain.Lines[0].UnitPrice.AmountMinor } };
+            await store.PlaceOrder(account.Id, "request-0001", () => order);
+            var stored = (await store.Orders(account.Id)).Single();
+            Assert.Null(stored.Lines[0].Personalization);
+            // The address is built per request, so it is not stored.
+            Assert.Equal(design with { ImageUrl = null }, stored.Lines[1].Personalization);
+        }
+        finally
+        {
+            var users = db.Users.Where(x => x.NormalizedEmail == email).Select(x => x.Id);
+            await db.SalesOrders.Where(x => users.Contains(x.UserId)).ExecuteDeleteAsync();
+            await db.Users.Where(x => x.NormalizedEmail == email).ExecuteDeleteAsync();
         }
     }
 

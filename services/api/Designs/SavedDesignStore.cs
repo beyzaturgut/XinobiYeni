@@ -93,6 +93,27 @@ public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore file
             ? await files.Open(FileAreas.Designs, design.File) is { } file ? file with { ContentType = design.Mime } : null
             : null;
 
+    /// <summary>The owner's design record; null for anyone else.</summary>
+    public async Task<SavedDesign?> Find(string accountId, string id) =>
+        (await store.Read()).Designs.FirstOrDefault(design => design.Id == id && design.AccountId == accountId);
+
+    /// <summary>File key of a design copied into an order line; the order owns it, independent of the saved design.</summary>
+    public static string OrderFile(string orderId, int line) => $"order-{orderId}-{line}";
+
+    /// <summary>Copies the design image for an order line. Returns false when the saved file is gone.</summary>
+    public async Task<bool> CopyToOrder(SavedDesign design, string orderId, int line)
+    {
+        await using var source = await files.Open(FileAreas.Designs, design.File);
+        if (source is null) return false;
+        await files.Save(FileAreas.Designs, OrderFile(orderId, line), source.Content, design.Mime);
+        return true;
+    }
+
+    public async Task<StoredFile?> OrderImage(string orderId, int line, string mime) =>
+        await files.Open(FileAreas.Designs, OrderFile(orderId, line)) is { } file ? file with { ContentType = mime } : null;
+
+    public Task ForgetOrderImage(string orderId, int line) => files.Delete(FileAreas.Designs, OrderFile(orderId, line));
+
     public async Task ForgetAccount(string accountId)
     {
         var removed = await store.Update(state =>

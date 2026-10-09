@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../features/account/account_screen.dart';
 import '../features/account/addresses.dart';
+import '../features/account/notifications.dart';
 import '../features/account/orders.dart';
 import '../features/cart/checkout_screen.dart';
 import '../features/cart/cart.dart';
@@ -49,6 +50,8 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(path: '/hesap/adresler/:id', builder: (context, state) => AddressFormScreen(addressId: state.pathParameters['id'])),
         GoRoute(path: '/hesap/siparisler', builder: (context, state) => const OrdersScreen()),
         GoRoute(path: '/hesap/siparisler/:id', builder: (context, state) => OrderDetailScreen(orderId: state.pathParameters['id']!)),
+        GoRoute(path: '/hesap/siparisler/:id/iade', builder: (context, state) => ReturnRequestScreen(orderId: state.pathParameters['id']!)),
+        GoRoute(path: '/hesap/bildirimler', builder: (context, state) => const NotificationsScreen()),
         GoRoute(path: '/odeme', builder: (context, state) => const CheckoutScreen()),
         GoRoute(path: '/duyurular', builder: (context, state) => const NewsScreen()),
         GoRoute(path: '/urunler/:id', builder: (context, state) => ProductDetailScreen(productId: state.pathParameters['id']!)),

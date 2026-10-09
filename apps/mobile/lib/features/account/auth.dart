@@ -1,3 +1,4 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -33,6 +34,14 @@ abstract interface class AccountRepository {
   Future<void> deleteAddress(String accessToken, String id);
   Future<List<CustomerOrder>> orders(String accessToken);
   Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order);
+  Future<CustomerOrder> order(String accessToken, String id);
+  Future<OrderOptions> orderOptions(String accessToken);
+  /// Cancels a received order at once, or opens a request while it is being prepared.
+  Future<CustomerOrder> cancelOrder(String accessToken, String id, CancelMyOrder request);
+  Future<CustomerOrder> returnOrder(String accessToken, String id, ReturnMyOrder request);
+  Future<Inbox> inbox(String accessToken);
+  /// [ids] null marks every notification read.
+  Future<void> markRead(String accessToken, List<String>? ids);
 
   /// Signs out every other device; the returned session keeps this one signed in.
   Future<AuthSession> changePassword(String accessToken, {required String current, required String next});
@@ -124,6 +133,27 @@ class ApiAccountRepository implements AccountRepository {
 
   @override
   Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order) => _call(() => _api.placeMyOrder(placeOrder: order, headers: _bearer(accessToken)));
+
+  @override
+  Future<CustomerOrder> order(String accessToken, String id) => _call(() => _api.getMyOrder(id: id, headers: _bearer(accessToken)));
+
+  @override
+  Future<OrderOptions> orderOptions(String accessToken) => _call(() => _api.getOrderOptions(headers: _bearer(accessToken)));
+
+  @override
+  Future<CustomerOrder> cancelOrder(String accessToken, String id, CancelMyOrder request) =>
+      _call(() => _api.cancelMyOrder(id: id, cancelMyOrder: request, headers: _bearer(accessToken)));
+
+  @override
+  Future<CustomerOrder> returnOrder(String accessToken, String id, ReturnMyOrder request) =>
+      _call(() => _api.returnMyOrder(id: id, returnMyOrder: request, headers: _bearer(accessToken)));
+
+  @override
+  Future<Inbox> inbox(String accessToken) => _call(() => _api.listMyNotifications(headers: _bearer(accessToken)));
+
+  @override
+  Future<void> markRead(String accessToken, List<String>? ids) => _empty(() => _api.markMyNotificationsRead(
+      markNotificationsRead: MarkNotificationsRead((b) => b.ids = ids == null ? null : ListBuilder<String>(ids)), headers: _bearer(accessToken)));
 
   Future<void> _empty(Future<Response<void>> Function() request) async {
     try {

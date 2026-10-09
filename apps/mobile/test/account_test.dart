@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/features/account/auth.dart';
+import 'package:xinobi_mobile/features/account/notifications.dart';
+import 'package:xinobi_mobile/features/account/orders.dart';
 import 'package:xinobi_mobile/features/cart/cart.dart';
 import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/main.dart';
@@ -187,6 +191,67 @@ class FakeAccounts implements AccountRepository {
     if (current != 'guclu-parola-1') throw const AccountException('wrong_password', 'Mevcut parolan hatalı.');
     return _session('pw', profile);
   }
+
+  final notifications = <InboxItem>[];
+  void notify(String kind, String title) => notifications.add(InboxItem((b) => b
+    ..id = 'n${notifications.length + 1}'
+    ..kind = kind
+    ..title = title
+    ..body = title
+    ..link = '/hesap/siparisler?siparis=o1'
+    ..createdAt = DateTime.utc(2026, 10, 9, 12)
+    ..read = false));
+
+  @override
+  Future<CustomerOrder> order(String accessToken, String id) async => placed.firstWhere((o) => o.id == id);
+
+  @override
+  Future<OrderOptions> orderOptions(String accessToken) async => OrderOptions((b) => b
+    ..cancelReasons.addAll(['Fikrimi değiştirdim', 'Diğer'])
+    ..returnReasons.addAll(['Ürün hasarlı ulaştı', 'Diğer'])
+    ..carriers.addAll(['Aras Kargo'])
+    ..returnWindowDays = 14);
+
+  @override
+  Future<CustomerOrder> cancelOrder(String accessToken, String id, CancelMyOrder request) async {
+    final index = placed.indexWhere((o) => o.id == id);
+    placed[index] = placed[index].rebuild((b) => b
+      ..status = 'cancelled'
+      ..requests.add(OrderRequest((r) => r
+        ..id = 'r1'
+        ..type = 'cancel'
+        ..status = 'completed'
+        ..reason = request.reason
+        ..createdAt = DateTime.utc(2026, 10, 9, 12))));
+    notify('order_cancelled', 'Siparişin iptal edildi');
+    return placed[index];
+  }
+
+  @override
+  Future<CustomerOrder> returnOrder(String accessToken, String id, ReturnMyOrder request) async {
+    final index = placed.indexWhere((o) => o.id == id);
+    placed[index] = placed[index].rebuild((b) => b.requests.add(OrderRequest((r) => r
+      ..id = 'r2'
+      ..type = 'return'
+      ..status = 'requested'
+      ..reason = request.reason
+      ..lines.replace(request.lines)
+      ..createdAt = DateTime.utc(2026, 10, 9, 12))));
+    notify('return_requested', 'İade talebin alındı');
+    return placed[index];
+  }
+
+  @override
+  Future<Inbox> inbox(String accessToken) async => Inbox((b) => b
+    ..items.addAll(notifications.reversed)
+    ..unread = notifications.where((n) => !n.read).length);
+
+  @override
+  Future<void> markRead(String accessToken, List<String>? ids) async {
+    for (var i = 0; i < notifications.length; i++) {
+      if (ids == null || ids.contains(notifications[i].id)) notifications[i] = notifications[i].rebuild((b) => b.read = true);
+    }
+  }
 }
 
 Future<(FakeAccounts, MemoryTokens)> pumpAccount(WidgetTester tester, {String? storedRefresh, bool keepPreferences = false}) async {
@@ -333,6 +398,8 @@ void main() {
 
   Future<void> openMenu(WidgetTester tester, String row) async {
     await tester.scrollUntilVisible(find.text(row), 200, scrollable: find.byType(Scrollable).first);
+    await tester.ensureVisible(find.text(row));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(row));
     await tester.pumpAndSettle();
   }
@@ -446,5 +513,93 @@ void main() {
     expect(find.text('Sipariş detayı'), findsOneWidget);
     final container = ProviderScope.containerOf(tester.element(find.byType(Scaffold).first));
     expect(container.read(cartProvider), isEmpty, reason: 'The cart is emptied after the order.');
+  });
+
+  testWidgets('a received order is cancelled from its detail and the inbox shows it', (tester) async {
+    final (accounts, _) = await pumpAccount(tester, storedRefresh: 'refresh-old');
+    final address = await accounts.saveAddress('t', null, SaveCustomerAddress((b) => b
+      ..title = 'Ev'
+      ..fullName = 'Ayşe Yılmaz'
+      ..phone = '+905321234567'
+      ..city = 'İstanbul'
+      ..district = 'Kadıköy'
+      ..line = 'Moda Cad. No: 1'
+      ..isDefault = true));
+    await accounts.placeOrder('t', PlaceOrder((b) => b
+      ..addressId = address.id
+      ..clientRequestId = 'request-1'
+      ..items.add(PlaceOrderItem((i) => i
+        ..productId = 'P1'
+        ..variantId = 'V1'
+        ..quantity = 1))));
+    final container = ProviderScope.containerOf(tester.element(find.byType(Scaffold).first));
+    unawaited(GoRouter.of(tester.element(find.byType(Scaffold).first)).push('/hesap/siparisler/o1'));
+    await tester.pumpAndSettle();
+    expect(find.text('Sipariş detayı'), findsOneWidget);
+    expect(find.bySemanticsLabel(RegExp('Sipariş durumu: Sipariş alındı')), findsOneWidget);
+    await tester.scrollUntilVisible(find.widgetWithText(OutlinedButton, 'Siparişi iptal et'), 200, scrollable: find.byType(Scrollable).first);
+    await tester.tap(find.widgetWithText(OutlinedButton, 'Siparişi iptal et'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Fikrimi değiştirdim').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Siparişi iptal et'));
+    await tester.pumpAndSettle();
+    expect(accounts.placed.single.status, 'cancelled');
+    expect(find.text('İptal edildi'), findsWidgets);
+    final subscription = container.listen(inboxProvider, (_, _) {});
+    await tester.pumpAndSettle();
+    expect(container.read(unreadNotificationsProvider), 1);
+    subscription.close();
+  });
+
+  test('returnable quantities follow the window and earlier requests', () {
+    final order = CustomerOrder((b) => b
+      ..id = 'o1'
+      ..number = 'XN-1'
+      ..createdAt = DateTime.utc(2026, 10, 1)
+      ..status = 'delivered'
+      ..address = (CustomerAddressBuilder()
+        ..id = 'a'
+        ..title = 'Ev'
+        ..fullName = 'A'
+        ..phone = '+905321234567'
+        ..city = 'İstanbul'
+        ..district = 'Kadıköy'
+        ..line = 'Moda'
+        ..isDefault = true)
+      ..lines.add(CustomerOrderLine((l) => l
+        ..productId = 'P1'
+        ..variantId = 'V1'
+        ..name = 'Çay'
+        ..color = 'Mavi'
+        ..unitPrice = (MoneyBuilder()
+          ..amountMinor = 100
+          ..currency = 'TRY')
+        ..quantity = 3
+        ..lineTotal = (MoneyBuilder()
+          ..amountMinor = 300
+          ..currency = 'TRY')))
+      ..total = (MoneyBuilder()
+        ..amountMinor = 300
+        ..currency = 'TRY')
+      ..shipment = (OrderShipmentBuilder()
+        ..carrier = 'Aras Kargo'
+        ..trackingNumber = 'AR1234'
+        ..shippedAt = DateTime.utc(2026, 10, 2)
+        ..deliveredAt = DateTime.utc(2026, 10, 3))
+      ..requests.add(OrderRequest((r) => r
+        ..id = 'r'
+        ..type = 'return'
+        ..status = 'requested'
+        ..reason = 'Diğer'
+        ..lines.add(OrderRequestLine((line) => line
+          ..variantId = 'V1'
+          ..quantity = 2))
+        ..createdAt = DateTime.utc(2026, 10, 4))));
+    expect(returnable(order, 14, now: DateTime.utc(2026, 10, 5)), {'V1': 1});
+    expect(returnable(order, 14, now: DateTime.utc(2026, 10, 20)), isEmpty);
+    expect(canCancel(order), isFalse);
   });
 }

@@ -83,6 +83,7 @@ class _Profile extends ConsumerWidget {
         const _SectionTitle('Alışveriş'),
         _MenuGroup(children: [
           _MenuRow(icon: Icons.receipt_long_outlined, title: 'Siparişlerim', subtitle: 'Demo siparişlerin ve durumları', onTap: () => context.push('/hesap/siparisler')),
+          _MenuRow(icon: Icons.notifications_none, title: 'Bildirimlerim', subtitle: 'Sipariş, kargo, iptal ve iade gelişmeleri', onTap: () => context.push('/hesap/bildirimler')),
           _MenuRow(icon: Icons.location_on_outlined, title: 'Adreslerim', subtitle: 'Teslimat adreslerin', onTap: () => context.push('/hesap/adresler')),
         ]),
         const SizedBox(height: 28),

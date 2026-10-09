@@ -21,6 +21,12 @@ class _$CustomerOrder extends CustomerOrder {
   final BuiltList<CustomerOrderLine> lines;
   @override
   final Money total;
+  @override
+  final OrderShipment? shipment;
+  @override
+  final BuiltList<OrderEvent>? history;
+  @override
+  final BuiltList<OrderRequest>? requests;
 
   factory _$CustomerOrder([void Function(CustomerOrderBuilder)? updates]) =>
       (CustomerOrderBuilder()..update(updates))._build();
@@ -32,7 +38,10 @@ class _$CustomerOrder extends CustomerOrder {
       required this.status,
       required this.address,
       required this.lines,
-      required this.total})
+      required this.total,
+      this.shipment,
+      this.history,
+      this.requests})
       : super._();
   @override
   CustomerOrder rebuild(void Function(CustomerOrderBuilder) updates) =>
@@ -51,7 +60,10 @@ class _$CustomerOrder extends CustomerOrder {
         status == other.status &&
         address == other.address &&
         lines == other.lines &&
-        total == other.total;
+        total == other.total &&
+        shipment == other.shipment &&
+        history == other.history &&
+        requests == other.requests;
   }
 
   @override
@@ -64,6 +76,9 @@ class _$CustomerOrder extends CustomerOrder {
     _$hash = $jc(_$hash, address.hashCode);
     _$hash = $jc(_$hash, lines.hashCode);
     _$hash = $jc(_$hash, total.hashCode);
+    _$hash = $jc(_$hash, shipment.hashCode);
+    _$hash = $jc(_$hash, history.hashCode);
+    _$hash = $jc(_$hash, requests.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -77,7 +92,10 @@ class _$CustomerOrder extends CustomerOrder {
           ..add('status', status)
           ..add('address', address)
           ..add('lines', lines)
-          ..add('total', total))
+          ..add('total', total)
+          ..add('shipment', shipment)
+          ..add('history', history)
+          ..add('requests', requests))
         .toString();
   }
 }
@@ -116,6 +134,22 @@ class CustomerOrderBuilder
   MoneyBuilder get total => _$this._total ??= MoneyBuilder();
   set total(MoneyBuilder? total) => _$this._total = total;
 
+  OrderShipmentBuilder? _shipment;
+  OrderShipmentBuilder get shipment =>
+      _$this._shipment ??= OrderShipmentBuilder();
+  set shipment(OrderShipmentBuilder? shipment) => _$this._shipment = shipment;
+
+  ListBuilder<OrderEvent>? _history;
+  ListBuilder<OrderEvent> get history =>
+      _$this._history ??= ListBuilder<OrderEvent>();
+  set history(ListBuilder<OrderEvent>? history) => _$this._history = history;
+
+  ListBuilder<OrderRequest>? _requests;
+  ListBuilder<OrderRequest> get requests =>
+      _$this._requests ??= ListBuilder<OrderRequest>();
+  set requests(ListBuilder<OrderRequest>? requests) =>
+      _$this._requests = requests;
+
   CustomerOrderBuilder() {
     CustomerOrder._defaults(this);
   }
@@ -130,6 +164,9 @@ class CustomerOrderBuilder
       _address = $v.address.toBuilder();
       _lines = $v.lines.toBuilder();
       _total = $v.total.toBuilder();
+      _shipment = $v.shipment?.toBuilder();
+      _history = $v.history?.toBuilder();
+      _requests = $v.requests?.toBuilder();
       _$v = null;
     }
     return this;
@@ -164,6 +201,9 @@ class CustomerOrderBuilder
             address: address.build(),
             lines: lines.build(),
             total: total.build(),
+            shipment: _shipment?.build(),
+            history: _history?.build(),
+            requests: _requests?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -174,6 +214,12 @@ class CustomerOrderBuilder
         lines.build();
         _$failedField = 'total';
         total.build();
+        _$failedField = 'shipment';
+        _shipment?.build();
+        _$failedField = 'history';
+        _history?.build();
+        _$failedField = 'requests';
+        _requests?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'CustomerOrder', _$failedField, e.toString());

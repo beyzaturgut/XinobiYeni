@@ -3,6 +3,8 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Xinobi.Api.Catalog;
 using Xinobi.Api.EmailVerification;
+using Xinobi.Api.Notifications;
+using Xinobi.Api.Orders;
 
 namespace Xinobi.Api.Identity;
 
@@ -44,10 +46,11 @@ public static class CustomerEndpoints
             .ProducesProblem(StatusCodes.Status409Conflict);
 
         // POST rather than DELETE so the password can travel in a body every client supports.
-        var deletion = me.MapPost("/deletion", async Task<Results<NoContent, ProblemHttpResult>> (DeleteMyAccount request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts) =>
+        var deletion = me.MapPost("/deletion", async Task<Results<NoContent, ProblemHttpResult>> (DeleteMyAccount request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts, NotificationCenter notifications) =>
             {
                 if (request.CurrentPassword is not { Length: > 0 and <= AccountRules.MaxPasswordLength } || !await accounts.Delete(Id(user), request.CurrentPassword))
                     return AccountEndpoints.Failure(StatusCodes.Status400BadRequest, "wrong_password", "Mevcut parolan hatalı.");
+                await notifications.ForgetAccount(Id(user));
                 WebSessionCookies.Clear(http);
                 return TypedResults.NoContent();
             })
@@ -77,11 +80,11 @@ public static class CustomerEndpoints
 
         // Orders keep the catalogue's relative image path; it is resolved per request, so the web and the app each get a URL they can load.
         me.MapGet("/orders", async Task<Ok<CustomerOrder[]>> (ClaimsPrincipal user, HttpContext http, IAccountStore accounts, IConfiguration configuration, IWebHostEnvironment environment) =>
-                TypedResults.Ok((await accounts.Orders(Id(user))).Select(order => WithImages(order, http, configuration, environment)).ToArray()))
+                TypedResults.Ok((await accounts.Orders(Id(user))).Select(order => OrderEndpoints.WithImages(order, http, configuration, environment)).ToArray()))
             .WithName("ListMyOrders");
 
         me.MapPost("/orders", async Task<Results<Created<CustomerOrder>, ProblemHttpResult>> (PlaceOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
-                ICatalogSource source, IConfiguration configuration, IWebHostEnvironment environment) =>
+                ICatalogSource source, NotificationCenter notifications, IConfiguration configuration, IWebHostEnvironment environment) =>
             {
                 var id = Id(user);
                 if (request.ClientRequestId is not { Length: >= 8 and <= 80 }) throw new AccountException("invalid_request", "Sipariş isteği tanımlanamadı. Tekrar dene.");
@@ -101,21 +104,22 @@ public static class CustomerEndpoints
                         item.Quantity, variant.Price with { AmountMinor = variant.Price.AmountMinor * item.Quantity });
                 }).ToArray();
                 var now = DateTimeOffset.UtcNow;
-                var order = await accounts.PlaceOrder(id, request.ClientRequestId, () => new CustomerOrder(
-                    Guid.NewGuid().ToString("N"), $"XN-{now:yyMMdd}-{RandomNumberGenerator.GetInt32(1000, 10000)}", now, OrderStatuses.Received, address, lines,
-                    new Money(lines.Sum(line => line.LineTotal.AmountMinor), lines[0].UnitPrice.Currency)));
-                return TypedResults.Created($"/api/v1/me/orders/{order.Id}", WithImages(order, http, configuration, environment));
+                var created = false;
+                var order = await accounts.PlaceOrder(id, request.ClientRequestId, () =>
+                {
+                    created = true;
+                    return new CustomerOrder(Guid.NewGuid().ToString("N"), $"XN-{now:yyMMdd}-{RandomNumberGenerator.GetInt32(1000, 10000)}", now, OrderStatuses.Received, address, lines,
+                        new Money(lines.Sum(line => line.LineTotal.AmountMinor), lines[0].UnitPrice.Currency), History: [new OrderEvent(OrderStatuses.Received, now, "customer", null)]);
+                });
+                // A retried request returns the stored order and must not notify twice.
+                if (created && await accounts.FindById(id) is { } account) await OrderNotifications.Send(notifications, account, order, "order_placed");
+                return TypedResults.Created($"/api/v1/me/orders/{order.Id}", OrderEndpoints.WithImages(order, http, configuration, environment));
             })
             .WithName("PlaceMyOrder")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
     }
-
-    private static CustomerOrder WithImages(CustomerOrder order, HttpContext http, IConfiguration configuration, IWebHostEnvironment environment) => order with
-    {
-        Lines = [.. order.Lines.Select(line => line with { ImageUrl = CatalogEndpoints.ResolveUrl(line.ImageUrl, http.Request, configuration["Catalog:AssetBaseUrl"], environment.IsDevelopment()) })],
-    };
 
     private static PlaceOrderItem[] Merge(PlaceOrderItem[]? items)
     {

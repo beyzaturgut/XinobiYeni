@@ -66,22 +66,30 @@ All URIs are relative to *http://localhost*
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 [*AccountApi*](doc/AccountApi.md) | [**addMyAddress**](doc/AccountApi.md#addmyaddress) | **POST** /api/v1/me/addresses |
+[*AccountApi*](doc/AccountApi.md) | [**cancelMyOrder**](doc/AccountApi.md#cancelmyorder) | **POST** /api/v1/me/orders/{id}/cancellation |
 [*AccountApi*](doc/AccountApi.md) | [**changeMyPassword**](doc/AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
 [*AccountApi*](doc/AccountApi.md) | [**confirmMyEmailChange**](doc/AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAccount**](doc/AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAddress**](doc/AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
+[*AccountApi*](doc/AccountApi.md) | [**getOrderOptions**](doc/AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[*AccountApi*](doc/AccountApi.md) | [**listMyNotifications**](doc/AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [*AccountApi*](doc/AccountApi.md) | [**listMyOrders**](doc/AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [*AccountApi*](doc/AccountApi.md) | [**loginWebAccount**](doc/AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
 [*AccountApi*](doc/AccountApi.md) | [**logoutSession**](doc/AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
 [*AccountApi*](doc/AccountApi.md) | [**logoutWebSession**](doc/AccountApi.md#logoutwebsession) | **POST** /api/v1/auth/web/logout |
+[*AccountApi*](doc/AccountApi.md) | [**markMyNotificationsRead**](doc/AccountApi.md#markmynotificationsread) | **POST** /api/v1/me/notifications/read |
 [*AccountApi*](doc/AccountApi.md) | [**placeMyOrder**](doc/AccountApi.md#placemyorder) | **POST** /api/v1/me/orders |
 [*AccountApi*](doc/AccountApi.md) | [**refreshSession**](doc/AccountApi.md#refreshsession) | **POST** /api/v1/auth/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**refreshWebSession**](doc/AccountApi.md#refreshwebsession) | **POST** /api/v1/auth/web/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**registerAccount**](doc/AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
+[*AccountApi*](doc/AccountApi.md) | [**registerMyDevice**](doc/AccountApi.md#registermydevice) | **POST** /api/v1/me/devices |
 [*AccountApi*](doc/AccountApi.md) | [**registerWebAccount**](doc/AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
+[*AccountApi*](doc/AccountApi.md) | [**removeMyDevice**](doc/AccountApi.md#removemydevice) | **POST** /api/v1/me/devices/removal |
+[*AccountApi*](doc/AccountApi.md) | [**returnMyOrder**](doc/AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
@@ -112,6 +120,7 @@ Class | Method | HTTP request | Description
  - [AnnouncementList](doc/AnnouncementList.md)
  - [AuthSession](doc/AuthSession.md)
  - [Availability](doc/Availability.md)
+ - [CancelMyOrder](doc/CancelMyOrder.md)
  - [CategoryHighlight](doc/CategoryHighlight.md)
  - [CategoryItem](doc/CategoryItem.md)
  - [CategoryList](doc/CategoryList.md)
@@ -126,9 +135,17 @@ Class | Method | HTTP request | Description
  - [HealthResponse](doc/HealthResponse.md)
  - [HomeContent](doc/HomeContent.md)
  - [HomeSlide](doc/HomeSlide.md)
+ - [Inbox](doc/Inbox.md)
+ - [InboxItem](doc/InboxItem.md)
  - [LoginAccount](doc/LoginAccount.md)
  - [LogoutSession](doc/LogoutSession.md)
+ - [MarkNotificationsRead](doc/MarkNotificationsRead.md)
  - [Money](doc/Money.md)
+ - [OrderEvent](doc/OrderEvent.md)
+ - [OrderOptions](doc/OrderOptions.md)
+ - [OrderRequest](doc/OrderRequest.md)
+ - [OrderRequestLine](doc/OrderRequestLine.md)
+ - [OrderShipment](doc/OrderShipment.md)
  - [PermissionCatalogResponse](doc/PermissionCatalogResponse.md)
  - [PlaceOrder](doc/PlaceOrder.md)
  - [PlaceOrderItem](doc/PlaceOrderItem.md)
@@ -139,6 +156,9 @@ Class | Method | HTTP request | Description
  - [ReadinessResponse](doc/ReadinessResponse.md)
  - [RefreshSession](doc/RefreshSession.md)
  - [RegisterAccount](doc/RegisterAccount.md)
+ - [RegisterDevice](doc/RegisterDevice.md)
+ - [RemoveDevice](doc/RemoveDevice.md)
+ - [ReturnMyOrder](doc/ReturnMyOrder.md)
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartEmailChange](doc/StartEmailChange.md)

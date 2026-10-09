@@ -14,6 +14,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AnnouncementList.serializer)
       ..add(AuthSession.serializer)
       ..add(Availability.serializer)
+      ..add(CancelMyOrder.serializer)
       ..add(CategoryHighlight.serializer)
       ..add(CategoryItem.serializer)
       ..add(CategoryList.serializer)
@@ -28,9 +29,17 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(HealthResponse.serializer)
       ..add(HomeContent.serializer)
       ..add(HomeSlide.serializer)
+      ..add(Inbox.serializer)
+      ..add(InboxItem.serializer)
       ..add(LoginAccount.serializer)
       ..add(LogoutSession.serializer)
+      ..add(MarkNotificationsRead.serializer)
       ..add(Money.serializer)
+      ..add(OrderEvent.serializer)
+      ..add(OrderOptions.serializer)
+      ..add(OrderRequest.serializer)
+      ..add(OrderRequestLine.serializer)
+      ..add(OrderShipment.serializer)
       ..add(PermissionCatalogResponse.serializer)
       ..add(PlaceOrder.serializer)
       ..add(PlaceOrderItem.serializer)
@@ -41,6 +50,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ReadinessResponse.serializer)
       ..add(RefreshSession.serializer)
       ..add(RegisterAccount.serializer)
+      ..add(RegisterDevice.serializer)
+      ..add(RemoveDevice.serializer)
+      ..add(ReturnMyOrder.serializer)
       ..add(SaveCustomerAddress.serializer)
       ..add(StartAccountEmailVerification.serializer)
       ..add(StartEmailChange.serializer)
@@ -64,6 +76,12 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(CustomerOrderLine)]),
           () => ListBuilder<CustomerOrderLine>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(OrderEvent)]),
+          () => ListBuilder<OrderEvent>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(OrderRequest)]),
+          () => ListBuilder<OrderRequest>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(DependencyHealth)]),
           () => ListBuilder<DependencyHealth>())
       ..addBuilderFactory(
@@ -76,11 +94,32 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(CategoryHighlight)]),
           () => ListBuilder<CategoryHighlight>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(InboxItem)]),
+          () => ListBuilder<InboxItem>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(OrderRequestLine)]),
+          () => ListBuilder<OrderRequestLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(OrderRequestLine)]),
+          () => ListBuilder<OrderRequestLine>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(PlaceOrderItem)]),
           () => ListBuilder<PlaceOrderItem>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ProductSummary)]),
           () => ListBuilder<ProductSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

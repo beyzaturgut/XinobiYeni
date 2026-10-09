@@ -109,6 +109,7 @@ public static class AccountEndpoints
                 try { return await next(context); }
                 catch (AccountUnavailableException) { return Problem(StatusCodes.Status503ServiceUnavailable, "account_unavailable", "Hesap işlemleri şu anda kullanılamıyor."); }
                 catch (AccountException error) { return Problem(error.Status, error.Code, error.Message); }
+                catch (Infrastructure.ProblemException error) { return Problem(error.Status, error.Code, error.Message); }
                 catch (EmailVerificationException error) { return Problem(error.Status, error.Status == 429 ? "verification_rate_limited" : error.Status == 503 ? "email_unavailable" : "verification_failed", error.Message); }
             }).ProducesProblem(StatusCodes.Status503ServiceUnavailable);
         }
@@ -256,6 +257,13 @@ public static class AccountEndpoints
         if (app.Environment.IsDevelopment()) password.RequireRateLimiting("Account");
 
         CustomerEndpoints.Map(me, app.Environment.IsDevelopment());
+        Orders.OrderEndpoints.MapCustomerOrders(me);
+        Notifications.NotificationEndpoints.MapCustomerNotifications(me);
+        if (LocalCommerceEndpoints.PanelGroup(app) is { } panel)
+        {
+            Orders.OrderEndpoints.MapPanelOrders(panel);
+            Notifications.NotificationEndpoints.MapPanelNotifications(panel);
+        }
 
         admin.MapGet("/session", async Task<Results<Ok<AdminSession>, ProblemHttpResult>> (ClaimsPrincipal user, IAccountStore accounts) =>
                 await accounts.FindById(user.FindFirstValue(ClaimTypes.NameIdentifier)!) is { } account

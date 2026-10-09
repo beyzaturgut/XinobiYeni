@@ -17,12 +17,45 @@ public record PlaceOrderItem(string ProductId, string VariantId, int Quantity);
 /// <summary>Demo order: no payment is taken and stock is not reserved. <paramref name="ClientRequestId"/> makes retries return the same order.</summary>
 public record PlaceOrder(string AddressId, PlaceOrderItem[] Items, string ClientRequestId);
 public record CustomerOrderLine(string ProductId, string VariantId, string Name, string Color, string? ImageUrl, Money UnitPrice, int Quantity, Money LineTotal);
-public record CustomerOrder(string Id, string Number, DateTimeOffset CreatedAt, string Status, CustomerAddress Address, CustomerOrderLine[] Lines, Money Total);
+/// <summary>
+/// <paramref name="Shipment"/>, <paramref name="History"/> and <paramref name="Requests"/> were added with the order lifecycle;
+/// orders stored before have none.
+/// </summary>
+public record CustomerOrder(string Id, string Number, DateTimeOffset CreatedAt, string Status, CustomerAddress Address, CustomerOrderLine[] Lines, Money Total,
+    OrderShipment? Shipment = null, OrderEvent[]? History = null, OrderRequest[]? Requests = null);
+
+/// <summary>The carrier and tracking number the panel entered; <paramref name="TrackingUrl"/> only when the panel pasted the carrier's link.</summary>
+public record OrderShipment(string Carrier, string TrackingNumber, string? TrackingUrl, DateTimeOffset ShippedAt, DateTimeOffset? DeliveredAt);
+/// <summary>One status change. <paramref name="Actor"/> is <c>customer</c>, <c>panel</c> or <c>system</c>.</summary>
+public record OrderEvent(string Status, DateTimeOffset At, string Actor, string? Note);
+public record OrderRequestLine(string VariantId, int Quantity);
+/// <summary>A cancellation (<c>cancel</c>) or return (<c>return</c>) the customer asked for and the panel decides.</summary>
+public record OrderRequest(string Id, string Type, string Status, string Reason, string? Description, OrderRequestLine[] Lines, DateTimeOffset CreatedAt,
+    DateTimeOffset? DecidedAt = null, string? Resolution = null);
+
+/// <summary>An order with its customer, for the panel.</summary>
+public record StaffOrder(CustomerOrder Order, string AccountId, string CustomerName, string CustomerEmail, string? CustomerPhone);
+
+public record CancelMyOrder(string Reason, string? Description);
+public record ReturnMyOrder(string Reason, string? Description, OrderRequestLine[] Lines);
 
 public static class OrderStatuses
 {
-    /// <summary>Demo orders stop here: there is no payment, fulfilment or shipping yet.</summary>
     public const string Received = "received";
+    public const string Preparing = "preparing";
+    public const string Shipped = "shipped";
+    public const string Delivered = "delivered";
+    public const string Cancelled = "cancelled";
+    /// <summary>Every line came back through completed returns.</summary>
+    public const string Returned = "returned";
+}
+
+public static class OrderRequestStatuses
+{
+    public const string Requested = "requested";
+    public const string Approved = "approved";
+    public const string Rejected = "rejected";
+    public const string Completed = "completed";
 }
 
 public static partial class CustomerRules

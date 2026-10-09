@@ -3,8 +3,11 @@
 //
 
 // ignore_for_file: unused_element
+import 'package:xinobi_api_client/src/model/order_event.dart';
+import 'package:xinobi_api_client/src/model/order_shipment.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
 import 'package:built_collection/built_collection.dart';
+import 'package:xinobi_api_client/src/model/order_request.dart';
 import 'package:xinobi_api_client/src/model/customer_order_line.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:built_value/built_value.dart';
@@ -22,6 +25,9 @@ part 'customer_order.g.dart';
 /// * [address]
 /// * [lines]
 /// * [total]
+/// * [shipment]
+/// * [history]
+/// * [requests]
 @BuiltValue()
 abstract class CustomerOrder implements Built<CustomerOrder, CustomerOrderBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -44,6 +50,15 @@ abstract class CustomerOrder implements Built<CustomerOrder, CustomerOrderBuilde
 
   @BuiltValueField(wireName: r'total')
   Money get total;
+
+  @BuiltValueField(wireName: r'shipment')
+  OrderShipment? get shipment;
+
+  @BuiltValueField(wireName: r'history')
+  BuiltList<OrderEvent>? get history;
+
+  @BuiltValueField(wireName: r'requests')
+  BuiltList<OrderRequest>? get requests;
 
   CustomerOrder._();
 
@@ -103,6 +118,27 @@ class _$CustomerOrderSerializer implements PrimitiveSerializer<CustomerOrder> {
       object.total,
       specifiedType: const FullType(Money),
     );
+    if (object.shipment != null) {
+      yield r'shipment';
+      yield serializers.serialize(
+        object.shipment,
+        specifiedType: const FullType.nullable(OrderShipment),
+      );
+    }
+    if (object.history != null) {
+      yield r'history';
+      yield serializers.serialize(
+        object.history,
+        specifiedType: const FullType.nullable(BuiltList, [FullType(OrderEvent)]),
+      );
+    }
+    if (object.requests != null) {
+      yield r'requests';
+      yield serializers.serialize(
+        object.requests,
+        specifiedType: const FullType.nullable(BuiltList, [FullType(OrderRequest)]),
+      );
+    }
   }
 
   @override
@@ -174,6 +210,30 @@ class _$CustomerOrderSerializer implements PrimitiveSerializer<CustomerOrder> {
             specifiedType: const FullType(Money),
           ) as Money;
           result.total.replace(valueDes);
+          break;
+        case r'shipment':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(OrderShipment),
+          ) as OrderShipment?;
+          if (valueDes == null) continue;
+          result.shipment.replace(valueDes);
+          break;
+        case r'history':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(BuiltList, [FullType(OrderEvent)]),
+          ) as BuiltList<OrderEvent>?;
+          if (valueDes == null) continue;
+          result.history.replace(valueDes);
+          break;
+        case r'requests':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(BuiltList, [FullType(OrderRequest)]),
+          ) as BuiltList<OrderRequest>?;
+          if (valueDes == null) continue;
+          result.requests.replace(valueDes);
           break;
         default:
           unhandled.add(key);

@@ -10,13 +10,14 @@ public static class LocalCommerceEndpoints
     private static bool ValidMedia(string source) => string.IsNullOrEmpty(source) ||
         Regex.IsMatch(source, @"^/assets/[a-zA-Z0-9/_\-.]+$") || Regex.IsMatch(source, @"^/api/v1/local-commerce/media/[a-f0-9]{32}\.(png|jpg|webp|mp4|webm)$");
 
-    public static void MapLocalCommerce(this WebApplication app)
+    /// <summary>
+    /// The panel's Development group under /api/v1/local-commerce: loopback and panel/web origins only (ADR-003); null outside
+    /// Development, where these routes must never exist. The panel moves to staff permissions with the SQL store (03.11).
+    /// </summary>
+    public static RouteGroupBuilder? PanelGroup(WebApplication app)
     {
-        // These endpoints must never be exposed by a production deployment.
-        if (!app.Environment.IsDevelopment()) return;
-        var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce")
-            // Development-only and loopback-only (ADR-003); the panel moves to staff permissions with the SQL store (03.11).
-            .AllowAnonymous();
+        if (!app.Environment.IsDevelopment()) return null;
+        var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce").AllowAnonymous().ExcludeFromDescription();
         group.AddEndpointFilter(async (context, next) =>
         {
             var request = context.HttpContext;
@@ -24,8 +25,17 @@ public static class LocalCommerceEndpoints
             var origin = request.Request.Headers.Origin.ToString();
             if (origin.Length > 0 && !AllowedOrigin(origin)) return Results.StatusCode(403);
             request.Response.Headers.CacheControl = "no-store";
-            return await next(context);
+            try { return await next(context); }
+            catch (Xinobi.Api.Infrastructure.ProblemException error) { return Results.Json(new { message = error.Message, code = error.Code }, statusCode: error.Status); }
+            catch (Xinobi.Api.Identity.AccountException error) { return Results.Json(new { message = error.Message, code = error.Code }, statusCode: error.Status); }
         });
+        return group;
+    }
+
+    public static void MapLocalCommerce(this WebApplication app)
+    {
+        // These endpoints must never be exposed by a production deployment.
+        if (PanelGroup(app) is not { } group) return;
         group.MapGet("/state", async (LocalCommerceStore store) => Results.Ok(await store.Read()));
         group.MapPost("/announcements", async (AnnouncementCreate announcement, LocalCommerceStore store) =>
         {

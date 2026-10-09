@@ -15,5 +15,8 @@ Name | Type | Description | Notes
 **address** | [**CustomerAddress**](CustomerAddress.md) |  |
 **lines** | [**BuiltList&lt;CustomerOrderLine&gt;**](CustomerOrderLine.md) |  |
 **total** | [**Money**](Money.md) |  |
+**shipment** | [**OrderShipment**](OrderShipment.md) |  | [optional]
+**history** | [**BuiltList&lt;OrderEvent&gt;**](OrderEvent.md) |  | [optional]
+**requests** | [**BuiltList&lt;OrderRequest&gt;**](OrderRequest.md) |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

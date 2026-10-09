@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Xinobi.Api.Features.ProductSurfaces.Development;
 using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
+using Xinobi.Api.Notifications;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +81,15 @@ if (builder.Configuration["Catalog:SnapshotPath"] is { Length: > 0 } snapshotPat
 builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
 builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
 builder.Services.TryAddSingleton(TimeProvider.System);
+// Notifications: registered everywhere so the contract lists the routes; the store answers 503 outside Development (ADR-003).
+builder.Services.AddSingleton<NotificationTexts>();
+builder.Services.AddSingleton<INotificationChannelSender, EmailNotificationSender>();
+builder.Services.AddHttpClient<SmsNotificationSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+builder.Services.AddSingleton<INotificationChannelSender>(services => services.GetRequiredService<SmsNotificationSender>());
+builder.Services.AddHttpClient<PushNotificationSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+builder.Services.AddSingleton<INotificationChannelSender>(services => services.GetRequiredService<PushNotificationSender>());
+builder.Services.AddSingleton<NotificationCenter>();
+if (builder.Environment.IsDevelopment() && builder.Configuration.GetValue("Notifications:WorkerEnabled", true)) builder.Services.AddHostedService<NotificationWorker>();
 builder.Services.AddAuthentication(AccountTokenHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, AccountTokenHandler>(AccountTokenHandler.SchemeName, null);
 // Default deny (Faz03 03.04): an endpoint without its own rule needs a signed-in account; public endpoints say AllowAnonymous.
 builder.Services.AddAuthorization(options =>

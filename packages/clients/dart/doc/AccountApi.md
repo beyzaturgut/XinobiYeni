@@ -10,22 +10,30 @@ All URIs are relative to *http://localhost*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**addMyAddress**](AccountApi.md#addmyaddress) | **POST** /api/v1/me/addresses |
+[**cancelMyOrder**](AccountApi.md#cancelmyorder) | **POST** /api/v1/me/orders/{id}/cancellation |
 [**changeMyPassword**](AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
 [**confirmMyEmailChange**](AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
 [**deleteMyAccount**](AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [**deleteMyAddress**](AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [**getMyAccount**](AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
+[**getOrderOptions**](AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[**listMyNotifications**](AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [**listMyOrders**](AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [**loginAccount**](AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [**loginWebAccount**](AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
 [**logoutSession**](AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
 [**logoutWebSession**](AccountApi.md#logoutwebsession) | **POST** /api/v1/auth/web/logout |
+[**markMyNotificationsRead**](AccountApi.md#markmynotificationsread) | **POST** /api/v1/me/notifications/read |
 [**placeMyOrder**](AccountApi.md#placemyorder) | **POST** /api/v1/me/orders |
 [**refreshSession**](AccountApi.md#refreshsession) | **POST** /api/v1/auth/refresh |
 [**refreshWebSession**](AccountApi.md#refreshwebsession) | **POST** /api/v1/auth/web/refresh |
 [**registerAccount**](AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
+[**registerMyDevice**](AccountApi.md#registermydevice) | **POST** /api/v1/me/devices |
 [**registerWebAccount**](AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
+[**removeMyDevice**](AccountApi.md#removemydevice) | **POST** /api/v1/me/devices/removal |
+[**returnMyOrder**](AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [**startMyEmailChange**](AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [**updateMyAccount**](AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
@@ -61,6 +69,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**CustomerAddress**](CustomerAddress.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **cancelMyOrder**
+> CustomerOrder cancelMyOrder(id, cancelMyOrder)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final CancelMyOrder cancelMyOrder = ; // CancelMyOrder |
+
+try {
+    final response = api.cancelMyOrder(id, cancelMyOrder);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->cancelMyOrder: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **cancelMyOrder** | [**CancelMyOrder**](CancelMyOrder.md)|  |
+
+### Return type
+
+[**CustomerOrder**](CustomerOrder.md)
 
 ### Authorization
 
@@ -272,6 +323,84 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getMyOrder**
+> CustomerOrder getMyOrder(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+
+try {
+    final response = api.getMyOrder(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getMyOrder: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**CustomerOrder**](CustomerOrder.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getOrderOptions**
+> OrderOptions getOrderOptions()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.getOrderOptions();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getOrderOptions: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**OrderOptions**](OrderOptions.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listMyAddresses**
 > BuiltList<CustomerAddress> listMyAddresses()
 
@@ -297,6 +426,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BuiltList&lt;CustomerAddress&gt;**](CustomerAddress.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listMyNotifications**
+> Inbox listMyNotifications()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.listMyNotifications();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->listMyNotifications: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**Inbox**](Inbox.md)
 
 ### Authorization
 
@@ -504,6 +670,46 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **markMyNotificationsRead**
+> markMyNotificationsRead(markNotificationsRead)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final MarkNotificationsRead markNotificationsRead = ; // MarkNotificationsRead |
+
+try {
+    api.markMyNotificationsRead(markNotificationsRead);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->markMyNotificationsRead: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **markNotificationsRead** | [**MarkNotificationsRead**](MarkNotificationsRead.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **placeMyOrder**
 > CustomerOrder placeMyOrder(placeOrder)
 
@@ -664,6 +870,46 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **registerMyDevice**
+> registerMyDevice(registerDevice)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final RegisterDevice registerDevice = ; // RegisterDevice |
+
+try {
+    api.registerMyDevice(registerDevice);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->registerMyDevice: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **registerDevice** | [**RegisterDevice**](RegisterDevice.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **registerWebAccount**
 > AccountProfile registerWebAccount(registerAccount)
 
@@ -693,6 +939,89 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**AccountProfile**](AccountProfile.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **removeMyDevice**
+> removeMyDevice(removeDevice)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final RemoveDevice removeDevice = ; // RemoveDevice |
+
+try {
+    api.removeMyDevice(removeDevice);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->removeMyDevice: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **removeDevice** | [**RemoveDevice**](RemoveDevice.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **returnMyOrder**
+> CustomerOrder returnMyOrder(id, returnMyOrder)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final ReturnMyOrder returnMyOrder = ; // ReturnMyOrder |
+
+try {
+    final response = api.returnMyOrder(id, returnMyOrder);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->returnMyOrder: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **returnMyOrder** | [**ReturnMyOrder**](ReturnMyOrder.md)|  |
+
+### Return type
+
+[**CustomerOrder**](CustomerOrder.md)
 
 ### Authorization
 

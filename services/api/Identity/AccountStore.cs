@@ -56,6 +56,13 @@ public interface IAccountStore
     Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build);
     /// <summary>False when <paramref name="currentPassword"/> is wrong. On success every session of the account is signed out.</summary>
     Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword);
+    /// <summary>
+    /// Saves <paramref name="change"/>'s result for the order; <paramref name="accountId"/> null lets the panel reach any account's order.
+    /// Throws <c>order_not_found</c>; whatever <paramref name="change"/> throws leaves the order untouched.
+    /// </summary>
+    Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change);
+    /// <summary>Every account's orders, newest first, for the panel.</summary>
+    Task<StaffOrder[]> AllOrders();
 }
 
 public sealed class UnavailableAccountStore : IAccountStore
@@ -80,6 +87,8 @@ public sealed class UnavailableAccountStore : IAccountStore
     public Task<CustomerOrder[]> Orders(string accountId) => throw new AccountUnavailableException();
     public Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build) => throw new AccountUnavailableException();
     public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => throw new AccountUnavailableException();
+    public Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change) => throw new AccountUnavailableException();
+    public Task<StaffOrder[]> AllOrders() => throw new AccountUnavailableException();
 }
 
 public static class AccountRules
@@ -373,6 +382,23 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
         await Write(state);
         return true;
     });
+
+    public Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change) => Locked(async state =>
+    {
+        var index = state.Orders!.FindIndex(entry => entry.Order.Id == orderId && (accountId is null || entry.AccountId == accountId));
+        var account = index < 0 ? null : state.Accounts.FirstOrDefault(item => item.Id == state.Orders[index].AccountId);
+        if (account is null) throw new AccountException("order_not_found", "Sipariş bulunamadı.", StatusCodes.Status404NotFound);
+        var order = change(state.Orders[index].Order);
+        state.Orders[index] = state.Orders[index] with { Order = order };
+        await Write(state);
+        return (order, account);
+    });
+
+    public Task<StaffOrder[]> AllOrders() => Locked(state => Task.FromResult(state.Orders!
+        .Select(entry => (entry, account: state.Accounts.FirstOrDefault(item => item.Id == entry.AccountId)))
+        .Where(pair => pair.account is not null)
+        .Select(pair => new StaffOrder(pair.entry.Order, pair.account!.Id, pair.account.Name, pair.account.Email, pair.account.Phone))
+        .OrderByDescending(item => item.Order.CreatedAt).ToArray()));
 
     private static AccountException Invalid() =>
         new("invalid_refresh_token", "Oturumun sona erdi. Tekrar giriş yap.", StatusCodes.Status401Unauthorized);

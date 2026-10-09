@@ -21,6 +21,7 @@ import 'package:xinobi_api_client/src/model/announcement_item.dart';
 import 'package:xinobi_api_client/src/model/announcement_list.dart';
 import 'package:xinobi_api_client/src/model/auth_session.dart';
 import 'package:xinobi_api_client/src/model/availability.dart';
+import 'package:xinobi_api_client/src/model/cancel_my_order.dart';
 import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
@@ -35,9 +36,17 @@ import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
 import 'package:xinobi_api_client/src/model/home_content.dart';
 import 'package:xinobi_api_client/src/model/home_slide.dart';
+import 'package:xinobi_api_client/src/model/inbox.dart';
+import 'package:xinobi_api_client/src/model/inbox_item.dart';
 import 'package:xinobi_api_client/src/model/login_account.dart';
 import 'package:xinobi_api_client/src/model/logout_session.dart';
+import 'package:xinobi_api_client/src/model/mark_notifications_read.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
+import 'package:xinobi_api_client/src/model/order_event.dart';
+import 'package:xinobi_api_client/src/model/order_options.dart';
+import 'package:xinobi_api_client/src/model/order_request.dart';
+import 'package:xinobi_api_client/src/model/order_request_line.dart';
+import 'package:xinobi_api_client/src/model/order_shipment.dart';
 import 'package:xinobi_api_client/src/model/permission_catalog_response.dart';
 import 'package:xinobi_api_client/src/model/place_order.dart';
 import 'package:xinobi_api_client/src/model/place_order_item.dart';
@@ -48,6 +57,9 @@ import 'package:xinobi_api_client/src/model/product_summary.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
 import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
+import 'package:xinobi_api_client/src/model/register_device.dart';
+import 'package:xinobi_api_client/src/model/remove_device.dart';
+import 'package:xinobi_api_client/src/model/return_my_order.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
@@ -72,6 +84,7 @@ part 'serializers.g.dart';
   AnnouncementList,
   AuthSession,
   Availability,
+  CancelMyOrder,
   CategoryHighlight,
   CategoryItem,
   CategoryList,
@@ -86,9 +99,17 @@ part 'serializers.g.dart';
   HealthResponse,
   HomeContent,
   HomeSlide,
+  Inbox,
+  InboxItem,
   LoginAccount,
   LogoutSession,
+  MarkNotificationsRead,
   Money,
+  OrderEvent,
+  OrderOptions,
+  OrderRequest,
+  OrderRequestLine,
+  OrderShipment,
   PermissionCatalogResponse,
   PlaceOrder,
   PlaceOrderItem,
@@ -99,6 +120,9 @@ part 'serializers.g.dart';
   ReadinessResponse,
   RefreshSession,
   RegisterAccount,
+  RegisterDevice,
+  RemoveDevice,
+  ReturnMyOrder,
   SaveCustomerAddress,
   StartAccountEmailVerification,
   StartEmailChange,
@@ -151,8 +175,16 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<PlaceOrderItem>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(OrderEvent)]),
+        () => ListBuilder<OrderEvent>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(DependencyHealth)]),
         () => ListBuilder<DependencyHealth>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(OrderRequestLine)]),
+        () => ListBuilder<OrderRequestLine>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(VariantDetail)]),
@@ -173,6 +205,14 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustomerOrder)]),
         () => ListBuilder<CustomerOrder>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(OrderRequest)]),
+        () => ListBuilder<OrderRequest>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(InboxItem)]),
+        () => ListBuilder<InboxItem>(),
       )
       ..add(const OneOfSerializer())
       ..add(const AnyOfSerializer())

@@ -10,17 +10,23 @@ export type Money={amountMinor:number;currency:string};
 export type CustomerAddress={id:string;title:string;fullName:string;phone:string;city:string;district:string;line:string;postalCode?:string|null;isDefault:boolean};
 export type AddressInput=Omit<CustomerAddress,'id'>;
 export type OrderLine={productId:string;variantId:string;name:string;color:string;imageUrl?:string|null;unitPrice:Money;quantity:number;lineTotal:Money};
-export type CustomerOrder={id:string;number:string;createdAt:string;status:string;address:CustomerAddress;lines:OrderLine[];total:Money};
+export type OrderShipment={carrier:string;trackingNumber:string;trackingUrl?:string|null;shippedAt:string;deliveredAt?:string|null};
+export type OrderEvent={status:string;at:string;actor:string;note?:string|null};
+export type OrderRequestLine={variantId:string;quantity:number};
+export type OrderRequest={id:string;type:'cancel'|'return';status:'requested'|'approved'|'rejected'|'completed';reason:string;description?:string|null;lines:OrderRequestLine[];createdAt:string;decidedAt?:string|null;resolution?:string|null};
+export type CustomerOrder={id:string;number:string;createdAt:string;status:string;address:CustomerAddress;lines:OrderLine[];total:Money;shipment?:OrderShipment|null;history?:OrderEvent[]|null;requests?:OrderRequest[]|null};
+export type OrderOptions={cancelReasons:string[];returnReasons:string[];carriers:string[];returnWindowDays:number};
+export type InboxItem={id:string;kind:string;title:string;body:string;link?:string|null;createdAt:string;read:boolean};
 export type EmailChallenge={verificationId:string;email:string;expiresAt:string;previewCode?:string|null};
 
 const api=commerceApi?commerceApi.replace(/\/local-commerce\/?$/,''):'';
-type Snapshot={user?:DemoUser;ready:boolean;addresses:CustomerAddress[];orders:CustomerOrder[]};
-const empty:Snapshot={ready:false,addresses:[],orders:[]};
+type Snapshot={user?:DemoUser;ready:boolean;addresses:CustomerAddress[];orders:CustomerOrder[];inbox:InboxItem[];unread:number};
+const empty:Snapshot={ready:false,addresses:[],orders:[],inbox:[],unread:0};
 let session:Snapshot=empty;
 let loading:Promise<void>|null=null;
 const listeners=new Set<()=>void>();
 function publish(next:Partial<Snapshot>){session={...session,...next};listeners.forEach(listener=>listener())}
-function signedOut(){publish({user:undefined,ready:true,addresses:[],orders:[]})}
+function signedOut(){publish({user:undefined,ready:true,addresses:[],orders:[],inbox:[],unread:0})}
 
 async function call<T>(path:string,init:RequestInit={}):Promise<T|null>{
   if(!api)throw new Error('Hesap servisi henüz kullanıma açılmadı.');
@@ -47,6 +53,34 @@ async function signedIn<T>(path:string,init:RequestInit={}):Promise<T|null>{
 async function loadAccountData(){
   const [addresses,orders]=await Promise.all([signedIn<CustomerAddress[]>('/me/addresses'),signedIn<CustomerOrder[]>('/me/orders')]);
   publish({addresses:addresses??[],orders:orders??[]});
+  await refreshInbox().catch(()=>{});
+}
+
+/** Reloads orders, e.g. after the panel changed a status. */
+export async function refreshOrders(){publish({orders:(await signedIn<CustomerOrder[]>('/me/orders'))??[]})}
+
+export async function refreshInbox(){
+  const inbox=await signedIn<{items:InboxItem[];unread:number}>('/me/notifications');
+  publish({inbox:inbox?.items??[],unread:inbox?.unread??0});
+}
+
+/** Marks the given notifications read, or all of them. */
+export async function markInboxRead(ids?:string[]){
+  await signedIn('/me/notifications/read',{method:'POST',body:JSON.stringify({ids:ids??null})});
+  await refreshInbox();
+}
+
+export async function orderOptions(){return (await signedIn<OrderOptions>('/me/order-options'))!}
+
+function replaceOrder(order:CustomerOrder){publish({orders:session.orders.map(existing=>existing.id===order.id?order:existing)});void refreshInbox().catch(()=>{});return order}
+
+/** A received order is cancelled at once; one being prepared opens a request the store decides. */
+export async function cancelOrder(id:string,reason:string,description:string){
+  return replaceOrder((await signedIn<CustomerOrder>(`/me/orders/${encodeURIComponent(id)}/cancellation`,{method:'POST',body:JSON.stringify({reason,description:description.trim()||null})}))!);
+}
+
+export async function requestReturn(id:string,reason:string,description:string,lines:OrderRequestLine[]){
+  return replaceOrder((await signedIn<CustomerOrder>(`/me/orders/${encodeURIComponent(id)}/returns`,{method:'POST',body:JSON.stringify({reason,description:description.trim()||null,lines})}))!);
 }
 
 /** Reads the cookie session; an expired access cookie is refreshed once. */
@@ -136,7 +170,23 @@ export async function placeDemoOrder(addressId:string,items:{productId:string;va
   return order;
 }
 
-export const orderStatusText=(status:string)=>status==='received'?'Sipariş alındı':status;
+const statusTexts:Record<string,string>={received:'Sipariş alındı',preparing:'Hazırlanıyor',shipped:'Kargoya verildi',delivered:'Teslim edildi',cancelled:'İptal edildi',returned:'İade edildi'};
+export const orderStatusText=(status:string)=>statusTexts[status]??status;
+const requestTexts:Record<string,string>={requested:'Değerlendiriliyor',approved:'Onaylandı',rejected:'Kabul edilmedi',completed:'Tamamlandı'};
+export const requestStatusText=(request:OrderRequest)=>`${request.type==='cancel'?'İptal':'İade'} talebi · ${requestTexts[request.status]??request.status}`;
+/** Main steps of the order timeline; cancelled and returned orders end where they stopped. */
+export const orderSteps=['received','preparing','shipped','delivered'] as const;
+export const pendingRequest=(order:CustomerOrder,type:'cancel'|'return')=>order.requests?.find(item=>item.type===type&&(item.status==='requested'||item.status==='approved'));
+export const canCancel=(order:CustomerOrder)=>(order.status==='received'||order.status==='preparing')&&!pendingRequest(order,'cancel');
+/** Delivered orders can be returned for [days] days after delivery while some quantity is left. */
+export function returnable(order:CustomerOrder,days:number):Record<string,number>{
+  if(order.status!=='delivered')return {};
+  const delivered=order.shipment?.deliveredAt??order.history?.findLast(item=>item.status==='delivered')?.at;
+  if(delivered&&Date.now()>new Date(delivered).getTime()+days*86400000)return {};
+  const left:Record<string,number>={};order.lines.forEach(line=>{left[line.variantId]=(left[line.variantId]??0)+line.quantity});
+  order.requests?.filter(item=>item.type==='return'&&item.status!=='rejected').forEach(item=>item.lines.forEach(line=>{left[line.variantId]-=line.quantity}));
+  return Object.fromEntries(Object.entries(left).filter(([,count])=>count>0));
+}
 
 /** +905321234567 → 0532 123 45 67 for display and editing; the server accepts any common spelling. */
 export function localPhone(phone?:string|null){

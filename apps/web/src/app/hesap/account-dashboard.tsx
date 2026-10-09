@@ -6,7 +6,7 @@ import {money} from '../../lib/commerce';
 import AccountAccess from './giris/account-access';
 import styles from './account.module.css';
 
-type IconName = 'person'|'package'|'heart'|'bag'|'lock'|'arrow'|'pin';
+type IconName = 'person'|'package'|'heart'|'bag'|'lock'|'arrow'|'pin'|'bell';
 function Icon({name}: {name: IconName}) {
   const paths: Record<IconName, string> = {
     person:'M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM5 21a7 7 0 0 1 14 0H5Z',
@@ -15,6 +15,7 @@ function Icon({name}: {name: IconName}) {
     bag:'M5 7h14l1 14H4L5 7ZM8 7V5a4 4 0 0 1 8 0v2',
     lock:'M5 10h14v11H5V10ZM8 10V6a4 4 0 0 1 8 0v4M12 14v3',
     arrow:'M4 12h16m-6-6 6 6-6 6',
+    bell:'M6 17v-6a6 6 0 0 1 12 0v6l1.5 2h-15L6 17ZM10 21a2 2 0 0 0 4 0',
     pin:'M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21ZM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
   };
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]}/></svg>;
@@ -80,6 +81,7 @@ function SignedInAccount({user,orders,addresses}:{user:DemoUser;orders:CustomerO
           <Link href="/hesap/siparisler"><Icon name="package"/><span><strong>Siparişlerim</strong><small>{orders.length?`${orders.length} demo sipariş · son: ${orders[0].number} · ${money(orders[0].total.amountMinor)}`:'Henüz siparişin yok'}</small></span><Icon name="arrow"/></Link>
           <Link href="/favoriler"><Icon name="heart"/><span><strong>Favorilerim</strong><small>Beğendiğin ürünler</small></span><Icon name="arrow"/></Link>
           <Link href="/sepet"><Icon name="bag"/><span><strong>Sepetim</strong><small>Seçtiğin ürünler ve adetleri</small></span><Icon name="arrow"/></Link>
+          <Link href="/hesap/bildirimler"><Icon name="bell"/><span><strong>Bildirimlerim</strong><small>Sipariş, kargo, iptal ve iade gelişmeleri</small></span><Icon name="arrow"/></Link>
           <Link href="/hesap/adresler"><Icon name="pin"/><span><strong>Adreslerim</strong><small>{addresses.length?`${addresses.length} kayıtlı adres${addresses[0]?.isDefault?` · varsayılan: ${addresses[0].title}`:''}`:'Henüz adres eklemedin'}</small></span><Icon name="arrow"/></Link>
         </nav>
       </section>

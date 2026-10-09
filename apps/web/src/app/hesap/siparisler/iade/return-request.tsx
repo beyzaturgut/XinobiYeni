@@ -1,32 +1,69 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import teaMaker from "../../../../../public/assets/products/tea-maker-101-blue.webp";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { orderOptions, requestReturn, returnable, useDemoCommerce, type OrderOptions } from "../../../../lib/demo-commerce";
+import { money } from "../../../../lib/commerce";
 import styles from "./return.module.css";
 
-type RequestType = "cancel" | "return";
-
+/** Return request for one delivered order (?siparis=id): lines and quantities, a listed reason and an optional description. */
 export default function ReturnRequest() {
-  const [type, setType] = useState<RequestType>("return");
+  const { user, orders, ready } = useDemoCommerce();
+  const orderId = useSearchParams().get("siparis");
+  const order = orders.find((item) => item.id === orderId);
+  const [options, setOptions] = useState<OrderOptions | null>(null);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
-  const [previewed, setPreviewed] = useState(false);
-  const ready = Boolean(reason && description.trim().length >= 10);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [sent, setSent] = useState(false);
+  useEffect(() => { if (user) orderOptions().then(setOptions).catch(() => setError("İade seçenekleri yüklenemedi.")); }, [user]);
+
+  if (!ready || (user && !options && !error)) return <p className={styles.layout} role="status">Yükleniyor…</p>;
+  if (!user) return <div className={styles.layout}><Link href="/hesap/giris">İade talebi için giriş yap →</Link></div>;
+  if (!order) {
+    // Reached without an order (e.g. the footer link): list the orders that can still be returned or cancelled.
+    const eligible = options ? orders.filter((item) => Object.keys(returnable(item, options.returnWindowDays)).length > 0 || item.status === "received" || item.status === "preparing") : [];
+    return <div className={styles.layout}><section className={styles.formArea}><p className={styles.eyebrow}>İptal ve iade</p><h1>{orderId ? "Sipariş bulunamadı." : "Hangi sipariş için?"}</h1>
+      {eligible.length === 0 ? <p>İptal veya iade edilebilecek bir siparişin yok. Kargoya verilmeden önce siparişi iptal edebilir, teslimattan sonra {options?.returnWindowDays ?? 14} gün içinde iade talebi oluşturabilirsin.</p> :
+        <ul className={styles.orderChoices}>{eligible.map((item) => <li key={item.id}><Link href={item.status === "delivered" ? `/hesap/siparisler/iade?siparis=${item.id}` : `/hesap/siparisler?siparis=${item.id}`}><strong>{item.number}</strong><span>{item.lines.map((line) => line.name).join(", ")} · {money(item.total.amountMinor)}</span><small>{item.status === "delivered" ? "İade talebi oluştur →" : "İptal için siparişe git →"}</small></Link></li>)}</ul>}
+      <Link href="/hesap/siparisler">Siparişlerime dön →</Link></section></div>;
+  }
+  const left = options ? returnable(order, options.returnWindowDays) : {};
+  const chosen = Object.entries(quantities).filter(([, count]) => count > 0);
+  const canSubmit = reason && chosen.length > 0 && !busy;
+
+  if (sent) return <div className={styles.layout}><section className={styles.formArea} aria-live="polite"><p className={styles.eyebrow}>İade talebi</p><h1>Talebin alındı.</h1><p>{order.number} için iade talebini inceleyip sonucu bildirim ve e-posta ile ileteceğiz. Onaylanırsa ürünü kargoyla geri gönderebilirsin.</p><Link href={`/hesap/siparisler?siparis=${order.id}`}>Siparişime dön →</Link></section></div>;
 
   return <div className={styles.layout}>
     <section className={styles.formArea} aria-labelledby="return-title">
-      <p className={styles.eyebrow}>Demo talep akışı</p><h1 id="return-title">Nasıl yardımcı olabiliriz?</h1>
-      <div className={styles.notice}><strong>Gerçek talep oluşturulmaz</strong><span>Bu form arayüz önizlemesidir. Veriler gönderilmez; iptal, iade veya ücret geri ödemesi başlatılmaz.</span></div>
-      <form onSubmit={(event) => event.preventDefault()}>
-        <fieldset><legend>01 · İşlem türü</legend><div className={styles.typeGrid}><label className={type === "cancel" ? styles.selected : ""}><input type="radio" name="type" checked={type === "cancel"} onChange={() => { setType("cancel"); setPreviewed(false); }} /><span><strong>İptal talebi</strong><small>Hazırlık aşamasındaki siparişler için</small></span></label><label className={type === "return" ? styles.selected : ""}><input type="radio" name="type" checked={type === "return"} onChange={() => { setType("return"); setPreviewed(false); }} /><span><strong>İade talebi</strong><small>Teslim edilen ürünler için</small></span></label></div></fieldset>
-        <fieldset><legend>02 · Ürün</legend><label className={styles.product}><input type="checkbox" defaultChecked /><Image src={teaMaker} alt="Lacivert Çay Makinesi 101" sizes="80px" /><span><strong>Çay Makinesi 101</strong><small>Lacivert · 1 adet · DEMO-2401</small></span></label></fieldset>
-        <fieldset><legend>03 · Talep nedeni</legend><label className={styles.field}>Neden<select value={reason} onChange={(event) => { setReason(event.target.value); setPreviewed(false); }}><option value="">Seçiniz</option><option>Fikrimi değiştirdim</option><option>Yanlış ürün seçtim</option><option>Ürün hasarlı ulaştı</option><option>Ürün beklentimi karşılamadı</option><option>Diğer</option></select></label><label className={styles.field}>Açıklama<textarea rows={5} value={description} onChange={(event) => { setDescription(event.target.value.slice(0, 500)); setPreviewed(false); }} placeholder="Talebinizi en az 10 karakterle açıklayın" /><small>{description.length}/500</small></label></fieldset>
-        <fieldset><legend>04 · Görsel veya belge</legend><div className={styles.upload}><span aria-hidden="true">↑</span><strong>Dosya yükleme henüz etkin değil</strong><small>Dosya türü, boyut, virüs taraması ve saklama politikası D10/API sonrası tanımlanacaktır.</small><button type="button" disabled>Dosya seç</button></div></fieldset>
-        <button className={styles.previewButton} type="button" disabled={!ready} onClick={() => setPreviewed(true)}>Demo talep özetini hazırla</button>
-      </form>
-      <p className={styles.status} aria-live="polite">{previewed ? "Demo özet hazırlandı; talep sunucuya gönderilmedi." : ""}</p>
+      <p className={styles.eyebrow}>İade talebi · {order.number}</p><h1 id="return-title">Hangi ürünleri iade etmek istiyorsun?</h1>
+      {Object.keys(left).length === 0 ? <div className={styles.notice}><strong>İade edilemez</strong><span>Bu sipariş için iade süresi ({options?.returnWindowDays} gün) dolmuş, sipariş henüz teslim edilmemiş ya da tüm ürünler için talep oluşturulmuş.</span></div> :
+      <form onSubmit={async (event) => {
+        event.preventDefault(); if (!canSubmit) return;
+        setBusy(true); setError("");
+        try { await requestReturn(order.id, reason, description, chosen.map(([variantId, quantity]) => ({ variantId, quantity }))); setSent(true); }
+        catch (e) { setError(e instanceof Error ? e.message : "Talep gönderilemedi."); }
+        finally { setBusy(false); }
+      }}>
+        <fieldset><legend>01 · Ürünler</legend><div className={styles.lines}>{order.lines.filter((line) => left[line.variantId]).map((line) => <label key={line.variantId} className={styles.product}>
+          <input type="checkbox" checked={(quantities[line.variantId] ?? 0) > 0} onChange={(event) => setQuantities((current) => ({ ...current, [line.variantId]: event.target.checked ? 1 : 0 }))} />
+          {line.imageUrl ? <Image src={line.imageUrl} alt="" width={70} height={85} unoptimized /> : <span />}
+          <span><strong>{line.name}</strong><small>{line.color} · {money(line.unitPrice.amountMinor)} · iade edilebilir: {left[line.variantId]}</small>
+            {(quantities[line.variantId] ?? 0) > 0 && left[line.variantId] > 1 && <select aria-label={`${line.name} iade adedi`} value={quantities[line.variantId]} onChange={(event) => setQuantities((current) => ({ ...current, [line.variantId]: Number(event.target.value) }))}>{Array.from({ length: left[line.variantId] }, (_, i) => i + 1).map((count) => <option key={count} value={count}>{count} adet</option>)}</select>}
+          </span>
+        </label>)}</div></fieldset>
+        <fieldset><legend>02 · Talep nedeni</legend>
+          <label className={styles.field}>Neden<select required value={reason} onChange={(event) => setReason(event.target.value)}><option value="">Seçiniz</option>{options?.returnReasons.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <label className={styles.field}>Açıklama (isteğe bağlı)<textarea rows={4} maxLength={1000} value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Örneğin hasarın nerede olduğunu anlat" /><small>{description.length}/1000</small></label>
+        </fieldset>
+        {error && <p role="alert" className={styles.error}>{error}</p>}
+        <button className={styles.submit} disabled={!canSubmit}>{busy ? "Gönderiliyor…" : "İade talebini gönder"}</button>
+      </form>}
     </section>
-    <aside className={styles.summary}><p>Talep özeti</p><h2>{type === "return" ? "İade" : "İptal"} önizlemesi</h2><dl><div><dt>Sipariş</dt><dd>DEMO-2401</dd></div><div><dt>Ürün</dt><dd>Çay Makinesi 101</dd></div><div><dt>Neden</dt><dd>{reason || "Henüz seçilmedi"}</dd></div><div><dt>Uygunluk</dt><dd>D03 bekleniyor</dd></div><div><dt>Geri ödeme</dt><dd>Hesaplanmadı</dd></div></dl><button type="button" disabled>Talebi gönder</button><p>D03 iptal/iade ve ücret iadesi kuralları ile D10 saklama metni doğrulanmadan işlem açılamaz.</p><ul><li>Kişiselleştirilmiş ürün uygunluğu ayrıca değerlendirilir.</li><li>Ücret iadesi ödeme sağlayıcısı sonucuyla kesinleşir.</li><li>Talep geçmişi değiştirilemez audit kaydı taşır.</li></ul></aside>
+    <aside className={styles.summary}><p>Nasıl işler?</p><h2>İade adımları</h2><ol><li>Talebini mağaza inceler; sonucu bildirim ve e-posta ile iletilir.</li><li>Onaylanırsa ürünü orijinal kutusuyla kargoya verirsin.</li><li>Ürün depoya ulaşınca iade tamamlanır.</li></ol><p>Teslimattan sonra {options?.returnWindowDays ?? 14} gün içinde talep oluşturabilirsin. Bu demo siparişte ödeme alınmadığı için geri ödeme yapılmaz. Kişiselleştirilmiş ürünlerde koşullar ayrıca değerlendirilir.</p></aside>
   </div>;
 }

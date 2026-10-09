@@ -1,0 +1,123 @@
+﻿Sıra,Başlık,Task Tipi,Birim,Proje,Açıklama,Öncelik,Müşteriye göster,Atanan Personel
+1,Ödeme sağlayıcısı ve sanal POS bilgilerini al,Müşteri talebi,,Xinobi,"- Sağlayıcı seçimi: banka sanal POS’u veya ödeme kuruluşu (iyzico, PayTR, Param vb.); üye işyeri sözleşmesi
+- Test (sandbox) hesabı, API erişimi ve teknik muhatap (anahtarlar güvenli kanaldan)
+- Ödeme bildirimi (webhook) imzası, iade ve durum sorgulama yeteneği
+- Taksit seçenekleri ve komisyonu kimin karşılayacağı
+- Havale/EFT kabulü, IBAN’lar ve ödeme onay sorumlusu
+
+Ayrıntılı görevler: INT-001–005",Yüksek,Evet,Beyza Turgut
+2,Sipariş kesinleşme anı ve stok rezervasyonu kararını al (D03),Karar,,Xinobi,"- Sipariş ne zaman kesinleşir: kart onayı mı, havale onayı mı?
+- Ödeme beklerken stok kaç dakika ayrılır?
+- İptal ve iade hangi aşamaya kadar mümkün; kısmi iade olacak mı? (sistemde geçici 14 gün)
+
+Ayrıntılı görevler: INT-006, ADD-047",Yüksek,Evet,Beyza Turgut
+3,Kargo firması anlaşması ve API erişimini al,Müşteri talebi,,Xinobi,"- Anlaşmalı kargo firması ve sözleşme
+- Gönderi oluşturma, etiket ve takip API’si için test hesabı
+
+Ayrıntılı görevler: INT-007–008",Yüksek,Evet,Beyza Turgut
+4,"Kargo için ürün ölçüleri, adresler ve ücret kurgusunu al",Müşteri talebi,,Xinobi,"- Her ürün için ağırlık ve desi
+- Gönderici adresi ve iade adresi
+- Kargo ücretini kim öder, ücretsiz kargo sınırı var mı?
+
+Ayrıntılı görevler: INT-009–011",Orta,Evet,Beyza Turgut
+5,Kurumsal e-posta gönderen adresi ve DNS kayıtlarını al,Müşteri talebi,,Xinobi,"- Gönderen adres ve hesap (ör. bildirim@xinobi.com); şu an test amaçlı Gmail kullanılıyor
+- SPF, DKIM ve DMARC kayıtları için DNS erişimi
+
+Ayrıntılı görevler: INT-012–013",Orta,Evet,Beyza Turgut
+6,SMS sağlayıcı hesabı ve SMS başlığını al,Müşteri talebi,,Xinobi,"- Sağlayıcı hesabı (sistem Netgsm’e hazır)
+- Onaylı SMS başlığı
+- Gerçek hesapla gönderim denemesi
+
+Ayrıntılı görevler: INT-014, ADD-046",Orta,Evet,Beyza Turgut
+7,Mobil push bildirimleri için Firebase projesini al,Müşteri talebi,,Xinobi,"- Firebase projesi ve uygulama dosyaları
+- Apple APNs anahtarı (iOS)
+- Sunucu hazır; mobil SDK ve token kaydı eklenecek
+
+Ayrıntılı görevler: ADD-045",Orta,Evet,Beyza Turgut
+8,Apple ve Google geliştirici hesaplarını ve mağaza içeriklerini al,Müşteri talebi,,Xinobi,"- Apple Developer kurumsal hesabı (D-U-N-S numarası gerekir)
+- Google Play Console kurumsal hesabı
+- Uygulama adı, ikon, ekran görüntüleri, kısa ve uzun açıklama
+
+Ayrıntılı görevler: INT-015–017",Orta,Evet,Beyza Turgut
+9,WhatsApp Business numarası ve destek ekibini belirle,Müşteri talebi,,Xinobi,"- WhatsApp Business numarası (Nobi’nin müşteriyi ekibe yönlendirmesi için); gelince panelden girilecek
+- Nobi ve formlardan gelen talepleri karşılayacak ekip ve çalışma saatleri
+
+Ayrıntılı görevler: INT-018–019, ADD-049",Orta,Evet,Beyza Turgut
+10,Mikro erişimi ve ürün/fiyat/stok ana kayıt kararını al (D02),Karar,,Xinobi,"- Mikro sürümü, bağlantı yöntemi (API / ara katman), test şirketi ve teknik kullanıcı
+- Ürün, fiyat ve stok hangi sistemde ana kayıt: panel mi, Mikro mu? Veri hangi yönde akacak?
+
+Ayrıntılı görevler: INT-020, INT-024",Orta,Evet,Beyza Turgut
+11,"Trendyol, Hepsiburada ve N11 API yetkilerini al",Müşteri talebi,,Xinobi,"- Trendyol mağaza API yetkileri ve teknik muhatap
+- Hepsiburada mağaza API yetkileri ve teknik muhatap
+- N11 mağaza API yetkileri ve teknik muhatap
+
+Ayrıntılı görevler: INT-021–023",Düşük,Evet,Beyza Turgut
+12,Yapay zekâ hesap sahipliği ve bütçe kararını al (D08),Karar,,Xinobi,"- Cloudflare (XINOBI U ve Nobi) ve Roboflow hesaplarının ve faturasının sahibi
+- Aylık maliyet tavanı ve kişi başı limitler (geçici: XINOBI U günde 30 görsel, Nobi günde 200 AI yanıtı)
+
+Ayrıntılı görevler: INT-025–026",Orta,Evet,Beyza Turgut
+13,"Baskı standardı, üretim onayı ve ürün bilgilerini al (D04)",Karar,,Xinobi,"- Baskı yüzeyleri, mm ölçüler, minimum DPI, dosya türü, renk profili
+- Kişiselleştirilmiş ürünü üretimden önce kim onaylayacak?
+- Her ürün için teknik özellikler, garanti süresi, barkod/GTIN
+- Panelde her renk için tasarım yüzeyinin (maskenin) onaylanması
+
+Ayrıntılı görevler: INT-027–029, ADD-051",Orta,Evet,Beyza Turgut
+14,"Alan adı, canlı sunucu ve veritabanı sorumlularını belirle",Müşteri talebi,,Xinobi,"- Alan adı sahibi, DNS erişimi ve SSL sertifikası
+- Canlı sunucu sahibi ve teknik muhatap
+- Canlı SQL Server ortamı ve yedekleme sorumlusu
+
+Ayrıntılı görevler: INT-030–032",Yüksek,Evet,Beyza Turgut
+15,Şirket bilgilerini al ve ETBİS kaydını yaptır,Müşteri talebi,,Xinobi,"- Ticaret unvanı, MERSİS no, vergi dairesi ve no, açık adres, KEP, telefon, e-posta (sitede yayımlanması zorunlu)
+- Site ve mobil uygulama için ETBİS kaydı (Ticaret Bakanlığı)
+
+Ayrıntılı görevler: INT-033–034",Yüksek,Evet,Beyza Turgut
+16,"VERBİS, İYS ve marka tescil durumunu öğren",Müşteri talebi,,Xinobi,"- VERBİS kayıt yükümlülüğü kontrolü (eşiklere göre muafiyet olabilir)
+- Pazarlama SMS/e-postası için İYS kaydı
+- “Xinobi”, “XINOBI U” ve “Nobi” için Türkpatent başvuru durumu
+
+Ayrıntılı görevler: INT-035–037",Orta,Evet,Beyza Turgut
+17,Mesafeli satış metinlerini ve cayma politikasını al,Müşteri talebi,,Xinobi,"- Ön Bilgilendirme Formu
+- Mesafeli Satış Sözleşmesi
+- İptal, iade ve cayma politikası (standart cayma 14 gün)
+- Kişiselleştirilmiş ürünler (XINOBI U, kendi görseli) cayma hakkı dışında mı tutulacak? Tutulacaksa sözleşmede açıkça yazılmalı
+
+Ayrıntılı görevler: INT-038–041",Yüksek,Evet,Beyza Turgut
+18,KVKK metinleri ve veri sözleşmelerini al (D10),Karar,,Xinobi,"- Aydınlatma metinleri: üyelik, sipariş, kurumsal teklif, Nobi
+- Açık rıza metinleri: pazarlama, yurt dışına aktarım
+- Çerez politikası ve onay metni
+- Saklama ve imha politikası (Nobi konuşmaları geçici 90 gün)
+- Yurt dışına aktarım sözleşmeleri (Cloudflare, Roboflow, e-posta/SMS)
+- Veri işleyen sözleşmeleri: sunucu, e-posta, SMS, kargo, AI
+
+Ayrıntılı görevler: INT-042–047, ADD-050",Yüksek,Evet,Beyza Turgut
+19,"Üyelik koşulları, yorum kuralları ve görsel hakları metinlerini al",Müşteri talebi,,Xinobi,"- Üyelik ve kullanım koşulları
+- Yorum yayın kuralları
+- Kullanıcının yüklediği görsellerin telif sorumluluğu ve AI tasarımlarının kullanım hakları
+
+Ayrıntılı görevler: INT-048–050",Orta,Evet,Beyza Turgut
+20,"Garanti, yetkili servis ve ürün uygunluk belgelerini al",Müşteri talebi,,Xinobi,"- Her ürün için garanti belgesi ve süresi
+- Yetkili servis listesi
+- CE uygunluk, kullanım kılavuzu, gerekiyorsa enerji etiketi
+
+Ayrıntılı görevler: INT-051–053",Orta,Evet,Beyza Turgut
+21,"Fiyat gösterimi, kampanya ve e-fatura bilgilerini al",Müşteri talebi,,Xinobi,"- Fiyat gösterim kurallarının teyidi: KDV dahil, indirimde son 30 günün en düşük fiyatı
+- Kampanya koşul metinleri
+- E-arşiv/e-fatura entegratörü; fatura Mikro üzerinden mi kesilecek?
+
+Ayrıntılı görevler: INT-054–056",Orta,Evet,Beyza Turgut
+22,Mağaza gizlilik politikası ve veri kullanım beyanlarını al,Müşteri talebi,,Xinobi,"- Gizlilik politikası adresi (URL)
+- App Store ve Google Play veri kullanım beyanları (uygulamada hesap silme var)
+
+Ayrıntılı görevler: INT-057–058",Düşük,Evet,Beyza Turgut
+23,Kabul edilen teklifin siparişe dönüşüm kuralını al (D07),Karar,,Xinobi,"- Kabul edilen kurumsal teklif nasıl siparişe dönüşür, kim onaylar?
+- Toplu siparişte ödeme şekli
+
+Ayrıntılı görevler: ADD-048",Orta,Evet,Beyza Turgut
+24,Müşteri talep formunu gönder ve yanıtları takip et,Takip,,Xinobi,"- Formu müşteriye ilet: https://claude.ai/code/artifact/040ecc24-d96d-47e2-ba7c-2cd72f79e99c
+- Gelen yanıtlara göre ilgili CRM görevlerini ve docs/tasks durumlarını güncelle
+
+Ayrıntılı görevler: INT-059",Yüksek,Hayır,Beyza Turgut
+25,İndirimli ürünlerde son 30 günün en düşük fiyatını göster,Geliştirme,,Xinobi,"- Fiyat Etiketi Yönetmeliği gereği; müşteri kuralı teyit edince (CRM görevi 21) geliştirilecek
+- Fiyat geçmişini sakla; web ve mobil ürün sayfası ile karşılaştırmada göster
+
+Ayrıntılı görevler: INT-054",Orta,Hayır,Beyza Turgut

@@ -6,7 +6,7 @@ Daha önce açılmış olanlar tekrar açılmadı; ilgili satırda adı geçer: 
 
 Yasal kalemlerin kapsamı ve metinleri Xinobi'nin avukatı ve mali müşaviri tarafından onaylanmalıdır; bu liste hukuki görüş değildir.
 
-[CSV](tasks-2026-10-09-customer-intake.csv) · 59 ayrı task.
+[CSV](tasks-2026-10-09-customer-intake.csv) · CRM’e girilecek 25 toplu görev: [crm-gorevleri-2026-10-09.md](crm-gorevleri-2026-10-09.md) · 59 ayrı task.
 
 ## Öncelikli ve ödeme
 

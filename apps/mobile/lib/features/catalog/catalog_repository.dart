@@ -14,6 +14,8 @@ abstract interface class CatalogRepository {
   Future<ProductPage> products(ProductQuery query);
   Future<ProductDetail> product(String id);
   Future<AnnouncementList> announcements();
+  Future<ReviewPage> reviews(String productId, {int page = 1});
+  Future<ReviewSummaryList> reviewSummaries(List<String> productIds);
 }
 
 @immutable
@@ -68,6 +70,12 @@ class ApiCatalogRepository implements CatalogRepository {
       ));
 
   @override
+  Future<ReviewPage> reviews(String productId, {int page = 1}) => _call(() => _catalog.listProductReviews(id: productId, page: page));
+
+  @override
+  Future<ReviewSummaryList> reviewSummaries(List<String> productIds) => _call(() => _catalog.listReviewSummaries(ids: productIds.join(',')));
+
+  @override
   Future<ProductDetail> product(String id) => _call(() => _catalog.getCatalogProduct(id: id), notFound: CatalogException.notFoundMessage);
 
   Future<T> _call<T>(Future<Response<T>> Function() request, {String? notFound}) async {
@@ -101,3 +109,11 @@ final homeProvider = FutureProvider<HomeContent>((ref) => ref.watch(catalogRepos
 final categoriesProvider = FutureProvider<CategoryList>((ref) => ref.watch(catalogRepositoryProvider).categories());
 final productsProvider = FutureProvider.family<ProductPage, ProductQuery>((ref, query) => ref.watch(catalogRepositoryProvider).products(query));
 final productProvider = FutureProvider.family<ProductDetail, String>((ref, id) => ref.watch(catalogRepositoryProvider).product(id));
+/// First page of approved reviews with the rating summary; null where reviews are unavailable (they are optional on the page).
+final productReviewsProvider = FutureProvider.autoDispose.family<ReviewPage?, String>((ref, id) async {
+  try {
+    return await ref.watch(catalogRepositoryProvider).reviews(id);
+  } on CatalogException {
+    return null;
+  }
+});

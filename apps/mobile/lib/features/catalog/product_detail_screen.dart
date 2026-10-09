@@ -7,9 +7,11 @@ import '../../app/design_tokens.g.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import '../cart/cart.dart';
+import '../compare/compare_button.dart';
 import '../favorites/favorite_button.dart';
 import 'catalog_repository.dart';
 import 'product_gallery.dart';
+import 'product_reviews.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   const ProductDetailScreen({super.key, required this.productId});
@@ -33,6 +35,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         toolbarHeight: XinobiTokens.headerHeight,
         title: Text(product.asData?.value.name ?? ''),
         actions: [
+          if (product.asData?.value case final detail?) CompareButton(productId: detail.id, productName: detail.name, color: XinobiTokens.onHeader),
           if (product.asData?.value case final detail?) FavoriteButton(productId: detail.id, productName: detail.name, color: XinobiTokens.onHeader),
         ],
       ),
@@ -103,6 +106,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   const SizedBox(height: 16),
                   Text(selected.price == null ? 'Bu renk için henüz fiyat tanımlanmadı.' : 'Bu renk şu anda stokta yok.', style: text.bodySmall),
                 ],
+                const SizedBox(height: 16),
+                Row(children: [
+                  CompareButton(productId: detail.id, productName: detail.name),
+                  TextButton(onPressed: () => context.push('/karsilastir'), child: const Text('Karşılaştırmayı aç')),
+                ]),
+                if (detail.specs.isNotEmpty) ...[
+                  const SizedBox(height: 24),
+                  ProductSpecs(specs: detail.specs.toList()),
+                ],
+                const SizedBox(height: 28),
+                ProductReviews(productId: detail.id, productName: detail.name),
               ]),
             ),
           ]);

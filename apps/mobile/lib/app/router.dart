@@ -11,6 +11,7 @@ import '../features/cart/cart.dart';
 import '../features/cart/cart_screen.dart';
 
 import '../features/catalog/product_detail_screen.dart';
+import '../features/compare/compare_screen.dart';
 import '../features/catalog/products_screen.dart';
 import '../features/favorites/favorites_screen.dart';
 import '../features/home/home_screen.dart';
@@ -41,6 +42,7 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
           ],
         ),
         GoRoute(path: '/favoriler', builder: (context, state) => const FavoritesScreen()),
+        GoRoute(path: '/karsilastir', builder: (context, state) => const CompareScreen()),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
         GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),
         GoRoute(path: '/hesap/eposta', builder: (context, state) => const EmailChangeScreen()),

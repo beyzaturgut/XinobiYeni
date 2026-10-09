@@ -241,6 +241,26 @@ class FakeAccounts implements AccountRepository {
     return placed[index];
   }
 
+  final reviews = <MyReview>[];
+  @override
+  Future<List<MyReview>> myReviews(String accessToken) async => reviews;
+
+  @override
+  Future<MyReview> submitReview(String accessToken, SubmitReview review) async {
+    final saved = MyReview((b) => b
+      ..id = 'rv1'
+      ..productId = review.productId
+      ..rating = review.rating
+      ..title = review.title
+      ..body = review.body
+      ..status = 'pending'
+      ..createdAt = DateTime.utc(2026, 10, 9));
+    reviews
+      ..removeWhere((r) => r.productId == review.productId)
+      ..add(saved);
+    return saved;
+  }
+
   @override
   Future<Inbox> inbox(String accessToken) async => Inbox((b) => b
     ..items.addAll(notifications.reversed)

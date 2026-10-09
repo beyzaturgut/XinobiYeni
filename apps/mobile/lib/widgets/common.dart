@@ -4,6 +4,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../app/design_tokens.g.dart';
 import '../core/formatting.dart';
+import '../features/compare/compare_button.dart';
 import '../features/favorites/favorite_button.dart';
 
 /// Network image with a neutral placeholder; product photos are contained, never cropped (web rule).
@@ -134,6 +135,7 @@ class ProductCard extends StatelessWidget {
     return Stack(children: [
       Positioned.fill(child: card),
       Positioned(top: 4, right: 4, child: FavoriteButton(productId: product.id, productName: product.name, onImage: true)),
+      Positioned(top: 56, right: 4, child: CompareButton(productId: product.id, productName: product.name, onImage: true)),
     ]);
   }
 }

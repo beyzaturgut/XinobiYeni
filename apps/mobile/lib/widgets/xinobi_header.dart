@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../app/design_tokens.g.dart';
 import '../features/account/notifications.dart';
+import '../features/compare/compare_button.dart';
 import '../features/news/news.dart';
 
 /// Single 64px black strip (DES-HDR-01 rev.1, mobile revision): logo on the left; favourites and news on the right.
@@ -44,6 +45,7 @@ class XinobiHeader extends ConsumerWidget implements PreferredSizeWidget {
                   ),
                 ),
                 const Spacer(),
+                const CompareHeaderButton(),
                 const NotificationBell(),
                 IconButton(
                   tooltip: 'Favorilerim',

@@ -42,6 +42,9 @@ abstract interface class AccountRepository {
   Future<Inbox> inbox(String accessToken);
   /// [ids] null marks every notification read.
   Future<void> markRead(String accessToken, List<String>? ids);
+  Future<List<MyReview>> myReviews(String accessToken);
+  /// Only products from a delivered order; a new submission replaces the earlier one and waits for moderation.
+  Future<MyReview> submitReview(String accessToken, SubmitReview review);
 
   /// Signs out every other device; the returned session keeps this one signed in.
   Future<AuthSession> changePassword(String accessToken, {required String current, required String next});
@@ -147,6 +150,12 @@ class ApiAccountRepository implements AccountRepository {
   @override
   Future<CustomerOrder> returnOrder(String accessToken, String id, ReturnMyOrder request) =>
       _call(() => _api.returnMyOrder(id: id, returnMyOrder: request, headers: _bearer(accessToken)));
+
+  @override
+  Future<List<MyReview>> myReviews(String accessToken) async => (await _call(() => _api.listMyReviews(headers: _bearer(accessToken)))).toList();
+
+  @override
+  Future<MyReview> submitReview(String accessToken, SubmitReview review) => _call(() => _api.submitMyReview(submitReview: review, headers: _bearer(accessToken)));
 
   @override
   Future<Inbox> inbox(String accessToken) => _call(() => _api.listMyNotifications(headers: _bearer(accessToken)));

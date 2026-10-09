@@ -43,6 +43,23 @@ class FakeCatalog implements CatalogRepository {
   @override
   Future<AnnouncementList> announcements() async => AnnouncementList((b) => b.items.addAll(news));
 
+  List<PublicReview> publicReviews = [];
+  ReviewSummary _summary(String id) => ReviewSummary((b) => b
+    ..productId = id
+    ..average = publicReviews.isEmpty ? 0 : publicReviews.map((r) => r.rating).reduce((a, b) => a + b) / publicReviews.length
+    ..count = publicReviews.length
+    ..distribution.addAll([for (var star = 1; star <= 5; star++) publicReviews.where((r) => r.rating == star).length]));
+
+  @override
+  Future<ReviewPage> reviews(String productId, {int page = 1}) async => ReviewPage((b) => b
+    ..summary = _summary(productId).toBuilder()
+    ..items.addAll(publicReviews)
+    ..page = page
+    ..pageSize = 20);
+
+  @override
+  Future<ReviewSummaryList> reviewSummaries(List<String> productIds) async => ReviewSummaryList((b) => b.items.addAll(productIds.map(_summary)));
+
   @override
   Future<HomeContent> home() async {
     homeCalls++;
@@ -80,8 +97,16 @@ class FakeCatalog implements CatalogRepository {
 
   @override
   Future<ProductDetail> product(String id) async => ProductDetail((b) => b
-    ..id = 'P1'
-    ..name = 'Çay Makinesi 101'
+    ..id = id == 'P2' ? 'P2' : 'P1'
+    ..name = id == 'P2' ? 'Kahve Makinesi 101' : 'Çay Makinesi 101'
+    ..specs.addAll([
+      ProductSpec((s) => s
+        ..name = 'Güç'
+        ..value = id == 'P2' ? '1200 W' : '1650 W'),
+      ProductSpec((s) => s
+        ..name = 'Kapasite'
+        ..value = '1,7 L'),
+    ])
     ..category = 'Çay makineleri'
     ..description = 'Örnek ürün açıklaması'
     ..seoTitle = ''

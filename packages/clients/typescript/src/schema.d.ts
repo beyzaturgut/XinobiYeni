@@ -116,6 +116,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quotes/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetQuoteOptions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["CreateQuote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quotes/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["TrackQuote"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quotes/{code}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SendQuoteMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/quotes/{code}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["DecideQuote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/xinobi-u/status": {
         parameters: {
             query?: never;
@@ -676,6 +756,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/quotes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListMyQuotes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/session": {
         parameters: {
             query?: never;
@@ -835,6 +931,20 @@ export interface components {
             verificationId: string;
             verificationCode: string;
             currentPassword: string;
+        };
+        CreateQuote: {
+            company: string;
+            contactName: string;
+            email: string;
+            phone: null | string;
+            taxNumber: null | string;
+            items: components["schemas"]["QuoteItemRequest"][];
+            personalization: boolean;
+            personalizationNote: null | string;
+            /** Format: date */
+            desiredDate: null | string;
+            purpose: null | string;
+            note: null | string;
         };
         CreateXinobiUSession: {
             productId: string;
@@ -1079,6 +1189,77 @@ export interface components {
             createdAt: string;
             storeReply: null | string;
         };
+        Quote: {
+            id: string;
+            code: string;
+            accountId: null | string;
+            company: string;
+            contactName: string;
+            email: string;
+            phone: null | string;
+            taxNumber: null | string;
+            items: components["schemas"]["QuoteItem"][];
+            personalization: boolean;
+            personalizationNote: null | string;
+            /** Format: date */
+            desiredDate: null | string;
+            purpose: null | string;
+            note: null | string;
+            status: string;
+            /** Format: date-time */
+            createdAt: string;
+            offer: null | components["schemas"]["QuoteOffer"];
+            messages: components["schemas"]["QuoteMessage"][];
+            history: components["schemas"]["QuoteEvent"][];
+        };
+        QuoteDecision: {
+            email: string;
+            decision: string;
+            note: null | string;
+        };
+        QuoteEvent: {
+            status: string;
+            /** Format: date-time */
+            at: string;
+            actor: string;
+            note: null | string;
+        };
+        QuoteItem: {
+            productId: string;
+            productName: string;
+            /** Format: int32 */
+            quantity: number;
+            unitPrice?: null | components["schemas"]["Money"];
+            lineTotal?: null | components["schemas"]["Money"];
+        };
+        QuoteItemRequest: {
+            productId: string;
+            /** Format: int32 */
+            quantity: number;
+        };
+        QuoteMessage: {
+            from: string;
+            text: string;
+            /** Format: date-time */
+            at: string;
+        };
+        QuoteOffer: {
+            total: components["schemas"]["Money"];
+            /** Format: date */
+            validUntil: string;
+            note: null | string;
+            /** Format: date-time */
+            at: string;
+        };
+        QuoteOptions: {
+            purposes: string[];
+            /** Format: int32 */
+            minQuantity: number;
+            /** Format: int32 */
+            maxQuantity: number;
+            /** Format: int32 */
+            maxItems: number;
+        };
         ReadinessResponse: {
             service: string;
             status: string;
@@ -1159,6 +1340,10 @@ export interface components {
             rating: number;
             title: null | string;
             body: string;
+        };
+        TrackQuoteMessage: {
+            email: string;
+            text: string;
         };
         UpdateMyAccount: {
             name: string;
@@ -1443,6 +1628,189 @@ export interface operations {
             };
             /** @description Service Unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetQuoteOptions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["QuoteOptions"];
+                };
+            };
+        };
+    };
+    CreateQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateQuote"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Too Many Requests */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    TrackQuote: {
+        parameters: {
+            query: {
+                email: string;
+            };
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SendQuoteMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrackQuoteMessage"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    DecideQuote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["QuoteDecision"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Conflict */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3205,6 +3573,35 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListMyQuotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Quote"][];
+                };
             };
             /** @description Service Unavailable */
             503: {

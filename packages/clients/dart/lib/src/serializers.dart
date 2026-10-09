@@ -27,6 +27,7 @@ import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
 import 'package:xinobi_api_client/src/model/change_my_password.dart';
 import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
+import 'package:xinobi_api_client/src/model/create_quote.dart';
 import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
 import 'package:xinobi_api_client/src/model/customer_order.dart';
@@ -58,6 +59,14 @@ import 'package:xinobi_api_client/src/model/product_page.dart';
 import 'package:xinobi_api_client/src/model/product_spec.dart';
 import 'package:xinobi_api_client/src/model/product_summary.dart';
 import 'package:xinobi_api_client/src/model/public_review.dart';
+import 'package:xinobi_api_client/src/model/quote.dart';
+import 'package:xinobi_api_client/src/model/quote_decision.dart';
+import 'package:xinobi_api_client/src/model/quote_event.dart';
+import 'package:xinobi_api_client/src/model/quote_item.dart';
+import 'package:xinobi_api_client/src/model/quote_item_request.dart';
+import 'package:xinobi_api_client/src/model/quote_message.dart';
+import 'package:xinobi_api_client/src/model/quote_offer.dart';
+import 'package:xinobi_api_client/src/model/quote_options.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
 import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
@@ -73,6 +82,7 @@ import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
+import 'package:xinobi_api_client/src/model/track_quote_message.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
@@ -100,6 +110,7 @@ part 'serializers.g.dart';
   CategoryList,
   ChangeMyPassword,
   ConfirmEmailChange,
+  CreateQuote,
   CreateXinobiUSession,
   CustomerAddress,
   CustomerOrder,
@@ -131,6 +142,14 @@ part 'serializers.g.dart';
   ProductSpec,
   ProductSummary,
   PublicReview,
+  Quote,
+  QuoteDecision,
+  QuoteEvent,
+  QuoteItem,
+  QuoteItemRequest,
+  QuoteMessage,
+  QuoteOffer,
+  QuoteOptions,
   ReadinessResponse,
   RefreshSession,
   RegisterAccount,
@@ -146,6 +165,7 @@ part 'serializers.g.dart';
   StartAccountEmailVerification,
   StartEmailChange,
   SubmitReview,
+  TrackQuoteMessage,
   UpdateMyAccount,
   VariantDetail,
   XinobiUAnswer,
@@ -207,6 +227,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<MyDesign>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(Quote)]),
+        () => ListBuilder<Quote>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ProductSummary)]),
         () => ListBuilder<ProductSummary>(),
       )
@@ -215,8 +239,24 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<MyReview>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(QuoteEvent)]),
+        () => ListBuilder<QuoteEvent>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUOption)]),
         () => ListBuilder<XinobiUOption>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(QuoteMessage)]),
+        () => ListBuilder<QuoteMessage>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(QuoteItemRequest)]),
+        () => ListBuilder<QuoteItemRequest>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(QuoteItem)]),
+        () => ListBuilder<QuoteItem>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OrderRequestLine)]),

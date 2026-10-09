@@ -13,6 +13,7 @@ import 'package:xinobi_api_client/src/api/account_api.dart';
 import 'package:xinobi_api_client/src/api/admin_api.dart';
 import 'package:xinobi_api_client/src/api/catalog_api.dart';
 import 'package:xinobi_api_client/src/api/content_api.dart';
+import 'package:xinobi_api_client/src/api/quotes_api.dart';
 import 'package:xinobi_api_client/src/api/system_api.dart';
 import 'package:xinobi_api_client/src/api/xinobi_u_api.dart';
 
@@ -132,6 +133,12 @@ class XinobiApiClient {
   /// by doing that all interceptors will not be executed
   ContentApi getContentApi() {
     return ContentApi(dio, serializers);
+  }
+
+  /// Get QuotesApi instance, base route and serializer can be overridden by a given but be careful,
+  /// by doing that all interceptors will not be executed
+  QuotesApi getQuotesApi() {
+    return QuotesApi(dio, serializers);
   }
 
   /// Get SystemApi instance, base route and serializer can be overridden by a given but be careful,

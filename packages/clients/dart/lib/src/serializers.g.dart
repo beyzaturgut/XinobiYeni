@@ -20,6 +20,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(CategoryList.serializer)
       ..add(ChangeMyPassword.serializer)
       ..add(ConfirmEmailChange.serializer)
+      ..add(CreateQuote.serializer)
       ..add(CreateXinobiUSession.serializer)
       ..add(CustomerAddress.serializer)
       ..add(CustomerOrder.serializer)
@@ -51,6 +52,14 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(ProductSpec.serializer)
       ..add(ProductSummary.serializer)
       ..add(PublicReview.serializer)
+      ..add(Quote.serializer)
+      ..add(QuoteDecision.serializer)
+      ..add(QuoteEvent.serializer)
+      ..add(QuoteItem.serializer)
+      ..add(QuoteItemRequest.serializer)
+      ..add(QuoteMessage.serializer)
+      ..add(QuoteOffer.serializer)
+      ..add(QuoteOptions.serializer)
       ..add(ReadinessResponse.serializer)
       ..add(RefreshSession.serializer)
       ..add(RegisterAccount.serializer)
@@ -66,6 +75,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(StartAccountEmailVerification.serializer)
       ..add(StartEmailChange.serializer)
       ..add(SubmitReview.serializer)
+      ..add(TrackQuoteMessage.serializer)
       ..add(UpdateMyAccount.serializer)
       ..add(VariantDetail.serializer)
       ..add(XinobiUAnswer.serializer)
@@ -122,8 +132,23 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList, const [const FullType(PublicReview)]),
           () => ListBuilder<PublicReview>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(QuoteItem)]),
+          () => ListBuilder<QuoteItem>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(QuoteMessage)]),
+          () => ListBuilder<QuoteMessage>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(QuoteEvent)]),
+          () => ListBuilder<QuoteEvent>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(QuoteItemRequest)]),
+          () => ListBuilder<QuoteItemRequest>())
+      ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ReviewSummary)]),
           () => ListBuilder<ReviewSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

@@ -18,6 +18,7 @@ doc/CategoryList.md
 doc/ChangeMyPassword.md
 doc/ConfirmEmailChange.md
 doc/ContentApi.md
+doc/CreateQuote.md
 doc/CreateXinobiUSession.md
 doc/CustomerAddress.md
 doc/CustomerOrder.md
@@ -49,6 +50,15 @@ doc/ProductPage.md
 doc/ProductSpec.md
 doc/ProductSummary.md
 doc/PublicReview.md
+doc/Quote.md
+doc/QuoteDecision.md
+doc/QuoteEvent.md
+doc/QuoteItem.md
+doc/QuoteItemRequest.md
+doc/QuoteMessage.md
+doc/QuoteOffer.md
+doc/QuoteOptions.md
+doc/QuotesApi.md
 doc/ReadinessResponse.md
 doc/RefreshSession.md
 doc/RegisterAccount.md
@@ -65,6 +75,7 @@ doc/StartAccountEmailVerification.md
 doc/StartEmailChange.md
 doc/SubmitReview.md
 doc/SystemApi.md
+doc/TrackQuoteMessage.md
 doc/UpdateMyAccount.md
 doc/VariantDetail.md
 doc/XinobiUAnswer.md
@@ -81,6 +92,7 @@ lib/src/api/account_api.dart
 lib/src/api/admin_api.dart
 lib/src/api/catalog_api.dart
 lib/src/api/content_api.dart
+lib/src/api/quotes_api.dart
 lib/src/api/system_api.dart
 lib/src/api/xinobi_u_api.dart
 lib/src/api_util.dart
@@ -103,6 +115,7 @@ lib/src/model/category_item.dart
 lib/src/model/category_list.dart
 lib/src/model/change_my_password.dart
 lib/src/model/confirm_email_change.dart
+lib/src/model/create_quote.dart
 lib/src/model/create_xinobi_u_session.dart
 lib/src/model/customer_address.dart
 lib/src/model/customer_order.dart
@@ -135,6 +148,14 @@ lib/src/model/product_page.dart
 lib/src/model/product_spec.dart
 lib/src/model/product_summary.dart
 lib/src/model/public_review.dart
+lib/src/model/quote.dart
+lib/src/model/quote_decision.dart
+lib/src/model/quote_event.dart
+lib/src/model/quote_item.dart
+lib/src/model/quote_item_request.dart
+lib/src/model/quote_message.dart
+lib/src/model/quote_offer.dart
+lib/src/model/quote_options.dart
 lib/src/model/readiness_response.dart
 lib/src/model/refresh_session.dart
 lib/src/model/register_account.dart
@@ -150,6 +171,7 @@ lib/src/model/save_design_from_session.dart
 lib/src/model/start_account_email_verification.dart
 lib/src/model/start_email_change.dart
 lib/src/model/submit_review.dart
+lib/src/model/track_quote_message.dart
 lib/src/model/update_my_account.dart
 lib/src/model/variant_detail.dart
 lib/src/model/xinobi_u_answer.dart

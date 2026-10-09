@@ -66,7 +66,9 @@ public sealed class AuthorizationTests : IDisposable
     {
         using var factory = Factory();
         string[] publicAreas = ["/api/v1/health", "/api/v1/catalog", "/api/v1/content", "/api/v1/design-studio", "/api/v1/local-commerce",
-            "/api/v1/xinobi-u", "/api/v1/email-verification", "/api/v1/auth", "/openapi"];
+            "/api/v1/xinobi-u", "/api/v1/email-verification", "/api/v1/auth", "/openapi",
+            // Corporate quote form and tracking by code + e-mail: companies ask without an account (Faz07).
+            "/api/v1/quotes"];
         var endpoints = factory.Services.GetRequiredService<EndpointDataSource>().Endpoints.OfType<RouteEndpoint>().ToArray();
         Assert.NotEmpty(endpoints);
         foreach (var endpoint in endpoints)

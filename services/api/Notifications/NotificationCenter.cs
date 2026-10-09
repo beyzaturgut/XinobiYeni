@@ -72,6 +72,17 @@ public sealed class NotificationCenter(IWebHostEnvironment environment, IConfigu
         return true;
     });
 
+    /// <summary>E-mail to someone without an account (e.g. a corporate quote contact); nothing goes to an inbox.</summary>
+    public Task NotifyGuest(string email, string kind, string title, string body, string? link) => store.Update(state =>
+    {
+        var now = clock.GetUtcNow();
+        var status = ReservedAddress(email) ? NotificationStatuses.Skipped : Configured(NotificationChannels.Email) ? NotificationStatuses.Pending : NotificationStatuses.Skipped;
+        state.Items.Add(new NotificationItem(Guid.NewGuid().ToString("N"), "guest", NotificationChannels.Email, email, kind, title, body, link, now, status,
+            LastError: status == NotificationStatuses.Skipped ? (ReservedAddress(email) ? "Ayrılmış test alan adı; gönderilmez." : "E-posta gönderimi yapılandırılmadı.") : null,
+            NextAttemptAt: status == NotificationStatuses.Pending ? now : null));
+        return true;
+    });
+
     /// <summary>
     /// RFC 2606 / 6761 names (example.com, *.test, *.invalid…) are never mailed. Tests use them and load the developer's real SMTP
     /// settings; a real mail to someone else's inbox from a test run happened once (TST-098) and must not happen again.

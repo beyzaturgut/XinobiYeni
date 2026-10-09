@@ -80,6 +80,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**listMyDesigns**](doc/AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**listMyNotifications**](doc/AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [*AccountApi*](doc/AccountApi.md) | [**listMyOrders**](doc/AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
+[*AccountApi*](doc/AccountApi.md) | [**listMyQuotes**](doc/AccountApi.md#listmyquotes) | **GET** /api/v1/me/quotes |
 [*AccountApi*](doc/AccountApi.md) | [**listMyReviews**](doc/AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
 [*AccountApi*](doc/AccountApi.md) | [**loginWebAccount**](doc/AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
@@ -111,6 +112,11 @@ Class | Method | HTTP request | Description
 [*CatalogApi*](doc/CatalogApi.md) | [**listReviewSummaries**](doc/CatalogApi.md#listreviewsummaries) | **GET** /api/v1/catalog/review-summaries |
 [*ContentApi*](doc/ContentApi.md) | [**getHomeContent**](doc/ContentApi.md#gethomecontent) | **GET** /api/v1/content/home |
 [*ContentApi*](doc/ContentApi.md) | [**listAnnouncements**](doc/ContentApi.md#listannouncements) | **GET** /api/v1/content/announcements |
+[*QuotesApi*](doc/QuotesApi.md) | [**createQuote**](doc/QuotesApi.md#createquote) | **POST** /api/v1/quotes |
+[*QuotesApi*](doc/QuotesApi.md) | [**decideQuote**](doc/QuotesApi.md#decidequote) | **POST** /api/v1/quotes/{code}/decision |
+[*QuotesApi*](doc/QuotesApi.md) | [**getQuoteOptions**](doc/QuotesApi.md#getquoteoptions) | **GET** /api/v1/quotes/options |
+[*QuotesApi*](doc/QuotesApi.md) | [**sendQuoteMessage**](doc/QuotesApi.md#sendquotemessage) | **POST** /api/v1/quotes/{code}/messages |
+[*QuotesApi*](doc/QuotesApi.md) | [**trackQuote**](doc/QuotesApi.md#trackquote) | **GET** /api/v1/quotes/{code} |
 [*SystemApi*](doc/SystemApi.md) | [**getApiHealth**](doc/SystemApi.md#getapihealth) | **GET** /api/v1/health |
 [*SystemApi*](doc/SystemApi.md) | [**getApiLiveness**](doc/SystemApi.md#getapiliveness) | **GET** /api/v1/health/live |
 [*SystemApi*](doc/SystemApi.md) | [**getApiReadiness**](doc/SystemApi.md#getapireadiness) | **GET** /api/v1/health/ready |
@@ -136,6 +142,7 @@ Class | Method | HTTP request | Description
  - [CategoryList](doc/CategoryList.md)
  - [ChangeMyPassword](doc/ChangeMyPassword.md)
  - [ConfirmEmailChange](doc/ConfirmEmailChange.md)
+ - [CreateQuote](doc/CreateQuote.md)
  - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
  - [CustomerAddress](doc/CustomerAddress.md)
  - [CustomerOrder](doc/CustomerOrder.md)
@@ -167,6 +174,14 @@ Class | Method | HTTP request | Description
  - [ProductSpec](doc/ProductSpec.md)
  - [ProductSummary](doc/ProductSummary.md)
  - [PublicReview](doc/PublicReview.md)
+ - [Quote](doc/Quote.md)
+ - [QuoteDecision](doc/QuoteDecision.md)
+ - [QuoteEvent](doc/QuoteEvent.md)
+ - [QuoteItem](doc/QuoteItem.md)
+ - [QuoteItemRequest](doc/QuoteItemRequest.md)
+ - [QuoteMessage](doc/QuoteMessage.md)
+ - [QuoteOffer](doc/QuoteOffer.md)
+ - [QuoteOptions](doc/QuoteOptions.md)
  - [ReadinessResponse](doc/ReadinessResponse.md)
  - [RefreshSession](doc/RefreshSession.md)
  - [RegisterAccount](doc/RegisterAccount.md)
@@ -182,6 +197,7 @@ Class | Method | HTTP request | Description
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartEmailChange](doc/StartEmailChange.md)
  - [SubmitReview](doc/SubmitReview.md)
+ - [TrackQuoteMessage](doc/TrackQuoteMessage.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)
  - [XinobiUAnswer](doc/XinobiUAnswer.md)

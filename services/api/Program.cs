@@ -91,6 +91,7 @@ builder.Services.AddSingleton<INotificationChannelSender>(services => services.G
 builder.Services.AddSingleton<NotificationCenter>();
 builder.Services.AddSingleton<Xinobi.Api.Reviews.ReviewStore>();
 builder.Services.AddSingleton<Xinobi.Api.Designs.SavedDesignStore>();
+builder.Services.AddSingleton<Xinobi.Api.Quotes.QuoteStore>();
 if (builder.Environment.IsDevelopment() && builder.Configuration.GetValue("Notifications:WorkerEnabled", true)) builder.Services.AddHostedService<NotificationWorker>();
 builder.Services.AddAuthentication(AccountTokenHandler.SchemeName).AddScheme<AuthenticationSchemeOptions, AccountTokenHandler>(AccountTokenHandler.SchemeName, null);
 // Default deny (Faz03 03.04): an endpoint without its own rule needs a signed-in account; public endpoints say AllowAnonymous.
@@ -157,6 +158,7 @@ app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();
 Xinobi.Api.Reviews.ReviewEndpoints.MapPublicReviews(app);
+Xinobi.Api.Quotes.QuoteEndpoints.MapPublicQuotes(app);
 app.MapXinobiU();
 app.MapAccounts();
 

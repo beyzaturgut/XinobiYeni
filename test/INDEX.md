@@ -166,4 +166,6 @@
 
 - 09.10.2026 · [TST-108 web regresyonlarının giderilmesi](2026-10-09/TST-108-web-regression-resolution.md) — Tam web e2e 107/107, atlanan/flaky 0; 20 rota erişilebilirlik taraması, kontrast/dokunma alanı düzeltmeleri, güncel sözleşmeli akış testleri. Build/TypeScript/lint temiz; SQL değişmedi.
 
-- 09.10.2026 · [TST-109 SQL bağlantı teşhisi](2026-10-09/TST-109-sql-connectivity-diagnosis.md) — API’de eksik SQL bağlantı ayarı Keychain ile yerelde tamamlandı; TCP 64019 iki kontrolde timeout, SQL login/DB aşamalarına ulaşılamadı. Yeniden başlatılan API SQL readiness `sql_timeout`; parola ve yerel ayar Git dışında.
+- 09.10.2026 · [TST-109 SQL bağlantı teşhisi](2026-10-09/TST-109-sql-connectivity-diagnosis.md) — İlk kontrolde eksik ayar ve TCP timeout; ayar düzeltmesi sonrası tekrar kontrolünde TCP, SQL login, XinobiYeniDB ve API readiness başarılı. Parola ve yerel ayar Git dışında.
+
+- 09.10.2026 · [TST-110 ilk SQL migration uygulaması](2026-10-09/TST-110-initial-core-migration-application.md) — Model/script testleri 12/12; boş XinobiYeniDB’ye InitialCore uygulandı, 12 temel tablo ve 1 sürüm kaydı doğrulandı; ikinci uygulama sonucu aynı, API SQL ready. Yerel iş verileri henüz SQL’e taşınmadı.

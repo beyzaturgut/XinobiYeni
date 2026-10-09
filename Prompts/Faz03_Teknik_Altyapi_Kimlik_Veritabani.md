@@ -74,6 +74,8 @@ API: `/api/v1/auth/register|login|refresh|logout|password-reset`, `/api/v1/admin
 
 **Geçiş:** 03.01–03.12 kanıtları, CI, migration/restore sonucu, OpenAPI sürümü, kullanıcı sahipliği negatif testleri, `docs/decisions` ve Faz00 kaldığı yerden devam kaydı tamamlanır. Test erişimi olmayan bir sağlayıcıyı gerçek çalışıyor saymayın; erişim sahibi, eksik izin, bloklanan test ve plan Faz00'a yazılır. D01 nedeniyle değişen yollar açıklanır. D02/D10 açık ise ilgili gerçek veri yazımı ve saklama politikasına bağımlı iş koşullu tutulur.
 
+**09.10.2026 uygulama güncellemesi:** 03.05 artık gerçek `XinobiYeniDB` üzerinde uygulanmıştır ([TST-110](../test/2026-10-09/TST-110-initial-core-migration-application.md)). Boş hedef ön kontrolü, model/script testleri 12/12, 12 çekirdek tablo ve 1 migration sürümü, ikinci uygulamada aynı metadata ve API SQL readiness başarılı. Önceki SQL erişim blokajı son kontrolde yoktur. İş modülleri ve SQL depoları henüz bağlanmadı; restore provası ve hesap ayrımı bu kanıtla kapanmaz, faz kabulü verilmez.
+
 ## 7. Yedi rol kontrolü ve PM son kararı
 
 Her rol ayrı bir kayıt ekler: `rol | karar: bekliyor/onay/revizyon | kanıt bağlantısı/commit | açık nokta | tarih`. Bu doküman yazıldığında tamamı **BEKLİYOR** durumundadır; otomatik veya hayali imza yoktur.

@@ -34,3 +34,12 @@
 .catalog-edit-fields{border:0;padding:0;margin:0;min-width:0}
 .gallery-product-media{padding-top:16px;border-top:1px solid #555}.gallery-product-media small{display:block;margin-top:10px}.gallery-product-media ol.catalog-media{list-style:none;margin:0;padding:0}.gallery-product-media li{width:180px;display:grid;gap:8px}.gallery-product-media li figure{width:auto}.gallery-actions{display:flex;flex-wrap:wrap;gap:6px}.gallery-actions button{min-height:44px;min-width:44px}
 @media(max-width:700px){.gallery-product-media li{width:100%}}
+
+/* Real order desk. */
+.order-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100vh - 48px)}
+.order-dialog .dialog-body{display:grid;gap:14px}.order-dialog dl{display:grid;gap:8px;margin:0}.order-dialog dl div{display:grid;grid-template-columns:110px 1fr;gap:10px}
+.order-dialog dt{color:#9a9a9a}.order-dialog dd{margin:0}.order-dialog label{display:grid;gap:6px}
+.order-dialog textarea,.order-dialog input,.order-dialog select{font:inherit;padding:8px 10px}
+.order-lines,.order-history{margin:0;padding-left:18px;display:grid;gap:4px}
+.dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
+td small{color:#9a9a9a}

@@ -44,3 +44,5 @@
 .dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
 td small{color:#9a9a9a}
 .spec-row{grid-template-columns:1fr 2fr auto!important;align-items:end}.spec-actions{display:flex;gap:6px}.spec-actions button{min-height:38px!important;padding:6px 10px!important}
+.quote-desk{display:grid;gap:18px}.quote-desk tr[aria-selected=true]{background:#f3f4f6}
+.quote-messages{list-style:none;margin:0;padding:0;display:grid;gap:8px}.quote-messages li{padding:8px 10px;border-radius:6px;background:#f3f4f6;font-size:12px}.quote-messages li[data-from=store]{background:#111;color:#fff}.quote-messages p{margin:4px 0 0;color:inherit}

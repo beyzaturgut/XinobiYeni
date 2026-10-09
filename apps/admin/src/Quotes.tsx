@@ -1,15 +1,65 @@
-import { useState } from 'react'
-import { quoteTotal, revisionPrice, validateRevision, type Quote, type QuoteRevision } from './quote-model'
-const money=(cents:number)=>new Intl.NumberFormat('tr-TR',{style:'currency',currency:'TRY'}).format(cents/100)
-export default function Quotes({quotes,onRevision}:{quotes:Quote[];onRevision:(id:string,base:number,revision:QuoteRevision)=>string}){
- const [query,setQuery]=useState(''),[status,setStatus]=useState('Tümü'),[selectedId,setSelectedId]=useState(''),[revisionNumber,setRevisionNumber]=useState(1),[draft,setDraft]=useState<QuoteRevision|null>(null),[base,setBase]=useState(0),[error,setError]=useState(''),[notice,setNotice]=useState('')
- const selected=quotes.find(quote=>quote.id===selectedId),revision=selected?.revisions.find(item=>item.number===revisionNumber)
- const filtered=quotes.filter(quote=>(status==='Tümü'||quote.status===status)&&`${quote.id} ${quote.company} ${quote.contact}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
- function discard(){if(draft&&!window.confirm('Kaydedilmemiş revizyon taslağı silinsin mi?'))return false;setDraft(null);setError('');return true}
- function open(quote:Quote){if(!discard())return;setSelectedId(quote.id);setRevisionNumber(quote.revisions.at(-1)!.number);setNotice('')}
- function save(){if(!draft||!selected)return;const issue=validateRevision(draft)||onRevision(selected.id,base,draft);if(issue){setError(issue);return}setRevisionNumber(base+1);setDraft(null);setError('');setNotice('Yeni demo revizyonu oturumda oluşturuldu; müşteriye gönderilmedi. Önceki sürüm korundu.')}
- return <section aria-label="Kurumsal teklif yönetimi"><div className="catalog-summary">{[['Örnek talep',quotes.length],['İnceleniyor',quotes.filter(q=>q.status==='İnceleniyor').length],['Bilgi bekliyor',quotes.filter(q=>q.status==='Bilgi bekliyor').length],['Demo revizyon',quotes.reduce((sum,q)=>sum+q.revisions.length,0)]].map(([label,value])=><div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div><div className="order-filters"><label>Firma veya teklif ara<input value={query} onChange={e=>setQuery(e.target.value)}/></label><label>Teklif durumu<select aria-label="Teklif durum filtresi" value={status} onChange={e=>setStatus(e.target.value)}>{['Tümü','İnceleniyor','Bilgi bekliyor'].map(item=><option key={item}>{item}</option>)}</select></label><button onClick={()=>{setQuery('');setStatus('Tümü')}}>Filtreleri temizle</button></div><div className="table-scroll"><table><caption>Örnek kurumsal talepler · müşteri/sipariş kaydı değildir</caption><thead><tr>{['Referans','Firma','Durum','İstenen termin','Son sürüm','Örnek ürün tutarı','İşlem'].map(item=><th scope="col" key={item}>{item}</th>)}</tr></thead><tbody>{filtered.map(quote=><tr key={quote.id}><th scope="row">{quote.id}</th><td>{quote.company}</td><td>{quote.status}</td><td>{quote.requestedDelivery}</td><td>v{quote.revisions.at(-1)!.number}</td><td>{money(quoteTotal(quote.revisions.at(-1)!))}</td><td><button aria-label={`${quote.id} teklif detayını aç`} onClick={()=>open(quote)}>İncele</button></td></tr>)}</tbody></table></div>{!filtered.length&&<p role="status">Filtrelere uygun teklif yok.</p>}
- {selected&&revision&&<section className="quote-detail" aria-labelledby="quote-detail-title"><header className="page-heading"><h2 id="quote-detail-title">{selected.id} · {selected.company}</h2><button onClick={()=>{if(discard())setSelectedId('')}}>Teklif detayını kapat</button></header><dl><div><dt>Yetkili</dt><dd>{selected.contact}</dd></div><div><dt>Talep edilen termin</dt><dd>{selected.requestedDelivery}</dd></div><div><dt>Kişiselleştirme</dt><dd>{selected.personalization}</dd></div></dl><div className="catalog-tabs" role="group" aria-label="Teklif sürümleri">{selected.revisions.map(item=><button key={item.number} aria-pressed={revision.number===item.number} onClick={()=>{if(discard())setRevisionNumber(item.number)}}>Sürüm {item.number}</button>)}</div><p>Örnek sürüm zamanı: {new Date(revision.createdAt).toLocaleString('tr-TR')}</p><p>Geçerlilik: {revision.validUntil} · {revision.delivery}</p><p>Gerekçe: {revision.note}</p><div className="table-scroll"><table><caption>Sürüm {revision.number} satırları · TRY örnek tutarlar</caption><thead><tr>{['Ürün/varyant','SKU','Adet','Birim tutar','Satır toplamı'].map(item=><th scope="col" key={item}>{item}</th>)}</tr></thead><tbody>{revision.lines.map(line=><tr key={line.id}><th scope="row">{line.label}</th><td>{line.sku}</td><td>{line.quantity}</td><td>{money(line.unitCents)}</td><td>{money(line.quantity*line.unitCents)}</td></tr>)}</tbody></table></div><p><strong>Örnek ürün toplamı: {money(quoteTotal(revision))}</strong></p><p className="muted">Vergi, kargo ve baskı bedeli kesinleşmedi; bu tutar bağlayıcı teklif değildir. Güvenli dosya indirme ve e-posta sağlayıcısı bağlı değil.</p><div className="order-filters"><button disabled={Boolean(draft)} onClick={()=>{const latest=selected.revisions.at(-1)!;setBase(latest.number);setDraft(structuredClone(latest));setError('')}}>Son sürümden revizyon oluştur</button><button disabled>Müşteriye gönder · API bekleniyor</button><button disabled>Onayla / siparişe dönüştür · D07 bekleniyor</button></div>
- {draft&&<div className="catalog-form"><h3>Yeni demo revizyonu</h3><p>Temel sürüm: {base}. Önceki satır etiketleri ve varyant kimlikleri korunur.</p>{draft.lines.map((line,index)=><fieldset key={line.id}><legend>{line.label}</legend><label>Satır {index+1} adet<input type="number" min="1" max="10000" value={Number.isFinite(line.quantity)?line.quantity:''} onChange={e=>setDraft({...draft,lines:draft.lines.map(item=>item.id===line.id?{...item,quantity:e.target.value===''?NaN:Number(e.target.value)}:item)})}/></label><label>Satır {index+1} birim fiyat<input inputMode="decimal" defaultValue={(line.unitCents/100).toFixed(2)} onChange={e=>setDraft({...draft,lines:draft.lines.map(item=>item.id===line.id?{...item,unitCents:revisionPrice(e.target.value)}:item)})}/></label></fieldset>)}<label>Teklif geçerlilik tarihi<input type="date" value={draft.validUntil} onChange={e=>setDraft({...draft,validUntil:e.target.value})}/></label><label>Teslimat koşulu<textarea rows={2} maxLength={1000} value={draft.delivery} onChange={e=>setDraft({...draft,delivery:e.target.value})}/></label><label>Revizyon gerekçesi<textarea rows={3} maxLength={1000} value={draft.note} onChange={e=>setDraft({...draft,note:e.target.value})}/></label><button onClick={save}>Demo revizyonunu kaydet</button><button onClick={discard}>Revizyondan vazgeç</button>{error&&<p role="alert" className="catalog-error">{error}</p>}</div>}
- {notice&&<p role="status">{notice}</p>}</section>}</section>
+import { useEffect, useState } from 'react'
+import { commerceApi, commerceRequest } from './commerce'
+
+type Money = { amountMinor: number; currency: string }
+type Item = { productId: string; productName: string; quantity: number; unitPrice?: Money | null; lineTotal?: Money | null }
+type Quote = { id: string; code: string; company: string; contactName: string; email: string; phone?: string | null; taxNumber?: string | null; items: Item[]; personalization: boolean; personalizationNote?: string | null; desiredDate?: string | null; purpose?: string | null; note?: string | null; status: string; createdAt: string; offer?: { total: Money; validUntil: string; note?: string | null } | null; messages: { from: string; text: string; at: string }[]; history: { status: string; at: string; actor: string; note?: string | null }[] }
+const statusText: Record<string, string> = { received: 'Yeni', reviewing: 'İnceleniyor', offered: 'Teklif verildi', accepted: 'Kabul edildi', rejected: 'Reddedildi', closed: 'Kapandı' }
+const tl = (money?: Money | null) => money ? new Intl.NumberFormat('tr-TR', { style: 'currency', currency: money.currency }).format(money.amountMinor / 100) : '—'
+const date = (value: string) => new Date(value).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+const inTenDays = () => new Date(Date.now() + 10 * 86400000).toISOString().slice(0, 10)
+
+/** Corporate quote desk: review requests, answer, write an offer with unit prices and a validity date, close. The contact is e-mailed. */
+export default function Quotes() {
+  const [items, setItems] = useState<Quote[]>([]), [status, setStatus] = useState(''), [selectedId, setSelectedId] = useState(''), [reload, setReload] = useState(0)
+  const [error, setError] = useState(''), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false)
+  const [prices, setPrices] = useState<Record<string, string>>({}), [validUntil, setValidUntil] = useState(inTenDays()), [offerNote, setOfferNote] = useState(''), [message, setMessage] = useState('')
+  useEffect(() => {
+    let active = true
+    commerceRequest<Quote[]>(commerceApi, `/quotes${status ? `?status=${status}` : ''}`).then(value => { if (active) { setItems(value); setError('') } }).catch(e => { if (active) setError(e instanceof Error ? e.message : 'Teklifler yüklenemedi.') })
+    return () => { active = false }
+  }, [status, reload])
+  const quote = items.find(item => item.id === selectedId)
+  async function act(route: string, body: unknown, done: string) {
+    if (!quote || busy) return
+    setBusy(true); setNotice('')
+    try { await commerceRequest(commerceApi, `/quotes/${quote.id}${route}`, 'POST', body); setReload(value => value + 1); setNotice(done) }
+    catch (e) { setNotice(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
+    finally { setBusy(false) }
+  }
+  function select(next: Quote) {
+    setSelectedId(next.id); setNotice(''); setMessage(''); setOfferNote(next.offer?.note ?? ''); setValidUntil(next.offer?.validUntil ?? inTenDays())
+    setPrices(Object.fromEntries(next.items.map(item => [item.productId, item.unitPrice ? (item.unitPrice.amountMinor / 100).toFixed(2) : ''])))
+  }
+  const priced = quote?.items.every(item => Number(prices[item.productId]?.replace(',', '.')) > 0)
+  const open = quote && ['received', 'reviewing', 'offered'].includes(quote.status)
+  return <section aria-label="Kurumsal teklifler">
+    <p className="panel-notice">Firmalar web veya mobil formdan talep gönderir; kod ve e-posta ile takip eder. Teklif ve mesajlar e-postayla iletilir. Talep ödeme emri değildir; kabul edilen teklifin toplu siparişe dönüşümü D07 kararını bekliyor.</p>
+    <div className="order-filters"><label>Durum<select value={status} onChange={event => setStatus(event.target.value)}><option value="">Tümü</option>{Object.entries(statusText).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><button onClick={() => setReload(value => value + 1)}>Yenile</button></div>
+    {error && <p role="alert">{error}</p>}
+    <div className="quote-desk">
+      <div className="table-scroll"><table><caption>{items.length} talep</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
+        <tbody>{items.map(item => <tr key={item.id} aria-selected={item.id === selectedId}><th scope="row">{item.code}</th><td>{item.company}<br /><small>{item.contactName}</small></td><td>{item.items.map(line => `${line.productName} × ${line.quantity}`).join(', ')}</td><td>{date(item.createdAt)}</td><td><span className="order-state">{statusText[item.status]}</span>{item.messages.at(-1)?.from === 'customer' && <span className="order-state">Yeni mesaj</span>}</td><td>{tl(item.offer?.total)}</td><td><button onClick={() => select(item)}>Aç</button></td></tr>)}</tbody></table></div>
+      {items.length === 0 && !error && <div className="empty-widget"><strong>Talep yok</strong><p>Web veya mobilden gelen kurumsal talepler burada görünür.</p></div>}
+      {quote && <article className="quote-detail">
+        <h2>{quote.code} · {quote.company} <span className="order-state">{statusText[quote.status]}</span></h2>
+        <dl><div><dt>Yetkili</dt><dd>{quote.contactName} · {quote.email}{quote.phone ? ` · ${quote.phone}` : ''}</dd></div><div><dt>Vergi no</dt><dd>{quote.taxNumber ?? '—'}</dd></div><div><dt>Kişiselleştirme</dt><dd>{quote.personalization ? quote.personalizationNote || 'İsteniyor' : 'Yok'}</dd></div><div><dt>Hedef tarih</dt><dd>{quote.desiredDate ?? '—'}</dd></div><div><dt>Amaç</dt><dd>{quote.purpose ?? '—'}</dd></div></dl>
+        {quote.note && <p>Not: {quote.note}</p>}
+        {open && <form className="catalog-form" onSubmit={event => { event.preventDefault(); if (priced) void act('/offer', { lines: quote.items.map(item => ({ productId: item.productId, unitPriceMinor: Math.round(Number(prices[item.productId].replace(',', '.')) * 100) })), validUntil, note: offerNote || null }, 'Teklif gönderildi; firmaya e-posta iletildi.') }}>
+          <h3>{quote.offer ? 'Teklifi güncelle' : 'Teklif hazırla'}</h3>
+          {quote.items.map(item => <label key={item.productId}>{item.productName} · {item.quantity} adet · birim fiyat (TL)<input inputMode="decimal" required value={prices[item.productId] ?? ''} onChange={event => setPrices(current => ({ ...current, [item.productId]: event.target.value }))} /></label>)}
+          <p>Toplam: {priced ? tl({ amountMinor: quote.items.reduce((sum, item) => sum + Math.round(Number(prices[item.productId].replace(',', '.')) * 100) * item.quantity, 0), currency: 'TRY' }) : '—'}</p>
+          <label>Geçerlilik tarihi<input type="date" required value={validUntil} onChange={event => setValidUntil(event.target.value)} /></label>
+          <label>Teklif notu (KDV, kargo, termin)<textarea rows={3} maxLength={2000} value={offerNote} onChange={event => setOfferNote(event.target.value)} /></label>
+          <button disabled={busy || !priced}>Teklifi gönder</button>
+        </form>}
+        <h3>Mesajlar</h3>
+        <ul className="quote-messages">{quote.messages.map((item, index) => <li key={index} data-from={item.from}><strong>{item.from === 'store' ? 'Xinobi' : quote.contactName}</strong> · {date(item.at)}<p>{item.text}</p></li>)}</ul>
+        {open && <form className="catalog-form" onSubmit={event => { event.preventDefault(); if (message.trim().length >= 2) void act('/messages', { text: message }, 'Mesaj gönderildi.').then(() => setMessage('')) }}><label>Firmaya mesaj<textarea rows={2} maxLength={2000} value={message} onChange={event => setMessage(event.target.value)} /></label><button disabled={busy || message.trim().length < 2}>Gönder</button></form>}
+        <div className="dialog-actions">{quote.status === 'received' && <button disabled={busy} onClick={() => void act('/status', { status: 'reviewing' }, 'İncelemeye alındı.')}>İncelemeye al</button>}{quote.status !== 'closed' && <button disabled={busy} onClick={() => { if (window.confirm(`${quote.code} kapatılsın mı?`)) void act('/status', { status: 'closed' }, 'Talep kapatıldı.') }}>Talebi kapat</button>}</div>
+        {notice && <p role="status">{notice}</p>}
+        <h3>Geçmiş</h3><ol className="order-history">{quote.history.map((item, index) => <li key={index}>{date(item.at)} · {statusText[item.status] ?? item.status} · {item.actor === 'customer' ? 'Firma' : 'Panel'}{item.note ? ` · ${item.note}` : ''}</li>)}</ol>
+      </article>}
+    </div>
+  </section>
 }

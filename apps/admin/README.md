@@ -21,7 +21,7 @@ Stok/depo: fiziksel, rezerve, satılabilir örnek bakiyeler; hareket geçmişi, 
 
 Fiyat/kampanya: varyant örnek fiyatları, koşullu kampanya taslakları ve tek kampanyalı TRY önizlemesi. Testler: `node tools/test-pricing-model.mjs`, `node tools/test-admin-pricing.mjs`. Gerçek fiyat yayını ve kupon tüketimi kapalıdır.
 
-Kurumsal teklifler: örnek firma/talep listesi, sürüm geçmişi ve değişmez demo revizyonlar. Test: `node tools/test-quote-model.mjs`, `node tools/test-admin-quotes.mjs`. Müşteriye gönderim, onay ve sipariş dönüşümü kapalı.
+Kurumsal teklifler: web ve mobil formdan gelen gerçek talepler (`/api/v1/local-commerce/quotes`); inceleme, mesaj, birim fiyatlı teklif ve kapatma. Firma kod ve e-postayla takip edip kabul veya ret verir. Kabul edilen teklifin toplu siparişe dönüşümü D07 kararını bekliyor. Önceki örnek model ve araçları (TST-082) kaldırıldı.
 
 Tasarım/baskı: sürüm ve sipariş bağı, kalite bulguları, yüz bazlı örnek çıktı durumları ve inceleme notları. Test: `node tools/test-admin-print.mjs`. Üretim, onay ve gerçek dosya indirme kapalı.
 

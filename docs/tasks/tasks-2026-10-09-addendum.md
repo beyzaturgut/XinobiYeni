@@ -309,13 +309,14 @@
 
 ### TASK-20261009-ADD-044 — Son mobil Nobi/teklif/Tasarımlarım/editör sürümünü emülatörde doğrula
 
-- Durum: Doğrulama bekliyor
-- Kapsam/engel: baf83e4 için henüz emülatör sonucu yok.
+- Durum: Doğrulandı — yalıtılmış cihaz testleri
+- Kapsam/engel: 5/5 Android emülatör testi; Nobi, teklif ekranları, tasarım adlandırma/silme ve editör kontrolleri geçti. Tüm teklif kabul/mesajlaşma akışı kapsam dışı.
+- Kanıt: [TST-107](../../test/2026-10-09/TST-107-pending-work-validation.md).
 
 ### TASK-20261009-ADD-045 — Mobil push için Firebase projesi ve uygulama dosyalarını bağla
 
 - Durum: Harici erişim bekliyor
-- Kapsam/engel: Sunucu desteği mevcut; kullanıcının Firebase hesabı/proje dosyaları gerekli. Gerçek push doğrulanmadı.
+- Kapsam/engel: Sunucu desteği mevcut; Firebase proje/APNs/hizmet hesabı erişimi gerekli. Mobil SDK, bildirim izni ve token kaydı da henüz eklenmedi. Gerçek push doğrulanmadı.
 
 ### TASK-20261009-ADD-046 — Netgsm SMS adaptörünü gerçek test hesabıyla doğrula
 
@@ -349,16 +350,22 @@
 
 ### TASK-20261009-ADD-052 — Temsilidir generated web e2e vakasının maske önkoşulunu düzelt
 
-- Durum: Bilinen test hatası
-- Kapsam/engel: Kullanıcı bildirimine göre kaynak ürünün onaylı maskesi yok; test henüz başarılı sayılmaz.
+- Durum: Tamamlandı
+- Kapsam/engel: Test kataloğu ve tam varyant izole edildi; doğru tasarım API ayarıyla web build ve 3/3 Playwright başarılı. Gerçek ürün maskeleri onaylanmadı.
+- Kanıt: [TST-107](../../test/2026-10-09/TST-107-pending-work-validation.md).
 
 ### TASK-20261009-ADD-053 — DevelopmentAcceptedSurfaceTests aralıklı hatasını araştır
 
-- Durum: Bilinen aralıklı hata
-- Kapsam/engel: Bir koşu başarısız, tekrar başarılı olarak bildirildi; kök neden çözülmüş sayılmaz.
+- Durum: Araştırıldı — yeniden üretilemedi
+- Kapsam/engel: Tam .NET 306/306, iki odaklı koşu 18/18 geçti. İlk hatanın logu/test adı eksik; kök neden çözülmüş sayılmaz.
+- Kanıt: [TST-107](../../test/2026-10-09/TST-107-pending-work-validation.md).
 
 ### TASK-20261009-ADD-054 — Emülatör uygulamasını yalıtılmış API’den normal API’ye geri bağla
 
-- Durum: Normal kullanım geçişi bekliyor
-- Kapsam/engel: Bildirilen çalışan mobil uygulama 5004’e bağlı; normal local API 5003. Bu kayıt sırasında servisler değiştirilmedi.
+- Durum: Tamamlandı
+- Kapsam/engel: Normal APK 10.0.2.2:5003 ile derlendi ve emülatöre yüklendi; API sağlık kontrolü başarılı.
+- Kanıt: [TST-107](../../test/2026-10-09/TST-107-pending-work-validation.md).
 
+## Bekleyen işlerin güncel doğrulaması — 09.10.2026
+
+Bu dökümün ilk kayıt anından sonra kontroller gerçekten çalıştırıldı. [TST-107](../../test/2026-10-09/TST-107-pending-work-validation.md) sonuçları esas alınır; önceki kullanıcı bildirimi tarihsel olarak korunur.

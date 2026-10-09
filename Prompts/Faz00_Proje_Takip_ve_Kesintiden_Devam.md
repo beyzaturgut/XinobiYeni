@@ -460,3 +460,9 @@ Kullanıcı isteğiyle 7–8 Ekim işleri commit kanıtlarına bağlı tek tek t
 - Açık kararlar: D03 geçici 14 günlük iade/iptal kuralları; D07 kabul edilen teklifin siparişe dönüşümü; D10 Nobi konuşmalarının geçici 90 günlük saklanması/aydınlatma. WhatsApp numarası, Firebase mobil projesi ve gerçek Netgsm test erişimi eksik.
 - Bilinen test sorunları: Temsilidir/generated vakasında onaylı maske önkoşulu eksik; DevelopmentAcceptedSurfaceTests bir koşu başarısız, tekrar başarılı. İkisi de çözülmüş işaretlenmedi.
 - Kullanıcının bildirdiği emülatör 5004'e bağlı; normal kullanımda 5003'e dönüş gerekiyor. Bu kayıt sırasında local servisler, veri, maskeler veya posta kutuları değiştirilmedi.
+
+### Bekleyen işler — bağımsız doğrulama / 09.10.2026
+
+[TST-107](../test/2026-10-09/TST-107-pending-work-validation.md): .NET 306/306, DevelopmentAcceptedSurfaceTests iki odaklı koşuda 18/18, mobil 49/49, Android cihaz testleri 5/5, Temsilidir web 3/3; Flutter analiz ve web build/ilgili lint temiz. Web test kataloğu/maskesi izole edildi (`bf510fc`). Emülatör Tasarımlarım’da kart taşması ve adlandırma controller yaşam döngüsü hatalarını yakaladı; düzeltme ve cihaz testleri `63ac7a4`. Galeri, taşıma, boyut, döndürme, kaplama ve hesaba kaydetme test verisiyle doğrulandı. Normal APK 5003 adresiyle derlenip yüklendi.
+
+ADD-044/052/054 güncellendi. ADD-053 araştırıldı ancak ilk hata yeniden üretilemedi; çözülmüş değil. Firebase mobil SDK/izin/token bağlantısı eksik; proje erişimi/APNs/hizmet hesabı gerekli. Netgsm gerçek test hesabı ve izinli alıcı, WhatsApp numarası, D03/D07/D10 kararları ve insan maske incelemesi bekliyor. Bu kontroller yeni gerçek sağlayıcı çağrısı, gerçek e-posta/SMS teslimi veya faz onayı anlamına gelmez.

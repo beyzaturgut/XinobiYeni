@@ -953,14 +953,14 @@ apps/mobile/pubspec.yaml
 apps/mobile/test/account_test.dart
 apps/mobile/windows/flutter/generated_plugin_registrant.cc
 apps/mobile/windows/flutter/generated_plugins.cmake"
-TASK-20261009-ADD-044,Son mobil Nobi/teklif/Tasarımlarım/editör sürümünü emülatörde doğrula,Doğrulama bekliyor,,baf83e4 için henüz emülatör sonucu yok.,
-TASK-20261009-ADD-045,Mobil push için Firebase projesi ve uygulama dosyalarını bağla,Harici erişim bekliyor,,Sunucu desteği mevcut; kullanıcının Firebase hesabı/proje dosyaları gerekli. Gerçek push doğrulanmadı.,
+TASK-20261009-ADD-044,Son mobil Nobi/teklif/Tasarımlarım/editör sürümünü emülatörde doğrula,Doğrulandı — yalıtılmış cihaz testleri,63ac7a4,"5/5 Android emülatör testi; Nobi, teklif ekranları, tasarım adlandırma/silme ve editör kontrolleri geçti. Tüm teklif kabul/mesajlaşma akışı kapsam dışı. Kanıt: test/2026-10-09/TST-107-pending-work-validation.md",
+TASK-20261009-ADD-045,Mobil push için Firebase projesi ve uygulama dosyalarını bağla,Harici erişim bekliyor,,Sunucu desteği mevcut; Firebase proje/APNs/hizmet hesabı erişimi gerekli. Mobil SDK, bildirim izni ve token kaydı da henüz eklenmedi. Gerçek push doğrulanmadı.,
 TASK-20261009-ADD-046,Netgsm SMS adaptörünü gerçek test hesabıyla doğrula,Doğrulama bekliyor,,Önizleme modu aktif; gerçek hesapla deneme yapılmadı.,
 TASK-20261009-ADD-047,İade süresi ve iptal/iade kurallarını kesinleştir,Karar bekliyor — D03,,14 gün geçici uygulama değeri; nihai ürün/hukuk kararı verilmiş sayılmaz.,
 TASK-20261009-ADD-048,Kabul edilmiş teklifin siparişe dönüşümünü kararlaştır,Karar bekliyor — D07,,Kabul siparişe dönüşümün tamamlandığı anlamına gelmez.,
 TASK-20261009-ADD-049,Nobi WhatsApp numarasını panelden yapılandır,Yapılandırma bekliyor,,Numara boş; gerçek iletişim adresi sağlanmalı.,
 TASK-20261009-ADD-050,Nobi konuşma saklama süresini ve aydınlatma metnini kesinleştir,Karar bekliyor — D10,,90 gün geçici değer; nihai saklama/aydınlatma kararı yok.,
 TASK-20261009-ADD-051,Yerel ürün varyantları için yüzey maskelerini onayla,Veri onayı bekliyor,,Onaylı maske yokken ürün üzerinde önizleme kullanılamıyor; otomatik onay verilmedi.,
-TASK-20261009-ADD-052,Temsilidir generated web e2e vakasının maske önkoşulunu düzelt,Bilinen test hatası,,Kullanıcı bildirimine göre kaynak ürünün onaylı maskesi yok; test henüz başarılı sayılmaz.,
-TASK-20261009-ADD-053,DevelopmentAcceptedSurfaceTests aralıklı hatasını araştır,Bilinen aralıklı hata,,"Bir koşu başarısız, tekrar başarılı olarak bildirildi; kök neden çözülmüş sayılmaz.",
-TASK-20261009-ADD-054,Emülatör uygulamasını yalıtılmış API’den normal API’ye geri bağla,Normal kullanım geçişi bekliyor,,Bildirilen çalışan mobil uygulama 5004’e bağlı; normal local API 5003. Bu kayıt sırasında servisler değiştirilmedi.,
+TASK-20261009-ADD-052,Temsilidir generated web e2e vakasının maske önkoşulunu düzelt,Tamamlandı,bf510fc,Test kataloğu ve tam varyant izole edildi; doğru tasarım API ayarıyla web build ve 3/3 Playwright başarılı. Gerçek ürün maskeleri onaylanmadı. Kanıt: test/2026-10-09/TST-107-pending-work-validation.md,
+TASK-20261009-ADD-053,DevelopmentAcceptedSurfaceTests aralıklı hatasını araştır,Araştırıldı — yeniden üretilemedi,,"Tam .NET 306/306, iki odaklı koşu 18/18 geçti. İlk hatanın logu/test adı eksik; kök neden çözülmüş sayılmaz. Kanıt: test/2026-10-09/TST-107-pending-work-validation.md",
+TASK-20261009-ADD-054,Emülatör uygulamasını yalıtılmış API’den normal API’ye geri bağla,Tamamlandı,,Normal APK 10.0.2.2:5003 ile derlendi ve emülatöre yüklendi; API sağlık kontrolü başarılı. Kanıt: test/2026-10-09/TST-107-pending-work-validation.md,

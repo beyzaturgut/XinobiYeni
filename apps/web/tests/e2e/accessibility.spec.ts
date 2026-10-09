@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
+import {mockStore} from './fixtures';
+
 const routes = [
   "/",
   "/urunler/",
@@ -38,6 +40,7 @@ async function tabUntil(page: Page, target: Locator, limit = 30) {
 
 for (const route of routes) {
   test(`erişilebilirlik taraması: ${route}`, async ({ page }) => {
+    await mockStore(page);
     await page.goto(route);
     await closeConsent(page);
     const results = await new AxeBuilder({ page })
@@ -58,37 +61,40 @@ for (const route of routes) {
 }
 
 test("üyelik akışında ileri ve geri klavye odağı görünür kontrollere ulaşır", async ({ page }) => {
+  await mockStore(page);
   await page.goto("/hesap/giris/");
   await closeConsent(page);
 
-  const loginTab = page.getByRole("tab", { name: "Giriş" });
+  const loginTab = page.getByRole("button", { name: "Giriş", exact: true });
   await page.locator("body").click({ position: { x: 1, y: 1 } });
   await tabUntil(page, loginTab);
   await expect(loginTab).toBeFocused();
 
-  const registerTab = page.getByRole("tab", { name: "Yeni hesap" });
+  const registerTab = page.getByRole("button", { name: "Yeni hesap", exact: true });
   await page.keyboard.press("Tab");
   await expect(registerTab).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(registerTab).toHaveAttribute("aria-selected", "true");
+  await expect(registerTab).toHaveAttribute("aria-pressed", "true");
 
   const passwordToggle = page.getByRole("button", { name: "Parolayı göster" });
   await tabUntil(page, passwordToggle);
   await expect(passwordToggle).toBeFocused();
   await page.keyboard.press("Shift+Tab");
-  await expect(page.getByPlaceholder("En az 8 karakter")).toBeFocused();
+  await expect(page.getByLabel("Parola", {exact: true})).toBeFocused();
 });
 
-test("ödeme sonucu sekmeleri ileri ve geri klavyeyle değiştirilebilir", async ({ page }) => {
-  await page.goto("/odeme/sonuc/");
+test("ödeme senaryoları ileri ve geri klavyeyle değiştirilebilir", async ({ page }) => {
+  await mockStore(page, {signedIn: true, cart: true});
+  await page.goto("/odeme/");
   await closeConsent(page);
-
-  const pending = page.getByRole("button", { name: "Bekliyor" });
-  await page.locator("body").click({ position: { x: 1, y: 1 } });
-  await tabUntil(page, pending);
-  await expect(pending).toBeFocused();
-  await page.keyboard.press("Tab");
-  await expect(page.getByRole("button", { name: "Başarısız" })).toBeFocused();
-  await page.keyboard.press("Shift+Tab");
-  await expect(pending).toBeFocused();
+  const success = page.getByRole("radio", {name: "Başarılı ödeme", exact: true});
+  await success.focus();
+  await expect(success).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  const failed = page.getByRole("radio", {name: "Başarısız ödeme", exact: true});
+  await expect(failed).toBeChecked();
+  await expect(failed).toBeFocused();
+  await page.keyboard.press("ArrowUp");
+  await expect(success).toBeChecked();
+  await expect(success).toBeFocused();
 });

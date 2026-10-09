@@ -23,11 +23,11 @@
  .siteHeader{display:flex;align-items:center;height:64px;padding-inline:50px}
  .bar,.inner{display:contents}
  .desktopNav,.headerActions>a.desktopOnly{display:none}
- .mobileMenu{display:block;order:1;margin-right:16px}
+ .mobileMenu{display:block;order:1;flex-shrink:0;margin-left:-14px;margin-right:2px}
  .brand{order:2;height:40px;margin-right:24px}.brand img{height:40px}
  .headerActions{order:3;flex:1;min-width:0;justify-content:flex-end}
- .search{width:245px;flex-shrink:1;min-width:0}
- .mobileMenu summary{width:16px;height:48px;display:flex;align-items:center;cursor:pointer;list-style:none}.mobileMenu summary::-webkit-details-marker{display:none}.mobileMenu summary svg{width:16px;height:12px}
+ .search{width:245px;height:44px;flex-shrink:1;min-width:44px;background:linear-gradient(#fff,#fff) center/100% 34px no-repeat}
+ .mobileMenu summary{width:44px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;list-style:none}.mobileMenu summary::-webkit-details-marker{display:none}.mobileMenu summary svg{width:16px;height:12px}
  .mobileMenu nav{position:absolute;top:64px;left:0;width:min(320px,100vw);background:#111;padding:18px 25px;display:grid;box-shadow:0 15px 25px #0004;font-size:16px}.mobileMenu nav a{padding:14px 0;border-bottom:1px solid #444}
 }
 @media(max-width:600px){.siteHeader{padding-inline:25px}.search{margin-right:5px}}

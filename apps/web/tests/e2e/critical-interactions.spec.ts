@@ -1,240 +1,153 @@
-import { expect, test, type Page } from "@playwright/test";
+import {expect,test} from '@playwright/test';
+import {closeConsent,mockStore,checkCartTotal} from './fixtures';
 
-async function closeConsent(page: Page) {
-  await page.getByRole("button", { name: "Çerez tercih panelini kapat" }).click();
-}
-
-test("çerez tercih paneli kapatılır, yeniden açılır ve kategoriler gösterilir", async ({ page }) => {
-  await page.goto("/");
-  await closeConsent(page);
-  await expect(page.getByRole("button", { name: "Çerez tercihleri" })).toBeVisible();
-  await page.getByRole("button", { name: "Çerez tercihleri" }).click();
-  await page.getByRole("button", { name: "Ayarları yönet" }).click();
-  await expect(page.getByRole("group", { name: "Tercih kategorileri" })).toBeVisible();
-  await expect(page.getByLabel("Zorunlu")).toBeChecked();
-  await page.getByLabel("Analitik").check();
-  await page.getByRole("button", { name: "Tercihi uygula" }).click();
-  await expect(page.getByText(/yalnızca bu prototip ekranında gösterildi/)).toBeVisible();
+test('çerez tercih paneli kapatılır, yeniden açılır ve kategoriler gösterilir',async({page})=>{
+ await mockStore(page);await page.goto('/');await closeConsent(page);
+ await page.getByRole('button',{name:'Çerez tercihleri',exact:true}).click();
+ await page.getByRole('button',{name:'Ayarları yönet'}).click();
+ await expect(page.getByRole('group',{name:'Tercih kategorileri'})).toBeVisible();
+ await expect(page.getByLabel('Zorunlu')).toBeChecked();await page.getByLabel('Analitik').check();
+ await page.getByRole('button',{name:'Tercihi uygula'}).click();
+ await expect(page.getByText(/yalnızca bu prototip ekranında gösterildi/)).toBeVisible();
 });
 
-test("arama Escape ile temizlenir ve karşılaştırma üç ürünle sınırlanır", async ({ page }) => {
-  await page.goto("/arama/");
-  await closeConsent(page);
-  const search = page.getByRole("searchbox", { name: "Ürün, kategori veya özellik ara" });
-  await search.fill("kahve");
-  await expect(page.getByRole("heading", { name: /kahve.*1 sonuç/i })).toBeVisible();
-  await search.press("Escape");
-  await expect(search).toHaveValue("");
-  await page.getByRole("article").filter({ hasText: "Air Purifier 101" }).getByRole("button", { name: "Karşılaştır" }).click();
-  await expect(page.getByRole("article").filter({ hasText: "Yemek Yapma Makinesi" }).getByRole("button", { name: "En fazla 3 ürün" })).toBeDisabled();
+test('arama Escape ile temizlenir ve karşılaştırma dört ürünle sınırlanır',async({page})=>{
+ const {state}=await mockStore(page);await page.goto('/arama/');await closeConsent(page);
+ const search=page.getByRole('searchbox',{name:'Ürün, kategori veya özellik ara'});
+ await search.fill('kahve');await expect(page.getByRole('heading',{name:/kahve.*2 sonuç/i})).toBeVisible();
+ await search.press('Escape');await expect(search).toHaveValue('');
+ for(const product of state.products.slice(0,4))await page.getByRole('article').filter({has:page.getByRole('heading',{name:product.name,exact:true})}).getByRole('button',{name:'Karşılaştır',exact:true}).click();
+ await expect(page.getByRole('button',{name:'En fazla 4 ürün'})).toHaveCount(2);
+ await expect(page.getByRole('button',{name:'En fazla 4 ürün'}).first()).toBeDisabled();
+ await page.goto('/karsilastir/');await expect(page.getByRole('checkbox',{name:'Yalnız farkları göster'})).toBeVisible();
 });
 
-test("ödeme sonucu senaryoları klavye ile değiştirilebilir", async ({ page }) => {
-  await page.goto("/odeme/sonuc/");
-  await closeConsent(page);
-  const failed = page.getByRole("button", { name: "Başarısız" });
-  await failed.focus();
-  await page.keyboard.press("Enter");
-  await expect(page.getByRole("heading", { name: "Ödeme onaylanmadı." })).toBeVisible();
-  const success = page.getByRole("button", { name: "Başarılı" });
-  await success.focus();
-  await page.keyboard.press("Space");
-  await expect(page.getByRole("heading", { name: "Ödeme doğrulandı." })).toBeVisible();
+test('ödeme sonucunda oturumsuz kullanıcıya sipariş gösterilmez',async({page})=>{
+ await mockStore(page);await page.goto('/odeme/sonuc/?siparis=unknown');await closeConsent(page);
+ await expect(page.getByRole('heading',{name:'Gösterilecek sipariş yok'})).toBeVisible();
+ await expect(page.getByText(/ödeme alınmadı/)).toBeVisible();
 });
 
-test("sepet adedi değişir ve ürün kaldırılınca boş durum görünür", async ({ page }) => {
-  await page.goto("/sepet/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: "Adedi artır" }).click();
-  await expect(page.getByText("2 ürün", { exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "Sepetten çıkar" }).click();
-  await expect(page.getByRole("heading", { name: "Sepetiniz şu anda boş." })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Ödemeye geç" })).toBeDisabled();
+test('sepet adedi değişir, yenilemede korunur ve ürün kaldırılır',async({page})=>{
+ await mockStore(page,{cart:true});await page.goto('/sepet/');await closeConsent(page);
+ await page.getByRole('button',{name:/adedini artır/}).click();await checkCartTotal(page,2);
+ await page.reload();await checkCartTotal(page,2);
+ await page.getByRole('button',{name:'Sepetten çıkar'}).click();
+ await expect(page.getByRole('heading',{name:'Sepetin şu an boş.'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Önce sepeti kontrol et'})).toBeDisabled();
 });
 
-test("hesap profil ve adres demo akışları sunucuya kaydetmeden geri bildirim verir", async ({ page }) => {
-  await page.goto("/hesap/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: /Profili düzenle/ }).click();
-  await page.getByLabel("Ad soyad").fill("Demo Kullanıcı");
-  await page.getByRole("button", { name: "Demo değişiklikleri uygula" }).click();
-  await expect(page.getByText(/Profil değişiklikleri yalnız bu oturumda önizlendi/)).toBeVisible();
-  await page.getByRole("button", { name: /Adreslerim/ }).click();
-  await page.getByRole("button", { name: "Yeni adres" }).click();
-  await page.getByLabel("Adres başlığı").fill("İş");
-  await page.getByRole("button", { name: "Demo adresi hazırla" }).click();
-  await expect(page.getByText(/Adres değişiklikleri yalnız bu oturumda önizlendi/)).toBeVisible();
+test('hesap profili ve adres kaydı güncel sunucu sözleşmesine gönderilir',async({page})=>{
+ const {requests}=await mockStore(page,{signedIn:true});await page.goto('/hesap/');await closeConsent(page);
+ await page.getByLabel('Ad soyad',{exact:true}).fill('Yeni Kullanıcı');
+ await page.getByRole('button',{name:'Kaydet',exact:true}).click();
+ await expect.poll(()=>requests.find(r=>r.path==='/me'&&r.method==='PATCH')?.body.name).toBe('Yeni Kullanıcı');
+ await page.goto('/hesap/adresler/');await page.getByRole('button',{name:'Adres ekle'}).click();
+ await page.getByLabel('Adres başlığı').fill('İş');await page.getByLabel('Telefon',{exact:true}).fill('05321234567');
+ await page.getByLabel('İl',{exact:true}).fill('İstanbul');await page.getByLabel('İlçe',{exact:true}).fill('Kadıköy');await page.getByLabel('Açık adres').fill('Test adresi 2');
+ await page.getByRole('button',{name:'Kaydet',exact:true}).click();
+ await expect.poll(()=>requests.find(r=>r.path==='/me/addresses'&&r.method==='POST')?.body.title).toBe('İş');
+ await expect(page.getByText('İş',{exact:true})).toBeVisible();
 });
 
-test("kurumsal teklif özeti seçimleri yansıtır fakat gönderim kapalı kalır", async ({ page }) => {
-  await page.goto("/kurumsal/teklif/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: "Kahve Makinesi 101" }).click();
-  await page.getByLabel("Tahmini adet").fill("50");
-  await page.getByLabel("Kurumsal kişiselleştirme istiyorum").check();
-  await page.getByRole("button", { name: "Demo talep özetini hazırla" }).click();
-  await expect(page.getByText("Demo talep özeti hazırlandı; sunucuya gönderilmedi.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Teklif talebini gönder" })).toBeDisabled();
+test('kurumsal teklif ürün, adet ve kişiselleştirme bilgisini gönderir',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/kurumsal/teklif/');await closeConsent(page);
+ await page.getByLabel('Firma adı').fill('Test Firma');await page.getByLabel('Yetkili kişi').fill('Test Yetkili');await page.getByLabel('Kurumsal e-posta').fill('test@example.com');
+ await page.getByRole('combobox',{name:'Ürün',exact:true}).selectOption('DEMO-P102');await page.getByLabel('Adet',{exact:true}).fill('50');await page.getByLabel('Kurumsal kişiselleştirme istiyorum').check();
+ await page.getByLabel('Kişiselleştirme notu').fill('Tek renk logo');await page.getByRole('button',{name:'Teklif talebini gönder'}).click();
+ await expect(page.getByRole('heading',{name:'Talebin alındı.'})).toBeVisible();
+ const sent=requests.find(r=>r.path==='/quotes')!;expect(sent.body.items).toEqual([{productId:'DEMO-P102',quantity:50}]);expect(sent.body.personalization).toBe(true);
 });
 
-test("AI tasarım demo alternatif ve hata durumları arasında güvenle geçer", async ({ page }) => {
-  await page.goto("/studio/ai/");
-  await closeConsent(page);
-  const prompt = page.getByRole("textbox", { name: /Tasarım istemi/ });
-  await expect(page.getByRole("button", { name: "Demo alternatifleri göster" })).toBeDisabled();
-  await prompt.fill("Sakin dalga çizgileri ve yalın bir görünüm");
-  await page.getByRole("button", { name: "Geometrik" }).click();
-  await page.getByRole("button", { name: "Demo alternatifleri göster" }).click();
-  await expect(page.getByRole("button", { name: /Denge/ })).toBeVisible();
-  await page.getByRole("button", { name: /Denge/ }).click();
-  await expect(page.getByRole("heading", { name: "Denge" })).toBeVisible();
-  await page.getByRole("button", { name: "Hata durumunu önizle" }).click();
-  await expect(page.getByRole("heading", { name: "Üretim tamamlanamadı." })).toBeVisible();
-  await page.getByRole("button", { name: "İsteme dön" }).click();
-  await expect(page.getByRole("heading", { name: "İlk fikrinizi oluşturun." })).toBeVisible();
+test('eski AI tasarım adresi güncel ürün seçimine yönlendirir',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/studio/ai/');await closeConsent(page);
+ await page.getByRole('link',{name:'Kişiselleştirilebilir ürünleri keşfet →'}).click();
+ await expect(page).toHaveURL(/\/xinobi-u\/?$/);expect(requests.filter(r=>r.path.includes('design-studio'))).toEqual([]);
 });
 
-test("satış asistanı sabit öneri, bildirim ve temizleme akışını çalıştırır", async ({ page }) => {
-  await page.goto("/asistan/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: /Kahve seçenekleri/ }).click();
-  await expect(page.getByRole("strong").filter({ hasText: "Kahve Makinesi 101" })).toBeVisible();
-  await page.getByLabel("Mesajınız").fill("Ofis için seçenek arıyorum");
-  await page.getByRole("button", { name: "Gönder" }).click();
-  await expect(page.getByText("Demo mesaj hazırlandı; AI sağlayıcısına gönderilmedi.")).toBeVisible();
-  await page.getByRole("button", { name: "Konuşmayı temizle" }).click();
-  await expect(page.getByRole("button", { name: /Çay makinesi öner/ })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Canlı desteğe bağlan" })).toBeDisabled();
+test('Nobi mesaj yanıtını gösterir ve yeni konuşma başlatır',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/asistan/');await closeConsent(page);
+ await page.getByRole('button',{name:'Kahve seçenekleri'}).click();
+ await expect(page.getByText('Kahve Makinesi 101 seçeneklerini inceleyebilirsin.')).toBeVisible();
+ await page.getByLabel('Nobi’ye mesajın').fill('Ofis için seçenek arıyorum');await page.getByRole('button',{name:'Mesajı gönder'}).click();
+ await expect.poll(()=>requests.filter(r=>r.path==='/assistant/messages').length).toBe(2);
+ await page.getByRole('button',{name:'Yeni konuşma',exact:true}).click();
+ await expect(page.getByRole('button',{name:'Kahve seçenekleri'})).toBeVisible();
 });
 
-test("üyelik sekmeleri, parola görünürlüğü ve parola yenileme görünümü çalışır", async ({ page }) => {
-  await page.goto("/hesap/giris/");
-  await closeConsent(page);
-  await page.getByRole("tab", { name: "Yeni hesap" }).click();
-  await expect(page.getByRole("heading", { name: "Yeni hesabınızı oluşturun." })).toBeVisible();
-  await expect(page.getByLabel(/Üyelik koşullarını/)).not.toBeChecked();
-  const password = page.getByPlaceholder("En az 8 karakter");
-  await expect(password).toHaveAttribute("type", "password");
-  await page.getByRole("button", { name: "Parolayı göster" }).click();
-  await expect(password).toHaveAttribute("type", "text");
-  await page.getByRole("tab", { name: "Giriş" }).click();
-  await page.getByRole("button", { name: "Parolamı unuttum" }).click();
-  await expect(page.getByRole("heading", { name: "Parolanızı yenileyin." })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Yenileme bağlantısı gönder" })).toBeDisabled();
+test('üyelik modları, parola görünürlüğü ve e-posta doğrulaması çalışır',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/hesap/giris/');await closeConsent(page);
+ await page.getByRole('button',{name:'Yeni hesap',exact:true}).click();await expect(page.getByRole('heading',{name:'Hesap oluştur',exact:true})).toBeVisible();
+ await page.getByLabel('Ad soyad').fill('Test Kullanıcı');await page.getByLabel('E-posta adresi').fill('test@example.com');const password=page.getByLabel('Parola',{exact:true});await password.fill('test-parola-123');
+ await page.getByRole('button',{name:'Parolayı göster'}).click();await expect(password).toHaveAttribute('type','text');
+ await page.getByRole('button',{name:'Doğrulama kodu gönder'}).click();await expect(page.getByRole('heading',{name:'E-postanı doğrula'})).toBeVisible();
+ await page.getByLabel('Doğrulama kodu').fill('123456');await page.getByRole('button',{name:'E-postayı doğrula ve hesabı oluştur'}).click();
+ await expect(page).toHaveURL(/\/hesap\/?$/);expect(requests.find(r=>r.path==='/auth/web/register')?.body.verificationCode).toBe('123456');
 });
 
-test("sipariş seçimi detay ve teslimat çizgisini günceller", async ({ page }) => {
-  await page.goto("/hesap/siparisler/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: /DEMO-2312/ }).click();
-  await expect(page.getByRole("heading", { name: "DEMO-2312" })).toBeVisible();
-  const detail = page.locator("section[aria-labelledby='order-title']");
-  await expect(detail.getByText("Kahve Makinesi 101", { exact: true })).toBeVisible();
-  await expect(page.getByText("Demo kargo durumu")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Kargoyu takip et" })).toBeDisabled();
+test('sipariş takibi teslimat adımlarını ve takip numarasını gösterir',async({page})=>{
+ await mockStore(page,{signedIn:true});await page.goto('/hesap/siparisler/');await closeConsent(page);
+ await expect(page.getByRole('heading',{name:'TEST-ORDER-1'})).toBeVisible();await expect(page.getByText('TEST123',{exact:true})).toBeVisible();
+ await expect(page.getByRole('list',{name:'Sipariş durumu'}).locator('[aria-current=step]')).toContainText('Teslim edildi');
 });
 
-test("iade formu geçerli girişlerle demo özeti hazırlar", async ({ page }) => {
-  await page.goto("/hesap/siparisler/iade/");
-  await closeConsent(page);
-  await page.getByLabel("İptal talebi").check();
-  await page.getByLabel("Neden").selectOption({ label: "Yanlış ürün seçtim" });
-  await page.getByLabel("Açıklama").fill("Yanlış ürün seçildiği için iptal etmek istiyorum.");
-  await page.getByRole("button", { name: "Demo talep özetini hazırla" }).click();
-  await expect(page.getByRole("heading", { name: "İptal önizlemesi" })).toBeVisible();
-  await expect(page.getByText("Demo özet hazırlandı; talep sunucuya gönderilmedi.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Talebi gönder" })).toBeDisabled();
+test('teslim edilmiş sipariş için seçilen adetle iade talebi gönderilir',async({page})=>{
+ const {requests}=await mockStore(page,{signedIn:true});await page.goto('/hesap/siparisler/iade/?siparis=test-order');await closeConsent(page);
+ await page.getByRole('checkbox').check();await page.getByLabel('Çay Makinesi 101 iade adedi').selectOption('2');await page.getByRole('combobox',{name:'Neden',exact:true}).selectOption('Ürün hasarlı');
+ await page.getByRole('button',{name:'İade talebini gönder'}).click();await expect(page.getByRole('heading',{name:'Talebin alındı.'})).toBeVisible();
+ expect(requests.find(r=>r.path.endsWith('/returns'))?.body.lines).toEqual([{variantId:'DEMO-V101-B',quantity:2}]);
 });
 
-test("teklif revizyonu ve demo geri bildirim notu birlikte güncellenir", async ({ page }) => {
-  await page.goto("/kurumsal/teklif/takip/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: "Revizyon 1" }).click();
-  await expect(page.getByRole("heading", { name: "Revizyon 1" })).toBeVisible();
-  await expect(page.getByText("20", { exact: true })).toBeVisible();
-  await page.getByLabel("Talebiniz").fill("Termin ve renk seçeneklerinin güncellenmesini rica ederiz.");
-  await page.getByRole("button", { name: "Demo revizyon notunu hazırla" }).click();
-  await expect(page.getByText("Demo revizyon notu hazırlandı; sunucuya gönderilmedi.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Teklifi onayla" })).toBeDisabled();
+test('teklif takibinde mesaj ve kabul kararı güncellenir',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/kurumsal/teklif/takip/?kod=Q-TEST-1&eposta=test@example.com');await closeConsent(page);
+ await page.getByLabel('Mesajınız').fill('Termin bilgisini paylaşır mısınız?');await page.getByRole('button',{name:'Mesaj gönder'}).click();
+ await expect(page.getByText('Termin bilgisini paylaşır mısınız?',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Teklifi kabul et'}).click();await expect(page.getByText('Kabul edildi',{exact:true})).toBeVisible();
+ expect(requests.find(r=>r.path.endsWith('/decision'))?.body.decision).toBe('accept');
 });
 
-test("gelişmiş editör katman, görünürlük, kilit ve yüz seçimlerini yönetir", async ({ page }) => {
-  await page.goto("/urunler/cay-makinesi-101/editor/");
-  await closeConsent(page);
-  await page.locator("aside[aria-label='Tasarım araçları'] button").filter({ hasText: "Metin" }).click();
-  await expect(page.getByText("3 öğe")).toBeVisible();
-  await expect(page.getByText("Metin katmanı demo çalışma alanına eklendi.")).toBeVisible();
-  await page.getByRole("button", { name: "Yeni metin katmanını gizle" }).click();
-  await expect(page.getByRole("button", { name: "Yeni metin katmanını göster" })).toBeVisible();
-  await page.getByRole("button", { name: "Bana özel katmanının kilidini kapat" }).click();
-  await expect(page.getByRole("button", { name: "Bana özel katmanının kilidini aç" })).toBeVisible();
-  await page.getByRole("button", { name: "Arka yüz" }).click();
-  await expect(page.getByRole("heading", { name: "Arka yüz" })).toBeVisible();
-  await page.getByRole("button", { name: "Demo taslağı hazırla" }).click();
-  await expect(page.getByText("Demo taslak hazırlandı; sunucuya kalıcı kayıt yapılmadı.")).toBeVisible();
+test('gelişmiş editör katman, görünürlük, kilit ve yüz seçimlerini yönetir',async({page})=>{
+ await mockStore(page);await page.goto('/urunler/cay-makinesi-101/editor/');await closeConsent(page);
+ await page.locator("aside[aria-label='Tasarım araçları'] button").filter({hasText:'Metin'}).click();await expect(page.getByText('3 öğe')).toBeVisible();
+ await page.getByRole('button',{name:'Yeni metin katmanını gizle'}).click();await expect(page.getByRole('button',{name:'Yeni metin katmanını göster'})).toBeVisible();
+ await page.getByRole('button',{name:'Bana özel katmanının kilidini kapat'}).click();await expect(page.getByRole('button',{name:'Bana özel katmanının kilidini aç'})).toBeVisible();
+ await page.getByRole('button',{name:'Arka yüz',exact:true}).click();await expect(page.getByRole('heading',{name:'Arka yüz'})).toBeVisible();
 });
 
-test("katalog arama, kategori, sıralama ve boş durumdan sıfırlama akışlarını çalıştırır", async ({ page }) => {
-  await page.goto("/urunler/");
-  await closeConsent(page);
-  await page.getByRole("button", { name: "Kahve", exact: true }).click();
-  await expect(page.getByText("3 ürün varyantı")).toBeVisible();
-  await page.getByLabel("Ürünlerde ara").fill("kırmızı");
-  await expect(page.getByText("1 ürün varyantı")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Kahve Makinesi 101" })).toBeVisible();
-  await page.getByLabel("Sırala").selectOption("name");
-  await page.getByLabel("Ürünlerde ara").fill("bulunmayan ürün");
-  await expect(page.getByRole("heading", { name: "Aradığınız ürün bulunamadı." })).toBeVisible();
-  await page.getByRole("button", { name: "Filtreleri temizle" }).click();
-  await expect(page.getByText("10 ürün varyantı")).toBeVisible();
+test('katalog kategori, arama, sıralama ve filtre temizleme akışını çalıştırır',async({page})=>{
+ await mockStore(page);await page.goto('/urunler/');await closeConsent(page);
+ await page.getByRole('button',{name:'Kahve',exact:true}).click();await expect(page.getByText('2 ürün',{exact:true})).toBeVisible();
+ await page.getByLabel('Ürünlerde ara').fill('102');await expect(page.getByText('1 ürün',{exact:true})).toBeVisible();await page.getByLabel('Sırala').selectOption('name');
+ await page.getByLabel('Ürünlerde ara').fill('bulunmayan ürün');await expect(page.getByRole('heading',{name:'Aradığınız ürün bulunamadı.'})).toBeVisible();
+ await page.getByRole('button',{name:'Filtreleri temizle'}).click();await expect(page.getByText('6 ürün',{exact:true})).toBeVisible();
 });
 
-test("ürün detayında renk varyantı görsel ve seçili durumla birlikte değişir", async ({ page }) => {
-  await page.goto("/urunler/cay-makinesi-101/");
-  await closeConsent(page);
-  const red = page.getByRole("button", { name: "Kırmızı rengini seç" });
-  await red.click();
-  await expect(red).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("group", { name: "Renk: Kırmızı" })).toBeVisible();
-  await expect(page.getByRole("img", { name: "Xinobi Çay Makinesi 101, Kırmızı" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Satış bilgisi hazırlanıyor" })).toBeDisabled();
+test('ürün detayında renk varyantı, görsel ve seçili durum değişir',async({page})=>{
+ await mockStore(page);await page.goto('/urunler/cay-makinesi-101/');await closeConsent(page);
+ const red=page.getByRole('button',{name:'Kırmızı rengini seç'});await red.click();await expect(red).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('group',{name:'Renk: Kırmızı'})).toBeVisible();await expect(page.getByRole('img',{name:'Xinobi Çay Makinesi 101, Kırmızı'})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Sepete ekle',exact:true})).toBeEnabled();
 });
 
-test("katalog favorisi tarayıcı listesine taşınır ve listeden kaldırılır", async ({ page }) => {
-  await page.goto("/urunler/");
-  await closeConsent(page);
-  const favorite = page.getByRole("button", { name: "Çay Makinesi 101 Lacivert ürününü favorilere ekle" });
-  await favorite.click();
-  await expect(page.getByRole("button", { name: "Çay Makinesi 101 Lacivert ürününü favorilerden çıkar" })).toHaveAttribute("aria-pressed", "true");
-  await page.goto("/favoriler/");
-  await expect(page.getByText("1 favori ürün")).toBeVisible();
-  await page.getByRole("button", { name: "Çay Makinesi 101 Lacivert ürününü favorilerden çıkar" }).click();
-  await expect(page.getByRole("heading", { name: "Favori listeniz henüz boş." })).toBeVisible();
+test('katalog favorisi tarayıcı listesine taşınır ve listeden kaldırılır',async({page})=>{
+ await mockStore(page);await page.goto('/urunler/');await closeConsent(page);
+ await page.getByRole('button',{name:/^Çay Makinesi 101 .*ürününü favorilere ekle$/}).click();await page.goto('/favoriler/');
+ await expect(page.getByText('1 favori ürün',{exact:true})).toBeVisible();await page.getByRole('button',{name:/^Çay Makinesi 101 .*ürününü favorilerden çıkar$/}).click();
+ await expect(page.getByRole('heading',{name:'Favori listeniz henüz boş.'})).toBeVisible();
 });
 
-test("ödeme formu girişleri korur ve yöntem açıklamasını değiştirir", async ({ page }) => {
-  await page.goto("/odeme/");
-  await closeConsent(page);
-  await page.getByLabel("Ad soyad").fill("Demo Kullanıcı");
-  await page.getByLabel("Telefon").fill("0555 000 00 00");
-  await page.getByLabel("E-posta").fill("demo@example.com");
-  await page.getByLabel("Havale / EFT").check();
-  await expect(page.getByText("Banka bilgileri etkin değil")).toBeVisible();
-  await expect(page.getByLabel("Ad soyad")).toHaveValue("Demo Kullanıcı");
-  await expect(page.getByRole("button", { name: "Ödemeyi başlat" })).toBeDisabled();
+test('deneme ödeme reddedilince sipariş oluşmaz; tekrarında sipariş kaydedilir',async({page})=>{
+ const {requests}=await mockStore(page,{signedIn:true,cart:true});await page.goto('/odeme/');await closeConsent(page);
+ await page.getByLabel('Başarısız ödeme',{exact:true}).check();await page.getByRole('button',{name:'Ödemeyi tamamla'}).click();await expect(page.getByRole('alert').filter({hasText:'Ödeme reddedildi'})).toBeVisible();
+ expect(requests.filter(r=>r.path==='/me/orders'&&r.method==='POST')).toEqual([]);
+ await page.getByLabel('Başarılı ödeme',{exact:true}).check();await page.getByRole('button',{name:'Ödemeyi tamamla'}).click();await expect(page.getByRole('heading',{name:'Siparişin oluşturuldu'})).toBeVisible();
+ expect(requests.find(r=>r.path==='/me/orders'&&r.method==='POST')?.body.addressId).toBe('test-address');
+ expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!))).toEqual([]);
 });
 
-test("basit kişiselleştirme metin sınırı, stil, renk ve demo taslağı uygular", async ({ page }) => {
-  await page.goto("/urunler/cay-makinesi-101/kisisellestir/");
-  await closeConsent(page);
-  const text = page.getByLabel("İsim veya kısa mesaj");
-  await text.fill("Xinobi için uzun demo metni");
-  await expect(text).toHaveValue("Xinobi için uzun demo me");
-  await page.getByRole("button", { name: /Geometrik/ }).click();
-  await page.getByRole("button", { name: "Xinobi teal rengini seç" }).click();
-  await expect(page.getByRole("button", { name: /Geometrik/ })).toHaveAttribute("aria-pressed", "true");
-  await expect(page.getByRole("button", { name: "Xinobi teal rengini seç" })).toHaveAttribute("aria-pressed", "true");
-  await page.getByRole("button", { name: "Demo taslağını hazırla" }).click();
-  await expect(page.getByText("Demo taslağınız bu oturum için hazırlandı. Kalıcı kayıt yapılmadı.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Siparişe devam et" })).toBeDisabled();
+test('basit kişiselleştirme onaylı yüzeyin güncel editörüne geçer',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/urunler/cay-makinesi-101/kisisellestir/?product=DEMO-P101&variant=DEMO-V101-B');await closeConsent(page);
+ await page.getByRole('link',{name:'Gelişmiş editörde devam et ↗'}).click();
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await expect(page).toHaveURL(/\/editor\/?.*variant=DEMO-V101-B/);expect(requests.filter(r=>r.path.includes('design-studio'))).toEqual([]);
 });

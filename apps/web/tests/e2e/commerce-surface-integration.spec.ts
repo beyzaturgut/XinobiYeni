@@ -21,7 +21,7 @@ test("commerce blue uses exact accepted surface; unsupported never renders",asyn
   await expect(page.locator("canvas[role=img]")).toHaveCount(0);
  }
 });
-test("existing generated design uses canonical renderer, no generation requests",async({page})=>{
+test("existing generated design uses canonical renderer, no generation requests",async({page},testInfo)=>{
  const id="a".repeat(64), product=source.products.find((p:{id:string})=>p.id==="DEMO-P101");
  let posts=0;
  page.on("request",r=>{if(r.method()==="POST")posts++});
@@ -38,7 +38,7 @@ test("existing generated design uses canonical renderer, no generation requests"
  for(const width of [1440,390]){
   await page.setViewportSize({width,height:1000});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await page.screenshot({path:process.env.TEMP+"/xinobi-integration-canonical-"+width+".png",fullPage:true});
+  await page.screenshot({path:testInfo.outputPath("xinobi-integration-canonical-"+width+".png"),fullPage:true});
  }
  expect(posts).toBe(0);
 });

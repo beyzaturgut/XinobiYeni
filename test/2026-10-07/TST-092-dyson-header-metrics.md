@@ -57,3 +57,7 @@ Kontrast hataları gerçek erişilebilirlik kusurlarıdır ve düzeltilmelidir; 
 ## Etki ve sonraki adım
 
 Header Dyson ölçüleriyle eşleşti. Sonraki adım: 4 kontrast hatasını düzeltmek ve 15 eski e2e testini güncellemek; ardından Faz03 03.04.
+
+## Güncel durum — 09.10.2026
+
+Bu rapordaki 19 başarısızlık tarihsel kayıttır. [TST-108](../2026-10-09/TST-108-web-regression-resolution.md) kapsamında güncel akış testleri ve ürün kontrast/dokunma alanı sorunları düzeltildi; tam güncel paket **107/107** geçti. SQL konusu ayrıdır.

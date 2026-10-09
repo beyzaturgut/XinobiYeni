@@ -43,3 +43,4 @@
 .order-lines,.order-history{margin:0;padding-left:18px;display:grid;gap:4px}
 .dialog-actions{display:flex;flex-wrap:wrap;gap:8px}
 td small{color:#9a9a9a}
+.spec-row{grid-template-columns:1fr 2fr auto!important;align-items:end}.spec-actions{display:flex;gap:6px}.spec-actions button{min-height:38px!important;padding:6px 10px!important}

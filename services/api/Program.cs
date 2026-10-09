@@ -109,6 +109,10 @@ builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
 builder.Services.TryAddSingleton(TimeProvider.System);
 // Feature stores are registered everywhere so the contract lists the routes; outside Development they need Features:StorageProvider=SqlServer, else 503.
 builder.Services.AddSingleton<Xinobi.Api.Infrastructure.FeatureDocuments>();
+// Product media and customer designs: a local folder (Development data directory, or Storage:LocalRoot on a server); otherwise 503.
+builder.Services.AddSingleton<Xinobi.Api.Infrastructure.IFileStore>(services =>
+    Xinobi.Api.Infrastructure.FileStorage.LocalRoot(builder.Environment, builder.Configuration) is { } fileRoot
+        ? new Xinobi.Api.Infrastructure.LocalFileStore(fileRoot) : new Xinobi.Api.Infrastructure.UnavailableFileStore());
 builder.Services.AddSingleton<NotificationTexts>();
 builder.Services.AddSingleton<INotificationChannelSender, EmailNotificationSender>();
 builder.Services.AddHttpClient<SmsNotificationSender>(client => client.Timeout = TimeSpan.FromSeconds(20));

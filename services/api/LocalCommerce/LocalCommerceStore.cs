@@ -30,7 +30,6 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     private readonly string path = configuration["LocalCommerce:DataDirectory"] ?? Path.Combine(environment.ContentRootPath, "App_Data", "local-commerce");
     internal static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     public string DataDirectory => path;
-    public string MediaDirectory => Path.Combine(path, "media");
     public bool UsesSql => configuration["Catalog:StorageProvider"] == "SqlServer"
         || configuration["Catalog:StorageProvider"] is null && File.Exists(Path.Combine(path, "catalog-sql.enabled"));
 

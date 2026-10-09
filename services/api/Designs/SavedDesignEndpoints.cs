@@ -58,8 +58,8 @@ public static class SavedDesignEndpoints
             .WithName("DeleteMyDesign")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
-        me.MapGet("/designs/{id}/image", async Task<Results<PhysicalFileHttpResult, NotFound>> (string id, ClaimsPrincipal user, SavedDesignStore designs) =>
-                await designs.Image(Id(user), id) is { } image && File.Exists(image.Path) ? TypedResults.PhysicalFile(image.Path, image.Mime) : TypedResults.NotFound())
+        me.MapGet("/designs/{id}/image", async Task<Results<FileStreamHttpResult, NotFound>> (string id, ClaimsPrincipal user, SavedDesignStore designs) =>
+                await designs.Image(Id(user), id) is { } image ? TypedResults.Stream(image.Content, image.ContentType) : TypedResults.NotFound())
             .WithName("GetMyDesignImage");
     }
 

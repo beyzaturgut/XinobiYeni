@@ -40,7 +40,7 @@ public sealed class SurfaceException(string code, string message, int status = S
 /// Approval copies the mask into commerce media and records it on the variant, so storefront, snapshot and deploy carry it
 /// like the product photo. Roboflow is called only on an explicit admin action, within a daily limit, with a server-side key.
 /// </summary>
-public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, IWebHostEnvironment environment, IConfiguration configuration, IHttpClientFactory http, TimeProvider clock)
+public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.Api.Infrastructure.IFileStore files, IWebHostEnvironment environment, IConfiguration configuration, IHttpClientFactory http, TimeProvider clock)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     private readonly SemaphoreSlim gate = new(1, 1);
@@ -219,8 +219,7 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, IWebHos
         var bytes = await File.ReadAllBytesAsync(DraftPath(draft.MaskFile));
         new AlignedImageInspector().ValidateMask(bytes, "dev:surface-approval", source, source);
         var media = $"{Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant()}.png";
-        System.IO.Directory.CreateDirectory(commerce.MediaDirectory);
-        await File.WriteAllBytesAsync(Path.Combine(commerce.MediaDirectory, media), bytes);
+        await files.Save(Xinobi.Api.Infrastructure.FileAreas.Media, media, new MemoryStream(bytes), "image/png");
         var path = "/api/v1/local-commerce/media/" + media;
         var updated = await SetSurface(productId, variantId, variant.Image, path, path);
         return await Locked(async state =>
@@ -289,7 +288,18 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, IWebHos
     {
         const string media = "/api/v1/local-commerce/media/";
         string? path = null;
-        if (image.StartsWith(media, StringComparison.Ordinal)) path = Path.Combine(commerce.MediaDirectory, Path.GetFileName(image[media.Length..]));
+        if (image.StartsWith(media, StringComparison.Ordinal))
+        {
+            // Development tool: the local store opens synchronously, so blocking here costs nothing.
+            var key = Path.GetFileName(image[media.Length..]);
+            var stored = System.Text.RegularExpressions.Regex.IsMatch(key, "^[a-f0-9]{32}\\.(png|jpg|webp)$")
+                ? files.Open(Xinobi.Api.Infrastructure.FileAreas.Media, key).GetAwaiter().GetResult() : null;
+            if (stored is null) throw new SurfaceException("image_unreadable", "Ürün fotoğrafı bulunamadı.", StatusCodes.Status404NotFound);
+            using var content = stored.Content;
+            using var buffer = new MemoryStream();
+            content.CopyTo(buffer);
+            return buffer.ToArray();
+        }
         else if (image.StartsWith("/assets/", StringComparison.Ordinal))
         {
             var root = Path.GetFullPath(Path.Combine(configuration["ProductSurfaces:WebPublicDirectory"] ?? Path.Combine(environment.ContentRootPath, "../../apps/web/public")));

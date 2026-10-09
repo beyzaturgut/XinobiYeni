@@ -14,13 +14,12 @@ public record MyDesign(string Id, string Kind, string Name, string ProductId, st
 public record SaveDesignFromSession(string SessionId, string? Name);
 public record RenameDesign(string Name);
 
-public sealed class SavedDesignStore(FeatureDocuments documents, TimeProvider clock)
+public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore files, TimeProvider clock)
 {
     public const int MaxPerAccount = 50;
     public const long MaxUploadBytes = 8 * 1024 * 1024;
     private sealed record State(List<SavedDesign> Designs);
     private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("designs", "designs.json"), () => new([]), "Tasarımlarım");
-    private string FileDirectory => Path.Combine(store.Folder, "files");
 
     public static MyDesign View(SavedDesign design) => new(design.Id, design.Kind, design.Name, design.ProductId, design.ProductName, design.VariantId, design.Color, design.Profile,
         $"/api/v1/me/designs/{design.Id}/image", design.CreatedAt);
@@ -48,16 +47,24 @@ public sealed class SavedDesignStore(FeatureDocuments documents, TimeProvider cl
         var (mime, extension) = DetectImage(bytes);
         var id = Guid.NewGuid().ToString("N");
         var file = id + extension;
-        return await store.Update(state =>
+        // The file goes first; if the record is refused (limit) the file is removed again.
+        await files.Save(FileAreas.Designs, file, new MemoryStream(bytes), mime);
+        try
         {
-            if (state.Designs.Count(design => design.AccountId == accountId) >= MaxPerAccount)
-                throw new ProblemException("design_limit", $"En fazla {MaxPerAccount} tasarım saklayabilirsin. Eskilerden birini sil.", StatusCodes.Status409Conflict);
-            Directory.CreateDirectory(FileDirectory);
-            System.IO.File.WriteAllBytes(Path.Combine(FileDirectory, file), bytes);
-            var design = new SavedDesign(id, accountId, kind, name, productId, productName, variantId, color, profile, file, mime, clock.GetUtcNow());
-            state.Designs.Add(design);
-            return View(design);
-        });
+            return await store.Update(state =>
+            {
+                if (state.Designs.Count(design => design.AccountId == accountId) >= MaxPerAccount)
+                    throw new ProblemException("design_limit", $"En fazla {MaxPerAccount} tasarım saklayabilirsin. Eskilerden birini sil.", StatusCodes.Status409Conflict);
+                var design = new SavedDesign(id, accountId, kind, name, productId, productName, variantId, color, profile, file, mime, clock.GetUtcNow());
+                state.Designs.Add(design);
+                return View(design);
+            });
+        }
+        catch
+        {
+            await files.Delete(FileAreas.Designs, file);
+            throw;
+        }
     }
 
     public Task<MyDesign> Rename(string accountId, string id, string name) => store.Update(state =>
@@ -67,25 +74,33 @@ public sealed class SavedDesignStore(FeatureDocuments documents, TimeProvider cl
         return View(state.Designs[index] = state.Designs[index] with { Name = CleanName(name, state.Designs[index].Name) });
     });
 
-    public Task<bool> Delete(string accountId, string id) => store.Update(state =>
+    public async Task<bool> Delete(string accountId, string id)
     {
-        var design = state.Designs.FirstOrDefault(item => item.Id == id && item.AccountId == accountId);
+        var design = await store.Update(state =>
+        {
+            var found = state.Designs.FirstOrDefault(item => item.Id == id && item.AccountId == accountId);
+            if (found is not null) state.Designs.Remove(found);
+            return found;
+        });
         if (design is null) return false;
-        state.Designs.Remove(design);
-        System.IO.File.Delete(Path.Combine(FileDirectory, design.File));
+        await files.Delete(FileAreas.Designs, design.File);
         return true;
-    });
+    }
 
     /// <summary>The file of the owner's design; null for anyone else (another customer's id is indistinguishable from a missing one).</summary>
-    public async Task<(string Path, string Mime)?> Image(string accountId, string id) =>
+    public async Task<StoredFile?> Image(string accountId, string id) =>
         (await store.Read()).Designs.FirstOrDefault(design => design.Id == id && design.AccountId == accountId) is { } design
-            ? (Path.Combine(FileDirectory, design.File), design.Mime)
+            ? await files.Open(FileAreas.Designs, design.File) is { } file ? file with { ContentType = design.Mime } : null
             : null;
 
-    public Task ForgetAccount(string accountId) => store.Update(state =>
+    public async Task ForgetAccount(string accountId)
     {
-        foreach (var design in state.Designs.Where(item => item.AccountId == accountId))
-            System.IO.File.Delete(Path.Combine(FileDirectory, design.File));
-        return state.Designs.RemoveAll(item => item.AccountId == accountId);
-    });
+        var removed = await store.Update(state =>
+        {
+            var mine = state.Designs.Where(item => item.AccountId == accountId).ToArray();
+            state.Designs.RemoveAll(item => item.AccountId == accountId);
+            return mine;
+        });
+        foreach (var design in removed) await files.Delete(FileAreas.Designs, design.File);
+    }
 }

@@ -170,7 +170,7 @@ public static class LocalCommerceEndpoints
             }
             catch (ArgumentException error) { return Results.BadRequest(new { message = error.Message }); }
         });
-        group.MapPost("/media", async (HttpRequest request, LocalCommerceStore store) =>
+        group.MapPost("/media", async (HttpRequest request, Infrastructure.IFileStore files) =>
         {
             if (!request.HasFormContentType) return Results.BadRequest(new { message = "Medya dosyası gerekli." });
             var form = await request.ReadFormAsync();
@@ -194,18 +194,14 @@ public static class LocalCommerceEndpoints
                 if (!valid) return Results.BadRequest(new { message = "Dosya içeriği seçilen medya türüyle eşleşmiyor." });
             }
             var name = Guid.NewGuid().ToString("N") + extension;
-            Directory.CreateDirectory(store.MediaDirectory);
-            await using var stream = File.Create(Path.Combine(store.MediaDirectory, name));
-            await file.CopyToAsync(stream);
+            await using (var upload = file.OpenReadStream()) await files.Save(Infrastructure.FileAreas.Media, name, upload, Infrastructure.FileAreas.ContentTypeOf(name));
             return Results.Ok(new { src = "/api/v1/local-commerce/media/" + name });
         }).DisableAntiforgery();
-        group.MapGet("/media/{name}", (string name, LocalCommerceStore store) =>
+        group.MapGet("/media/{name}", async (string name, Infrastructure.IFileStore files) =>
         {
             if (!Regex.IsMatch(name, @"^[a-f0-9]{32}\.(png|jpg|webp|mp4|webm)$")) return Results.NotFound();
-            var file = Path.Combine(store.MediaDirectory, name);
-            if (!File.Exists(file)) return Results.NotFound();
-            var type = Path.GetExtension(name) switch { ".png" => "image/png", ".jpg" => "image/jpeg", ".webp" => "image/webp", ".mp4" => "video/mp4", _ => "video/webm" };
-            return Results.File(file, type, enableRangeProcessing: true);
+            // Videos need range requests; the result disposes the stream.
+            return await files.Open(Infrastructure.FileAreas.Media, name) is { } file ? Results.Stream(file.Content, file.ContentType, enableRangeProcessing: true) : Results.NotFound();
             // Product photos and videos are shown on the storefront.
         }).AllowAnonymous();
     }

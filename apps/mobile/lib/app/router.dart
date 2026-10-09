@@ -5,6 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../features/account/account_screen.dart';
 import '../features/account/addresses.dart';
 import '../features/account/notifications.dart';
+import '../features/assistant/nobi.dart';
+import '../features/designs/designs.dart';
+import '../features/personalization/editor_screen.dart';
+import '../features/quotes/quotes.dart';
 import '../features/account/orders.dart';
 import '../features/cart/checkout_screen.dart';
 import '../features/cart/cart.dart';
@@ -43,6 +47,15 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         ),
         GoRoute(path: '/favoriler', builder: (context, state) => const FavoritesScreen()),
         GoRoute(path: '/karsilastir', builder: (context, state) => const CompareScreen()),
+        GoRoute(path: '/nobi', builder: (context, state) => const NobiScreen()),
+        GoRoute(path: '/hesap/tasarimlarim', builder: (context, state) => const DesignsScreen()),
+        GoRoute(path: '/hesap/teklifler', builder: (context, state) => const MyQuotesScreen()),
+        GoRoute(path: '/kurumsal/teklif', builder: (context, state) => const QuoteFormScreen()),
+        GoRoute(path: '/kurumsal/teklif/takip', builder: (context, state) => QuoteTrackScreen(code: state.uri.queryParameters['kod'], email: state.uri.queryParameters['eposta'])),
+        GoRoute(
+          path: '/tasarim-editoru',
+          builder: (context, state) => EditorScreen(productId: state.uri.queryParameters['urun'], variantId: state.uri.queryParameters['renk'], designId: state.uri.queryParameters['tasarim']),
+        ),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
         GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),
         GoRoute(path: '/hesap/eposta', builder: (context, state) => const EmailChangeScreen()),
@@ -76,6 +89,7 @@ class _Shell extends ConsumerWidget {
     final count = ref.watch(cartCountProvider);
     return Scaffold(
         body: shell,
+        floatingActionButton: const NobiButton(),
         bottomNavigationBar: NavigationBar(
           selectedIndex: shell.currentIndex,
           onDestinationSelected: (index) => shell.goBranch(index, initialLocation: index == shell.currentIndex),

@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
+import '../../core/ids.dart';
 import '../catalog/catalog_repository.dart';
 
 /// XINOBI U contract (/api/v1/xinobi-u). Generation is a real, metered provider call on the server; the server makes it idempotent.
@@ -84,7 +84,7 @@ class XinobiULocalStore {
     final prefs = await _prefs;
     final existing = prefs.getString(_clientKey);
     if (existing != null) return existing;
-    final id = _uuidV4();
+    final id = uuidV4();
     await prefs.setString(_clientKey, id);
     return id;
   }
@@ -102,15 +102,6 @@ class XinobiULocalStore {
 
   Future<void> saveAnswers(String sessionId, Map<String, String> answers) async =>
       (await _prefs).setString('xinobi-u-answers:$sessionId', jsonEncode(answers));
-
-  static String _uuidV4() {
-    final random = Random.secure();
-    final bytes = List<int>.generate(16, (_) => random.nextInt(256));
-    bytes[6] = (bytes[6] & 0x0f) | 0x40;
-    bytes[8] = (bytes[8] & 0x3f) | 0x80;
-    final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
-    return '${hex.substring(0, 8)}-${hex.substring(8, 12)}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(20)}';
-  }
 }
 
 final xinobiULocalStoreProvider = Provider<XinobiULocalStore>((ref) => XinobiULocalStore(SharedPreferences.getInstance()));

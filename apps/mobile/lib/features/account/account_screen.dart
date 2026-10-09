@@ -84,6 +84,8 @@ class _Profile extends ConsumerWidget {
         _MenuGroup(children: [
           _MenuRow(icon: Icons.receipt_long_outlined, title: 'Siparişlerim', subtitle: 'Demo siparişlerin ve durumları', onTap: () => context.push('/hesap/siparisler')),
           _MenuRow(icon: Icons.notifications_none, title: 'Bildirimlerim', subtitle: 'Sipariş, kargo, iptal ve iade gelişmeleri', onTap: () => context.push('/hesap/bildirimler')),
+          _MenuRow(icon: Icons.palette_outlined, title: 'Tasarımlarım', subtitle: 'XINOBI U tasarımların ve kendi görsellerin', onTap: () => context.push('/hesap/tasarimlarim')),
+          _MenuRow(icon: Icons.business_center_outlined, title: 'Kurumsal tekliflerim', subtitle: 'Toplu alım talepleri ve teklifler', onTap: () => context.push('/hesap/teklifler')),
           _MenuRow(icon: Icons.location_on_outlined, title: 'Adreslerim', subtitle: 'Teslimat adreslerin', onTap: () => context.push('/hesap/adresler')),
         ]),
         const SizedBox(height: 28),

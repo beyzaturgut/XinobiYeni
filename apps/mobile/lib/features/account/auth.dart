@@ -45,14 +45,27 @@ abstract interface class AccountRepository {
   Future<List<MyReview>> myReviews(String accessToken);
   /// Only products from a delivered order; a new submission replaces the earlier one and waits for moderation.
   Future<MyReview> submitReview(String accessToken, SubmitReview review);
+  Future<List<MyDesign>> designs(String accessToken);
+  /// Copies a finished XINOBI U design out of its session into the account (K-21).
+  Future<MyDesign> saveDesign(String accessToken, String sessionId);
+  /// Stores the customer's own image for a product (K-14); the server checks the content is PNG, JPEG or WebP.
+  Future<MyDesign> uploadDesign(String accessToken, List<int> bytes, String fileName, String productId, String? variantId);
+  Future<MyDesign> renameDesign(String accessToken, String id, String name);
+  Future<void> deleteDesign(String accessToken, String id);
+  /// Absolute URL of a design image; it needs the bearer header.
+  String designImageUrl(String path);
+  Future<List<Quote>> quotes(String accessToken);
 
   /// Signs out every other device; the returned session keeps this one signed in.
   Future<AuthSession> changePassword(String accessToken, {required String current, required String next});
 }
 
 class ApiAccountRepository implements AccountRepository {
-  ApiAccountRepository(XinobiApiClient client) : _api = client.getAccountApi();
+  ApiAccountRepository(XinobiApiClient client)
+      : _api = client.getAccountApi(),
+        _baseUrl = client.dio.options.baseUrl;
   final AccountApi _api;
+  final String _baseUrl;
 
   @override
   Future<AccountEmailVerification> startVerification(String email) =>
@@ -156,6 +169,30 @@ class ApiAccountRepository implements AccountRepository {
 
   @override
   Future<MyReview> submitReview(String accessToken, SubmitReview review) => _call(() => _api.submitMyReview(submitReview: review, headers: _bearer(accessToken)));
+
+  @override
+  Future<List<MyDesign>> designs(String accessToken) async => (await _call(() => _api.listMyDesigns(headers: _bearer(accessToken)))).toList();
+
+  @override
+  Future<MyDesign> saveDesign(String accessToken, String sessionId) =>
+      _call(() => _api.saveMyDesign(saveDesignFromSession: SaveDesignFromSession((b) => b.sessionId = sessionId), headers: _bearer(accessToken)));
+
+  @override
+  Future<MyDesign> uploadDesign(String accessToken, List<int> bytes, String fileName, String productId, String? variantId) => _call(() => _api.uploadMyDesign(
+      file: MultipartFile.fromBytes(bytes, filename: fileName), productId: productId, variantId: variantId, headers: _bearer(accessToken)));
+
+  @override
+  Future<MyDesign> renameDesign(String accessToken, String id, String name) =>
+      _call(() => _api.renameMyDesign(id: id, renameDesign: RenameDesign((b) => b.name = name), headers: _bearer(accessToken)));
+
+  @override
+  Future<void> deleteDesign(String accessToken, String id) => _empty(() => _api.deleteMyDesign(id: id, headers: _bearer(accessToken)));
+
+  @override
+  String designImageUrl(String path) => Uri.parse(_baseUrl).resolve(path).toString();
+
+  @override
+  Future<List<Quote>> quotes(String accessToken) async => (await _call(() => _api.listMyQuotes(headers: _bearer(accessToken)))).toList();
 
   @override
   Future<Inbox> inbox(String accessToken) => _call(() => _api.listMyNotifications(headers: _bearer(accessToken)));
@@ -313,6 +350,9 @@ class AuthController extends Notifier<AuthState> {
   }
 
   /// For account data owned by other features (addresses, orders): runs [call] with a valid access token.
+  /// A valid access token (refreshed when needed) for requests the generated client cannot make, e.g. image headers; null when signed out.
+  Future<String?> accessToken() => _authorized((token) async => token);
+
   Future<T?> withSession<T>(Future<T> Function(AccountRepository repository, String accessToken) call) => _authorized((token) => call(_repository, token));
 
   /// Throws [AccountException] (`wrong_password`, `weak_password`); on success this device gets the new session.

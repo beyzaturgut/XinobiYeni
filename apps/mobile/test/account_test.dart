@@ -262,6 +262,21 @@ class FakeAccounts implements AccountRepository {
   }
 
   @override
+  Future<List<MyDesign>> designs(String accessToken) async => const [];
+  @override
+  Future<MyDesign> saveDesign(String accessToken, String sessionId) => throw UnimplementedError();
+  @override
+  Future<MyDesign> uploadDesign(String accessToken, List<int> bytes, String fileName, String productId, String? variantId) => throw UnimplementedError();
+  @override
+  Future<MyDesign> renameDesign(String accessToken, String id, String name) => throw UnimplementedError();
+  @override
+  Future<void> deleteDesign(String accessToken, String id) async {}
+  @override
+  String designImageUrl(String path) => 'http://localhost$path';
+  @override
+  Future<List<Quote>> quotes(String accessToken) async => const [];
+
+  @override
   Future<Inbox> inbox(String accessToken) async => Inbox((b) => b
     ..items.addAll(notifications.reversed)
     ..unread = notifications.where((n) => !n.read).length);

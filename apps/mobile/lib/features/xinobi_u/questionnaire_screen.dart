@@ -1,13 +1,16 @@
 import 'dart:async';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
+import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
+import '../designs/designs.dart';
+import '../personalization/surface_preview.dart';
 import 'xinobi_u_repository.dart';
 
 enum _Phase { loading, questions, review, generating, ready, failed, error }
@@ -296,16 +299,34 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   }
 }
 
-class _Result extends StatefulWidget {
+class _Result extends ConsumerStatefulWidget {
   const _Result({required this.session, required this.onRestart});
   final XinobiUSession session;
   final VoidCallback onRestart;
   @override
-  State<_Result> createState() => _ResultState();
+  ConsumerState<_Result> createState() => _ResultState();
 }
 
-class _ResultState extends State<_Result> {
+class _ResultState extends ConsumerState<_Result> {
   bool onProduct = true;
+  bool saving = false;
+  bool saved = false;
+
+  /// K-21: copies the design into the account so it outlives the session.
+  Future<void> _save() async {
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => saving = true);
+    try {
+      await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveDesign(token, widget.session.id));
+      ref.invalidate(myDesignsProvider);
+      if (mounted) setState(() => saved = true);
+      messenger.showSnackBar(SnackBar(content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim'))));
+    } on AccountException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    } finally {
+      if (mounted) setState(() => saving = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -333,6 +354,13 @@ class _ResultState extends State<_Result> {
       // K-12: the "Temsilidir" notice is permanent, readable text.
       Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: text.bodySmall),
       const SizedBox(height: 20),
+      if (ref.watch(authProvider) is SignedIn)
+        FilledButton(onPressed: saving || saved ? null : _save, child: Text(saved ? 'Tasarımlarım’a kaydedildi' : saving ? 'Kaydediliyor…' : 'Tasarımımı kaydet'))
+      else
+        OutlinedButton(onPressed: () => context.go('/hesap'), child: const Text('Kaydetmek için giriş yap')),
+      const SizedBox(height: 8),
+      OutlinedButton(onPressed: () => context.push('/tasarim-editoru?urun=${Uri.encodeQueryComponent(session.product.id)}&renk=${Uri.encodeQueryComponent(session.variant.id)}'), child: const Text('Kendi görselimle dene')),
+      const SizedBox(height: 8),
       OutlinedButton(onPressed: widget.onRestart, child: const Text('Yeni anket başlat')),
     ]);
   }
@@ -357,7 +385,7 @@ class _ProductPreview extends ConsumerWidget {
       image: true,
       excludeSemantics: true,
       child: mask != null && productUrl != null && patternUrl != null
-          ? _MaskedPreview(productUrl: productUrl!, patternUrl: patternUrl!, maskUrl: mask, fallback: _overlay())
+          ? SurfacePreview(product: NetworkImage(productUrl!), design: NetworkImage(patternUrl!), mask: NetworkImage(mask), fallback: _overlay())
           : _overlay(),
     );
   }
@@ -376,91 +404,6 @@ class _ProductPreview extends ConsumerWidget {
           ),
         ),
       ]);
-}
-
-class _MaskedPreview extends StatefulWidget {
-  const _MaskedPreview({required this.productUrl, required this.patternUrl, required this.maskUrl, required this.fallback});
-  final String productUrl;
-  final String patternUrl;
-  final String maskUrl;
-  final Widget fallback;
-  @override
-  State<_MaskedPreview> createState() => _MaskedPreviewState();
-}
-
-class _MaskedPreviewState extends State<_MaskedPreview> {
-  List<ui.Image>? images;
-  bool failed = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _load();
-  }
-
-  @override
-  void didUpdateWidget(_MaskedPreview old) {
-    super.didUpdateWidget(old);
-    if (old.productUrl != widget.productUrl || old.patternUrl != widget.patternUrl || old.maskUrl != widget.maskUrl) _load();
-  }
-
-  Future<void> _load() async {
-    try {
-      final loaded = await Future.wait([widget.productUrl, widget.patternUrl, widget.maskUrl].map(_image));
-      if (mounted) setState(() => images = loaded);
-    } catch (_) {
-      if (mounted) setState(() => failed = true);
-    }
-  }
-
-  static Future<ui.Image> _image(String url) {
-    final done = Completer<ui.Image>();
-    final stream = NetworkImage(url).resolve(ImageConfiguration.empty);
-    late final ImageStreamListener listener;
-    listener = ImageStreamListener((info, _) {
-      done.complete(info.image);
-      stream.removeListener(listener);
-    }, onError: (error, stack) {
-      done.completeError(error, stack);
-      stream.removeListener(listener);
-    });
-    stream.addListener(listener);
-    return done.future;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final loaded = images;
-    if (failed || loaded == null) return widget.fallback;
-    return CustomPaint(painter: _MaskedPainter(loaded[0], loaded[1], loaded[2]));
-  }
-}
-
-/// Photo, then a layer of pattern with the photo multiplied in (the body keeps its shading), clipped to the approved mask.
-class _MaskedPainter extends CustomPainter {
-  _MaskedPainter(this.product, this.pattern, this.mask);
-  final ui.Image product;
-  final ui.Image pattern;
-  final ui.Image mask;
-
-  static Rect _all(ui.Image image) => Rect.fromLTWH(0, 0, image.width.toDouble(), image.height.toDouble());
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final fitted = applyBoxFit(BoxFit.contain, Size(product.width.toDouble(), product.height.toDouble()), size);
-    final target = Alignment.center.inscribe(fitted.destination, Offset.zero & size);
-    final cover = applyBoxFit(BoxFit.cover, Size(pattern.width.toDouble(), pattern.height.toDouble()), target.size);
-    final paint = Paint()..filterQuality = FilterQuality.medium;
-    canvas.drawImageRect(product, _all(product), target, paint);
-    canvas.saveLayer(target, Paint());
-    canvas.drawImageRect(pattern, Alignment.center.inscribe(cover.source, _all(pattern)), target, paint);
-    canvas.drawImageRect(product, _all(product), target, Paint()..blendMode = BlendMode.multiply..color = const Color(0x73000000));
-    canvas.drawImageRect(mask, _all(mask), target, Paint()..blendMode = BlendMode.dstIn);
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_MaskedPainter old) => old.product != product || old.pattern != pattern || old.mask != mask;
 }
 
 class _Message extends StatelessWidget {

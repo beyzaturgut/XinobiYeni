@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "version": "811f44ed-2d47-49b6-ada2-2824b54d72ef",
+  "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+  "variantId": "DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1",
+  "width": 3543,
+  "height": 5315,
+  "sourceImageReference": "/api/v1/local-commerce/media/01b20091ecaa4fbb86a9a929bf7b56ee.webp",
+  "provenance": "explicit-local-admin-review",
+  "acceptedAt": "2026-10-08T22:19:28.044Z",
+  "files": {
+    "mask.png": {
+      "sha256": "5050520107b9e77d6ff6a4463bba25415c5d5b8b2ca9bf5b6953a178a0966e84",
+      "bytes": 390742
+    },
+    "branding.png": {
+      "sha256": "fc571a30edb7d3ce859730c8c6e8684bb4e91d19abb5ff9531a3b801a3b7f26f",
+      "bytes": 426417
+    },
+    "acceptance.json": {
+      "sha256": "77dd92517c0a2c334ec8b7c76d72667a2177092777a0f30649fde42c1d900c20",
+      "bytes": 591
+    },
+    "current.json": {
+      "sha256": "55b1b9d3bceae87bb42aed755c1e24352e1ff4b2381164f45d5cba3ebe2074ae",
+      "bytes": 50
+    },
+    "source.webp": {
+      "sha256": "f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935",
+      "bytes": 1266424
+    },
+    "demo-state.json": {
+      "sha256": "e29b2f84a66f8446d667544ae82426673874be0f85457a0df9f728d5d3eb6592",
+      "bytes": 4944
+    }
+  }
+}

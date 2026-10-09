@@ -71,10 +71,13 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**confirmMyEmailChange**](doc/AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAccount**](doc/AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAddress**](doc/AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
+[*AccountApi*](doc/AccountApi.md) | [**deleteMyDesign**](doc/AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[*AccountApi*](doc/AccountApi.md) | [**getMyDesignImage**](doc/AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getOrderOptions**](doc/AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[*AccountApi*](doc/AccountApi.md) | [**listMyDesigns**](doc/AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**listMyNotifications**](doc/AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [*AccountApi*](doc/AccountApi.md) | [**listMyOrders**](doc/AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [*AccountApi*](doc/AccountApi.md) | [**listMyReviews**](doc/AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
@@ -90,12 +93,15 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**registerMyDevice**](doc/AccountApi.md#registermydevice) | **POST** /api/v1/me/devices |
 [*AccountApi*](doc/AccountApi.md) | [**registerWebAccount**](doc/AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
 [*AccountApi*](doc/AccountApi.md) | [**removeMyDevice**](doc/AccountApi.md#removemydevice) | **POST** /api/v1/me/devices/removal |
+[*AccountApi*](doc/AccountApi.md) | [**renameMyDesign**](doc/AccountApi.md#renamemydesign) | **PATCH** /api/v1/me/designs/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**returnMyOrder**](doc/AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
+[*AccountApi*](doc/AccountApi.md) | [**saveMyDesign**](doc/AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**submitMyReview**](doc/AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAddress**](doc/AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
+[*AccountApi*](doc/AccountApi.md) | [**uploadMyDesign**](doc/AccountApi.md#uploadmydesign) | **POST** /api/v1/me/designs/upload |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*CatalogApi*](doc/CatalogApi.md) | [**getCatalogProduct**](doc/CatalogApi.md#getcatalogproduct) | **GET** /api/v1/catalog/products/{id} |
@@ -145,6 +151,7 @@ Class | Method | HTTP request | Description
  - [LogoutSession](doc/LogoutSession.md)
  - [MarkNotificationsRead](doc/MarkNotificationsRead.md)
  - [Money](doc/Money.md)
+ - [MyDesign](doc/MyDesign.md)
  - [MyReview](doc/MyReview.md)
  - [OrderEvent](doc/OrderEvent.md)
  - [OrderOptions](doc/OrderOptions.md)
@@ -165,11 +172,13 @@ Class | Method | HTTP request | Description
  - [RegisterAccount](doc/RegisterAccount.md)
  - [RegisterDevice](doc/RegisterDevice.md)
  - [RemoveDevice](doc/RemoveDevice.md)
+ - [RenameDesign](doc/RenameDesign.md)
  - [ReturnMyOrder](doc/ReturnMyOrder.md)
  - [ReviewPage](doc/ReviewPage.md)
  - [ReviewSummary](doc/ReviewSummary.md)
  - [ReviewSummaryList](doc/ReviewSummaryList.md)
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
+ - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartEmailChange](doc/StartEmailChange.md)
  - [SubmitReview](doc/SubmitReview.md)

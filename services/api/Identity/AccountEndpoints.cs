@@ -260,6 +260,7 @@ public static class AccountEndpoints
         Orders.OrderEndpoints.MapCustomerOrders(me);
         Notifications.NotificationEndpoints.MapCustomerNotifications(me);
         Reviews.ReviewEndpoints.MapCustomerReviews(me);
+        Designs.SavedDesignEndpoints.MapCustomerDesigns(me);
         if (LocalCommerceEndpoints.PanelGroup(app) is { } panel)
         {
             Reviews.ReviewEndpoints.MapPanelReviews(panel);

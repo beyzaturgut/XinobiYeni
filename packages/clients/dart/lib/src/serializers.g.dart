@@ -35,6 +35,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(LogoutSession.serializer)
       ..add(MarkNotificationsRead.serializer)
       ..add(Money.serializer)
+      ..add(MyDesign.serializer)
       ..add(MyReview.serializer)
       ..add(OrderEvent.serializer)
       ..add(OrderOptions.serializer)
@@ -55,11 +56,13 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(RegisterAccount.serializer)
       ..add(RegisterDevice.serializer)
       ..add(RemoveDevice.serializer)
+      ..add(RenameDesign.serializer)
       ..add(ReturnMyOrder.serializer)
       ..add(ReviewPage.serializer)
       ..add(ReviewSummary.serializer)
       ..add(ReviewSummaryList.serializer)
       ..add(SaveCustomerAddress.serializer)
+      ..add(SaveDesignFromSession.serializer)
       ..add(StartAccountEmailVerification.serializer)
       ..add(StartEmailChange.serializer)
       ..add(SubmitReview.serializer)
@@ -121,6 +124,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(ReviewSummary)]),
           () => ListBuilder<ReviewSummary>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

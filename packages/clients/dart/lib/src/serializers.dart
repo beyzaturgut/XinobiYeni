@@ -42,6 +42,7 @@ import 'package:xinobi_api_client/src/model/login_account.dart';
 import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/mark_notifications_read.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
+import 'package:xinobi_api_client/src/model/my_design.dart';
 import 'package:xinobi_api_client/src/model/my_review.dart';
 import 'package:xinobi_api_client/src/model/order_event.dart';
 import 'package:xinobi_api_client/src/model/order_options.dart';
@@ -62,11 +63,13 @@ import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
 import 'package:xinobi_api_client/src/model/register_device.dart';
 import 'package:xinobi_api_client/src/model/remove_device.dart';
+import 'package:xinobi_api_client/src/model/rename_design.dart';
 import 'package:xinobi_api_client/src/model/return_my_order.dart';
 import 'package:xinobi_api_client/src/model/review_page.dart';
 import 'package:xinobi_api_client/src/model/review_summary.dart';
 import 'package:xinobi_api_client/src/model/review_summary_list.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
+import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
@@ -112,6 +115,7 @@ part 'serializers.g.dart';
   LogoutSession,
   MarkNotificationsRead,
   Money,
+  MyDesign,
   MyReview,
   OrderEvent,
   OrderOptions,
@@ -132,11 +136,13 @@ part 'serializers.g.dart';
   RegisterAccount,
   RegisterDevice,
   RemoveDevice,
+  RenameDesign,
   ReturnMyOrder,
   ReviewPage,
   ReviewSummary,
   ReviewSummaryList,
   SaveCustomerAddress,
+  SaveDesignFromSession,
   StartAccountEmailVerification,
   StartEmailChange,
   SubmitReview,
@@ -153,16 +159,8 @@ part 'serializers.g.dart';
 ])
 Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(ProductSummary)]),
-        () => ListBuilder<ProductSummary>(),
-      )
-      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(PublicReview)]),
         () => ListBuilder<PublicReview>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(MyReview)]),
-        () => ListBuilder<MyReview>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CategoryItem)]),
@@ -171,10 +169,6 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(AnnouncementItem)]),
         () => ListBuilder<AnnouncementItem>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(XinobiUOption)]),
-        () => ListBuilder<XinobiUOption>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(HomeSlide)]),
@@ -205,6 +199,26 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<DependencyHealth>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ReviewSummary)]),
+        () => ListBuilder<ReviewSummary>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(MyDesign)]),
+        () => ListBuilder<MyDesign>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(ProductSummary)]),
+        () => ListBuilder<ProductSummary>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(MyReview)]),
+        () => ListBuilder<MyReview>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(XinobiUOption)]),
+        () => ListBuilder<XinobiUOption>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OrderRequestLine)]),
         () => ListBuilder<OrderRequestLine>(),
       )
@@ -215,10 +229,6 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(VariantDetail)]),
         () => ListBuilder<VariantDetail>(),
-      )
-      ..addBuilderFactory(
-        const FullType(BuiltList, [FullType(ReviewSummary)]),
-        () => ListBuilder<ReviewSummary>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustomerOrderLine)]),

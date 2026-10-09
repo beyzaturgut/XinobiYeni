@@ -15,10 +15,13 @@ Method | HTTP request | Description
 [**confirmMyEmailChange**](AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
 [**deleteMyAccount**](AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [**deleteMyAddress**](AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
+[**deleteMyDesign**](AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
 [**getMyAccount**](AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[**getMyDesignImage**](AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [**getOrderOptions**](AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[**listMyDesigns**](AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
 [**listMyNotifications**](AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [**listMyOrders**](AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [**listMyReviews**](AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
@@ -34,12 +37,15 @@ Method | HTTP request | Description
 [**registerMyDevice**](AccountApi.md#registermydevice) | **POST** /api/v1/me/devices |
 [**registerWebAccount**](AccountApi.md#registerwebaccount) | **POST** /api/v1/auth/web/register |
 [**removeMyDevice**](AccountApi.md#removemydevice) | **POST** /api/v1/me/devices/removal |
+[**renameMyDesign**](AccountApi.md#renamemydesign) | **PATCH** /api/v1/me/designs/{id} |
 [**returnMyOrder**](AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
+[**saveMyDesign**](AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [**startMyEmailChange**](AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [**submitMyReview**](AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [**updateMyAccount**](AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [**updateMyAddress**](AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
+[**uploadMyDesign**](AccountApi.md#uploadmydesign) | **POST** /api/v1/me/designs/upload |
 
 
 # **addMyAddress**
@@ -288,6 +294,46 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **deleteMyDesign**
+> deleteMyDesign(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+
+try {
+    api.deleteMyDesign(id);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->deleteMyDesign: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getMyAccount**
 > AccountProfile getMyAccount()
 
@@ -322,6 +368,46 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyDesignImage**
+> getMyDesignImage(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+
+try {
+    api.getMyDesignImage(id);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getMyDesignImage: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -428,6 +514,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BuiltList&lt;CustomerAddress&gt;**](CustomerAddress.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listMyDesigns**
+> BuiltList<MyDesign> listMyDesigns()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.listMyDesigns();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->listMyDesigns: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BuiltList&lt;MyDesign&gt;**](MyDesign.md)
 
 ### Authorization
 
@@ -1030,6 +1153,49 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **renameMyDesign**
+> MyDesign renameMyDesign(id, renameDesign)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final RenameDesign renameDesign = ; // RenameDesign |
+
+try {
+    final response = api.renameMyDesign(id, renameDesign);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->renameMyDesign: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **renameDesign** | [**RenameDesign**](RenameDesign.md)|  |
+
+### Return type
+
+[**MyDesign**](MyDesign.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **returnMyOrder**
 > CustomerOrder returnMyOrder(id, returnMyOrder)
 
@@ -1061,6 +1227,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**CustomerOrder**](CustomerOrder.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **saveMyDesign**
+> MyDesign saveMyDesign(saveDesignFromSession)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final SaveDesignFromSession saveDesignFromSession = ; // SaveDesignFromSession |
+
+try {
+    final response = api.saveMyDesign(saveDesignFromSession);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->saveMyDesign: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **saveDesignFromSession** | [**SaveDesignFromSession**](SaveDesignFromSession.md)|  |
+
+### Return type
+
+[**MyDesign**](MyDesign.md)
 
 ### Authorization
 
@@ -1276,6 +1483,53 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **uploadMyDesign**
+> MyDesign uploadMyDesign(file, productId, variantId, name)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final MultipartFile file = BINARY_DATA_HERE; // MultipartFile |
+final String productId = productId_example; // String |
+final String variantId = variantId_example; // String |
+final String name = name_example; // String |
+
+try {
+    final response = api.uploadMyDesign(file, productId, variantId, name);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->uploadMyDesign: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **file** | **MultipartFile**|  |
+ **productId** | **String**|  |
+ **variantId** | **String**|  | [optional]
+ **name** | **String**|  | [optional]
+
+### Return type
+
+[**MyDesign**](MyDesign.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: multipart/form-data
  - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

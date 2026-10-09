@@ -7,6 +7,7 @@ import '../../app/design_tokens.g.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
+import '../designs/designs.dart';
 import 'cart.dart';
 
 class CartScreen extends ConsumerWidget {
@@ -88,7 +89,7 @@ class _CartRow extends ConsumerWidget {
     final name = item.product?.name ?? 'Ürün';
     // Distinguishes two colours of the same product for screen readers.
     final label = variant == null ? name : '$name ${variant.color}';
-    final canIncrease = variant != null && line.quantity < variant.maxQuantity.clamp(0, maxLineQuantity);
+    final canIncrease = variant != null && line.quantity < maxLineQuantity && variantUnits(ref.watch(cartProvider), line.variantId) < variant.maxQuantity.clamp(0, maxLineQuantity);
     Future<void> run(Future<void> Function() action) async {
       try {
         await action();
@@ -107,6 +108,15 @@ class _CartRow extends ConsumerWidget {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(name, style: text.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
             if (variant != null) Text(variant.color, style: text.bodySmall),
+            if (line.designId != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Row(children: [
+                  SizedBox(width: 44, height: 44, child: PrivateDesignImage(path: designImagePath(line.designId!), label: '${line.designName} tasarımı')),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('Kişiselleştirilmiş · ${line.designName}', style: text.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis)),
+                ]),
+              ),
             const SizedBox(height: 4),
             if (variant != null) Text(formatMoney(variant.price), style: text.bodyMedium),
             if (item.problemText != null)
@@ -115,13 +125,13 @@ class _CartRow extends ConsumerWidget {
             Row(children: [
               IconButton(
                 tooltip: '$label adedini azalt',
-                onPressed: () => run(() => cart.setQuantity(line.productId, line.variantId, line.quantity - 1)),
+                onPressed: () => run(() => cart.setQuantity(line.productId, line.variantId, line.quantity - 1, designId: line.designId)),
                 icon: const Icon(Icons.remove),
               ),
               Semantics(label: 'Adet ${line.quantity}', excludeSemantics: true, child: Text('${line.quantity}', style: text.titleMedium)),
               IconButton(
                 tooltip: '$label adedini artır',
-                onPressed: canIncrease ? () => run(() => cart.setQuantity(line.productId, line.variantId, line.quantity + 1)) : null,
+                onPressed: canIncrease ? () => run(() => cart.setQuantity(line.productId, line.variantId, line.quantity + 1, designId: line.designId)) : null,
                 icon: const Icon(Icons.add),
               ),
               const Spacer(),
@@ -129,8 +139,8 @@ class _CartRow extends ConsumerWidget {
                 label: '$label sepetten kaldır',
                 button: true,
                 excludeSemantics: true,
-                onTap: () => run(() => cart.remove(line.productId, line.variantId)),
-                child: TextButton(onPressed: () => run(() => cart.remove(line.productId, line.variantId)), child: const Text('Kaldır')),
+                onTap: () => run(() => cart.remove(line.productId, line.variantId, designId: line.designId)),
+                child: TextButton(onPressed: () => run(() => cart.remove(line.productId, line.variantId, designId: line.designId)), child: const Text('Kaldır')),
               ),
             ]),
           ]),

@@ -4,6 +4,7 @@ import {useEffect,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {designImageUrl,myDesigns,useDemoCommerce,type MyDesign} from '../../../../lib/demo-commerce';
 import {useCommerce} from '../../../../lib/commerce';
+import {addToCart} from '../../../../lib/cart';
 import AcceptedSurfaceEditor from '../../../urunler/cay-makinesi-101/editor/accepted-surface-editor';
 import styles from '../../../xinobi-u/studio.module.css';
 
@@ -19,7 +20,7 @@ export default function SavedDesignPreview(){
     return()=>{active=false;if(url)URL.revokeObjectURL(url)};
   },[user,id]);
   const product=state?.products.find(item=>item.id===design?.productId);
-  const [variant,setVariant]=useState('');
+  const [variant,setVariant]=useState(''),[notice,setNotice]=useState('');
   const chosen=variant||design?.variantId||product?.variants[0]?.id||'';
   if(!ready)return <main className={styles.main}><p role="status">Yükleniyor…</p></main>;
   if(!user)return <main className={styles.main}><Link href="/hesap/giris">Giriş yap →</Link></main>;
@@ -27,6 +28,14 @@ export default function SavedDesignPreview(){
   if(!design||!src)return <main className={styles.main}><p role="status">Tasarım yükleniyor…</p></main>;
   return <><header className={styles.main}><section className={styles.intro}><p className={styles.kicker}>Tasarımlarım</p><h1>{design.name}</h1><p>{design.productName}</p></section>
     {product&&product.variants.length>1&&<label>Renk <select value={chosen} onChange={event=>setVariant(event.target.value)}>{product.variants.map(item=><option key={item.id} value={item.id}>{item.color}</option>)}</select></label>}
-    <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><Link href="/hesap/tasarimlarim">← Tasarımlarıma dön</Link></header>
+    <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p>{product?.active&&<AddDesign product={product} variantId={chosen} design={design} onNotice={setNotice}/>}<p role="status">{notice}</p><Link href="/hesap/tasarimlarim">← Tasarımlarıma dön</Link></header>
     {chosen&&<AcceptedSurfaceEditor key={chosen} commerceProduct={design.productId} commerceVariant={chosen} patternSrc={src}/>}</>;
+}
+
+type StoreProduct=NonNullable<ReturnType<typeof useCommerce>['state']>['products'][number];
+/** Puts the product in the chosen colour with this design in the cart; checkout re-checks ownership, product and stock. */
+export function AddDesign({product,variantId,design,onNotice}:{product:StoreProduct;variantId:string;design:MyDesign;onNotice:(text:string)=>void}){
+  const variant=product.variants.find(item=>item.id===variantId);
+  if(!variant)return null;
+  return <p><button type="button" disabled={variant.stock<=0} onClick={()=>{try{addToCart(product.id,variant.id,variant.stock,{id:design.id,name:design.name});onNotice(`“${design.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.`)}catch(e){onNotice(e instanceof Error?e.message:'Sepete eklenemedi.')}}}>{variant.stock<=0?'Bu renk stokta yok':'Bu tasarımla sepete ekle'}</button> <Link href="/sepet">Sepete git →</Link></p>;
 }

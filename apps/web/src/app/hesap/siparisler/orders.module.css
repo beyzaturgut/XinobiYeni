@@ -39,3 +39,4 @@
 .dialogActions .primary{background:#262626;border-color:#262626;color:#fff}.dialogActions .primary:disabled{opacity:.5;cursor:not-allowed}
 .error{padding:10px;border:1px solid #bf7979;border-radius:6px;color:#8b2424!important}
 @media(max-width:620px){.shipment{grid-template-columns:1fr 1fr}.steps span{font-size:11px}}
+.lineDesign{width:64px;height:64px;border-radius:8px;overflow:hidden;background:#f1f1f1}

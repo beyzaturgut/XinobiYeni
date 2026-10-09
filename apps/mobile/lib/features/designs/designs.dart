@@ -7,6 +7,8 @@ import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';
 import '../account/account_widgets.dart';
 import '../account/auth.dart';
+import '../cart/cart.dart';
+import '../catalog/catalog_repository.dart';
 
 /// The account's saved designs (K-21), newest first; empty when signed out.
 final myDesignsProvider = FutureProvider.autoDispose<List<MyDesign>>((ref) async {
@@ -20,6 +22,25 @@ final designImageProvider = FutureProvider.autoDispose.family<ImageProvider?, St
   if (token == null) return null;
   return NetworkImage(ref.read(accountRepositoryProvider).designImageUrl(path), headers: {'Authorization': 'Bearer $token'});
 });
+
+String designImagePath(String id) => '/api/v1/me/designs/${Uri.encodeComponent(id)}/image';
+
+/// A private design image by path (saved design or order line) with the "Temsilidir" label (K-12).
+class PrivateDesignImage extends ConsumerWidget {
+  const PrivateDesignImage({super.key, required this.path, required this.label});
+  final String path;
+  final String label;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final image = ref.watch(designImageProvider(path)).value;
+    return Stack(fit: StackFit.expand, children: [
+      image == null
+          ? const ColoredBox(color: XinobiTokens.mediaWarm)
+          : Image(image: image, fit: BoxFit.cover, semanticLabel: label, errorBuilder: (_, _, _) => const ColoredBox(color: XinobiTokens.mediaWarm)),
+      Positioned(left: 2, bottom: 2, child: Container(padding: const EdgeInsets.symmetric(horizontal: 3), color: XinobiTokens.surface, child: Text('Temsilidir', style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9)))),
+    ]);
+  }
+}
 
 class DesignImage extends ConsumerWidget {
   const DesignImage({super.key, required this.design, this.fit = BoxFit.cover});
@@ -59,6 +80,23 @@ class DesignsScreen extends ConsumerWidget {
     if (ok != true) return;
     await ref.read(authProvider.notifier).withSession((repository, token) => repository.deleteDesign(token, design.id));
     ref.invalidate(myDesignsProvider);
+  }
+
+  /// Puts the design's product in its colour (or the first one in stock) into the cart; checkout re-checks everything.
+  Future<void> _addToCart(BuildContext context, WidgetRef ref, MyDesign design) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final product = await ref.read(catalogRepositoryProvider).product(design.productId);
+      final variant = product.variants.where((item) => item.id == design.variantId && item.maxQuantity > 0).firstOrNull ??
+          product.variants.where((item) => item.maxQuantity > 0 && item.price != null).firstOrNull;
+      if (variant == null) throw const CartException('Bu ürün şu anda stokta yok.');
+      await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name);
+      messenger.showSnackBar(SnackBar(content: Text('“${design.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.')));
+    } on CartException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    } on CatalogException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
 
   @override
@@ -101,6 +139,7 @@ class DesignsScreen extends ConsumerWidget {
                       const Spacer(),
                       Row(children: [
                         IconButton(tooltip: '${design.name} ürün üzerinde dene', icon: const Icon(Icons.view_in_ar_outlined), onPressed: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}')),
+                        IconButton(tooltip: '${design.name} tasarımıyla sepete ekle', icon: const Icon(Icons.add_shopping_cart), onPressed: () => _addToCart(context, ref, design)),
                         IconButton(tooltip: '${design.name} yeniden adlandır', icon: const Icon(Icons.edit_outlined), onPressed: () => _rename(context, ref, design)),
                         IconButton(tooltip: '${design.name} sil', icon: const Icon(Icons.delete_outline), onPressed: () => _delete(context, ref, design)),
                       ]),

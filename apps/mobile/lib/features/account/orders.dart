@@ -9,6 +9,7 @@ import '../../app/design_tokens.g.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import 'account_widgets.dart';
+import '../designs/designs.dart';
 import 'addresses.dart';
 import 'auth.dart';
 import 'notifications.dart';
@@ -241,12 +242,19 @@ class OrderDetailScreen extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    SizedBox(width: 64, height: 64, child: ColoredBox(color: XinobiTokens.surface, child: RemoteImage(line.imageUrl, label: '${line.name}, ${line.color}'))),
+                    SizedBox(
+                      width: 64,
+                      height: 64,
+                      child: line.personalization?.imageUrl != null
+                          ? PrivateDesignImage(path: line.personalization!.imageUrl!, label: '${line.personalization!.name} tasarımı')
+                          : ColoredBox(color: XinobiTokens.surface, child: RemoteImage(line.imageUrl, label: '${line.name}, ${line.color}')),
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(line.name, style: text.titleMedium),
                         Text('${line.color} · ${line.quantity} × ${formatMoney(line.unitPrice)}', style: text.bodySmall),
+                        if (line.personalization != null) Text('Kişiselleştirilmiş · ${line.personalization!.name}', style: text.bodySmall),
                       ]),
                     ),
                     Text(formatMoney(line.lineTotal), style: text.bodyMedium),
@@ -421,7 +429,8 @@ class _ReturnRequestScreenState extends ConsumerState<ReturnRequestScreen> {
             Text('${order.number} · teslimattan sonra ${options.returnWindowDays} gün içinde iade talebi oluşturabilirsin.', style: text.bodySmall),
             const SizedBox(height: 16),
             Text('Ürünler', style: text.titleMedium),
-            for (final line in order.lines.where((line) => left.containsKey(line.variantId)))
+            // A colour may sit on several lines (plain and with designs); returns count per colour, so it is listed once.
+            for (final line in order.lines.where((line) => left.containsKey(line.variantId) && order.lines.indexWhere((other) => other.variantId == line.variantId) == order.lines.indexOf(line)))
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
                 value: (quantities[line.variantId] ?? 0) > 0,

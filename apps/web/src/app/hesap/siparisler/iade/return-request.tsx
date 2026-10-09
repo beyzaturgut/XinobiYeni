@@ -49,7 +49,7 @@ export default function ReturnRequest() {
         catch (e) { setError(e instanceof Error ? e.message : "Talep gönderilemedi."); }
         finally { setBusy(false); }
       }}>
-        <fieldset><legend>01 · Ürünler</legend><div className={styles.lines}>{order.lines.filter((line) => left[line.variantId]).map((line) => <label key={line.variantId} className={styles.product}>
+        <fieldset><legend>01 · Ürünler</legend><div className={styles.lines}>{order.lines.filter((line, index, all) => left[line.variantId] && all.findIndex((other) => other.variantId === line.variantId) === index).map((line) => <label key={line.variantId} className={styles.product}>
           <input type="checkbox" checked={(quantities[line.variantId] ?? 0) > 0} onChange={(event) => setQuantities((current) => ({ ...current, [line.variantId]: event.target.checked ? 1 : 0 }))} />
           {line.imageUrl ? <Image src={line.imageUrl} alt="" width={70} height={85} unoptimized /> : <span />}
           <span><strong>{line.name}</strong><small>{line.color} · {money(line.unitPrice.amountMinor)} · iade edilebilir: {left[line.variantId]}</small>

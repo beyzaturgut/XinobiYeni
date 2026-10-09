@@ -58,6 +58,7 @@ Future<void> pumpApp(WidgetTester tester, String location) async {
 }
 
 void main() {
+  designLineTests();
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   test('stored cart uses the web format and drops invalid rows', () {
@@ -129,5 +130,27 @@ void main() {
       await tester.pumpAndSettle();
     }
     expect(find.text('Sepetin boş.'), findsOneWidget);
+  });
+}
+
+void designLineTests() {
+  test('a design makes its own line and the colour shares one stock limit', () async {
+    SharedPreferences.setMockInitialValues({});
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final cart = container.read(cartProvider.notifier);
+    await cart.add('P1', 'V1', 3);
+    await cart.add('P1', 'V1', 3, designId: 'd1', designName: 'Mavi dalgalar');
+    await cart.add('P1', 'V1', 3, designId: 'd1', designName: 'Mavi dalgalar');
+    expect(container.read(cartProvider).length, 2);
+    expect(variantUnits(container.read(cartProvider), 'V1'), 3);
+    await expectLater(cart.add('P1', 'V1', 3, designId: 'd2', designName: 'Başka'), throwsA(isA<CartException>()));
+    // The device copy keeps the design and is read back the same way as the web cart.
+    final stored = parseCart(jsonEncode(container.read(cartProvider).map((line) => line.toJson()).toList()));
+    expect(stored.map((line) => (line.designId, line.designName, line.quantity)), [(null, null, 1), ('d1', 'Mavi dalgalar', 2)]);
+    await cart.setQuantity('P1', 'V1', 0, designId: 'd1');
+    expect(container.read(cartProvider).single.designId, isNull);
+    // A tampered row with a design id but no name is dropped.
+    expect(parseCart('[{"productId":"P1","variantId":"V1","quantity":1,"designId":"d1"}]'), isEmpty);
   });
 }

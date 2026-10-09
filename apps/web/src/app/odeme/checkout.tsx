@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import {useRef,useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {useCart,clearCart} from '../../lib/cart';
+import {useCart,clearCart,cartLineKey,variantUnits} from '../../lib/cart';
 import {useCommerce,money} from '../../lib/commerce';
 import {localPhone,placeDemoOrder,useDemoCommerce} from '../../lib/demo-commerce';
 import styles from './checkout.module.css';
@@ -13,7 +13,7 @@ export default function Checkout(){
   const [scenario,setScenario]=useState('success');const [chosen,setChosen]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
   const requestId=useRef('');const locked=useRef(false);
   const rows=cart.map(row=>{const product=state?.products.find(item=>item.id===row.productId&&item.active);const variant=product?.variants.find(item=>item.id===row.variantId);return {...row,product,variant,price:state?.prices[row.variantId]}});
-  const valid=rows.length>0&&rows.every(row=>row.product&&row.variant&&row.variant.stock>=row.quantity&&row.price!==undefined&&row.price>0);
+  const valid=rows.length>0&&rows.every(row=>row.product&&row.variant&&row.variant.stock>=variantUnits(cart,row.variantId)&&row.price!==undefined&&row.price>0);
   const total=rows.reduce((sum,row)=>sum+(row.price||0)*row.quantity,0);
   const address=addresses.find(item=>item.id===chosen)??addresses.find(item=>item.isDefault)??addresses[0];
   async function submit(event:React.FormEvent){event.preventDefault();if(locked.current)return;setError('');
@@ -21,7 +21,7 @@ export default function Checkout(){
     if(!address){setError('Bir teslimat adresi seç.');return}
     if(scenario==='failed'){setError('Ödeme reddedildi (demo). Sipariş oluşmadı; yeniden deneyebilirsin.');return}
     locked.current=true;setBusy(true);
-    try{requestId.current||='web-'+crypto.randomUUID();const order=await placeDemoOrder(address.id,rows.map(row=>({productId:row.productId,variantId:row.variantId,quantity:row.quantity})),requestId.current);clearCart();router.push(`/odeme/sonuc?siparis=${encodeURIComponent(order.id)}`)}
+    try{requestId.current||='web-'+crypto.randomUUID();const order=await placeDemoOrder(address.id,rows.map(row=>({productId:row.productId,variantId:row.variantId,quantity:row.quantity,designId:row.designId??null})),requestId.current);clearCart();router.push(`/odeme/sonuc?siparis=${encodeURIComponent(order.id)}`)}
     catch(problem){setError(problem instanceof Error?problem.message:'Sipariş kaydedilemedi.');locked.current=false;setBusy(false)}}
   return <div className={styles.layout}><section className={styles.formArea}><h1>Ödeme</h1>
     <div className={styles.notice}><strong>Para çekilmez</strong><p>Demo sipariş: kart bilgisi istenmez, ödeme alınmaz; kargo ve stok işlemi yapılmaz. Siparişin web ve mobilde görünür.</p></div>
@@ -34,5 +34,5 @@ export default function Checkout(){
     </form>}
     {error&&<p role="alert">{error}</p>}
   </section>
-  <aside className={styles.summary}><h2>Sipariş özeti</h2>{rows.map(row=><p key={row.variantId}>{row.product?.name||'Ürün bulunamadı'} · {row.variant?.color} × {row.quantity}</p>)}<p>Toplam: {valid?money(total):'Sepeti kontrol et'}</p><button form="demo-checkout" type="submit" disabled={!user||!valid||!address||busy}>{busy?'Kaydediliyor…':'Ödemeyi tamamla'}</button><p><Link href="/sepet">Sepete dön →</Link></p></aside></div>;
+  <aside className={styles.summary}><h2>Sipariş özeti</h2>{rows.map(row=><p key={cartLineKey(row)}>{row.product?.name||'Ürün bulunamadı'} · {row.variant?.color}{row.designName?` · Tasarım: ${row.designName}`:''} × {row.quantity}</p>)}<p>Toplam: {valid?money(total):'Sepeti kontrol et'}</p><button form="demo-checkout" type="submit" disabled={!user||!valid||!address||busy}>{busy?'Kaydediliyor…':'Ödemeyi tamamla'}</button><p><Link href="/sepet">Sepete dön →</Link></p></aside></div>;
 }

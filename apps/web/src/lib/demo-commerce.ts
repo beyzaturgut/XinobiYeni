@@ -9,7 +9,8 @@ export type DemoUser={id:string;name:string;email:string;createdAt?:string;phone
 export type Money={amountMinor:number;currency:string};
 export type CustomerAddress={id:string;title:string;fullName:string;phone:string;city:string;district:string;line:string;postalCode?:string|null;isDefault:boolean};
 export type AddressInput=Omit<CustomerAddress,'id'>;
-export type OrderLine={productId:string;variantId:string;name:string;color:string;imageUrl?:string|null;unitPrice:Money;quantity:number;lineTotal:Money};
+export type OrderPersonalization={designId:string;kind:'ai'|'upload';name:string;mime:string;imageUrl?:string|null};
+export type OrderLine={productId:string;variantId:string;name:string;color:string;imageUrl?:string|null;unitPrice:Money;quantity:number;lineTotal:Money;personalization?:OrderPersonalization|null};
 export type OrderShipment={carrier:string;trackingNumber:string;trackingUrl?:string|null;shippedAt:string;deliveredAt?:string|null};
 export type OrderEvent={status:string;at:string;actor:string;note?:string|null};
 export type OrderRequestLine={variantId:string;quantity:number};
@@ -166,7 +167,7 @@ export async function deleteAddress(id:string){
 }
 
 /** Demo order: the server prices the items from the catalogue. Reusing [requestId] returns the same order instead of a second one. */
-export async function placeDemoOrder(addressId:string,items:{productId:string;variantId:string;quantity:number}[],requestId:string){
+export async function placeDemoOrder(addressId:string,items:{productId:string;variantId:string;quantity:number;designId?:string|null}[],requestId:string){
   const order=(await signedIn<CustomerOrder>('/me/orders',{method:'POST',body:JSON.stringify({addressId,items,clientRequestId:requestId})}))!;
   publish({orders:[order,...session.orders.filter(existing=>existing.id!==order.id)]});
   return order;
@@ -191,12 +192,14 @@ export async function uploadDesign(file:Blob,productId:string,variantId:string|n
 export async function renameDesign(id:string,name:string){return (await signedIn<MyDesign>(`/me/designs/${encodeURIComponent(id)}`,{method:'PATCH',body:JSON.stringify({name})}))!}
 export async function deleteDesign(id:string){await signedIn(`/me/designs/${encodeURIComponent(id)}`,{method:'DELETE'})}
 /** Design images need the session; they are fetched with it and shown from an object URL the caller revokes. */
-export async function designImageUrl(design:MyDesign){
+export async function privateImageUrl(path:string){
   if(!api)throw new Error('Hesap servisi kullanılamıyor.');
-  const response=await fetch(api.replace(/\/api\/v1$/,'')+design.imageUrl,{credentials:'include',cache:'no-store'});
+  const response=await fetch(api.replace(/\/api\/v1$/,'')+path,{credentials:'include',cache:'no-store'});
   if(!response.ok)throw new Error('Tasarım görseli yüklenemedi.');
   return URL.createObjectURL(await response.blob());
 }
+export const designImageUrl=(design:Pick<MyDesign,'imageUrl'>)=>privateImageUrl(design.imageUrl);
+export const designImagePath=(id:string)=>`/api/v1/me/designs/${encodeURIComponent(id)}/image`;
 
 export const orderStatusText=(status:string)=>statusTexts[status]??status;
 const requestTexts:Record<string,string>={requested:'Değerlendiriliyor',approved:'Onaylandı',rejected:'Kabul edilmedi',completed:'Tamamlandı'};

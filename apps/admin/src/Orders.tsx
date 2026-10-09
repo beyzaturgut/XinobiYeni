@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 
+/** Design images on order lines are served by the panel API with the staff session. */
+const designUrl = (path: string) => commerceApi.replace(/\/api\/v1\/local-commerce\/?$/, '') + path
 type Money = { amountMinor: number; currency: string }
-type Line = { productId: string; variantId: string; name: string; color: string; quantity: number; unitPrice: Money; lineTotal: Money }
+type Line = { productId: string; variantId: string; name: string; color: string; quantity: number; unitPrice: Money; lineTotal: Money; personalization?: { designId: string; kind: 'ai' | 'upload'; name: string; imageUrl?: string | null } | null }
 type Address = { title: string; fullName: string; phone: string; city: string; district: string; line: string; postalCode?: string | null }
 type Shipment = { carrier: string; trackingNumber: string; trackingUrl?: string | null; shippedAt: string; deliveredAt?: string | null }
 type OrderEvent = { status: string; at: string; actor: string; note?: string | null }
@@ -65,7 +67,7 @@ export default function Orders() {
       {selected && order && <div className="dialog-body">
         <span className="order-state">{statusText[order.status] ?? order.status}</span>
         <dl><div><dt>Müşteri</dt><dd>{selected.customerName} · {selected.customerEmail} · {phone(selected.customerPhone)}</dd></div><div><dt>Teslimat</dt><dd>{order.address.fullName} · {phone(order.address.phone)} · {order.address.line}, {order.address.district}/{order.address.city}</dd></div><div><dt>Tutar</dt><dd>{money(order.total)}</dd></div>{order.shipment && <div><dt>Kargo</dt><dd>{order.shipment.carrier} · {order.shipment.trackingNumber}{order.shipment.deliveredAt ? ` · teslim ${date(order.shipment.deliveredAt)}` : ''}</dd></div>}</dl>
-        <ul className="order-lines">{order.lines.map(line => <li key={line.variantId}>{line.name} · {line.color} · {line.quantity} adet · {money(line.lineTotal)}</li>)}</ul>
+        <ul className="order-lines">{order.lines.map((line, index) => <li key={index}>{line.name} · {line.color} · {line.quantity} adet · {money(line.lineTotal)}{line.personalization && <div className="order-design">{line.personalization.imageUrl && <a href={designUrl(line.personalization.imageUrl)} target="_blank" rel="noreferrer"><img src={designUrl(line.personalization.imageUrl)} alt={`${line.personalization.name} tasarımı`} /></a>}<span>Kişiselleştirilmiş · {line.personalization.kind === 'ai' ? 'AI tasarımı' : 'Müşteri görseli'}: <strong>{line.personalization.name}</strong> · Temsilidir; üretim dosyası ayrıca kontrol edilir.</span></div>}</li>)}</ul>
         {order.requests?.map(request => <div className="quote-detail" key={request.id}><h3>{request.type === 'cancel' ? 'İptal talebi' : 'İade talebi'} · {requestText[request.status]}</h3><p>{request.reason}{request.description ? ` — ${request.description}` : ''}</p>{request.type === 'return' && <p>Ürünler: {request.lines.map(line => `${order.lines.find(item => item.variantId === line.variantId)?.name ?? line.variantId} × ${line.quantity}`).join(', ')}</p>}{request.resolution && <p>Not: {request.resolution}</p>}
           {request.status === 'requested' && <div className="dialog-actions"><button disabled={busy} onClick={() => void act(`/requests/${request.id}`, { decision: 'approve', resolution: note || null }, request.type === 'cancel' ? 'Sipariş iptal edildi.' : 'İade onaylandı.')}>{request.type === 'cancel' ? 'İptali onayla' : 'İadeyi onayla'}</button><button disabled={busy} onClick={() => void act(`/requests/${request.id}`, { decision: 'reject', resolution: note || null }, 'Talep reddedildi.')}>Reddet</button></div>}
           {request.status === 'approved' && <div className="dialog-actions"><button disabled={busy} onClick={() => void act(`/requests/${request.id}`, { decision: 'complete', resolution: note || null }, 'İade tamamlandı.')}>Ürün depoya ulaştı · iadeyi tamamla</button></div>}

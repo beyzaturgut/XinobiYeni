@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import {useEffect,useState} from 'react';
 import {deleteDesign,designImageUrl,myDesigns,renameDesign,useDemoCommerce,type MyDesign} from '../../../lib/demo-commerce';
+import {useCommerce} from '../../../lib/commerce';
+import {AddDesign} from './onizleme/saved-design-preview';
 import styles from './designs.module.css';
 
 function DesignImage({design}:{design:MyDesign}){
@@ -14,6 +16,8 @@ function DesignImage({design}:{design:MyDesign}){
 /** Designs kept in the account (K-21): AI designs and own images, each tried again on its product. */
 export default function MyDesigns(){
   const {user,ready}=useDemoCommerce();
+  const {state}=useCommerce();
+  const [notice,setNotice]=useState('');
   const [designs,setDesigns]=useState<MyDesign[]|null>(null),[error,setError]=useState(''),[editing,setEditing]=useState<string|null>(null),[name,setName]=useState('');
   useEffect(()=>{if(!user)return;let active=true;myDesigns().then(value=>{if(active)setDesigns(value)}).catch(e=>{if(active)setError(e instanceof Error?e.message:'Tasarımlar yüklenemedi.')});return()=>{active=false}},[user]);
   return <div className={styles.shell}>
@@ -27,9 +31,11 @@ export default function MyDesigns(){
         {design.profile.length>0&&<details><summary>Tasarım profili</summary><ul>{design.profile.map(line=><li key={line}>{line}</li>)}</ul></details>}
         <div className={styles.actions}>
           <Link href={`/hesap/tasarimlarim/onizleme?id=${design.id}`}>Ürün üzerinde gör</Link>
+          {(()=>{const product=state?.products.find(item=>item.id===design.productId&&item.active);const variant=product?.variants.find(item=>item.id===design.variantId)??product?.variants.find(item=>item.stock>0)??product?.variants[0];return product&&variant?<AddDesign product={product} variantId={variant.id} design={design} onNotice={setNotice}/>:null})()}
           <button type="button" onClick={()=>{setEditing(design.id);setName(design.name)}}>Yeniden adlandır</button>
           <button type="button" onClick={async()=>{if(!window.confirm(`“${design.name}” silinsin mi?`))return;try{await deleteDesign(design.id);setDesigns(list=>list!.filter(item=>item.id!==design.id))}catch(e){setError(e instanceof Error?e.message:'Silinemedi.')}}}>Sil</button>
         </div>
       </li>)}</ul>}
+    <p role="status">{notice}</p>
   </div>;
 }

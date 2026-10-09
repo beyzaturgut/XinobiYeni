@@ -6,3 +6,7 @@
 .empty{min-height:0;padding:32px}.emptyIcon{width:64px;height:64px;margin-bottom:14px}.empty>p{margin-bottom:20px}.emptyNotes{margin-top:20px}
 .summary{top:80px;padding:20px}.summary h2{margin-bottom:14px}
 }
+
+.design{display:flex;align-items:center;gap:10px;margin-top:6px}
+.design p{margin:0}
+.designImage{width:56px;height:56px;border-radius:8px;overflow:hidden;flex:none;background:#f1f1f1}

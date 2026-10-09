@@ -27,6 +27,6 @@ Tasarım/baskı: sürüm ve sipariş bağı, kalite bulguları, yüz bazlı örn
 
 Entegrasyonlar: Mikro/Trendyol/Hepsiburada/N11 örnek eşleme, hata ve uzlaştırma izleme. Test: `node tools/test-integration-model.mjs`, `node tools/test-admin-integrations.mjs`. Sağlayıcı bağlantısı, veri yazımı ve gerçek retry kapalıdır.
 
-AI yönetimi: sürümlü demo politika/istem, örnek kullanım/hata, kaynak uygunluğu ve izin bekleyen devir talebi. Test: `node tools/test-ai-admin-model.mjs`, `node tools/test-admin-ai.mjs`. Sağlayıcı/kota/ücret/yayın ve gerçek destek devri kapalı.
+AI yönetimi: Nobi'nin sürümlü politikası (yönerge, karşılama, hızlı yanıtlar, model, günlük AI sınırı, WhatsApp numarası, birim maliyet), onay akışlı bilgi kaynakları, konuşmalar (maskeli), iletişim talepleri ve Nobi + XINOBI U kullanım/tahmini maliyet raporu (`/api/v1/local-commerce/assistant/*`). Önceki örnek model ve araçları (TST-085) kaldırıldı.
 
 Rol/ayar/denetim: sabit demo yönetici ve düzenlenebilir operasyon rolü, ayar sürümü ve güvenli önce/sonra oturum kayıtları. Test: `node tools/test-settings-model.mjs`, `node tools/test-admin-settings.mjs`. Gerçek kimlik/API yetkisi, kullanıcı daveti, kalıcı append-only audit ve bildirim gönderimi bağlı değildir.

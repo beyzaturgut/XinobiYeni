@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Transparent canvas keeps the full rectangular logo inside Android's splash safe area. -->
+    <item android:width="288dp" android:height="288dp">
+        <shape><solid android:color="@android:color/transparent" /></shape>
+    </item>
+    <item android:width="96dp" android:height="83dp" android:gravity="center">
+        <bitmap android:src="@drawable/xinobi_launch_logo" android:gravity="fill" android:tint="#000000" />
+    </item>
+</layer-list>

@@ -7,6 +7,7 @@ import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./pr
 
 import { applySurfaceInk } from "./surface-ink";
 import { containArtwork } from "./artwork-placement";
+import { separatedBodyPlacements } from "./separated-body-placement";
 
 
 
@@ -67,6 +68,7 @@ function validateMaskAlpha(mask: HTMLImageElement, SOURCE_WIDTH: number, SOURCE_
   throw new Error("Mask has no usable alpha region");
 }
 
+type BodyPlacement = ReturnType<typeof separatedBodyPlacements>[number] & { clipPath: Path2D };
 type RenderAssets = {
   sourcePixels?: ImageData;
   product: HTMLImageElement;
@@ -76,6 +78,7 @@ type RenderAssets = {
   patternBuffer: HTMLCanvasElement;
   lighting: ReturnType<typeof deriveProductLighting>;
   artwork: ReturnType<typeof containArtwork>;
+  bodies: BodyPlacement[];
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
@@ -118,8 +121,9 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
         const sourcePixels = readPixels(product);
         const lighting = deriveProductLighting(sourcePixels, maskPixels, branding ? readPixels(branding) : undefined);
         const surface = deriveBodySurface(maskPixels, surfaceTreatment === "metallic-ink");
-        const artwork = placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight, surfaceTreatment === "metallic-ink" ? 0.6 : 0.8) : {x:centerX,y:centerY,width:pattern.naturalWidth,height:pattern.naturalHeight};
-        setResult({ assetKey, status: "ready", assets: { sourcePixels: surfaceTreatment === "metallic-ink" ? sourcePixels : undefined, product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } });
+        const bodies: BodyPlacement[] = (surfaceTreatment === "metallic-ink" ? separatedBodyPlacements(maskPixels, pattern.naturalWidth, pattern.naturalHeight, placementMode === "artwork") : []).map(body => { const clipPath = new Path2D(); for (const run of body.runs) clipPath.rect(run.start, run.y, run.end - run.start + 1, 1); return { ...body, clipPath }; });
+        const artwork = bodies.length ? bodies[0] : placementMode === "artwork" ? containArtwork(maskPixels, pattern.naturalWidth, pattern.naturalHeight, surfaceTreatment === "metallic-ink" ? 0.6 : 0.8) : {x:centerX,y:centerY,width:pattern.naturalWidth,height:pattern.naturalHeight};
+        setResult({ assetKey, status: "ready", assets: { sourcePixels: surfaceTreatment === "metallic-ink" ? sourcePixels : undefined, product, mask, pattern, branding, patternBuffer, lighting, surface, artwork, bodies } });
       } catch {
         if (!cancelled) setResult({ assetKey, status: "error" });
       }
@@ -130,10 +134,23 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
 
   useLayoutEffect(() => {
     if (status !== "ready" || !result?.assets) return;
-    const { sourcePixels, product, mask, pattern, branding, patternBuffer, lighting, surface, artwork } = result.assets;
+    const { sourcePixels, product, mask, pattern, branding, patternBuffer, lighting, surface, artwork, bodies } = result.assets;
     const buffer = patternBuffer.getContext("2d")!;
     const context = canvasRef.current!.getContext("2d")!;
     buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+    if (bodies.length) {
+      for (const body of bodies) {
+        buffer.save();
+        // Each body has its own centre and fit. Shared controls apply the same
+        // source-coordinate movement, scale and rotation to both placements.
+        buffer.clip(body.clipPath);
+        buffer.translate(body.x+x-centerX,body.y+y-centerY);
+        buffer.rotate(rotation*Math.PI/180);
+        buffer.scale(scale,scale);
+        buffer.drawImage(pattern,-body.width/2,-body.height/2,body.width,body.height);
+        buffer.restore();
+      }
+    } else {
     buffer.save();
     buffer.translate(placementMode === "artwork" ? artwork.x + x - centerX : x, placementMode === "artwork" ? artwork.y + y - centerY : y);
     buffer.rotate(rotation * Math.PI / 180);
@@ -141,6 +158,7 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     if (placementMode === "artwork") buffer.drawImage(pattern, -artwork.width / 2, -artwork.height / 2, artwork.width, artwork.height);
     else { const ratio = SOURCE_WIDTH / 1066; buffer.drawImage(pattern, -pattern.naturalWidth * ratio / 2, -pattern.naturalHeight * ratio / 2, pattern.naturalWidth * ratio, pattern.naturalHeight * ratio); }
     buffer.restore();
+    }
     const patternPixels = buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
     warpPattern(patternPixels, surface, curvatureStrength);
     if (surfaceTreatment === "metallic-ink" && sourcePixels) applySurfaceInk(patternPixels, sourcePixels, lighting);

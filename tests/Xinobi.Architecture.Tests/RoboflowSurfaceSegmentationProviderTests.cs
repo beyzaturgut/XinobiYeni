@@ -399,4 +399,36 @@ public sealed class RoboflowSurfaceSegmentationProviderTests
             if (Path.GetFullPath(tempRoot).StartsWith(Path.GetFullPath(Path.GetTempPath()), StringComparison.OrdinalIgnoreCase)) Directory.Delete(tempRoot, true);
         }
     }
+
+    [Fact]
+    public async Task CatalogMultiplePromptsRetainSeparateMasksAndEvidenceWithoutApproval()
+    {
+        var masks=new DevelopmentMaskBuffer();
+        var handler=new MockHandler(async(request,token)=>{
+            using var body=JsonDocument.Parse(await request.Content!.ReadAsStringAsync(token));
+            Assert.Equal(new[]{"upper teapot body","lower kettle body"},body.RootElement.GetProperty("prompts").EnumerateArray().Select(p=>p.GetProperty("text").GetString()).ToArray());
+            Assert.Equal(Convert.ToBase64String(SourceBytes),body.RootElement.GetProperty("image").GetProperty("value").GetString());
+            return Response("{\"prompt_results\":[{\"prompt_index\":1,\"predictions\":["+Prediction(new[]{2,4,6},score:.9)+"]},{\"prompt_index\":0,\"predictions\":["+Prediction(new[]{1,2,9},score:.6)+"]}]}");
+        });
+        var provider=new RoboflowSurfaceSegmentationProvider(new HttpClient(handler),new(){ApiKey=FakeKey},true,_=>SourceBytes,masks,true,["upper teapot body","lower kettle body"]);
+        var analysis=new SurfaceAnalysis(Source,Intent);
+        var revision=await new SurfaceSegmentationService(provider).GenerateAutomaticAsync(analysis,Source);
+        Assert.Equal(2,revision.Candidates.Count);Assert.Null(analysis.ActiveApproval);Assert.All(revision.Candidates,c=>Assert.Equal(CandidateReviewStatus.Pending,c.ReviewStatus));
+        Assert.Equal(new[]{0,1},revision.Candidates.Select(c=>masks.Evidence(c.Mask.AssetReference)!.PromptIndex));Assert.Equal(1,handler.Calls);
+    }
+    [Fact]
+    public async Task MissingOneConceptRemainsMissingAndDoesNotInventMask()
+    {
+        var handler=new MockHandler((_,_)=>Task.FromResult(Response("{\"prompt_results\":[{\"prompt_index\":0,\"predictions\":[]},{\"prompt_index\":1,\"predictions\":["+Prediction(new[]{2,4,6})+"]}]}")));
+        var masks=new DevelopmentMaskBuffer();var provider=new RoboflowSurfaceSegmentationProvider(new HttpClient(handler),new(){ApiKey=FakeKey},true,_=>SourceBytes,masks,true,["upper teapot body","lower kettle body"]);
+        var result=await provider.GenerateAutomaticAsync(new(Source,Intent),default);var single=Assert.Single(result.Candidates);Assert.Equal(1,masks.Evidence(single.Mask.AssetReference)!.PromptIndex);Assert.Equal(1,handler.Calls);
+    }
+    [Fact]
+    public async Task MultipleCatalogResponseOverEightOrMalformedIsRejected()
+    {
+        foreach(var item in new[]{(Body:Automatic(Enumerable.Repeat(Prediction(new[]{1,2,9}),9).ToArray()),Code:"provider_invalid_response"),(Body:Automatic(Prediction(new[]{1,2,9}),Prediction(new[]{99})),Code:"provider_invalid_mask")}){
+            var handler=new MockHandler((_,_)=>Task.FromResult(Response(item.Body)));var provider=new RoboflowSurfaceSegmentationProvider(new HttpClient(handler),new(){ApiKey=FakeKey},true,_=>SourceBytes,new(),true);
+            Assert.Equal(item.Code,(await Assert.ThrowsAsync<SegmentationProviderException>(()=>provider.GenerateAutomaticAsync(new(Source,Intent),default))).Message);Assert.Equal(1,handler.Calls);
+        }
+    }
 }

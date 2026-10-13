@@ -18,7 +18,8 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
         {
             ["LocalCommerce:DataDirectory"] = directory,
             ["ConnectionStrings:Xinobi"] = "",
-            ["Catalog:StorageProvider"] = "File"
+            ["Catalog:StorageProvider"] = "File",
+            ["LocalCommerce:SeedFile"] = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"))
         }));
         builder.ConfigureServices(services =>
         {

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
-const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));
+const state=JSON.parse(await readFile('tests/fixtures/demo-commerce.json','utf8'));
 const product=state.products[0];product.variants[0].hex='#123456';product.variants[1].hex='#CC3344';state.prices[product.variants[1].id]=120000;product.variants[1].stock=10;
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try{
- for(const path of ['/urunler/detay?id='+encodeURIComponent(product.id),'/urunler/cay-makinesi-101'])for(const width of [1440,390]){
+ for(const path of ['/urunler/detay?id='+encodeURIComponent(product.id)])for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}});const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.route('**/api/v1/local-commerce/state',route=>route.fulfill({json:state}));await page.goto('http://127.0.0.1:3000'+path);
  await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();

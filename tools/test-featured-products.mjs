@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
-const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));state.categories=[...new Set(state.products.map(product=>product.category))];
+const state=JSON.parse(await readFile('tests/fixtures/demo-commerce.json','utf8'));state.categories=[...new Set(state.products.map(product=>product.category))];
 const selected=state.products.filter(product=>product.active).slice(0,4).reverse();assert.equal(selected.length,4);
 state.content.featuredProducts=[];
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});

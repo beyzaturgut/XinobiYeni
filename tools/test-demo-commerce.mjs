@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
-const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));const product=state.products[0],variant=product.variants[0];state.prices[variant.id]=100000;variant.stock=3;
+const state=JSON.parse(await readFile('tests/fixtures/demo-commerce.json','utf8'));const product=state.products[0],variant=product.variants[0];state.prices[variant.id]=100000;variant.stock=3;
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try{for(const width of [1440,390]){const page=await browser.newPage({viewport:{width,height:1000}});await page.route('**/api/v1/local-commerce/state',route=>route.fulfill({json:state}));
  // In-browser stand-in for the shared account API (cookie session), so the test never creates accounts in the developer's store.

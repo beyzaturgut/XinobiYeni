@@ -36,7 +36,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     private async Task<CommerceState> ReadCore()
     {
         var file = Path.Combine(path, "state.json");
-        var source = File.Exists(file) ? file : Path.Combine(environment.ContentRootPath, "LocalCommerce", "seed.json");
+        var source = File.Exists(file) ? file : configuration["LocalCommerce:SeedFile"] ?? Path.Combine(environment.ContentRootPath, "LocalCommerce", "seed.json");
         return Parse(await File.ReadAllTextAsync(source));
     }
 

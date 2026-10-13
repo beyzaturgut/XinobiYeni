@@ -2,17 +2,8 @@ import { useState } from 'react'
 import type { Product } from './catalog-data'
 
 const warehouses = [{ id: 'DEMO-W1', name: 'Merkez depo' }, { id: 'DEMO-W2', name: 'Sevkiyat deposu' }]
-const balances = [
-  { variantId: 'DEMO-V101-B', warehouseId: 'DEMO-W1', physical: 8, reserved: 2, available: 6 },
-  { variantId: 'DEMO-V101-B', warehouseId: 'DEMO-W2', physical: 4, reserved: 2, available: 2 },
-  { variantId: 'DEMO-V101-R', warehouseId: 'DEMO-W1', physical: 0, reserved: 0, available: 0 },
-  { variantId: 'DEMO-V102-R', warehouseId: 'DEMO-W1', physical: 6, reserved: 1, available: 5 },
-  { variantId: 'DEMO-V103-W', warehouseId: 'DEMO-W2', physical: 0, reserved: 0, available: 0 },
-]
-const movements = [
-  { id: 'DEMO-M1', variantId: 'DEMO-V101-B', warehouseId: 'DEMO-W1', date: '03.10.2026 10:00', type: 'Giriş', before: 5, after: 8, reason: 'Örnek teslim alma', actor: 'Demo operasyon' },
-  { id: 'DEMO-M2', variantId: 'DEMO-V102-R', warehouseId: 'DEMO-W1', date: '03.10.2026 09:00', type: 'Çıkış', before: 8, after: 6, reason: 'Örnek sevkiyat', actor: 'Demo operasyon' },
-]
+const balances: { variantId: string; warehouseId: string; physical: number; reserved: number; available: number }[] = []
+const movements: { id: string; variantId: string; warehouseId: string; date: string; type: string; before: number; after: number; reason: string; actor: string }[] = []
 
 export default function Inventory({ products, onSave }: { products: Product[]; onSave: (product: Product) => Promise<void> }) {
   const [tab, setTab] = useState('Web stokları'), [query, setQuery] = useState(''), [warehouse, setWarehouse] = useState('Tümü')

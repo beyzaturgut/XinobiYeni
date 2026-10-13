@@ -5,8 +5,8 @@ import ProductExperience from "./product-experience";
 import styles from "./product.module.css";
 
 export const metadata: Metadata = {
-  title: "Çay Makinesi 101 | Xinobi",
-  description: "Xinobi Çay Makinesi 101 renklerini ve ürün deneyimini keşfedin.",
+  title: "Ürün kataloğu | Xinobi",
+  description: "Güncel Xinobi ürünlerini keşfedin.",
 };
 
 export default function TeaMakerPage() {

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
 // XINOBI U has no colour step: the pattern covers the body, so a product card opens the questions directly and old /renk links redirect.
-const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));const product=state.products[0];
+const state=JSON.parse(await readFile('tests/fixtures/demo-commerce.json','utf8'));const product=state.products[0];
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try{for(const width of [1440,390]){
  const page=await browser.newPage({viewport:{width,height:1000}});let generation=0;

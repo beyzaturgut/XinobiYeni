@@ -5,7 +5,7 @@ import PersonalizationStudio from "./personalization-studio";
 import styles from "./studio.module.css";
 
 export const metadata: Metadata = {
-  title: "Çay Makinesi 101'i Kişiselleştir | Xinobi Studio",
+  title: "Ürün seçimi | Xinobi Studio",
   description: "Xinobi Studio basit kişiselleştirme deneyimini keşfedin.",
 };
 

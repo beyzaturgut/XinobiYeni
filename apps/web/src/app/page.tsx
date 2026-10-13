@@ -11,11 +11,6 @@ import CategoryGallery from '../components/category-gallery';
 import SiteFooter from "../components/site-footer";
 import styles from "./page.module.css";
 
-import airPurifier from "../../public/assets/products/air-purifier-101.webp";
-import coffeeMaker from "../../public/assets/products/coffee-maker-101-red.webp";
-import cookingMachine from "../../public/assets/products/cooking-machine.webp";
-import teaMaker from "../../public/assets/products/tea-maker-101-blue.webp";
-import toastMaker from "../../public/assets/products/toast-maker.webp";
 
 type IconName = "arrow" | "bag" | "search" | "user";
 type Product = { name: string; category: string; image: StaticImageData | string; price?: number; stock?: number; badge?: string; href?: string; colorCount?: number };
@@ -26,17 +21,7 @@ const fallbackSlides: { src: string; alt: string; type?: string; duration?: numb
   { src: "/assets/banners/home-slider-3.png", alt: "Sade koyu stüdyoda Xinobi çay makinesi ve çay bardağı" },
 ];
 
-const fallbackProducts: Product[] = [
-  { name: "Çay Makinesi 101", category: "Çay makineleri", image: teaMaker, badge: "Yeni" },
-  { name: "Kahve Makinesi 101", category: "Kahve makineleri", image: coffeeMaker },
-  { name: "Hava Temizleme 101", category: "Hava temizleme", image: airPurifier },
-];
 
-const fallbackCategories = [
-  { name: "Çay makineleri", image: teaMaker }, { name: "Kahve makineleri", image: coffeeMaker },
-  { name: "Tost makineleri", image: toastMaker }, { name: "Pişirme makineleri", image: cookingMachine },
-  { name: "Hava temizleme", image: airPurifier },
-];
 
 function Icon({ name }: { name: IconName }) {
   const common = { "aria-hidden": true, fill: "none", stroke: "currentColor", strokeLinecap: "round" as const, strokeLinejoin: "round" as const, strokeWidth: 1.8, viewBox: "0 0 32 32" };
@@ -55,7 +40,7 @@ function ProductCard({ product }: { product: Product }) {
 export default function Home() {
   const { state, error, enabled } = useCommerce();
   const slides = state ? state.content.slides.filter(item => item.active) : enabled ? [] : fallbackSlides;
-  const products: Product[] = state ? (state.content.featuredProducts == null ? state.products.filter(product => product.active).slice(0,4) : state.content.featuredProducts.flatMap(id => {const product=state.products.find(product=>product.id===id&&product.active);return product?[product]:[]})).map(product => ({ name: product.name, category: product.category, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), href: `/urunler/detay?id=${encodeURIComponent(product.id)}`, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0) })) : enabled ? [] : fallbackProducts.slice(0,4);
+  const products: Product[] = state ? (state.content.featuredProducts == null ? state.products.filter(product => product.active).slice(0,4) : state.content.featuredProducts.flatMap(id => {const product=state.products.find(product=>product.id===id&&product.active);return product?[product]:[]})).map(product => ({ name: product.name, category: product.category, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), href: `/urunler/detay?id=${encodeURIComponent(product.id)}`, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0) })) : [];
   const categories: {name: string; image: StaticImageData | string; alt?: string; modelCount?: number; description?: string}[] = state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).flatMap(name => {
     const selected = state.content.categoryProducts?.[name];
     if (selected === '') return [];
@@ -67,7 +52,7 @@ export default function Home() {
       if (variant) return [{name, image: mediaUrl(selected === undefined ? (product.originalImage || variant.image) : variant.image, commerceApi), alt: `${product.name} · ${variant.color}`, modelCount: candidates.length, description: product.description || `${name} koleksiyonunu keşfedin. Kendinize uygun modeli ve rengi seçin.`}];
     }
     return [];
-  }) : enabled ? [] : fallbackCategories;
+  }) : [];
   const titaniumImage = state?.content.titaniumImage ?? '/assets/products/titanium-bronze-gold.png';
   const [slide, setSlide] = useState(0);
   const slideCount = slides.length;
@@ -76,7 +61,7 @@ export default function Home() {
 
   return <div id="top" className={styles.page}>
     {error && <p role="alert">{error}</p>}
-    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a><SiteHeader categories={state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).map(name => ({name})) : enabled ? [] : fallbackCategories} />
+    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a><SiteHeader categories={state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).map(name => ({name})) : []} />
     <main id="main-content">
       <h1 className={styles.srOnly}>Xinobi ev teknolojileri</h1>
       {slides.length > 0 && <section className={styles.hero} aria-label="Xinobi ürün tanıtımları">{slides[slide % slides.length].type === 'Video' ? <video className={styles.heroImage} style={{ width: '100%', height: '100%' }} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} autoPlay muted loop playsInline /> : <Image className={styles.heroImage} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} alt={slides[slide % slides.length].alt} fill priority sizes="100vw" />}<div className={styles.sliderDots} aria-label="Slider sayfaları">{slides.map((item, index) => <button type="button" key={item.src} className={index === slide % slides.length ? styles.activeDot : ""} onClick={() => setSlide(index)} aria-label={`${index + 1}. görsel`} aria-current={index === slide % slides.length ? "true" : undefined} />)}</div></section>}

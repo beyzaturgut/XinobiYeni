@@ -1,7 +1,7 @@
 import {test,expect} from "@playwright/test";
 import {readFileSync} from "node:fs";
 import path from "node:path";
-const source=JSON.parse(readFileSync(path.resolve("../../services/api/LocalCommerce/seed.json"),"utf8"));
+const source=JSON.parse(readFileSync(path.resolve("../../tests/fixtures/demo-commerce.json"),"utf8"));
 const editor="/urunler/cay-makinesi-101/editor/";
 test("commerce product link preserves exact selected identity",async({page})=>{
  await page.route("**/api/v1/local-commerce/state",r=>r.fulfill({json:source}));

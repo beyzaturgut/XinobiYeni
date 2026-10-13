@@ -2,7 +2,7 @@ import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
 for(const flow of ['generated','own-image'])test(flow+' personalized preview has persistent shared disclosure',async({page})=>{
  // Test-only approved surface: never depend on or approve the owner's local records.
- const state=JSON.parse(readFileSync('../../services/api/LocalCommerce/seed.json','utf8'));
+ const state=JSON.parse(readFileSync('../../tests/fixtures/demo-commerce.json','utf8'));
  const product=state.products.find((p:{id:string})=>p.id==='DEMO-P101');
  const variant=product.variants.find((v:{id:string})=>v.id==='DEMO-V101-B');
  variant.surfaceMask='/assets/personalization/tea-maker-101-blue-designable.png';

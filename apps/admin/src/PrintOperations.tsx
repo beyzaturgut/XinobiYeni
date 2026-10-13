@@ -1,11 +1,5 @@
 import { useState } from 'react'
-const designs = [
- { id:'DEMO-D1', order:'DEMO-1001', variant:'DEMO-V101-B', product:'Çay Makinesi 101 · Lacivert', image:'/assets/products/tea-maker-101-blue.webp', versions:[
-  { id:'DEMO-DV1', revision:1, created:'2026-10-02 10:00', areaVersion:'DEMO-AREA-v1', profile:'Tanımlanmadı', findings:[{severity:'Engel', message:'Görsel çözünürlüğü fiziksel baskı standardıyla doğrulanmadı.'}], outputs:[{face:'Ön yüz',status:'failed',reference:'DEMO-OUT1',error:'Örnek medya doğrulama hatası'},{face:'Arka yüz',status:'queued',reference:'DEMO-OUT2',error:''}] },
-  { id:'DEMO-DV2', revision:2, created:'2026-10-03 10:00', areaVersion:'DEMO-AREA-v1', profile:'Tanımlanmadı', findings:[{severity:'Bekliyor',message:'D04 fiziksel baskı alanı ve kalite kabulü bekleniyor.'}],outputs:[{face:'Ön yüz',status:'running',reference:'DEMO-OUT3',error:''}] },
- ], boundVersion:'DEMO-DV1' },
- { id:'DEMO-D2', order:'DEMO-1002', variant:'DEMO-V102-R', product:'Kahve Makinesi 101 · Kırmızı',image:'/assets/products/coffee-maker-101-red.webp',versions:[{id:'DEMO-DV3',revision:1,created:'2026-10-03 09:00',areaVersion:'DEMO-AREA-v2',profile:'Tanımlanmadı',findings:[{severity:'Bekliyor',message:'Örnek çıktı tamamlandı; gerçek fiziksel baskı ve üretim onayı yok.'}],outputs:[{face:'Ön yüz',status:'ready',reference:'DEMO-OUT4',error:''}]}],boundVersion:'DEMO-DV3' },
-]
+const designs: { id: string; order: string; variant: string; product: string; image: string; boundVersion: string; versions: { id: string; revision: number; created: string; areaVersion: string; profile: string; findings: { severity: string; message: string }[]; outputs: { face: string; status: string; reference: string; error: string }[] }[] }[] = []
 const labels:Record<string,string>={queued:'Kuyrukta',running:'İşleniyor',failed:'Başarısız',ready:'Örnek çıktı tamamlandı'}
 export default function PrintOperations({ notes, onNote }:{notes:Record<string,string>;onNote:(id:string,note:string)=>void}){
  const [query,setQuery]=useState(''),[status,setStatus]=useState('Tümü'),[selectedId,setSelectedId]=useState(''),[versionId,setVersionId]=useState(''),[note,setNote]=useState(''),[notice,setNotice]=useState(''),[retry,setRetry]=useState(''),[error,setError]=useState('')

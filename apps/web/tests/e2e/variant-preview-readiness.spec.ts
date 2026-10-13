@@ -1,6 +1,6 @@
 import {test,expect} from "@playwright/test";
 import {readFileSync} from "node:fs";
-const seed=JSON.parse(readFileSync("../../services/api/LocalCommerce/seed.json","utf8"));
+const seed=JSON.parse(readFileSync("../../tests/fixtures/demo-commerce.json","utf8"));
 const pairs=[["DEMO-P101","DEMO-V101-B",true],["DEMO-P101","DEMO-V101-R",false],["DEMO-P101","DEMO-V101-S",false],["DEMO-P101","DEMO-V101-G",false],["DEMO-P102","DEMO-V102-R",false]] as const;
 for(const [product,variant,ready] of pairs)test("exact preview readiness "+variant,async({page,request})=>{
  const bundle=await(await request.get("/api/v1/dev/product-surfaces/commerce/"+product+"/"+variant+"/rendering-inputs")).json();

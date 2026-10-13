@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
 // Serve the unpacked production ZIP at http://127.0.0.1:3318/admin/ before running.
-const state=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));
+const state=JSON.parse(await readFile('tests/fixtures/demo-commerce.json','utf8'));
 const browser=await chromium.launch({executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',headless:true});
 try{
  const page=await browser.newPage();page.setDefaultTimeout(15000);let authenticated=false,staff=false;

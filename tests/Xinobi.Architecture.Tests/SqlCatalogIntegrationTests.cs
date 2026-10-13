@@ -38,7 +38,7 @@ public sealed class SqlCatalogIntegrationTests
         Assert.False(await db.CatalogPrices.AnyAsync());
         Assert.False(await db.CatalogCategories.AnyAsync());
         Assert.False(await db.CatalogAnnouncements.AnyAsync());
-        var seed = LocalCommerceStore.Parse(await File.ReadAllTextAsync(Path.Combine(Repo(), "services/api/LocalCommerce/seed.json")));
+        var seed = LocalCommerceStore.Parse(await File.ReadAllTextAsync(Path.Combine(Repo(), "tests/fixtures/demo-commerce.json")));
         var fixture = seed with { Products = seed.Products.Select(p => p with
         {
             Gallery = ["/assets/test-gallery.png"], Specs = [new ProductSpec("Güç", "1500 W")],
@@ -123,7 +123,7 @@ public sealed class SqlCatalogIntegrationTests
     [Fact]
     public void PriceCannotBeAssignedToMissingVariant()
     {
-        var source = LocalCommerceStore.Parse(File.ReadAllText(Path.Combine(Repo(), "services/api/LocalCommerce/seed.json")));
+        var source = LocalCommerceStore.Parse(File.ReadAllText(Path.Combine(Repo(), "tests/fixtures/demo-commerce.json")));
         Assert.Throws<ArgumentException>(() => SqlCommerceStore.Validate(source with { Prices = new(source.Prices) { ["missing"] = 100 } }));
     }
 }

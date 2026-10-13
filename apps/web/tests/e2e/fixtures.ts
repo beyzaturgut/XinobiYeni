@@ -10,7 +10,7 @@ export async function closeConsent(page:Page) {
 
 /** Browser-only contract fixtures. No request can reach real accounts, mail or inference. */
 export async function mockStore(page:Page,{signedIn=false,cart=false}:{signedIn?:boolean;cart?:boolean}={}) {
-  const state:CommerceState=JSON.parse(readFileSync('../../services/api/LocalCommerce/seed.json','utf8'));
+  const state:CommerceState=JSON.parse(readFileSync('../../tests/fixtures/demo-commerce.json','utf8'));
   for(const product of state.products){product.active=true;for(const variant of product.variants){variant.stock=8;state.prices[variant.id]=240000;}}
   const blue=state.products[0].variants[0];
   Object.assign(blue,{surfaceMask:'/assets/personalization/tea-maker-101-blue-designable.png',surfaceImage:blue.image});

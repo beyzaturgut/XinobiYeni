@@ -7,39 +7,17 @@ import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/
 import CompareToggle from "../../components/compare-toggle";
 import styles from "./catalog.module.css";
 
-import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
-import coffeeGold from "../../../public/assets/products/coffee-maker-101-gold.webp";
-import coffeeRed from "../../../public/assets/products/coffee-maker-101-red.webp";
-import coffeeTwo from "../../../public/assets/products/coffee-maker-102.webp";
-import cookingMachine from "../../../public/assets/products/cooking-machine.webp";
-import teaBlue from "../../../public/assets/products/tea-maker-101-blue.webp";
-import teaRed from "../../../public/assets/products/tea-maker-101-red.webp";
-import teaRose from "../../../public/assets/products/tea-maker-101-rose-gold.webp";
-import teaSilver from "../../../public/assets/products/tea-maker-101-silver.webp";
-import toastMaker from "../../../public/assets/products/toast-maker.webp";
 
 type Category = string;
 type Product = { id: string; name: string; category: Exclude<Category, "Tümü">; family: string; color: string; swatch: string; image: StaticImageData | string; price?: number; stock?: number; tall?: boolean; order: number; href?: string; colorCount?: number };
 
 const fallbackCategories: Category[] = ["Tümü", "Çay", "Kahve", "Hava", "Pişirme"];
-const fallbackProducts: Product[] = [
-  { id: "tea-101-blue", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Lacivert", swatch: "#18304d", image: teaBlue, tall: true, order: 1, href: "/urunler/cay-makinesi-101" },
-  { id: "tea-101-rose", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Rose gold", swatch: "#b87d72", image: teaRose, tall: true, order: 2, href: "/urunler/cay-makinesi-101" },
-  { id: "coffee-101-gold", name: "Kahve Makinesi 101", category: "Kahve", family: "Kahve makineleri", color: "Gold", swatch: "#b78945", image: coffeeGold, order: 3 },
-  { id: "air-101", name: "Air Purifier 101", category: "Hava", family: "Hava temizleyiciler", color: "Beyaz", swatch: "#efefed", image: airPurifier, tall: true, order: 4 },
-  { id: "tea-101-silver", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Gümüş gri", swatch: "#9ba0a1", image: teaSilver, tall: true, order: 5, href: "/urunler/cay-makinesi-101" },
-  { id: "tea-101-red", name: "Çay Makinesi 101", category: "Çay", family: "Çay makineleri", color: "Kırmızı", swatch: "#9f202b", image: teaRed, tall: true, order: 6, href: "/urunler/cay-makinesi-101" },
-  { id: "coffee-101-red", name: "Kahve Makinesi 101", category: "Kahve", family: "Kahve makineleri", color: "Kırmızı", swatch: "#9f202b", image: coffeeRed, order: 7 },
-  { id: "coffee-102", name: "Kahve Makinesi 102", category: "Kahve", family: "Kahve makineleri", color: "Siyah", swatch: "#202426", image: coffeeTwo, order: 8 },
-  { id: "cooking", name: "Yemek Yapma Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: cookingMachine, tall: true, order: 9 },
-  { id: "toast", name: "Tost Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: toastMaker, order: 10 },
-];
 const favoriteStorageKey = "xinobi-demo-favorites";
 
 const categoryLabel = (name: string) => ({'Çay makineleri':'Çay', 'Kahve makineleri':'Kahve', 'Hava temizleme':'Hava', 'Pişirme teknolojileri':'Pişirme'} as Record<string, string>)[name] || name;
 export default function Catalog() {
-  const { state, error, enabled } = useCommerce();
-  const products: Product[] = useMemo(() => state ? state.products.filter(product => product.active).map((product, order) => ({ id: product.id, name: product.name, category: categoryLabel(product.category), family: product.category, color: product.variants.map(variant=>variant.color).join(', '), swatch: product.variants[0]?.hex || '#777777', image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), order, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum,variant)=>sum+variant.stock,0), href: `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : enabled ? [] : fallbackProducts.filter((product,index,items)=>items.findIndex(other=>other.name===product.name)===index).map(product=>({...product,colorCount:fallbackProducts.filter(other=>other.name===product.name).length})), [state, enabled]);
+  const { state, error } = useCommerce();
+  const products: Product[] = useMemo(() => state ? state.products.filter(product => product.active).map((product, order) => ({ id: product.id, name: product.name, category: categoryLabel(product.category), family: product.category, color: product.variants.map(variant=>variant.color).join(', '), swatch: product.variants[0]?.hex || '#777777', image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), order, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum,variant)=>sum+variant.stock,0), href: `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : [], [state]);
   const categories = state ? ["Tümü", ...new Set((state.categories ?? state.products.map(product => product.category)).map(categoryLabel))] : fallbackCategories;
   const [category, setCategory] = useState<Category>("Tümü");
   const [query, setQuery] = useState("");

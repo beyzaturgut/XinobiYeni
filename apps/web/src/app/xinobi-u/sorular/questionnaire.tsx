@@ -10,7 +10,7 @@ import styles from '../studio.module.css';
 export default function Questionnaire() {
   const params = useSearchParams(); const router = useRouter();
   // Colour is not chosen (the pattern covers the body); without `variant` the server uses the first photographed variant.
-  const product = params.get('product') || 'DEMO-P101', variant = params.get('variant') || '';
+  const product = params.get('product') || '', variant = params.get('variant') || '';
   const [session, setSession] = useState<DesignSession | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [step, setStep] = useState(0), [error, setError] = useState(''), [busy, setBusy] = useState(false), [revision, setRevision] = useState(0);
@@ -20,6 +20,7 @@ export default function Questionnaire() {
   const startingKey = useRef('');
   useEffect(() => {
     let active = true;
+    if (!product) return;
     async function load() {
       const existing = sessionStorage.getItem(sessionKey(product, variant));
       if (existing) {
@@ -66,6 +67,7 @@ export default function Questionnaire() {
     catch (error) { setError(error instanceof Error ? error.message : 'Üretim başlatılamadı.'); }
     finally { setBusy(false); }
   }
+  if (!product) return <main className={styles.main}><p role="status">Önce güncel katalogdan bir ürün seçin.</p><Link href="/xinobi-u">Ürün seçimine dön</Link></main>;
   if (!session) return <main className={styles.main}><p role="status">{error || 'Sana özel sorular hazırlanıyor…'}</p>{error && <><button className={styles.primary} onClick={restart}>Tekrar dene</button><Link href="/xinobi-u">Ürün seçimine dön</Link></>}</main>;
   const question = session.questions[step];
   const complete = session.questions.every(q => Boolean(answers[q.id]));

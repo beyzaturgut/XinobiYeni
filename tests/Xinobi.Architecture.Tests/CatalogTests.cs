@@ -22,6 +22,23 @@ public sealed class CatalogTests : IDisposable
     });
 
     [Fact]
+    public async Task DefaultSeedHasNoDemoProductsAndExistingStateIsPreserved()
+    {
+        using var factory = CreateFactory().WithWebHostBuilder(builder =>
+            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:SeedFile"] = null })));
+        using var client = factory.CreateClient();
+        var empty = (await client.GetFromJsonAsync<CommerceState>("/api/v1/catalog/storefront"))!;
+        Assert.Empty(empty.Products);
+        Assert.Empty(empty.Prices);
+        Directory.CreateDirectory(dataDirectory);
+        var existing = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"));
+        await File.WriteAllTextAsync(Path.Combine(dataDirectory, "state.json"), existing);
+        var saved = (await client.GetFromJsonAsync<CommerceState>("/api/v1/catalog/storefront"))!;
+        Assert.NotEmpty(saved.Products);
+        Assert.Equal(existing, await File.ReadAllTextAsync(Path.Combine(dataDirectory, "state.json")));
+    }
+
+    [Fact]
     public async Task AnonymousStorefrontTracksCatalogChangesAndHidesDrafts()
     {
         using var factory = CreateFactory();
@@ -81,7 +98,7 @@ public sealed class CatalogTests : IDisposable
     {
         Directory.CreateDirectory(dataDirectory);
         var snapshot = Path.Combine(dataDirectory, "snapshot.json");
-        var seed = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../services/api/LocalCommerce/seed.json"));
+        var seed = await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"));
         await File.WriteAllTextAsync(snapshot, seed);
         using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {

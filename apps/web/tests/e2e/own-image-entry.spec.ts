@@ -1,6 +1,6 @@
 import {test,expect} from "@playwright/test";
 import {readFileSync} from "node:fs";
-const seed=JSON.parse(readFileSync("../../services/api/LocalCommerce/seed.json","utf8"));
+const seed=JSON.parse(readFileSync("../../tests/fixtures/demo-commerce.json","utf8"));
 const entry="/xinobi-u/kendi-gorselin/";
 test("XINOBI U offers two separate exact-identity paths",async({page})=>{
  await page.route("**/api/v1/local-commerce/state",r=>r.fulfill({json:seed}));let posts=0;page.on("request",r=>{if(r.method()==="POST")posts++});

@@ -6,24 +6,12 @@ import { useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import { clearCompare, maxCompare, toggleCompare, useCompare } from "../../lib/compare";
 import styles from "./search.module.css";
-import teaMaker from "../../../public/assets/products/tea-maker-101-blue.webp";
-import coffeeMaker from "../../../public/assets/products/coffee-maker-101-gold.webp";
-import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
-import cookingMachine from "../../../public/assets/products/cooking-machine.webp";
-import toastMaker from "../../../public/assets/products/toast-maker.webp";
 
 type Item = { id: string; name: string; family: string; description: string; image: StaticImageData | string; price?: number; stock?: number; tall?: boolean; features: [string, string, string]; href?: string };
-const fallbackItems: Item[] = [
-  { id: "tea", name: "Çay Makinesi 101", family: "Çay makineleri", description: "Modern çay ritüeli için dengeli form.", image: teaMaker, tall: true, features: ["Çay hazırlama", "4 demo renk", "Studio uyumlu"], href: "/urunler/cay-makinesi-101" },
-  { id: "coffee", name: "Kahve Makinesi 101", family: "Kahve makineleri", description: "İki fincanı aynı anda hazırlayan kompakt tasarım.", image: coffeeMaker, features: ["Kahve hazırlama", "2 demo renk", "Studio planlanıyor"] },
-  { id: "air", name: "Air Purifier 101", family: "Hava temizleyiciler", description: "Yaşam alanlarına uyumlu sade hava yaklaşımı.", image: airPurifier, tall: true, features: ["Hava kategorisi", "Beyaz", "Detay hazırlanıyor"] },
-  { id: "cooking", name: "Yemek Yapma Makinesi", family: "Pişirme teknolojileri", description: "Tek merkezde çok adımlı mutfak deneyimi.", image: cookingMachine, tall: true, features: ["Pişirme", "Siyah", "Detay hazırlanıyor"] },
-  { id: "toast", name: "Tost Makinesi", family: "Pişirme teknolojileri", description: "Günlük kullanıma uygun yalın masaüstü formu.", image: toastMaker, features: ["Tost hazırlama", "Siyah", "Detay hazırlanıyor"] },
-];
 
 export default function SearchCompare() {
-  const { state, error, enabled } = useCommerce();
-  const items: Item[] = useMemo(() => state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, description: product.description, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0), features: [product.category, `${product.variants.length} renk`, product.description], href: product.id === 'DEMO-P101' ? '/urunler/cay-makinesi-101' : `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : enabled ? [] : fallbackItems, [state, enabled]);
+  const { state, error } = useCommerce();
+  const items: Item[] = useMemo(() => state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, description: product.description, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0), features: [product.category, `${product.variants.length} renk`, product.description], href: `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : [], [state]);
   const [query, setQuery] = useState("");
   // The comparison list is shared with product cards, the tray and /karsilastir.
   const selected = useCompare();
@@ -43,7 +31,7 @@ export default function SearchCompare() {
     </section>
 
     <section className={styles.results} aria-labelledby="results-title">
-      <div className={styles.sectionHeader}><div><p>Arama sonuçları</p><h2 id="results-title">{query ? `“${query}” için ${results.length} sonuç` : `${results.length} demo ürün`}</h2></div><span>Karşılaştırmak için en fazla {maxCompare} ürün seçin.</span></div>
+      <div className={styles.sectionHeader}><div><p>Arama sonuçları</p><h2 id="results-title">{query ? `“${query}” için ${results.length} sonuç` : `${results.length} ürün`}</h2></div><span>Karşılaştırmak için en fazla {maxCompare} ürün seçin.</span></div>
       {results.length ? <div className={styles.resultGrid}>{results.map((item) => { const active = selected.includes(item.id); const full = selected.length === maxCompare && !active; return <article key={item.id}>
         <div className={styles.productMedia}>{item.image ? <Image className={item.tall ? styles.tall : ""} src={item.image} width={600} height={600} alt={item.name} sizes="(max-width: 680px) 88vw, 25vw" /> : <span>Görsel yok</span>}</div>
         <div className={styles.productCopy}><p>{item.family}</p><h3>{item.name}</h3><span>{item.description}</span><div><button type="button" aria-pressed={active} disabled={full} onClick={() => toggle(item.id)}>{active ? "Karşılaştırmadan çıkar" : full ? `En fazla ${maxCompare} ürün` : "Karşılaştır"}</button>{item.href ? <Link href={item.href}>İncele →</Link> : <span>Detay hazırlanıyor</span>}</div></div>

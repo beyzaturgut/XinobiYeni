@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {chromium} from '../node_modules/.pnpm/playwright@1.55.1/node_modules/playwright/index.mjs';
-const seed=JSON.parse(await readFile('services/api/LocalCommerce/seed.json','utf8'));
+const seed=JSON.parse(await readFile('tests/fixtures/demo-commerce.json','utf8'));
 const product=seed.products[0];product.variants[0].hex='#123456';product.originalImage='/assets/products/original-test.webp';
 const photo=await readFile('apps/web/public'+product.variants[0].image);
 const session={id:'test-preview',status:'ready',product,variant:product.variants[0],imageUrl:'/test-art.webp'};

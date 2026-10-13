@@ -64,7 +64,7 @@ public sealed class XinobiUTests : IDisposable
     {
         Directory.CreateDirectory(directory);
         var snapshot = Path.Combine(directory, "snapshot.json");
-        await File.WriteAllTextAsync(snapshot, await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../services/api/LocalCommerce/seed.json")));
+        await File.WriteAllTextAsync(snapshot, await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json")));
         using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder =>
         {
             builder.UseEnvironment("Production");

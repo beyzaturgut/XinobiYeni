@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "source": "services/api/App_Data/real-catalog-qa/state.json",
+  "products": [
+    {
+      "id": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+      "name": "Elektrikli Çay Makinesi CM 101-105",
+      "category": "Çay makineleri",
+      "active": true,
+      "description": "",
+      "seoTitle": "",
+      "variants": [
+        {
+          "id": "DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1",
+          "sku": "101",
+          "color": "Metalik Lacivert",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/01b20091ecaa4fbb86a9a929bf7b56ee.webp",
+          "hex": "#2D4B75"
+        },
+        {
+          "id": "DEMO-V-2eb46bda-939a-4dd8-b6a9-b291a2009d78",
+          "sku": "103",
+          "color": "Rose Gold",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/45b9c496df9c4b2c8871b37309a02447.webp",
+          "hex": "#D79888"
+        },
+        {
+          "id": "DEMO-V-3715b0ef-2087-4392-8e9f-f62da0acc001",
+          "sku": "104",
+          "color": "Metalik Kırmızı",
+          "stock": 9,
+          "image": "/api/v1/local-commerce/media/2909bd0ff68a44388bb53fcb42f5bf89.webp",
+          "hex": "#DD343D"
+        },
+        {
+          "id": "DEMO-V-cd1525d4-f909-4c7c-b2a2-6d4df9f53458",
+          "sku": "105",
+          "color": "Antrasit gri",
+          "stock": 8,
+          "image": "/api/v1/local-commerce/media/dcbd460c05084f78a643e70d818803bf.webp",
+          "hex": "#555358"
+        }
+      ],
+      "personalizable": true,
+      "originalImage": "/api/v1/local-commerce/media/99544f27a8bc4f0c98100f59542798cc.webp"
+    },
+    {
+      "id": "DEMO-499cf715-33cd-4144-8c40-2245181e8625",
+      "name": "Elektrikli Çay Makinesi CM 121-125",
+      "category": "Çay makineleri",
+      "active": true,
+      "description": "",
+      "seoTitle": "",
+      "variants": [
+        {
+          "id": "DEMO-V-5a46bb98-c95c-42b9-9f12-e4286f628cca",
+          "sku": "121",
+          "color": "Metalik gümüş",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/3a7cea44590943f481c7206478d9b0eb.webp",
+          "hex": "#E1E1E1"
+        },
+        {
+          "id": "DEMO-V-8eab5252-a5e1-4a99-91f9-708ea13ec4e8",
+          "sku": "122",
+          "color": "Metalik lacivert",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/8a194ef30efe404ca332b178906e91e2.webp",
+          "hex": "#576C90"
+        },
+        {
+          "id": "DEMO-V-a0e2ecc7-ce8f-469f-9fb6-93f68454f99b",
+          "sku": "123",
+          "color": "Rose gold",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/5d932f80c1634357950556eda5f9ab04.webp",
+          "hex": "#E5B8B1"
+        }
+      ],
+      "personalizable": null,
+      "originalImage": "/api/v1/local-commerce/media/9a1fcc360e89481b847fb5e87543384a.webp"
+    },
+    {
+      "id": "DEMO-97db48f3-afb3-4026-aa26-03deb087cd9d",
+      "name": "Otomatik Türk Kahvesi Makinesi EC 501-505",
+      "category": "Kahve makineleri",
+      "active": true,
+      "description": "",
+      "seoTitle": "",
+      "variants": [
+        {
+          "id": "DEMO-V-459a05ef-1a88-490b-95a6-810f95e70bd5",
+          "sku": "501",
+          "color": "Metalik gümüş",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/ddf3a412b17b4b67ab6097a99e55e76d.webp",
+          "hex": "#AFAFAF"
+        }
+      ],
+      "personalizable": true,
+      "originalImage": "/api/v1/local-commerce/media/a92c578561114398b1c0c4369d8d1018.webp"
+    }
+  ],
+  "stateDefaults": {
+    "prices": {},
+    "content": {},
+    "categories": [],
+    "announcements": []
+  }
+}

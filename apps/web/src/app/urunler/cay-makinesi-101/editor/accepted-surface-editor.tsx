@@ -15,7 +15,7 @@ function PreviewStatus({ error = false, children }: { error?: boolean; children:
     <Link href="/urunler/cay-makinesi-101">Ürüne dön</Link>
   </section>;
 }
-function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc }: { variant: string; commerceProduct?: string; patternSrc?: string }) {
+function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailableMessage }: { variant: string; commerceProduct?: string; patternSrc?: string; unavailableMessage?: string }) {
   const [state, setState] = useState<{ variant: string; inputs?: RenderingInputs | null; error?: boolean }>({ variant });
   useEffect(() => {
     const controller = new AbortController();
@@ -26,8 +26,8 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc }: { varia
   }, [variant, commerceProduct]);
   if (state.variant !== variant || (state.inputs === undefined && !state.error))
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
-  if (state.error) return <PreviewStatus error>Önizleme yüklenemedi.</PreviewStatus>;
-  if (!state.inputs) return <PreviewStatus>{previewUnavailableMessage}</PreviewStatus>;
+  if (state.error) return <PreviewStatus error>Önizleme yüklenemedi. Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin.</PreviewStatus>;
+  if (!state.inputs) return <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>;
   return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} />;
 }
 function AcceptedSurfaceRoute() {
@@ -46,6 +46,6 @@ function ReferenceLink({ href, children }: { href: string; children: React.React
 export function DevelopmentReferenceLink({ href, children }: { href: string; children: React.ReactNode }) {
   return <Suspense fallback={<Link href="/urunler/cay-makinesi-101">{children}</Link>}><ReferenceLink href={href}>{children}</ReferenceLink></Suspense>;
 }
-export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string } = {}) {
-  return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} /> : <AcceptedSurfaceRoute />}</Suspense>;
+export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string } = {}) {
+  return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage} /> : <AcceptedSurfaceRoute />}</Suspense>;
 }

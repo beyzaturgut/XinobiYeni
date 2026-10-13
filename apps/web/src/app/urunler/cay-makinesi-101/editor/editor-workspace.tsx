@@ -54,8 +54,11 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
           <div className={styles.halo} />
           <ProductPatternPreview
             surfaceTreatment={renderingInputs.surfaceTreatment}
+            surfaceInkExposureStops={renderingInputs.surfaceInkExposureStops}
             sourceWidth={renderingInputs.width}
             sourceHeight={renderingInputs.height}
+            assetWidth={renderingInputs.assetWidth ?? renderingInputs.width}
+            assetHeight={renderingInputs.assetHeight ?? renderingInputs.height}
             productSrc={renderingInputs.source.url}
             designableMaskSrc={renderingInputs.mask.url}
             brandingOverlaySrc={renderingInputs.branding?.url}

@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react'
 import type { Product } from '../../commerce'
 import LocalMaskEditor from './LocalMaskEditor'
 
-type SourceSelection = Readonly<{ productId: string; variantId: string; imageReference: string; sha256: string; width: number; height: number; previewUrl: string }>
+type SourceSelection = Readonly<{ productId: string; variantId: string; imageReference: string; sha256: string; width: number; height: number; originalWidth: number; originalHeight: number; previewUrl: string }>
+const maxWorkingPixels = 8_000_000
+function workingDimensions(width: number, height: number) {
+  const scale = width * height > maxWorkingPixels ? Math.sqrt(maxWorkingPixels / (width * height)) : 1
+  return { width: Math.max(1, Math.floor(width * scale)), height: Math.max(1, Math.floor(height * scale)) }
+}
 // Read-only entry; never passes a catalog source into the fixture's review/candidate state.
 const configuredBase = import.meta.env.VITE_PRODUCT_SURFACES_CATALOG_API_URL || '/api/v1/local-commerce'
 function catalogBase() {
@@ -35,7 +40,7 @@ export default function CatalogSourceSelection({ disabled, onSelected }: { disab
     void load(); return () => controller.abort()
   }, [])
   useEffect(() => {
-    const controller = new AbortController(); let objectUrl: string | null = null
+    const controller = new AbortController(); let previewUrl: string | null = null
     if (!product || !variant) return () => controller.abort()
     const productSnapshot = product.id, variantSnapshot = variant.id, imageReference = variant.image
     async function load() {
@@ -48,17 +53,28 @@ export default function CatalogSourceSelection({ disabled, onSelected }: { disab
         if (!bytes.byteLength || bytes.byteLength > 20 * 1024 * 1024) throw new Error('source_size')
         const hash = await crypto.subtle.digest('SHA-256', bytes)
         if (controller.signal.aborted) return
-        objectUrl = URL.createObjectURL(new Blob([bytes], { type: response.headers.get('content-type')! }))
-        const image = new Image(); image.src = objectUrl; await image.decode()
-        if (!image.naturalWidth || !image.naturalHeight) throw new Error('invalid_dimensions')
-        if (!controller.signal.aborted) setSource(Object.freeze({ productId: productSnapshot, variantId: variantSnapshot, imageReference, sha256: Array.from(new Uint8Array(hash), n => n.toString(16).padStart(2, '0')).join(''), width: image.naturalWidth, height: image.naturalHeight, previewUrl: objectUrl }))
-      } catch { if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null }; if (!controller.signal.aborted) setSourceError(true) }
+        const inputBlob = new Blob([bytes], { type: response.headers.get('content-type')! })
+        const bitmap = await createImageBitmap(inputBlob)
+        const originalWidth = bitmap.width, originalHeight = bitmap.height, working = workingDimensions(originalWidth, originalHeight)
+        if (working.width === originalWidth && working.height === originalHeight) {
+          bitmap.close(); previewUrl = URL.createObjectURL(inputBlob)
+        }
+        else {
+          const canvas = document.createElement('canvas'); canvas.width = working.width; canvas.height = working.height
+          const context = canvas.getContext('2d'); if (!context) throw new Error('preview_context')
+          context.drawImage(bitmap, 0, 0, working.width, working.height); bitmap.close()
+          const preview = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/webp', 0.92))
+          if (!preview) throw new Error('preview_encode')
+          previewUrl = URL.createObjectURL(preview)
+        }
+        if (!controller.signal.aborted) setSource(Object.freeze({ productId: productSnapshot, variantId: variantSnapshot, imageReference, sha256: Array.from(new Uint8Array(hash), n => n.toString(16).padStart(2, '0')).join(''), ...working, originalWidth, originalHeight, previewUrl }))
+      } catch { if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null }; if (!controller.signal.aborted) setSourceError(true) }
     }
-    void load(); return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl) }
+    void load(); return () => { controller.abort(); if (previewUrl) URL.revokeObjectURL(previewUrl) }
   }, [product, variant])
   return <section className="surface-panel surface-catalog-entry" aria-label="Ürün ve varyant seçimi">
     <div className="surface-controls">
-      <CatalogReadiness disabled={disabled} onSelect={(p,v)=>{setProductId(p);setVariantId(v);setSource(null);setSourceError(false);onSelected(true)}} />
+      <CatalogReadiness products={products} disabled={disabled} onSelect={(p,v)=>{setProductId(p);setVariantId(v);setSource(null);setSourceError(false);onSelected(true)}} />
       <fieldset disabled={disabled}>
         <legend>İncelenecek ürün</legend>
         <label>Ürün<select value={productId} onChange={event => { setProductId(event.target.value); setVariantId(''); setSource(null); setSourceError(false); onSelected(!!event.target.value) }}>
@@ -72,7 +88,7 @@ export default function CatalogSourceSelection({ disabled, onSelected }: { disab
       {productId && !variantId && <p>İncelemek için bir varyant seçin.</p>}
       {variantId && !source && !sourceError && <p role="status">Seçili varyantın görseli yükleniyor…</p>}
       {sourceError && <p role="alert">Bu varyantın görseli doğrulanamadı. Başka bir görsel veya maske kullanılmadı.</p>}
-      {source && <div data-testid="catalog-surface-source" data-product-id={source.productId} data-variant-id={source.variantId} data-image-reference={source.imageReference} data-source-sha256={source.sha256} data-source-width={source.width} data-source-height={source.height}>
+      {source && <div data-testid="catalog-surface-source" data-product-id={source.productId} data-variant-id={source.variantId} data-image-reference={source.imageReference} data-source-sha256={source.sha256} data-source-width={source.width} data-source-height={source.height} data-source-original-width={source.originalWidth} data-source-original-height={source.originalHeight}>
         <h2>{product?.name} · {variant?.color}</h2>
         <p>Maske durumu yalnızca seçili varyant ve doğrulanmış kaynak için kontrol edilir.</p>
         <CatalogMaskReview key={source.productId+source.variantId+source.sha256} source={source} />

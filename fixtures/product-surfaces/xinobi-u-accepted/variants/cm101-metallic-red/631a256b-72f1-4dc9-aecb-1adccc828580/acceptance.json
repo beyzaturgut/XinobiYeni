@@ -1,0 +1,113 @@
+{
+  "version": "631a256b-72f1-4dc9-aecb-1adccc828580",
+  "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+  "variantId": "DEMO-V-3715b0ef-2087-4392-8e9f-f62da0acc001",
+  "sourceImage": "/api/v1/local-commerce/media/2909bd0ff68a44388bb53fcb42f5bf89.webp",
+  "sourceSha256": "7f5dae6ce433fa94498d6cbd390c1af6a34d5a05b2895978835a65012422352b",
+  "sourceVersion": "f7b2a59ebfcdaf3ce3a5865ad55f80a8c04f2fe5e6ffc2858e533d51e02a025c",
+  "width": 3543,
+  "height": 5315,
+  "candidateId": "1d31834f-debd-492f-acf9-02982fe2646d",
+  "target": "upper-body + lower-body",
+  "maskSha256": "b7ac38e215b9ac945c2d09d4e073021871709f5f8fdcf4aedcb17f3d5a0b1c61",
+  "brandingSha256": "9b0d275274b0aaaeaab9e6b186e3a3513d5bcb9637c3ce4d7922a8a3d8d9d9dd",
+  "brandingRequired": true,
+  "boundariesReviewed": true,
+  "brandingReviewed": true,
+  "updatedAt": "2026-10-10T23:13:10.291Z",
+  "acceptedAt": "2026-10-10T23:13:10.291Z",
+  "provenance": "DERIVED FAMILY GEOMETRY — MANUAL REVIEW REQUIRED",
+  "familyGeometry": {
+    "familyId": "423d6018-9053-40d6-aeea-e72c8b1e533d",
+    "version": "db795d0b-163e-4c64-967b-0208b671d1e6",
+    "reference": {
+      "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+      "variantId": "DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1",
+      "sourceImage": "/api/v1/local-commerce/media/01b20091ecaa4fbb86a9a929bf7b56ee.webp",
+      "sourceSha256": "f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935",
+      "width": 3543,
+      "height": 5315,
+      "sourceVersion": "71ce3d0bea27e8ee59d8408160f46ec99623e8cc8a84cce76ac024cf8686bf85",
+      "acceptedVersion": "56ddfb9b-ecc5-42d4-b03d-5a5aa83227ba",
+      "acceptedMaskSha256": "66aa43b8afa1fc9af455a5bc03344baa532345839ffd9e5da3e32a353637df75",
+      "provenance": "REAL ROBOFLOW OUTPUT — EXPLICIT LOCAL MASK SELECTION",
+      "brandingRequired": true
+    },
+    "surfaceIds": [
+      "upper-body",
+      "lower-body"
+    ],
+    "missing": [],
+    "alignment": {
+      "schemaVersion": 1,
+      "method": "affine",
+      "referenceWidth": 3543,
+      "referenceHeight": 5315,
+      "targetWidth": 3543,
+      "targetHeight": 5315,
+      "analysisWidth": 600,
+      "analysisHeight": 900,
+      "referenceToTarget": [
+        0.9925086242280332,
+        0.0022522969558203608,
+        -7.8,
+        0.007827703044179637,
+        0.9973086242280332,
+        0.7999999999999999
+      ],
+      "correlation": 0.5470680927702398,
+      "medianSourcePixels": 2.5216383266905575,
+      "p95SourcePixels": 22.453259832241212,
+      "regions": {
+        "upperBody": {
+          "samples": 60,
+          "medianSourcePixels": 0,
+          "p95SourcePixels": 9.241007425760595
+        },
+        "lowerBody": {
+          "samples": 961,
+          "medianSourcePixels": 3.1235988991438823,
+          "p95SourcePixels": 24.20990368020573
+        },
+        "handleJunctions": {
+          "samples": 555,
+          "medianSourcePixels": 3.364626070715892,
+          "p95SourcePixels": 23.586678055810488
+        },
+        "spouts": {
+          "samples": 195,
+          "medianSourcePixels": 3.0969109060599425,
+          "p95SourcePixels": 16.87499489418879
+        },
+        "metalJunctions": {
+          "samples": 166,
+          "medianSourcePixels": 1.4629062386272365,
+          "p95SourcePixels": 19.99908366901691
+        },
+        "base": {
+          "samples": 127,
+          "medianSourcePixels": 0,
+          "p95SourcePixels": 8.893037867197242
+        },
+        "logo": {
+          "samples": 135,
+          "medianSourcePixels": 5.291433923058217,
+          "p95SourcePixels": 39.34708621184926
+        }
+      },
+      "requiresManualReview": true,
+      "localDeformation": false,
+      "warnings": [
+        "Bu hizalama onay değildir; sap, ağız, logo, metal birleşimler ve kaideyi hedef fotoğrafta inceleyin.",
+        "Kenar metriği fiziksel sınır eşleşmesini veya maskenin doğru olduğunu kanıtlamaz.",
+        "Branding hedef varyantın kendi kaynak piksellerinden yeniden hazırlanmalıdır."
+      ],
+      "uncertaintySourcePixels": 5.905
+    },
+    "brandingRequired": true,
+    "editingRadius": 32
+  },
+  "familyAlignmentReviewed": true,
+  "familyBrandingReviewed": true,
+  "approvalKind": "explicit-development-admin-review"
+}

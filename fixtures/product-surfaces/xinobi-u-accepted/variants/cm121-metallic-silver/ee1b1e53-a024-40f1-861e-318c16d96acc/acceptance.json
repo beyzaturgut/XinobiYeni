@@ -1,0 +1,48 @@
+{
+  "version": "ee1b1e53-a024-40f1-861e-318c16d96acc",
+  "productId": "DEMO-499cf715-33cd-4144-8c40-2245181e8625",
+  "variantId": "DEMO-V-5a46bb98-c95c-42b9-9f12-e4286f628cca",
+  "sourceImage": "/api/v1/local-commerce/media/3a7cea44590943f481c7206478d9b0eb.webp",
+  "sourceSha256": "957b268ded0c00d633788b841168f7bed5cc487ee2dd8a13093bfb4e92b56660",
+  "sourceVersion": "d7681167e137531c1a28fad2358529a047b145261c24b51a12573fbed75487da",
+  "width": 2309,
+  "height": 3463,
+  "originalWidth": 7711,
+  "originalHeight": 11561,
+  "workingCopy": true,
+  "candidateId": "b3635295-5491-4a55-bfee-5161ec5bd45e",
+  "target": "upper-body + lower-body",
+  "maskSha256": "21df2ad13359687e6e85abb51bbd35ee0368c550a284192c694bf83b3e30a8ef",
+  "brandingSha256": "e9bde4679534b2a7b6f3437b90138e820f7c6b7f85c9f701173a0724427ebdb1",
+  "brandingRequired": true,
+  "boundariesReviewed": true,
+  "brandingReviewed": true,
+  "updatedAt": "2026-10-12T07:31:03.546Z",
+  "acceptedAt": "2026-10-12T07:31:03.546Z",
+  "provenance": "CM121 UPPER-BODY LOWER-SEAM LOCAL CORRECTION - UNAPPROVED",
+  "composition": {
+    "selected": [
+      {
+        "id": "262c0c7c-010a-4661-a556-6a946b576c21",
+        "surfaceId": "upper-body"
+      },
+      {
+        "id": "746bbfb3-99d7-48f9-92ae-422bbc2d9a56",
+        "surfaceId": "lower-body"
+      }
+    ],
+    "expectedBodyCount": 2,
+    "observedBodyCount": 2,
+    "missingBodies": [],
+    "brandingRequired": true,
+    "surfaceIds": [
+      "upper-body",
+      "lower-body"
+    ]
+  },
+  "surfaceIds": [
+    "upper-body",
+    "lower-body"
+  ],
+  "approvalKind": "explicit-development-admin-review"
+}

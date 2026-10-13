@@ -22,6 +22,7 @@ import '../features/home/home_screen.dart';
 import '../features/news/news_screen.dart';
 import '../features/xinobi_u/questionnaire_screen.dart';
 import '../features/xinobi_u/xinobi_u_screen.dart';
+import '../features/xinobi_u/mobile_preview_screen.dart';
 
 /// Five tabs keep their own navigation stacks; product detail opens above the tabs so Android back returns to the list.
 GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
@@ -75,6 +76,12 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
           builder: (context, state) => QuestionnaireScreen(
             productId: state.uri.queryParameters['urun'] ?? '',
             variantId: state.uri.queryParameters['renk'],
+          ),
+        ),
+        GoRoute(
+          path: '/xinobi-u/mobil-onizleme',
+          builder: (context, state) => XinobiMobilePreviewScreen(
+            sessionId: state.uri.queryParameters['session'],
           ),
         ),
       ],

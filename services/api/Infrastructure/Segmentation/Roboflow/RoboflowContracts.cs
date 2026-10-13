@@ -12,4 +12,4 @@ internal sealed record InteractivePayload(RoboflowImage Image, PointPrompts Prom
     [property: JsonPropertyName("multimask_output")] bool MultimaskOutput = false);
 
 // Infrastructure evidence only; score is not business or manufacturing approval.
-public sealed record ProviderSelectionEvidence(int SelectedOrder, int TotalResults, double? Score);
+public sealed record ProviderSelectionEvidence(int SelectedOrder, int TotalResults, double? Score, int PromptIndex = 0);

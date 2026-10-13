@@ -50,4 +50,23 @@ public sealed class CatalogCandidateRuntimeTests
    await Assert.ThrowsAsync<SegmentationProviderException>(()=>runtime.ExecuteAsync(request with{AttemptId=Guid.NewGuid(),Sha256=new string('0',64)},()=>throw new Exception(),()=>throw new Exception(),true));
   }
  }
+
+ private sealed class MultiHttp(string[] prompts,byte[] bytes,int w,int h):HttpMessageHandler {
+  public int Calls;
+  protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,CancellationToken token){
+   Calls++;Assert.Equal(HttpVersion.Version11,request.Version);Assert.True(request.Headers.ConnectionClose);using var payload=JsonDocument.Parse(await request.Content!.ReadAsStringAsync(token));Assert.Equal(prompts,payload.RootElement.GetProperty("prompts").EnumerateArray().Select(p=>p.GetProperty("text").GetString()));Assert.Equal(bytes,Convert.FromBase64String(payload.RootElement.GetProperty("image").GetProperty("value").GetString()!));
+   var prediction=new{format="rle",masks=new{size=new[]{h,w},counts=new[]{h*(w/4),h*(w/2),h*(w-w/4-w/2)}},confidence=.8};
+   return new(HttpStatusCode.OK){Content=new StringContent(JsonSerializer.Serialize(new{prompt_results=prompts.Select((p,i)=>new{prompt_index=i,predictions=new[]{prediction,prediction}})}),Encoding.UTF8,"application/json")};
+  }
+ }
+ [Fact]
+ public async Task PresetsAndManualRetainAllBoundedChoicesAsPendingWithoutApproval()
+ {
+  var data=Path.Combine(Root,"services/api/App_Data/real-catalog-qa");var catalog=new SnapshotCatalogSource(Path.Combine(data,"state.json"));var p=(await catalog.ReadAsync()).Products.First(p=>p.Active&&p.Personalizable==true);var v=p.Variants.First();var bytes=File.ReadAllBytes(Path.Combine(data,"media",Path.GetFileName(v.Image)));using var info=SKBitmap.Decode(bytes);
+  foreach(var mode in new[]{"upper","lower","both","manual"}){
+   var prompts=mode switch{"upper"=>new[]{"upper teapot body"},"lower"=>new[]{"lower kettle body"},"both"=>new[]{"upper teapot body","lower kettle body"},_=>new[]{"coffee machine designable body"}};
+   var request=new CatalogCandidateRequest(Guid.NewGuid(),p.Id,v.Id,Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),info.Width,info.Height,prompts[0],true,mode,true);var directory=Path.Combine(Root,"services/api/App_Data/integration-runtime/multi-runtime-"+Guid.NewGuid());var runtime=new CatalogCandidateRuntime(catalog,Path.Combine(data,"media"),directory);var handler=new MultiHttp(prompts,bytes,info.Width,info.Height);
+   var id=await runtime.ExecuteAsync(request,()=>"fake-mock-only",()=>handler,true);Assert.Equal(1,handler.Calls);using var record=JsonDocument.Parse(File.ReadAllText(Path.Combine(directory,"pending",id.ToString(),"candidate.json")));var options=record.RootElement.GetProperty("options");Assert.Equal(prompts.Length*2,options.GetArrayLength());Assert.Equal(options.GetArrayLength(),options.EnumerateArray().Select(o=>o.GetProperty("id").GetGuid()).Distinct().Count());Assert.All(options.EnumerateArray(),o=>Assert.True(File.Exists(Path.Combine(directory,"pending",id.ToString(),o.GetProperty("file").GetString()!))));Assert.False(record.RootElement.GetProperty("approved").GetBoolean());Assert.False(Directory.Exists(Path.Combine(directory,"accepted")));await Assert.ThrowsAsync<SegmentationProviderException>(()=>runtime.ExecuteAsync(request,()=>throw new Exception("credential must not load twice"),()=>handler,true));Assert.Equal(1,handler.Calls);
+  }
+ }
 }

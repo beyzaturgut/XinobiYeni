@@ -28,6 +28,12 @@ class XinobiUScreen extends ConsumerWidget {
               Semantics(header: true, child: Text('XINOBI U', style: text.headlineSmall)),
               const SizedBox(height: 6),
               Text('Bir ürün. Binlerce olasılık. Kişiselleştirmek istediğin ürünü seç.', style: text.bodyMedium),
+              const SizedBox(height: 16),
+              OutlinedButton.icon(
+                onPressed: () => context.push('/xinobi-u/mobil-onizleme'),
+                icon: const Icon(Icons.phone_android_outlined),
+                label: const Text('CM121 önizlemesini aç'),
+              ),
             ]),
           ),
         ),

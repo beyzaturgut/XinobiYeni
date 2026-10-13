@@ -8,11 +8,11 @@ namespace Xinobi.Api.Infrastructure.Segmentation.Roboflow;
 
 // HttpClient must be explicitly injected. No constructor/fallback creates network transport.
 public sealed class RoboflowSurfaceSegmentationProvider(HttpClient client, RoboflowSegmentationOptions options,
-    bool externalInferenceEnabled, Func<SourceMediaIdentity, byte[]> resolveSource, DevelopmentMaskBuffer masks) : ISurfaceSegmentationProvider
+    bool externalInferenceEnabled, Func<SourceMediaIdentity, byte[]> resolveSource, DevelopmentMaskBuffer masks, bool retainAutomaticCandidates = false, IReadOnlyList<string>? automaticPrompts = null) : ISurfaceSegmentationProvider
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     public Task<SegmentationResult> GenerateAutomaticAsync(AutomaticSegmentationRequest request, CancellationToken cancellationToken)
-        => SendAsync(request.Source, "/sam3/concept_segment", image => new AutomaticPayload(image, [new TextPrompt("text", request.Surface.AutomaticPrompt)]), true, cancellationToken);
+        => SendAsync(request.Source, "/sam3/concept_segment", image => new AutomaticPayload(image, (automaticPrompts ?? [request.Surface.AutomaticPrompt]).Select(text => new TextPrompt("text", text)).ToArray()), true, cancellationToken);
 
     public Task<SegmentationResult> GenerateInteractiveAsync(InteractiveSegmentationRequest request, CancellationToken cancellationToken)
     {
@@ -28,6 +28,9 @@ public sealed class RoboflowSurfaceSegmentationProvider(HttpClient client, Robof
             !Uri.TryCreate(options.BaseUrl, UriKind.Absolute, out var baseUri) || baseUri.Scheme != "https" ||
             baseUri.Host != "serverless.roboflow.com" || !baseUri.IsDefaultPort || baseUri.UserInfo.Length != 0 || baseUri.AbsolutePath != "/" || baseUri.Query.Length != 0 || baseUri.Fragment.Length != 0)
             throw new SegmentationProviderException("provider_configuration_invalid", 503);
+        var prompts = automaticPrompts ?? Array.Empty<string>();
+        if (automatic && (prompts.Count > 2 || prompts.Any(p => string.IsNullOrWhiteSpace(p) || p.Length > 160 || p.Any(char.IsControl))))
+            throw new SegmentationProviderException("provider_request_rejected");
         cancellationToken.ThrowIfCancellationRequested();
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         deadline.CancelAfter(TimeSpan.FromSeconds(options.TimeoutSeconds));
@@ -58,37 +61,53 @@ public sealed class RoboflowSurfaceSegmentationProvider(HttpClient client, Robof
             using var document = JsonDocument.Parse(body.ToArray(), new JsonDocumentOptions { MaxDepth = 32 });
             var root = document.RootElement;
             // Selected contract: PCS prompt_results; PVS top-level predictions. No historic-schema guessing.
-            JsonElement predictions;
+            var groups = new List<(int Index, JsonElement Predictions)>();
             if (automatic)
             {
                 var results = root.GetProperty("prompt_results");
-                if (results.GetArrayLength() != 1 || results[0].GetProperty("prompt_index").GetInt32() != 0) throw new InvalidDataException();
-                predictions = results[0].GetProperty("predictions");
+                var expected = prompts.Count == 0 ? 1 : prompts.Count;
+                if (results.GetArrayLength() != expected) throw new InvalidDataException();
+                var seen = new HashSet<int>();
+                foreach (var item in results.EnumerateArray())
+                {
+                    var index = item.GetProperty("prompt_index").GetInt32();
+                    if (index < 0 || index >= expected || !seen.Add(index)) throw new InvalidDataException();
+                    groups.Add((index, item.GetProperty("predictions")));
+                }
+                groups.Sort((a,b) => a.Index.CompareTo(b.Index));
             }
-            else predictions = root.GetProperty("predictions");
-            if (predictions.ValueKind != JsonValueKind.Array || predictions.GetArrayLength() is < 1 or > 100 || (!automatic && predictions.GetArrayLength() != 1)) throw new InvalidDataException();
+            else groups.Add((0, root.GetProperty("predictions")));
+            var limit = automatic && retainAutomaticCandidates ? 8 : 100;
+            var total = 0;
+            foreach (var group in groups)
+            {
+                if (group.Predictions.ValueKind != JsonValueKind.Array) throw new InvalidDataException();
+                total += group.Predictions.GetArrayLength();
+            }
+            if (total < 1 || total > limit || (!automatic && total != 1)) throw new InvalidDataException();
             var normalizer = new RoboflowMaskNormalizer();
-            (ValidatedAlignedMask Mask, byte[] Bytes, double? Score, int Order)? best = null;
-            int order = 0;
-            foreach (var prediction in predictions.EnumerateArray())
+            var normalized = new List<(ValidatedAlignedMask Mask, byte[] Bytes, double? Score, int Order, int Prompt)>();
+            foreach (var group in groups)
+            foreach (var prediction in group.Predictions.EnumerateArray())
             {
                 if (prediction.GetProperty("format").GetString() != "rle") throw new InvalidDataException();
                 double? score = prediction.TryGetProperty("confidence", out var value) ? value.GetDouble() : null;
                 if (score is not null && !double.IsFinite(score.Value)) throw new InvalidDataException();
                 var result = normalizer.Normalize(prediction.GetProperty("masks"), source, "dev:segmentation-mask:" + Guid.NewGuid());
-                // Validate every prediction, but retain only the best mask. Stable ties keep provider order.
-                if (best is null || (score ?? double.NegativeInfinity) > (best.Value.Score ?? double.NegativeInfinity))
-                    best = (result.Mask, result.Bytes, score, order);
-                order++;
+                normalized.Add((result.Mask,result.Bytes,score,normalized.Count,group.Index));
             }
-            var selected = best!.Value;
+            // Legacy callers still receive the highest-scored single mask. New catalog callers opt in.
+            var chosen = automatic && retainAutomaticCandidates ? normalized :
+                normalized.OrderByDescending(item => item.Score ?? double.NegativeInfinity).Take(1).ToList();
             // Source snapshot must still be exact after await; no remote claim substitutes for this check.
             if (new AlignedImageInspector().InspectSource(resolveSource(source), source.MediaVersionId) != source)
                 throw new SegmentationProviderException("provider_source_mismatch", 409);
             deadline.Token.ThrowIfCancellationRequested();
-            masks.Add(selected.Mask, selected.Bytes, new ProviderSelectionEvidence(selected.Order, order, selected.Score));
+            foreach (var item in chosen)
+                masks.Add(item.Mask,item.Bytes,new ProviderSelectionEvidence(item.Order,total,item.Score,item.Prompt));
             return new SegmentationResult(source, new ProviderProvenance("roboflow", "sam3"),
-                [new ProviderMaskCandidate(selected.Mask.Metadata, selected.Score is null ? null : new ProviderScore("confidence", selected.Score.Value, "Provider segmentation score; not designability approval."))]);
+                chosen.Select(item => new ProviderMaskCandidate(item.Mask.Metadata,item.Score is null ? null :
+                    new ProviderScore("confidence",item.Score.Value,"Provider segmentation score; not designability approval."))));
         }
         catch (SegmentationProviderException) { throw; }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw new OperationCanceledException(cancellationToken); }

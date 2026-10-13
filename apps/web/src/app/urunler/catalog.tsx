@@ -1,10 +1,9 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import styles from "./catalog.module.css";
+import CatalogProductCard, { catalogFavoriteStorageKey, type CatalogProductCardData } from "../../components/catalog-product-card";
 
 import airPurifier from "../../../public/assets/products/air-purifier-101.webp";
 import coffeeGold from "../../../public/assets/products/coffee-maker-101-gold.webp";
@@ -18,7 +17,7 @@ import teaSilver from "../../../public/assets/products/tea-maker-101-silver.webp
 import toastMaker from "../../../public/assets/products/toast-maker.webp";
 
 type Category = string;
-type Product = { id: string; name: string; category: Exclude<Category, "Tümü">; family: string; color: string; swatch: string; image: StaticImageData | string; price?: number; stock?: number; tall?: boolean; order: number; href?: string; colorCount?: number };
+type Product = CatalogProductCardData & { category: Exclude<Category, "Tümü">; price?: number; stock?: number; order: number; href?: string };
 
 const fallbackCategories: Category[] = ["Tümü", "Çay", "Kahve", "Hava", "Pişirme"];
 const fallbackProducts: Product[] = [
@@ -33,8 +32,6 @@ const fallbackProducts: Product[] = [
   { id: "cooking", name: "Yemek Yapma Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: cookingMachine, tall: true, order: 9 },
   { id: "toast", name: "Tost Makinesi", category: "Pişirme", family: "Pişirme teknolojileri", color: "Siyah", swatch: "#202426", image: toastMaker, order: 10 },
 ];
-const favoriteStorageKey = "xinobi-demo-favorites";
-
 const categoryLabel = (name: string) => ({'Çay makineleri':'Çay', 'Kahve makineleri':'Kahve', 'Hava temizleme':'Hava', 'Pişirme teknolojileri':'Pişirme'} as Record<string, string>)[name] || name;
 export default function Catalog() {
   const { state, error, enabled } = useCommerce();
@@ -49,7 +46,7 @@ export default function Catalog() {
     const timer = window.setTimeout(() => {
       const selectedCategory = new URLSearchParams(window.location.search).get("category");
       if (selectedCategory) setCategory(categoryLabel(selectedCategory));
-      try { setFavorites(JSON.parse(localStorage.getItem(favoriteStorageKey) || "[]")); } catch { setFavorites([]); }
+      try { setFavorites(JSON.parse(localStorage.getItem(catalogFavoriteStorageKey) || "[]")); } catch { setFavorites([]); }
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
@@ -57,7 +54,7 @@ export default function Catalog() {
   function toggleFavorite(id: string) {
     setFavorites((current) => {
       const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id];
-      localStorage.setItem(favoriteStorageKey, JSON.stringify(next));
+      localStorage.setItem(catalogFavoriteStorageKey, JSON.stringify(next));
       return next;
     });
   }
@@ -77,11 +74,6 @@ export default function Catalog() {
       <div className={styles.categoryBar} aria-label="Kategori filtresi">{categories.map((item) => <button type="button" key={item} className={activeCategory === item ? styles.activeCategory : ""} aria-pressed={activeCategory === item} onClick={() => setCategory(item)}>{item}</button>)}</div>
     </div>
     <div className={styles.resultSummary} aria-live="polite"><strong>{visibleProducts.length} ürün</strong><span>Ürünler</span></div>
-    {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <article className={styles.card} key={product.id}>
-      <Link className={styles.cardLink} href={product.href || '/urunler'}><div className={styles.media}>{(product.colorCount || 0)>1 && <span className={styles.multiColorBadge}>◉ {product.colorCount} renk</span>}<span className={styles.demoBadge}>Xinobi</span>{product.image ? <Image className={product.tall ? styles.tallImage : ""} src={product.image} width={600} height={600} alt={`${product.name}, ${product.color}`} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /> : <span>Görsel yok</span>}</div>
-
-      <div className={styles.cardBody}><p>{product.family}</p><h2>{product.name}</h2><div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{(product.colorCount || 0)>1 ? `${product.colorCount} renk seçeneği` : product.color}</span></div><div className={styles.cardFooter}><span>{money(product.price)}{stockText(product.stock) && <><br />{stockText(product.stock)}</>}</span>{product.href ? <span className={styles.inspect}>İncele <b aria-hidden="true">→</b></span> : <span>İncele →</span>}</div></div></Link>
-      <button type="button" className={styles.favoriteButton} aria-label={`${product.name} ${product.color} ürününü ${favorites.includes(product.id) ? "favorilerden çıkar" : "favorilere ekle"}`} aria-pressed={favorites.includes(product.id)} onClick={() => toggleFavorite(product.id)}><span aria-hidden="true">{favorites.includes(product.id) ? "♥" : "♡"}</span></button>
-    </article>)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
+    {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <CatalogProductCard key={product.id} product={product} cardHref={product.href || '/urunler'} favorite={favorites.includes(product.id)} onToggleFavorite={() => toggleFavorite(product.id)} action={<><span>{money(product.price)}{stockText(product.stock) && <><br />{stockText(product.stock)}</>}</span>{product.href ? <span className={styles.inspect}>İncele <b aria-hidden="true">→</b></span> : <span>İncele →</span>}</>} />)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
   </section>;
 }

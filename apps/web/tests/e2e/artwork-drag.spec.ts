@@ -1,4 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
+import { artworkReadOnly } from './artwork-read-only';
+test.beforeEach(async ({page}) => artworkReadOnly(page));
 async function setup(page:Page,width=1440){
  await page.setViewportSize({width,height:1000});await page.goto('/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B');
  await page.getByLabel('Görsel seç',{exact:true}).setInputFiles('public/assets/personalization/sample-pattern.png');

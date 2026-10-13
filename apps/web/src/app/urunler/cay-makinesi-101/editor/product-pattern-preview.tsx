@@ -190,9 +190,9 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
       }
       buffer.clearRect(0,0,SOURCE_WIDTH,SOURCE_HEIGHT);
       buffer.drawImage(canvasRef.current!,0,0);
-    } else if (bodies.length) {
+    } else if (placementMode === "pattern" && bodies.length) {
       // Pattern mode uses one common natural-image scale, sized to cover the
-      // largest component. Artwork mode keeps each photo's own rectangle fit.
+      // largest component. Artwork instead uses the single movable rectangle below.
       const sharedPatternScale = placementMode === "pattern" && bodies.length > 1
         ? Math.max(...bodies.map(body => Math.max(body.width / pattern.naturalWidth, body.height / pattern.naturalHeight)))
         : null;

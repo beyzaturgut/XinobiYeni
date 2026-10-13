@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import EditorWorkspace from "./editor-workspace";
+import LocalPatternPreview from "../../../../features/product-personalization/local-pattern-preview";
 import { loadAcceptedSurface, type RenderingInputs } from "./accepted-surface-api";
 import styles from "./editor.module.css";
 import { previewUnavailableMessage } from "../../../../features/product-personalization/variant-preview-readiness";
@@ -28,7 +28,7 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailab
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi. Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin.</PreviewStatus>;
   if (!state.inputs) return <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>;
-  return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} />;
+  return <LocalPatternPreview inputs={state.inputs} initialPatternSrc={patternSrc ?? "/assets/personalization/sample-pattern.png"} />;
 }
 function AcceptedSurfaceRoute() {
   const query = useSearchParams();

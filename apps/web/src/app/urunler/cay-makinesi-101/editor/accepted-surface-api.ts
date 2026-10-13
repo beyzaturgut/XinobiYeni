@@ -51,3 +51,25 @@ export async function loadAcceptedSurface(variantReference:string,signal:AbortSi
  if(cm && (input.source.sha256!=="f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935" || !input.brandingRequired))throw new Error("Invalid CM101 source");
  return input;
 }
+
+// XINOBI U changes routes while this request is in flight. Keep one shared
+// request per exact product/variant so an unmounted colour screen cannot abort
+// the check that the questionnaire is about to reuse.
+const acceptedSurfaceRequests = new Map<string, Promise<RenderingInputs|null>>();
+
+export function loadCachedAcceptedSurface(productReference: string, variantReference: string): Promise<RenderingInputs|null> {
+ const key = `${productReference}:${variantReference}`;
+ const existing = acceptedSurfaceRequests.get(key);
+ if (existing) return existing;
+ const controller = new AbortController();
+ const request = loadAcceptedSurface(variantReference, controller.signal, productReference).catch(error => {
+  acceptedSurfaceRequests.delete(key);
+  throw error;
+ });
+ acceptedSurfaceRequests.set(key, request);
+ return request;
+}
+
+export function clearCachedAcceptedSurface(productReference: string, variantReference: string): void {
+ acceptedSurfaceRequests.delete(`${productReference}:${variantReference}`);
+}

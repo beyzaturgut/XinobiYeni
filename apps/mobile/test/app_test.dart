@@ -41,6 +41,9 @@ class FakeCatalog implements CatalogRepository {
   List<AnnouncementItem> news = [];
 
   @override
+  Future<bool?> acceptedPreviewAvailable({required String productId, required String variantId}) async => true;
+
+  @override
   Future<AnnouncementList> announcements() async => AnnouncementList((b) => b.items.addAll(news));
 
   @override
@@ -157,6 +160,23 @@ void main() {
     expect(fake.queries.last.personalizable, isTrue);
     expect(find.text('Çay Makinesi 101'), findsOneWidget);
     expect(find.text('Kahve Makinesi 101'), findsNothing);
+  });
+
+  testWidgets('XINOBI U opens the separate colour screen from the card action', (tester) async {
+    await pumpApp(tester, location: '/xinobi-u');
+    final action = find.text('XINOBI U ile kişiselleştir →');
+    expect(action, findsOneWidget);
+    await tester.tap(action);
+    await tester.pumpAndSettle();
+    expect(find.text('Renk: seçin'), findsOneWidget);
+    expect(find.bySemanticsLabel('Lacivert rengini seç'), findsOneWidget);
+  });
+
+  testWidgets('XINOBI U card identity opens the same colour screen', (tester) async {
+    await pumpApp(tester, location: '/xinobi-u');
+    await tester.tap(find.text('Çay Makinesi 101'));
+    await tester.pumpAndSettle();
+    expect(find.text('Renk: seçin'), findsOneWidget);
   });
 
   testWidgets('product detail switches price and stock with the selected colour', (tester) async {

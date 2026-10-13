@@ -1,5 +1,7 @@
 import {test,expect,type Page} from '@playwright/test';
 import {containArtwork} from '../../src/app/urunler/cay-makinesi-101/editor/artwork-placement';
+import { artworkReadOnly } from './artwork-read-only';
+test.beforeEach(async ({page}) => artworkReadOnly(page));
 declare global{interface Window{localPatternUrls:{created:string[];revoked:string[]}}}
 const route='/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B';
 async function setup(page:Page){
@@ -68,4 +70,34 @@ test('artwork moved across mask stays clipped with branding above it',async({pag
   const m=read(mask),branding=read(brand);ctx.clearRect(0,0,b.width,b.height);ctx.drawImage(product,0,0);ctx.drawImage(brand,0,0);const original=ctx.getImageData(0,0,b.width,b.height).data,final=c.getContext('2d')!.getImageData(0,0,b.width,b.height).data;
   let outside=0,logo=0;for(let i=0;i<final.length;i+=4){if(m[i+3]===0&&[0,1,2,3].some(k=>final[i+k]!==original[i+k]))outside++;if(branding[i+3]===255&&[0,1,2].some(k=>final[i+k]!==branding[i+k]))logo++}return {outside,logo};
  });expect(stats).toEqual({outside:0,logo:0});
+});
+
+test('toolbar replaces artwork; removal releases the URL and does not imply a saved design',async({page})=>{
+ await setup(page);
+ await page.locator('input[type=file]').setInputFiles({name:'first.png',mimeType:'image/png',buffer:await image(page,'image/png')});
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ const chooserEvent=page.waitForEvent('filechooser');
+ await page.getByRole('button',{name:/Görsel yükle/}).click();
+ await (await chooserEvent).setFiles({name:'replacement.jpg',mimeType:'image/jpeg',buffer:await image(page,'image/jpeg')});
+ await expect.poll(()=>page.evaluate(()=>window.localPatternUrls.created.length)).toBe(2);
+ await expect(page.getByRole('button',{name:'Kalıcı kaydetme henüz kullanılamıyor'})).toBeDisabled();
+ await page.getByRole('button',{name:'Görseli kaldır',exact:true}).click();
+ await expect(page.locator('canvas[role=img]')).toHaveCount(0);
+ expect(await page.evaluate(()=>window.localPatternUrls.revoked.length)).toBe(2);
+ await expect(page.getByLabel('Görsel seç',{exact:true})).toBeEnabled();
+});
+
+test('removing an uploaded photo restores the original pattern preview byte for byte',async({page})=>{
+ await page.goto('/urunler/cay-makinesi-101/editor/');
+ const canvas=page.locator('canvas[role=img]');
+ await expect(canvas).toBeVisible();
+ await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
+ const original=await canvas.evaluate((c:HTMLCanvasElement)=>c.toDataURL());
+ const chooser=page.waitForEvent('filechooser');
+ await page.getByRole('button',{name:/Görsel yükle/}).click();
+ await (await chooser).setFiles({name:'photo.png',mimeType:'image/png',buffer:await image(page,'image/png',100,150)});
+ await expect(page.getByRole('button',{name:'Görseli kaldır',exact:true})).toBeVisible();
+ await expect(canvas).toBeVisible();
+ await page.getByRole('button',{name:'Görseli kaldır',exact:true}).click();
+ await expect.poll(()=>canvas.evaluate((c:HTMLCanvasElement)=>c.toDataURL())).toBe(original);
 });

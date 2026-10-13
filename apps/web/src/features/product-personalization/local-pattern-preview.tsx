@@ -4,9 +4,9 @@ import type {RenderingInputs} from '../../app/urunler/cay-makinesi-101/editor/ac
 import EditorWorkspace from '../../app/urunler/cay-makinesi-101/editor/editor-workspace';
 import {validateLocalPattern} from './local-pattern-image';
 import styles from '../../app/xinobi-u/studio.module.css';
-export default function LocalPatternPreview({inputs}:{inputs:RenderingInputs}){
+export default function LocalPatternPreview({inputs,initialPatternSrc}:{inputs:RenderingInputs;initialPatternSrc?:string}){
  const [pattern,setPattern]=useState<string|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
- const activeUrl=useRef<string|null>(null),generation=useRef(0);
+ const activeUrl=useRef<string|null>(null),generation=useRef(0),fileInput=useRef<HTMLInputElement>(null);
  useEffect(()=>()=>{generation.current++;if(activeUrl.current){URL.revokeObjectURL(activeUrl.current);activeUrl.current=null}},[]);
  async function select(file:File){
   const ticket=++generation.current;setBusy(true);setError('');
@@ -18,13 +18,16 @@ export default function LocalPatternPreview({inputs}:{inputs:RenderingInputs}){
   }catch(e){if(ticket===generation.current)setError(e instanceof Error?e.message:'Görsel doğrulanamadı.');}
   finally{if(ticket===generation.current)setBusy(false)}
  }
+ function remove(){generation.current++;if(activeUrl.current)URL.revokeObjectURL(activeUrl.current);activeUrl.current=null;setPattern(null);setError('');setBusy(false);}
+ const previewPattern=pattern??initialPatternSrc;
  return <>
   <div className={styles.localImageSelection}>
    <label htmlFor="local-pattern">{pattern?'Başka bir görsel seç':'Görsel seç'}</label>
-   <input id="local-pattern" type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} aria-describedby="local-image-help" onChange={event=>{const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(file)void select(file)}}/>
+   <input ref={fileInput} id="local-pattern" type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} aria-describedby="local-image-help" onChange={event=>{const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(file)void select(file)}}/>
+   {pattern&&<button type="button" className={styles.secondary} onClick={remove}>Görseli kaldır</button>}
    <p id="local-image-help">PNG, JPEG veya WebP · En fazla 8 MB · Her kenar en fazla 4096 piksel · En fazla 8 megapiksel. Görsel yalnız bu tarayıcı önizlemesinde geçici kullanılır; sunucuya yüklenmez veya kalıcı kaydedilmez.</p>
    {busy&&<p role="status">Görsel doğrulanıyor…</p>}{error&&<p role="alert" className={styles.error}>{error}</p>}
   </div>
-  {pattern&&<EditorWorkspace renderingInputs={inputs} patternSrc={pattern} placementMode="artwork"/>}
+  {previewPattern&&<EditorWorkspace key={pattern?'artwork':'pattern'} renderingInputs={inputs} patternSrc={previewPattern} placementMode={pattern?'artwork':'pattern'} onUpload={()=>fileInput.current?.click()} uploadBusy={busy}/>}
  </>;
 }

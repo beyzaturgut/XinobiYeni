@@ -63,8 +63,28 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
       message = null;
       slow = false;
     });
+    final variantId = widget.variantId;
+    if (variantId == null || variantId.isEmpty) {
+      setState(() {
+        phase = _Phase.error;
+        message = 'Önce ürününü ve rengini seçmelisin.';
+      });
+      return;
+    }
     try {
-      final existing = fresh ? null : await store.sessionFor(widget.productId, widget.variantId);
+      final detail = await ref.read(productProvider(widget.productId).future);
+      final selectedVariant = detail.variants.where((variant) => variant.id == variantId).firstOrNull;
+      final remoteReady = selectedVariant == null || selectedVariant.surfaceMaskUrl?.isNotEmpty == true
+          ? true
+          : await ref.read(acceptedSurfaceProvider((productId: widget.productId, variantId: variantId)).future);
+      if (selectedVariant == null || selectedVariant.imageUrl == null || remoteReady != true) {
+        setState(() {
+          phase = _Phase.error;
+          message = remoteReady == false ? 'Bu renk için onaylı ürün önizlemesi bulunmuyor.' : 'Bu rengin önizleme uygunluğu doğrulanamadı.';
+        });
+        return;
+      }
+      final existing = fresh ? null : await store.sessionFor(widget.productId, variantId);
       XinobiUSession? current;
       if (existing != null) {
         try {
@@ -74,15 +94,29 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
           if (current.status == 'ready' || current.status == 'failed') current = null;
         } on XinobiUException catch (error) {
           if (!error.sessionGone) rethrow;
-          await store.forgetSession(widget.productId, widget.variantId);
+          await store.forgetSession(widget.productId, variantId);
         }
       }
-      current ??= await repository.createSession(productId: widget.productId, variantId: widget.variantId);
-      await store.rememberSession(widget.productId, widget.variantId, current.id);
+      current ??= await repository.createSession(productId: widget.productId, variantId: variantId);
+      if (current.product.id != widget.productId || current.variant.id != variantId) {
+        setState(() {
+          phase = _Phase.error;
+          message = 'Seçilen ürün ve renk doğrulanamadı.';
+        });
+        return;
+      }
+      await store.rememberSession(widget.productId, variantId, current.id);
       final saved = await store.answers(current.id);
       if (!mounted) return;
       _apply(current, restoredAnswers: saved);
     } on XinobiUException catch (error) {
+      if (mounted) {
+        setState(() {
+          phase = _Phase.error;
+          message = error.message;
+        });
+      }
+    } on CatalogException catch (error) {
       if (mounted) {
         setState(() {
           phase = _Phase.error;

@@ -22,13 +22,20 @@ public static class LocalCommerceEndpoints
     public static RouteGroupBuilder? PanelGroup(WebApplication app)
     {
         if (!app.Environment.IsDevelopment()) return null;
+        return CreatePanelGroup(app, development: true);
+    }
+
+    private static RouteGroupBuilder CreatePanelGroup(WebApplication app, bool development)
+    {
         var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce").RequirePanelPermissions().ExcludeFromDescription();
         group.AddEndpointFilter(async (context, next) =>
         {
             var request = context.HttpContext;
-            if (request.Connection.RemoteIpAddress is { } address && !IPAddress.IsLoopback(address)) return Results.StatusCode(403);
+            if (development && request.Connection.RemoteIpAddress is { } address && !IPAddress.IsLoopback(address)) return Results.StatusCode(403);
+            if (!development && !request.Request.IsHttps) return Results.StatusCode(403);
             var origin = request.Request.Headers.Origin.ToString();
-            if (origin.Length > 0 && !AllowedOrigin(origin)) return Results.StatusCode(403);
+            if (origin.Length > 0 && (development ? !AllowedOrigin(origin)
+                : !string.Equals(origin, $"https://{request.Request.Host}", StringComparison.OrdinalIgnoreCase))) return Results.StatusCode(403);
             request.Response.Headers.CacheControl = "no-store";
             try { return await next(context); }
             catch (Xinobi.Api.Infrastructure.ProblemException error) { return Results.Json(new { message = error.Message, code = error.Code }, statusCode: error.Status); }
@@ -40,15 +47,17 @@ public static class LocalCommerceEndpoints
 
     public static void MapLocalCommerce(this WebApplication app)
     {
-        // These endpoints must never be exposed by a production deployment.
-        if (PanelGroup(app) is not { } group) return;
+        var group = app.Environment.IsDevelopment() ? PanelGroup(app)
+            : app.Configuration.GetValue<bool>("AdminCatalog:Enabled") ? CreatePanelGroup(app, development: false) : null;
+        if (group is null) return;
         // The local storefront reads the catalog from here in Development; it holds no personal data.
-        group.MapGet("/state", async (HttpContext http, LocalCommerceStore store) =>
+        var stateEndpoint = group.MapGet("/state", async (HttpContext http, LocalCommerceStore store) =>
         {
             var state = await store.Read();
             http.Response.Headers["X-Xinobi-Catalog-Storage"] = store.UsesSql ? "SqlServer" : "File";
             return Results.Ok(state);
-        }).AllowAnonymous();
+        });
+        if (app.Environment.IsDevelopment()) stateEndpoint.AllowAnonymous();
         group.MapPost("/announcements", async (AnnouncementCreate announcement, LocalCommerceStore store) =>
         {
             var title = announcement.Title?.Trim();var body = announcement.Body?.Trim();

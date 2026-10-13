@@ -31,7 +31,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     internal static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     public string DataDirectory => path;
     public bool UsesSql => configuration["Catalog:StorageProvider"] == "SqlServer"
-        || configuration["Catalog:StorageProvider"] is null && File.Exists(Path.Combine(path, "catalog-sql.enabled"));
+        || environment.IsDevelopment() && configuration["Catalog:StorageProvider"] is null && File.Exists(Path.Combine(path, "catalog-sql.enabled"));
 
     private async Task<CommerceState> ReadCore()
     {
@@ -51,6 +51,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     public async Task<CommerceState> Read()
     {
         if (UsesSql) return await sql.Read();
+        if (!environment.IsDevelopment()) throw new CatalogUnavailableException();
         await gate.WaitAsync();
         try { return await ReadCore(); }
         finally { gate.Release(); }
@@ -59,6 +60,7 @@ public sealed class LocalCommerceStore(IWebHostEnvironment environment, IConfigu
     public async Task<CommerceState> Update(Func<CommerceState, CommerceState> change)
     {
         if (UsesSql) return await sql.Update(change);
+        if (!environment.IsDevelopment()) throw new CatalogUnavailableException();
         await gate.WaitAsync();
         try
         {

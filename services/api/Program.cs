@@ -105,6 +105,14 @@ if (sqlAccountsOutsideDevelopment)
     });
 }
 builder.Services.AddXinobiPersistence(builder.Configuration.GetConnectionString("Xinobi"));
+if (!builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("AdminCatalog:Enabled"))
+{
+    if (builder.Configuration["Catalog:StorageProvider"] != "SqlServer"
+        || builder.Configuration["Accounts:StorageProvider"] != "SqlServer"
+        || string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Xinobi")))
+        throw new InvalidOperationException("AdminCatalog:Enabled requires SQL Server catalog, SQL Server accounts and ConnectionStrings:Xinobi.");
+    builder.Services.AddSingleton<LocalCommerceStore>();
+}
 if (builder.Configuration["Catalog:StorageProvider"] == "SqlServer")
     builder.Services.Replace(ServiceDescriptor.Singleton<ICatalogSource>(services => new SqlCatalogSource(services.GetRequiredService<SqlCommerceStore>())));
 // Without an explicit SQL provider, non-Development environments use a snapshot when configured, otherwise 503.

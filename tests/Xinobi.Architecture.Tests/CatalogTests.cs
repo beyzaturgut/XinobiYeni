@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Xinobi.Api.Catalog;
 using Xinobi.Api.LocalCommerce;
 
@@ -32,6 +33,18 @@ public sealed class CatalogTests : IDisposable
             using var problem = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
             Assert.Equal("catalog_unavailable", problem.RootElement.GetProperty("code").GetString());
         }
+    }
+
+    [Fact]
+    public void ProductionSqlProviderTakesPrecedenceOverSnapshot()
+    {
+        using var factory = new IsolatedApiFactory().WithWebHostBuilder(builder =>
+        {
+            builder.UseEnvironment("Production");
+            builder.UseSetting("Catalog:StorageProvider", "SqlServer");
+            builder.UseSetting("Catalog:SnapshotPath", Path.Combine(dataDirectory, "snapshot.json"));
+        });
+        Assert.IsType<SqlCatalogSource>(factory.Services.GetRequiredService<ICatalogSource>());
     }
 
     [Fact]

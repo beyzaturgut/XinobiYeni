@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication;
 using Xinobi.Api.EmailVerification;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Security.Claims;
 using Xinobi.Api.Features.ProductSurfaces.Development;
 using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
@@ -167,6 +168,11 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
+// Behind IIS ARR on the same machine (https://host/api → http://localhost:API port), trust the scheme and client
+// address that the loopback proxy forwards, so HTTPS-only admin writes and Secure cookies see the original request.
+var behindReverseProxy = !builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("ReverseProxy:Enabled");
+if (behindReverseProxy)
+    builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
 var app = builder.Build();
 
 if (builder.Configuration["CatalogTransfer:ImportPath"] is { Length: > 0 } catalogImportPath)
@@ -202,6 +208,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi().AllowAnonymous();
 }
 
+if (behindReverseProxy) app.UseForwardedHeaders();
 app.UseMiddleware<RequestCorrelationMiddleware>();
 app.UseExceptionHandler();
 app.UseStatusCodePages(async statusCodeContext =>

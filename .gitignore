@@ -29,6 +29,7 @@ services/api/appsettings.Local.json
 # Generated IIS preview content snapshots and copied media
 apps/web/public/commerce-preview/
 apps/web/public/assets/deploy-media/
+apps/web/public/assets/product-previews/
 
 # Generated review renders and fixture inspection output
 artifacts/

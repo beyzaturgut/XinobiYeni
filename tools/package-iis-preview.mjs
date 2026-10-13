@@ -3,6 +3,7 @@ import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {readCommerceSnapshot} from './commerce-snapshot-source.mjs';
+import {publishProductPreviews} from './publish-product-previews.mjs';
 const root=process.cwd();
 const sha=spawnSync('git',['rev-parse','--short','HEAD'],{encoding:'utf8'}).stdout.trim();
 // Once the local catalog is migrated, its old state.json is an archive, never a deployment source.
@@ -22,6 +23,7 @@ async function map(value){
  return value;
 }
 await map(state); // Keep packaged media copies for existing asset references; the catalog itself comes from the API.
+await publishProductPreviews(root,publicDir,state);
 // XINOBI U on the test server (ADR-002 Ek B); the API must list this site's origin in XinobiU:AllowedOrigins.
 // Same-origin through the site's /api proxy, so the page works over HTTPS without mixed content.
 // IIS ARR forwards /api to the API site; needs ARR proxy and HTTP_X_FORWARDED_PROTO allowed (docs/runbooks/https-reverse-proxy.md).

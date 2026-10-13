@@ -31,6 +31,7 @@ async function loadCatalogSurface(product:string,variant:string,signal:AbortSign
 }
 
 export async function loadAcceptedSurface(variantReference:string,signal:AbortSignal,commerceProduct?:string):Promise<RenderingInputs|null>{
+ if(process.env.NODE_ENV!=='development')return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
  if(commerceProduct&&commerceProduct!=='DEMO-P101'){const generic=await loadCatalogSurface(commerceProduct,variantReference,signal);if(generic)return generic;}
  const productReference=commerceProduct??"cay-makinesi-101";
  const cm=commerceProduct===CM_PRODUCT&&variantReference===CM_VARIANT;
@@ -50,4 +51,31 @@ export async function loadAcceptedSurface(variantReference:string,signal:AbortSi
  }
  if(cm && (input.source.sha256!=="f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935" || !input.brandingRequired))throw new Error("Invalid CM101 source");
  return input;
+}
+
+async function loadPublishedSurface(product:string,variant:string,signal:AbortSignal):Promise<RenderingInputs|null>{
+ const base='/assets/product-previews/'+encodeURIComponent(product)+'/'+encodeURIComponent(variant);
+ const response=await fetch(base+'/inputs.json',{signal,cache:'no-store'});
+ if(response.status===404)return null;if(!response.ok)throw Error('Preview unavailable');
+ const bundle=await response.json(),input=bundle.inputs as RenderingInputs;
+ if(bundle.scope!=='representative-preview'||bundle.productReference!==product||bundle.variantReference!==variant
+   ||!input||!Number.isInteger(input.width)||!Number.isInteger(input.height)||input.width<=0||input.height<=0
+   ||input.width>MAX_CATALOG_SOURCE_DIMENSION||input.height>MAX_CATALOG_SOURCE_DIMENSION||input.width*input.height>MAX_CATALOG_SOURCE_PIXELS
+   ||!checksum.test(input.surfaceVersion)||typeof input.brandingRequired!=='boolean'||input.brandingRequired&&!input.branding)throw Error('Invalid published preview');
+ let version:string|undefined;
+ for(const [role,item] of [['source',input.source],['mask',input.mask],['branding',input.branding]] as const){
+  if(role==='branding'&&item===null)continue;
+  if(!item||!checksum.test(item.sha256)||!item.url.startsWith(base+'/')||!item.url.endsWith('?v='+item.sha256))throw Error('Invalid published media');
+  const parts=item.url.slice(base.length+1).split('/');
+  if(parts.length!==2||!/^[a-f0-9-]{36}$/.test(parts[0])||parts[1]!==`${role}.${role==='source'?'webp':'png'}?v=${item.sha256}`||version&&version!==parts[0])throw Error('Mixed preview version');
+  version=parts[0];
+ }
+ if(input.mask.sha256!==input.surfaceVersion)throw Error('Invalid mask version');
+ // Never use a packaged mask after this exact live variant's source photo changed or the product was withdrawn.
+ const current=await fetch('/api/v1/catalog/products/'+encodeURIComponent(product),{signal,cache:'no-store'});
+ if(current.status===404)return null;if(!current.ok)throw Error('Catalog unavailable');
+ const detail=await current.json(),selected=detail.variants?.find((item:{id:string})=>item.id===variant);
+ if(!selected?.imageUrl||new URL(selected.imageUrl,window.location.origin).pathname!==bundle.sourceImage)return null;
+ const preview=catalogPreviewDimensions(input.width,input.height);
+ return {...input,assetWidth:input.width,assetHeight:input.height,...preview,surfaceTreatment:'metallic-ink',...(product===CM121_PRODUCT&&variant===CM121_VARIANT?{surfaceInkExposureStops:0.55}:{})};
 }

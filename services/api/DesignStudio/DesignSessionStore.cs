@@ -15,6 +15,7 @@ public record DesignSession(string Id, string BrowserId, DateTimeOffset CreatedA
     public string Status { get; set; } = "questionnaire";
     public DesignAnswer[] Answers { get; set; } = [];
     public string? GenerationPrompt { get; set; }
+    public string? GenerationPromptVersion { get; set; }
     public string? RequestHash { get; set; }
     public string? ErrorCode { get; set; }
     public string? ErrorMessage { get; set; }
@@ -137,6 +138,7 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
             if (!(environment.IsDevelopment() && configuration.GetValue<bool>("DesignStudio:DisableGenerationLimit")) && state.Sessions.Values.Count(s => s.StartedAt?.UtcDateTime.Date == DateTime.UtcNow.Date || s.Status == "queued") >= limit)
                 throw new DesignProviderException("daily_limit", "Bugünkü görsel üretim sınırına ulaşıldı.");
             session.GenerationPrompt = prompt;
+            session.GenerationPromptVersion = DesignArtDirection.Version;
             session.Answers = request.Answers; session.RequestHash = hash; session.Status = "queued";
             await SaveCore(state);
             await Queue.Writer.WriteAsync(id);

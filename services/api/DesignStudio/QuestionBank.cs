@@ -43,15 +43,16 @@ public sealed class QuestionBank
     }
     public string BuildPrompt(SessionQuestion[] questions, DesignAnswer[] answers)
     {
-        if (answers.Length != 5 || answers.Select(a => a.QuestionId).Distinct().Count() != 5)
+        if (questions.Length != 5 || questions.Select(q => q.Id).Distinct().Count() != 5
+            || !questions.Select(q => q.Axis).Order().SequenceEqual(Data.Axes.Select(a => a.Id).Order())
+            || answers.Length != 5 || answers.Select(a => a.QuestionId).Distinct().Count() != 5)
             throw new ArgumentException("Beş sorunun tamamını yanıtlayın.");
-        var preferences = questions.Select(question =>
+        var preferences = questions.ToDictionary(question => question.Axis, question =>
         {
             var answer = answers.SingleOrDefault(a => a.QuestionId == question.Id);
             if (answer is null || !question.Options.Any(option => option.Id == answer.OptionId)) throw new ArgumentException("Bu oturuma ait geçerli bir seçenek seçin.");
-            return Data.Options[question.Axis].Single(o => o.Id == answer.OptionId).Prompt;
+            return Data.Options[question.Axis].Single(o => o.Id == answer.OptionId).Id;
         });
-        return "Seamless repeating decorative pattern, flat two-dimensional illustration, full-frame original surface texture. " + string.Join(". ", preferences) +
-            ". Edge-to-edge graphic pattern, coherent palette, crisp visual forms, even lighting, top-down flat artwork without perspective. The entire image is filled with decorative motifs and their background, a standalone pattern swatch. No text, letters, numbers, logos, signatures, brands, people, faces, copyrighted characters, violent, sexual or hateful imagery.";
+        return DesignArtDirection.Build(preferences);
     }
 }

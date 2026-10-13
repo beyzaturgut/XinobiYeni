@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -86,8 +87,12 @@ public sealed class DesignStudioTests : IDisposable
         Assert.Equal(session.Variant.Id, ready.Variant.Id);
         var bank = factory.Services.GetRequiredService<QuestionBank>();
         Assert.Equal(bank.BuildPrompt(session.Questions, Answers(session).Answers), provider.LastPrompt);
-        foreach (var question in session.Questions)
-            Assert.Contains(bank.Data.Options[question.Axis].Single(o => o.Id == question.Options[0].Id).Prompt, provider.LastPrompt!);
+        Assert.Contains("Art direction: Xinobi", provider.LastPrompt!);
+        Assert.Contains("Composition:", provider.LastPrompt!);
+        using var stored = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "design-studio", "sessions.json")));
+        var savedSession = stored.RootElement.GetProperty("sessions").GetProperty(session.Id);
+        Assert.Equal(DesignArtDirection.Version, savedSession.GetProperty("generationPromptVersion").GetString());
+        Assert.Equal(provider.LastPrompt, savedSession.GetProperty("generationPrompt").GetString());
         Assert.NotNull(ready.ImageUrl);
         Assert.Equal(FakeImageProvider.Png, await client.GetByteArrayAsync(ready.ImageUrl));
         var changed = Answers(session).Answers.ToArray(); changed[0] = changed[0] with { OptionId = session.Questions[0].Options[1].Id };

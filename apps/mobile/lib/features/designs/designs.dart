@@ -9,6 +9,7 @@ import '../account/account_widgets.dart';
 import '../account/auth.dart';
 import '../cart/cart.dart';
 import '../catalog/catalog_repository.dart';
+import '../personalization/surface_preview.dart';
 
 /// The account's saved designs (K-21), newest first; empty when signed out.
 final myDesignsProvider = FutureProvider.autoDispose<List<MyDesign>>((ref) async {
@@ -44,6 +45,40 @@ Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign desig
     messenger.showSnackBar(SnackBar(content: Text(error.message)));
   } on CatalogException catch (error) {
     messenger.showSnackBar(SnackBar(content: Text(error.message)));
+  }
+}
+
+/// A saved design worn on its colour's approved surface, placed as the editor starts (an AI pattern covers it, an uploaded
+/// image sits at the default size); colours without an approved surface show the design itself. Labelled "Temsilidir".
+class DesignOnProduct extends ConsumerWidget {
+  const DesignOnProduct({super.key, required this.designId, required this.label, this.variant});
+  final String designId;
+  final String label;
+  final VariantDetail? variant;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final path = designImagePath(designId);
+    final product = variant?.imageUrl, mask = variant?.surfaceMaskUrl;
+    final design = ref.watch(designImageProvider(path)).value;
+    if (product == null || mask == null) return PrivateDesignImage(path: path, label: label);
+    final upload = ref.watch(myDesignsProvider).value?.where((item) => item.id == designId).firstOrNull?.kind == 'upload';
+    return Stack(fit: StackFit.expand, children: [
+      if (design == null)
+        const ColoredBox(color: XinobiTokens.mediaWarm)
+      else
+        Semantics(
+          label: label,
+          image: true,
+          child: SurfacePreview(
+            product: NetworkImage(product),
+            design: design,
+            mask: NetworkImage(mask),
+            placement: upload ? const DesignPlacement.place() : const DesignPlacement.cover(),
+            fallback: const ColoredBox(color: XinobiTokens.mediaWarm),
+          ),
+        ),
+      Positioned(left: 2, bottom: 2, child: Container(padding: const EdgeInsets.symmetric(horizontal: 3), color: XinobiTokens.surface, child: Text('Temsilidir', style: Theme.of(context).textTheme.labelSmall?.copyWith(fontSize: 9)))),
+    ]);
   }
 }
 

@@ -102,7 +102,7 @@ class _CartRow extends ConsumerWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: XinobiTokens.surface, border: Border.all(color: item.problem == CartProblem.none ? XinobiTokens.line : XinobiTokens.danger)),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(width: 72, height: 72, child: line.designId != null ? PrivateDesignImage(path: designImagePath(line.designId!), label: '${line.designName} tasarımı') : RemoteImage(variant?.imageUrl ?? item.product?.imageUrl)),
+        SizedBox(width: 72, height: 72, child: line.designId != null ? DesignOnProduct(designId: line.designId!, variant: variant, label: '$label üzerinde ${line.designName} tasarımı') : RemoteImage(variant?.imageUrl ?? item.product?.imageUrl)),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

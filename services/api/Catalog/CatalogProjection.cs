@@ -20,6 +20,38 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
 
     public static int MaxQuantityFor(int stock) => Math.Clamp(stock, 0, CartLineLimit);
 
+    /// <summary>Compatibility read model for the storefront; never returns drafts or unrestricted inventory counts.</summary>
+    public CommerceState Storefront()
+    {
+        var products = Active.Select(product => product with
+        {
+            Personalizable = IsPersonalizable(product),
+            OriginalImage = resolveUrl(product.OriginalImage),
+            Gallery = (product.Gallery ?? []).Select(resolveUrl).OfType<string>().ToArray(),
+            Variants = product.Variants.Select(variant => variant with
+            {
+                Stock = MaxQuantityFor(variant.Stock), Image = resolveUrl(variant.Image) ?? "",
+                SurfaceMask = resolveUrl(variant.ApprovedSurfaceMask), SurfaceImage = null
+            }).ToArray()
+        }).ToArray();
+        var ids = products.SelectMany(product => product.Variants).Select(variant => variant.Id).ToHashSet();
+        var productIds = products.Select(product => product.Id).ToHashSet();
+        return state with
+        {
+            Products = products,
+            Prices = state.Prices.Where(price => ids.Contains(price.Key) && price.Value > 0).ToDictionary(),
+            Content = state.Content with
+            {
+                Slides = state.Content.Slides.Where(slide => slide.Active).Select(slide => slide with { Src = resolveUrl(slide.Src) ?? "" }).ToArray(),
+                XinobiBanner = resolveUrl(state.Content.XinobiBanner) ?? "",
+                TitaniumBanner = resolveUrl(state.Content.TitaniumBanner),
+                TitaniumImage = resolveUrl(state.Content.TitaniumImage),
+                CategoryImages = state.Content.CategoryImages?.ToDictionary(pair => pair.Key, pair => resolveUrl(pair.Value) ?? ""),
+                FeaturedProducts = state.Content.FeaturedProducts?.Where(productIds.Contains).ToArray()
+            }
+        };
+    }
+
     public static Availability AvailabilityFor(int stock) => stock switch
     {
         <= 0 => new(AvailabilityStatuses.OutOfStock, 0),

@@ -22,11 +22,40 @@ public sealed class CatalogTests : IDisposable
     });
 
     [Fact]
+    public async Task AnonymousStorefrontTracksCatalogChangesAndHidesDrafts()
+    {
+        using var factory = CreateFactory();
+        using var anonymous = factory.CreateClient();
+        using var staff = await TestStaff.Client(factory);
+        var initial = (await anonymous.GetFromJsonAsync<CommerceState>("/api/v1/catalog/storefront"))!;
+        Assert.DoesNotContain(initial.Products, product => product.Id == "DEMO-P103");
+        Assert.All(initial.Products.SelectMany(product => product.Variants), variant => Assert.InRange(variant.Stock, 0, 99));
+        var product = initial.Products[0] with
+        {
+            Id = "LIVE-TEST", Name = "Canlı test",
+            OriginalImage = null, Gallery = [],
+            Variants = [new CommerceVariant("LIVE-V", "LIVE-SKU", "Mavi", 123, "/assets/live.webp")]
+        };
+        (await staff.PutAsJsonAsync("/api/v1/local-commerce/products/LIVE-TEST", product)).EnsureSuccessStatusCode();
+        (await staff.PutAsJsonAsync("/api/v1/local-commerce/prices/LIVE-V", new PriceUpdate(12345))).EnsureSuccessStatusCode();
+        var response = await anonymous.GetAsync("/api/v1/catalog/storefront");
+        Assert.Equal("no-store", response.Headers.CacheControl!.ToString());
+        var state = (await response.Content.ReadFromJsonAsync<CommerceState>())!;
+        var saved = Assert.Single(state.Products, item => item.Id == product.Id);
+        Assert.Equal(99, saved.Variants[0].Stock);
+        Assert.Equal("http://localhost:3000/assets/live.webp", saved.Variants[0].Image);
+        Assert.Equal(12345, state.Prices["LIVE-V"]);
+        Assert.Equal("Canlı test", (await anonymous.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/LIVE-TEST"))!.Name);
+        (await staff.DeleteAsync("/api/v1/local-commerce/products/LIVE-TEST")).EnsureSuccessStatusCode();
+        Assert.DoesNotContain((await anonymous.GetFromJsonAsync<CommerceState>("/api/v1/catalog/storefront"))!.Products, item => item.Id == product.Id);
+    }
+
+    [Fact]
     public async Task ProductionAnswersUnavailableInsteadOfServingDevelopmentData()
     {
         using var factory = CreateFactory("Production");
         using var client = factory.CreateClient();
-        foreach (var route in new[] { "/api/v1/catalog/products", "/api/v1/catalog/categories", "/api/v1/catalog/products/DEMO-P101", "/api/v1/content/home", "/api/v1/content/announcements" })
+        foreach (var route in new[] { "/api/v1/catalog/storefront", "/api/v1/catalog/products", "/api/v1/catalog/categories", "/api/v1/catalog/products/DEMO-P101", "/api/v1/content/home", "/api/v1/content/announcements" })
         {
             var response = await client.GetAsync(route);
             Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);

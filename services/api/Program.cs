@@ -172,7 +172,13 @@ builder.Services.AddProblemDetails(options =>
 // address that the loopback proxy forwards, so HTTPS-only admin writes and Secure cookies see the original request.
 var behindReverseProxy = !builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("ReverseProxy:Enabled");
 if (behindReverseProxy)
-    builder.Services.Configure<ForwardedHeadersOptions>(options => options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+        // Only the configured public hosts may replace the backend host; default trusted proxies remain loopback only.
+        foreach (var host in builder.Configuration.GetSection("ReverseProxy:AllowedHosts").Get<string[]>() ?? ["109.104.120.91"])
+            options.AllowedHosts.Add(host);
+    });
 var app = builder.Build();
 
 if (builder.Configuration["CatalogTransfer:ImportPath"] is { Length: > 0 } catalogImportPath)

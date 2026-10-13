@@ -32,6 +32,11 @@ public static class CatalogEndpoints
                 TypedResults.Ok((await Project(http, source, configuration, environment)).Categories()))
             .WithName("ListCatalogCategories");
 
+        // Web compatibility contract; mobile continues to use the typed product/content contracts from the same source.
+        catalog.MapGet("/storefront", async (HttpContext http, ICatalogSource source, IConfiguration configuration, IWebHostEnvironment environment) =>
+                TypedResults.Ok((await Project(http, source, configuration, environment)).Storefront()))
+            .ExcludeFromDescription();
+
         catalog.MapGet("/products", async Task<Results<Ok<ProductPage>, ProblemHttpResult>> (
                 HttpContext http, ICatalogSource source, IConfiguration configuration, IWebHostEnvironment environment,
                 string? category, string? q, bool? personalizable, int? page, int? pageSize) =>

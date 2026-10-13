@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Builder;
 using Xinobi.Api.Identity;
 using Xinobi.Api.LocalCommerce;
 
@@ -13,6 +14,19 @@ namespace Xinobi.Architecture.Tests;
 
 public sealed class ProductionCatalogAdminTests
 {
+    private sealed class LoopbackProxy : IStartupFilter
+    {
+        public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) => app =>
+        {
+            app.Use(async (context, continuation) =>
+            {
+                context.Connection.RemoteIpAddress = IPAddress.Loopback;
+                await continuation();
+            });
+            next(app);
+        };
+    }
+
     private static WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Production");
@@ -64,6 +78,24 @@ public sealed class ProductionCatalogAdminTests
         Assert.True(factory.Services.GetRequiredService<LocalCommerceStore>().UsesSql);
         foreach (var path in new[] { "orders", "quotes", "surfaces", "notifications" })
             Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/v1/local-commerce/" + path)).StatusCode);
+    }
+
+    [Fact]
+    public async Task TrustedProxyPreservesPublicHttpsOriginForAdminWrites()
+    {
+        using var factory = Factory().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("ReverseProxy:Enabled", "true");
+            builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, LoopbackProxy>());
+        });
+        using var staff = await TestStaff.Client(factory);
+        staff.DefaultRequestHeaders.Add("X-Forwarded-Proto", "https");
+        staff.DefaultRequestHeaders.Add("X-Forwarded-Host", "109.104.120.91");
+        staff.DefaultRequestHeaders.Add("Origin", "https://109.104.120.91");
+        Assert.Equal(HttpStatusCode.BadRequest, (await staff.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        staff.DefaultRequestHeaders.Remove("X-Forwarded-Host");
+        staff.DefaultRequestHeaders.Add("X-Forwarded-Host", "evil.example");
+        Assert.Equal(HttpStatusCode.Forbidden, (await staff.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
     }
 
     [Fact]

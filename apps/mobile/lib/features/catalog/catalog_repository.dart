@@ -13,6 +13,7 @@ abstract interface class CatalogRepository {
   Future<CategoryList> categories();
   Future<ProductPage> products(ProductQuery query);
   Future<ProductDetail> product(String id);
+  Future<bool?> acceptedPreviewAvailable({required String productId, required String variantId});
   Future<AnnouncementList> announcements();
   Future<ReviewPage> reviews(String productId, {int page = 1});
   Future<ReviewSummaryList> reviewSummaries(List<String> productIds);
@@ -45,10 +46,12 @@ class CatalogException implements Exception {
 class ApiCatalogRepository implements CatalogRepository {
   ApiCatalogRepository(XinobiApiClient client)
       : _catalog = client.getCatalogApi(),
-        _content = client.getContentApi();
+        _content = client.getContentApi(),
+        _preview = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5), receiveTimeout: const Duration(seconds: 10)));
 
   final CatalogApi _catalog;
   final ContentApi _content;
+  final Dio _preview;
   // The contract caps pageSize at 100; paging UI follows when catalogs grow past it.
   static const pageSize = 100;
 
@@ -77,6 +80,20 @@ class ApiCatalogRepository implements CatalogRepository {
 
   @override
   Future<ProductDetail> product(String id) => _call(() => _catalog.getCatalogProduct(id: id), notFound: CatalogException.notFoundMessage);
+
+  @override
+  Future<bool?> acceptedPreviewAvailable({required String productId, required String variantId}) async {
+    final uri = xinobiAcceptedSurfaceUri(productId: productId, variantId: variantId);
+    if (uri == null) return null;
+    try {
+      final response = await _preview.getUri(uri);
+      final body = response.data;
+      if (response.statusCode != 200 || body is! Map) return false;
+      return body['productReference'] == productId && body['variantReference'] == variantId && body['previewAvailable'] == true && body['inputs'] is Map;
+    } on DioException {
+      return null;
+    }
+  }
 
   Future<T> _call<T>(Future<Response<T>> Function() request, {String? notFound}) async {
     try {
@@ -117,3 +134,4 @@ final productReviewsProvider = FutureProvider.autoDispose.family<ReviewPage?, St
     return null;
   }
 });
+final acceptedSurfaceProvider = FutureProvider.family<bool?, ({String productId, String variantId})>((ref, key) => ref.watch(catalogRepositoryProvider).acceptedPreviewAvailable(productId: key.productId, variantId: key.variantId));

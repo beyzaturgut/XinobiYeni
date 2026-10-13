@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/app/theme.dart';
+import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/features/xinobi_u/questionnaire_screen.dart';
 import 'package:xinobi_mobile/features/xinobi_u/xinobi_u_repository.dart';
 import 'package:xinobi_mobile/main.dart';
@@ -40,6 +41,24 @@ XinobiUSession _session(String id, {String status = 'questionnaire', Map<String,
   ..imageUrl = status == 'ready' ? null : null
   ..errorCode = error
   ..errorMessage = error == null ? null : 'Görsel üretimi tamamlanamadı.');
+
+ProductDetail _product() => ProductDetail((b) => b
+  ..id = 'P1'
+  ..name = 'Çay Makinesi 101'
+  ..category = 'Çay makineleri'
+  ..description = ''
+  ..seoTitle = ''
+  ..imageUrl = 'https://example.invalid/product.webp'
+  ..personalizable = true
+  ..variants.add(VariantDetail((v) => v
+    ..id = 'V1'
+    ..sku = 'V1'
+    ..color = 'Lacivert'
+    ..imageUrl = 'https://example.invalid/variant.webp'
+    ..availability.status = 'in_stock'
+    ..purchasable = true
+    ..maxQuantity = 1
+    ..surfaceMaskUrl = 'https://example.invalid/mask.png')));
 
 /// Offline stand-in for the server; counts generation requests so no metered call can slip into tests.
 class FakeXinobiU implements XinobiURepository {
@@ -90,10 +109,10 @@ Future<void> pumpQuestionnaire(WidgetTester tester, FakeXinobiU fake) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(ProviderScope(
     retry: noAutomaticRetry,
-    overrides: [xinobiURepositoryProvider.overrideWithValue(fake)],
+    overrides: [xinobiURepositoryProvider.overrideWithValue(fake), productProvider('P1').overrideWith((ref) async => _product())],
     child: MaterialApp(
       theme: buildTheme(),
-      home: const QuestionnaireScreen(productId: 'P1', pollInterval: Duration(milliseconds: 10)),
+      home: const QuestionnaireScreen(productId: 'P1', variantId: 'V1', pollInterval: Duration(milliseconds: 10)),
     ),
   ));
   await tester.pumpAndSettle();
@@ -125,7 +144,7 @@ void main() {
     expect(find.text('İşte sana özel yorum.'), findsOneWidget);
     expect(find.textContaining('Temsilidir.'), findsOneWidget);
     expect(fake.generateCalls, 1);
-    expect(fake.lastVariant, isNull, reason: 'No colour is chosen; the server picks the photo.');
+    expect(fake.lastVariant, 'V1', reason: 'The selected colour is sent with the session.');
   });
 
   testWidgets('restarting the app resumes the same questionnaire and answers', (tester) async {
@@ -154,14 +173,14 @@ void main() {
   testWidgets('a finished design is not reopened; the product starts new questions', (tester) async {
     final fake = FakeXinobiU();
     fake.sessions['done'] = _session('done', status: 'ready', answers: {for (var i = 0; i < 5; i++) 'q$i': 'q$i-o0'});
-    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:': 'done'});
+    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:V1': 'done'});
     await pumpQuestionnaire(tester, fake);
     expect(fake.created, 1);
     expect(find.text('Soru 1 / 5'), findsOneWidget);
   });
 
   testWidgets('an expired stored session starts a new questionnaire', (tester) async {
-    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:': 'old'});
+    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:V1': 'old'});
     final fake = FakeXinobiU()..expired.add('old');
     await pumpQuestionnaire(tester, fake);
     expect(fake.created, 1);

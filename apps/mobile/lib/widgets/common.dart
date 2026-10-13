@@ -25,7 +25,9 @@ class RemoteImage extends StatelessWidget {
       alignment: Alignment.center,
       child: const Icon(Icons.image_outlined, color: XinobiTokens.muted),
     );
-    if (url == null) return Semantics(label: label, image: label != null, child: placeholder);
+    if (url == null) {
+      return Semantics(label: label, image: label != null, child: placeholder);
+    }
     return Semantics(
       label: label,
       image: label != null,
@@ -75,25 +77,38 @@ class EmptyView extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product, this.onTap, this.showFavorite = true});
+  const ProductCard({super.key, required this.product, this.onTap, this.showFavorite = true, this.footer, this.cardInteractive = true, this.semanticsLabel});
   final ProductSummary product;
   final bool showFavorite;
   /// Defaults to the product detail page.
   final VoidCallback? onTap;
+  /// Replaces the normal price/stock footer for a contextual card action.
+  final Widget? footer;
+  /// Keeps the card itself passive when a contextual footer owns the action.
+  final bool cardInteractive;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    void open() => onTap != null ? onTap!() : context.push('/urunler/${Uri.encodeComponent(product.id)}');
+    final canOpen = cardInteractive || onTap != null;
+    void open() {
+      if (!canOpen) return;
+      if (onTap != null) {
+        onTap!();
+      } else {
+        context.push('/urunler/${Uri.encodeComponent(product.id)}');
+      }
+    }
     // The merged label replaces the children's semantics, so the tap action is restated for screen readers.
     // The heart sits outside that merge so it stays its own control.
     final card = Semantics(
-      button: true,
-      label: '${product.name}, ${formatMoney(product.priceFrom)}${product.inStock ? '' : ', stokta yok'}',
-      onTap: open,
-      excludeSemantics: true,
+      button: canOpen,
+      label: semanticsLabel ?? '${product.name}, ${formatMoney(product.priceFrom)}${product.inStock ? '' : ', stokta yok'}',
+      onTap: canOpen ? open : null,
+      excludeSemantics: canOpen,
       child: InkWell(
-        onTap: open,
+        onTap: canOpen ? open : null,
         child: Container(
           decoration: BoxDecoration(color: XinobiTokens.surface, border: Border.all(color: XinobiTokens.line)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -122,8 +137,10 @@ class ProductCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Flexible(child: Text(product.name, style: text.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis)),
                   const SizedBox(height: 6),
-                  Text(formatMoney(product.priceFrom), style: text.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
-                  if (!product.inStock) Text('Stokta yok', style: text.bodySmall?.copyWith(color: XinobiTokens.danger), maxLines: 1),
+                  if (footer != null) footer! else ...[
+                    Text(formatMoney(product.priceFrom), style: text.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    if (!product.inStock) Text('Stokta yok', style: text.bodySmall?.copyWith(color: XinobiTokens.danger), maxLines: 1),
+                  ],
                 ]),
               ),
             ),
@@ -141,10 +158,10 @@ class ProductCard extends StatelessWidget {
 }
 
 /// Two-column product grid sized for phones; switches to three columns on wide screens.
-SliverGrid productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true}) => SliverGrid(
+SliverGrid productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true, Widget Function(BuildContext context, ProductSummary product)? footerBuilder, bool cardInteractive = true, String Function(ProductSummary product)? semanticsLabelBuilder}) => SliverGrid(
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 260, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.52),
       delegate: SliverChildBuilderDelegate(
-        (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite),
+        (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite, footer: footerBuilder?.call(context, products[index]), cardInteractive: cardInteractive, semanticsLabel: semanticsLabelBuilder?.call(products[index])),
         childCount: products.length,
       ),
     );

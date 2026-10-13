@@ -1,18 +1,70 @@
 'use client';
-import Image from 'next/image';
-import Link from 'next/link';
+
+import { useEffect, useMemo, useState } from 'react';
 import { useCommerce, commerceApi, mediaUrl } from '../../lib/commerce';
-import { sessionKey } from '../../lib/design-studio';
+import CatalogProductCard, { catalogFavoriteStorageKey, type CatalogProductCardData } from '../../components/catalog-product-card';
+import catalogStyles from '../urunler/catalog.module.css';
 import styles from './studio.module.css';
-import VariantPreviewReadiness from '../../features/product-personalization/variant-preview-readiness';
+import type { Product } from '../../../../../packages/commerce/client';
+
+type PersonalizableCard = CatalogProductCardData & { href: string };
+
+function isPersonalizable(product: Product) {
+  return product.active && (product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve')));
+}
+
+function toCard(product: Product): PersonalizableCard {
+  const firstVariant = product.variants[0];
+  return {
+    id: product.id,
+    name: product.name,
+    family: product.category,
+    color: firstVariant?.color || 'Renk seçimi',
+    swatch: firstVariant?.hex || '#777777',
+    image: mediaUrl(product.originalImage || firstVariant?.image || '', commerceApi),
+    colorCount: product.variants.length,
+    href: `/xinobi-u/renk?product=${encodeURIComponent(product.id)}`,
+  };
+}
+
 export default function PersonalizableProducts() {
   const { state, error } = useCommerce();
-  const products = state?.products.filter(product => product.active && (product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve')))) || [];
-  return <main className={styles.main}><section className={styles.intro}><p className={styles.kicker}>XINOBI U · Sana özgü</p><h1>Bir ürün.<br />Binlerce olasılık.</h1><p>Ürününü seç. Tarzını Keşfet sorularıyla tasarımını bul veya kendi hazır görselini kullan.</p><div className={styles.steps}><span>01 · Ürününü seç</span><span>02 · Tarzını keşfet</span><span>03 · Ürününde dene</span></div></section>
-  {error && <p className={styles.error} role="alert">{error}</p>}
-  {!state ? <p role="status">Ürünler hazırlanıyor…</p> : products.length === 0 ? <p>Şu anda kişiselleştirmeye açık bir ürün bulunmuyor.</p> : <section className={styles.grid} aria-label="Kişiselleştirilebilir ürünler">{products.map(product => {
-    const variant = product.variants.find(variant => variant.image);
-    if (!variant) return null;
-    return <article className={styles.product} key={product.id}><Link onClick={() => sessionStorage.removeItem(sessionKey(product.id, variant.id))} href={`/xinobi-u/sorular?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(variant.id)}`} aria-label={`${product.name} için tasarım oluştur`}><div className={styles.productImage}><Image src={mediaUrl(product.originalImage || variant.image, commerceApi)} alt={product.name} width={600} height={600} /></div><p>{product.category}</p><h2>{product.name}</h2></Link><VariantPreviewReadiness product={product.id} variant={variant.id} color={variant.color} /><div className={styles.entryActions}><Link href={`/xinobi-u/sorular?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(variant.id)}`} onClick={() => sessionStorage.removeItem(sessionKey(product.id, variant.id))}>Tarzını Keşfet ↗</Link><Link href={`/xinobi-u/kendi-gorselin?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(variant.id)}`}>Kendi görselini kullan →</Link></div><p>İstediğiniz görseli ekleyebilirsiniz. Önizleme, seçili varyantın uygunluğuna bağlıdır.</p></article>
-  })}</section>}</main>;
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const products = useMemo(() => (state?.products.filter(isPersonalizable) || []).map(toCard), [state]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      try { setFavorites(JSON.parse(localStorage.getItem(catalogFavoriteStorageKey) || '[]')); } catch { setFavorites([]); }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  function toggleFavorite(id: string) {
+    setFavorites(current => {
+      const next = current.includes(id) ? current.filter(item => item !== id) : [...current, id];
+      localStorage.setItem(catalogFavoriteStorageKey, JSON.stringify(next));
+      return next;
+    });
+  }
+
+  return <main className={styles.main}>
+    <section className={styles.intro}>
+      <p className={styles.kicker}>XINOBI U · Sana özel</p>
+      <h1>Bir ürün.<br />Binlerce olasılık.</h1>
+      <p>Önce ürününü seç. Sonra rengini seçip Tarzını Keşfet sorularıyla tasarımını bul veya kendi görselini kullan.</p>
+      <div className={styles.steps}><span>01 · Ürününüzü seçin</span><span>02 · Rengini seçin</span><span>03 · Tarzınızı keşfedin</span></div>
+    </section>
+    {error && <p className={styles.error} role="alert">{error}</p>}
+    {!state ? <p role="status">Ürünler hazırlanıyor…</p> : products.length === 0 ? <p>Şu anda kişiselleştirmeye açık bir ürün bulunmuyor.</p> : <section className={catalogStyles.grid} aria-label="Kişiselleştirilebilir ürünler">
+      {products.map(product => <CatalogProductCard
+        key={product.id}
+        product={product}
+        cardHref={product.href}
+        actionHref={product.href}
+        favorite={favorites.includes(product.id)}
+        onToggleFavorite={() => toggleFavorite(product.id)}
+        action={<>XINOBI U ile kişiselleştir <b aria-hidden="true">→</b></>}
+      />)}
+    </section>}
+  </main>;
 }

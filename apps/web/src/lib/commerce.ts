@@ -5,6 +5,14 @@ export { mediaUrl, money, productGallery } from '../../../../packages/commerce/c
 export const commerceApi = process.env.NEXT_PUBLIC_COMMERCE_API_URL || (process.env.NODE_ENV === 'development' ? localApi : '');
 const snapshotUrl = process.env.NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL || '';
 const catalogUrl = process.env.NEXT_PUBLIC_CATALOG_URL || (process.env.NODE_ENV === 'development' || snapshotUrl ? '' : '/api/v1/catalog/storefront');
+let pendingState: Promise<CommerceState> | undefined;
+function loadCommerceState() {
+  // Header and page hooks read the same endpoint. Share only an in-flight
+  // request; each later refresh still reads the current catalog.
+  pendingState ??= commerceRequest<CommerceState>(catalogUrl ? '' : commerceApi, catalogUrl || (commerceApi ? '/state' : snapshotUrl))
+    .finally(() => { pendingState = undefined; });
+  return pendingState;
+}
 export function useCommerce() {
   const [state, setState] = useState<CommerceState | null>(null);
   const [error, setError] = useState('');
@@ -13,7 +21,7 @@ export function useCommerce() {
     let active = true;
     const refresh = async () => {
       try {
-        const data = await commerceRequest<CommerceState>(catalogUrl ? '' : commerceApi, catalogUrl || (commerceApi ? '/state' : snapshotUrl));
+        const data = await loadCommerceState();
         if (active) { setState(data); setError(''); }
       } catch { if (active) setError('Ürün ve içerik bağlantısı kurulamadı. Biraz sonra tekrar deneyin.'); }
     };

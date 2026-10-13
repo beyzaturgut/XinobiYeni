@@ -10,7 +10,6 @@ import '../../widgets/common.dart';
 import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
 import '../designs/designs.dart';
-import '../personalization/surface_preview.dart';
 import 'xinobi_u_repository.dart';
 
 enum _Phase { loading, questions, review, generating, ready, failed, error }
@@ -65,8 +64,28 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
       message = null;
       slow = false;
     });
+    final variantId = widget.variantId;
+    if (variantId == null || variantId.isEmpty) {
+      setState(() {
+        phase = _Phase.error;
+        message = 'Önce ürününü ve rengini seçmelisin.';
+      });
+      return;
+    }
     try {
-      final existing = fresh ? null : await store.sessionFor(widget.productId, widget.variantId);
+      final detail = await ref.read(productProvider(widget.productId).future);
+      final selectedVariant = detail.variants.where((variant) => variant.id == variantId).firstOrNull;
+      final remoteReady = selectedVariant == null || selectedVariant.surfaceMaskUrl?.isNotEmpty == true
+          ? true
+          : await ref.read(acceptedSurfaceProvider((productId: widget.productId, variantId: variantId)).future);
+      if (selectedVariant == null || selectedVariant.imageUrl == null || remoteReady != true) {
+        setState(() {
+          phase = _Phase.error;
+          message = remoteReady == false ? 'Bu renk için onaylı ürün önizlemesi bulunmuyor.' : 'Bu rengin önizleme uygunluğu doğrulanamadı.';
+        });
+        return;
+      }
+      final existing = fresh ? null : await store.sessionFor(widget.productId, variantId);
       XinobiUSession? current;
       if (existing != null) {
         try {
@@ -76,15 +95,29 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
           if (current.status == 'ready' || current.status == 'failed') current = null;
         } on XinobiUException catch (error) {
           if (!error.sessionGone) rethrow;
-          await store.forgetSession(widget.productId, widget.variantId);
+          await store.forgetSession(widget.productId, variantId);
         }
       }
-      current ??= await repository.createSession(productId: widget.productId, variantId: widget.variantId);
-      await store.rememberSession(widget.productId, widget.variantId, current.id);
+      current ??= await repository.createSession(productId: widget.productId, variantId: variantId);
+      if (current.product.id != widget.productId || current.variant.id != variantId) {
+        setState(() {
+          phase = _Phase.error;
+          message = 'Seçilen ürün ve renk doğrulanamadı.';
+        });
+        return;
+      }
+      await store.rememberSession(widget.productId, variantId, current.id);
       final saved = await store.answers(current.id);
       if (!mounted) return;
       _apply(current, restoredAnswers: saved);
     } on XinobiUException catch (error) {
+      if (mounted) {
+        setState(() {
+          phase = _Phase.error;
+          message = error.message;
+        });
+      }
+    } on CatalogException catch (error) {
       if (mounted) {
         setState(() {
           phase = _Phase.error;
@@ -377,46 +410,6 @@ class _ResultState extends ConsumerState<_Result> {
       OutlinedButton(onPressed: widget.onRestart, child: const Text('Yeni anket başlat')),
     ]);
   }
-}
-
-/// The design on the selected colour's photo, limited to the surface the admin approved for that colour (Ürün yüzeyleri).
-/// Colours without an approved mask keep the simple representative overlay.
-class _ProductPreview extends ConsumerWidget {
-  const _ProductPreview({required this.productId, required this.variantId, required this.productUrl, required this.patternUrl, required this.label});
-  final String productId;
-  final String variantId;
-  final String? productUrl;
-  final String? patternUrl;
-  final String label;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final variants = ref.watch(productProvider(productId)).value?.variants;
-    final mask = variants?.where((variant) => variant.id == variantId).firstOrNull?.surfaceMaskUrl;
-    return Semantics(
-      label: label,
-      image: true,
-      excludeSemantics: true,
-      child: mask != null && productUrl != null && patternUrl != null
-          ? SurfacePreview(product: NetworkImage(productUrl!), design: NetworkImage(patternUrl!), mask: NetworkImage(mask), fallback: _overlay())
-          : _overlay(),
-    );
-  }
-
-  Widget _overlay() => Stack(fit: StackFit.expand, children: [
-        RemoteImage(productUrl),
-        Align(
-          alignment: const Alignment(-0.08, 0.05),
-          child: FractionallySizedBox(
-            widthFactor: 0.34,
-            heightFactor: 0.42,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(XinobiTokens.radiusMedium),
-              child: Opacity(opacity: 0.88, child: RemoteImage(patternUrl, fit: BoxFit.cover)),
-            ),
-          ),
-        ),
-      ]);
 }
 
 class _Message extends StatelessWidget {

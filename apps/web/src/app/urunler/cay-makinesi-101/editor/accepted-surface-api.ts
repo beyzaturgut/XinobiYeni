@@ -81,3 +81,25 @@ async function loadPublishedSurface(product:string,variant:string,signal:AbortSi
  const preview=catalogPreviewDimensions(input.width,input.height);
  return {...input,assetWidth:input.width,assetHeight:input.height,...preview,surfaceTreatment:'metallic-ink',...(product===CM121_PRODUCT&&variant===CM121_VARIANT?{surfaceInkExposureStops:0.55}:{})};
 }
+
+// XINOBI U changes routes while this request is in flight. Keep one shared
+// request per exact product/variant so an unmounted colour screen cannot abort
+// the check that the questionnaire is about to reuse.
+const acceptedSurfaceRequests = new Map<string, Promise<RenderingInputs|null>>();
+
+export function loadCachedAcceptedSurface(productReference: string, variantReference: string): Promise<RenderingInputs|null> {
+ const key = `${productReference}:${variantReference}`;
+ const existing = acceptedSurfaceRequests.get(key);
+ if (existing) return existing;
+ const controller = new AbortController();
+ const request = loadAcceptedSurface(variantReference, controller.signal, productReference).catch(error => {
+  acceptedSurfaceRequests.delete(key);
+  throw error;
+ });
+ acceptedSurfaceRequests.set(key, request);
+ return request;
+}
+
+export function clearCachedAcceptedSurface(productReference: string, variantReference: string): void {
+ acceptedSurfaceRequests.delete(`${productReference}:${variantReference}`);
+}

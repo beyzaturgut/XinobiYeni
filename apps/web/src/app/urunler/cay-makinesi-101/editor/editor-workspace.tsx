@@ -12,7 +12,7 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png" }: { renderingInputs: RenderingInputs; patternSrc?: string; placementMode?: "pattern" | "artwork" }) {
+export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png", onUpload, uploadBusy = false }: { renderingInputs: RenderingInputs; patternSrc?: string; placementMode?: "pattern" | "artwork"; onUpload?: () => void; uploadBusy?: boolean }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
@@ -36,7 +36,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
     <aside className={styles.tools} aria-label="Tasarım araçları">
       <p className={styles.eyebrow}>Araçlar</p>
       <button type="button" onClick={() => addLayer("Metin")}><span aria-hidden="true">T</span><strong>Metin</strong><small>Başlık veya isim ekle</small></button>
-      <button type="button" disabled aria-describedby="upload-disabled"><span aria-hidden="true">↑</span><strong>Görsel yükle</strong><small id="upload-disabled">Medya API&apos;si bekleniyor</small></button>
+      <button type="button" onClick={onUpload} disabled={!onUpload || uploadBusy}><span aria-hidden="true">↑</span><strong>Görsel yükle</strong><small>{uploadBusy ? 'Görsel doğrulanıyor…' : 'PNG, JPEG veya WebP seç'}</small></button>
       <button type="button" onClick={() => addLayer("Şekil")}><span aria-hidden="true">◇</span><strong>Şekil</strong><small>Temel şekil ekle</small></button>
       <button type="button" disabled><span aria-hidden="true">▦</span><strong>Şablonlar</strong><small>Kategori verisi bekleniyor</small></button>
       <div className={styles.toolNote}><strong>D04 koruması</strong><p>Gerçek baskı alanı ve taşma hesabı üretim standardı onaylandıktan sonra açılır.</p></div>
@@ -102,7 +102,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
         <div className={styles.panelTitle}><div><p id="properties-title">Özellikler</p><span>Seçili katman</span></div></div>
         <label>Konum <span>Demo</span></label><div className={styles.propertyGrid}><button type="button" disabled>X —</button><button type="button" disabled>Y —</button></div>
         <label>Boyut ve dönüş <span>D04 bekliyor</span></label><div className={styles.propertyGrid}><button type="button" disabled>W —</button><button type="button" disabled>0°</button></div>
-        <button type="button" className={styles.demoSave} onClick={() => setNotice("Demo taslak hazırlandı; sunucuya kalıcı kayıt yapılmadı.")}>Demo taslağı hazırla</button>
+        <button type="button" className={styles.demoSave} disabled>Kalıcı kaydetme henüz kullanılamıyor</button>
         <p>Kalıcı sürüm, gerçek koordinat ve çıktı üretimi API/üretim standardı sonrasında etkinleşir.</p>
       </section>
     </aside>

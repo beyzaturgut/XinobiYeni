@@ -221,7 +221,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           signedIn
               ? FilledButton(onPressed: busy || productId == null ? null : _save, child: Text(busy ? 'Kaydediliyor…' : 'Tasarımımı kaydet'))
               : OutlinedButton(onPressed: () => context.go('/hesap'), child: const Text('Kaydetmek için giriş yap')),
-        if (current != null && picked == null) Text('“${current.name}” Tasarımlarım’da kayıtlı.', style: text.bodySmall),
+        if (current != null && picked == null) ...[
+          FilledButton.icon(onPressed: () => addDesignToCart(context, ref, current, variantId: variant?.id), icon: const Icon(Icons.add_shopping_cart), label: const Text('Sepete ekle')),
+          const SizedBox(height: 8),
+          Text('“${current.name}” Tasarımlarım’da kayıtlı.', style: text.bodySmall),
+        ],
       ]),
     );
   }

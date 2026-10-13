@@ -102,7 +102,7 @@ class _CartRow extends ConsumerWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: XinobiTokens.surface, border: Border.all(color: item.problem == CartProblem.none ? XinobiTokens.line : XinobiTokens.danger)),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(width: 72, height: 72, child: RemoteImage(variant?.imageUrl ?? item.product?.imageUrl)),
+        SizedBox(width: 72, height: 72, child: line.designId != null ? PrivateDesignImage(path: designImagePath(line.designId!), label: '${line.designName} tasarımı') : RemoteImage(variant?.imageUrl ?? item.product?.imageUrl)),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -111,11 +111,7 @@ class _CartRow extends ConsumerWidget {
             if (line.designId != null)
               Padding(
                 padding: const EdgeInsets.only(top: 6),
-                child: Row(children: [
-                  SizedBox(width: 44, height: 44, child: PrivateDesignImage(path: designImagePath(line.designId!), label: '${line.designName} tasarımı')),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text('Kişiselleştirilmiş · ${line.designName}', style: text.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis)),
-                ]),
+                child: Text('Kişiselleştirilmiş · ${line.designName}', style: text.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
               ),
             const SizedBox(height: 4),
             if (variant != null) Text(formatMoney(variant.price), style: text.bodyMedium),

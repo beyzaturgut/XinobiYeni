@@ -7,6 +7,6 @@
 .summary{top:80px;padding:20px}.summary h2{margin-bottom:14px}
 }
 
-.design{display:flex;align-items:center;gap:10px;margin-top:6px}
-.design p{margin:0}
-.designImage{width:56px;height:56px;border-radius:8px;overflow:hidden;flex:none;background:#f1f1f1}
+.design{margin-top:6px}
+/* A personalised line shows the customer's design as its picture. */
+.designImage{display:block!important;width:100%;aspect-ratio:1;background:#f1f1f1}

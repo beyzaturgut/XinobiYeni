@@ -25,6 +25,28 @@ final designImageProvider = FutureProvider.autoDispose.family<ImageProvider?, St
 
 String designImagePath(String id) => '/api/v1/me/designs/${Uri.encodeComponent(id)}/image';
 
+/// Puts the design's product in [variantId], its own colour or the first one in stock into the cart; checkout re-checks
+/// ownership, product and stock.
+Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign design, {String? variantId}) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final router = GoRouter.of(context);
+  try {
+    final product = await ref.read(catalogRepositoryProvider).product(design.productId);
+    final variant = [variantId, design.variantId].nonNulls.map((id) => product.variants.where((item) => item.id == id && item.maxQuantity > 0).firstOrNull).nonNulls.firstOrNull ??
+        product.variants.where((item) => item.maxQuantity > 0 && item.price != null).firstOrNull;
+    if (variant == null) throw const CartException('Bu ürün şu anda stokta yok.');
+    await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name);
+    messenger.showSnackBar(SnackBar(
+      content: Text('“${design.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.'),
+      action: SnackBarAction(label: 'Sepete git', onPressed: () => router.go('/sepet')),
+    ));
+  } on CartException catch (error) {
+    messenger.showSnackBar(SnackBar(content: Text(error.message)));
+  } on CatalogException catch (error) {
+    messenger.showSnackBar(SnackBar(content: Text(error.message)));
+  }
+}
+
 /// A private design image by path (saved design or order line) with the "Temsilidir" label (K-12).
 class PrivateDesignImage extends ConsumerWidget {
   const PrivateDesignImage({super.key, required this.path, required this.label});
@@ -82,23 +104,6 @@ class DesignsScreen extends ConsumerWidget {
     ref.invalidate(myDesignsProvider);
   }
 
-  /// Puts the design's product in its colour (or the first one in stock) into the cart; checkout re-checks everything.
-  Future<void> _addToCart(BuildContext context, WidgetRef ref, MyDesign design) async {
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final product = await ref.read(catalogRepositoryProvider).product(design.productId);
-      final variant = product.variants.where((item) => item.id == design.variantId && item.maxQuantity > 0).firstOrNull ??
-          product.variants.where((item) => item.maxQuantity > 0 && item.price != null).firstOrNull;
-      if (variant == null) throw const CartException('Bu ürün şu anda stokta yok.');
-      await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name);
-      messenger.showSnackBar(SnackBar(content: Text('“${design.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.')));
-    } on CartException catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text(error.message)));
-    } on CatalogException catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text(error.message)));
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final designs = ref.watch(myDesignsProvider);
@@ -139,7 +144,7 @@ class DesignsScreen extends ConsumerWidget {
                       const Spacer(),
                       Row(children: [
                         IconButton(tooltip: '${design.name} ürün üzerinde dene', icon: const Icon(Icons.view_in_ar_outlined), onPressed: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}')),
-                        IconButton(tooltip: '${design.name} tasarımıyla sepete ekle', icon: const Icon(Icons.add_shopping_cart), onPressed: () => _addToCart(context, ref, design)),
+                        IconButton(tooltip: '${design.name} tasarımıyla sepete ekle', icon: const Icon(Icons.add_shopping_cart), onPressed: () => addDesignToCart(context, ref, design)),
                         IconButton(tooltip: '${design.name} yeniden adlandır', icon: const Icon(Icons.edit_outlined), onPressed: () => _rename(context, ref, design)),
                         IconButton(tooltip: '${design.name} sil', icon: const Icon(Icons.delete_outline), onPressed: () => _delete(context, ref, design)),
                       ]),

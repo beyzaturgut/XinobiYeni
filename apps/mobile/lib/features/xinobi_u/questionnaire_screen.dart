@@ -362,22 +362,32 @@ class _Result extends ConsumerStatefulWidget {
 
 class _ResultState extends ConsumerState<_Result> {
   bool saving = false;
-  bool saved = false;
+  MyDesign? saved;
 
-  /// K-21: copies the design into the account so it outlives the session.
-  Future<void> _save() async {
+  /// K-21: copies the design into the account so it outlives the session; saved once, reused by "Sepete ekle".
+  Future<MyDesign?> _save({bool announce = true}) async {
+    if (saved != null) return saved;
     final messenger = ScaffoldMessenger.of(context);
     setState(() => saving = true);
     try {
-      await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveDesign(token, widget.session.id));
+      final design = await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveDesign(token, widget.session.id));
       ref.invalidate(myDesignsProvider);
-      if (mounted) setState(() => saved = true);
-      messenger.showSnackBar(SnackBar(content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim'))));
+      if (mounted) setState(() => saved = design);
+      if (announce) messenger.showSnackBar(SnackBar(content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim'))));
+      return design;
     } on AccountException catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.message)));
+      return null;
     } finally {
       if (mounted) setState(() => saving = false);
     }
+  }
+
+  /// A cart line needs a saved design, so the result is saved to the account first.
+  Future<void> _addToCart() async {
+    final design = await _save(announce: false);
+    if (design == null || !mounted) return;
+    await addDesignToCart(context, ref, design, variantId: widget.session.variant.id);
   }
 
   @override
@@ -398,12 +408,14 @@ class _ResultState extends ConsumerState<_Result> {
       // K-12: the "Temsilidir" notice is permanent, readable text.
       Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: text.bodySmall),
       const SizedBox(height: 20),
-      FilledButton.icon(onPressed: widget.onOpenPreview, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
+      OutlinedButton.icon(onPressed: widget.onOpenPreview, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
       const SizedBox(height: 8),
-      if (ref.watch(authProvider) is SignedIn)
-        OutlinedButton(onPressed: saving || saved ? null : _save, child: Text(saved ? 'Tasarımlarım’a kaydedildi' : saving ? 'Kaydediliyor…' : 'Tasarımımı kaydet'))
-      else
-        OutlinedButton(onPressed: () => context.go('/hesap'), child: const Text('Kaydetmek için giriş yap')),
+      if (ref.watch(authProvider) is SignedIn) ...[
+        FilledButton.icon(onPressed: saving ? null : _addToCart, icon: const Icon(Icons.add_shopping_cart), label: Text(saving ? 'Hazırlanıyor…' : 'Sepete ekle')),
+        const SizedBox(height: 8),
+        OutlinedButton(onPressed: saving || saved != null ? null : _save, child: Text(saved != null ? 'Tasarımlarım’a kaydedildi' : 'Tasarımımı kaydet')),
+      ] else
+        OutlinedButton(onPressed: () => context.go('/hesap'), child: const Text('Sepete eklemek ve kaydetmek için giriş yap')),
       const SizedBox(height: 8),
       OutlinedButton(onPressed: () => context.push('/tasarim-editoru?urun=${Uri.encodeQueryComponent(session.product.id)}&renk=${Uri.encodeQueryComponent(session.variant.id)}'), child: const Text('Kendi görselimle dene')),
       const SizedBox(height: 8),

@@ -1,0 +1,1 @@
+import {Suspense} from "react";import ReviewPreview from "./review-preview";export default function Page(){return <Suspense fallback={<p>Maske kontrolü hazırlanıyor…</p>}><ReviewPreview/></Suspense>}

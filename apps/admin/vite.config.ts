@@ -1,8 +1,24 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
+
+// Only the isolated QA launcher protects the received catalog from Admin writes.
+const qaCatalogGuard: Plugin = {
+  name: 'xinobi-qa-catalog-read-only',
+  configureServer(server) {
+    server.middlewares.use((request, response, next) => {
+      if (request.url?.startsWith('/api/v1/local-commerce') && !['GET', 'HEAD'].includes(request.method || '')) {
+        response.statusCode = 405
+        response.setHeader('Content-Type', 'application/json')
+        response.end(JSON.stringify({ message: 'QA katalog verileri salt okunurdur.' }))
+        return
+      }
+      next()
+    })
+  },
+}
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  server: { proxy: { '/api/v1/local-commerce': { target: process.env.PRODUCT_SURFACES_API_URL || 'http://localhost:5003', changeOrigin: true }, '/api/v1/admin/dev/product-surfaces': { target: process.env.PRODUCT_SURFACES_API_URL || 'http://localhost:5003', changeOrigin: true } } },
+  plugins: [react(), ...(process.env.XINOBI_QA_MODE === 'true' ? [qaCatalogGuard] : [])],
+  server: { proxy: { '/api/v1/local-commerce': { target: process.env.PRODUCT_SURFACES_CATALOG_API_URL || process.env.PRODUCT_SURFACES_API_URL || 'http://localhost:5003', changeOrigin: true }, '/api/v1/dev/catalog-surfaces': { target: 'http://127.0.0.1:3046', changeOrigin: true }, '/api/v1/admin/dev/catalog-candidate': { target: 'http://127.0.0.1:5020', changeOrigin: true, timeout: 130000 }, '/api/v1/admin/dev/cm101-candidate': { target: 'http://127.0.0.1:5020', changeOrigin: true, timeout: 130000 }, '/api/v1/admin/dev/product-surfaces': { target: process.env.PRODUCT_SURFACES_API_URL || 'http://localhost:5003', changeOrigin: true } } },
 })

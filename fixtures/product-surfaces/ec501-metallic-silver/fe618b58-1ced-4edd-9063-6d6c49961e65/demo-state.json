@@ -1,0 +1,21 @@
+{
+  "products": [
+    {
+      "id": "DEMO-97db48f3-afb3-4026-aa26-03deb087cd9d",
+      "name": "Otomatik Türk Kahvesi Makinesi EC 501-505",
+      "category": "Kahve makineleri",
+      "active": true,
+      "personalizable": true,
+      "variants": [
+        {
+          "id": "DEMO-V-459a05ef-1a88-490b-95a6-810f95e70bd5",
+          "sku": "501",
+          "color": "Metalik gümüş",
+          "stock": 10,
+          "image": "/api/v1/local-commerce/media/ddf3a412b17b4b67ab6097a99e55e76d.webp",
+          "hex": "#AFAFAF"
+        }
+      ]
+    }
+  ]
+}

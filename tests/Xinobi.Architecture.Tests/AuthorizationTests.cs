@@ -24,7 +24,7 @@ public sealed class AuthorizationTests : IDisposable
     private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
-        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory }));
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory, ["ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"] = "true" }));
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<IVerificationEmailSender>();

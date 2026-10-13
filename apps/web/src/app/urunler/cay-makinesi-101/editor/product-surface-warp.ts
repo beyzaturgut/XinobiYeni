@@ -9,7 +9,7 @@ export function cylindricalCoordinate(u: number, strength: number) {
   return u + strength * (Math.sign(u) * angular - u);
 }
 
-export function deriveBodySurface(mask: ImageData) {
+export function deriveBodySurface(mask: ImageData, followSilhouette = false) {
   const { width, height, data } = mask;
   const rows: { y: number; left: number; right: number; count: number }[] = [];
   let widest = 0, widestRow = 0;
@@ -25,7 +25,10 @@ export function deriveBodySurface(mask: ImageData) {
   }
   // Fit a stable tapered silhouette, excluding spout-narrowed rows, holes and the bottom cap.
   // The original mask still clips those physical exclusions; it is never changed here.
-  const bodyRows = rows.filter((row) => row.y <= widestRow && row.right - row.left >= widest * 0.85 && row.count / (row.right - row.left) >= 0.95);
+  let bodyRows = rows.filter((row) => row.y <= widestRow && row.right - row.left >= widest * 0.85 && row.count / (row.right - row.left) >= 0.95);
+  // A constant-width body can have its first row as the widest row. Fit its stable rows
+  // only when the legacy fit has insufficient rows; validated Tea Maker fits are unchanged.
+  if (bodyRows.length < 2) bodyRows = rows.filter((row) => row.right - row.left >= widest * 0.85 && row.count / (row.right - row.left) >= 0.95);
   if (bodyRows.length < 2) throw new Error("Insufficient body silhouette rows");
   const fit = (side: "left" | "right") => {
     const meanY = bodyRows.reduce((sum, row) => sum + row.y, 0) / bodyRows.length;
@@ -38,7 +41,10 @@ export function deriveBodySurface(mask: ImageData) {
   const centers = new Float32Array(height), radii = new Float32Array(height);
   const activePixels: number[] = [], offsets: number[] = [];
   for (let y = 0; y < height; y++) {
-    const left = leftAt(y), right = rightAt(y);
+    // Generic metal bodies follow the accepted source-aligned silhouette, including
+    // taper/neck changes; legacy Tea Maker regression retains its exact line fit.
+    const row = followSilhouette ? rows.find(row=>row.y===y) : undefined;
+    const left = row ? row.left : leftAt(y), right = row ? row.right : rightAt(y);
     centers[y] = (left + right) / 2;
     radii[y] = (right - left) / 2;
     for (let x = 0; x < width; x++) {

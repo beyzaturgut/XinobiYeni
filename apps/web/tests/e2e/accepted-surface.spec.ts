@@ -56,3 +56,10 @@ test("disabled endpoint is unavailable, not a static fallback", async ({ page })
   await expect(page.getByRole("status")).toContainText("kullanılamıyor");
   expect(await page.locator("canvas[role='img']").count()).toBe(0);
 });
+
+test("catalog path-only mask records cannot bypass validated rendering inputs",async({page})=>{
+ await page.route("**/api/v1/local-commerce/state",r=>r.fulfill({json:{products:[{id:"real-product",active:true,variants:[{id:"real-variant",image:"/assets/products/tea-maker-101-blue.webp",surfaceImage:"/assets/products/tea-maker-101-blue.webp",surfaceMask:"/assets/personalization/tea-maker-101-blue-designable.png"}]}]}}));
+ await page.route("**/api/v1/dev/product-surfaces/commerce/real-product/real-variant/rendering-inputs",r=>r.fulfill({status:404,json:{}}));
+ await page.goto("/urunler/cay-makinesi-101/editor/?product=real-product&variant=real-variant");
+ await expect(page.getByRole("status")).toBeVisible();await expect(page.locator("canvas[role=img]")).toHaveCount(0);
+});

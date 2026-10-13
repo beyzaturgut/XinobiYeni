@@ -16,6 +16,15 @@ Aynı ekranda **Preserve client IP in the following header** `X-Forwarded-For` k
 IIS Manager → **XinobiYeni** sitesi → **URL Rewrite** → sağda
 **View Server Variables** → **Add** → `HTTP_X_FORWARDED_PROTO`.
 
+## 2b. Admin'in HTTPS zorunluluğu için kilidi aç
+
+`out/admin/web.config` `<access sslFlags="Ssl" />` kullanır; IIS bu bölümü varsayılan
+olarak kilitler ve panel 500.19 (0x80070021) döner. Bir kez, yönetici PowerShell'de:
+
+```powershell
+& "$env:windir\system32\inetsrv\appcmd.exe" unlock config -section:system.webServer/security/access
+```
+
 ## 3. Yönlendirme kuralları
 
 Kurallar web paketinin `out/web.config` dosyasında gelir (`tools/package-iis-preview.mjs`);

@@ -73,7 +73,10 @@ Set-SectionValue $config 'ReverseProxy' 'AllowedHosts' @($origin.DnsSafeHost)
 $temporaryConfig = $configPath + '.repair.tmp'
 $json = $config | ConvertTo-Json -Depth 100
 [IO.File]::WriteAllText($temporaryConfig, $json, (New-Object Text.UTF8Encoding($false)))
-[IO.File]::Replace($temporaryConfig, $configPath, $null)
+# Windows PowerShell 5.1 can bind $null to an empty string for the backup path;
+# File.Replace then rejects it. Use a real, unique backup path on the same volume.
+$replaceBackup = Join-Path $backup 'appsettings.Production.before-replace.json'
+[IO.File]::Replace($temporaryConfig, $configPath, $replaceBackup)
 & $appcmd recycle apppool "/apppool.name:$ApiPool"
 if ($LASTEXITCODE -ne 0) { throw 'Settings saved, but API pool recycle failed. Recycle it from IIS Manager.' }
 Write-Host "Repair applied. Copied media files: $copied. Backup: $backup"

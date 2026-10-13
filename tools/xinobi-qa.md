@@ -59,7 +59,10 @@ is for real-catalog sessions; the demo API is kept generation-disabled.
 - Existing mask editor/delivery 3046: preserves current approved pointer/files.
 - Admin 5176: real catalog reads proxied to 5019; demo review to 5013. QA-only
   catalog writes return 405 so received data cannot be changed through Admin.
-- Web 3032: same-origin catalog/design/accepted media routes.
+- Web 3032: same-origin catalog/design/accepted media routes. The QA launcher sets
+  `PRODUCT_SURFACES_XINOBI_U_API_PORT=5020`, so `/api/v1/xinobi-u/*` reads the
+  same questionnaire session store as the Flutter AI API. The Next development
+  bridge defaults this variable to 5019 when it is not supplied.
 
 No process needs to be stopped to move between Admin, own-image and questionnaire.
 No worker runs in the catalog/demo APIs. No external job starts from GET, startup,

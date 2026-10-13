@@ -26,7 +26,7 @@ export default function CatalogMaskReview({source}:{source:Source}) {
  <p>İki gövde için hedefi açıkça üst demlik ve alt çaydanlık gövdesi olarak belirtin. Adayda iki gövde de bulunmalıdır; aradaki metal birleşimi maskeden çıkarın. Müşteri aynı görseli her ayrı gövdeye kendi boyutunda yerleştirir. Eksik gövdeyi başka ürünün maskesiyle tamamlamayın.</p>
  {status?.candidates.map(c=><button key={c.candidateId} type="button" onClick={()=>setCandidate(c.candidateId)}>{c.target} · {c.provenance} · Düzenle</button>)}
  {candidate&&status?.candidates.find(c=>c.candidateId===candidate)?.options&&<MaskCandidateSelection key={candidate} source={source} candidateId={candidate} acceptedVersion={status?.accepted?.version} onCandidate={id=>{setCandidate(id);refresh().catch(e=>setError(e.message))}}/>}
- {status?.candidates.find(c=>c.candidateId===candidate)?.composition?.warnings.map(w=><p role="alert" key={w}>{w}</p>)}
+ {status?.candidates.find(c=>c.candidateId===candidate)?.composition?.warnings?.map(w=><p role="alert" key={w}>{w}</p>)}
  {candidate&&!status?.candidates.find(c=>c.candidateId===candidate)?.options&&<><button onClick={()=>{setCandidate('');refresh().catch(e=>setError(e.message))}}>Editörü kapat ve durumu yenile</button><iframe title="Katalog varyantı maske editörü" className="surface-local-editor" src={'http://127.0.0.1:3046/catalog-editor/'+candidate+'/'+encodeURIComponent(source.productId)+'/'+encodeURIComponent(source.variantId)+'/'} /></>}
  {status?.versions.map(v=><button type="button" disabled={busy||v.version===status.accepted?.version} key={v.version} onClick={()=>restore(v.version)}>Önceki onay · {v.acceptedAt}</button>)}
  </section>

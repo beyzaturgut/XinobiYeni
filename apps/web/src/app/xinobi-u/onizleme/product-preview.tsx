@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import {useEffect,useState} from 'react';
-import {designRequest,type DesignSession} from '../../../lib/design-studio';
+import {designRequest,studioAsset,type DesignSession} from '../../../lib/design-studio';
 import AcceptedSurfaceEditor from '../../urunler/cay-makinesi-101/editor/accepted-surface-editor';
 import SaveDesignButton from '../../../components/save-design-button';
 import styles from '../studio.module.css';
@@ -18,5 +18,5 @@ export default function ProductPreview(){
  },[]);
  if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/xinobi-u">Ürününü seç ↗</Link></main>;
  if(!session)return <main className={styles.main}><p role="status">Tasarımın yükleniyor…</p></main>;
- return <><header className={styles.main}><p>{session.product.name} · {session.variant.color}</p><Link href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}>Tasarımıma dön</Link><p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><SaveDesignButton source={{sessionId:session.id}}/></header><AcceptedSurfaceEditor commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={session.imageUrl!}/></>;
+ return <><header className={styles.main}><p>{session.product.name} · {session.variant.color}</p><Link href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}>Tasarımıma dön</Link><p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><SaveDesignButton source={{sessionId:session.id}}/></header><AcceptedSurfaceEditor commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={studioAsset(session.imageUrl!)}/></>;
 }

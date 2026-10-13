@@ -1,4 +1,5 @@
 // Temporary provider-unaware development rendering seam.
+import {commerceApi} from '../../../../lib/commerce';
 export type RenderingMedia={url:string;sha256:string;originalSha256?:string};
 export type RenderingInputs={surfaceVersion:string;sourceMediaVersion:string;width:number;height:number;assetWidth?:number;assetHeight?:number;source:RenderingMedia;mask:RenderingMedia;brandingRequired:boolean;branding:RenderingMedia|null;displayName?:string;surfaceTreatment?:"metallic-ink";surfaceInkExposureStops?:number};
 export const MAX_CATALOG_PREVIEW_PIXELS=20_000_000;
@@ -37,7 +38,7 @@ export async function loadAcceptedSurface(variantReference:string,signal:AbortSi
  const cm=commerceProduct===CM_PRODUCT&&variantReference===CM_VARIANT;
  const route=cm?"/api/v1/dev/cm101-approved/"+CM_PRODUCT+"/"+CM_VARIANT+"/rendering-inputs":commerceProduct?"/api/v1/dev/product-surfaces/commerce/"+encodeURIComponent(commerceProduct)+"/"+encodeURIComponent(variantReference)+"/rendering-inputs":surfaceRoot+"/"+encodeURIComponent(variantReference)+"/rendering-inputs";
  const response=await fetch(route,{signal,cache:"no-store"});
- if(response.status===404)return null;
+ if(response.status===404)return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
  if(!response.ok)throw new Error("Preview unavailable");
  const value=await response.json();
  if(value.scope!=="development-preview"||value.productReference!==productReference||value.variantReference!==variantReference)throw new Error("Invalid preview bundle");
@@ -72,7 +73,8 @@ async function loadPublishedSurface(product:string,variant:string,signal:AbortSi
  }
  if(input.mask.sha256!==input.surfaceVersion)throw Error('Invalid mask version');
  // Never use a packaged mask after this exact live variant's source photo changed or the product was withdrawn.
- const current=await fetch('/api/v1/catalog/products/'+encodeURIComponent(product),{signal,cache:'no-store'});
+ const catalogApi=commerceApi?commerceApi.replace(/\/local-commerce\/?$/,''):'/api/v1';
+ const current=await fetch(catalogApi+'/catalog/products/'+encodeURIComponent(product),{signal,cache:'no-store'});
  if(current.status===404)return null;if(!current.ok)throw Error('Catalog unavailable');
  const detail=await current.json(),selected=detail.variants?.find((item:{id:string})=>item.id===variant);
  if(!selected?.imageUrl||new URL(selected.imageUrl,window.location.origin).pathname!==bundle.sourceImage)return null;

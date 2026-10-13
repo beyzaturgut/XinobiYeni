@@ -42,6 +42,7 @@ type ProductPatternPreviewProps = {
 
 async function loadImage(src: string) {
   const image = new window.Image();
+  image.crossOrigin = "anonymous";
   image.src = src;
   await image.decode();
   return image;

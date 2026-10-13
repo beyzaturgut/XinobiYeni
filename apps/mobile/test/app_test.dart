@@ -42,6 +42,8 @@ class FakeCatalog implements CatalogRepository {
 
   @override
   Future<bool?> acceptedPreviewAvailable({required String productId, required String variantId}) async => true;
+  @override
+  Future<PublishedSurface?> publishedSurface({required String productId, required String variantId}) async => null;
 
   @override
   Future<AnnouncementList> announcements() async => AnnouncementList((b) => b.items.addAll(news));

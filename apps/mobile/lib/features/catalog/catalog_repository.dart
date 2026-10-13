@@ -14,6 +14,8 @@ abstract interface class CatalogRepository {
   Future<ProductPage> products(ProductQuery query);
   Future<ProductDetail> product(String id);
   Future<bool?> acceptedPreviewAvailable({required String productId, required String variantId});
+  /// The published approved surface of a colour (product photo and mask aligned to it), or null when there is none.
+  Future<PublishedSurface?> publishedSurface({required String productId, required String variantId});
   Future<AnnouncementList> announcements();
   Future<ReviewPage> reviews(String productId, {int page = 1});
   Future<ReviewSummaryList> reviewSummaries(List<String> productIds);
@@ -32,6 +34,14 @@ class ProductQuery {
 
   @override
   int get hashCode => Object.hash(category, search, personalizable);
+}
+
+/// A colour's approved surface as the web package publishes it: the product photo and the mask drawn on it.
+@immutable
+class PublishedSurface {
+  const PublishedSurface({required this.sourceUrl, required this.maskUrl});
+  final String sourceUrl;
+  final String maskUrl;
 }
 
 /// User-facing failure; [message] is safe to show, technical details stay out of the UI.
@@ -88,11 +98,44 @@ class ApiCatalogRepository implements CatalogRepository {
     try {
       final response = await _preview.getUri(uri);
       final body = response.data;
-      if (response.statusCode != 200 || body is! Map) return false;
-      return body['productReference'] == productId && body['variantReference'] == variantId && body['previewAvailable'] == true && body['inputs'] is Map;
+      if (response.statusCode == 200 &&
+          body is Map &&
+          body['productReference'] == productId &&
+          body['variantReference'] == variantId &&
+          body['previewAvailable'] == true &&
+          body['inputs'] is Map) {
+        return true;
+      }
+    } on DioException {
+      // The development check runs only beside the QA tools; the published bundle below answers everywhere else.
+    }
+    try {
+      return await publishedSurface(productId: productId, variantId: variantId) != null;
     } on DioException {
       return null;
     }
+  }
+
+  @override
+  Future<PublishedSurface?> publishedSurface({required String productId, required String variantId}) async {
+    final uri = xinobiPublishedSurfaceUri(productId: productId, variantId: variantId);
+    if (uri == null) return null;
+    final Response<dynamic> response;
+    try {
+      response = await _preview.getUri(uri);
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) return null;
+      rethrow;
+    }
+    final body = response.data;
+    if (response.statusCode != 200 || body is! Map) return null;
+    final inputs = body['inputs'];
+    if (body['scope'] != 'representative-preview' || body['productReference'] != productId || body['variantReference'] != variantId || inputs is! Map) return null;
+    final source = inputs['source'], mask = inputs['mask'];
+    final prefix = '/assets/product-previews/$productId/$variantId/';
+    String? url(Object? item) => item is Map && item['url'] is String && (item['url'] as String).startsWith(prefix) ? uri.resolve(item['url'] as String).toString() : null;
+    final sourceUrl = url(source), maskUrl = url(mask);
+    return sourceUrl == null || maskUrl == null ? null : PublishedSurface(sourceUrl: sourceUrl, maskUrl: maskUrl);
   }
 
   Future<T> _call<T>(Future<Response<T>> Function() request, {String? notFound}) async {
@@ -135,3 +178,11 @@ final productReviewsProvider = FutureProvider.autoDispose.family<ReviewPage?, St
   }
 });
 final acceptedSurfaceProvider = FutureProvider.family<bool?, ({String productId, String variantId})>((ref, key) => ref.watch(catalogRepositoryProvider).acceptedPreviewAvailable(productId: key.productId, variantId: key.variantId));
+/// A colour's published approved surface; null when it has none or the web origin is not configured.
+final publishedSurfaceProvider = FutureProvider.family<PublishedSurface?, ({String productId, String variantId})>((ref, key) async {
+  try {
+    return await ref.watch(catalogRepositoryProvider).publishedSurface(productId: key.productId, variantId: key.variantId);
+  } on DioException {
+    return null;
+  }
+});

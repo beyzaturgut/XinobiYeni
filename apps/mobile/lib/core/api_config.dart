@@ -93,3 +93,16 @@ Uri? xinobiAcceptedSurfaceUri({
     fragment: '',
   );
 }
+
+/// The representative surface bundle the web package publishes for each approved colour
+/// (`/assets/product-previews/<product>/<variant>/inputs.json`), on the same web origin as the preview.
+Uri? xinobiPublishedSurfaceUri({
+  required String productId,
+  required String variantId,
+  String override = const String.fromEnvironment('XINOBI_WEB_PREVIEW_URL'),
+}) {
+  final base = xinobiMobilePreviewUri(override: override);
+  final identifier = RegExp(r'^[A-Za-z0-9_-]{1,128}$');
+  if (base == null || !identifier.hasMatch(productId) || !identifier.hasMatch(variantId)) return null;
+  return Uri(scheme: base.scheme, host: base.host, port: base.port, path: '/assets/product-previews/$productId/$variantId/inputs.json');
+}

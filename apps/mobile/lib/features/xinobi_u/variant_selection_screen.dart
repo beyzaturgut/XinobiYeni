@@ -162,15 +162,7 @@ class _SelectionBody extends ConsumerWidget {
           ],
         ),
         if (selected != null) ...[
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 180,
-            child: RemoteImage(
-              selected.imageUrl ?? detail.imageUrl,
-              label: '${selected.color} ürün görseli',
-            ),
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           if (remoteUnsupported)
             Text(
               'Bu renk için kişiselleştirme henüz kullanılamıyor.',

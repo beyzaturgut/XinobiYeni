@@ -51,14 +51,17 @@ Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign desig
 /// A saved design worn on its colour's approved surface, placed as the editor starts (an AI pattern covers it, an uploaded
 /// image sits at the default size); colours without an approved surface show the design itself. Labelled "Temsilidir".
 class DesignOnProduct extends ConsumerWidget {
-  const DesignOnProduct({super.key, required this.designId, required this.label, this.variant});
+  const DesignOnProduct({super.key, required this.designId, required this.label, this.productId, this.variant});
   final String designId;
+  final String? productId;
   final String label;
   final VariantDetail? variant;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final path = designImagePath(designId);
-    final product = variant?.imageUrl, mask = variant?.surfaceMaskUrl;
+    final published = variant == null || variant!.surfaceMaskUrl != null || productId == null ? null : ref.watch(publishedSurfaceProvider((productId: productId!, variantId: variant!.id))).value;
+    final product = variant?.surfaceMaskUrl != null ? variant?.imageUrl : published?.sourceUrl;
+    final mask = variant?.surfaceMaskUrl ?? published?.maskUrl;
     final design = ref.watch(designImageProvider(path)).value;
     if (product == null || mask == null) return PrivateDesignImage(path: path, label: label);
     final upload = ref.watch(myDesignsProvider).value?.where((item) => item.id == designId).firstOrNull?.kind == 'upload';

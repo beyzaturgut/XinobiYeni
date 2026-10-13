@@ -8,8 +8,10 @@ Android emülatörü varsayılan olarak `http://10.0.2.2:5003`, iOS simülatör�
 
 ```sh
 flutter pub get
-flutter run -d emulator-5554
+flutter run -d emulator-5554 --dart-define=XINOBI_WEB_PREVIEW_URL=http://10.0.2.2:3000
 ```
+
+XINOBI U (renk seçimi, onaylı yüzeyler, önizleme) web kaynağını `XINOBI_WEB_PREVIEW_URL` ile bulur; verilmezse renkler "kullanılamıyor" görünür. Yerel web 3000'de çalışır; APK için `tools/build-apk.mjs` aynı değişkeni okur.
 
 ## Doğrulama
 

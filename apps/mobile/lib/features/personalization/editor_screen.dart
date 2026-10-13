@@ -121,7 +121,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final variants = detail?.variants.toList() ?? const <VariantDetail>[];
     final variant = variants.where((item) => item.id == variantId).firstOrNull ?? variants.where((item) => item.surfaceMaskUrl != null).firstOrNull ?? variants.firstOrNull;
     final designImage = picked != null ? MemoryImage(picked!.bytes) : current == null ? null : ref.watch(designImageProvider(current.imageUrl)).value;
-    final mask = variant?.surfaceMaskUrl;
+    // Catalog colours without a mask on the API use the approved surface the web package publishes.
+    final published = variant == null || variant.surfaceMaskUrl != null || productId == null ? null : ref.watch(publishedSurfaceProvider((productId: productId!, variantId: variant.id))).value;
+    final mask = variant?.surfaceMaskUrl ?? published?.maskUrl;
+    final productImage = variant?.surfaceMaskUrl != null ? variant?.imageUrl : published?.sourceUrl ?? variant?.imageUrl;
 
     return Scaffold(
       appBar: AppBar(
@@ -151,7 +154,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           Wrap(spacing: 8, children: [
             for (final item in variants)
               ChoiceChip(
-                label: Text(item.surfaceMaskUrl == null ? '${item.color} · yüzey yok' : item.color),
+                label: Text(item.color),
                 selected: item.id == variant?.id,
                 onSelected: (_) => setState(() => variantId = item.id),
               ),
@@ -170,7 +173,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             color: XinobiTokens.surface,
             child: variant == null
                 ? const Center(child: Text('Bir ürün seç.'))
-                : mask == null || variant.imageUrl == null
+                : mask == null || productImage == null
                     ? Stack(fit: StackFit.expand, children: [
                         RemoteImage(variant.imageUrl),
                         const Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.all(8), child: Text('Bu renk için onaylı tasarım yüzeyi yok; başka bir renk seç.', textAlign: TextAlign.center))),
@@ -187,7 +190,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                                 label: '${detail?.name ?? ''} ${variant.color} üzerinde tasarımın temsili önizlemesi',
                                 image: true,
                                 child: SurfacePreview(
-                                  product: NetworkImage(variant.imageUrl!),
+                                  product: NetworkImage(productImage),
                                   design: designImage,
                                   mask: NetworkImage(mask),
                                   placement: placement,

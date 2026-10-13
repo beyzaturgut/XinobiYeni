@@ -58,6 +58,15 @@ void main() {
     },
   );
 
+  test('published surface bundle is read from the web origin with exact identity', () {
+    expect(
+      xinobiPublishedSurfaceUri(productId: 'P1', variantId: 'V2', override: 'http://10.0.2.2:3000')?.toString(),
+      'http://10.0.2.2:3000/assets/product-previews/P1/V2/inputs.json',
+    );
+    expect(xinobiPublishedSurfaceUri(productId: 'P1', variantId: '../V2', override: 'http://10.0.2.2:3000'), isNull);
+    expect(xinobiPublishedSurfaceUri(productId: 'P1', variantId: 'V2', override: ''), isNull);
+  });
+
   test('money is formatted like the web (tr-TR)', () {
     Money money(int minor) => Money(
       (b) => b

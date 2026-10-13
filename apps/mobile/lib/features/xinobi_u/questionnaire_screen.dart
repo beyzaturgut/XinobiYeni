@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
@@ -33,6 +34,7 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   XinobiUSession? session;
   Map<String, String> answers = {};
   int step = 0;
+  String? _openedPreviewSession;
   String? message;
   bool busy = false;
   bool slow = false;
@@ -91,6 +93,7 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   }
 
   void _apply(XinobiUSession next, {Map<String, String>? restoredAnswers}) {
+    final openAdvancedPreview = next.status == 'ready' && _openedPreviewSession != next.id;
     setState(() {
       session = next;
       if (restoredAnswers != null) answers = {...restoredAnswers, for (final answer in next.answers) answer.questionId: answer.optionId};
@@ -108,6 +111,16 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
           message = next.errorMessage ?? 'Görsel üretimi tamamlanamadı.';
       }
     });
+    if (openAdvancedPreview) {
+      _openedPreviewSession = next.id;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || GoRouter.maybeOf(context) == null) return;
+        context.push(Uri(
+          path: '/xinobi-u/mobil-onizleme',
+          queryParameters: {'session': next.id},
+        ).toString());
+      });
+    }
   }
 
   void _poll() {
@@ -291,49 +304,44 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
           },
         );
       case _Phase.ready:
-        return _Result(session: current!, onRestart: () => _start(fresh: true));
+        return _Result(
+          session: current!,
+          onRestart: () => _start(fresh: true),
+          onOpenPreview: () => context.push(Uri(
+            path: '/xinobi-u/mobil-onizleme',
+            queryParameters: {'session': current.id},
+          ).toString()),
+        );
     }
   }
 }
 
-class _Result extends StatefulWidget {
-  const _Result({required this.session, required this.onRestart});
+class _Result extends StatelessWidget {
+  const _Result({required this.session, required this.onRestart, required this.onOpenPreview});
   final XinobiUSession session;
   final VoidCallback onRestart;
-  @override
-  State<_Result> createState() => _ResultState();
-}
-
-class _ResultState extends State<_Result> {
-  bool onProduct = true;
+  final VoidCallback onOpenPreview;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final session = widget.session;
     return ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
       Semantics(header: true, child: Text('İşte sana özel yorum.', style: text.headlineSmall)),
-      const SizedBox(height: 12),
-      SegmentedButton<bool>(
-        segments: const [ButtonSegment(value: true, label: Text('Ürünümde')), ButtonSegment(value: false, label: Text('Desen'))],
-        selected: {onProduct},
-        onSelectionChanged: (value) => setState(() => onProduct = value.first),
-      ),
       const SizedBox(height: 12),
       AspectRatio(
         aspectRatio: 1,
         child: ColoredBox(
           color: XinobiTokens.surface,
-          child: onProduct
-              ? _ProductPreview(productId: session.product.id, variantId: session.variant.id, productUrl: session.variant.imageUrl, patternUrl: session.imageUrl, label: '${session.product.name} ${session.variant.color} üzerinde AI tasarımının temsili önizlemesi')
-              : RemoteImage(session.imageUrl, label: 'AI tarafından üretilen desen', fit: BoxFit.cover),
+          child: RemoteImage(session.imageUrl, label: 'AI tarafından üretilen desen', fit: BoxFit.cover),
         ),
       ),
       const SizedBox(height: 8),
       // K-12: the "Temsilidir" notice is permanent, readable text.
       Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: text.bodySmall),
       const SizedBox(height: 20),
-      OutlinedButton(onPressed: widget.onRestart, child: const Text('Yeni anket başlat')),
+      FilledButton.icon(onPressed: onOpenPreview, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
+      const SizedBox(height: 8),
+      OutlinedButton(onPressed: onRestart, child: const Text('Yeni anket başlat')),
     ]);
   }
 }

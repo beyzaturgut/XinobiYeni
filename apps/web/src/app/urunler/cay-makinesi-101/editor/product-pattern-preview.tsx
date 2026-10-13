@@ -7,7 +7,7 @@ import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./pr
 
 import { applySurfaceInk } from "./surface-ink";
 import { containArtwork } from "./artwork-placement";
-import { separatedBodyPlacements } from "./separated-body-placement";
+import { separatedBodyPlacements, type BodyPlacementAdjustment, type BodySurfaceId } from "./separated-body-placement";
 
 
 
@@ -21,9 +21,12 @@ export type PatternTransform = {
 
 type ProductPatternPreviewProps = {
   surfaceTreatment?: "legacy" | "metallic-ink";
+  surfaceInkExposureStops?: number;
   onRendered?: (canvas: HTMLCanvasElement) => void;
   sourceWidth?: number;
   sourceHeight?: number;
+  assetWidth?: number;
+  assetHeight?: number;
   productSrc: string;
   designableMaskSrc: string;
   brandingOverlaySrc?: string;
@@ -31,6 +34,8 @@ type ProductPatternPreviewProps = {
   placementMode?: "pattern" | "artwork";
   onArtworkMove?: (x: number, y: number) => void;
   patternTransform: PatternTransform;
+  /** Optional offsets composed over the existing shared controls. x/y add pixels, scale multiplies, rotation adds degrees. */
+  bodyPlacementAdjustments?: Partial<Record<BodySurfaceId, BodyPlacementAdjustment>>;
   curvatureStrength?: number;
   alt: string;
 };
@@ -42,15 +47,23 @@ async function loadImage(src: string) {
   return image;
 }
 
-async function loadAlignedImage(src: string, SOURCE_WIDTH: number, SOURCE_HEIGHT: number) {
+async function loadAlignedPreviewImage(src: string, ASSET_WIDTH: number, ASSET_HEIGHT: number, previewWidth: number, previewHeight: number, smooth: boolean) {
   const image = await loadImage(src);
-  if (image.naturalWidth !== SOURCE_WIDTH || image.naturalHeight !== SOURCE_HEIGHT) {
+  if (image.naturalWidth !== ASSET_WIDTH || image.naturalHeight !== ASSET_HEIGHT) {
     throw new Error("Unexpected asset dimensions");
   }
-  return image;
+  const preview = document.createElement("canvas");
+  preview.width = previewWidth;
+  preview.height = previewHeight;
+  const context = preview.getContext("2d");
+  if (!context) throw new Error("Canvas unavailable");
+  context.imageSmoothingEnabled = smooth;
+  context.drawImage(image, 0, 0, previewWidth, previewHeight);
+  image.src = "data:,";
+  return preview;
 }
 
-function validateMaskAlpha(mask: HTMLImageElement, SOURCE_WIDTH: number, SOURCE_HEIGHT: number) {
+function validateMaskAlpha(mask: CanvasImageSource, SOURCE_WIDTH: number, SOURCE_HEIGHT: number) {
   const buffer = document.createElement("canvas");
   buffer.width = SOURCE_WIDTH;
   buffer.height = SOURCE_HEIGHT;
@@ -71,10 +84,10 @@ function validateMaskAlpha(mask: HTMLImageElement, SOURCE_WIDTH: number, SOURCE_
 type BodyPlacement = ReturnType<typeof separatedBodyPlacements>[number] & { clipPath: Path2D };
 type RenderAssets = {
   sourcePixels?: ImageData;
-  product: HTMLImageElement;
-  mask: HTMLImageElement;
+  product: HTMLCanvasElement;
+  mask: HTMLCanvasElement;
   pattern: HTMLImageElement;
-  branding?: HTMLImageElement;
+  branding?: HTMLCanvasElement;
   patternBuffer: HTMLCanvasElement;
   lighting: ReturnType<typeof deriveProductLighting>;
   artwork: ReturnType<typeof containArtwork>;
@@ -82,29 +95,33 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ onRendered, surfaceTreatment = "legacy", sourceWidth = 1066, sourceHeight = 1600, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
   const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
+  const ASSET_WIDTH = assetWidth, ASSET_HEIGHT = assetHeight;
   const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
   const centerX = sourceWidth / 2, centerY = sourceHeight * .65;
   const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
   const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight, surfaceTreatment]);
+  const effectiveSurfaceInkExposureStops = placementMode === "pattern" ? surfaceInkExposureStops : undefined;
+  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight, assetWidth, assetHeight, surfaceTreatment, effectiveSurfaceInkExposureStops]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
   const { x, y, scale, rotation } = patternTransform;
-  const validTransform = dimensionsValid && [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1;
+  const validBodyAdjustments = Object.values(bodyPlacementAdjustments ?? {}).every((adjustment) => !adjustment || [adjustment.x ?? 0, adjustment.y ?? 0, adjustment.scale ?? 1, adjustment.rotation ?? 0].every(Number.isFinite) && (adjustment.scale ?? 1) > 0);
+  const validTransform = dimensionsValid && [x, y, scale, rotation, curvatureStrength].every(Number.isFinite) && scale > 0 && curvatureStrength >= 0 && curvatureStrength <= 1 && validBodyAdjustments;
   const status = !validTransform ? "error" : result?.assetKey === assetKey ? result.status : "loading";
 
   useEffect(() => {
     let cancelled = false;
     async function render() {
       try {
-        const [product, mask, pattern, branding] = await Promise.all([
-          loadAlignedImage(productSrc, SOURCE_WIDTH, SOURCE_HEIGHT),
-          loadAlignedImage(designableMaskSrc, SOURCE_WIDTH, SOURCE_HEIGHT),
-          loadImage(patternSrc),
-          brandingOverlaySrc ? loadAlignedImage(brandingOverlaySrc, SOURCE_WIDTH, SOURCE_HEIGHT) : undefined,
-        ]);
+        // Decode the original assets one at a time and retain only aligned preview-sized
+        // canvases. Large accepted catalog images can otherwise keep three 25+ MP
+        // bitmaps alive together and exhaust browser image-decoder memory.
+        const product = await loadAlignedPreviewImage(productSrc, ASSET_WIDTH, ASSET_HEIGHT, SOURCE_WIDTH, SOURCE_HEIGHT, true);
+        const mask = await loadAlignedPreviewImage(designableMaskSrc, ASSET_WIDTH, ASSET_HEIGHT, SOURCE_WIDTH, SOURCE_HEIGHT, false);
+        const pattern = await loadImage(patternSrc);
+        const branding = brandingOverlaySrc ? await loadAlignedPreviewImage(brandingOverlaySrc, ASSET_WIDTH, ASSET_HEIGHT, SOURCE_WIDTH, SOURCE_HEIGHT, true) : undefined;
         validateMaskAlpha(mask, SOURCE_WIDTH, SOURCE_HEIGHT);
         if (cancelled) return;
         const patternBuffer = document.createElement("canvas");
@@ -112,12 +129,13 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
         patternBuffer.height = SOURCE_HEIGHT;
         const buffer = patternBuffer.getContext("2d", { willReadFrequently: true });
         if (!canvasRef.current?.getContext("2d") || !buffer) throw new Error("Canvas unavailable");
-        const readPixels = (image: HTMLImageElement) => {
+        const readPixels = (image: CanvasImageSource, smooth = true) => {
           buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+          buffer.imageSmoothingEnabled = smooth;
           buffer.drawImage(image, 0, 0);
           return buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
         };
-        const maskPixels = readPixels(mask);
+        const maskPixels = readPixels(mask, false);
         const sourcePixels = readPixels(product);
         const lighting = deriveProductLighting(sourcePixels, maskPixels, branding ? readPixels(branding) : undefined);
         const surface = deriveBodySurface(maskPixels, surfaceTreatment === "metallic-ink");
@@ -130,7 +148,7 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     }
     void render();
     return () => { cancelled = true; };
-  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, dimensionsValid, surfaceTreatment]);
+  }, [productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, assetKey, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, ASSET_WIDTH, ASSET_HEIGHT, centerX, centerY, dimensionsValid, surfaceTreatment]);
 
   useLayoutEffect(() => {
     if (status !== "ready" || !result?.assets) return;
@@ -138,16 +156,65 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     const buffer = patternBuffer.getContext("2d")!;
     const context = canvasRef.current!.getContext("2d")!;
     buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
-    if (bodies.length) {
+    const warpEachBodyBeforeMask = placementMode === "pattern" && surfaceTreatment === "metallic-ink" && bodies.length > 1;
+    if (warpEachBodyBeforeMask) {
+      // Keep source pattern pixels available to the horizontal warp. Clip each
+      // warped body layer afterwards, then retain the accepted full mask clip below.
+      context.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+      const sharedPatternScale = Math.max(...bodies.map(body => Math.max(body.width / pattern.naturalWidth, body.height / pattern.naturalHeight)));
+      for (const body of bodies) {
+        buffer.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+        const adjustment=bodyPlacementAdjustments?.[body.id];
+        buffer.save();
+        if(adjustment){
+          buffer.translate(body.x+x-centerX+(adjustment.x??0),body.y+y-centerY+(adjustment.y??0));
+          buffer.rotate((rotation+(adjustment.rotation??0))*Math.PI/180);
+          buffer.scale(scale*(adjustment.scale??1),scale*(adjustment.scale??1));
+        }else{
+          buffer.translate(body.x+x-centerX,body.y+y-centerY);
+          buffer.rotate(rotation*Math.PI/180);
+          buffer.scale(scale,scale);
+        }
+        buffer.drawImage(pattern,-pattern.naturalWidth*sharedPatternScale/2,-pattern.naturalHeight*sharedPatternScale/2,pattern.naturalWidth*sharedPatternScale,pattern.naturalHeight*sharedPatternScale);
+        buffer.restore();
+        const bodyPixels=buffer.getImageData(0,0,SOURCE_WIDTH,SOURCE_HEIGHT);
+        warpPattern(bodyPixels,surface,curvatureStrength);
+        if(sourcePixels)applySurfaceInk(bodyPixels,sourcePixels,lighting,effectiveSurfaceInkExposureStops);
+        buffer.putImageData(bodyPixels,0,0);
+        buffer.save();
+        buffer.globalCompositeOperation="destination-in";
+        buffer.fillStyle="#fff";
+        buffer.fill(body.clipPath);
+        buffer.restore();
+        context.drawImage(patternBuffer,0,0);
+      }
+      buffer.clearRect(0,0,SOURCE_WIDTH,SOURCE_HEIGHT);
+      buffer.drawImage(canvasRef.current!,0,0);
+    } else if (bodies.length) {
+      // Pattern mode uses one common natural-image scale, sized to cover the
+      // largest component. Artwork mode keeps each photo's own rectangle fit.
+      const sharedPatternScale = placementMode === "pattern" && bodies.length > 1
+        ? Math.max(...bodies.map(body => Math.max(body.width / pattern.naturalWidth, body.height / pattern.naturalHeight)))
+        : null;
       for (const body of bodies) {
         buffer.save();
         // Each body has its own centre and fit. Shared controls apply the same
         // source-coordinate movement, scale and rotation to both placements.
         buffer.clip(body.clipPath);
-        buffer.translate(body.x+x-centerX,body.y+y-centerY);
-        buffer.rotate(rotation*Math.PI/180);
-        buffer.scale(scale,scale);
-        buffer.drawImage(pattern,-body.width/2,-body.height/2,body.width,body.height);
+        const adjustment=bodyPlacementAdjustments?.[body.id];
+        if(adjustment){
+          buffer.translate(body.x+x-centerX+(adjustment.x??0),body.y+y-centerY+(adjustment.y??0));
+          buffer.rotate((rotation+(adjustment.rotation??0))*Math.PI/180);
+          const bodyScale=scale*(adjustment.scale??1);
+          buffer.scale(bodyScale,bodyScale);
+        }else{
+          buffer.translate(body.x+x-centerX,body.y+y-centerY);
+          buffer.rotate(rotation*Math.PI/180);
+          buffer.scale(scale,scale);
+        }
+        const drawWidth = sharedPatternScale === null ? body.width : pattern.naturalWidth * sharedPatternScale;
+        const drawHeight = sharedPatternScale === null ? body.height : pattern.naturalHeight * sharedPatternScale;
+        buffer.drawImage(pattern,-drawWidth/2,-drawHeight/2,drawWidth,drawHeight);
         buffer.restore();
       }
     } else {
@@ -159,11 +226,13 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     else { const ratio = SOURCE_WIDTH / 1066; buffer.drawImage(pattern, -pattern.naturalWidth * ratio / 2, -pattern.naturalHeight * ratio / 2, pattern.naturalWidth * ratio, pattern.naturalHeight * ratio); }
     buffer.restore();
     }
-    const patternPixels = buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
-    warpPattern(patternPixels, surface, curvatureStrength);
-    if (surfaceTreatment === "metallic-ink" && sourcePixels) applySurfaceInk(patternPixels, sourcePixels, lighting);
-    else shadePattern(patternPixels, lighting);
-    buffer.putImageData(patternPixels, 0, 0);
+    if(!warpEachBodyBeforeMask){
+      const patternPixels = buffer.getImageData(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
+      warpPattern(patternPixels, surface, curvatureStrength);
+      if (surfaceTreatment === "metallic-ink" && sourcePixels) applySurfaceInk(patternPixels, sourcePixels, lighting, effectiveSurfaceInkExposureStops);
+      else shadePattern(patternPixels, lighting);
+      buffer.putImageData(patternPixels, 0, 0);
+    }
     // The mask stays in source coordinates; only the pattern is transformed.
     buffer.save();
     buffer.globalCompositeOperation = "destination-in";
@@ -174,7 +243,7 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     context.drawImage(patternBuffer, 0, 0);
     if (branding) context.drawImage(branding, 0, 0);
     onRendered?.(canvasRef.current!);
-  }, [result, status, x, y, scale, rotation, curvatureStrength, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, onRendered]);
+  }, [result, status, x, y, scale, rotation, bodyPlacementAdjustments, curvatureStrength, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, effectiveSurfaceInkExposureStops, onRendered]);
 
   // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.
   const draggable = placementMode === "artwork" && !!onArtworkMove && status === "ready";
@@ -210,7 +279,7 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
       onPointerLeave={()=>{if(!drag.current)setCursor("auto")}}
     />
     {status !== "ready" && <div className={styles.previewMessage} role={status === "error" ? "alert" : "status"}>
-      <p>{status === "error" ? "Ürün önizlemesi yüklenemedi. Lütfen sayfayı yenileyin." : "Ürün önizlemesi hazırlanıyor…"}</p>
+      <p>{status === "error" ? "Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin." : "Ürün önizlemesi hazırlanıyor…"}</p>
     </div>}
   </div>;
 }

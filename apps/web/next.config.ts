@@ -14,6 +14,8 @@ export default function config(phase: string): NextConfig {
   if (phase !== PHASE_DEVELOPMENT_SERVER || process.env.PRODUCT_SURFACES_DEV_PREVIEW_PROXY !== "true") return nextConfig;
   const port = Number(process.env.PRODUCT_SURFACES_DEV_PREVIEW_API_PORT ?? "5003");
   if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error("Invalid local preview API port");
+  const xinobiUApiPort = Number(process.env.PRODUCT_SURFACES_XINOBI_U_API_PORT ?? "5019");
+  if (!Number.isInteger(xinobiUApiPort) || xinobiUApiPort < 1024 || xinobiUApiPort > 65535) throw new Error("Invalid XINOBI U API port");
   return {
     ...nextConfig,
     output: undefined,
@@ -25,6 +27,7 @@ export default function config(phase: string): NextConfig {
         { source: "/api/v1/dev/catalog-surfaces/:path*", destination: "http://127.0.0.1:3046/api/v1/dev/catalog-surfaces/:path*" },
         { source: "/api/v1/dev/cm101-approved/:path*", destination: "http://127.0.0.1:3046/api/v1/dev/cm101-approved/:path*" },
         { source: "/api/v1/local-commerce/:path*", destination: "http://127.0.0.1:5019/api/v1/local-commerce/:path*" },
+        { source: "/api/v1/xinobi-u/:path*", destination: `http://127.0.0.1:${xinobiUApiPort}/api/v1/xinobi-u/:path*` },
         { source: "/api/v1/design-studio/:path*", destination: "http://127.0.0.1:5021/api/v1/design-studio/:path*" },
         { source: "/api/v1/design-studio/sessions/:id", destination: "http://127.0.0.1:5013/api/v1/design-studio/sessions/:id" },
         { source: "/api/v1/dev/product-surfaces/commerce/:product/:variant/rendering-inputs/", destination: "http://127.0.0.1:"+port+"/api/v1/dev/product-surfaces/commerce/:product/:variant/rendering-inputs" },

@@ -7,7 +7,7 @@ export type AssistantAction={kind:'compare'|'quote'|'xinobi_u'|'handoff'|'lead'|
 export type AssistantMessage={id:string;role:'user'|'assistant';text:string;products:AssistantProduct[];actions:AssistantAction[];at:string;source?:string|null};
 export type AssistantConfig={enabled:boolean;aiAnswers:boolean;greeting:string;quickReplies:string[];whatsAppAvailable:boolean;disclaimer:string};
 
-const api=commerceApi?commerceApi.replace(/\/local-commerce\/?$/,''):'';
+const api=commerceApi?commerceApi.replace(/\/local-commerce\/?$/,''):'/api/v1';
 const clientKey='xinobi-nobi-client',conversationKey='xinobi-nobi-conversation';
 
 /** A random id this browser keeps; anonymous conversations belong to it. */

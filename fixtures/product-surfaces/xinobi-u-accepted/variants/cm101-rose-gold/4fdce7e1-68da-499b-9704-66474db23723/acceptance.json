@@ -1,0 +1,130 @@
+{
+  "version": "4fdce7e1-68da-499b-9704-66474db23723",
+  "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+  "variantId": "DEMO-V-2eb46bda-939a-4dd8-b6a9-b291a2009d78",
+  "sourceImage": "/api/v1/local-commerce/media/45b9c496df9c4b2c8871b37309a02447.webp",
+  "sourceSha256": "b9c745059b45bc729443fd6ac6844e2013695e217569b8622c819c2049a49b90",
+  "sourceVersion": "253cc2dd0736b869e12ccde0bef4af2889b8543c550e50059cf0813e60397a33",
+  "width": 3531,
+  "height": 5805,
+  "candidateId": "8576a6e1-adbb-4fe3-b20c-3cc8a5c53f1e",
+  "target": "upper-body + lower-body",
+  "maskSha256": "319c43e0f9f34a264bb45f04be9fdeb29cf0a207d8cf34b21b77b9a85edccf03",
+  "brandingSha256": "f6454db7c665a08350dc8a987b265afdbe1c33d9f5a791ee8f24ffc98cc35956",
+  "brandingRequired": true,
+  "boundariesReviewed": true,
+  "brandingReviewed": true,
+  "updatedAt": "2026-10-11T18:22:58.915Z",
+  "acceptedAt": "2026-10-11T18:22:58.915Z",
+  "provenance": "DERIVED FAMILY GEOMETRY — CONTENT CROP NORMALIZATION — MANUAL REVIEW REQUIRED",
+  "familyGeometry": {
+    "familyId": "423d6018-9053-40d6-aeea-e72c8b1e533d",
+    "version": "48ba5eb6-0275-4e25-81ad-8385f204129c",
+    "reference": {
+      "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+      "variantId": "DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1",
+      "sourceImage": "/api/v1/local-commerce/media/01b20091ecaa4fbb86a9a929bf7b56ee.webp",
+      "sourceSha256": "f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935",
+      "width": 3543,
+      "height": 5315,
+      "sourceVersion": "71ce3d0bea27e8ee59d8408160f46ec99623e8cc8a84cce76ac024cf8686bf85",
+      "acceptedVersion": "56ddfb9b-ecc5-42d4-b03d-5a5aa83227ba",
+      "acceptedMaskSha256": "66aa43b8afa1fc9af455a5bc03344baa532345839ffd9e5da3e32a353637df75",
+      "provenance": "REAL ROBOFLOW OUTPUT — EXPLICIT LOCAL MASK SELECTION",
+      "brandingRequired": true
+    },
+    "surfaceIds": [
+      "upper-body",
+      "lower-body"
+    ],
+    "missing": [],
+    "alignment": {
+      "schemaVersion": 1,
+      "method": "affine",
+      "referenceWidth": 2721,
+      "referenceHeight": 4416,
+      "targetWidth": 2929,
+      "targetHeight": 4729,
+      "analysisWidth": 600,
+      "analysisHeight": 974,
+      "referenceToTarget": [
+        0.9988319342543827,
+        -0.00937139401528792,
+        -2.2800000000000007,
+        0.024971394015287925,
+        1.0044799342543829,
+        6.04
+      ],
+      "correlation": 0.39252178449627817,
+      "medianSourcePixels": 3.9268597825814653,
+      "p95SourcePixels": 36.504450520810565,
+      "regions": {
+        "upperBody": {
+          "samples": 675,
+          "medianSourcePixels": 3.155321692245472,
+          "p95SourcePixels": 62.58361336712718
+        },
+        "lowerBody": {
+          "samples": 648,
+          "medianSourcePixels": 4.396423198886553,
+          "p95SourcePixels": 25.823191763280736
+        },
+        "handleJunctions": {
+          "samples": 813,
+          "medianSourcePixels": 4.267579522685341,
+          "p95SourcePixels": 31.19086820512127
+        },
+        "spouts": {
+          "samples": 304,
+          "medianSourcePixels": 4.275544572432722,
+          "p95SourcePixels": 40.87363739079828
+        },
+        "metalJunctions": {
+          "samples": 224,
+          "medianSourcePixels": 5.092480480639339,
+          "p95SourcePixels": 44.614022377971025
+        },
+        "base": {
+          "samples": 241,
+          "medianSourcePixels": 4.573998048554641,
+          "p95SourcePixels": 26.618260715337716
+        },
+        "logo": {
+          "samples": 103,
+          "medianSourcePixels": 2.7125234460781584,
+          "p95SourcePixels": 13.05624531652146
+        }
+      },
+      "requiresManualReview": true,
+      "localDeformation": false,
+      "warnings": [
+        "Bu hizalama onay değildir; sap, ağız, logo, metal birleşimler ve kaideyi hedef fotoğrafta inceleyin.",
+        "Kenar metriği fiziksel sınır eşleşmesini veya maskenin doğru olduğunu kanıtlamaz.",
+        "Branding hedef varyantın kendi kaynak piksellerinden yeniden hazırlanmalıdır."
+      ],
+      "uncertaintySourcePixels": 4.535,
+      "normalization": {
+        "kind": "white-margin content crop",
+        "threshold": 235,
+        "paddingFraction": 0.035,
+        "referenceCrop": {
+          "left": 429,
+          "top": 489,
+          "width": 2721,
+          "height": 4416
+        },
+        "targetCrop": {
+          "left": 292,
+          "top": 555,
+          "width": 2929,
+          "height": 4729
+        }
+      }
+    },
+    "brandingRequired": true,
+    "editingRadius": 32
+  },
+  "familyAlignmentReviewed": true,
+  "familyBrandingReviewed": true,
+  "approvalKind": "explicit-development-admin-review"
+}

@@ -1,0 +1,51 @@
+{
+  "version": "56ddfb9b-ecc5-42d4-b03d-5a5aa83227ba",
+  "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+  "variantId": "DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1",
+  "sourceImage": "/api/v1/local-commerce/media/01b20091ecaa4fbb86a9a929bf7b56ee.webp",
+  "sourceSha256": "f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935",
+  "sourceVersion": "71ce3d0bea27e8ee59d8408160f46ec99623e8cc8a84cce76ac024cf8686bf85",
+  "width": 3543,
+  "height": 5315,
+  "candidateId": "dec506d0-3c6f-47a0-9fae-797dd3bdbe3d",
+  "target": "upper + lower bodies",
+  "maskSha256": "66aa43b8afa1fc9af455a5bc03344baa532345839ffd9e5da3e32a353637df75",
+  "brandingSha256": "522dfdc9226b5d202cfab3bf59ec458193f0133560e6a0e53da9c7c3f2ad105b",
+  "brandingRequired": true,
+  "boundariesReviewed": true,
+  "brandingReviewed": true,
+  "updatedAt": "2026-10-09T13:58:13.238Z",
+  "acceptedAt": "2026-10-09T13:58:13.238Z",
+  "provenance": "REAL ROBOFLOW OUTPUT — EXPLICIT LOCAL MASK SELECTION",
+  "composition": {
+    "batchId": "027e30ea-e54f-4646-952f-a5cf35013ef1",
+    "selected": [
+      {
+        "id": "5a446755-f126-4f81-98a8-0098993a61aa",
+        "maskSha256": "cbdc63a63ce8d3687091e613eabd28e46f1db1def584ebc233f7fef971283b08",
+        "promptIndex": 0,
+        "prompt": "upper teapot body"
+      }
+    ],
+    "reference": {
+      "version": "811f44ed-2d47-49b6-ada2-2824b54d72ef",
+      "sourceSha256": "f913955d929df14547253de31a69402cbb6e0a47b36d062be70ffd1b39ffc935",
+      "maskSha256": "5050520107b9e77d6ff6a4463bba25415c5d5b8b2ca9bf5b6953a178a0966e84",
+      "brandingSha256": "fc571a30edb7d3ce859730c8c6e8684bb4e91d19abb5ff9531a3b801a3b7f26f"
+    },
+    "surfaceIds": [
+      "upper-body",
+      "lower-body"
+    ],
+    "expectedBodyCount": 2,
+    "observedBodyCount": 1,
+    "missingBodies": [],
+    "warnings": [],
+    "brandingRequired": true
+  },
+  "surfaceIds": [
+    "upper-body",
+    "lower-body"
+  ],
+  "approvalKind": "explicit-development-admin-review"
+}

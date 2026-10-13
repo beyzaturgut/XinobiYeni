@@ -7,4 +7,4 @@
 /* Static fallback photo (no live surface preview): blend its white background into the grey panel, as before. */
 .product>img{mix-blend-mode:multiply}
 
-.product{position:relative}.representative{position:absolute;left:8px;bottom:8px;z-index:2;padding:4px 9px;border-radius:6px;background:rgba(255,255,255,.92);border:1px solid #b0b0b0;color:#1a1a1a;font-size:12px;font-weight:500;line-height:1.4;pointer-events:none}
+.representative{position:absolute;left:8px;bottom:8px;z-index:2;padding:4px 9px;border-radius:6px;background:rgba(255,255,255,.92);border:1px solid #b0b0b0;color:#1a1a1a;font-size:12px;font-weight:500;line-height:1.4;pointer-events:none}

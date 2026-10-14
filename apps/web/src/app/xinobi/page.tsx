@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "../../lib/seo";
 import SiteHeader from "../../components/site-header";
 import SiteFooter from "../../components/site-footer";
 import styles from "./xinobi.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/xinobi/", {
   title: "Xinobi Dünyası | Hakkımızda",
   description: "Xinobi, ileri teknolojiyi, zarif tasarımı ve güvenilir kaliteyi bir araya getiren premium küçük ev aletleri markasıdır. Xinobi U ve Premium Products yaklaşımımızı keşfedin.",
-};
+});
 
 export default function XinobiPage() {
   return <div className={styles.page}>

@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "../../lib/seo";
 import SiteHeader from "../../components/site-header";
 import Link from "next/link";
 import Catalog from "./catalog";
 import styles from "./catalog.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/urunler/", {
   title: "Ürünler | Xinobi",
   description: "Xinobi çay ve kahve makinelerini, hava temizleyicileri ve mutfak teknolojilerini keşfedin.",
-};
+});
 
 export default function ProductsPage() {
   return <div className={styles.page}>

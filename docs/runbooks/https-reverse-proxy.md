@@ -59,6 +59,18 @@ Mevcut sertifika kendi imzalı (`CN=109.104.120.91`). Tarayıcı uyarı gösteri
 mobil uygulama bu adrese HTTPS ile bağlanamaz. Güvenilir sertifika için sunucuya bir
 alan adı yönlendirip win-acme ile Let's Encrypt sertifikası alınmalıdır.
 
+### Arama motoru indeksleme (Faz04 SEO)
+
+Web paketi `NEXT_PUBLIC_SITE_URL` olmadan derlenirse (bugünkü IP'li test sunucusu)
+`robots.txt` tüm siteyi engeller, sitemap boştur ve her sayfa `noindex` taşır. Alan
+adına geçerken paketi `NEXT_PUBLIC_SITE_URL=https://<alan-adı>` ile derleyin
+(`NEXT_PUBLIC_SITE_URL=https://… node tools/package-deploy.mjs`); yalnız `https://`
+adresi kabul edilir. Bu derlemede canonical bağlantıları, herkese açık sayfaların
+sitemap'i, özel sayfaların (`/hesap/`, `/sepet/`, `/odeme/`, editör ve XINOBI U
+adımları, `/admin/`, `/api/`) engellenmesi ve Organization/WebSite verisi etkinleşir.
+Yayın sonrası `https://<alan-adı>/robots.txt` ve `/sitemap.xml` kontrol edilip
+Search Console'a sitemap bildirilir.
+
 ## Webde canlı katalog ve yayın sırası
 
 Yeni web paketi katalog/içeriği `/api/v1/catalog/storefront` üzerinden periyodik

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { pageMetadata } from "../../../lib/seo";
 import Image from "next/image";
 import Link from "next/link";
 import QuoteForm from "./quote-form";
 import styles from "./quote.module.css";
 
-export const metadata: Metadata = { title: "Kurumsal Teklif | Xinobi", description: "Xinobi kurumsal ve toplu ürün ihtiyaçlarınız için teklif talebi oluşturun." };
+export const metadata: Metadata = pageMetadata("/kurumsal/teklif/", { title: "Kurumsal Teklif | Xinobi", description: "Xinobi kurumsal ve toplu ürün ihtiyaçlarınız için teklif talebi oluşturun." });
 
 export default function QuotePage() {
   return <div className={styles.page}>

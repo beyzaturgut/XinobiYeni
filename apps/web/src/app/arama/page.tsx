@@ -1,12 +1,13 @@
 import SiteHeader from "../../components/site-header";
 import type { Metadata } from "next";
+import { pageMetadata } from "../../lib/seo";
 import SearchCompare from "./search-compare";
 import styles from "./search.module.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/arama/", {
   title: "Ara ve Karşılaştır | Xinobi",
   description: "Xinobi ürünlerini bulun, özelliklerini yan yana karşılaştırın.",
-};
+});
 
 export default function SearchPage() {
   return <div className={styles.page}>

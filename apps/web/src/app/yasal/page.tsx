@@ -1,9 +1,10 @@
 import SiteHeader from "../../components/site-header";
 import type { Metadata } from "next";
+import { pageMetadata } from "../../lib/seo";
 import Link from "next/link";
 import styles from "./yasal.module.css";
 
-export const metadata: Metadata = { title: "Yasal Merkez | Xinobi", description: "Xinobi gizlilik, çerez ve kullanım metinleri için taslak yasal merkez." };
+export const metadata: Metadata = pageMetadata("/yasal/", { title: "Yasal Merkez | Xinobi", description: "Xinobi gizlilik, çerez ve kullanım metinleri için taslak yasal merkez." });
 
 const documents = [
   { title: "Gizlilik bildirimi", copy: "Hangi kişisel verilerin, hangi amaç ve hukuki dayanakla işlendiğini açıklayacak metin.", state: "D10 onayı bekleniyor" },

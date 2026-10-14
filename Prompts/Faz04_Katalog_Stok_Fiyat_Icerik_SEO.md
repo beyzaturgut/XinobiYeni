@@ -1,6 +1,6 @@
 # Faz04 — Ürün kataloğu, içerik ve yayın
 
-**Durum (14.10.2026):** Devam · geliştirme ~45 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
+**Durum (14.10.2026):** Devam · geliştirme ~50 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
 
 ## 1. Amaç, bağımlılık, sınır
 
@@ -84,13 +84,13 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 | Ana sayfa içerik ve duyurular | Tamam | Panelden kategori görseli, öne çıkan ürünler, duyurular |
 | Kampanya/kupon | Yok | Panelde yalnız fiyat önizleme prototipi (TST-081) |
 | CMS sayfa/blog/SSS/iletişim formu | Yok | Yalnız `/yasal` ve `/xinobi` (Hakkımızda) |
-| SEO (sitemap, robots, canonical, yapılandırılmış veri) ve analitik | Yok | — |
+| SEO (sitemap, robots, canonical, yapılandırılmış veri) ve analitik | Kısmi (14.10) | robots/sitemap/canonical/Open Graph, Organization + Product JSON-LD; alan adı yokken indeks kapalı ([TST-120](../test/2026-10-14/TST-120-seo-foundation.md)). Eksik: ürün başına statik sayfa ve sitemap’te ürünler, breadcrumb, analitik (erişim + D10), 301 haritası |
 | Medya kütüphanesi | Yok | Dosyalar `IFileStore`’da, kütüphane ekranı yok |
 | İlk katalog içe aktarma (CSV), 301 haritası | Yok | — |
 | Gerçek dashboard ve temel rapor | Kısmi | Panel dashboard prototip ağırlıklı |
 | Desenler | Bloke | D13 |
 
-**Sonraki adım:** sitemap/robots/ürün yapılandırılmış verisi (karar gerektirmeyen bağımsız iş).
+**Sonraki adım:** iletişim formu arka ucu ve panel gelen kutusu veya CSV ile katalog içe aktarma (karar gerektirmeyen bağımsız işler).
 
 ## 6. Yedi rol inceleme ve onay kapısı
 

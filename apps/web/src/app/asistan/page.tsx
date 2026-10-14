@@ -1,10 +1,11 @@
 import SiteHeader from "../../components/site-header";
 import type { Metadata } from "next";
+import { pageMetadata } from "../../lib/seo";
 import Link from "next/link";
 import NobiChat from "../../components/nobi/nobi-chat";
 import styles from "./assistant.module.css";
 
-export const metadata: Metadata = { title: "Nobi · Xinobi Asistan", description: "Xinobi ürünlerini bulmak, karşılaştırmak ve kişiselleştirmek için satış asistanı Nobi." };
+export const metadata: Metadata = pageMetadata("/asistan/", { title: "Nobi · Xinobi Asistan", description: "Xinobi ürünlerini bulmak, karşılaştırmak ve kişiselleştirmek için satış asistanı Nobi." });
 
 export default function AssistantPage() {
   return <div className={styles.page}>

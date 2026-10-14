@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/app/theme.dart';
@@ -130,6 +131,41 @@ Future<void> answerAll(WidgetTester tester, {int from = 0}) async {
 
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  testWidgets('ready stays on result until preview tap; restart still works', (tester) async {
+    final fake = FakeXinobiU();
+    final router = GoRouter(initialLocation: '/questions', routes: [
+      GoRoute(path: '/questions', builder: (_, _) => const QuestionnaireScreen(productId: 'P1', variantId: 'V1', pollInterval: Duration(milliseconds: 10))),
+      GoRoute(path: '/xinobi-u/mobil-onizleme', builder: (_, state) => Scaffold(body: Text('Advanced ${state.uri.queryParameters['session']}'))),
+    ]);
+    addTearDown(router.dispose);
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ProviderScope(retry: noAutomaticRetry, overrides: [
+      xinobiURepositoryProvider.overrideWithValue(fake), productProvider('P1').overrideWith((ref) async => _product()),
+    ], child: MaterialApp.router(theme: buildTheme(), routerConfig: router)));
+    await tester.pumpAndSettle();
+    await answerAll(tester);
+    await tester.tap(find.text('AI ile tasarımımı oluştur ✦'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 10));
+    expect(find.text('İşte sana özel yorum.'), findsOneWidget);
+    expect(find.text('Advanced s1'), findsNothing);
+    expect(fake.generateCalls, 1);
+    await tester.ensureVisible(find.text('Üründe gelişmiş önizlemeyi aç'));
+    await tester.tap(find.text('Üründe gelişmiş önizlemeyi aç'));
+    await tester.pumpAndSettle();
+    expect(find.text('Advanced s1'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    await tester.ensureVisible(find.text('Yeni anket başlat'));
+    await tester.tap(find.text('Yeni anket başlat'));
+    await tester.pumpAndSettle();
+    expect(find.text('Soru 1 / 5'), findsOneWidget);
+    expect(fake.created, 2);
+    expect(fake.generateCalls, 1);
+  });
 
   testWidgets('five questions, review, one generation, then the representative preview', (tester) async {
     final fake = FakeXinobiU();

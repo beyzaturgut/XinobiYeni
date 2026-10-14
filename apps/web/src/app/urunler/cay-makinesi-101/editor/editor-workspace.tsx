@@ -65,7 +65,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
   return <div className={`${styles.workspace} ${xinobiPreview ? styles.xinobiPreview : ""}`}>
     <aside className={styles.tools} aria-label="Tasarım araçları">
       <p className={styles.eyebrow}>Araçlar</p>
-      <button type="button" onClick={() => addLayer("Metin")}><span aria-hidden="true">T</span><strong>Metin</strong><small>Başlık veya isim ekle</small></button>
+      {!xinobiPreview && <button type="button" onClick={() => addLayer("Metin")}><span aria-hidden="true">T</span><strong>Metin</strong><small>Başlık veya isim ekle</small></button>}
       <button type="button" onClick={onUpload} disabled={!onUpload || uploadBusy}><span aria-hidden="true">↑</span><strong>Görsel yükle</strong><small>{uploadBusy ? 'Görsel doğrulanıyor…' : 'PNG, JPEG veya WebP seç'}</small></button>
       {!xinobiPreview && <><button type="button" onClick={() => addLayer("Şekil")}><span aria-hidden="true">◇</span><strong>Şekil</strong><small>Temel şekil ekle</small></button>
       <button type="button" disabled><span aria-hidden="true">▦</span><strong>Şablonlar</strong><small>Kategori verisi bekleniyor</small></button>

@@ -112,7 +112,10 @@ test('accepted colour selection preserves original identity and loads exact surf
   const selected=await selector.getAttribute('data-preview-variant');
   expect(selected).not.toBe(original);
   expect(await selector.getAttribute('data-session-variant')).toBe(original);
-  await expect(selector.getByText(/yalnızca önizleniyor/)).toBeVisible();
+  await expect(selector.getByText(/yalnızca önizleniyor/)).toHaveCount(0);
+  await expect(selector).toHaveAttribute("data-active-variant",selected!);
+  await page.reload();
+  await expect(page.getByRole("region",{name:"Önizleme rengi"})).toHaveAttribute("data-active-variant",selected!);
   const bundle=inputs.findLast(value=>value.variantReference===selected && value.previewAvailable);
   expect(bundle).toBeTruthy();
   for(const media of [bundle!.inputs!.source,bundle!.inputs!.mask,bundle!.inputs!.branding]) if(media) {

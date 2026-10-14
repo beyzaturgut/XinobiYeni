@@ -50,10 +50,11 @@ function ReferenceLink({ href, children }: { href: string; children: React.React
 export function DevelopmentReferenceLink({ href, children }: { href: string; children: React.ReactNode }) {
   return <Suspense fallback={<Link href="/urunler/cay-makinesi-101">{children}</Link>}><ReferenceLink href={href}>{children}</ReferenceLink></Suspense>;
 }
-function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavailableMessage }: { productId: string; sessionVariantId: string; patternSrc?: string; unavailableMessage?: string }) {
-  // The session's original identity is immutable. This state selects only the
-  // surface used to review the same design; it never rewrites the session.
-  const [previewVariantId, setPreviewVariantId] = useState(sessionVariantId);
+function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavailableMessage, designId }: { productId: string; sessionVariantId: string; patternSrc?: string; unavailableMessage?: string; designId?: string }) {
+  // Active design colour is separate from immutable generation identity.
+  // Persist only its catalog ID; restored IDs must pass accepted-surface checks.
+  const [activeVariantId, setActiveVariantId] = useState(sessionVariantId);
+  const activeVariantKey = `xinobi-u-active-variant:${productId}:${designId ?? sessionVariantId}`;
   const [variants, setVariants] = useState<Variant[]>([]);
   const [surfaces, setSurfaces] = useState<Record<string, RenderingInputs>>({});
   const [placementWarning, setPlacementWarning] = useState("");
@@ -78,6 +79,9 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
         }));
         if (active) {
           const accepted = supported.filter((value): value is {variant: Variant; inputs: RenderingInputs} => value !== null);
+          let saved: string | null = null;
+          try { saved = localStorage.getItem(activeVariantKey); } catch { /* Storage can be unavailable. */ }
+          setActiveVariantId(accepted.some(value => value.variant.id === saved) ? saved! : sessionVariantId);
           setVariants(accepted.map(value => value.variant));
           setSurfaces(Object.fromEntries(accepted.map(value => [value.variant.id, value.inputs])));
           setOriginalColor(product.variants.find(item=>item.id===sessionVariantId)!.color);
@@ -87,19 +91,20 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
     }
     void load();
     return () => { active = false; controller.abort(); };
-  }, [productId, sessionVariantId, retry]);
-  const selected = variants.find(variant => variant.id === previewVariantId);
-  const inputs = surfaces[previewVariantId];
+  }, [productId, sessionVariantId, retry, activeVariantKey]);
+  const selected = variants.find(variant => variant.id === activeVariantId);
+  const inputs = surfaces[activeVariantId];
   async function selectPreviewVariant(variantId: string) {
     const next = surfaces[variantId];
-    if (!next || !inputs || switching || variantId === previewVariantId) return;
+    if (!next || !inputs || switching || variantId === activeVariantId) return;
     const ticket = ++transferGeneration.current;
     setSwitching(true);
     setPlacementWarning("");
     const commit = await placementRef.current?.prepare(next);
     if (ticket !== transferGeneration.current) return;
     if (commit && commit()) {
-      setPreviewVariantId(variantId);
+      setActiveVariantId(variantId);
+      try { localStorage.setItem(activeVariantKey, variantId); } catch { /* Keep the in-memory selection. */ }
       setPlacementWarning("Yerleşim bu renge uyarlandı; görselin konumu biraz değişebilir.");
     } else {
       setPlacementWarning("Güvenli yerleşim aktarımı yapılamadı. Görseli tek bir gövdenin içine taşıyıp yeniden deneyin; mevcut önizleme korundu.");
@@ -107,14 +112,13 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
     setSwitching(false);
   }
   return <>
-    <section className={styles.previewVariants} aria-label="Önizleme rengi" data-session-variant={sessionVariantId} data-preview-variant={previewVariantId}>
+    <section className={styles.previewVariants} aria-label="Önizleme rengi" data-session-variant={sessionVariantId} data-preview-variant={activeVariantId} data-active-variant={activeVariantId}>
       <fieldset className={detailStyles.variants}>
         <legend>Önizleme rengi: <strong>{selected?.color || originalColor}</strong></legend>
-        <div>{variants.map(variant=><button type="button" key={variant.id} disabled={switching} className={previewVariantId===variant.id?detailStyles.selectedVariant:''} aria-label={`${variant.color} önizle`} aria-pressed={previewVariantId===variant.id} onClick={()=>void selectPreviewVariant(variant.id)}>
+        <div>{variants.map(variant=><button type="button" key={variant.id} disabled={switching} className={activeVariantId===variant.id?detailStyles.selectedVariant:''} aria-label={`${variant.color} önizle`} aria-pressed={activeVariantId===variant.id} onClick={()=>void selectPreviewVariant(variant.id)}>
           <span style={{background:variant.hex&&/^#[a-fA-F0-9]{6}$/.test(variant.hex)?variant.hex:undefined}} aria-hidden="true"/><small>{variant.color}</small>
         </button>)}</div>
       </fieldset>
-      {previewVariantId !== sessionVariantId && <p>Bu renk yalnızca önizleniyor. Tasarımın özgün rengi: {originalColor}.</p>}
       {error && <p role="alert">Diğer renkler yüklenemedi. <button type="button" onClick={()=>setRetry(value=>value+1)}>Tekrar dene</button></p>}
       {placementWarning && <p role="status">{placementWarning}</p>}
       {switching && <p role="status">Renk hazırlanıyor…</p>}
@@ -128,7 +132,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
       : <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}
   </>;
 }
-export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage, xinobiPreview = false }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean } = {}) {
-  if (xinobiPreview && commerceProduct && commerceVariant) return <XinobiVariantPreview key={commerceProduct+':'+commerceVariant} productId={commerceProduct} sessionVariantId={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage}/>;
+export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage, xinobiPreview = false, designId }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean; designId?: string } = {}) {
+  if (xinobiPreview && commerceProduct && commerceVariant) return <XinobiVariantPreview key={commerceProduct+':'+commerceVariant+':'+(designId ?? '')} designId={designId} productId={commerceProduct} sessionVariantId={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage}/>;
   return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage} xinobiPreview={xinobiPreview} /> : <AcceptedSurfaceRoute />}</Suspense>;
 }

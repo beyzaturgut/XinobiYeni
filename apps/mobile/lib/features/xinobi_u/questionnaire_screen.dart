@@ -35,7 +35,6 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   XinobiUSession? session;
   Map<String, String> answers = {};
   int step = 0;
-  String? _openedPreviewSession;
   String? message;
   bool busy = false;
   bool slow = false;
@@ -128,7 +127,6 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   }
 
   void _apply(XinobiUSession next, {Map<String, String>? restoredAnswers}) {
-    final openAdvancedPreview = next.status == 'ready' && _openedPreviewSession != next.id;
     setState(() {
       session = next;
       if (restoredAnswers != null) answers = {...restoredAnswers, for (final answer in next.answers) answer.questionId: answer.optionId};
@@ -146,16 +144,6 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
           message = next.errorMessage ?? 'Görsel üretimi tamamlanamadı.';
       }
     });
-    if (openAdvancedPreview) {
-      _openedPreviewSession = next.id;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || GoRouter.maybeOf(context) == null) return;
-        context.push(Uri(
-          path: '/xinobi-u/mobil-onizleme',
-          queryParameters: {'session': next.id},
-        ).toString());
-      });
-    }
   }
 
   void _poll() {

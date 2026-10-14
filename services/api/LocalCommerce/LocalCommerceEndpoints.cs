@@ -158,6 +158,9 @@ public static class LocalCommerceEndpoints
             }
             catch (ArgumentException error) { return Results.BadRequest(new { message = error.Message }); }
         });
+        // Audit trail (Faz03 03.06): read-only, audit.read; records are written by AuditMiddleware, never by hand.
+        group.MapGet("/audit", async (string? entityType, int? limit, Infrastructure.AuditTrail trail) =>
+            Results.Ok(await trail.Recent(entityType, limit ?? 100)));
         group.MapPut("/content", async (CommerceContent content, LocalCommerceStore store) =>
         {
             if (content.Slides is null || content.Slides.Length > 50 || !ValidMedia(content.XinobiBanner) || !ValidMedia(content.TitaniumBanner ?? "") || !ValidMedia(content.TitaniumImage ?? "") || !Regex.IsMatch(content.ButtonColor ?? "", "^#[a-fA-F0-9]{6}$") ||

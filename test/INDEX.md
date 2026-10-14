@@ -179,3 +179,5 @@
 - 09.10.2026 · [TST-114 panel güvenliği, dosya deposu, arka plan işleri, kişiselleştirilmiş sipariş](2026-10-09/TST-114-panel-security-storage-jobs-personalised-order.md) — Panel personel + rota izni ister; medya/tasarım `IFileStore`'da; bildirim kuyruğu sahiplenmeli ve SQL'de çalışır; kayıtlı tasarım sepete eklenip siparişe değişmez kopyayla geçer (0005 uygulandı). .NET 341 geçti / 4 atlandı, Flutter 50/50.
 
 - 14.10.2026 · [TST-115 HEAD regresyonu ve faz denetimi](2026-10-14/TST-115-head-regression-and-phase-audit.md) — `b1573d0`: .NET 385 geçti / 13 atlandı / 0 başarısız, Flutter analyze temiz + 55/55, lint (5 admin uyarısı) ve web/admin TypeScript temiz. 09–13 Ekim’deki 31 kayıtsız commit için toplu doğrulama; e2e, gerçek SQL ve canlı smoke çalıştırılmadı.
+
+- 14.10.2026 · [TST-116 denetim kaydı](2026-10-14/TST-116-audit-trail.md) — Faz03 03.06: panel/yönetim değişiklik denemeleri (başarılı, 4xx, 401/403) gövdesiz kaydediliyor, `audit.read` ile okunuyor; AuditTrailTests 2/2, tam .NET 387/14 atlandı/0, admin tsc/lint/build temiz.

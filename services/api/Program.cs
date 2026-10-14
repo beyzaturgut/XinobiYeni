@@ -128,6 +128,7 @@ builder.Services.AddSingleton<Xinobi.Api.Infrastructure.FeatureDocuments>();
 builder.Services.AddSingleton<Xinobi.Api.Infrastructure.IFileStore>(services =>
     Xinobi.Api.Infrastructure.FileStorage.LocalRoot(builder.Environment, builder.Configuration) is { } fileRoot
         ? new Xinobi.Api.Infrastructure.LocalFileStore(fileRoot) : new Xinobi.Api.Infrastructure.UnavailableFileStore());
+builder.Services.AddSingleton<AuditTrail>();
 builder.Services.AddSingleton<NotificationTexts>();
 builder.Services.AddSingleton<INotificationChannelSender, EmailNotificationSender>();
 builder.Services.AddHttpClient<SmsNotificationSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
@@ -216,6 +217,8 @@ if (app.Environment.IsDevelopment())
 
 if (behindReverseProxy) app.UseForwardedHeaders();
 app.UseMiddleware<RequestCorrelationMiddleware>();
+// Outside the exception handler and authorization, so failed and refused panel changes are recorded with their final status.
+app.UseMiddleware<AuditMiddleware>();
 app.UseExceptionHandler();
 app.UseStatusCodePages(async statusCodeContext =>
 {

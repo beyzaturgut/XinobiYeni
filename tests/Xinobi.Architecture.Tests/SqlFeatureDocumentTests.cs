@@ -34,6 +34,25 @@ public sealed class SqlFeatureDocumentTests
     }
 
     [EmptySqlAccountsFact]
+    public async Task AuditTrailWritesAndReadsOpsAuditLogs()
+    {
+        var services = new ServiceCollection();
+        services.AddXinobiPersistence(Environment.GetEnvironmentVariable("XINOBI_TEST_SQL")!);
+        services.AddLogging();
+        await using var provider = services.BuildServiceProvider();
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["Features:StorageProvider"] = "SqlServer" }).Build();
+        var scopes = provider.GetRequiredService<IServiceScopeFactory>();
+        var trail = new AuditTrail(new FeatureDocuments(new Production(), configuration, scopes), configuration, scopes,
+            provider.GetRequiredService<Microsoft.Extensions.Logging.ILogger<AuditTrail>>());
+        var entityId = "test-" + Guid.NewGuid().ToString("N");
+        var actor = Guid.NewGuid().ToString("N");
+        await trail.Write(new AuditEntry("", DateTimeOffset.UtcNow, actor, "PUT local-commerce/prices/{id}", "xinobi-test", entityId, 200, "trace-1"));
+        var entry = Assert.Single(await trail.Recent("xinobi-test", 200), x => x.EntityId == entityId);
+        Assert.Equal(actor, entry.ActorId);
+        Assert.Equal(200, entry.Status);
+    }
+
+    [EmptySqlAccountsFact]
     public async Task ConcurrentWritersAreSerialised()
     {
         var services = new ServiceCollection();

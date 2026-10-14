@@ -23,6 +23,7 @@ public static class PanelAccess
         ["quotes"] = "quotes",
         ["assistant"] = "ai",
         ["notifications"] = "notifications",
+        ["audit"] = "audit",
     };
 
     /// <summary>The permission a panel request needs, from its route and HTTP method.</summary>

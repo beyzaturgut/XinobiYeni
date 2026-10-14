@@ -136,10 +136,11 @@ test('katalog kategori, arama, sıralama ve filtre temizleme akışını çalı�
 });
 
 test('ürün detayında renk varyantı, görsel ve seçili durum değişir',async({page})=>{
- await mockStore(page);await page.goto('/urunler/cay-makinesi-101/');await closeConsent(page);
+ await mockStore(page);await page.goto('/urunler/detay/?id=DEMO-P101');await closeConsent(page);
  const red=page.getByRole('button',{name:'Kırmızı rengini seç'});await red.click();await expect(red).toHaveAttribute('aria-pressed','true');
- await expect(page.getByRole('group',{name:'Renk: Kırmızı'})).toBeVisible();await expect(page.getByRole('img',{name:'Xinobi Çay Makinesi 101, Kırmızı'})).toBeVisible();
+ await expect(page.getByRole('group',{name:'Renk: Kırmızı'})).toBeVisible();await expect(page.getByRole('img',{name:/Çay Makinesi 101, Kırmızı/})).toBeVisible();
  await expect(page.getByRole('button',{name:'Sepete ekle',exact:true})).toBeEnabled();
+ await expect(page.getByRole('link',{name:/XINOBI U ile kişiselleştir/})).toHaveAttribute('href',/product=DEMO-P101&variant=DEMO-V101-R/);
 });
 
 test('katalog favorisi tarayıcı listesine taşınır ve listeden kaldırılır',async({page})=>{
@@ -158,9 +159,12 @@ test('deneme ödeme reddedilince sipariş oluşmaz; tekrarında sipariş kaydedi
  expect(await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!))).toEqual([]);
 });
 
-test('basit kişiselleştirme onaylı yüzeyin güncel editörüne geçer',async({page})=>{
- const {requests}=await mockStore(page);await page.goto('/urunler/cay-makinesi-101/kisisellestir/?product=DEMO-P101&variant=DEMO-V101-B');await closeConsent(page);
- await page.getByRole('link',{name:'Gelişmiş editörde devam et ↗'}).click();
- await expect(page.locator('canvas[role=img]')).toBeVisible();
- await expect(page).toHaveURL(/\/editor\/?.*variant=DEMO-V101-B/);expect(requests.filter(r=>r.path.includes('design-studio'))).toEqual([]);
+// The fixed Tea Maker demo pages were retired (2bb0b6d); old bookmarks must lead to the live XINOBI U flow, never a preview.
+test('kaldırılan demo ürün ve kişiselleştirme adresleri güncel ürünlere yönlendirir',async({page})=>{
+ const {requests}=await mockStore(page);
+ for(const [route,target] of [['/urunler/cay-makinesi-101/','/urunler'],['/urunler/cay-makinesi-101/kisisellestir/?product=DEMO-P101&variant=DEMO-V101-B','/xinobi-u']]){
+  await page.goto(route);await expect(page.getByRole('status')).toContainText('Bu örnek ürün artık katalogda yer almıyor.');
+  await expect(page.locator('main').getByRole('link').first()).toHaveAttribute('href',new RegExp('^'+target+'/?$'));await expect(page.locator('canvas[role=img]')).toHaveCount(0);
+ }
+ expect(requests.filter(r=>r.path.includes('design-studio'))).toEqual([]);
 });

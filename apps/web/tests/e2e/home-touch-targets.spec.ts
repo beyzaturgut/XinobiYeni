@@ -16,7 +16,8 @@ for (const width of [320, 390, 768, 1024, 1440]) {
       // Küçük görünen noktanın dışındaki alan da tıklanabilir olmalı.
       await button.click({ position: { x: 2, y: 2 } });
       await expect(button).toHaveAttribute("aria-current", "true");
-      await expect(hero.locator("img")).toHaveAttribute("src", `/assets/banners/home-slider-${index}.png`);
+      // The public storefront returns absolute asset URLs (Catalog:AssetBaseUrl); only the path is the slide identity.
+      await expect(hero.locator("img")).toHaveAttribute("src", new RegExp(`/assets/banners/home-slider-${index}\\.png$`));
     }
     const first = hero.getByRole("button", { name: "1. görsel", exact: true });
     await first.focus();

@@ -32,7 +32,8 @@ async function loadCatalogSurface(product:string,variant:string,signal:AbortSign
 }
 
 export async function loadAcceptedSurface(variantReference:string,signal:AbortSignal,commerceProduct?:string):Promise<RenderingInputs|null>{
- if(process.env.NODE_ENV!=='development')return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
+ // Live builds read only published bundles; the e2e build opts into the development bridge (NEXT_PUBLIC_DEV_SURFACE_BRIDGE=1).
+ if(process.env.NODE_ENV!=='development'&&process.env.NEXT_PUBLIC_DEV_SURFACE_BRIDGE!=='1')return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
  if(commerceProduct&&commerceProduct!=='DEMO-P101'){const generic=await loadCatalogSurface(commerceProduct,variantReference,signal);if(generic)return generic;}
  const productReference=commerceProduct??"cay-makinesi-101";
  const cm=commerceProduct===CM_PRODUCT&&variantReference===CM_VARIANT;

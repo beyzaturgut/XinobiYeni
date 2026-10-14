@@ -10,6 +10,8 @@ test("XINOBI U offers two separate exact-identity paths",async({page})=>{
  await page.goto("/xinobi-u/");const card=page.locator("article").filter({has:page.getByRole("heading",{name:"Çay Makinesi 101",exact:true})});
  await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
  await card.getByRole('link',{name:'XINOBI U ile kişiselleştir',exact:true}).click();
+ // The consent banner is not remembered until the D10 decision, so it opens again on the colour page.
+ const consent=page.getByRole('button',{name:'Çerez tercih panelini kapat'});await expect(page.getByRole('button',{name:'Lacivert rengini seç',exact:true})).toBeVisible();if(await consent.isVisible())await consent.click();
  await expect(page.getByRole('link',{name:'Kendi görselinizi ekleyin',exact:true})).toHaveCount(0);
  await page.getByRole('button',{name:'Lacivert rengini seç',exact:true}).click();
  await expect(page.getByRole('link',{name:'Sorulara başla →'})).toHaveAttribute('href','/xinobi-u/sorular/?product=DEMO-P101&variant=DEMO-V101-B');
@@ -25,8 +27,13 @@ for(const [product,variant] of [["DEMO-P101","DEMO-V101-R"],["DEMO-P101","DEMO-V
  await expect(page.getByRole("link",{name:"Tarzını Keşfet"})).toHaveAttribute("href","/xinobi-u/sorular/?product="+product+"&variant="+variant);await expect(page.locator('input[type=file],canvas')).toHaveCount(0);expect(masks).toHaveLength(0);expect(posts).toBe(0);
 });
 test("product color selection carries the exact variant into the own-image path",async({page})=>{
- await page.route("**/api/v1/local-commerce/state*",r=>r.fulfill({json:seed}));await page.goto("/urunler/detay/?id=DEMO-P101");await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
- for(const [variant,color] of [["DEMO-V101-B","Lacivert"],["DEMO-V101-R","Kırmızı"],["DEMO-V101-S","Gümüş gri"],["DEMO-V101-G","Rose gold"]]){await page.getByRole("button",{name:color+" rengini seç"}).click();await expect(page.getByRole("link",{name:"Kendi görselini kullan"})).toHaveAttribute("href",entry+"?product=DEMO-P101&variant="+variant)}
+ await page.goto("/xinobi-u/renk/?product=DEMO-P101");await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
+ for(const [variant,color,ready] of [["DEMO-V101-B","Lacivert",true],["DEMO-V101-R","Kırmızı",false],["DEMO-V101-S","Gümüş gri",false],["DEMO-V101-G","Rose gold",false]] as const){
+  await page.getByRole("button",{name:color+" rengini seç"}).click();
+  await expect(page.locator('[data-variant-reference="'+variant+'"]')).toHaveAttribute("data-preview-readiness",ready?"ready":"unavailable");
+  const own=page.getByRole("link",{name:"Kendi görselinizi ekleyin",exact:true});
+  if(ready)await expect(own).toHaveAttribute("href",new RegExp("^/xinobi-u/kendi-gorselin/?\\?product=DEMO-P101&variant="+variant+"$"));else await expect(own).toHaveCount(0);
+ }
 });
 test("missing identity and disabled preview never imply own-image readiness",async({page})=>{
  await page.goto(entry);await expect(page.locator('main section[role=status]')).toContainText("bir ürün ve varyant seçin");await expect(page.locator('input[type=file],canvas')).toHaveCount(0);

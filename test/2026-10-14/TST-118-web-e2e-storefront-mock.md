@@ -30,14 +30,16 @@ cd apps/web && node tests/run-e2e.mjs
 | Değişiklik öncesi (ilk 66 test, sonra durduruldu) | 28 başarısız; paket cm101 spec’i yüzünden tam çalıştırılamıyordu |
 | Tam paket, değişiklik sonrası | **70 geçti / 50 başarısız / 1 atlandı** (121), 18,6 dk |
 | Karşılaştırılabilir ilk 66 test | Kritik etkileşimlerde 9 hatanın 6’sı giderildi (sepet, arama/karşılaştırma, teklif, katalog filtre, favori, deneme ödeme); yeni hata yok |
-| Örnek kontrol: `local-pattern-image:12`, `variant-preview-readiness`, `home-touch-targets` düzeltmeler **olmadan** | 12 başarısız / 4 geçti → düzeltmelerle aynı grupta 9 başarısız (ana sayfa slider 320/390/768 düzeldi) |
+| Örnek kontrol: `local-pattern-image:12`, `variant-preview-readiness`, `home-touch-targets` düzeltmeler **olmadan** | 12 başarısız / 4 geçti; düzeltmelerle de aynı 12 test başarısız → bu iş yeni hata eklemedi. *Düzeltme (TST-119): ilk sürümde “slider 320/390/768 düzeldi” yazılmıştı; tam listede beşi de başarısızdı.* |
 
 ## Açık kalan (önceden var olan) hatalar — 50
 
-Kritik etkileşim: gelişmiş editör katmanları, ürün detayında renk varyantı, basit kişiselleştirme → editör. Ana sayfa slider 1024/1440. XINOBI U ve ürün yüzeyi akışı: accepted-surface (1), artwork-drag (5), cm101-demo-byte-regression (1), commerce-surface-integration (7), large-catalog-preview (3), local-pattern-image (15), own-image-entry (2), product-pattern-preview (1), representative-disclosure (2), variant-preview-readiness (4). Bu dosyalar `fixtures.ts` kullanmıyor ve düzeltme öncesinde de başarısız; 13.10 XINOBI U/kişiselleştirme değişiklikleriyle (`fe93107`, `2bb0b6d`, `88d80e0`, `a7ff0e8`) test beklentileri ayrışmış görünüyor. Ayrı onaylı iş olarak ele alınmalı.
+Kritik etkileşim: gelişmiş editör katmanları, ürün detayında renk varyantı, basit kişiselleştirme → editör. Ana sayfa slider 320/390/768/1024/1440. XINOBI U ve ürün yüzeyi akışı: accepted-surface (1), artwork-drag (5), cm101-demo-byte-regression (1), commerce-surface-integration (7), large-catalog-preview (3), local-pattern-image (15), own-image-entry (2), product-pattern-preview (1), representative-disclosure (2), variant-preview-readiness (4). Bu dosyalar `fixtures.ts` kullanmıyor ve düzeltme öncesinde de başarısız; 13.10 XINOBI U/kişiselleştirme değişiklikleriyle (`fe93107`, `2bb0b6d`, `88d80e0`, `a7ff0e8`) test beklentileri ayrışmış görünüyor. Ayrı onaylı iş olarak ele alınmalı.
 
 Gerçek ödeme/e-posta/AI çağrısı yapılmadı; SQL değişmedi.
 
 ## Sonuç kararı
 
 KISMİ BAŞARILI: altyapı hataları giderildi, paket tam çalışır; 50 önceden var olan hata açık.
+
+**Devamı:** [TST-119](TST-119-web-e2e-current-flows.md) — 116 geçti / 1 başarısız / 1 atlandı.

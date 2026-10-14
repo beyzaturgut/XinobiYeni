@@ -185,3 +185,5 @@
 - 14.10.2026 · [TST-117 parola sıfırlama](2026-10-14/TST-117-password-reset.md) — Faz03 03.03: hesap ifşa etmeyen kodlu sıfırlama, tüm oturumları kapatır; web + mobil ekran. .NET 389/14 atlandı/0, Dart 4/4, Flutter 56/56, hedefli web e2e 4/4. Tam web e2e’de önceden var olan storefront mock ve cm101 spec sorunları kayıtlı.
 
 - 14.10.2026 · [TST-118 web e2e storefront mock ve CM101 koruması](2026-10-14/TST-118-web-e2e-storefront-mock.md) — Test sahte sunucusu `/catalog/storefront`’u yanıtlıyor, yerel CM101 verisi yoksa spec gerekçeyle atlanıyor; tam paket 70 geçti / 50 başarısız / 1 atlandı. Kritik etkileşim hatalarının 6/9’u giderildi; kalan 50 hata XINOBI U/yüzey testlerinde, önceden var.
+
+- 14.10.2026 · [TST-119 web e2e güncel XINOBI U akışı](2026-10-14/TST-119-web-e2e-current-flows.md) — Test API demo kataloğu ve asset adresi, production e2e derlemesinde env ile açılan geliştirme önizleme köprüsü (canlı değişmedi), kaldırılan demo sayfalarına bağlı testler `/urunler/detay` ve `/xinobi-u/renk`’e taşındı. Tam paket **116 geçti / 1 başarısız / 1 atlandı**; kalan CM101 piksel farkı karar bekliyor.

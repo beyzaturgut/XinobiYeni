@@ -4,11 +4,10 @@ import path from "node:path";
 const source=JSON.parse(readFileSync(path.resolve("../../tests/fixtures/demo-commerce.json"),"utf8"));
 const editor="/urunler/cay-makinesi-101/editor/";
 test("commerce product link preserves exact selected identity",async({page})=>{
- await page.route("**/api/v1/local-commerce/state",r=>r.fulfill({json:source}));
- await page.goto("/urunler/cay-makinesi-101/");
+ await page.goto("/urunler/detay/?id=DEMO-P101");
  await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
  await page.getByRole("button",{name:"Gümüş gri rengini seç"}).click();
- await expect(page.getByRole("link",{name:"Kişiselleştirme seçenekleri"})).toHaveAttribute("href",/product=DEMO-P101&variant=DEMO-V101-S/);
+ await expect(page.getByRole("link",{name:/XINOBI U ile kişiselleştir/})).toHaveAttribute("href",/product=DEMO-P101&variant=DEMO-V101-S/);
 });
 test("commerce blue uses exact accepted surface; unsupported never renders",async({page})=>{
  await page.goto(editor+"?product=DEMO-P101&variant=DEMO-V101-B");
@@ -43,43 +42,18 @@ test("existing generated design uses canonical renderer, no generation requests"
  expect(posts).toBe(0);
 });
 
-const personalization="/urunler/cay-makinesi-101/kisisellestir/";
-for(const [name,query] of [
- ["direct",""],
- ["legacy blue","?variant=blue"],
- ["explicit commerce","?product=DEMO-P101&variant=DEMO-V101-B"],
-]){
- test("Tea Maker questionnaire entry preserves "+name+" identity",async({page})=>{
-  let generationRequests=0;
-  page.on("request",r=>{if(r.method()==="POST"&&r.url().endsWith("/generation"))generationRequests++});
-  await page.goto(personalization+query);
-  const action=page.getByRole("link",{name:"Soruları yanıtla",exact:false});
-  await expect(action).toHaveCount(1);
-  await expect(action).toBeVisible();
-  const href=await action.getAttribute("href");
-  const target=new URL(href!,"http://localhost");
-  expect(target.pathname.replace(/\/$/,"")).toBe("/xinobi-u/sorular");
-  expect([...target.searchParams.entries()].sort()).toEqual([
-   ["product","DEMO-P101"],["variant","DEMO-V101-B"],
-  ]);
-  const editorAction=page.getByRole("link",{name:"Gelişmiş editörde devam et",exact:false});
-  const editorTarget=new URL((await editorAction.getAttribute("href"))!,"http://localhost");
-  expect(editorTarget.searchParams.get("product")).toBe(query.includes("product=")?"DEMO-P101":null);
-  expect(editorTarget.searchParams.get("variant")).toBe(query.includes("product=")?"DEMO-V101-B":"blue");
-  expect(generationRequests).toBe(0);
- });
-}
-test("Tea Maker questionnaire fallback never replaces unsupported explicit identities",async({page})=>{
- for(const query of [
-  "?product=other&variant=DEMO-V101-B",
-  "?product=DEMO-P101&variant=DEMO-V101-S",
-  "?product=DEMO-P101&variant=blue",
-  "?variant=red",
- ]){
-  await page.goto(personalization+query);
-  await expect(page.getByRole("status")).toContainText("kullanılamıyor");
+// The fixed Tea Maker entry was retired (2bb0b6d): every former identity shows the retirement notice, offers the live
+// XINOBI U product list and never starts a questionnaire, editor or generation from the old page.
+test("retired Tea Maker personalization entry never starts a design",async({page})=>{
+ let generationRequests=0;
+ page.on("request",r=>{if(r.method()==="POST"&&r.url().endsWith("/generation"))generationRequests++});
+ for(const query of ["","?variant=blue","?product=DEMO-P101&variant=DEMO-V101-B","?product=other&variant=DEMO-V101-B","?product=DEMO-P101&variant=DEMO-V101-S","?variant=red"]){
+  await page.goto("/urunler/cay-makinesi-101/kisisellestir/"+query);
+  await expect(page.getByRole("status")).toContainText("artık katalogda yer almıyor");
+  await expect(page.getByRole("link",{name:/Güncel ürünlerden birini seç/})).toHaveAttribute("href",/^\/xinobi-u\/?$/);
   await expect(page.getByRole("link",{name:"Soruları yanıtla",exact:false})).toHaveCount(0);
   await expect(page.getByRole("link",{name:"Gelişmiş editörde devam et",exact:false})).toHaveCount(0);
   await expect(page.locator("canvas[role=img]")).toHaveCount(0);
  }
+ expect(generationRequests).toBe(0);
 });

@@ -378,6 +378,88 @@ class _EmailChangeScreenState extends ConsumerState<EmailChangeScreen> {
   }
 }
 
+/// /hesap/parola-sifirla: an e-mailed code and a new password; every device is signed out, then the person signs in.
+class PasswordResetScreen extends ConsumerStatefulWidget {
+  const PasswordResetScreen({super.key});
+  @override
+  ConsumerState<PasswordResetScreen> createState() => _PasswordResetScreenState();
+}
+
+class _PasswordResetScreenState extends ConsumerState<PasswordResetScreen> {
+  final email = TextEditingController();
+  final code = TextEditingController();
+  final password = TextEditingController();
+  AccountEmailVerification? challenge;
+  String? error;
+  bool busy = false;
+
+  @override
+  void dispose() {
+    email.dispose();
+    code.dispose();
+    password.dispose();
+    super.dispose();
+  }
+
+  Future<void> run(Future<void> Function() action) async {
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      await action();
+    } on AccountException catch (problem) {
+      if (mounted) setState(() => error = problem.message);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> send() => run(() async {
+        if (!email.text.contains('@')) throw const AccountException('invalid_email', 'Geçerli bir e-posta adresi gir.');
+        final sent = await ref.read(accountRepositoryProvider).startPasswordReset(email.text);
+        if (mounted) setState(() => challenge = sent);
+      });
+
+  Future<void> confirm() => run(() async {
+        if (password.text.length < 8) throw const AccountException('weak_password', 'Yeni parola en az 8 karakter olmalı.');
+        final messenger = ScaffoldMessenger.of(context);
+        final router = GoRouter.of(context);
+        await ref.read(accountRepositoryProvider).confirmPasswordReset(email: challenge!.email, verificationId: challenge!.verificationId, code: code.text, newPassword: password.text);
+        messenger.showSnackBar(const SnackBar(content: Text('Parolan değiştirildi ve tüm cihazlardaki oturumların kapatıldı. Yeni parolanla giriş yap.')));
+        router.pop();
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final sent = challenge;
+    return Scaffold(
+      appBar: accountBar('Parolanı sıfırla'),
+      body: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
+        if (sent == null) ...[
+          Text('Hesabının e-posta adresini gir. Bu adrese kayıtlı bir hesap varsa 6 haneli sıfırlama kodu gönderilir.', style: text.bodyMedium),
+          const SizedBox(height: 12),
+          TextField(controller: email, keyboardType: TextInputType.emailAddress, autofillHints: const [AutofillHints.email], decoration: accountField('E-posta')),
+          FormErrorText(error),
+          const SizedBox(height: 16),
+          FilledButton(onPressed: busy ? null : send, child: Text(busy ? 'Gönderiliyor…' : 'Sıfırlama kodu gönder')),
+        ] else ...[
+          Text('${sent.email} adresine kayıtlı bir hesap varsa 6 haneli kod gönderildi. Kod 10 dakika geçerlidir.', style: text.bodyMedium),
+          if (sent.previewCode != null) Text('Geliştirme ortamı kodu: ${sent.previewCode}', style: text.bodySmall),
+          const SizedBox(height: 12),
+          TextField(controller: code, keyboardType: TextInputType.number, maxLength: 6, autofillHints: const [AutofillHints.oneTimeCode], decoration: accountField('Sıfırlama kodu')),
+          PasswordField(controller: password, label: 'Yeni parola', helper: 'En az 8 karakter', autofill: AutofillHints.newPassword),
+          FormErrorText(error),
+          const SizedBox(height: 16),
+          FilledButton(onPressed: busy ? null : confirm, child: Text(busy ? 'Kaydediliyor…' : 'Parolayı değiştir')),
+          TextButton(onPressed: busy ? null : () => setState(() => challenge = null), child: const Text('Farklı bir adres gir')),
+        ],
+      ]),
+    );
+  }
+}
+
 /// /hesap/sil: the password and an explicit confirmation delete the account with its addresses and orders.
 class DeleteAccountScreen extends ConsumerStatefulWidget {
   const DeleteAccountScreen({super.key});
@@ -532,6 +614,7 @@ class _LoginFormState extends ConsumerState<_LoginForm> {
           FormErrorText(error),
           const SizedBox(height: 16),
           FilledButton(onPressed: busy ? null : submit, child: Text(busy ? 'Giriş yapılıyor…' : 'Giriş yap')),
+          TextButton(onPressed: busy ? null : () => context.push('/hesap/parola-sifirla'), child: const Text('Parolamı unuttum')),
         ]),
       );
 }

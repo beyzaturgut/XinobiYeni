@@ -13,6 +13,7 @@ Method | HTTP request | Description
 [**cancelMyOrder**](AccountApi.md#cancelmyorder) | **POST** /api/v1/me/orders/{id}/cancellation |
 [**changeMyPassword**](AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
 [**confirmMyEmailChange**](AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
+[**confirmPasswordReset**](AccountApi.md#confirmpasswordreset) | **POST** /api/v1/auth/password-reset/confirm |
 [**deleteMyAccount**](AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [**deleteMyAddress**](AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [**deleteMyDesign**](AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
@@ -44,6 +45,7 @@ Method | HTTP request | Description
 [**saveMyDesign**](AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [**startMyEmailChange**](AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
+[**startPasswordReset**](AccountApi.md#startpasswordreset) | **POST** /api/v1/auth/password-reset |
 [**submitMyReview**](AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [**updateMyAccount**](AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [**updateMyAddress**](AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
@@ -213,6 +215,46 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **confirmPasswordReset**
+> confirmPasswordReset(confirmPasswordReset)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final ConfirmPasswordReset confirmPasswordReset = ; // ConfirmPasswordReset |
+
+try {
+    api.confirmPasswordReset(confirmPasswordReset);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->confirmPasswordReset: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **confirmPasswordReset** | [**ConfirmPasswordReset**](ConfirmPasswordReset.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1427,6 +1469,47 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **startEmailChange** | [**StartEmailChange**](StartEmailChange.md)|  |
+
+### Return type
+
+[**AccountEmailVerification**](AccountEmailVerification.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **startPasswordReset**
+> AccountEmailVerification startPasswordReset(startPasswordReset)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final StartPasswordReset startPasswordReset = ; // StartPasswordReset |
+
+try {
+    final response = api.startPasswordReset(startPasswordReset);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->startPasswordReset: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **startPasswordReset** | [**StartPasswordReset**](StartPasswordReset.md)|  |
 
 ### Return type
 

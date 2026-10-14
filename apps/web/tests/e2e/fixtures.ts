@@ -33,6 +33,8 @@ export async function mockStore(page:Page,{signedIn=false,cart=false}:{signedIn?
     if(path==='/auth/web/refresh')return signedIn?json(user):json({title:'Oturum yok'},401);
     if(path==='/email-verification/start')return json({id:'test-verification',email:body.email,expiresAt:new Date(Date.now()+600000).toISOString(),previewCode:'123456'});
     if(path==='/auth/web/register'||path==='/auth/web/login'){signedIn=true;user={...user,...(path.endsWith('register')?{name:String(body.name)}:{}),email:String(body.email)};return json(user);}
+    if(path==='/auth/password-reset')return json({verificationId:'test-reset',email:String(body.email),expiresAt:new Date(Date.now()+600000).toISOString(),previewCode:'654321'});
+    if(path==='/auth/password-reset/confirm')return body.verificationCode==='654321'?route.fulfill({status:204}):json({title:'Doğrulama kodu hatalı.',code:'verification_failed'},400);
     if(path==='/me'&&method==='PATCH'){user={...user,name:String(body.name)};return json(user);}
     if(path==='/me/addresses'){
       if(method==='POST'){addresses.push({...body,id:'new-address'} as CustomerAddress);return json(addresses.at(-1));}

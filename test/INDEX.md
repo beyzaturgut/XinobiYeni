@@ -181,3 +181,5 @@
 - 14.10.2026 · [TST-115 HEAD regresyonu ve faz denetimi](2026-10-14/TST-115-head-regression-and-phase-audit.md) — `b1573d0`: .NET 385 geçti / 13 atlandı / 0 başarısız, Flutter analyze temiz + 55/55, lint (5 admin uyarısı) ve web/admin TypeScript temiz. 09–13 Ekim’deki 31 kayıtsız commit için toplu doğrulama; e2e, gerçek SQL ve canlı smoke çalıştırılmadı.
 
 - 14.10.2026 · [TST-116 denetim kaydı](2026-10-14/TST-116-audit-trail.md) — Faz03 03.06: panel/yönetim değişiklik denemeleri (başarılı, 4xx, 401/403) gövdesiz kaydediliyor, `audit.read` ile okunuyor; AuditTrailTests 2/2, tam .NET 387/14 atlandı/0, admin tsc/lint/build temiz.
+
+- 14.10.2026 · [TST-117 parola sıfırlama](2026-10-14/TST-117-password-reset.md) — Faz03 03.03: hesap ifşa etmeyen kodlu sıfırlama, tüm oturumları kapatır; web + mobil ekran. .NET 389/14 atlandı/0, Dart 4/4, Flutter 56/56, hedefli web e2e 4/4. Tam web e2e’de önceden var olan storefront mock ve cm101 spec sorunları kayıtlı.

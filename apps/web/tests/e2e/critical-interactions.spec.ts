@@ -85,6 +85,19 @@ test('üyelik modları, parola görünürlüğü ve e-posta doğrulaması çalı
  await expect(page).toHaveURL(/\/hesap\/?$/);expect(requests.find(r=>r.path==='/auth/web/register')?.body.verificationCode).toBe('123456');
 });
 
+test('parolamı unuttum kodla yeni parola belirler ve girişe döner',async({page})=>{
+ const {requests}=await mockStore(page);await page.goto('/hesap/giris/');await closeConsent(page);
+ await page.getByRole('button',{name:'Parolamı unuttum'}).click();await expect(page.getByRole('heading',{name:'Parolanı sıfırla'})).toBeVisible();
+ await page.getByLabel('E-posta adresi').fill('Test@Example.com');await page.getByRole('button',{name:'Sıfırlama kodu gönder'}).click();
+ await expect(page.getByText('654321')).toBeVisible();
+ await page.getByLabel('Sıfırlama kodu').fill('111111');await page.getByLabel('Yeni parola').fill('yeni-parola-123');await page.getByRole('button',{name:'Parolayı değiştir'}).click();
+ await expect(page.getByText('Doğrulama kodu hatalı.')).toBeVisible();
+ await page.getByLabel('Sıfırlama kodu').fill('654321');await page.getByRole('button',{name:'Parolayı değiştir'}).click();
+ await expect(page.getByRole('heading',{name:'Giriş yap',exact:true})).toBeVisible();await expect(page.getByRole('status')).toContainText('Parolan değiştirildi');
+ expect(requests.find(r=>r.path==='/auth/password-reset')?.body.email).toBe('test@example.com');
+ expect(requests.filter(r=>r.path==='/auth/password-reset/confirm').at(-1)?.body).toEqual({email:'test@example.com',verificationId:'test-reset',verificationCode:'654321',newPassword:'yeni-parola-123'});
+});
+
 test('sipariş takibi teslimat adımlarını ve takip numarasını gösterir',async({page})=>{
  await mockStore(page,{signedIn:true});await page.goto('/hesap/siparisler/');await closeConsent(page);
  await expect(page.getByRole('heading',{name:'TEST-ORDER-1'})).toBeVisible();await expect(page.getByText('TEST123',{exact:true})).toBeVisible();

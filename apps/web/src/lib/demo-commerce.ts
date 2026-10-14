@@ -223,3 +223,16 @@ export function localPhone(phone?:string|null){
   if(!phone||!phone.startsWith('+90')||phone.length!==13)return phone??'';
   const d=phone.slice(3);return `0${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6,8)} ${d.slice(8)}`;
 }
+
+/** Sends a reset code; the answer is the same whether or not the address has an account. */
+export async function startPasswordReset(email:string){
+  email=email.trim().toLowerCase();
+  if(!email)throw new Error('E-posta adresini gir.');
+  return (await call<EmailChallenge>('/auth/password-reset',{method:'POST',body:JSON.stringify({email})}))!;
+}
+
+/** Sets the new password and signs out every device; the person signs in again afterwards. */
+export async function confirmPasswordReset(email:string,verificationId:string,code:string,newPassword:string){
+  if(newPassword.length<8)throw new Error('Yeni parola en az 8 karakter olmalı.');
+  await call('/auth/password-reset/confirm',{method:'POST',body:JSON.stringify({email:email.trim().toLowerCase(),verificationId,verificationCode:code.trim(),newPassword})});
+}

@@ -69,6 +69,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**cancelMyOrder**](doc/AccountApi.md#cancelmyorder) | **POST** /api/v1/me/orders/{id}/cancellation |
 [*AccountApi*](doc/AccountApi.md) | [**changeMyPassword**](doc/AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
 [*AccountApi*](doc/AccountApi.md) | [**confirmMyEmailChange**](doc/AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
+[*AccountApi*](doc/AccountApi.md) | [**confirmPasswordReset**](doc/AccountApi.md#confirmpasswordreset) | **POST** /api/v1/auth/password-reset/confirm |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAccount**](doc/AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAddress**](doc/AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyDesign**](doc/AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
@@ -100,6 +101,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**saveMyDesign**](doc/AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
+[*AccountApi*](doc/AccountApi.md) | [**startPasswordReset**](doc/AccountApi.md#startpasswordreset) | **POST** /api/v1/auth/password-reset |
 [*AccountApi*](doc/AccountApi.md) | [**submitMyReview**](doc/AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAddress**](doc/AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
@@ -159,6 +161,7 @@ Class | Method | HTTP request | Description
  - [CategoryList](doc/CategoryList.md)
  - [ChangeMyPassword](doc/ChangeMyPassword.md)
  - [ConfirmEmailChange](doc/ConfirmEmailChange.md)
+ - [ConfirmPasswordReset](doc/ConfirmPasswordReset.md)
  - [CreateQuote](doc/CreateQuote.md)
  - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
  - [CustomerAddress](doc/CustomerAddress.md)
@@ -214,6 +217,7 @@ Class | Method | HTTP request | Description
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartEmailChange](doc/StartEmailChange.md)
+ - [StartPasswordReset](doc/StartPasswordReset.md)
  - [SubmitReview](doc/SubmitReview.md)
  - [TrackQuoteMessage](doc/TrackQuoteMessage.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)

@@ -354,15 +354,33 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         var user = await db.Users.FirstOrDefaultAsync(x => x.Id == Key(accountId));
         var account = user is null ? null : await Record(db, user);
         if (account is null || hasher.VerifyHashedPassword(account, account.PasswordHash, currentPassword) == PasswordVerificationResult.Failed) return false;
-        user!.PasswordHash = hasher.HashPassword(account, newPassword);
+        await SetPassword(db, user!, account, newPassword);
+        return true;
+    });
+
+    public async Task<bool> ResetPassword(string email, string newPassword)
+    {
+        var id = await Run(null, db => db.Users.AsNoTracking().Where(x => x.NormalizedEmail == email && x.Status == UserStatuses.Active).Select(x => (Guid?)x.Id).FirstOrDefaultAsync());
+        if (id is null) return false;
+        return await Run(Lock(Id(id.Value)), async db =>
+        {
+            var user = await db.Users.FirstOrDefaultAsync(x => x.Id == id.Value && x.Status == UserStatuses.Active);
+            if (user is null) return false;
+            await SetPassword(db, user, await Record(db, user), newPassword);
+            return true;
+        });
+    }
+
+    private async Task SetPassword(XinobiDbContext db, User user, AccountRecord account, string newPassword)
+    {
+        user.PasswordHash = hasher.HashPassword(account, newPassword);
         user.UpdatedAt = clock.GetUtcNow();
         // A changed password signs out every device; the caller issues a fresh session for the one that made the change.
         var now = clock.GetUtcNow();
         await db.RefreshSessions.Where(x => x.UserId == user.Id && x.RevokedAt == null).ExecuteUpdateAsync(x => x.SetProperty(s => s.RevokedAt, now));
         await db.AccessSessions.Where(x => x.UserId == user.Id).ExecuteDeleteAsync();
         await db.SaveChangesAsync();
-        return true;
-    });
+    }
 
     public async Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change)
     {

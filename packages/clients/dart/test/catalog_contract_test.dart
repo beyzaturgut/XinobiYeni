@@ -36,6 +36,9 @@ void main() {
           'maxQuantity': 0,
         },
       ],
+      'originalImageUrl': null,
+      'gallery': <Object?>[],
+      'specs': <Object?>[],
     };
 
     final product = standardSerializers.deserializeWith(ProductDetail.serializer, json)!;

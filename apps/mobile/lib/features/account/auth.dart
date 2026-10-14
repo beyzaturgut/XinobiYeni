@@ -21,6 +21,10 @@ abstract interface class AccountRepository {
   Future<AccountEmailVerification> startVerification(String email);
   Future<AuthSession> register({required String name, required String email, required String password, required String verificationId, required String code});
   Future<AuthSession> login(String email, String password);
+  /// Sends a reset code; the answer is the same whether or not the address has an account.
+  Future<AccountEmailVerification> startPasswordReset(String email);
+  /// Sets the new password and signs out every device.
+  Future<void> confirmPasswordReset({required String email, required String verificationId, required String code, required String newPassword});
   Future<AuthSession> refresh(String refreshToken);
   Future<void> logout(String refreshToken);
   Future<AccountProfile> me(String accessToken);
@@ -100,6 +104,20 @@ class ApiAccountRepository implements AccountRepository {
       // Local sign-out still happens; the server session expires on its own.
     }
   }
+
+  @override
+  Future<AccountEmailVerification> startPasswordReset(String email) =>
+      _call(() => _api.startPasswordReset(startPasswordReset: StartPasswordReset((b) => b.email = email.trim().toLowerCase())));
+
+  @override
+  Future<void> confirmPasswordReset({required String email, required String verificationId, required String code, required String newPassword}) =>
+      _empty(() => _api.confirmPasswordReset(
+            confirmPasswordReset: ConfirmPasswordReset((b) => b
+              ..email = email
+              ..verificationId = verificationId
+              ..verificationCode = code.trim()
+              ..newPassword = newPassword),
+          ));
 
   @override
   Future<AccountProfile> me(String accessToken) => _call(() => _api.getMyAccount(headers: {'Authorization': 'Bearer $accessToken'}));

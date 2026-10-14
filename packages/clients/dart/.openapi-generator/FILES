@@ -29,6 +29,7 @@ doc/CategoryItem.md
 doc/CategoryList.md
 doc/ChangeMyPassword.md
 doc/ConfirmEmailChange.md
+doc/ConfirmPasswordReset.md
 doc/ContentApi.md
 doc/CreateQuote.md
 doc/CreateXinobiUSession.md
@@ -86,6 +87,7 @@ doc/SaveCustomerAddress.md
 doc/SaveDesignFromSession.md
 doc/StartAccountEmailVerification.md
 doc/StartEmailChange.md
+doc/StartPasswordReset.md
 doc/SubmitReview.md
 doc/SystemApi.md
 doc/TrackQuoteMessage.md
@@ -140,6 +142,7 @@ lib/src/model/category_item.dart
 lib/src/model/category_list.dart
 lib/src/model/change_my_password.dart
 lib/src/model/confirm_email_change.dart
+lib/src/model/confirm_password_reset.dart
 lib/src/model/create_quote.dart
 lib/src/model/create_xinobi_u_session.dart
 lib/src/model/customer_address.dart
@@ -196,6 +199,7 @@ lib/src/model/save_customer_address.dart
 lib/src/model/save_design_from_session.dart
 lib/src/model/start_account_email_verification.dart
 lib/src/model/start_email_change.dart
+lib/src/model/start_password_reset.dart
 lib/src/model/submit_review.dart
 lib/src/model/track_quote_message.dart
 lib/src/model/update_my_account.dart

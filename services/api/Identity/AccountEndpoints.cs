@@ -16,6 +16,8 @@ public record RegisterAccount(string Name, string Email, string Password, string
 public record LoginAccount(string Email, string Password);
 public record RefreshSession(string RefreshToken);
 public record LogoutSession(string RefreshToken);
+public record StartPasswordReset(string Email);
+public record ConfirmPasswordReset(string Email, string VerificationId, string VerificationCode, string NewPassword);
 public record AccountProfile(string Id, string Name, string Email, DateTimeOffset CreatedAt, string? Phone = null);
 
 /// <summary>What the panel may show; every action is still checked on the server.</summary>
@@ -211,6 +213,33 @@ public static class AccountEndpoints
                 return TypedResults.NoContent();
             })
             .WithName("LogoutWebSession");
+
+        // Password reset (Faz03 03.03): the answer is the same whether or not the address has an account, and a code is only
+        // e-mailed to an existing one. A successful reset signs out every device; the person then signs in with the new password.
+        auth.MapPost("/password-reset", async Task<Results<Ok<AccountEmailVerification>, ProblemHttpResult>> (StartPasswordReset request, HttpContext http, IAccountStore accounts, CancellationToken token) =>
+            {
+                var email = AccountRules.NormalizeEmail(request.Email);
+                var store = http.RequestServices.GetService<EmailVerificationStore>() ?? throw new AccountUnavailableException();
+                var challenge = await store.Start(email, token, VerificationPurpose.PasswordReset, deliver: await accounts.EmailInUse(email));
+                return TypedResults.Ok(new AccountEmailVerification(challenge.Id, challenge.Email, challenge.ExpiresAt, challenge.PreviewCode));
+            })
+            .WithName("StartPasswordReset")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        auth.MapPost("/password-reset/confirm", async Task<Results<NoContent, ProblemHttpResult>> (ConfirmPasswordReset request, HttpContext http, IAccountStore accounts) =>
+            {
+                var email = AccountRules.NormalizeEmail(request.Email);
+                AccountRules.ValidatePassword(request.NewPassword);
+                var verification = http.RequestServices.GetService<EmailVerificationStore>() ?? throw new AccountUnavailableException();
+                await verification.Confirm(new ConfirmEmailVerification(request.VerificationId, email, request.VerificationCode));
+                return await accounts.ResetPassword(email, request.NewPassword)
+                    ? TypedResults.NoContent()
+                    : Problem(StatusCodes.Status400BadRequest, "verification_failed", "Doğrulama isteği bulunamadı. Yeni kod iste.");
+            })
+            .WithName("ConfirmPasswordReset")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status429TooManyRequests);
 
         auth.MapPost("/logout", async Task<NoContent> (LogoutSession request, IAccountStore accounts) =>
             {

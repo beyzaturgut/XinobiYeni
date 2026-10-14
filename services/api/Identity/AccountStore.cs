@@ -56,6 +56,8 @@ public interface IAccountStore
     Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build);
     /// <summary>False when <paramref name="currentPassword"/> is wrong. On success every session of the account is signed out.</summary>
     Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword);
+    /// <summary>Sets a new password for the active account at <paramref name="email"/> (ownership proven by an e-mailed code) and signs out every device. False when no such account.</summary>
+    Task<bool> ResetPassword(string email, string newPassword);
     /// <summary>
     /// Saves <paramref name="change"/>'s result for the order; <paramref name="accountId"/> null lets the panel reach any account's order.
     /// Throws <c>order_not_found</c>; whatever <paramref name="change"/> throws leaves the order untouched.
@@ -87,6 +89,7 @@ public sealed class UnavailableAccountStore : IAccountStore
     public Task<CustomerOrder[]> Orders(string accountId) => throw new AccountUnavailableException();
     public Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build) => throw new AccountUnavailableException();
     public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => throw new AccountUnavailableException();
+    public Task<bool> ResetPassword(string email, string newPassword) => throw new AccountUnavailableException();
     public Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change) => throw new AccountUnavailableException();
     public Task<StaffOrder[]> AllOrders() => throw new AccountUnavailableException();
 }
@@ -368,11 +371,27 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
         return order;
     });
 
+    public Task<bool> ResetPassword(string email, string newPassword) => Locked(async state =>
+    {
+        var index = state.Accounts.FindIndex(account => account.Email == email);
+        if (index < 0) return false;
+        await SetPassword(state, index, newPassword);
+        return true;
+    });
+
     public Task<bool> ChangePassword(string accountId, string currentPassword, string newPassword) => Locked(async state =>
     {
         var index = state.Accounts.FindIndex(account => account.Id == accountId);
         var account = index < 0 ? null : state.Accounts[index];
         if (account is null || hasher.VerifyHashedPassword(account, account.PasswordHash, currentPassword) == PasswordVerificationResult.Failed) return false;
+        await SetPassword(state, index, newPassword);
+        return true;
+    });
+
+    private async Task SetPassword(State state, int index, string newPassword)
+    {
+        var account = state.Accounts[index];
+        var accountId = account.Id;
         state.Accounts[index] = account with { PasswordHash = hasher.HashPassword(account, newPassword) };
         // A changed password signs out every device; the caller issues a fresh session for the one that made the change.
         var now = clock.GetUtcNow();
@@ -380,8 +399,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
             if (state.RefreshTokens[i].AccountId == accountId && state.RefreshTokens[i].RevokedAt is null) state.RefreshTokens[i] = state.RefreshTokens[i] with { RevokedAt = now };
         state.AccessTokens.RemoveAll(entry => entry.AccountId == accountId);
         await Write(state);
-        return true;
-    });
+    }
 
     public Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change) => Locked(async state =>
     {

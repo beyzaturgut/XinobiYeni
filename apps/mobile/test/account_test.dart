@@ -54,6 +54,21 @@ class FakeAccounts implements AccountRepository {
     ..expiresAt = DateTime.utc(2026, 10, 7, 12, 10)
     ..previewCode = '123456');
 
+  String? resetPassword;
+
+  @override
+  Future<AccountEmailVerification> startPasswordReset(String email) async => AccountEmailVerification((b) => b
+    ..verificationId = 'r1'
+    ..email = email.trim().toLowerCase()
+    ..expiresAt = DateTime.utc(2026, 10, 14, 12, 10)
+    ..previewCode = '654321');
+
+  @override
+  Future<void> confirmPasswordReset({required String email, required String verificationId, required String code, required String newPassword}) async {
+    if (code != '654321') throw const AccountException('verification_failed', 'Doğrulama kodu hatalı.');
+    resetPassword = newPassword;
+  }
+
   @override
   Future<AuthSession> register({required String name, required String email, required String password, required String verificationId, required String code}) async {
     if (code != '123456') throw const AccountException('verification_failed', 'Doğrulama kodu hatalı.');
@@ -342,6 +357,27 @@ void main() {
     expect(find.text('Hesabına giriş yap'), findsOneWidget);
     expect(tokens.value, isNull);
     expect(accounts.revoked, ['refresh-login']);
+  });
+
+  testWidgets('a forgotten password is reset with the e-mailed code, then the forms return', (tester) async {
+    final (accounts, tokens) = await pumpAccount(tester);
+    await tester.tap(find.widgetWithText(TextButton, 'Parolamı unuttum'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'E-posta'), 'Ayse@Example.com');
+    await tester.tap(find.widgetWithText(FilledButton, 'Sıfırlama kodu gönder'));
+    await tester.pumpAndSettle();
+    expect(find.text('Geliştirme ortamı kodu: 654321'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextField, 'Sıfırlama kodu'), '111111');
+    await tester.enterText(find.widgetWithText(TextField, 'Yeni parola'), 'yeni-parola-12');
+    await tester.tap(find.widgetWithText(FilledButton, 'Parolayı değiştir'));
+    await tester.pumpAndSettle();
+    expect(find.text('Doğrulama kodu hatalı.'), findsOneWidget);
+    await tester.enterText(find.widgetWithText(TextField, 'Sıfırlama kodu'), '654321');
+    await tester.tap(find.widgetWithText(FilledButton, 'Parolayı değiştir'));
+    await tester.pumpAndSettle();
+    expect(accounts.resetPassword, 'yeni-parola-12');
+    expect(find.text('Hesabına giriş yap'), findsOneWidget);
+    expect(tokens.value, isNull, reason: 'A reset does not sign this device in.');
   });
 
   testWidgets('registration sends a code and creates the account with it', (tester) async {

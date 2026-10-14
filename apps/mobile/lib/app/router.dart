@@ -60,6 +60,7 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         ),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
         GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),
+        GoRoute(path: '/hesap/parola-sifirla', builder: (context, state) => const PasswordResetScreen()),
         GoRoute(path: '/hesap/eposta', builder: (context, state) => const EmailChangeScreen()),
         GoRoute(path: '/hesap/sil', builder: (context, state) => const DeleteAccountScreen()),
         GoRoute(path: '/hesap/adresler', builder: (context, state) => const AddressesScreen()),

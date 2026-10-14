@@ -39,7 +39,9 @@ public sealed class AccountTests : IDisposable
         public int Sent;
         public bool IsConfigured => true;
         public bool IsPreview => true;
+        public VerificationPurpose? LastPurpose;
         public Task Send(string email, string code, CancellationToken cancellationToken) { Interlocked.Increment(ref Sent); return Task.CompletedTask; }
+        public Task Send(string email, string code, VerificationPurpose purpose, CancellationToken cancellationToken) { LastPurpose = purpose; return Send(email, code, cancellationToken); }
     }
 
     private static async Task<string?> Code(HttpResponseMessage response)
@@ -70,6 +72,64 @@ public sealed class AccountTests : IDisposable
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/me");
         if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return await client.SendAsync(request);
+    }
+
+    [Fact]
+    public async Task PasswordResetSetsTheNewPasswordAndSignsOutEveryDevice()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var account = await accounts.Register("Ayşe Yılmaz", "ayse@example.com", "eski-parola-1");
+        var oldSession = await accounts.IssueTokens(account.Id);
+
+        var start = await client.PostAsJsonAsync("/api/v1/auth/password-reset", new StartPasswordReset("Ayse@Example.com"));
+        start.EnsureSuccessStatusCode();
+        var challenge = (await start.Content.ReadFromJsonAsync<AccountEmailVerification>())!;
+        Assert.Equal(1, sender.Sent);
+        Assert.Equal(VerificationPurpose.PasswordReset, sender.LastPurpose);
+
+        Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync("/api/v1/auth/password-reset/confirm",
+            new ConfirmPasswordReset("ayse@example.com", challenge.VerificationId, challenge.PreviewCode!, "kisa"))).StatusCode);
+        var confirm = await client.PostAsJsonAsync("/api/v1/auth/password-reset/confirm",
+            new ConfirmPasswordReset("ayse@example.com", challenge.VerificationId, challenge.PreviewCode!, "yeni-parola-12"));
+        Assert.Equal(HttpStatusCode.NoContent, confirm.StatusCode);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Me(client, oldSession.AccessToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync("/api/v1/auth/refresh", new RefreshSession(oldSession.RefreshToken))).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync("/api/v1/auth/login", new LoginAccount("ayse@example.com", "eski-parola-1"))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/v1/auth/login", new LoginAccount("ayse@example.com", "yeni-parola-12"))).StatusCode);
+        // The code is single use.
+        Assert.Equal(HttpStatusCode.TooManyRequests, (await client.PostAsJsonAsync("/api/v1/auth/password-reset/confirm",
+            new ConfirmPasswordReset("ayse@example.com", challenge.VerificationId, challenge.PreviewCode!, "baska-parola-12"))).StatusCode);
+    }
+
+    [Fact]
+    public async Task PasswordResetForAnUnknownAddressLooksTheSameAndSendsNothing()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        await factory.Services.GetRequiredService<IAccountStore>().Register("Ayşe Yılmaz", "ayse@example.com", "eski-parola-1");
+
+        var unknown = await client.PostAsJsonAsync("/api/v1/auth/password-reset", new StartPasswordReset("kimse@example.com"));
+        Assert.Equal(HttpStatusCode.OK, unknown.StatusCode);
+        var challenge = (await unknown.Content.ReadFromJsonAsync<AccountEmailVerification>())!;
+        Assert.Equal("kimse@example.com", challenge.Email);
+        Assert.Null(challenge.PreviewCode);
+        Assert.Equal(0, sender.Sent);
+
+        // Known and unknown addresses share the one-minute cooldown, so a repeat cannot tell them apart either.
+        Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync("/api/v1/auth/password-reset", new StartPasswordReset("ayse@example.com"))).StatusCode);
+        foreach (var email in new[] { "kimse@example.com", "ayse@example.com" })
+        {
+            var repeat = await client.PostAsJsonAsync("/api/v1/auth/password-reset", new StartPasswordReset(email));
+            Assert.Equal(HttpStatusCode.TooManyRequests, repeat.StatusCode);
+            Assert.Equal("verification_rate_limited", await Code(repeat));
+        }
+
+        var guess = await client.PostAsJsonAsync("/api/v1/auth/password-reset/confirm", new ConfirmPasswordReset("kimse@example.com", challenge.VerificationId, "123456", "yeni-parola-12"));
+        Assert.Equal(HttpStatusCode.BadRequest, guess.StatusCode);
+        Assert.Equal("verification_failed", await Code(guess));
     }
 
     [Fact]

@@ -62,7 +62,7 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 | İş | Durum | Kanıt / eksik |
 |---|---|---|
 | Üyelik, profil, adres (en çok 10), hesap silme | Tamam | `/api/v1/me/*`, web+mobil (TST-098/099, `1354a08`) |
-| Parola sıfırlama | Yok | Uç ve ekran yok |
+| Parola sıfırlama | Tamam (14.10) | `/auth/password-reset`, web + mobil ekran (TST-117) |
 | Favoriler | Kısmi | Web ve mobil cihazda; sunucu `/me/favorites` yok |
 | Sepet | Kısmi | Tarayıcı/cihaz deposu; kişiselleştirilmiş satır (`49d3f35`, `265c48d`); sunucu sepeti ve `checkout/quote` yok |
 | Sipariş (sunucu fiyatlı, idempotent) | Kısmi | Ödeme almayan demo sipariş, 0003/0005 tabloları; stok rezervasyonu yok |
@@ -73,7 +73,7 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 | Bildirim (e-posta/SMS/push) | Kısmi | Bildirim merkezi, SMTP, kuyruk; Netgsm test erişimi ve Firebase yok |
 | Yasal onay kaydı, İYS izni | Bloke | D10/D11 |
 
-**Sonraki adım:** parola sıfırlama (karar gerektirmez); ödeme için D03/D05 kararı.
+**Sonraki adım:** ödeme için D03/D05 kararı; karar gerektirmeyen iş olarak sunucu tarafı sepet.
 
 ## 6. Yedi rol inceleme ve PM son kapısı
 

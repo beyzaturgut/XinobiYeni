@@ -88,7 +88,7 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 |---|---|---|
 | 03.01 | Tamam | README, pnpm/dotnet araç zinciri, `pnpm dev:local:background` |
 | 03.02 | Tamam | `/api/v1/health/live|ready`, `RequestCorrelationMiddleware`, OpenAPI + TS/Dart istemcileri |
-| 03.03 | Kısmi | Kayıt/giriş/yenileme/çıkış, e-posta doğrulama kodu, web cookie+CSRF, mobil refresh (TST-098/099). **Parola sıfırlama ve yönetici daveti/rol atama ekranı yok** |
+| 03.03 | Kısmi | Kayıt/giriş/yenileme/çıkış, e-posta doğrulama kodu, web cookie+CSRF, mobil refresh (TST-098/099); **parola sıfırlama 14.10’da eklendi** (hesap ifşa etmez, tüm oturumları kapatır; web+mobil, [TST-117](../test/2026-10-14/TST-117-password-reset.md)). Eksik: yönetici daveti/rol atama ekranı |
 | 03.04 | Tamam | İzin kataloğu, `RequirePermission`, panel uçları personel oturumuna bağlı (`12f543c`, TST-100/114) |
 | 03.05 | Tamam | 0001 XinobiYeniDB’ye uygulandı (TST-110) |
 | 03.06 | Kısmi (14.10) | `AuditMiddleware` panel/yönetim değişiklik denemelerini (başarılı, 4xx, 401/403, 5xx) aktör/işlem/kayıt/sonuç/istek no ile `ops.AuditLogs`’a yazar, gövde saklanmaz; `GET /local-commerce/audit` yalnız `audit.read`; panelde Denetim kaydı ([TST-116](../test/2026-10-14/TST-116-audit-trail.md)). Eksik: alan bazlı önce/sonra farkı ve rol alanı |
@@ -99,7 +99,7 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 | 03.11 | Kısmi | Katalog, hesap, sipariş, özellik belgeleri SQL’de (TST-113); canlı IIS SQL katalog (DEPLOY-008 hazırlandı). Sepet tarayıcıda (`xinobi-cart-v1`), XINOBI U oturumları SQL’de değil, `state.json` Development’ta duruyor |
 | 03.12 | Kısmi | T-03/T-05/T-06 kapandı (ADR-004); T-07, T-08, T-09 (yalnız `XinobiU:Enabled`/`Features:*` ayarları), T-10, T-11 açık |
 
-**Sonraki adım:** 03.03 parola sıfırlama (karar gerektirmez).
+**Sonraki adım:** yönetici daveti ve rol atama ekranı (03.03/03.04); 03.10 restore provası.
 
 ## 7. Yedi rol kontrolü ve PM son kararı
 

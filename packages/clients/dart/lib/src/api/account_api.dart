@@ -16,6 +16,7 @@ import 'package:xinobi_api_client/src/model/auth_session.dart';
 import 'package:xinobi_api_client/src/model/cancel_my_order.dart';
 import 'package:xinobi_api_client/src/model/change_my_password.dart';
 import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
+import 'package:xinobi_api_client/src/model/confirm_password_reset.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
 import 'package:xinobi_api_client/src/model/customer_order.dart';
 import 'package:xinobi_api_client/src/model/delete_my_account.dart';
@@ -39,6 +40,7 @@ import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
+import 'package:xinobi_api_client/src/model/start_password_reset.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 
@@ -430,6 +432,73 @@ class AccountApi {
       statusMessage: _response.statusMessage,
       extra: _response.extra,
     );
+  }
+
+  /// confirmPasswordReset
+  ///
+  ///
+  /// Parameters:
+  /// * [confirmPasswordReset]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future]
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<void>> confirmPasswordReset({
+    required ConfirmPasswordReset confirmPasswordReset,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/auth/password-reset/confirm';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(ConfirmPasswordReset);
+      _bodyData = _serializers.serialize(confirmPasswordReset, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    return _response;
   }
 
   /// deleteMyAccount
@@ -2730,6 +2799,101 @@ class AccountApi {
     try {
       const _type = FullType(StartEmailChange);
       _bodyData = _serializers.serialize(startEmailChange, specifiedType: _type);
+
+    } catch(error, stackTrace) {
+      throw DioException(
+         requestOptions: _options.compose(
+          _dio.options,
+          _path,
+        ),
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    final _response = await _dio.request<Object>(
+      _path,
+      data: _bodyData,
+      options: _options,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AccountEmailVerification? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(AccountEmailVerification),
+      ) as AccountEmailVerification;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AccountEmailVerification>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// startPasswordReset
+  ///
+  ///
+  /// Parameters:
+  /// * [startPasswordReset]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AccountEmailVerification] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AccountEmailVerification>> startPasswordReset({
+    required StartPasswordReset startPasswordReset,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/auth/password-reset';
+    final _options = Options(
+      method: r'POST',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      contentType: 'application/json',
+      validateStatus: validateStatus,
+    );
+
+    dynamic _bodyData;
+
+    try {
+      const _type = FullType(StartPasswordReset);
+      _bodyData = _serializers.serialize(startPasswordReset, specifiedType: _type);
 
     } catch(error, stackTrace) {
       throw DioException(

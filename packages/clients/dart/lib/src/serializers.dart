@@ -38,6 +38,7 @@ import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
 import 'package:xinobi_api_client/src/model/change_my_password.dart';
 import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
+import 'package:xinobi_api_client/src/model/confirm_password_reset.dart';
 import 'package:xinobi_api_client/src/model/create_quote.dart';
 import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
@@ -93,6 +94,7 @@ import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
+import 'package:xinobi_api_client/src/model/start_password_reset.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
 import 'package:xinobi_api_client/src/model/track_quote_message.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
@@ -133,6 +135,7 @@ part 'serializers.g.dart';
   CategoryList,
   ChangeMyPassword,
   ConfirmEmailChange,
+  ConfirmPasswordReset,
   CreateQuote,
   CreateXinobiUSession,
   CustomerAddress,
@@ -188,6 +191,7 @@ part 'serializers.g.dart';
   SaveDesignFromSession,
   StartAccountEmailVerification,
   StartEmailChange,
+  StartPasswordReset,
   SubmitReview,
   TrackQuoteMessage,
   UpdateMyAccount,

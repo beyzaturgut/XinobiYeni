@@ -28,7 +28,11 @@ public sealed class EmailVerificationStore(IVerificationEmailSender sender, Time
     }
     private static byte[] Hash(string id, string code) => SHA256.HashData(Encoding.UTF8.GetBytes(id + ":" + code));
 
-    public async Task<VerificationChallenge> Start(string email, CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Sends a code to <paramref name="email"/>. With <paramref name="deliver"/> false nothing is sent but the challenge, cooldown
+    /// and answer look the same, so a password reset for an unknown address cannot be told apart from a real one.
+    /// </summary>
+    public async Task<VerificationChallenge> Start(string email, CancellationToken cancellationToken = default, VerificationPurpose purpose = VerificationPurpose.Email, bool deliver = true)
     {
         email = Normalize(email);
         if (!sender.IsConfigured) throw new EmailVerificationException("E-posta gönderimi henüz yapılandırılmadı. Lütfen daha sonra tekrar dene.", 503);
@@ -42,10 +46,10 @@ public sealed class EmailVerificationStore(IVerificationEmailSender sender, Time
             if (entries.Count >= 1000) throw new EmailVerificationException("Çok fazla istek var. Lütfen daha sonra tekrar dene.", 429);
             var id = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
             var code = RandomNumberGenerator.GetInt32(1000000).ToString("D6");
-            await sender.Send(email, code, cancellationToken);
+            if (deliver) await sender.Send(email, code, purpose, cancellationToken);
             foreach (var key in entries.Where(pair => pair.Value.Email == email).Select(pair => pair.Key).ToArray()) entries.Remove(key);
             entries[id] = new(email, Hash(id, code), now.AddMinutes(10), now);
-            return new(id, email, now.AddMinutes(10), sender.IsPreview ? code : null);
+            return new(id, email, now.AddMinutes(10), sender.IsPreview && deliver ? code : null);
         }
         finally { gate.Release(); }
     }

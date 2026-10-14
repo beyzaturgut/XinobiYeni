@@ -100,6 +100,43 @@
 .productPreview { width: min(82%, calc(min(67vh, 610px) * var(--source-aspect, .66625))); aspect-ratio: 1066 / 1600; position: relative; z-index: 1; }
 .productPreview > canvas { display: block; width: 100%; height: 100%; }
 .productPreview > canvas[hidden] { display: none; }
+.artworkOverlay { position: absolute; inset: 0; z-index: 3; }
+.xinobiPreview .artworkOverlay > .productPreview { width: 100%; height: 100%; max-width: none; max-height: none; }
+.previewVariants { padding: 12px 18px; min-width: 0; }
+.previewVariants p { font-size: .8rem; overflow-wrap: anywhere; }
+.previewVariants fieldset { min-width: 0; }
+.previewVariants fieldset > div { flex-wrap: wrap; }
+/* Compact swatches are scoped to preview; the product/color-selection pages
+   retain their existing detailStyles. Keep the whole button touchable at 44px. */
+.previewVariants fieldset { margin: 0; padding: 0; }
+.previewVariants fieldset legend { margin-bottom: 8px; font-size: .78rem; }
+.previewVariants fieldset > div { display: flex; gap: 8px; }
+.previewVariants fieldset button {
+  flex: 0 1 76px;
+  min-width: 0;
+  max-width: 84px;
+  min-height: 44px;
+  padding: 3px;
+  gap: 5px;
+  border: 0;
+}
+.previewVariants fieldset button[aria-pressed="true"] { padding: 3px; border: 0; }
+.previewVariants fieldset button > span {
+  width: 38px;
+  height: 38px;
+  margin: 3px;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #c6c6c6;
+}
+.previewVariants fieldset button[aria-pressed="true"] > span {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+}
+.previewVariants fieldset button small { font-size: .68rem; line-height: 1.3; }
+.previewVariants p { margin: 8px 0 0; }
+@media (max-width: 680px) {
+  .previewVariants { padding: 10px 12px; }
+  .previewVariants fieldset > div { gap: 4px; }
+  .previewVariants fieldset button { flex-basis: calc((100% - 12px) / 4); }
+}
 .previewMessage { position: absolute; inset: 0; display: grid; place-items: center; padding: 18px; border: 1px solid var(--color-line); background: var(--color-surface); color: var(--color-muted); text-align: center; }
 .previewMessage p { margin: 0; font-size: .69rem; line-height: 1.5; }
 .previewStatus { min-height: 65vh; padding: clamp(24px, 5vw, 64px); background: var(--color-paper, #f4f6f5); }
@@ -114,6 +151,24 @@
 @media(max-width:680px){.productPreview{width:min(96%,calc(500px * 1066 / 1600))}}
 
 .representativeBadge { display: inline-block; margin-top: 8px; padding: 5px 9px; border: 1px solid #b0b0b0; border-radius: 6px; background: #fff; color: #262626; font-size: .7rem; line-height: 1.4; }
+
+/* Only XINOBI U preview entry points opt in; the shopping editor is unchanged. */
+.xinobiPreview .canvasSection { grid-template-rows: 52px auto minmax(0,1fr) 38px; }
+.previewHeading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 18px; min-width: 0; }
+.xinobiPreview .previewHeading h1 { margin: 0; font-size: .85rem; overflow-wrap: anywhere; }
+.previewHeading .representativeBadge { margin: 0; flex-shrink: 0; }
+@media (max-width: 1050px) {
+  .xinobiPreview .properties { grid-column: 1 / -1; }
+}
+@media (max-width: 680px) {
+  .xinobiPreview { min-height: 0; }
+  .xinobiPreview .tools { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .xinobiPreview .canvasSection { min-height: 0; display: block; overflow: visible; }
+  .xinobiPreview .canvasHeading { position: static; }
+  .xinobiPreview .productStage { min-height: 0; }
+  .xinobiPreview .canvasDisclaimer { position: static; margin-top: 12px; }
+  .xinobiPreview .canvasToolbar { min-height: 52px; flex-wrap: wrap; }
+}
 
 @media (max-width: 680px) {
   .mobilePreviewPage {

@@ -20,7 +20,7 @@ function Selection({product,variant}:{product:string;variant:string}){
   <section role="status">
    {!product||!variant?<p>Devam etmek için bir ürün ve varyant seçin.</p>:status==="loading"?<p>Ürün hazırlanıyor…</p>:status==="ready"?null:status==="error"?<p>Ürün önizlemesi yüklenemedi. Yeniden deneyin.</p>:<><p>Bu renk için kişiselleştirme henüz kullanılamıyor.</p><p>Başka bir ürünün veya rengin maskesi kullanılmaz.</p></>}
   </section>
-  {status==="ready"&&inputs&&<LocalPatternPreview inputs={inputs}/>}
+  {status==="ready"&&inputs&&<LocalPatternPreview xinobiPreview inputs={inputs}/>}
   <div className={styles.entryActions}><Link href="/xinobi-u">Başka ürün seç →</Link>{product&&variant&&<Link href={"/xinobi-u/sorular?"+identity}>Tarzını Keşfet →</Link>}</div>
  </main>;
 }

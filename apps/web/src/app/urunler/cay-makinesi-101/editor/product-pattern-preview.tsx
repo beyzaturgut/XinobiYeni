@@ -32,6 +32,9 @@ type ProductPatternPreviewProps = {
   brandingOverlaySrc?: string;
   patternSrc: string;
   placementMode?: "pattern" | "artwork";
+  /** A single artwork overlay uses the existing mask/warp, without repainting the product. */
+  transparentProduct?: boolean;
+  children?: React.ReactNode;
   onArtworkMove?: (x: number, y: number) => void;
   patternTransform: PatternTransform;
   /** Optional offsets composed over the existing shared controls. x/y add pixels, scale multiplies, rotation adds degrees. */
@@ -95,7 +98,7 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", transparentProduct = false, children, onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
   const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
   const ASSET_WIDTH = assetWidth, ASSET_HEIGHT = assetHeight;
   const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
@@ -239,11 +242,13 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     buffer.drawImage(mask, 0, 0);
     buffer.restore();
     context.clearRect(0, 0, SOURCE_WIDTH, SOURCE_HEIGHT);
-    context.drawImage(product, 0, 0);
+    if (!transparentProduct) context.drawImage(product, 0, 0);
     context.drawImage(patternBuffer, 0, 0);
-    if (branding) context.drawImage(branding, 0, 0);
+    // The base preview already restores branding. An overlay must not blend its
+    // antialiased logo pixels a second time; artwork remains inside the mask.
+    if (branding && !transparentProduct) context.drawImage(branding, 0, 0);
     onRendered?.(canvasRef.current!);
-  }, [result, status, x, y, scale, rotation, bodyPlacementAdjustments, curvatureStrength, placementMode, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, effectiveSurfaceInkExposureStops, onRendered]);
+  }, [result, status, x, y, scale, rotation, bodyPlacementAdjustments, curvatureStrength, placementMode, transparentProduct, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, effectiveSurfaceInkExposureStops, onRendered]);
 
   // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.
   const draggable = placementMode === "artwork" && !!onArtworkMove && status === "ready";
@@ -281,5 +286,6 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     {status !== "ready" && <div className={styles.previewMessage} role={status === "error" ? "alert" : "status"}>
       <p>{status === "error" ? "Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin." : "Ürün önizlemesi hazırlanıyor…"}</p>
     </div>}
+    {status === "ready" && children}
   </div>;
 }

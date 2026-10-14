@@ -1,6 +1,6 @@
 # Faz04 — Ürün kataloğu, içerik ve yayın
 
-**Durum:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
+**Durum (14.10.2026):** Devam · geliştirme ~45 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
 
 ## 1. Amaç, bağımlılık, sınır
 
@@ -69,6 +69,28 @@ Web Designer, Analiz2 K-01–K-11 ana sayfa sırası ve etkileşimini Faz02'de o
 **Kabul kapısı:** Gerçek Xinobi katalog örnekleriyle en az bir çok varyantlı/çok depolu ürün ve kampanyalı ürün panelden yayınlanıp webde ve sözleşme seviyesinde mobilde aynı kimlik/fiyat/stok bağını gösterir. Kaynak listedeki panel/katalog/CMS/SEO alt maddelerinin her biri ekran, API ve test kanıtıyla izlenir. Eksik kararlar Faz00'da blokajdır. PM, tasarım ve uygulama kanıtını kabul etmeden Faz05/06 bu temele dayanarak kapatılmaz.
 
 **Teslim kanıtı:** migration ve geri alma notu; OpenAPI ve örnek istek/yanıt; onaylı Creative/prototip/FE teslimi; ekran kayıtları; medya lisans ve gerçek ürün görsel eşlemesi; birim/entegrasyon/erişilebilirlik/SEO test sonuçları; rol/denetim testi; Faz00 değişiklik/karar/commit ve sonraki adım kaydı.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~45 % · kalan ~55 % · Statü: Devam (D02/D13 açık)**
+
+| İş | Durum | Kanıt / eksik |
+|---|---|---|
+| Kategori/ürün/varyant/fiyat/stok şeması | Kısmi | 0002 CatalogCommerce (6 tablo) uygulandı; marka, doküman, depo bazlı stok, `InventoryMovement`, `ChannelPrice`, kampanya/kupon, CMS tabloları yok |
+| Katalog API ve panel CRUD | Kısmi | Panel ürün/varyant/fiyat/kategori/galeri, production’da korumalı SQL yönetimi (`81543aa`); yayın doğrulaması ve audit yok |
+| Web katalog, arama, filtre, karşılaştırma, ürün detay | Tamam | `/urunler`, `/arama`, `/karsilastir`; renk/varyant galerisi; TST-108 |
+| Ana sayfa içerik ve duyurular | Tamam | Panelden kategori görseli, öne çıkan ürünler, duyurular |
+| Kampanya/kupon | Yok | Panelde yalnız fiyat önizleme prototipi (TST-081) |
+| CMS sayfa/blog/SSS/iletişim formu | Yok | Yalnız `/yasal` ve `/xinobi` (Hakkımızda) |
+| SEO (sitemap, robots, canonical, yapılandırılmış veri) ve analitik | Yok | — |
+| Medya kütüphanesi | Yok | Dosyalar `IFileStore`’da, kütüphane ekranı yok |
+| İlk katalog içe aktarma (CSV), 301 haritası | Yok | — |
+| Gerçek dashboard ve temel rapor | Kısmi | Panel dashboard prototip ağırlıklı |
+| Desenler | Bloke | D13 |
+
+**Sonraki adım:** sitemap/robots/ürün yapılandırılmış verisi (karar gerektirmeyen bağımsız iş).
 
 ## 6. Yedi rol inceleme ve onay kapısı
 

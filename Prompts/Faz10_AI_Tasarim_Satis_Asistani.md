@@ -57,6 +57,28 @@ API önerisi: `POST /api/v1/ai/design-jobs` (prompt, tema, renk, stil, sektör, 
 
 Kanıt paketi: müşteri D05/D08/D10 kayıtları; Creative handoff ve FE kabulü; migration ve OpenAPI farkı; otomatik test komutları/sonuçları; gerçek sağlayıcı iş/ücret referansları maskelenmiş örnek; ürün-tasarım-sipariş sürümü; asistan kaynak/lead/devir UAT ekranları; güvenlik ve yetki testleri. Gerçek servis yoksa bu faz `Bloke` kalır; mock çıktısı canlı kabul yerine yazılmaz.
 
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~50 % · kalan ~50 % · Statü: Devam (D05/D08/D10 açık)**
+
+| ID | Durum | Kanıt / eksik |
+|---|---|---|
+| 10.01 | Bloke | D05/D08/D10 kararları yok |
+| 10.01A | Kısmi | ADR-002 + Ek A/B/C; CTO PoC ve çıkış planı kaydı yok |
+| 10.02 | Kısmi | `design/ai-spec.md`, `docs/xinobi-u-art-direction.md` (`324d129`); FE kabul kaydı yok |
+| 10.03 | Kısmi | AI verisi özellik belgelerinde (0004); XINOBI U oturumları SQL’de değil |
+| 10.04 | Kısmi | Günlük üretim sınırı (30/gün); moderasyon, transaction’lı kota ve ücret ölçümü yok |
+| 10.05 | Kısmi | Anket → Cloudflare üretim (web+mobil); alternatif sayısı D08, arka plan kaldırma/genişletme yok |
+| 10.06 | Kısmi | Onaylı yüzeyde önizleme, hesaba kaydet, sepete ekle (`49d3f35`); `DesignVersion`/baskı kontrolü Faz06’ya bağlı |
+| 10.07 | Kısmi | Nobi katalog bilgisi, bilgi kaynağı yönetimi; canlıda 503 (DEPLOY-010 bekliyor) |
+| 10.08 | Kısmi | Öneri, lead, insana devir; WhatsApp numarası yok |
+| 10.09 | Kısmi | Panel AI politika/bilgi/konuşma/lead/kullanım ekranları |
+| 10.09A | Yok | Soru havuzu yönetimi panelde yok |
+| 10.09B | Kısmi | `XinobiU:Enabled` ve `Features:*` ayarları; T-09 resmi bayrak mekanizması yok |
+| 10.10 | Yok | Rol/PM kapısı ve maliyet kontrolü |
+
 ## 5. Kesintiden devam ve rol kapıları
 
 Faz00'a son doğrulanmış commit/test, aktif iş ID/job status, kota rezervasyonu, providerRef, worker son deneme ve hata, prompt/kaynak sürümü, açık D kararı, sonraki **tek** güvenli işlem yaz. Yeniden başlarken `git status`, migration, iş DB kaydı ve sağlayıcı durumunu kontrol et; aynı üretim isteğini kör tekrar edip çift masraf çıkarma. Sağlayıcı sonuç vermiş ama callback kaybolmuşsa durumunu uzlaştır, sonra kota kesinleştir/iade et. Görüşme/lead tekrarında mevcut ID'yi sorgula. Gizli anahtar, prompt içine konmuş kişisel veri ve müşteri konuşması Faz00'a yapıştırılmaz.

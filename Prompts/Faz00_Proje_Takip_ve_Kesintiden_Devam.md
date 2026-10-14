@@ -122,21 +122,44 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-09 · Claude Code; 07.10 17:37 – 08.10 17:12 kayıt açığı (52 commit) geri dolduruldu |
-| Aktif faz/görev ID | **Faz06 ürün yüzeyleri**: varyant başına maske (Roboflow/fırça/onay), web ve mobil XINOBI U onaylı yüzeye uygulanıyor. **Faz05 demo**: hesap ayarları, adresler, ödeme almayan sunucu siparişi (web+mobil). Faz03 03.05 SQL uygulaması BLOKE (port); Faz02 web onayı ertelendi (F02-A17) |
-| Repo/branch/HEAD | `main` · uygulama kodu `84bf964`; `feature/product-personalization` `4c5ccb7` ile main'e alındı · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
-| Geliştirme/test/canlı ortamları | macOS + Docker'sız CI; uzak SQL Server 2022 Express ve boş `XinobiYeniDB` TST-017'de doğrulandı ama uygulama henüz SQL Server kullanmıyor; Development verisi `services/api/App_Data/local-commerce/` dosya deposunda; canlı önizleme IIS `109.104.120.91:8014` |
-| Son çalışan uygulama komutu/URL | `pnpm dev:local:background` (API 5003, web 3000, admin 5173; log `/tmp/xinobi-local.log`); mobil `flutter run -d emulator-5554` (Pixel_8). Son birleşik paket DEPLOY-007 `XinobiYeni-deploy-0b02837.zip`, IIS'e aktarım kaydı yok; paketler `paketler/{web,mobil,apk}` |
-| Son test komutu ve sonucu | `4c5ccb7` merge: .NET 281/281 (üç koşu), Flutter 45/45, web/admin tsc+lint+build başarılı. 08.10'daki diğer commit'ler için tarihli `test/` raporu yok. Önceki: TST-102 Flutter 34/34, TST-100 .NET 82/82. Web e2e 107/107 — TST-108 |
-| Değişen dosyalar / migration | Yeni `services/shared/Xinobi.Persistence` (DbContext, migration `20261007090524_InitialCore`), `infra/db/migrations/0001_InitialCore.{idempotent,rollback}.sql`, `PersistenceModelTests`, `dotnet-tools.json`, runbook. Migration **hiçbir veritabanına uygulanmadı** |
-| Aktif hata/yarım iş | SQL Server `109.104.120.91:64019` dışarıdan erişilemiyor (IIS 8014 erişilebilir); migration uygulaması bekliyor. Faz03 03.03 geliştirme deposuyla, 03.04 kod tarafı tamam (TST-100); 03.06–03.08 yok; DEPLOY-004 IIS smoke yapılmadı; HND-01–05, `design/a11y-audit.md`, gerçek rol incelemesi ve D kararları açık; **web e2e eski 19 hata giderildi: 107/107** (TST-108); SQL blokajı ayrı olarak açık |
-| Sonraki en küçük güvenli adım | Panel girişi (admin uygulaması `/api/v1/admin/session`) ve panel uçlarının `RequirePermission`'a geçmesi; ya da mobil favoriler. SQL portu açılınca 0001 migration'ı ve hesapların SQL'e taşınması (03.11) |
-| Geri alma / devam noktası | `0a18bba` (TST-088 ile doğrulanmış uygulama kodu); migration ve dış sistem yazımı yok; Cloudflare'a yalnız TST-XINOBI-U-live'daki iki üretim çağrısı yapıldı |
+| Son güncelleme ve sorumlu | 2026-10-14 · Claude Code; 09.10 17:28 – 13.10 17:36 kayıt açığı (31 commit) geri dolduruldu, faz denetimi yapıldı (TST-115) |
+| Aktif faz/görev ID | **Faz06/10 XINOBI U ve kişiselleştirilmiş sepet**: tasarım ekranlarından sepete ekleme, sepette ürün üzerinde tasarım (web+mobil), mobil onaylı yüzeyler webin yayımlanmış paketinden. **Faz03 03.11 canlı**: IIS’te SQL katalog, HTTPS ARR altında API (DEPLOY-008–010 hazırlandı). Faz02 web onayı ertelendi (F02-A17) |
+| Repo/branch/HEAD | `main` · uygulama kodu `b1573d0`; `feature/xinobi-u-unified-ai-qa` üç kez main’e alındı (`b38d13d`, `57a1969`, `74032cd`) · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Geliştirme/test/canlı ortamları | macOS + Docker’sız CI; uzak SQL Server 2022 Express `XinobiYeniDB` üzerinde 0001–0005 migration’ları uygulandı, yerel API SQL’den okuyor (TST-113/114); canlı önizleme IIS `109.104.120.91` HTTPS 443 (web/admin) + loopback ARR ile API 8024 |
+| Son çalışan uygulama komutu/URL | `pnpm dev:local:background` (API 5003, web 3000, admin 5173; log `/tmp/xinobi-local.log`); mobil `flutter run -d emulator-5554` (Pixel_8). Son hazırlanan paketler DEPLOY-008 (`d1639f6` web+API), DEPLOY-009 (`42dc4d8`), DEPLOY-010 (`dfbc972`); **uzak IIS uygulaması ve canlı smoke kaydı yok** |
+| Son test komutu ve sonucu | TST-115 (14.10, HEAD `b1573d0`): .NET 385 geçti / 13 atlandı / 0 başarısız; Flutter, lint ve TypeScript sonuçları raporda. Önceki: TST-114 .NET 341/4/0, Flutter 50/50; TST-108 web e2e 107/107 |
+| Değişen dosyalar / migration | Migration’lar 0001 InitialCore, 0002 CatalogCommerce, 0003 CustomerIdentityOrders, 0004 FeatureDocuments, 0005 OrderLinePersonalization — **hepsi XinobiYeniDB’ye uygulandı**. 10–13 Ekim’de yeni migration yok |
+| Aktif hata/yarım iş | DEPLOY-008–010 uzak sunucuda uygulanmadı (canlı `/api/v1/assistant/config` 503 `feature_unavailable`, `Features:StorageProvider=SqlServer` bekliyor); yedek VERIFYONLY/restore provası yapılmadı; AuditLog yazımı (03.06), parola sıfırlama, ödeme (D03/D05), baskı alanı/çıktısı (D04/T-04), Mikro ve pazaryerleri yok; `design/a11y-audit.md` yok; §7 rol/PM onayları boş |
+| Sonraki en küçük güvenli adım | DEPLOY-008→010 paketlerini RDP’de yedekleyip uygulamak ve canlı smoke’u DEPLOY kaydına yazmak; ardından 03.06 AuditLog yazımı ve parola sıfırlama. Karar tarafında D03 (ödeme) ve D04 (baskı ölçüsü) sahipleri ve hedef tarihleri |
+| Geri alma / devam noktası | `b1573d0` (TST-115 ile doğrulanmış HEAD); SQL’de 5 migration, geri alma script’leri `infra/db/migrations`; Cloudflare’a yeni çağrı yapılmadı |
+
+### 5.1 Faz ilerleme ve eksik özeti — 14.10.2026
+
+**Ölçüm kuralı:** "Geliştirme %" her faz dosyasındaki görev listesinin kod/belge/test kanıtına göre tahminidir (tamam = 1, kısmi = 0,5 civarı, yok/bloke = 0). "Kabul" §7’deki rol + PM kapısıdır. **Hiçbir faz kabul edilmedi; bu nedenle resmi olarak tamamen biten faz yoktur.** Ayrıntılı görev tabloları ilgili faz dosyasının "Uygulama durumu — 14.10.2026" bölümündedir.
+
+| Faz | Geliştirme % | Kalan % | Statü | Başlıca eksikler |
+|---|---|---|---|---|
+| 00 | 85 | 15 | Devam | Takvim/sprint tablosu boş; D kararlarına sahip ve hedef tarih yazılmadı; §7 rol/PM kayıtları boş |
+| 01 | 45 | 55 | Bloke (müşteri kararları) | D02–D14 açık (D01 kısmi); gerçek as-is görüşme kanıtı, takvim (01.15), veri/geçiş envanteri (01.17), kalite/maliyet hedefleri (01.18) yok |
+| 02 | 60 | 40 | Devam | `design/a11y-audit.md` yok (F02-A07); gerçek cihaz ve ekran okuyucu QA (A01/A02/A16); WEB-001 dışındaki ekran kaynakları (A08); mobil referans ekranlar (A10); BRIEF/ORTAK/WEB TASARIM onayları kayıtsız, A17 ertelendi |
+| 03 | 65 | 35 | Devam | 03.06 AuditLog yazımı yok; parola sıfırlama ve yönetici daveti yok; inbox/dead-letter ve ayrı worker işlevsiz (şablon); zararlı dosya taraması (T-07); yedek doğrulama/restore provası; T-08/09/10/11; sepet hâlâ tarayıcıda |
+| 04 | 45 | 55 | Devam | Kampanya/kupon, depo bazlı stok hareketi, marka/doküman; CMS sayfa/blog/SSS/iletişim formu; sitemap/robots/yapılandırılmış veri; medya kütüphanesi; CSV içe aktarma; 301 haritası; gerçek dashboard/rapor; Desenler (D13) |
+| 05 | 45 | 55 | Bloke (D03/D05/D11) | Ödeme (kart/3DS/havale), sunucu sepeti, stok rezervasyonu, kargo firma/ücret, yasal onay kaydı, İYS izni, iade ödemesi, push gönderimi (Firebase yok), parola sıfırlama |
+| 06 | 40 | 60 | Bloke (D04/T-04) | Fiziksel `PrintArea` (mm), değişmez `DesignVersion`, şablonlar, metin/katman, ön/arka yüz, geri/ileri, baskı çıktısı render işçisi, panelde çıktı indirme, fiyat farkı |
+| 07 | 45 | 55 | Bloke (D07) | Teklif → sipariş dönüşümü, firma/kurumsal başvuru, teklifsiz toplu sipariş, ek dosya, outbox e-posta şablonları, rapor |
+| 08 | 5 | 95 | Bloke (D02/D06) | Yalnız panel prototip ekranı; `IMikroClient`, eşleme/senkron/mutabakat yok |
+| 09 | 5 | 95 | Bloke (D06) | Yalnız panel prototip ekranı; Trendyol/Hepsiburada/N11 adaptörleri, merkezi sipariş yok |
+| 10 | 50 | 50 | Devam | Moderasyon, kota/maliyet ölçümü (D08), soru havuzu yönetimi (10.09A), resmi özellik bayrağı (10.09B/T-09), arka plan kaldırma/genişletme, WhatsApp devri, PoC/CTO kaydı |
+| 11 | 20 | 80 | Devam (mobil) | iOS kanıtı, push, ödeme, UAT, güvenlik/yük testi, yedek-geri yükleme provası, mağaza yayını, eğitim, teknik doküman, cutover, D09/D14 |
+
+**Ağırlıksız ortalama geliştirme:** ~43 %. **Kayıtsız adım denetimi (14.10):** `5da3dba..b1573d0` arası 31 commit Faz00’da ve `test/` altında kayıtsızdı → [tasks-2026-10-13-addendum](../docs/tasks/tasks-2026-10-13-addendum.md) ve TST-115 ile kapatıldı. DEPLOY-008/009/010 kayıtları mevcut fakat uzak uygulama/smoke sonucu yok. Faz04–11 dosyalarında daha önce hiç durum notu yoktu; bu denetimle eklendi.
 
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
 |---|---|---|---|---|---|---|---|
+| 2026-10-14 | Faz00 kayıt açığı + faz denetimi | `main` / `b1573d0` → bu commit | 31 kayıtsız commit task kaydına alındı (`docs/tasks/tasks-2026-10-13-addendum.{md,csv}`); Faz00 §5, §5.1, §6, §7 ve Faz01–11 dosyalarına "Uygulama durumu — 14.10.2026" eklendi; kod değişmedi | TST-115: .NET 385/13 atlandı/0, Flutter analyze temiz + 55/55, lint + web/admin tsc temiz | `test/2026-10-14/TST-115-*` | DEPLOY-008–010’u RDP’de uygula ve canlı smoke yaz; 03.06 AuditLog | Claude Code |
+| 2026-10-13 09:37–17:36 · *geri dolduruldu* | Faz06/10 XINOBI U, Faz05 sepet, Faz03 canlı SQL, dağıtım | `5da3dba` → `b1573d0` (27 commit + 4 branch commit’i, 3 merge) | Aslı Aydın’ın `feature/xinobi-u-unified-ai-qa` branch’i üç kez alındı (çoklu maske, aile maske aktarımı, kabul edilmiş yüzey fixture’ları, mobil dinamik önizleme, görsel yükleme); panelde production SQL katalog yönetimi (`81543aa`); API HTTPS site altında IIS ARR (`c88ea3e`); vitrin canlı SQL kataloğu (`d1639f6`); IIS SQL hesapları, medya ve WebDAV onarımı (`c59c423`, `c6c889c`); Nobi aynı köken API (`dfbc972`); onaylı yüzey yayını (`88d80e0`, `a7ff0e8`); demo ürünlerin kaldırılması (`2bb0b6d`); tasarım ekranlarından sepete ekleme ve sepette tasarım gösterimi (`49d3f35`, `265c48d`); sanat yönleri (`324d129`); mobil yayımlanmış yüzeyler (`b1573d0`) | Commit anında tarihli rapor yok; `74032cd` mesajında Flutter 54 test, analyze, web tsc+lint. Geriye dönük TST-115 başarılı | `docs/tasks/tasks-2026-10-13-addendum.md`, DEPLOY-008–010 | Uzak IIS uygulaması ve canlı smoke | Beyza Turgut, Aslı Aydın (Codex: DEPLOY kayıtları); kayıt: Claude Code |
 | 2026-10-09 | Faz00 kayıt açığı | `main` / `84bf964` → bu commit | 07.10 17:37 – 08.10 17:12 arasındaki 52 commit (merge dahil ana hatta 45 + merge ile gelen 7 branch commit'i) aşağıda beş satırda geri dolduruldu; Anlık durum tablosu güncellendi; kod değişmedi | Belge değişikliği; test yok. Yerel stack (API 5003, web 3000, admin 5173) ve Pixel_8 emülatörü açıldı | Bu satır, commit mesajları, DEPLOY-005–007 | Varyant yüzey maskeleme ve hesap/sipariş demosu için tarihli test raporu; web e2e 19 hata | Claude Code |
 | 2026-10-08 16:26–17:12 · *geri dolduruldu* | Faz06 ürün yüzeyleri / kişiselleştirme | `85d3752` → `84bf964` (merge + 4 commit) | `feature/product-personalization` main'e alındı (`4c5ccb7`; Aslı Aydın'ın 7 commit'i: panelde yüzey inceleme, kabul edilmiş yüzey önizlemesi, kendi görselini kullan ve önizlemede sürükleme). Merge düzeltmeleri: branch'in Development uçlarına `AllowAnonymous` (yalnız Development + loopback + bayrak), ana sayfa XINOBI U örneği statik fotoğrafa düşer. Varyant başına yüzey maskesi API'si: Roboflow SAM3 metin/nokta, fırça, onay/geri alma/eskime, günde en çok 50 çağrı, anahtar user-secrets'ta (`1cdd475`); panelde **Ürün yüzeyleri** ekranı (`cb3a303`); web (`ba166e1`) ve mobil (`84bf964`) XINOBI U tasarımı onaylı yüzeye kırpılır | Merge commit'i: .NET 281/281 (üç koşu), Flutter 45/45, analyze temiz; web/admin tsc, lint ve production build başarılı. Sonraki 4 commit için tarihli rapor yok; testlerde Roboflow sahte | TST-106 (branch entegrasyonu), `4c5ccb7` mesajı | Gerçek Roboflow ile bir varyantı maskeleyip onaylama ve web/mobil önizlemesini tarihli raporla doğrulama | Claude Code; branch: Aslı Aydın |
 | 2026-10-08 14:16–16:13 · *geri dolduruldu* | Faz05 hesap ve demo sipariş / Faz02 Hakkımızda | `0689f9b` → `85d3752` (15 commit) | Xinobi dünyası: metin sayfası denendi, proje sahibi isteğiyle geri alındı (`8d59e96`, `9c8756e`); sonra `Hakkımızda.docx` metniyle sade sayfa ve ana sayfanın siyah footer'ı (`2621e34`, `2566f69`, `825b7bd`). Hesap: ad değiştirme ve parola değişikliği (`32cce9b`); mobil ve web hesap sayfaları gerçek ayarlarla yeniden kuruldu (`0518fa6`, `6862ef1`, `866c42b`). `/api/v1/me`: telefon, kodla e-posta değişikliği, hesap silme, en çok 10 adres, ödeme almayan sunucu fiyatlı demo sipariş ve idempotent istek kimliği (`1354a08`); mobil (`31139ef`) ve web (`f91479f`) bunlara bağlandı. Sipariş görseli istek başına çözümleniyor (`b450604`); katalog kartında `swatchHex` (`c87af64`); release mobilde yalnız test sunucusuna cleartext istisnası (`85d3752`, proje sahibi onaylı) | Commit anında tarihli rapor yok | Commit mesajları | D03 ödeme kararı; yasal metinler; hesap/sipariş akışı için e2e raporu | Claude Code |
@@ -275,7 +298,7 @@ Tek sonraki işlem:
 | ADR-003 / 2026-10-07 | Development'ta SQL Server yerine `services/api/App_Data/local-commerce/state.json` dosya deposu ve tarayıcı localStorage demo hesap/sipariş kaydı; yalnız Development/loopback | Faz03 çekirdeği olmadan demo ilerletme | Faz03–05/10; `docs/decisions/ADR-003-gecici-yerel-ticaret-deposu.md` | TST-088; SQL Server'a geçiş Faz03 03.11 | **Proje sahibi onayladı · 07.10.2026** |
 | ADR-002 Ek A / 2026-10-07 | Cloudflare Workers AI gerçek adaptörü ve ücretli çağrı Faz10 kapısından (D05/D08/D10, PoC) önce eklendi (`3db452e`); yalnız Development/loopback, 30/gün | Kullanıcı isteğiyle XINOBI U canlı denemesi | Faz10 10.01A–10.05; `docs/decisions/ADR-002-cloudflare-workers-ai.md` Ek A | TST-XINOBI-U-live; yalnız Development; production'a Faz10 kapısıyla | **Proje sahibi onayladı · 07.10.2026** |
 
-**Plan–kod sapma kaydı (2026-10-07 incelemesi):** (1) Faz03'ün EF Core DbContext/migration, kimlik, rol, audit ve outbox çekirdeği henüz yok; web ve panelin büyük kısmı geçici dosya deposu üzerinde çalışıyor. (2) Faz02 aktifken Faz04/05/06/10 işlevleri demo olarak kodlandı; bu kodlar ilgili fazın kabulü sayılmaz, faz başlarken yeniden doğrulanır. (3) Faz02'nin zorunlu çıktısı `design/a11y-audit.md` yok; BRIEF / ORTAK TASARIM / WEB TASARIM onayları bu tabloya işlenmedi. Bu üç madde kapanmadan ilgili faz kapısı açılmaz.
+**Plan–kod sapma kaydı (2026-10-07 incelemesi):** (1) Faz03'ün EF Core DbContext/migration, kimlik, rol, audit ve outbox çekirdeği henüz yok; web ve panelin büyük kısmı geçici dosya deposu üzerinde çalışıyor. (2) Faz02 aktifken Faz04/05/06/10 işlevleri demo olarak kodlandı; bu kodlar ilgili fazın kabulü sayılmaz, faz başlarken yeniden doğrulanır. (3) Faz02'nin zorunlu çıktısı `design/a11y-audit.md` yok; BRIEF / ORTAK TASARIM / WEB TASARIM onayları bu tabloya işlenmedi. Bu üç madde kapanmadan ilgili faz kapısı açılmaz. **14.10.2026 güncellemesi:** (1) kısmen kapandı — DbContext, 5 migration, kimlik/rol ve outbox sahiplenme SQL’de; audit yazımı, inbox işleyicisi ve ayrı worker hâlâ yok. (2) aynen geçerli; demo kodun büyük kısmı artık SQL’e bağlı ama faz kabulü yok. (3) aynen açık.
 
 Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: problem, kaynak maddesi, seçenekler, karar/sahip/tarih, güvenlik/veri etkisi, geriye dönüş, test, etkilenen fazlar. Sözleşme ya da şema değişince ilgili önceki fazın regresyonunu yeniden çalıştır; Faz00 satırı ve Faz dosyası bağlantısını güncelle.
 
@@ -284,10 +307,10 @@ Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: prob
 | Tür | Komut / ortam | Son sonuç / tarih |
 |---|---|---|
 | API başlatma | `dotnet run --project services/api/Xinobi.Api.csproj` | Sağlık ucu doğrulandı · 2026-09-29 |
-| Web/panel/mobil başlatma | `pnpm --filter web dev`; `pnpm --filter admin dev`; `cd apps/mobile && flutter run` | Web/panel production build ve mobil analyze/test başarılı; cihaz çalıştırması bekliyor |
-| Veritabanı migration/seed | Bekliyor: Faz03 komutu; önce yedek/ortam denetimi | Çalıştırılmadı |
-| Birim/entegrasyon/e2e | `dotnet test XinobiYeni.slnx`; `pnpm lint && pnpm build`; `cd apps/mobile && flutter analyze && flutter test` | Başarılı · 2026-09-29; gerçek SQL ve cihaz entegrasyonu bekliyor |
-| Geri yükleme/rollback | Bekliyor: Faz03 ve Faz11 prosedürü | Denenmedi |
+| Web/panel/mobil başlatma | `pnpm dev:local:background`; `cd apps/mobile && flutter run -d emulator-5554` | Android emülatörde çalışıyor (TST-095–107); iOS cihaz çalıştırması yok |
+| Veritabanı migration/seed | `infra/db/migrations/000N_*.idempotent.sql` (sqlcmd, runbook `docs/runbooks/database-migrations.md`) | 0001–0005 XinobiYeniDB’ye uygulandı · 2026-10-09 (TST-110/113/114) |
+| Birim/entegrasyon/e2e | `dotnet test XinobiYeni.slnx`; `pnpm lint`; web/admin `tsc`; `cd apps/mobile && flutter analyze && flutter test`; web e2e `apps/web/tests/e2e` | 385/13 atlandı/0, Flutter 55/55, lint/tsc temiz · 2026-10-14 (TST-115); web e2e 107/107 · 2026-10-09 (TST-108) |
+| Geri yükleme/rollback | `infra/db/migrations/*.rollback.sql`; yedek doğrulama `tools/sql/verify-catalog-backup.sql` | Rollback script’leri var; VERIFYONLY Msg262 yetki hatası, restore provası **denenmedi** |
 
 ## 7. Faz kabul kayıtları — gerçek uygulamada doldur
 
@@ -295,20 +318,20 @@ Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: prob
 
 | Faz | Kod/teslim kanıtı | BA | Creative | FE | BE | DBA | Full Stack | Web Des. | CTO | PM nihai | Statü |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 00 | Plan var; uygulama kabulü yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
-| 01 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Planlandı |
-| 02 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Planlandı |
-| 03 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Planlandı |
-| 04 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Planlandı |
-| 05 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
-| 06 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Planlandı |
-| 07 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
-| 08 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
-| 09 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Planlandı |
-| 10 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Planlandı |
-| 11 | — | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Planlandı |
+| 00 | Defter, ADR-001–004, test/INDEX, task dökümleri; TST-115 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Devam |
+| 01 | `docs/discovery/*` (368 satır izlenebilirlik, karar defteri, as-is/to-be, sözleşme taslağı); D kararları açık | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Bloke |
+| 02 | `design/*` (tokens, components, flows, editor/ai-spec, handoff, WEB-001 hi-fi); TST-053–086 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Devam |
+| 03 | Persistence + 5 migration uygulandı; kimlik/izin/panel girişi; IFileStore; TST-091–114 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Devam |
+| 04 | SQL katalog/varyant/fiyat/stok, panel katalog, galeri; TST-111/113 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Devam |
+| 05 | Hesap, adres, ödemesiz sipariş, iptal/iade talebi, değerlendirme, bildirim; TST-098/099/114 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 06 | Ürün yüzey maskeleri, XINOBI U önizleme, editör, kayıtlı tasarım → sepet/sipariş; TST-106/114 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bloke |
+| 07 | Teklif talep/takip/mesaj/kabul-ret, panel teklifleri; tasks-2026-10-09-addendum | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 08 | Yalnız panel prototip (TST-084) | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 09 | Yalnız panel prototip (TST-084) | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 10 | XINOBI U (Cloudflare, ADR-002 Ek A/B), Nobi + AI yönetimi (Ek C); TST-XINOBI-U-live | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Devam |
+| 11 | Flutter Android uygulaması (TST-095–107, TST-115 55/55); iOS/UAT/yayın yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Devam |
 
-`—` o fazda ek rolün zorunlu kaydı olmadığını gösterir.
+`—` o fazda ek rolün zorunlu kaydı olmadığını gösterir. **14.10.2026:** "Kod/teslim kanıtı" ve statü sütunları güncellendi; rol ve PM hücreleri gerçek inceleme yapılmadığı için `Bekliyor` bırakıldı. Bu nedenle hiçbir faz `Tamamlandı` değildir.
 
 PM her fazda kontrol eder: ① kaynak kapsamı ve Creative/UIUX handoff ② D kararlarının gerçek sahibi ③ kod/şema/API kanıtı ④ otomatik ve manuel test sonucu ⑤ yedi rol incelemesi ⑥ güvenlik, veri, rollback ⑦ Faz00 güncelliği. PM kendi rol incelemesini `PM-İNCELEME: ONAY/RED`, ardından ayrı nihai kararı `PM-KAPI: KABUL/RED` ve iki ayrı kanıt/tarihle aynı hücreye veya bağlantılı tutanağa yazar. Herhangi biri yoksa gerekçe yazıp `RED`; koşullu kabul ile sonraki bağımlı fazı başlatma. Plan dosyaları için ayrı temsili doküman inceleme sonucu aşağıya yazılır; uygulama tablosunu değiştirmez.
 

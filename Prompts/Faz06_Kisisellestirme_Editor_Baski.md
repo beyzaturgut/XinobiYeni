@@ -1,6 +1,6 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
-**Durum:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
+**Durum (14.10.2026):** Bloke (D04) · geliştirme ~40 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
 
 ## 1. Amaç, bağımlılık, karar kapısı
 
@@ -62,6 +62,25 @@ Analiz2 K-12 ve K-14–K-21 için Web Designer iki ayrı giriş yolunu tasarlar:
 **Kabul kapısı:** Xinobi ürün/üretim yetkilisi D04 baskı örneği ve eşikleriyle gerçek baskı dosyası önizleme uyumunu onaylar; basit ve gelişmiş akış, ön/arka/çok alanlı tasarım, sürüm, sepet/checkout/sipariş ve panel indirme uçtan uca gösterilir. Webde ve mobil API sözleşme testlerinde aynı tasarım sürümü kullanılır; mobil uygulama gerçek cihaz kabulü kendi fazında ayrıca kapanır. Kritik taşma/çözünürlük/güvenlik hatası açıksa faz kapatılmaz.
 
 **Teslim kanıtı:** Creative tasarım dosyası/prototip ve FE teslim notu; D04 fiziksel ölçü/çıktı profili kararı; migration/OpenAPI/JSON şema; geometri ve render karşılaştırma vektörleri; ekran ve panel kaydı; örnek sipariş satırı/sürüm/çıktı hash'i; erişim, eşzamanlılık, hatadan dönüş test raporu; Faz00 commit/karar/sonraki adım girdisi.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~40 % · kalan ~60 % · Statü: Bloke (D04, T-04)**
+
+| İş | Durum | Kanıt / eksik |
+|---|---|---|
+| Ürün yüzey maskeleri (Roboflow, fırça, onay, aile aktarımı) | Tamam | ProductSurfaces Step 1–5B, `6ff45a0`, panel Ürün yüzeyleri |
+| Basit kişiselleştirme / XINOBI U önizleme | Tamam | Web + mobil onaylı yüzey renderer (`88d80e0`, `b1573d0`) |
+| Kendi görselini yükleme, taşı/boyut/döndür | Kısmi | Web+mobil (`fe93107`, TST-107); metin, şekil, katman listesi, ön/arka, geri/ileri yok |
+| Kaydet/yeniden aç (Tasarımlarım) | Kısmi | Hesaba bağlı tasarımlar; değişmez `DesignVersion` ve geçmiş yok |
+| Sepet/siparişe tasarım bağlama | Kısmi | Sunucu sahiplik denetimi, siparişe görsel kopyası (`49618a1`); fiyat farkı ve sürüm güncelleme akışı yok |
+| Fiziksel `PrintArea` (mm), DPI/taşma kontrolü | Bloke | D04, T-04 |
+| Şablon kategorisi | Yok | — |
+| Baskı çıktısı render işçisi ve panel indirme | Yok | `PrintOperations.tsx` prototip |
+
+**Sonraki adım:** D04 baskı ölçülerini almak; T-04 tuval birimini karara bağlamak.
 
 ## 6. Yedi rol inceleme ve PM nihai onayı
 

@@ -76,6 +76,25 @@ Web Designer ve Creative Designer, Analiz2 ana sayfa/XINOBI U/Nobi hiyerarşisin
 4. **Mobil mağaza:** İmzalı paket ve yasal varlıklarla iOS/Android başvurularını ayrı izle. Onay/reddin tarihi, build ve mağaza bağlantısını Faz00'a yaz; reddi düzeltip yeniden gönder. Uygulama eski sürümünün API ile çalışma penceresi ve zorunlu güncelleme kararı belgelenir. Proje tam kabulü her iki mağaza yayını ve smoke doğrulamasına bağlıdır.
 5. **Devir:** Katalog, fiyat/stok, ödeme/iade, teklif, baskı, AI ayarı, Mikro/pazaryeri hata düzeltme, yedek/restore ve müşteri destek yolları için adım adım rehber ve eğitim kaydı verilir; erişim en az yetkiyle sahiplerine aktarılır.
 
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~20 % · kalan ~80 % · Statü: Devam (yalnız mobil geliştirme)**
+
+| ID | Durum | Kanıt / eksik |
+|---|---|---|
+| 11.01 | Kısmi | DES-MOB-01; platform bazlı ekran paketi ve handoff kabulü yok |
+| 11.02 | Kısmi | Android emülatör; giriş/çıkış/refresh; iOS kurulum ve otomatik dağıtım yok |
+| 11.03 | Kısmi | Katalog, favori, profil/adres, karşılaştırma, duyurular (Android); kampanya yok |
+| 11.04 | Kısmi | Mobil editör, yükleme, onaylı yüzey (`b1573d0`); D04 karşılaştırması yok |
+| 11.05 | Kısmi | Sepet, ödemesiz sipariş, iptal/iade, teklif; ödeme yok (D03/D05) |
+| 11.06 | Kısmi | XINOBI U ve Nobi mobilde; push (Firebase) ve deep link yok |
+| 11.07–11.11 | Yok | UAT, güvenlik/performans, yayın, GO/NO-GO, mağaza |
+| 11.12–11.16 | Yok | Eğitim, teknik doküman (yalnız runbook’lar var), cutover, güvenlik/yük testi, bakım (D14) |
+
+Ekran matrisi (§2): Android sütununda üyelik, katalog/favori, kişiselleştirme, sepet/sipariş, teklif ve AI için emülatör kanıtı var (TST-095–107); iOS sütunu tamamen `Bekliyor`.
+
 ## 6. Kesintiden devam, kanıt ve zorunlu onay
 
 Faz00'dan son doğrulanmış commit, iOS/Android build numarası ve dağıtım kanalı, API/DB migration, yedek kimliği/geri yükleme provası, her mağaza inceleme durumu, erişimli sağlayıcıların son başarılı olay/cursor'u, bekleyen outbox ve açık müşteri kararı okunur. `git status` ve servis sağlıklarını kontrol et. Son canlı ödeme/sipariş/AI/Mikro/pazaryeri işlemini tekrar etmeden önce iç ve dış işlem ID/durumunu uzlaştır. Başarısız yayın sürümünü yeniden yollamadan önce ret gerekçesi ve değişikliği Faz00'a yaz. Bir sonraki güvenli tek adımı, gerçek komut, beklenen/elde edilen sonucu kaydet.

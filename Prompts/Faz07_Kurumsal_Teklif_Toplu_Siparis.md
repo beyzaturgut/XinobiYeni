@@ -1,6 +1,6 @@
 # Faz07 — Kurumsal teklif ve toplu sipariş
 
-**Durum:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–5, 6.2–6.3, 7–8; müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`; Faz01 D07 kararı. Durum ve kanıtlar Faz00'da tutulur.
+**Durum (14.10.2026):** Bloke (D07) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–5, 6.2–6.3, 7–8; müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`; Faz01 D07 kararı. Durum ve kanıtlar Faz00'da tutulur.
 
 ## Amaç ve sınır
 
@@ -71,6 +71,26 @@ Her engel Faz00'da sahibi, hangi testin engellendiği, güvenli ilerlenebilecek 
 - Web ve panel akışları, teklif sürümü, e-posta sonucu, onaylı dönüşüm ve toplu sipariş bağlantısı F07-T01–T08'de doğrulanmıştır; kaynakta istenen mobil talep F07-T09 ve merkezi operasyon F07-T10 için açık bağımlılık varsa proje geneli bitmiş sayılmaz.
 - Talep yanlışlıkla ücretli siparişe dönüşmez; onaylı sürümden dönüşüm tekrarında tek sipariş üretilir; firma ve panel yetki sınırları korunur.
 - Yedi rolün gerçek inceleme kayıtları alınır; müşteri D07/UAT kararı ayrı belgelenir; PM son kapıyı açık kanıtlara göre onaylar veya blokeyi bildirir.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~45 % · kalan ~55 % · Statü: Bloke (D07)**
+
+| Madde | Durum | Kanıt / eksik |
+|---|---|---|
+| 1 D07 sözleşmesi | Bloke | Geçiş tablosu iş sahibince onaylanmadı |
+| 2 Web/mobil talep formu | Tamam | `/kurumsal/teklif`, mobil teklif ekranları |
+| 3 API | Kısmi | Talep/takip/mesaj/teklif/kabul-ret; `convert-to-order` yok |
+| 4 Veri modeli | Kısmi | Özellik belgesi deposunda (0004); `Company`, ek dosya ve ilişkisel tablolar yok |
+| 5 Panel iş akışı | Kısmi | Teklif listesi/detay/teklif verme; kurumsal müşteri profili yok |
+| 6 E-posta izi | Kısmi | Bildirim kuyruğu; onaylı şablonlar yok |
+| 7 Teklif → sipariş | Bloke | D07 |
+| 8 Mobil | Kısmi | Android emülatör; iOS yok |
+| 9 Kurumsal başvuru | Yok | — |
+| 10 Teklifsiz toplu sipariş | Bloke | D07 model seçimi |
+| 11 Rapor | Yok | — |
 
 ## Yedi rolün inceleme/onay kaydı
 

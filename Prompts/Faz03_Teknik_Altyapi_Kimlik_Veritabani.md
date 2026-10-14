@@ -1,6 +1,6 @@
 # Faz03 — Teknik temel, kimlik ve veritabanı iskeleti
 
-> **Durum:** Plan / uygulanmadı. Bu dosyadaki yedi rol değerlendirmesi bir kontrol listesidir; gerçek kişilerin onayı değildir. Uygulama tamamlanınca kanıt yollarını ve ayrı ayrı kararları doldurun. Son geçişi her koşulda PM verir.
+> **Durum (14.10.2026):** Devam · geliştirme ~65 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Plan / uygulanmadı. Bu dosyadaki yedi rol değerlendirmesi bir kontrol listesidir; gerçek kişilerin onayı değildir. Uygulama tamamlanınca kanıt yollarını ve ayrı ayrı kararları doldurun. Son geçişi her koşulda PM verir.
 
 ## 1. Bağlayıcı kaynak, sınır ve ön koşullar
 
@@ -77,6 +77,29 @@ API: `/api/v1/auth/register|login|refresh|logout|password-reset`, `/api/v1/admin
 **09.10.2026 uygulama güncellemesi:** 03.05 artık gerçek `XinobiYeniDB` üzerinde uygulanmıştır ([TST-110](../test/2026-10-09/TST-110-initial-core-migration-application.md)). Boş hedef ön kontrolü, model/script testleri 12/12, 12 çekirdek tablo ve 1 migration sürümü, ikinci uygulamada aynı metadata ve API SQL readiness başarılı. Önceki SQL erişim blokajı son kontrolde yoktur. İş modülleri ve SQL depoları henüz bağlanmadı; restore provası ve hesap ayrımı bu kanıtla kapanmaz, faz kabulü verilmez.
 
 **09.10.2026 katalog hazırlığı:** [TST-111](../test/2026-10-09/TST-111-sql-catalog-preparation.md): 0002 katalog migration'ı, SQL depo, mevcut sözleşmeyi koruyan facade ve doğrulamalı aktarım hazır; tam .NET 315 geçti / 1 gerçek SQL testi atlandı, Release 0/0. COPY_ONLY/CHECKSUM yedeği alındı; `RESTORE VERIFYONLY` Msg262 sunucu yetkisi nedeniyle başarısız olduğundan DBA kontrolü bekleniyor. Katalog migration'ı, gerçek SQL entegrasyon testi ve yerel aktarım henüz yapılmadı; Development mevcut dosya deposuyla devam eder. Hesap/sipariş ve diğer modüllerin SQL bağlantısı ayrı sonraki işlerdir.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~65 % · kalan ~35 % · Statü: Devam**
+
+| ID | Durum | Kanıt / eksik |
+|---|---|---|
+| 03.01 | Tamam | README, pnpm/dotnet araç zinciri, `pnpm dev:local:background` |
+| 03.02 | Tamam | `/api/v1/health/live|ready`, `RequestCorrelationMiddleware`, OpenAPI + TS/Dart istemcileri |
+| 03.03 | Kısmi | Kayıt/giriş/yenileme/çıkış, e-posta doğrulama kodu, web cookie+CSRF, mobil refresh (TST-098/099). **Parola sıfırlama ve yönetici daveti/rol atama ekranı yok** |
+| 03.04 | Tamam | İzin kataloğu, `RequirePermission`, panel uçları personel oturumuna bağlı (`12f543c`, TST-100/114) |
+| 03.05 | Tamam | 0001 XinobiYeniDB’ye uygulandı (TST-110) |
+| 03.06 | Yok | `AuditLog` tablosu var, hiçbir işlem yazmıyor; okuma ekranı yok |
+| 03.07 | Kısmi | Outbox sahiplenme ve SQL’de işçiler (`7db18d6`); inbox yalnız tablo; dead-letter/panel yok; `services/worker` hâlâ şablon döngü |
+| 03.08 | Kısmi | `IFileStore` (`fa8d720`), MIME/görüntü doğrulama; kısa ömürlü imzalı URL, `/api/v1/media/uploads` finalize sözleşmesi ve zararlı içerik taraması (T-07) yok |
+| 03.09 | Tamam | Panel girişi/rota izinleri, mobil kimlik kabuğu |
+| 03.10 | Kısmi | CI (`.github/workflows/ci.yml`), rate limit, HTTPS ARR (`c88ea3e`); yedek VERIFYONLY Msg262, restore provası ve RPO/RTO yok |
+| 03.11 | Kısmi | Katalog, hesap, sipariş, özellik belgeleri SQL’de (TST-113); canlı IIS SQL katalog (DEPLOY-008 hazırlandı). Sepet tarayıcıda (`xinobi-cart-v1`), XINOBI U oturumları SQL’de değil, `state.json` Development’ta duruyor |
+| 03.12 | Kısmi | T-03/T-05/T-06 kapandı (ADR-004); T-07, T-08, T-09 (yalnız `XinobiU:Enabled`/`Features:*` ayarları), T-10, T-11 açık |
+
+**Sonraki adım:** 03.06 — fiyat/stok/rol/sipariş durumu değişikliklerinde `AuditLog` yazımı ve `audit` izniyle okuma ucu.
 
 ## 7. Yedi rol kontrolü ve PM son kararı
 

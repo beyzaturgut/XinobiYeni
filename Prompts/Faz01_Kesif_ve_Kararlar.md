@@ -1,6 +1,6 @@
 # Faz01 — Keşif, kararlar ve uygulanabilir teslim temeli
 
-**Durum:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–4, 6–8, ek kaynak `Proje Yönetimi/Xinobi_Kavramsal_ve_Teknik_Analiz2.md` K-01–K-21 ve müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`. Bu faz, Faz00'daki ilerleme kaydından yönetilir. Bu belgede iş kararı verilmiş gibi gösterilen hiçbir boşluk yoktur.
+**Durum (14.10.2026):** Bloke (müşteri kararları) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–4, 6–8, ek kaynak `Proje Yönetimi/Xinobi_Kavramsal_ve_Teknik_Analiz2.md` K-01–K-21 ve müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`. Bu faz, Faz00'daki ilerleme kaydından yönetilir. Bu belgede iş kararı verilmiş gibi gösterilen hiçbir boşluk yoktur.
 
 ## Amaç ve sınır
 
@@ -78,6 +78,30 @@ Karar kaydı formatı: `ID | soru | seçenekler | seçilen karar | kaynak kanıt
 - K0 keşif bulgusu ve K1 süreç/veri/rol/API taslağı PM tarafından incelenmiştir; açık kararlar ilgili uygulamayı blokeler ve Faz00'a taşınmıştır.
 - Creative için kaynak marka/medya envanteri ve ekran brief'i hazırlanmış; Faz02 tasarım ve handoff işi ön koşul olarak açılmıştır.
 - Ekip rolleri ayrı ayrı gerçek inceleme kaydı vermedikçe onay kutusu işaretlenmez; PM her koşulda son kapıyı değerlendirir.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~45 % · kalan ~55 % · Statü: Bloke (müşteri kararları)**
+
+| Madde | Durum | Kanıt / eksik |
+|---|---|---|
+| 1 Kaynak izlenebilirliği | Tamam | `docs/discovery/requirements-traceability.csv` (367 satır) |
+| 2 Bugünkü operasyon | Kısmi | `as-is-to-be.md` taslak; yetkili kullanıcı görüşmesi ve anonim örnek kayıt yok |
+| 3 D01 | Kısmi | Sıfırdan geliştirme kararı; operasyon/veri örneği ve barındırma envanteri eksik |
+| 4–10 D02–D10 | Bloke | `decision-register.md` (30.09’dan beri güncellenmedi), `stakeholder-decision-intake.md`; hiçbir karar müşteri sahibiyle kapanmadı |
+| 11 Sözleşme taslakları | Tamam | `docs/contracts/*`, `data-ownership-and-state-transitions.md` |
+| 12 Plan ve kapı | Kısmi | `phase-dependency-uat-plan.md`; kapasite ve tarih yok |
+| 13 Analiz2 yaratıcı keşif | Tamam | `creative-brief-input.md`, `design/analysis2-gap-matrix.md` |
+| 14 AI-P01 | Tamam | ADR-002 (CTO PoC doğrulaması Faz10’a kaldı) |
+| 15 İş planı/sprint takvimi | Yok | Faz00 §1 takvim satırı `Belirlenmedi` |
+| 16 D11 | Bloke | Hukuk/muhasebe kararı yok |
+| 17 Mevcut veri ve geçiş envanteri | Yok | Pazaryeri ürün/SKU/müşteri hacmi, eski URL listesi yok |
+| 18 Kalite hedefleri ve maliyet (D14) | Yok | p95/RPO/RTO ve maliyet tavanı yazılmadı |
+| 19 D12/D13 ve kapsam dışı modüller | Bloke | Ürün sahibi yanıtı yok |
+
+**Sonraki adım:** `decision-register.md`’yi Faz00 §4 ile eşleyip her D kararına sahip ve hedef tarih yazmak; 01.15 takvimini proje sahibiyle doldurmak.
 
 ## Yedi rolün inceleme/onay kaydı
 

@@ -1,6 +1,6 @@
 # Faz02 — Xinobi yaratıcı yön, UI/UX ve tasarım teslimi
 
-**Durum:** Planlandı · **Faz sahibi:** Sr. Creative Designer (temsili 20+ yıl uzman rolü) · **Nihai kapı sahibi:** Proje Yöneticisi (PM)  
+**Durum (14.10.2026):** Devam · geliştirme ~60 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Faz sahibi:** Sr. Creative Designer (temsili 20+ yıl uzman rolü) · **Nihai kapı sahibi:** Proje Yöneticisi (PM)  
 **Kaynak ve öncelik:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2–5, §6.4, D04/D08/D09/D10 ve `Xinobi_Proje_Kapsami(4).md` UI/UX, web, panel, kişiselleştirme, mobil, AI kapsamı. Çelişkide müşteri kapsamı ile doğrulanmış karar kaydı esastır.  
 **Kapsam:** Yalnız belirtilen web, yönetim paneli, iOS/Android, basit/gelişmiş editör, AI üretim ve asistan arayüzü; özellik ekleme yetkisi vermez.
 
@@ -65,6 +65,29 @@ Bu tokenler tasarım kararı önerisidir. Creative Designer, gerçek logo ve ür
 - Klavye ile web formu/alışveriş/editörün temel işlevleri; ekran okuyucu etiketleri, hata odağı ve AA kontrast raporu doğrulanır. Dar telefon/tablet/masaüstünde yatay taşma, kapatılmış ödeme eylemi veya ulaşılamayan editör kontrolü yoktur.
 - Panelde yetki yok, boş/kayıt var/hata/yeniden dene; ödeme, dosya yükleme ve AI'da bekleme/başarı/hata durumları açılıp gösterilir. İki mobil platformun akışları ayrı doğrulanır.
 - Creative Designer'ın kaynak dosyası ve FE/UI/UX handoff kaydı incelenir. Sadece örnek görsel veya referans pano ile faz kapatılamaz.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~60 % · kalan ~40 % · Statü: Devam (A17 ertelendi)**
+
+| Madde | Durum | Kanıt / eksik |
+|---|---|---|
+| 1 Envanter ve IA | Tamam | `design/screen-inventory.md` |
+| 2 Akış/wireframe | Tamam | `design/flows.md` (TST-054), WEB-001 wireframe |
+| 3 Tasarım sistemi | Tamam | `design/tokens.json` 0.4.0 (web/mobil eşleşiyor), `components.md` |
+| 4 Yüksek doğruluk ekranları | Kısmi | Yalnız WEB-001 hi-fi; diğer ekranlar kodda var ama `design/screens/` kaynağı/PNG yok (F02-A08) |
+| 5 Editör ve AI spec | Kısmi | `editor-spec.md`, `ai-spec.md` taslak; inceleme kaydı yok; `docs/xinobi-u-art-direction.md` (13.10) eklendi |
+| 6 Panel ve mobil ayrıntıları | Kısmi | Panel prototipleri (TST-078–086); iOS/Android referans ekranları yok (F02-A10) |
+| 7 Handoff | Kısmi | `handoff.md`, 22 dosyalık manifest; HND-01–05 ve FE/BE/DBA kabulü açık |
+| 8 Analiz2 ana sayfa | Tamam | WEB-001 ve canlı ana sayfa (DEPLOY-003/009) |
+| 9 Onay kayıtları | Yok | BRIEF/ORTAK/WEB TASARIM onayları Faz00’a işlenmedi; F02-A17 07.10’da ertelendi |
+| 10 Eksik ekran aileleri | Kısmi | Teklif takip/hesap ekranları kodda; toplu sipariş, medya kütüphanesi, soru havuzu, iletişim kutusu, mesafeli satış onayı, İYS tercihleri yok; Desenler BLOKE · D13 |
+| `design/a11y-audit.md` (F02-A07) | Yok | TST-050/108 sonuçları tek tutanakta toplanmadı |
+| Gerçek cihaz ve ekran okuyucu QA (A01/A02/A16) | Yok | — |
+
+**Sonraki adım:** `design/a11y-audit.md`’yi TST-050 ve TST-108 ölçümlerinden oluşturmak.
 
 ## Yedi rolün incelemesi ve PM kapısı
 

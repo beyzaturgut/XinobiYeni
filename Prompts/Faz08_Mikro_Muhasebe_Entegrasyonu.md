@@ -1,6 +1,6 @@
 # Faz08 — Mikro muhasebe entegrasyonu ve mutabakat
 
-> **Durum:** Plan / uygulanmadı. Yedi rolün onayı uygulama kanıtından sonra ayrı ayrı kaydedilir; bu metin gerçek insan onayı veya 20 yıllık gerçek iş geçmişi iddiası değildir. Son kapı her durumda PM'dedir.
+> **Durum (14.10.2026):** Bloke (D02/D06) · geliştirme ~5 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Plan / uygulanmadı. Yedi rolün onayı uygulama kanıtından sonra ayrı ayrı kaydedilir; bu metin gerçek insan onayı veya 20 yıllık gerçek iş geçmişi iddiası değildir. Son kapı her durumda PM'dedir.
 
 ## 1. Kaynak, kapsam ve giriş koşulu
 
@@ -82,6 +82,20 @@ Faz03'teki `ExternalMapping(system, entityType, localId, externalId, mappingVers
 - Worker yanlış eşleme veya toplu gönderimde durdurulur; job lease'leri devralınabilir hale getirilir. Son başarılı checkpoint ile gerçek dış kaydı kıyaslanır. `unknown_outcome` otomatik tekrar edilmez. Operatör dış kaydı doğrulayıp gerekçeyle `eşle / yeniden dene / manuel kapat` işlemi yapar; tüm kararlar auditlidir.
 - Yetki anahtarı döndürme, yanlış gönderilmiş kişisel veri bildirimi, geciken job alarmı, yedek/restore, periyodik tam mutabakat ve tespit edilen farkı kimin kapatacağı `docs/runbooks/mikro.md` içine konur. Canlı kimlik bilgisi hiç belgeye/repoya/loga yazılmaz.
 - İndeks ve performans: yoğun job filtrelerinde `(system,state,nextAttemptAt)` ve `(entityType,localId)`; stok/fiyat sayfa işlemi kısa DB transaction, checkpoint yalnız tamamlanan sayfada. Ağ çağrısı açık SQL transaction'ında bekletilmez.
+
+## Uygulama durumu — 14.10.2026
+
+Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
+
+**Geliştirme ~5 % · kalan ~95 % · Statü: Bloke (D02/D06/D11)**
+
+| ID | Durum | Kanıt / eksik |
+|---|---|---|
+| 08.01 | Bloke | Mikro sürüm/API erişimi yok |
+| 08.02–08.07 | Yok | `IMikroClient` ve işleyiciler yok |
+| 08.03 | Kısmi | Faz03 çekirdeğinde `ExternalMapping`/`SyncJob` tabloları var; Mikro’ya özel tablolar yok |
+| 08.07a/08.08 | Kısmi | Panel entegrasyon izleme prototipi (TST-084), gerçek API yok |
+| 08.09–08.10 | Yok | — |
 
 ## 7. Faz çıkışı ve yedi rolün ayrı onayı
 

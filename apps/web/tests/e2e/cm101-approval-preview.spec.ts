@@ -7,6 +7,10 @@ type QuestionnaireSession={id:string;status:string;product?:{id?:string};variant
 type PatternDebug={mask:Uint8Array|null;source:Uint8Array|null;missing:Array<{upper:number;lower:number}>};
 type DebugWindow=Window & {__cm101PatternDebug?:PatternDebug};
 const p='DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6',v='DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1';
+// These checks read CM101 review data that lives only in a reviewer's ignored services/api/App_Data (cm101-sam3-review,
+// catalog-surface-review, real-catalog-qa, questionnaire-preview-sessions). Without it the file reports one skipped test
+// instead of failing the whole run at load time.
+try{
 const repo=path.resolve('../..'),base=path.join(repo,'services/api/App_Data/cm101-sam3-review'),pending=path.join(base,'pending/cbb1dbc9-2582-45dc-85ee-6de5fd27106c'),ref=path.join(base,'refinements/local-refinement-20261009-02');
 const files={source:fs.readFileSync(path.join(pending,'source.webp')),mask:fs.readFileSync(path.join(ref,'refined-mask.pending.png')),branding:fs.readFileSync(path.join(ref,'branding-protection.png'))};
 const hashes=Object.fromEntries(Object.entries(files).map(([k,b])=>[k,crypto.createHash('sha256').update(b).digest('hex')]));
@@ -93,3 +97,6 @@ const mountainSize=await page.evaluate(async(url)=>{const image=new Image();imag
 expect(diagnostics.maskCaptured).toBe(true);expect(diagnostics.sourceCaptured).toBe(true);expect(diagnostics.warpSnapshots).toHaveLength(2);expect(diagnostics.warpSnapshots[0].upper).toBe(0);expect(diagnostics.warpSnapshots[1].lower).toBe(0);
 expect(diagnostics.outside).toBe(0);expect(diagnostics.logo).toBe(0);expect(diagnostics.alpha).toBe(0);expect(diagnostics.insideChanged).toBeGreaterThan(0);expect(diagnostics.edgeTotal).toBeGreaterThan(0);expect(diagnostics.edgeUnchanged/diagnostics.edgeTotal).toBeLessThan(0.02);
 });
+}catch(error){
+test('CM101 approval preview needs the local CM101 review data',()=>{test.skip(true,'Local CM101 review data is missing: '+(error instanceof Error?error.message:String(error)));});
+}

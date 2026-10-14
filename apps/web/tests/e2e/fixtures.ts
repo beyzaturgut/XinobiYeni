@@ -28,7 +28,8 @@ export async function mockStore(page:Page,{signedIn=false,cart=false}:{signedIn?
     const body=req.postData()?req.postDataJSON():{};
     if(method!=='GET')requests.push({path,method,body});
     const json=(data:unknown,status=200)=>route.fulfill({json:data,status});
-    if(path==='/local-commerce/state')return json(state);
+    // Production builds read the public storefront (active products only); the fixture marks every product active.
+    if(path==='/local-commerce/state'||path==='/catalog/storefront')return json(state);
     if(path==='/me'&&method==='GET')return signedIn?json(user):json({title:'Oturum yok'},401);
     if(path==='/auth/web/refresh')return signedIn?json(user):json({title:'Oturum yok'},401);
     if(path==='/email-verification/start')return json({id:'test-verification',email:body.email,expiresAt:new Date(Date.now()+600000).toISOString(),previewCode:'123456'});

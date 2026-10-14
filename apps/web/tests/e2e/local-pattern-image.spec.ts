@@ -21,14 +21,14 @@ for(const [mime,extension] of [['image/png','png'],['image/jpeg','jpg'],['image/
 });
 for(const [name,mime,buffer,error] of [
  ['unsupported','text/plain',Buffer.from('not an image'),'Yalnız PNG'],
- ['oversized bytes','image/png',Buffer.alloc(8*1024*1024+1),'en fazla 8 MB'],
+ ['invalid large bytes','image/png',Buffer.alloc(8*1024*1024+1),'içeriği'],
  ['invalid content','image/png',Buffer.from('not PNG'),'içeriği'],
  ['decode failure','image/png',Buffer.from([137,80,78,71,13,10,26,10,0,0,0,0]),'Görsel okunamadı'],
 ] as const)test('rejects '+name+' before retaining an object URL',async({page})=>{
  await setup(page);await page.locator('input[type=file]').setInputFiles({name:'invalid.png',mimeType:mime,buffer});await expect(page.locator('main').getByRole('alert')).toContainText(error);await expect(page.locator('canvas[role=img]')).toHaveCount(0);expect(await page.evaluate(()=>window.localPatternUrls.created)).toEqual([]);
 });
-for(const [width,height] of [[4097,1],[3000,3000]])test('rejects decoded limits '+width+'x'+height,async({page})=>{
- await setup(page);await page.locator('input[type=file]').setInputFiles({name:'large.png',mimeType:'image/png',buffer:await image(page,'image/png',width,height)});await expect(page.locator('main').getByRole('alert')).toContainText('4096 piksel');expect(await page.evaluate(()=>window.localPatternUrls.created)).toEqual([]);
+for(const [width,height] of [[4097,1],[3000,3000]])test('optimizes decoded limits '+width+'x'+height,async({page})=>{
+ await setup(page);await page.locator('input[type=file]').setInputFiles({name:'large.png',mimeType:'image/png',buffer:await image(page,'image/png',width,height)});await expect(page.locator('canvas[role=img]')).toBeVisible();await expect(page.locator('main').getByRole('alert')).toHaveCount(0);expect(await page.evaluate(()=>window.localPatternUrls.created.length)).toBe(1);
 });
 test('replacement and SPA unmount revoke URLs; invalid replacement preserves preview',async({page})=>{
  await setup(page);const first=await image(page,'image/png');const input=page.locator('input[type=file]');await input.setInputFiles({name:'first.png',mimeType:'image/png',buffer:first});await expect(page.locator('canvas[role=img]')).toBeVisible();
@@ -80,7 +80,9 @@ test('toolbar replaces artwork; removal releases the URL and does not imply a sa
  await page.getByRole('button',{name:/Görsel yükle/}).click();
  await (await chooserEvent).setFiles({name:'replacement.jpg',mimeType:'image/jpeg',buffer:await image(page,'image/jpeg')});
  await expect.poll(()=>page.evaluate(()=>window.localPatternUrls.created.length)).toBe(2);
- await expect(page.getByRole('button',{name:'Kalıcı kaydetme henüz kullanılamıyor'})).toBeDisabled();
+ // T17 removes the nonfunctional properties/save panel only from XINOBI U.
+ await expect(page.getByRole('button',{name:'Kalıcı kaydetme henüz kullanılamıyor'})).toHaveCount(0);
+ await expect(page.locator('#local-image-help')).toContainText('yalnız “Tasarımımı kaydet” dersen hesabına yüklenir');
  await page.getByRole('button',{name:'Görseli kaldır',exact:true}).click();
  await expect(page.locator('canvas[role=img]')).toHaveCount(0);
  expect(await page.evaluate(()=>window.localPatternUrls.revoked.length)).toBe(2);
@@ -100,4 +102,28 @@ test('removing an uploaded photo restores the original pattern preview byte for 
  await expect(canvas).toBeVisible();
  await page.getByRole('button',{name:'Görseli kaldır',exact:true}).click();
  await expect.poll(()=>canvas.evaluate((c:HTMLCanvasElement)=>c.toDataURL())).toBe(original);
+});
+
+test('rapid selections serialize decoding and only retain the latest photo',async({page})=>{
+ await setup(page);
+ const result=await page.evaluate(async()=>{
+  const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;const ctx=canvas.getContext('2d')!;
+  const make=async(color:string)=>{ctx.fillStyle=color;ctx.fillRect(0,0,32,32);return new File([await new Promise<Blob>(resolve=>canvas.toBlob(b=>resolve(b!)))],color+'.png',{type:'image/png'})};
+  const first=await make('#ff0000'),second=await make('#0000ff');canvas.width=0;canvas.height=0;
+  const decode=window.createImageBitmap.bind(window);let active=0,maxActive=0,closed=0;let started!:()=>void;const firstStarted=new Promise<void>(r=>{started=r});
+  window.createImageBitmap=(async(blob:ImageBitmapSource,options?:ImageBitmapOptions)=>{
+   active++;maxActive=Math.max(maxActive,active);started();await new Promise(r=>setTimeout(r,150));
+   try{const bitmap=await decode(blob,options);const close=bitmap.close.bind(bitmap);bitmap.close=()=>{closed++;close()};return bitmap}finally{active--}
+  }) as typeof createImageBitmap;
+  const input=document.querySelector<HTMLInputElement>('input[type=file]')!;
+  const select=(file:File)=>{const transfer=new DataTransfer();transfer.items.add(file);input.files=transfer.files;input.dispatchEvent(new Event('change',{bubbles:true}))};
+  const create=URL.createObjectURL.bind(URL);let retainedName='';URL.createObjectURL=blob=>{if(blob instanceof File)retainedName=blob.name;return create(blob)};
+  select(first);await firstStarted;
+  const busy=input.disabled;select(second);
+  for(let n=0;n<200&&(!retainedName||input.disabled);n++)await new Promise(r=>setTimeout(r,20));
+  window.createImageBitmap=decode;
+  return{busy,maxActive,closed,retainedName,created:window.localPatternUrls.created.length};
+ });
+ expect(result.busy).toBe(true);expect(result.maxActive).toBe(1);expect(result.closed).toBeGreaterThanOrEqual(2);expect(result.retainedName).toBe('#0000ff.png');expect(result.created).toBe(1);
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
 });

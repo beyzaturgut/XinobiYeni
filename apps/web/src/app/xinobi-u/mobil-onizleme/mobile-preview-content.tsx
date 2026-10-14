@@ -94,7 +94,7 @@ export default function MobilePreviewContent({ demoProductId, demoVariantId, dem
   }, [retry, sessionId, validationMessage]);
 
   if (!sessionId) {
-    return <AcceptedSurfaceEditor commerceProduct={demoProductId} commerceVariant={demoVariantId} patternSrc={demoPatternSrc} />;
+    return <AcceptedSurfaceEditor xinobiPreview commerceProduct={demoProductId} commerceVariant={demoVariantId} patternSrc={demoPatternSrc} />;
   }
 
   if (validationMessage) {
@@ -108,7 +108,7 @@ export default function MobilePreviewContent({ demoProductId, demoVariantId, dem
 
   if (state === 'ready' && resolved?.sessionId === sessionId) {
     return (
-      <AcceptedSurfaceEditor
+      <AcceptedSurfaceEditor xinobiPreview
         commerceProduct={resolved.productId}
         commerceVariant={resolved.variantId}
         patternSrc={resolved.patternSrc}

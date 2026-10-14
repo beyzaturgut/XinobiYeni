@@ -47,4 +47,10 @@ Toplam test sayısı 121 → 118: dört eski Tea Maker giriş testi tek testte b
 
 ## Sonuç kararı
 
-BAŞARILI (bir karar bekleyen piksel regresyonu hariç). Uygulama davranışı canlıda değişmedi.
+BAŞARILI. Uygulama davranışı canlıda değişmedi; tam web e2e yeşil (ek bölüm).
+
+## Ek — CM101 piksel referansı güncellendi (kullanıcı onayı, 14.10.2026)
+
+Kullanıcı 13 Ekim editör çıktısını yeni doğru kabul etti. `cm101-demo-byte-regression.spec.ts` artık 7 Ekim hattını yeniden üretmek yerine güncel editör çıktısının piksel SHA-256’sını (`9d70df5b…40aaa3`, `bccef08`) bayt bayt karşılaştırır; iki ayrı koşuda aynı özet üretildi. Işık/çarpıtma yardımcıları Tea Maker için eski davranışı koruyor (`fda5c83`), fark editör birleştirme hattından (`fe93107`).
+
+**Son tam koşu: 117 geçti / 0 başarısız / 1 atlandı (118), 1,7 dk.** Atlanan: `cm101-approval-preview` (Git dışı yerel veri).

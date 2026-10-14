@@ -76,7 +76,7 @@ test('Nobi mesaj yanıtını gösterir ve yeni konuşma başlatır',async({page}
 });
 
 test('üyelik modları, parola görünürlüğü ve e-posta doğrulaması çalışır',async({page})=>{
- const {requests}=await mockStore(page);await page.goto('/hesap/giris/');await closeConsent(page);
+ const {requests}=await mockStore(page);await page.goto('/hesap/');await closeConsent(page);await page.getByRole('button',{name:'Giriş yap',exact:true}).click();
  await page.getByRole('button',{name:'Yeni hesap',exact:true}).click();await expect(page.getByRole('heading',{name:'Hesap oluştur',exact:true})).toBeVisible();
  await page.getByLabel('Ad soyad').fill('Test Kullanıcı');await page.getByLabel('E-posta adresi').fill('test@example.com');const password=page.getByLabel('Parola',{exact:true});await password.fill('test-parola-123');
  await page.getByRole('button',{name:'Parolayı göster'}).click();await expect(password).toHaveAttribute('type','text');
@@ -86,7 +86,7 @@ test('üyelik modları, parola görünürlüğü ve e-posta doğrulaması çalı
 });
 
 test('parolamı unuttum kodla yeni parola belirler ve girişe döner',async({page})=>{
- const {requests}=await mockStore(page);await page.goto('/hesap/giris/');await closeConsent(page);
+ const {requests}=await mockStore(page);await page.goto('/hesap/');await closeConsent(page);await page.getByRole('button',{name:'Giriş yap',exact:true}).click();
  await page.getByRole('button',{name:'Parolamı unuttum'}).click();await expect(page.getByRole('heading',{name:'Parolanı sıfırla'})).toBeVisible();
  await page.getByLabel('E-posta adresi').fill('Test@Example.com');await page.getByRole('button',{name:'Sıfırlama kodu gönder'}).click();
  await expect(page.getByText('654321')).toBeVisible();

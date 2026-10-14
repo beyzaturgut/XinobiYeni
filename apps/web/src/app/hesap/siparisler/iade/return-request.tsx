@@ -23,7 +23,7 @@ export default function ReturnRequest() {
   useEffect(() => { if (user) orderOptions().then(setOptions).catch(() => setError("İade seçenekleri yüklenemedi.")); }, [user]);
 
   if (!ready || (user && !options && !error)) return <p className={styles.layout} role="status">Yükleniyor…</p>;
-  if (!user) return <div className={styles.layout}><Link href="/hesap/giris">İade talebi için giriş yap →</Link></div>;
+  if (!user) return <div className={styles.layout}><Link href="/hesap">İade talebi için giriş yap →</Link></div>;
   if (!order) {
     // Reached without an order (e.g. the footer link): list the orders that can still be returned or cancelled.
     const eligible = options ? orders.filter((item) => Object.keys(returnable(item, options.returnWindowDays)).length > 0 || item.status === "received" || item.status === "preparing") : [];

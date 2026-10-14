@@ -23,7 +23,7 @@ export default function SavedDesignPreview(){
   const [variant,setVariant]=useState(''),[notice,setNotice]=useState('');
   const chosen=variant||design?.variantId||product?.variants[0]?.id||'';
   if(!ready)return <main className={styles.main}><p role="status">Yükleniyor…</p></main>;
-  if(!user)return <main className={styles.main}><Link href="/hesap/giris">Giriş yap →</Link></main>;
+  if(!user)return <main className={styles.main}><Link href="/hesap">Giriş yap →</Link></main>;
   if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/hesap/tasarimlarim">Tasarımlarıma dön</Link></main>;
   if(!design||!src)return <main className={styles.main}><p role="status">Tasarım yükleniyor…</p></main>;
   return <><header className={styles.main}><section className={styles.intro}><p className={styles.kicker}>Tasarımlarım</p><h1>{design.name}</h1><p>{design.productName}</p></section>

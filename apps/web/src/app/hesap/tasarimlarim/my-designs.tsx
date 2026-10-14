@@ -23,7 +23,7 @@ export default function MyDesigns(){
   return <div className={styles.shell}>
     <div className={styles.title}><h1>Tasarımlarım</h1><Link href="/xinobi-u">Yeni tasarım oluştur →</Link></div>
     <p className={styles.caption}>XINOBI U ile oluşturduğun ve yüklediğin tasarımlar hesabında saklanır; web ve mobilde aynı listeyi görürsün. Görseller yalnız sana görünür.</p>
-    {!ready?<p role="status">Yükleniyor…</p>:!user?<Link href="/hesap/giris">Tasarımlarını görmek için giriş yap →</Link>:error?<p role="alert">{error}</p>:!designs?<p role="status">Tasarımlar yükleniyor…</p>:designs.length===0?<p>Henüz kayıtlı tasarımın yok. XINOBI U sonucunda “Tasarımımı kaydet” dediğinde burada görünür.</p>:
+    {!ready?<p role="status">Yükleniyor…</p>:!user?<Link href="/hesap">Tasarımlarını görmek için giriş yap →</Link>:error?<p role="alert">{error}</p>:!designs?<p role="status">Tasarımlar yükleniyor…</p>:designs.length===0?<p>Henüz kayıtlı tasarımın yok. XINOBI U sonucunda “Tasarımımı kaydet” dediğinde burada görünür.</p>:
       <ul className={styles.grid}>{designs.map(design=><li key={design.id}>
         <div className={styles.media}><DesignImage design={design}/><span className={styles.badge}>Temsilidir</span></div>
         {editing===design.id?<form onSubmit={async event=>{event.preventDefault();try{const saved=await renameDesign(design.id,name);setDesigns(list=>list!.map(item=>item.id===saved.id?saved:item));setEditing(null)}catch(e){setError(e instanceof Error?e.message:'Ad değiştirilemedi.')}}}><input aria-label="Tasarım adı" value={name} maxLength={60} onChange={event=>setName(event.target.value)} autoFocus/><button>Kaydet</button></form>:<h2>{design.name}</h2>}

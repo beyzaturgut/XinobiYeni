@@ -1,15 +1,13 @@
 'use client';
 import {useId,useState} from 'react';
-import Image from 'next/image';
-import {useRouter} from 'next/navigation';
-import {demoAccess} from '../../../lib/demo-commerce';
-import {startEmailVerification, type VerificationChallenge} from '../../../lib/email-verification';
+import {demoAccess} from '../../lib/demo-commerce';
+import {startEmailVerification, type VerificationChallenge} from '../../lib/email-verification';
 import PasswordReset from './password-reset';
-import styles from './account.module.css';
+import styles from './account-access.module.css';
 
-type AccountAccessProps = {initialMode?: 'login'|'register'; embedded?: boolean; onAuthenticated?: () => void};
-export default function AccountAccess({initialMode='login', embedded=false, onAuthenticated}: AccountAccessProps = {}) {
-  const router = useRouter();
+/** Login, registration and password reset; shown inside the dialog on /hesap. */
+type AccountAccessProps = {initialMode?: 'login'|'register'; onAuthenticated: () => void};
+export default function AccountAccess({initialMode='login', onAuthenticated}: AccountAccessProps) {
   const passwordId=useId();
   const [mode, setMode] = useState<'login'|'register'>(initialMode);
   const [showPassword,setShowPassword]=useState(false);
@@ -23,9 +21,8 @@ export default function AccountAccess({initialMode='login', embedded=false, onAu
   function reset(nextMode: 'login'|'register') {
     setMode(nextMode); setForgot(false); setShowPassword(false); setError(''); setChallenge(null); setPending(null); setNotice('');
   }
-  function complete() {if(onAuthenticated)onAuthenticated();else router.push('/hesap');}
-  return <div className={`${styles.layout} ${embedded?styles.embedded:''}`}>
-    <section className={styles.story}><div><p className={styles.kicker}>● XINOBI ID</p><h1>Hesabın</h1><p className={styles.intro}>Kayıt ol, giriş yap ve siparişlerini görüntüle.</p></div><div className={styles.atmosphere}><Image src="/assets/banners/home-titanium.webp" alt="Xinobi ürünlerinde sade tasarım ve titanyum detaylar" width={800} height={450}/><span>Mimari Sadelik · Kişisel Alan</span></div><div className={styles.privacy}><h2>Gizlilik &amp; Yerel Depolama</h2><p>Yalnızca bu tarayıcıda saklanır. Gerçek hesabındaki parolayı kullanma.</p><small>Deneme hesabı · Cihazlar arasında eşitlenmez</small></div></section>
+  const complete = onAuthenticated;
+  return <div className={styles.layout}>
     <section className={styles.formPanel}>
       <div className={styles.tabs}><button aria-pressed={mode==='login'} disabled={busy} onClick={()=>reset('login')}>Giriş</button><button aria-pressed={mode==='register'} disabled={busy} onClick={()=>reset('register')}>Yeni hesap</button></div>
       {forgot ? <PasswordReset onCancel={()=>reset('login')} onDone={message=>{reset('login');setNotice(message);}}/> : <>

@@ -32,7 +32,7 @@ export default function ProductReviews({productId,productName}:{productId:string
       <button disabled={!rating||body.trim().length<10||busy}>{busy?'Gönderiliyor…':'Değerlendirmeyi gönder'}</button>
       <small>Değerlendirmen mağaza onayından sonra adının baş harfiyle (ör. Ayşe Y.) yayınlanır.</small>
     </form>}
-    {!user&&<p className={styles.muted}>Ürünü satın alıp teslim aldıysan <Link href="/hesap/giris">giriş yaparak</Link> değerlendirebilirsin.</p>}
+    {!user&&<p className={styles.muted}>Ürünü satın alıp teslim aldıysan <Link href="/hesap">giriş yaparak</Link> değerlendirebilirsin.</p>}
     {user&&!purchased&&!mine&&<p className={styles.muted}>Bu ürünü teslim aldıktan sonra değerlendirebilirsin.</p>}
     {page&&page.items.length===0&&<p className={styles.muted}>Bu ürün için henüz yayınlanmış değerlendirme yok.</p>}
     <ul className={styles.list}>{page?.items.map(review=><li key={review.id}><div><b aria-label={`5 üzerinden ${review.rating}`}>{stars(review.rating)}</b><strong>{review.title}</strong></div><p>{review.body}</p><small>{review.authorName} · {date(review.createdAt)}{review.color?` · ${review.color}`:''} · Doğrulanmış satın alma</small>{review.storeReply&&<blockquote><strong>Xinobi yanıtı:</strong> {review.storeReply}</blockquote>}</li>)}</ul>

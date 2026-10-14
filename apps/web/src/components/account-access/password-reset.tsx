@@ -1,7 +1,7 @@
 'use client';
 import {useId,useState} from 'react';
-import {confirmPasswordReset,startPasswordReset,type EmailChallenge} from '../../../lib/demo-commerce';
-import styles from './account.module.css';
+import {confirmPasswordReset,startPasswordReset,type EmailChallenge} from '../../lib/demo-commerce';
+import styles from './account-access.module.css';
 
 /** Forgotten password: e-mailed 6-digit code, then a new password. Every device is signed out after the change. */
 export default function PasswordReset({onDone,onCancel}:{onDone:(message:string)=>void;onCancel:()=>void}){

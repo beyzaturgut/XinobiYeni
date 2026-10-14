@@ -72,7 +72,7 @@ export default function Orders(){
   return <div className={styles.shell}>
     <div className={styles.title}><h1>Siparişlerim</h1></div>
     <div className={styles.notice}><p>Demo siparişler: ödeme alınmaz ve stok ayrılmaz. Kargo, iptal ve iade adımları mağaza panelinden yürütülür; her değişiklikte bildirim alırsın.</p></div>
-    {!ready?<p role="status">Siparişler yükleniyor…</p>:!user?<Link href="/hesap/giris">Siparişlerini görmek için giriş yap →</Link>:orders.length===0?<><p>Henüz siparişin yok.</p><Link href="/urunler">Ürünleri keşfet →</Link></>:
+    {!ready?<p role="status">Siparişler yükleniyor…</p>:!user?<Link href="/hesap">Siparişlerini görmek için giriş yap →</Link>:orders.length===0?<><p>Henüz siparişin yok.</p><Link href="/urunler">Ürünleri keşfet →</Link></>:
       <div className={styles.orderList}>{orders.map(order=><OrderCard key={order.id} order={order} options={options} focused={order.id===focus} onCancel={()=>setCancelling(order)}/>)}</div>}
     {cancelling&&options&&<CancelDialog key={cancelling.id} order={cancelling} options={options} onClose={()=>setCancelling(null)}/>}
   </div>;

@@ -15,7 +15,7 @@ export default function SaveDesignButton({source}:{source:Source}){
   const {state}=useCommerce();
   const [design,setDesign]=useState<MyDesign|null>(null),[busy,setBusy]=useState(false),[added,setAdded]=useState(''),[error,setError]=useState('');
   if(!ready)return null;
-  if(!user)return <p className={styles.note}><Link href="/hesap/giris">Giriş yap</Link>, tasarımını sepete ekle ve hesabında sakla.</p>;
+  if(!user)return <p className={styles.note}><Link href="/hesap">Giriş yap</Link>, tasarımını sepete ekle ve hesabında sakla.</p>;
   async function save(){
     if(design)return design;
     const saved='sessionId' in source?await saveDesignFromSession(source.sessionId):await uploadDesign(source.file,source.productId,source.variantId);

@@ -11,7 +11,7 @@ export default function Addresses(){
   const {user,addresses,ready}=useDemoCommerce();
   const [editing,setEditing]=useState<CustomerAddress|'new'|null>(null);
   if(!ready)return <div className={styles.shell}><p role="status">Adresler yükleniyor…</p></div>;
-  if(!user)return <div className={styles.shell}><h1>Adreslerim</h1><p><Link href="/hesap/giris">Adreslerini görmek için giriş yap →</Link></p></div>;
+  if(!user)return <div className={styles.shell}><h1>Adreslerim</h1><p><Link href="/hesap">Adreslerini görmek için giriş yap →</Link></p></div>;
   return <div className={styles.shell}>
     <div className={styles.titleRow}><div><p className={styles.eyebrow}><Link href="/hesap">← Hesabım</Link></p><h1>Adreslerim</h1></div>
       {editing===null&&<button className={styles.primary} onClick={()=>setEditing('new')}>Adres ekle</button>}</div>

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import {useEffect, useRef, useState, type FormEvent} from 'react';
 import {changeAccountPassword,confirmEmailChange,deleteAccount,demoLogout,localPhone,startEmailChange,updateAccountProfile,useDemoCommerce,type CustomerAddress,type CustomerOrder,type DemoUser,type EmailChallenge} from '../../lib/demo-commerce';
 import {money} from '../../lib/commerce';
-import AccountAccess from './giris/account-access';
+import AccountAccess from '../../components/account-access/account-access';
 import styles from './account.module.css';
 
 type IconName = 'person'|'package'|'heart'|'bag'|'lock'|'arrow'|'pin'|'bell';
@@ -27,7 +27,7 @@ function AuthModal({mode,onClose}: {mode:'login'|'register';onClose:()=>void}) {
   return <dialog ref={ref} className={styles.modal} aria-label={mode==='login'?'Giriş yap':'Hesap oluştur'} onClose={onClose} onClick={event=>{if(event.target===event.currentTarget){const box=event.currentTarget.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)close();}}}>
     <button className={styles.close} aria-label="Pencereyi kapat" onClick={close}>×</button>
     <p className={styles.eyebrow}>XINOBI Üye Portalı</p>
-    <AccountAccess initialMode={mode} embedded onAuthenticated={close}/>
+    <AccountAccess initialMode={mode} onAuthenticated={close}/>
   </dialog>;
 }
 export default function AccountDashboard(){

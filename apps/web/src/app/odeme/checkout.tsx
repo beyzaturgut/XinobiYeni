@@ -25,7 +25,7 @@ export default function Checkout(){
     catch(problem){setError(problem instanceof Error?problem.message:'Sipariş kaydedilemedi.');locked.current=false;setBusy(false)}}
   return <div className={styles.layout}><section className={styles.formArea}><h1>Ödeme</h1>
     <div className={styles.notice}><strong>Para çekilmez</strong><p>Demo sipariş: kart bilgisi istenmez, ödeme alınmaz; kargo ve stok işlemi yapılmaz. Siparişin web ve mobilde görünür.</p></div>
-    {!ready?<p role="status">Hesap kontrol ediliyor…</p>:!user?<p><Link href="/hesap/giris">Önce hesabına giriş yap →</Link></p>:<form id="demo-checkout" onSubmit={submit}>
+    {!ready?<p role="status">Hesap kontrol ediliyor…</p>:!user?<p><Link href="/hesap">Önce hesabına giriş yap →</Link></p>:<form id="demo-checkout" onSubmit={submit}>
       <p>{user.name} · {user.email}</p>
       <fieldset><legend>Teslimat adresi</legend>
         {addresses.length===0?<p>Sipariş için bir teslimat adresi ekle. <Link href="/hesap/adresler">Adres ekle →</Link></p>:<div className={styles.addresses}>{addresses.map(item=><label key={item.id} className={item.id===address?.id?styles.addressChosen:styles.address}><input type="radio" name="address" checked={item.id===address?.id} onChange={()=>setChosen(item.id)}/><span><strong>{item.title}{item.isDefault&&<em>Varsayılan</em>}</strong><small>{item.fullName} · {localPhone(item.phone)}</small><small>{item.line}, {item.district}/{item.city}</small></span></label>)}<Link href="/hesap/adresler">Adresleri yönet →</Link></div>}

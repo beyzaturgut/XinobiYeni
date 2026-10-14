@@ -14,7 +14,6 @@ const routes = [
   "/sepet/",
   "/odeme/",
   "/odeme/sonuc/",
-  "/hesap/giris/",
   "/hesap/",
   "/hesap/siparisler/",
   "/hesap/siparisler/iade/",
@@ -62,11 +61,12 @@ for (const route of routes) {
 
 test("üyelik akışında ileri ve geri klavye odağı görünür kontrollere ulaşır", async ({ page }) => {
   await mockStore(page);
-  await page.goto("/hesap/giris/");
+  await page.goto("/hesap/");
   await closeConsent(page);
+  await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
 
+  // The dialog closes on an outside click, so tab from its initial focus instead.
   const loginTab = page.getByRole("button", { name: "Giriş", exact: true });
-  await page.locator("body").click({ position: { x: 1, y: 1 } });
   await tabUntil(page, loginTab);
   await expect(loginTab).toBeFocused();
 

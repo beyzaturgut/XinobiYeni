@@ -17,5 +17,5 @@ export default function ProductPreview(){
  },[]);
  if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/xinobi-u">Ürününü seç ↗</Link></main>;
  if(!session)return <main className={styles.main}><p role="status">Tasarımın yükleniyor…</p></main>;
- return <><header className={styles.main}><p>{session.product.name} · {session.variant.color}</p><Link href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}>Tasarımıma dön</Link><p className={styles.note}>Geliştirme görsel önizlemesi; baskı ve üretim onayı değildir.</p></header><AcceptedSurfaceEditor xinobiPreview commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={session.imageUrl!}/></>;
+ return <><header className={styles.main}><p>{session.product.name}</p><Link href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}>Tasarımıma dön</Link><p className={styles.note}>Geliştirme görsel önizlemesi; baskı ve üretim onayı değildir.</p></header><AcceptedSurfaceEditor xinobiPreview designId={session.id} commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={session.imageUrl!}/></>;
 }

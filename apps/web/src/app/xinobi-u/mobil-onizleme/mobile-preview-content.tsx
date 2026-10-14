@@ -108,7 +108,7 @@ export default function MobilePreviewContent({ demoProductId, demoVariantId, dem
 
   if (state === 'ready' && resolved?.sessionId === sessionId) {
     return (
-      <AcceptedSurfaceEditor xinobiPreview
+      <AcceptedSurfaceEditor xinobiPreview designId={resolved.sessionId}
         commerceProduct={resolved.productId}
         commerceVariant={resolved.variantId}
         patternSrc={resolved.patternSrc}

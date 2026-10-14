@@ -16,6 +16,8 @@ for (const width of [360, 390, 1440]) {
     await expect(page.getByText('D04 koruması', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Katmanlar', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Özellikler', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Metin', {exact:true})).toHaveCount(0);
+    await expect(page.getByRole('button',{name:/Görsel yükle/})).toBeVisible();
     await expect(page.locator('#pattern-controls-title')).toBeVisible();
     const badge = await page.getByText('Temsilidir', { exact: true }).boundingBox();
     const image = await canvas.boundingBox();
@@ -40,6 +42,7 @@ test('normal shopping editor retains its original UI', async ({ page }) => {
   await expect(page.getByText('D04 koruması', { exact: true })).toBeVisible();
   await expect(page.getByText('Katmanlar', { exact: true })).toBeVisible();
   await expect(page.getByText('Özellikler', { exact: true })).toBeVisible();
+  await expect(page.getByText('Metin', { exact: true })).toBeVisible();
 });
 
 for (const width of [320, 360, 390, 1440]) {

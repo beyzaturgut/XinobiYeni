@@ -41,7 +41,7 @@ try{
    return route.fulfill({json:{id:'photodesign',kind:'upload',name:'Photo test',productId:product,variantId:variant,productName:'HTTP Preview Product',imageUrl:'/api/v1/me/designs/photodesign/image'}});
   }
   if(url.pathname==='/api/v1/me/designs/photodesign/image')return route.fulfill({body:uploadedPhoto,contentType:'image/png'});
-  if(signedInFixture&&url.pathname==='/api/v1/me/designs')return route.fulfill({json:[{id:'photodesign',kind:'upload'}]});
+  if(signedInFixture&&url.pathname==='/api/v1/me/designs')return route.fulfill({json:[{id:'photodesign',kind:'upload',name:'Photo test',productId:product,variantId:variant,productName:'HTTP Preview Product',imageUrl:'/api/v1/me/designs/photodesign/image'}]});
   if(signedInFixture&&url.pathname.startsWith('/api/v1/me/'))return route.fulfill({json:url.pathname.endsWith('/inbox')?{items:[],unread:0}:[]});
   if(url.pathname.startsWith('/api/'))return route.fulfill({status:401,json:{code:'unauthorized'}});
   let file=path.resolve(root,'.'+decodeURIComponent(url.pathname));
@@ -121,5 +121,21 @@ try{
  await page.reload();await cartCanvas.waitFor();
  await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()===previous,designed);
  console.log('PASS: uploaded photo cart image matches the editor pixels after placement edits and after reloading the cart.');
+ await page.goto('http://xinobi-mobile.test/hesap/tasarimlarim/onizleme/?id=photodesign');
+ await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();
+ await page.locator('canvas[role=img]').first().waitFor();
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()===previous,designed);
+ await page.locator('#pattern-scale').fill('0.8');
+ await page.locator('#pattern-rotation').fill('-23');
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()!==previous,designed);
+ const reopened=await page.locator('canvas[role=img]').first().evaluate(canvas=>canvas.toDataURL());
+ await page.getByRole('button',{name:'Bu tasarımla sepete ekle',exact:true}).click();
+ await page.goto('http://xinobi-mobile.test/sepet/');
+ await cartCanvas.waitFor();
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()===previous,reopened);
+ await page.reload();await cartCanvas.waitFor();
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()===previous,reopened);
+ console.log('PASS: reopening an uploaded photo from My Designs restores the artwork placement; subsequent edits match the cart pixels after reload.');
+
 
 }finally{await browser.close();}

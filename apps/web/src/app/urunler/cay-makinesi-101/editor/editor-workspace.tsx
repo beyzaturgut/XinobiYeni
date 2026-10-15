@@ -15,18 +15,19 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png", artworkSrc, onUpload, uploadBusy = false, xinobiPreview = false, placementRef, onPlacementChange }: { renderingInputs: RenderingInputs; patternSrc?: string; artworkSrc?: string; placementMode?: "pattern" | "artwork"; onUpload?: () => void; uploadBusy?: boolean; xinobiPreview?: boolean; placementRef?: Ref<PlacementTransferHandle>; onPlacementChange?:(value:DesignPlacement)=>void }) {
+export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png", artworkSrc, onUpload, uploadBusy = false, xinobiPreview = false, placementRef, onPlacementChange, initialPlacement }: { renderingInputs: RenderingInputs; patternSrc?: string; artworkSrc?: string; placementMode?: "pattern" | "artwork"; onUpload?: () => void; uploadBusy?: boolean; xinobiPreview?: boolean; placementRef?: Ref<PlacementTransferHandle>; onPlacementChange?:(value:DesignPlacement)=>void; initialPlacement?:DesignPlacement }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
   const [notice, setNotice] = useState("");
-  const [patternTransform, setPatternTransform] = useState<PatternTransform>({ x: renderingInputs.width / 2, y: renderingInputs.height * .65, scale: placementMode === "artwork" ? 1 : 1.2, rotation: 0 });
-  const [curvatureStrength, setCurvatureStrength] = useState(DEFAULT_CURVATURE_STRENGTH);
+  const restored = initialPlacement?.surfaceVersion===renderingInputs.surfaceVersion?initialPlacement:undefined;
+  const [patternTransform, setPatternTransform] = useState<PatternTransform>(restored ? {x:restored.x,y:restored.y,scale:restored.scale,rotation:restored.rotation} : { x: renderingInputs.width / 2, y: renderingInputs.height * .65, scale: placementMode === "artwork" ? 1 : 1.2, rotation: 0 });
+  const [curvatureStrength, setCurvatureStrength] = useState(restored?.curvatureStrength ?? DEFAULT_CURVATURE_STRENGTH);
   const [artworkTransform, setArtworkTransform] = useState<PatternTransform>({ x: renderingInputs.width / 2, y: renderingInputs.height * .65, scale: 1, rotation: 0 });
-  const [patternBodyAdjustments, setPatternBodyAdjustments] = useState<PreviewPlacements['bodyAdjustments']>();
+  const [patternBodyAdjustments, setPatternBodyAdjustments] = useState<PreviewPlacements['bodyAdjustments']>(restored?.bodyAdjustments);
   useEffect(() => {
-    onPlacementChange?.({sourceWidth:renderingInputs.width,sourceHeight:renderingInputs.height,surfaceVersion:renderingInputs.surfaceVersion,...patternTransform,curvatureStrength,bodyAdjustments:patternBodyAdjustments});
-  }, [onPlacementChange,renderingInputs.width,renderingInputs.height,renderingInputs.surfaceVersion,patternTransform,curvatureStrength,patternBodyAdjustments]);
+    onPlacementChange?.({sourceWidth:renderingInputs.width,sourceHeight:renderingInputs.height,surfaceVersion:renderingInputs.surfaceVersion,...patternTransform,curvatureStrength,bodyAdjustments:patternBodyAdjustments,mode:placementMode});
+  }, [onPlacementChange,renderingInputs.width,renderingInputs.height,renderingInputs.surfaceVersion,patternTransform,curvatureStrength,patternBodyAdjustments,placementMode]);
   const snapshot = useRef({ inputs: renderingInputs, pattern: patternTransform, artwork: artworkTransform, artworkSrc, bodyAdjustments: patternBodyAdjustments });
   useLayoutEffect(() => {
     snapshot.current = { inputs: renderingInputs, pattern: patternTransform, artwork: artworkTransform, artworkSrc, bodyAdjustments: patternBodyAdjustments };

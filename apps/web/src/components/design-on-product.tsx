@@ -14,7 +14,7 @@ export default function DesignOnProduct({productId,variantId,designPath,kind,alt
   useEffect(()=>{let active=true;loadCachedAcceptedSurface(productId,variantId).then(value=>{if(active)setInputs(value)}).catch(()=>{if(active)setInputs(null)});return()=>{active=false}},[productId,variantId]);
   useEffect(()=>{let url:string|null=null;let active=true;privateImageUrl(designPath).then(value=>{url=value;if(active)setSrc(value);else URL.revokeObjectURL(value)}).catch(()=>{});return()=>{active=false;if(url)URL.revokeObjectURL(url)}},[designPath]);
   if(inputs===null)return <PrivateDesignImage className={className} path={designPath} alt={alt}/>;
-  const artwork=kind==='upload'||Boolean(placement);
+  const artwork=placement?.mode?placement.mode==='artwork':kind==='upload'||Boolean(placement);
   const selected=inputs&&placement?.surfaceVersion===inputs.surfaceVersion?placement:undefined;
   const ratio=inputs&&selected?inputs.width/selected.sourceWidth:1;
   return <span className={`${styles.frame} ${className??''}`}>

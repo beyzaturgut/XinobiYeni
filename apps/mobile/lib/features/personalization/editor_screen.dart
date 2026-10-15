@@ -12,6 +12,7 @@ import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
 import '../designs/designs.dart';
 import 'surface_preview.dart';
+import 'design_placement_store.dart';
 
 /// Picks an image from the gallery; replaceable in tests.
 typedef GalleryPick = Future<({Uint8List bytes, String name})?> Function();
@@ -47,6 +48,11 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     super.initState();
     productId = widget.productId;
     variantId = widget.variantId;
+    if (widget.designId != null && productId != null && variantId != null) {
+      DesignPlacementStore.load(widget.designId!, productId!, variantId!).then((value) {
+        if (mounted && value != null) setState(() => placement = value);
+      });
+    }
   }
 
   Future<void> _pick() async {
@@ -78,7 +84,12 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       ]),
     );
     if (chosen != null) {
+      final restored = chosen.variantId == null ? null : await DesignPlacementStore.load(chosen.id, chosen.productId, chosen.variantId!);
+      if (!mounted) return;
       setState(() {
+        productId = chosen.productId;
+        variantId = chosen.variantId;
+        placement = restored ?? (chosen.kind == 'upload' ? const DesignPlacement.place() : const DesignPlacement.cover());
         saved = chosen;
         picked = null;
         message = null;
@@ -89,12 +100,16 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
   Future<void> _save() async {
     final image = picked;
     if (image == null || productId == null) return;
+    final detail = ref.read(productProvider(productId!)).value;
+    final selectedVariant = detail?.variants.where((item) => item.id == variantId).firstOrNull ?? detail?.variants.where((item) => item.surfaceMaskUrl != null).firstOrNull ?? detail?.variants.firstOrNull;
+    variantId = selectedVariant?.id;
     setState(() {
       busy = true;
       message = null;
     });
     try {
       final design = await ref.read(authProvider.notifier).withSession((repository, token) => repository.uploadDesign(token, image.bytes, image.name, productId!, variantId));
+      if (design != null && variantId != null) await DesignPlacementStore.save(design.id, productId!, variantId!, placement);
       ref.invalidate(myDesignsProvider);
       if (!mounted) return;
       setState(() {
@@ -116,7 +131,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
     final products = ref.watch(productsProvider(const ProductQuery(personalizable: true)));
     final designs = ref.watch(myDesignsProvider).value ?? const <MyDesign>[];
     // A design opened from Tasarımlarım stays chosen until the customer picks another image.
-    final current = saved ?? (picked == null ? designs.where((design) => design.id == widget.designId).firstOrNull : null);
+    final current = saved ?? (picked == null ? designs.where((design) => design.id == widget.designId && design.productId == productId).firstOrNull : null);
     final detail = productId == null ? null : ref.watch(productProvider(productId!)).value;
     final variants = detail?.variants.toList() ?? const <VariantDetail>[];
     final variant = variants.where((item) => item.id == variantId).firstOrNull ?? variants.where((item) => item.surfaceMaskUrl != null).firstOrNull ?? variants.firstOrNull;
@@ -145,6 +160,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
             onChanged: (value) => setState(() {
               productId = value;
               variantId = null;
+              saved = null;
             }),
           ),
         ),

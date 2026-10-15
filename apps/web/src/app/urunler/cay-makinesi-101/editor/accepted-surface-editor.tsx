@@ -3,6 +3,8 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import EditorWorkspace from "./editor-workspace";
+import type {DesignPlacement} from "../../../../lib/design-placement";
 import LocalPatternPreview from "../../../../features/product-personalization/local-pattern-preview";
 import { loadAcceptedSurface, type RenderingInputs } from "./accepted-surface-api";
 import styles from "./editor.module.css";
@@ -19,7 +21,8 @@ function PreviewStatus({ error = false, children }: { error?: boolean; children:
     <Link href="/urunler/cay-makinesi-101">Ürüne dön</Link>
   </section>;
 }
-function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailableMessage, xinobiPreview = false }: { variant: string; commerceProduct?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean }) {
+type SavedPlacementProps={placementMode?:"pattern"|"artwork";initialPlacement?:DesignPlacement;onPlacementChange?:(value:DesignPlacement)=>void};
+function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailableMessage, xinobiPreview = false, ...saved }: { variant: string; commerceProduct?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean } & SavedPlacementProps) {
   const [state, setState] = useState<{ variant: string; inputs?: RenderingInputs | null; error?: boolean }>({ variant });
   useEffect(() => {
     const controller = new AbortController();
@@ -32,6 +35,7 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailab
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi. Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin.</PreviewStatus>;
   if (!state.inputs) return <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>;
+  if(saved.onPlacementChange)return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} {...saved}/>;
   return <LocalPatternPreview inputs={state.inputs} initialPatternSrc={patternSrc ?? "/assets/personalization/sample-pattern.png"} xinobiPreview={xinobiPreview} />;
 }
 function AcceptedSurfaceRoute() {
@@ -132,7 +136,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
       : <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}
   </>;
 }
-export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage, xinobiPreview = false, designId }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean; designId?: string } = {}) {
+export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage, xinobiPreview = false, designId, ...saved }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean; designId?: string } & SavedPlacementProps = {}) {
   if (xinobiPreview && commerceProduct && commerceVariant) return <XinobiVariantPreview key={commerceProduct+':'+commerceVariant+':'+(designId ?? '')} designId={designId} productId={commerceProduct} sessionVariantId={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage}/>;
-  return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage} xinobiPreview={xinobiPreview} /> : <AcceptedSurfaceRoute />}</Suspense>;
+  return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage} xinobiPreview={xinobiPreview} {...saved} /> : <AcceptedSurfaceRoute />}</Suspense>;
 }

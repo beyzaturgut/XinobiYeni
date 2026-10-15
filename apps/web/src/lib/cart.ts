@@ -1,6 +1,6 @@
 'use client';
 import {useMemo,useSyncExternalStore} from 'react';
-import {validDesignPlacement,type DesignPlacement} from './design-placement';
+import {validDesignPlacement,readDesignPlacement,type DesignPlacement} from './design-placement';
 /** A cart row; [designId]/[designName] make it a personalised line with one of the customer's saved designs. */
 export type CartLine={productId:string;variantId:string;quantity:number;designId?:string;designName?:string;designPlacement?:DesignPlacement};
 export type CartDesign={id:string;name:string;placement?:DesignPlacement};
@@ -16,6 +16,6 @@ export const cartLineKey=(row:CartLine)=>`${row.productId}:${row.variantId}:${ro
 /** Units of one colour across all its lines; stock limits the colour, not each design. */
 export const variantUnits=(rows:CartLine[],variantId:string)=>rows.filter(row=>row.variantId===variantId).reduce((sum,row)=>sum+row.quantity,0);
 export function useCart(){const raw=useSyncExternalStore(subscribe,snapshot,()=>'[]');return useMemo(()=>parse(raw),[raw])}
-export function addToCart(productId:string,variantId:string,stock:number,design?:CartDesign){const rows=parse(snapshot());const existing=rows.find(row=>sameLine(row,productId,variantId,design?.id));if(variantUnits(rows,variantId)>=Math.min(stock,99)||(existing?.quantity||0)>=99)throw new Error('Bu renk için sepetteki adet mevcut stok sınırına ulaştı.');write(existing?rows.map(row=>row===existing?{...row,quantity:row.quantity+1,...(design?.placement?{designPlacement:design.placement}:{})}:row):[...rows,{productId,variantId,quantity:1,...(design?{designId:design.id,designName:design.name,...(design.placement?{designPlacement:design.placement}:{})}:{})}])}
+export function addToCart(productId:string,variantId:string,stock:number,design?:CartDesign){if(design&&!design.placement)design={...design,placement:readDesignPlacement(design.id,productId,variantId)};const rows=parse(snapshot());const existing=rows.find(row=>sameLine(row,productId,variantId,design?.id));if(variantUnits(rows,variantId)>=Math.min(stock,99)||(existing?.quantity||0)>=99)throw new Error('Bu renk için sepetteki adet mevcut stok sınırına ulaştı.');write(existing?rows.map(row=>row===existing?{...row,quantity:row.quantity+1,...(design?.placement?{designPlacement:design.placement}:{})}:row):[...rows,{productId,variantId,quantity:1,...(design?{designId:design.id,designName:design.name,...(design.placement?{designPlacement:design.placement}:{})}:{})}])}
 export function setCartQuantity(productId:string,variantId:string,quantity:number,designId?:string){if(!Number.isInteger(quantity)||quantity<0||quantity>99)throw new Error('Geçerli adet girin.');const rows=parse(snapshot());write(quantity===0?rows.filter(row=>!sameLine(row,productId,variantId,designId)):rows.map(row=>sameLine(row,productId,variantId,designId)?{...row,quantity}:row))}
 export function clearCart(){write([])}

@@ -4,7 +4,7 @@ import {useState} from 'react';
 import {saveDesignFromSession,uploadDesign,useDemoCommerce,type MyDesign} from '../lib/demo-commerce';
 import {useCommerce} from '../lib/commerce';
 import {addToCart} from '../lib/cart';
-import type {DesignPlacement} from '../lib/design-placement';
+import {saveDesignPlacement,type DesignPlacement} from '../lib/design-placement';
 import styles from './save-design.module.css';
 
 type Source={sessionId:string}|{file:Blob;productId:string;variantId:string|null};
@@ -18,8 +18,9 @@ export default function SaveDesignButton({source,placement}:{source:Source;place
   if(!ready)return null;
   if(!user)return <p className={styles.note}><Link href="/hesap">Giriş yap</Link>, tasarımını sepete ekle ve hesabında sakla.</p>;
   async function save(){
-    if(design)return design;
+    if(design){if(placement&&design.variantId)saveDesignPlacement(design.id,design.productId,design.variantId,placement);return design;}
     const saved='sessionId' in source?await saveDesignFromSession(source.sessionId):await uploadDesign(source.file,source.productId,source.variantId);
+    if(placement&&saved.variantId)saveDesignPlacement(saved.id,saved.productId,saved.variantId,placement);
     setDesign(saved);return saved;
   }
   async function run(action:()=>Promise<void>){setBusy(true);setError('');try{await action()}catch(e){setError(e instanceof Error?e.message:'İşlem tamamlanamadı.')}finally{setBusy(false)}}

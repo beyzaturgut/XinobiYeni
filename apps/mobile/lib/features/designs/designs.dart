@@ -10,6 +10,7 @@ import '../account/auth.dart';
 import '../cart/cart.dart';
 import '../catalog/catalog_repository.dart';
 import '../personalization/surface_preview.dart';
+import '../personalization/design_placement_store.dart';
 
 /// The account's saved designs (K-21), newest first; empty when signed out.
 final myDesignsProvider = FutureProvider.autoDispose<List<MyDesign>>((ref) async {
@@ -33,10 +34,12 @@ Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign desig
   final router = GoRouter.of(context);
   try {
     final product = await ref.read(catalogRepositoryProvider).product(design.productId);
-    final variant = [variantId, design.variantId].nonNulls.map((id) => product.variants.where((item) => item.id == id && item.maxQuantity > 0).firstOrNull).nonNulls.firstOrNull ??
-        product.variants.where((item) => item.maxQuantity > 0 && item.price != null).firstOrNull;
+    final variant = (variantId != null ? [variantId] : [design.variantId]).nonNulls.map((id) => product.variants.where((item) => item.id == id && item.maxQuantity > 0).firstOrNull).nonNulls.firstOrNull ??
+        (placement != null || variantId != null ? null : product.variants.where((item) => item.maxQuantity > 0 && item.price != null).firstOrNull);
     if (variant == null) throw const CartException('Bu ürün şu anda stokta yok.');
-    await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name, designPlacement: placement);
+    final selectedPlacement = placement ?? await DesignPlacementStore.load(design.id, product.id, variant.id);
+    if (selectedPlacement != null) await DesignPlacementStore.save(design.id, product.id, variant.id, selectedPlacement);
+    await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name, designPlacement: selectedPlacement);
     messenger.showSnackBar(SnackBar(
       content: Text('“${design.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.'),
       action: SnackBarAction(label: 'Sepete git', onPressed: () => router.go('/sepet')),

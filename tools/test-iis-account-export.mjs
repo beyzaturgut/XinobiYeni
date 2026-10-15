@@ -25,13 +25,22 @@ let browser;
 try{
  browser=await chromium.launch({headless:true,...(process.platform==='darwin'?{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'}:{})});
  const page=await browser.newPage();
- let loginRequest,verificationRequest,registrationRequest;
- let verificationAttempts=0,registered=false;
+ let loginRequest,verificationRequest,registrationRequest,resetRequest;
+ let verificationAttempts=0,registered=false,resetPassword;
  await page.route('**/api/**',async route=>{
   const request=route.request();
   if(new URL(request.url()).pathname==='/api/v1/auth/web/login'){
    loginRequest=request;
-   await route.fulfill({status:401,json:{title:'Export login reached the API',code:'invalid_credentials'}});
+   if(resetPassword&&request.postDataJSON().password===resetPassword){
+    registered=true;
+    await route.fulfill({json:{id:'export-customer',name:'Export Customer',email:'export-test@example.invalid'}});
+   }else await route.fulfill({status:401,json:{title:'Export login reached the API',code:'invalid_credentials'}});
+  }else if(new URL(request.url()).pathname==='/api/v1/auth/password-reset'){
+   await route.fulfill({json:{verificationId:'export-reset',email:request.postDataJSON().email,expiresAt:new Date(Date.now()+600000).toISOString()}});
+  }else if(new URL(request.url()).pathname==='/api/v1/auth/password-reset/confirm'){
+   resetRequest=request;
+   resetPassword=request.postDataJSON().newPassword;
+   await route.fulfill({status:204});
   }else if(new URL(request.url()).pathname==='/api/v1/auth/email-verification'){
    verificationRequest=request;
    if(++verificationAttempts===1)await route.fulfill({status:503,json:{title:'SMTP test unavailable',code:'email_unavailable'}});
@@ -80,6 +89,30 @@ try{
  assert.equal(registrationRequest.headers()['x-xinobi-csrf'],'1');
  assert.equal(registered,true);
  console.log('PASS: registration uses the production verification endpoint, shows delivery/code errors and submits the verification ID with the code.');
+ registered=false;
+ await page.reload();
+ await page.getByRole('button',{name:'Giriş yap',exact:true}).first().click();
+ await dialog.getByRole('button',{name:'Parolamı unuttum',exact:true}).click();
+ await dialog.getByLabel('E-posta adresi').fill('export-test@example.invalid');
+ await dialog.getByRole('button',{name:'Sıfırlama kodu gönder',exact:true}).click();
+ await dialog.getByLabel('Sıfırlama kodu').waitFor();
+ assert.equal(await dialog.getByLabel('Sıfırlama kodu').inputValue(),'');
+ assert.equal(await dialog.getByLabel('Yeni parola',{exact:true}).inputValue(),'');
+ await dialog.getByLabel('Sıfırlama kodu').fill('654321');
+ await dialog.getByLabel('Yeni parola',{exact:true}).fill('replacement-export-password-2');
+ await dialog.getByRole('button',{name:'Parolayı değiştir',exact:true}).click();
+ await dialog.getByText('Parolan değiştirildi ve tüm cihazlardaki oturumların kapatıldı. Yeni parolanla giriş yap.',{exact:true}).waitFor();
+ assert.equal(resetRequest.postDataJSON().verificationId,'export-reset');
+ assert.equal(resetRequest.postDataJSON().verificationCode,'654321');
+ assert.equal(resetRequest.postDataJSON().newPassword,'replacement-export-password-2');
+ await dialog.getByLabel('E-posta adresi').fill('export-test@example.invalid');
+ await dialog.getByLabel('Parola',{exact:true}).fill('export-test-password-1');
+ await dialog.getByRole('button',{name:'Giriş yap',exact:true}).click();
+ await dialog.getByText('Export login reached the API',{exact:true}).waitFor();
+ await dialog.getByLabel('Parola',{exact:true}).fill('replacement-export-password-2');
+ await dialog.getByRole('button',{name:'Giriş yap',exact:true}).click();
+ await dialog.waitFor({state:'hidden'});
+ console.log('PASS: reset code starts empty, reset submits the new password and subsequent login uses the entered replacement password.');
 }finally{
  await browser?.close();
  await new Promise(resolve=>server.close(resolve));

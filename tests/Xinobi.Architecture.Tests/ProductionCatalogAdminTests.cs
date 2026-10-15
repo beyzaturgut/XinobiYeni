@@ -60,14 +60,30 @@ public sealed class ProductionCatalogAdminTests
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", (await accounts.IssueTokens(account.Id)).AccessToken);
         Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
         await accounts.AssignRole(account.Email, "intern");
+        var internTokens = await accounts.IssueTokens(account.Id);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", internTokens.AccessToken);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        await factory.Services.GetRequiredService<AdminMfa>().Grant(account.Id, internTokens);
         Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
         await accounts.AssignRole(account.Email, Roles.SuperAdmin);
+        // Staff sessions require completed MFA, even when using a bearer token.
+        var staffTokens = await accounts.IssueTokens(account.Id);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", staffTokens.AccessToken);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        await factory.Services.GetRequiredService<AdminMfa>().Grant(account.Id, staffTokens);
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
         using var cookieClient = factory.CreateClient(new() { BaseAddress = new Uri("https://localhost"), HandleCookies = false });
         cookieClient.DefaultRequestHeaders.Add("Cookie", $"{WebSessionCookies.Access}={client.DefaultRequestHeaders.Authorization!.Parameter}");
         Assert.Equal(HttpStatusCode.Unauthorized, (await cookieClient.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
         cookieClient.DefaultRequestHeaders.Add(WebSessionCookies.CsrfHeader, "1");
         cookieClient.DefaultRequestHeaders.Add("Origin", "https://localhost");
+        // A customer cookie cannot authenticate a panel request, even with CSRF intent.
+        Assert.Equal(HttpStatusCode.Unauthorized, (await cookieClient.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        cookieClient.DefaultRequestHeaders.Remove("Cookie");
+        cookieClient.DefaultRequestHeaders.Remove(WebSessionCookies.CsrfHeader);
+        cookieClient.DefaultRequestHeaders.Add("Cookie", $"{WebSessionCookies.AdminAccess}={staffTokens.AccessToken}");
+        Assert.Equal(HttpStatusCode.Unauthorized, (await cookieClient.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        cookieClient.DefaultRequestHeaders.Add(WebSessionCookies.CsrfHeader, "1");
         Assert.Equal(HttpStatusCode.BadRequest, (await cookieClient.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
         client.DefaultRequestHeaders.Add("Origin", "https://evil.example");
         Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);

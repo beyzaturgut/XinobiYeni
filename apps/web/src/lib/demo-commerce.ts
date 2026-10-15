@@ -105,6 +105,10 @@ function subscribe(callback:()=>void){
 
 export function useDemoCommerce():Snapshot{return useSyncExternalStore(subscribe,()=>session,()=>empty)}
 
+export async function startAccountEmailVerification(email:string):Promise<EmailChallenge>{
+  return (await call<EmailChallenge>('/auth/email-verification',{method:'POST',body:JSON.stringify({email:email.trim().toLowerCase()})}))!;
+}
+
 export async function demoAccess(mode:'login'|'register',name:string,email:string,password:string,verification?:{id:string;code:string}){
   email=email.trim().toLowerCase();
   if(!email||password.length<8)throw new Error('Geçerli e-posta ve en az 8 karakterlik parola gir.');

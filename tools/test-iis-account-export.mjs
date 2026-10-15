@@ -25,12 +25,26 @@ let browser;
 try{
  browser=await chromium.launch({headless:true,...(process.platform==='darwin'?{executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'}:{})});
  const page=await browser.newPage();
- let loginRequest;
+ let loginRequest,verificationRequest,registrationRequest;
+ let verificationAttempts=0,registered=false;
  await page.route('**/api/**',async route=>{
   const request=route.request();
   if(new URL(request.url()).pathname==='/api/v1/auth/web/login'){
    loginRequest=request;
    await route.fulfill({status:401,json:{title:'Export login reached the API',code:'invalid_credentials'}});
+  }else if(new URL(request.url()).pathname==='/api/v1/auth/email-verification'){
+   verificationRequest=request;
+   if(++verificationAttempts===1)await route.fulfill({status:503,json:{title:'SMTP test unavailable',code:'email_unavailable'}});
+   else await route.fulfill({json:{verificationId:'export-verification',email:'export-test@example.invalid',expiresAt:new Date(Date.now()+600000).toISOString()}});
+  }else if(new URL(request.url()).pathname==='/api/v1/auth/web/register'){
+   registrationRequest=request;
+   if(request.postDataJSON().verificationCode!=='654321')await route.fulfill({status:400,json:{title:'Test verification code rejected'}});
+   else{
+    registered=true;
+    await route.fulfill({json:{id:'export-customer',name:'Export Customer',email:'export-test@example.invalid'}});
+   }
+  }else if(registered&&new URL(request.url()).pathname.startsWith('/api/v1/me/')){
+   await route.fulfill({json:new URL(request.url()).pathname.endsWith('/inbox')?{items:[],unread:0}:[]});
   }else if(new URL(request.url()).pathname==='/api/v1/catalog/storefront'){
    await route.fulfill({json:{products:[],prices:{},content:{slides:[]}}});
   }else await route.fulfill({status:401,json:{code:'unauthorized'}});
@@ -46,6 +60,26 @@ try{
  assert.equal(loginRequest.headers()['x-xinobi-csrf'],'1');
  assert.equal(loginRequest.postDataJSON().email,'export-test@example.invalid');
  console.log('PASS: exported account form sends a same-origin login request with CSRF and displays the API response.');
+ await dialog.getByRole('button',{name:'Yeni hesap',exact:true}).click();
+ await dialog.getByLabel('Ad soyad').fill('Export Customer');
+ await dialog.getByLabel('E-posta adresi').fill('export-test@example.invalid');
+ await dialog.getByLabel('Parola',{exact:true}).fill('export-test-password-1');
+ await dialog.getByRole('button',{name:'Doğrulama kodu gönder',exact:true}).click();
+ await dialog.getByText('SMTP test unavailable',{exact:true}).waitFor();
+ await dialog.getByRole('button',{name:'Doğrulama kodu gönder',exact:true}).click();
+ await dialog.getByLabel('Doğrulama kodu').fill('123456');
+ await dialog.getByRole('button',{name:'E-postayı doğrula ve hesabı oluştur',exact:true}).click();
+ await dialog.getByText('Test verification code rejected',{exact:true}).waitFor();
+ await dialog.getByLabel('Doğrulama kodu').fill('654321');
+ await dialog.getByRole('button',{name:'E-postayı doğrula ve hesabı oluştur',exact:true}).click();
+ await dialog.waitFor({state:'hidden'});
+ assert.equal(verificationRequest.headers()['x-xinobi-csrf'],'1');
+ assert.equal(verificationRequest.postDataJSON().email,'export-test@example.invalid');
+ assert.equal(registrationRequest.postDataJSON().verificationId,'export-verification');
+ assert.equal(registrationRequest.postDataJSON().verificationCode,'654321');
+ assert.equal(registrationRequest.headers()['x-xinobi-csrf'],'1');
+ assert.equal(registered,true);
+ console.log('PASS: registration uses the production verification endpoint, shows delivery/code errors and submits the verification ID with the code.');
 }finally{
  await browser?.close();
  await new Promise(resolve=>server.close(resolve));

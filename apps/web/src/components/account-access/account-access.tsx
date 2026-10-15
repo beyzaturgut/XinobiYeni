@@ -1,7 +1,6 @@
 'use client';
 import {useId,useState} from 'react';
-import {demoAccess} from '../../lib/demo-commerce';
-import {startEmailVerification, type VerificationChallenge} from '../../lib/email-verification';
+import {demoAccess,startAccountEmailVerification,type EmailChallenge} from '../../lib/demo-commerce';
 import PasswordReset from './password-reset';
 import styles from './account-access.module.css';
 
@@ -13,7 +12,7 @@ export default function AccountAccess({initialMode='login', onAuthenticated}: Ac
   const [showPassword,setShowPassword]=useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [challenge, setChallenge] = useState<VerificationChallenge|null>(null);
+  const [challenge, setChallenge] = useState<EmailChallenge|null>(null);
   const [pending, setPending] = useState<{name: string; email: string; password: string}|null>(null);
   const [notice, setNotice] = useState('');
   const [retryAt, setRetryAt] = useState(0);
@@ -36,7 +35,7 @@ export default function AccountAccess({initialMode='login', onAuthenticated}: Ac
           const code = String(new FormData(event.currentTarget).get('code') || '');
           setBusy(true); setError('');
           try {
-            await demoAccess('register',pending.name,pending.email,pending.password,{id:challenge.id,code});
+            await demoAccess('register',pending.name,pending.email,pending.password,{id:challenge.verificationId,code});
             setPending(null); complete();
           } catch(error) {setError(error instanceof Error?error.message:'İşlem tamamlanamadı.');}
           finally {setBusy(false);}
@@ -47,7 +46,7 @@ export default function AccountAccess({initialMode='login', onAuthenticated}: Ac
         <button disabled={busy} onClick={async()=>{
           if(Date.now()<retryAt){setError('Yeni kod istemek için bir dakika bekle.');return;}
           setBusy(true);setError('');setNotice('');
-          try{const next=await startEmailVerification(pending.email);setChallenge(next);setRetryAt(Date.now()+60000);setNotice(next.previewCode?'Yeni deneme kodu oluşturuldu.':'Yeni doğrulama kodu gönderildi.');}
+          try{const next=await startAccountEmailVerification(pending.email);setChallenge(next);setRetryAt(Date.now()+60000);setNotice(next.previewCode?'Yeni deneme kodu oluşturuldu.':'Yeni doğrulama kodu gönderildi.');}
           catch(error){setError(error instanceof Error?error.message:'Kod gönderilemedi.');}
           finally{setBusy(false);}
         }}>Kodu tekrar gönder</button>
@@ -59,7 +58,7 @@ export default function AccountAccess({initialMode='login', onAuthenticated}: Ac
         setBusy(true);setError('');
         try{
           if(mode==='register'){
-            setChallenge(await startEmailVerification(values.email));setPending(values);setRetryAt(Date.now()+60000);
+            setChallenge(await startAccountEmailVerification(values.email));setPending(values);setRetryAt(Date.now()+60000);
           }else{await demoAccess('login',values.name,values.email,values.password);complete();}
         }catch(error){setError(error instanceof Error?error.message:'İşlem tamamlanamadı.');}
         finally{setBusy(false);}
@@ -72,7 +71,7 @@ export default function AccountAccess({initialMode='login', onAuthenticated}: Ac
       </form>}
       {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
       </>}
-      <div className={styles.syncNotice}><p>Hesabın ve siparişlerin cihazlar arasında eşitlenmez. Tüm kayıtlar bu tarayıcıda korunur.</p></div>
+      <div className={styles.syncNotice}><p>Hesabına giriş yaparak siparişlerine farklı cihazlardan erişebilirsin.</p></div>
     </section>
   </div>;
 }

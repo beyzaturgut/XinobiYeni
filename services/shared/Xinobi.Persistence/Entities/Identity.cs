@@ -17,6 +17,13 @@ public sealed class User
     public List<UserRole> Roles { get; } = [];
 }
 
+public sealed class CustomerFavorite
+{
+    public Guid UserId { get; set; }
+    public required string ProductId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+}
+
 public static class UserKinds
 {
     public const string Customer = "customer";
@@ -60,4 +67,19 @@ public sealed class RolePermission
     public Guid RoleId { get; set; }
     public Guid PermissionId { get; set; }
     public Permission? Permission { get; set; }
+}
+
+public sealed class AdminInvitation
+{
+    public Guid Id { get; set; }
+    public required string Email { get; set; }
+    public required string NormalizedEmail { get; set; }
+    public required string TokenHash { get; set; }
+    public Guid InvitedByUserId { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset ExpiresAt { get; set; }
+    public DateTimeOffset? AcceptedAt { get; set; }
+    public Guid? AcceptedUserId { get; set; }
+    public DateTimeOffset? CancelledAt { get; set; }
+    public Guid? CancelledByUserId { get; set; }
 }

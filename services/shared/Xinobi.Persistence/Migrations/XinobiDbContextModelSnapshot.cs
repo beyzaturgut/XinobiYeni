@@ -22,6 +22,269 @@ namespace Xinobi.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminPasswordReset", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset?>("ConsumedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CredentialStamp")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("RequiredRole")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("AdminPasswordResets", "identity", t =>
+                        {
+                            t.HasCheckConstraint("CK_AdminPasswordResets_Expiry", "[ExpiresAt] > [CreatedAt]");
+
+                            t.HasCheckConstraint("CK_AdminPasswordResets_Role", "[RequiredRole] IN ('admin','super_admin')");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminPasswordReset", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminMfaChallengeRecord", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset?>("ConsumedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("CredentialStamp")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("AdminMfaChallenges", "identity", t =>
+                        {
+                            t.HasCheckConstraint("CK_AdminMfaChallenges_Attempts", "[Attempts] >= 0 AND [Attempts] <= 5");
+
+                            t.HasCheckConstraint("CK_AdminMfaChallenges_Expiry", "[ExpiresAt] > [CreatedAt]");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminMfaChallengeRecord", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminMfaGrant", b =>
+                {
+                    b.Property<string>("TokenHash")
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<string>("CredentialStamp")
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("TokenHash");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AdminMfaGrants", "identity");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminMfaGrant", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CustomerFavorite", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ProductId")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .UseCollation("Latin1_General_100_BIN2");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("UserId", "ProductId");
+
+                    b.HasIndex("UserId", "CreatedAt");
+
+                    b.ToTable("Favorites", "identity");
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.CustomerFavorite", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminInvitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("AcceptedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("AcceptedUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CancelledByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("InvitedByUserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("NormalizedEmail")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("nvarchar(320)");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcceptedUserId");
+
+                    b.HasIndex("CancelledByUserId");
+
+                    b.HasIndex("InvitedByUserId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("NormalizedEmail", "ExpiresAt");
+
+                    b.ToTable("AdminInvitations", "identity", t =>
+                        {
+                            t.HasCheckConstraint("CK_AdminInvitations_AcceptedUser", "([AcceptedAt] IS NULL AND [AcceptedUserId] IS NULL) OR ([AcceptedAt] IS NOT NULL AND [AcceptedUserId] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_AdminInvitations_CancelledBy", "([CancelledAt] IS NULL AND [CancelledByUserId] IS NULL) OR ([CancelledAt] IS NOT NULL AND [CancelledByUserId] IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_AdminInvitations_Expiry", "[ExpiresAt] > [CreatedAt]");
+
+                            t.HasCheckConstraint("CK_AdminInvitations_Outcome", "NOT ([AcceptedAt] IS NOT NULL AND [CancelledAt] IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Xinobi.Persistence.Entities.AdminInvitation", b =>
+                {
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("AcceptedUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("CancelledByUserId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Xinobi.Persistence.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("InvitedByUserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Xinobi.Persistence.Entities.AccessSession", b =>
                 {
                     b.Property<string>("TokenHash")

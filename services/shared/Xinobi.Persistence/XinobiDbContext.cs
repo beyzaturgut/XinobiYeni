@@ -11,9 +11,15 @@ namespace Xinobi.Persistence;
 public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) : DbContext(options)
 {
     public const string IdentitySchema = "identity";
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.AddInterceptors(new TransactionalAudit());
     public const string OpsSchema = "ops";
     public const string MediaSchema = "media";
 
+    public DbSet<AdminInvitation> AdminInvitations => Set<AdminInvitation>();
+    public DbSet<CustomerFavorite> CustomerFavorites => Set<CustomerFavorite>();
+    public DbSet<AdminMfaChallengeRecord> AdminMfaChallenges => Set<AdminMfaChallengeRecord>();
+    public DbSet<AdminMfaGrant> AdminMfaGrants => Set<AdminMfaGrant>();
+    public DbSet<AdminPasswordReset> AdminPasswordResets => Set<AdminPasswordReset>();
     public DbSet<User> Users => Set<User>();
     public DbSet<Role> Roles => Set<Role>();
     public DbSet<Permission> Permissions => Set<Permission>();
@@ -41,6 +47,75 @@ public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) :
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AdminPasswordReset>(entry =>
+        {
+            entry.ToTable("AdminPasswordResets", IdentitySchema, table =>
+            {
+                table.HasCheckConstraint("CK_AdminPasswordResets_Expiry", "[ExpiresAt] > [CreatedAt]");
+                table.HasCheckConstraint("CK_AdminPasswordResets_Role", "[RequiredRole] IN ('admin','super_admin')");
+            });
+            entry.HasKey(x => x.TokenHash);
+            entry.Property(x => x.TokenHash).HasMaxLength(64).IsUnicode(false);
+            entry.Property(x => x.CredentialStamp).HasMaxLength(64).IsUnicode(false);
+            entry.Property(x => x.RequiredRole).HasMaxLength(64).IsUnicode(false);
+            entry.HasIndex(x => new { x.UserId, x.CreatedAt });
+            entry.HasIndex(x => x.ExpiresAt);
+            entry.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<AdminMfaChallengeRecord>(entry =>
+        {
+            entry.ToTable("AdminMfaChallenges", IdentitySchema, table =>
+            {
+                table.HasCheckConstraint("CK_AdminMfaChallenges_Attempts", "[Attempts] >= 0 AND [Attempts] <= 5");
+                table.HasCheckConstraint("CK_AdminMfaChallenges_Expiry", "[ExpiresAt] > [CreatedAt]");
+            });
+            entry.HasKey(x => x.TokenHash);
+            entry.Property(x => x.TokenHash).HasMaxLength(64).IsUnicode(false);
+            entry.Property(x => x.CodeHash).HasMaxLength(64).IsUnicode(false);
+            entry.Property(x => x.CredentialStamp).HasMaxLength(64).IsUnicode(false);
+            entry.HasIndex(x => new { x.UserId, x.CreatedAt });
+            entry.HasIndex(x => x.ExpiresAt);
+            entry.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<AdminMfaGrant>(entry =>
+        {
+            entry.ToTable("AdminMfaGrants", IdentitySchema);
+            entry.HasKey(x => x.TokenHash);
+            entry.Property(x => x.TokenHash).HasMaxLength(64).IsUnicode(false);
+            entry.Property(x => x.CredentialStamp).HasMaxLength(64).IsUnicode(false);
+            entry.HasIndex(x => x.ExpiresAt);
+            entry.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+        modelBuilder.Entity<CustomerFavorite>(favorite =>
+        {
+            favorite.ToTable("Favorites", IdentitySchema);
+            favorite.HasKey(x => new { x.UserId, x.ProductId });
+            favorite.Property(x => x.ProductId).HasMaxLength(128).UseCollation("Latin1_General_100_BIN2");
+            favorite.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+            favorite.HasIndex(x => new { x.UserId, x.CreatedAt });
+        });
+        modelBuilder.Entity<AdminInvitation>(invitation =>
+        {
+            invitation.ToTable("AdminInvitations", IdentitySchema, table =>
+            {
+                table.HasCheckConstraint("CK_AdminInvitations_Expiry", "[ExpiresAt] > [CreatedAt]");
+                table.HasCheckConstraint("CK_AdminInvitations_Outcome", "NOT ([AcceptedAt] IS NOT NULL AND [CancelledAt] IS NOT NULL)");
+                table.HasCheckConstraint("CK_AdminInvitations_AcceptedUser", "([AcceptedAt] IS NULL AND [AcceptedUserId] IS NULL) OR ([AcceptedAt] IS NOT NULL AND [AcceptedUserId] IS NOT NULL)");
+                table.HasCheckConstraint("CK_AdminInvitations_CancelledBy", "([CancelledAt] IS NULL AND [CancelledByUserId] IS NULL) OR ([CancelledAt] IS NOT NULL AND [CancelledByUserId] IS NOT NULL)");
+            });
+            invitation.Property(x => x.Email).HasMaxLength(320);
+            invitation.Property(x => x.NormalizedEmail).HasMaxLength(320);
+            invitation.Property(x => x.TokenHash).HasMaxLength(64).IsUnicode(false);
+            invitation.HasIndex(x => x.TokenHash).IsUnique();
+            invitation.HasIndex(x => new { x.NormalizedEmail, x.ExpiresAt });
+            invitation.HasIndex(x => x.InvitedByUserId);
+            invitation.HasIndex(x => x.AcceptedUserId);
+            invitation.HasIndex(x => x.CancelledByUserId);
+            invitation.HasOne<User>().WithMany().HasForeignKey(x => x.InvitedByUserId).OnDelete(DeleteBehavior.Restrict);
+            invitation.HasOne<User>().WithMany().HasForeignKey(x => x.AcceptedUserId).OnDelete(DeleteBehavior.Restrict);
+            invitation.HasOne<User>().WithMany().HasForeignKey(x => x.CancelledByUserId).OnDelete(DeleteBehavior.Restrict);
+        });
+
         CatalogModel.Configure(modelBuilder);
         CustomerCommerceModel.Configure(modelBuilder);
         modelBuilder.Entity<User>(user =>

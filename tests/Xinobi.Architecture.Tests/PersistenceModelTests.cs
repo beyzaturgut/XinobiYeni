@@ -22,6 +22,11 @@ public sealed class PersistenceModelTests
 
     [Theory]
     [InlineData(typeof(User), new[] { nameof(User.NormalizedEmail) })]
+    [InlineData(typeof(AdminInvitation), new[] { nameof(AdminInvitation.TokenHash) })]
+    [InlineData(typeof(AdminMfaChallengeRecord), new[] { nameof(AdminMfaChallengeRecord.TokenHash) })]
+    [InlineData(typeof(AdminMfaGrant), new[] { nameof(AdminMfaGrant.TokenHash) })]
+    [InlineData(typeof(AdminPasswordReset), new[] { nameof(AdminPasswordReset.TokenHash) })]
+    [InlineData(typeof(CustomerFavorite), new[] { nameof(CustomerFavorite.UserId), nameof(CustomerFavorite.ProductId) })]
     [InlineData(typeof(Role), new[] { nameof(Role.Code) })]
     [InlineData(typeof(Permission), new[] { nameof(Permission.Resource), nameof(Permission.Action) })]
     [InlineData(typeof(SyncJob), new[] { nameof(SyncJob.System), nameof(SyncJob.IdempotencyKey) })]
@@ -61,12 +66,83 @@ public sealed class PersistenceModelTests
     public void ReviewedIdempotentScriptMatchesMigrations()
     {
         using var context = CreateContext();
-        var generated = context.GetService<IMigrator>().GenerateScript(options: MigrationsSqlGenerationOptions.Idempotent);
-        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0005_OrderLinePersonalization.idempotent.sql"));
+        var generated = context.GetService<IMigrator>().GenerateScript("0", "20261013072705_CustomerFavorites", MigrationsSqlGenerationOptions.Idempotent);
+        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0007_CustomerFavorites.idempotent.sql"));
         Assert.Equal(Normalize(committed), Normalize(generated));
     }
 
     private static string Normalize(string sql) => sql.Trim('﻿').ReplaceLineEndings("\n").Trim();
+
+    [Fact]
+    public void ReviewedMfaScriptsMatchTheIncrementalMigrationRange()
+    {
+        using var context = CreateContext();
+        var migrator = context.GetService<IMigrator>();
+        const string previous = "20261013072705_CustomerFavorites";
+        const string current = "20261013122941_AdminMfaPersistence";
+        Assert.Contains(current, context.Database.GetMigrations());
+        var deployed = migrator.GenerateScript(previous, current, MigrationsSqlGenerationOptions.Idempotent);
+        Assert.Equal(Normalize(File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0008_AdminMfaPersistence.idempotent.sql"))), Normalize(deployed));
+        var rollback = migrator.GenerateScript(current, previous);
+        Assert.Equal(Normalize(File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0008_AdminMfaPersistence.rollback.sql"))), Normalize(rollback));
+    }
+
+    [Fact]
+    public void ReviewedRecoveryScriptsMatchTheIncrementalMigrationRange()
+    {
+        using var context = CreateContext();
+        var migrator = context.GetService<IMigrator>();
+        const string previous = "20261013122941_AdminMfaPersistence";
+        const string current = "20261013123801_AdminPasswordResetPersistence";
+        Assert.Equal(new[]
+        {
+            "20261007090524_InitialCore",
+            "20261009120332_CatalogCommerce",
+            "20261009132316_CustomerIdentityOrders",
+            "20261009135019_FeatureDocuments",
+            "20261009141900_OrderLinePersonalization",
+            "20261012115009_AdminInvitations",
+            "20261013072705_CustomerFavorites",
+            previous,
+            current
+        }, context.Database.GetMigrations());
+        var deployed = migrator.GenerateScript(previous, current, MigrationsSqlGenerationOptions.Idempotent);
+        Assert.Equal(Normalize(File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0009_AdminPasswordResetPersistence.idempotent.sql"))), Normalize(deployed));
+        var rollback = migrator.GenerateScript(current, previous);
+        Assert.Equal(Normalize(File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0009_AdminPasswordResetPersistence.rollback.sql"))), Normalize(rollback));
+    }
+
+    [Theory]
+    [InlineData("0", "20261013072705_CustomerFavorites", "0007_CustomerFavorites.idempotent.sql")]
+    [InlineData("20261013072705_CustomerFavorites", "20261013122941_AdminMfaPersistence", "0008_AdminMfaPersistence.idempotent.sql")]
+    [InlineData("20261013122941_AdminMfaPersistence", "20261013123801_AdminPasswordResetPersistence", "0009_AdminPasswordResetPersistence.idempotent.sql")]
+    public void ReviewedDeploymentRangeMatchesMigrations(string from, string to, string file)
+    {
+        using var context = CreateContext();
+        var generated = context.GetService<IMigrator>().GenerateScript(from, to, MigrationsSqlGenerationOptions.Idempotent);
+        var committed = File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations", file));
+        Assert.Equal(Normalize(committed), Normalize(generated));
+    }
+
+    [Fact]
+    public void ReviewedDeploymentRangesCoverTheEntireOrderedMigrationHistory()
+    {
+        using var context = CreateContext();
+        // 0007 is cumulative; 0008 and 0009 are incremental. New migrations
+        // must explicitly extend reviewed deployment coverage.
+        Assert.Equal(new[]
+        {
+            "20261007090524_InitialCore",
+            "20261009120332_CatalogCommerce",
+            "20261009132316_CustomerIdentityOrders",
+            "20261009135019_FeatureDocuments",
+            "20261009141900_OrderLinePersonalization",
+            "20261012115009_AdminInvitations",
+            "20261013072705_CustomerFavorites",
+            "20261013122941_AdminMfaPersistence",
+            "20261013123801_AdminPasswordResetPersistence"
+        }, context.Database.GetMigrations());
+    }
 
     private static string RepositoryRoot()
     {

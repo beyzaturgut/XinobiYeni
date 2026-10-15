@@ -97,9 +97,10 @@ public sealed class NotificationCenter(FeatureDocuments documents, IConfiguratio
 
     public async Task<Inbox> Inbox(string accountId)
     {
-        var items = (await store.Read()).Items.Where(item => item.AccountId == accountId && item.Channel == NotificationChannels.InApp)
-            .OrderByDescending(item => item.CreatedAt).Take(50).Select(item => new InboxItem(item.Id, item.Kind, item.Title, item.Body, item.Link, item.CreatedAt, item.ReadAt is not null)).ToArray();
-        return new Inbox(items, items.Count(item => !item.Read));
+        var owned = (await store.Read()).Items.Where(item => item.AccountId == accountId && item.Channel == NotificationChannels.InApp).ToArray();
+        var items = owned.OrderByDescending(item => item.CreatedAt).Take(50)
+            .Select(item => new InboxItem(item.Id, item.Kind, item.Title, item.Body, item.Link, item.CreatedAt, item.ReadAt is not null)).ToArray();
+        return new Inbox(items, owned.Count(item => item.ReadAt is null));
     }
 
     /// <summary>Marks the given inbox items read, or all of them when <paramref name="ids"/> is null.</summary>

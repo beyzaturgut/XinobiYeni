@@ -53,6 +53,29 @@ public sealed class NotificationWorkerTests : IDisposable
         Assert.Equal(0, await center.DeliverDue(CancellationToken.None));
     }
 
+    [Fact]
+    public async Task InboxCountIncludesOlderItemsAndReadOperationsStayAccountScoped()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory }).Build();
+        var documents = new FeatureDocuments(new Development(directory), configuration, new ServiceCollection().BuildServiceProvider().GetRequiredService<IServiceScopeFactory>());
+        var center = new NotificationCenter(documents, configuration, TimeProvider.System, []);
+        var first = new AccountRecord(Guid.NewGuid().ToString("N"), "Ayşe", "ayse@example.com", "", DateTimeOffset.UtcNow);
+        var second = new AccountRecord(Guid.NewGuid().ToString("N"), "Ali", "ali@example.com", "", DateTimeOffset.UtcNow);
+        for (var i = 0; i < 55; i++) await center.Notify(first, "order_placed", $"Bildirim {i}", "Detay", $"/hesap/siparisler?siparis={i}");
+        await center.Notify(second, "order_placed", "Başkasının bildirimi", "Detay", null);
+
+        var inbox = await center.Inbox(first.Id);
+        Assert.Equal(50, inbox.Items.Length);
+        Assert.Equal(55, inbox.Unread);
+        await center.MarkRead(second.Id, [inbox.Items[0].Id]);
+        Assert.Equal(55, (await center.Inbox(first.Id)).Unread);
+        await center.MarkRead(first.Id, [inbox.Items[0].Id]);
+        Assert.Equal(54, (await center.Inbox(first.Id)).Unread);
+        await center.MarkRead(first.Id, null);
+        Assert.Equal(0, (await center.Inbox(first.Id)).Unread);
+        Assert.Equal(1, (await center.Inbox(second.Id)).Unread);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(directory)) Directory.Delete(directory, true);

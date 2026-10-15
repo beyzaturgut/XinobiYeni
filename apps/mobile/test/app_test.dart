@@ -138,6 +138,26 @@ Future<FakeCatalog> pumpApp(WidgetTester tester, {String location = '/', FakeCat
 }
 
 void main() {
+  testWidgets('date picker uses Turkish labels and month names', (tester) async {
+    await pumpApp(tester);
+    final context = tester.element(find.byType(Scaffold).first);
+    final picker = showDatePicker(
+      context: context,
+      firstDate: DateTime(2026),
+      lastDate: DateTime(2027),
+      initialDate: DateTime(2026, 11, 24),
+    );
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Kasım'), findsWidgets);
+    expect(find.text('Select date'), findsNothing);
+    expect(find.text('Cancel'), findsNothing);
+    final labels = MaterialLocalizations.of(context);
+    expect(labels.cancelButtonLabel.toLowerCase(), contains('ptal'));
+    await tester.tap(find.text(labels.cancelButtonLabel));
+    await tester.pumpAndSettle();
+    expect(await picker, isNull);
+  });
+
   testWidgets('home shows categories and featured products from the contract', (tester) async {
     await pumpApp(tester);
     // Same sections and copy as the web home.

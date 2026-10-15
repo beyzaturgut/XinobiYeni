@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,6 +34,8 @@ class _XinobiAppState extends State<XinobiApp> {
         debugShowCheckedModeBanner: false,
         theme: buildTheme(),
         locale: const Locale('tr', 'TR'),
+        supportedLocales: const [Locale('tr', 'TR')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         routerConfig: router,
       );
 }

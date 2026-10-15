@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   xinobi_api_client:
     path: ../../packages/clients/dart
 

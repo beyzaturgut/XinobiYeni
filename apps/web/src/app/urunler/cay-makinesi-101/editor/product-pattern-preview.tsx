@@ -20,6 +20,7 @@ export type PatternTransform = {
 };
 
 type ProductPatternPreviewProps = {
+  errorFallback?: React.ReactNode;
   surfaceTreatment?: "legacy" | "metallic-ink";
   surfaceInkExposureStops?: number;
   onRendered?: (canvas: HTMLCanvasElement) => void;
@@ -99,7 +100,7 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", transparentProduct = false, children, onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ errorFallback, onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", transparentProduct = false, children, onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
   const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
   const ASSET_WIDTH = assetWidth, ASSET_HEIGHT = assetHeight;
   const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
@@ -266,6 +267,7 @@ export default function ProductPatternPreview({ onRendered, surfaceTreatment = "
     drag.current=null;setCursor(hit(sourcePoint(event))?"grab":"auto");
     if(event.currentTarget.hasPointerCapture(event.pointerId))event.currentTarget.releasePointerCapture(event.pointerId);
   }
+  if (status === "error" && errorFallback) return <>{errorFallback}</>;
   return <div className={styles.productPreview} style={{aspectRatio:SOURCE_WIDTH+"/"+SOURCE_HEIGHT, "--source-aspect":String(SOURCE_WIDTH/SOURCE_HEIGHT)} as React.CSSProperties} aria-busy={status === "loading"}>
     <canvas ref={canvasRef} width={SOURCE_WIDTH} height={SOURCE_HEIGHT} role="img" aria-label={alt} hidden={status !== "ready"}
       style={draggable ? {touchAction:"none",cursor} : undefined}

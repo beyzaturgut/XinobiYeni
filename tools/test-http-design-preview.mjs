@@ -1,18 +1,17 @@
 // Real static export on insecure HTTP, mocked session/provider responses, real published preview assets.
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {globSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import path from 'node:path';
 const require=createRequire(path.resolve('apps/web/package.json'));
 const {chromium}=require('@playwright/test');
 const root=path.resolve('apps/web/out');
-const bundle=JSON.parse(await readFile(globSync('apps/web/out/assets/product-previews/*/*/inputs.json')[0],'utf8'));
+const bundle=JSON.parse(await readFile(path.join(root,'assets/product-previews/DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6/DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1/inputs.json'),'utf8'));
 const product=bundle.productReference,variant=bundle.variantReference;
 const id='abcdef123456';
 const session={id,status:'ready',product:{id:product,name:'HTTP Preview Product'},variant:{id:variant,color:'Test',image:bundle.sourceImage},questions:[],answers:[],imageUrl:`/api/v1/design-studio/sessions/${id}/image`};
 const types={'.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'};
-let created=0,patternReads=0,privateCatalogReads=0;
+let created=0,patternReads=0,privateCatalogReads=0,brokenHero=false;
 const errors=[];
 const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
 try{
@@ -20,6 +19,7 @@ try{
  page.on('pageerror',error=>errors.push(error.message));
  await page.route('http://xinobi-mobile.test/**',async route=>{
   const request=route.request(),url=new URL(request.url());
+  if(brokenHero&&url.pathname===new URL(bundle.inputs.source.url,'http://xinobi-mobile.test').pathname)return route.fulfill({status:404});
   if(url.pathname==='/api/v1/design-studio/sessions'&&request.method()==='POST'){
    const body=request.postDataJSON();assert.equal(body.productId,product);assert.equal(body.variantId,variant);
    assert.match(body.browserId,/^[a-f0-9-]{36}$/);created++;
@@ -36,7 +36,7 @@ try{
   if(url.pathname==='/api/v1/local-commerce/state')privateCatalogReads++;
   if(url.pathname.startsWith('/api/'))return route.fulfill({status:401,json:{code:'unauthorized'}});
   let file=path.resolve(root,'.'+decodeURIComponent(url.pathname));
-  if(!file.startsWith(root+path.sep))return route.fulfill({status:404});
+  if(file!==root&&!file.startsWith(root+path.sep))return route.fulfill({status:404});
   if(url.pathname.endsWith('/')||!path.extname(file))file=path.join(file,'index.html');
   try{return route.fulfill({body:await readFile(file),contentType:types[path.extname(file)]||'text/html'});}
   catch{return route.fulfill({status:404});}
@@ -61,4 +61,19 @@ try{
  await page.locator('canvas[role=img]').first().waitFor();
  assert.deepEqual(errors,[]);
  console.log('PASS: HTTP creates an AI session without randomUUID and renders the generated-pattern product canvas on web and mobile preview routes.');
+ await page.goto('http://xinobi-mobile.test/');
+ const hero=page.getByRole('region',{name:'XINOBI U',exact:true});
+ await hero.locator('canvas[role=img]').waitFor();
+ assert.equal(await hero.getByRole('alert').count(),0);
+ const size=await hero.locator('canvas').evaluate(canvas=>({width:canvas.width,height:canvas.height}));
+ const heroScale=Math.min(1,1280/Math.max(bundle.inputs.width,bundle.inputs.height));
+ assert.equal(size.width,Math.round(bundle.inputs.width*heroScale));
+ assert.equal(size.height,Math.round(bundle.inputs.height*heroScale));
+ brokenHero=true;
+ const failure=page.waitForResponse(response=>new URL(response.url()).pathname===new URL(bundle.inputs.source.url,'http://xinobi-mobile.test').pathname&&response.status()===404);
+ await page.reload();await failure;
+ await hero.getByRole('img',{name:'Japon dalga deseni uygulanmış Xinobi çay makinesi',exact:true}).waitFor();
+ assert.equal(await hero.getByRole('alert').count(),0);
+ assert.deepEqual(errors,[]);
+ console.log('PASS: mobile homepage renders the approved product at its actual dimensions and shows the fallback photo if preview media fails.');
 }finally{await browser.close();}

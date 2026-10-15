@@ -155,8 +155,8 @@ class _Visual extends StatelessWidget {
                   const SizedBox(height: 8),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    // The asset is pre-cropped to the web's artworkFrame window.
-                    child: AspectRatio(aspectRatio: 1, child: Image.asset('assets/home/japanese-wave-design.png', fit: BoxFit.cover)),
+                    // Share the full-bleed artwork with the web marketing card.
+                    child: AspectRatio(aspectRatio: 1, child: Image.asset('assets/home/japanese-wave-artwork.png', fit: BoxFit.cover)),
                   ),
                 ]),
               ),

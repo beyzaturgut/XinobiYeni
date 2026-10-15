@@ -11,7 +11,7 @@ const product=bundle.productReference,variant=bundle.variantReference;
 const id='abcdef123456';
 const session={id,status:'ready',product:{id:product,name:'HTTP Preview Product'},variant:{id:variant,color:'Test',image:bundle.sourceImage,stock:10,sku:'PHOTO-TEST'},questions:[],answers:[],imageUrl:`/api/v1/design-studio/sessions/${id}/image`};
 const types={'.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'};
-let created=0,patternReads=0,privateCatalogReads=0,brokenHero=false,signedInFixture=false,uploadedPhoto=null;
+let created=0,patternReads=0,privateCatalogReads=0,signedInFixture=false,uploadedPhoto=null;
 const errors=[];
 const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
 try{
@@ -20,7 +20,6 @@ try{
  page.on('pageerror',error=>errors.push(error.message));
  await page.route('http://xinobi-mobile.test/**',async route=>{
   const request=route.request(),url=new URL(request.url());
-  if(brokenHero&&url.pathname===new URL(bundle.inputs.source.url,'http://xinobi-mobile.test').pathname)return route.fulfill({status:404});
   if(url.pathname==='/api/v1/design-studio/sessions'&&request.method()==='POST'){
    const body=request.postDataJSON();assert.equal(body.productId,product);assert.equal(body.variantId,variant);
    assert.match(body.browserId,/^[a-f0-9-]{36}$/);created++;
@@ -73,39 +72,30 @@ try{
  console.log('PASS: HTTP creates an AI session without randomUUID and renders the generated-pattern product canvas on web and mobile preview routes.');
  await page.goto('http://xinobi-mobile.test/');
  const hero=page.getByRole('region',{name:'XINOBI U',exact:true});
- await hero.locator('canvas[role=img]').waitFor();
+ const heroProduct=hero.getByRole('img',{name:'Japon dalga deseni uygulanmış Xinobi çay makinesi',exact:true});
+ await heroProduct.waitFor();
+ assert.equal(await hero.locator('canvas').count(),0,'Marketing must use the same finished product photo as mobile');
  assert.equal(await hero.getByRole('alert').count(),0);
- const size=await hero.locator('canvas').evaluate(canvas=>({width:canvas.width,height:canvas.height}));
- const heroScale=Math.min(1,1280/Math.max(bundle.inputs.width,bundle.inputs.height));
- assert.equal(size.width,Math.round(bundle.inputs.width*heroScale));
- assert.equal(size.height,Math.round(bundle.inputs.height*heroScale));
+ const artwork=hero.getByRole('img',{name:'Japon dalga desenli tasarım örneği',exact:true});
+ assert.ok((await artwork.getAttribute('src')).includes('japanese-wave-artwork.png'));
  for(const width of [320,390,430,768,1440]){
   await page.setViewportSize({width,height:844});
-  const layout=await hero.locator('canvas').evaluate(canvas=>{
-   const frame=canvas.parentElement.parentElement;
-   const visual=frame.parentElement;
-   const rect=element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
-   return {image:rect(canvas),frame:rect(frame),questions:rect(visual.querySelector('h3').parentElement),art:rect(visual.querySelector('strong').parentElement),ratio:canvas.width/canvas.height};
+  const layout=await heroProduct.evaluate(image=>{
+   const frame=image.parentElement,visual=frame.parentElement;
+   const rect=element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom};};
+   return {image:rect(image),frame:rect(frame),visual:rect(visual),questions:rect(visual.querySelector('h3').parentElement),art:rect(visual.querySelector('strong').parentElement),fit:getComputedStyle(image).objectFit};
   });
-  const {image,frame,questions,art,ratio}=layout;
-  assert.ok(image.left>=frame.left-1&&image.right<=frame.right+1&&image.top>=frame.top-1&&image.bottom<=frame.bottom+1,`Complete product must fit at ${width}px: ${JSON.stringify(layout)}`);
-  assert.ok(Math.abs(image.width/image.height-ratio)<0.01,`Product must retain its aspect ratio at ${width}px`);
-  if(width<=700){
-   assert.ok(image.bottom<=questions.top&&image.bottom<=art.top,`Cards must not cover the product at ${width}px`);
-  }
+  const {image,frame,visual,questions,art,fit}=layout;
+  assert.equal(fit,'contain');
+  assert.ok(image.left>=visual.left-1&&image.right<=visual.right+1&&image.top>=visual.top-1&&image.bottom<=visual.bottom+1,`Complete product must fit at ${width}px`);
+  if(width<=700)assert.ok(frame.bottom<=questions.top&&frame.bottom<=art.top,`Cards must not cover the product at ${width}px`);
  }
  await page.setViewportSize({width:390,height:844});
  await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();
  await hero.screenshot({path:'artifacts/mobile-personalization-layout.png'});
- console.log('PASS: the complete homepage product retains its aspect ratio at 320–1440px, with mobile cards below the product.');
- brokenHero=true;
- const failure=page.waitForResponse(response=>new URL(response.url()).pathname===new URL(bundle.inputs.source.url,'http://xinobi-mobile.test').pathname&&response.status()===404);
- await page.reload();await failure;
- await hero.getByRole('img',{name:'Japon dalga deseni uygulanmış Xinobi çay makinesi',exact:true}).waitFor();
- assert.equal(await hero.getByRole('alert').count(),0);
  assert.deepEqual(errors,[]);
- console.log('PASS: mobile homepage renders the approved product at its actual dimensions and shows the fallback photo if preview media fails.');
- brokenHero=false;signedInFixture=true;
+ console.log('PASS: homepage uses the finished mobile product photo and clean artwork, with the complete product contained at 320–1440px.');
+ signedInFixture=true;
  await page.goto(`http://xinobi-mobile.test/xinobi-u/kendi-gorselin/?product=${product}&variant=${variant}`);
  await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();
  await page.locator('#local-pattern').setInputFiles(path.join(root,'assets/personalization/sample-pattern.png'));

@@ -6,6 +6,15 @@ export type Content = { slides: Slide[]; xinobiBanner: string; buttonColor: stri
 export type Announcement = { id: string; title: string; body: string; kind: 'Haber' | 'Duyuru'; publishedAt: string }
 export type CommerceState = { announcements?: Announcement[]; categories?: string[]; products: Product[]; prices: Record<string, number>; content: Content }
 export const localApi = 'http://127.0.0.1:5003/api/v1/local-commerce'
+// randomUUID is restricted to secure contexts; getRandomValues also works on the HTTP test site.
+export function randomCommerceId(): string {
+  if (typeof globalThis.crypto.randomUUID === 'function') return globalThis.crypto.randomUUID()
+  const bytes = globalThis.crypto.getRandomValues(new Uint8Array(16))
+  bytes[6] = (bytes[6] & 0x0f) | 0x40
+  bytes[8] = (bytes[8] & 0x3f) | 0x80
+  const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('')
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
+}
 // Panel routes need the staff session cookie; the CSRF header proves the request comes from our own pages (ADR-004).
 // A static snapshot (no API base) gets a plain request so CDNs need no credentialed CORS.
 const send = (url: string, method: string, body: unknown, api: boolean) => fetch(url, {

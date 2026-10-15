@@ -1,8 +1,9 @@
 'use client';
 import Link from 'next/link';
-import {useState,type FormEvent} from 'react';
+import {useEffect,useRef,useState,type FormEvent} from 'react';
 import {deleteAddress,localPhone,saveAddress,useDemoCommerce,type AddressInput,type CustomerAddress} from '../../../lib/demo-commerce';
 import styles from '../account.module.css';
+import confirmation from './confirmation.module.css';
 
 const blank=(name='',phone=''):AddressInput=>({title:'',fullName:name,phone,city:'',district:'',line:'',postalCode:'',isDefault:false});
 
@@ -25,6 +26,7 @@ export default function Addresses(){
 function AddressForm({address,initial,onDone}:{address?:CustomerAddress;initial?:AddressInput;onDone:()=>void}){
   const [form,setForm]=useState<AddressInput>(address?{...address,phone:localPhone(address.phone),postalCode:address.postalCode??''}:initial!);
   const [busy,setBusy]=useState(false),[error,setError]=useState('');
+  const [confirmDelete,setConfirmDelete]=useState(false);
   const set=(field:keyof AddressInput)=>(event:React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>)=>setForm(current=>({...current,[field]:field==='isDefault'?(event.target as HTMLInputElement).checked:event.target.value}));
   async function run(action:()=>Promise<unknown>){setBusy(true);setError('');try{await action();onDone()}catch(problem){setError(problem instanceof Error?problem.message:'İşlem tamamlanamadı.');setBusy(false)}}
   function submit(event:FormEvent){event.preventDefault();run(()=>saveAddress({...form,postalCode:form.postalCode?.trim()||null},address?.id))}
@@ -36,8 +38,21 @@ function AddressForm({address,initial,onDone}:{address?:CustomerAddress;initial?
     <label>Açık adres<textarea value={form.line} maxLength={250} rows={3} autoComplete="street-address" onChange={set('line')}/></label>
     <label>Posta kodu (isteğe bağlı)<input value={form.postalCode??''} inputMode="numeric" maxLength={5} autoComplete="postal-code" onChange={set('postalCode')}/></label>
     <label className={styles.check}><input type="checkbox" checked={form.isDefault} disabled={address?.isDefault} onChange={set('isDefault')}/>Varsayılan adresim olsun</label>
-    {error&&<p role="alert" className={styles.error}>{error}</p>}
+    {error&&!confirmDelete&&<p role="alert" className={styles.error}>{error}</p>}
     <div className={styles.addressActions}><button className={styles.primary} disabled={busy}>{busy?'Kaydediliyor…':'Kaydet'}</button><button type="button" className={styles.secondary} onClick={onDone} disabled={busy}>Vazgeç</button>
-      {address&&<button type="button" className={styles.logout} disabled={busy} onClick={()=>run(()=>deleteAddress(address.id))}>Adresi sil</button>}</div>
+      {address&&<button type="button" className={styles.logout} disabled={busy} onClick={()=>setConfirmDelete(true)}>Adresi sil</button>}</div>
+    {address&&confirmDelete&&<DeleteConfirmation title={address.title} busy={busy} error={error} onCancel={()=>setConfirmDelete(false)} onConfirm={()=>{if(!busy)void run(()=>deleteAddress(address.id))}}/>}
   </form>;
+}
+
+function DeleteConfirmation({title,busy,error,onCancel,onConfirm}:{title:string;busy:boolean;error:string;onCancel:()=>void;onConfirm:()=>void}){
+  const dialog=useRef<HTMLDialogElement>(null);
+  useEffect(()=>{const element=dialog.current!;element.showModal();return()=>element.close()},[]);
+  return <dialog ref={dialog} className={`${styles.modal} ${confirmation.modal}`} aria-labelledby="delete-address-title" aria-describedby="delete-address-description" onCancel={event=>{event.preventDefault();if(!busy)onCancel()}}>
+    <h2 id="delete-address-title">Adresi silmek istiyor musunuz?</h2>
+    <p className={confirmation.address}>{title}</p>
+    <p id="delete-address-description">Bu adres hesabınızdan kaldırılacak. Bu işlem geri alınamaz.</p>
+    {error&&<p role="alert" className={styles.error}>{error}</p>}
+    <div className={confirmation.actions}><button type="button" className={styles.secondary} autoFocus disabled={busy} onClick={onCancel}>Vazgeç</button><button type="button" className={styles.primary} disabled={busy} onClick={onConfirm}>{busy?'Siliniyor…':'Adresi sil'}</button></div>
+  </dialog>;
 }

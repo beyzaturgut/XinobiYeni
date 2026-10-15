@@ -5,19 +5,21 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../catalog/catalog_repository.dart';
+import '../personalization/surface_preview.dart';
 
 /// Same shape and limits as the web cart (`xinobi-cart-v1`): variant lines, 1–99 each, at most 100 lines, stored on this device.
 /// [designId]/[designName] make a personalised line with one of the customer's saved designs; the same colour with another design
 /// (or none) is a separate line. Prices and stock always come from the current catalog; checkout re-checks them on the server.
 class CartLine {
-  const CartLine({required this.productId, required this.variantId, required this.quantity, this.designId, this.designName});
+  const CartLine({required this.productId, required this.variantId, required this.quantity, this.designId, this.designName, this.designPlacement});
   final String productId;
   final String variantId;
   final int quantity;
   final String? designId;
   final String? designName;
+  final DesignPlacement? designPlacement;
 
-  CartLine withQuantity(int value) => CartLine(productId: productId, variantId: variantId, quantity: value, designId: designId, designName: designName);
+  CartLine withQuantity(int value, {DesignPlacement? placement}) => CartLine(productId: productId, variantId: variantId, quantity: value, designId: designId, designName: designName, designPlacement: placement ?? designPlacement);
   bool same(String product, String variant, [String? design]) => productId == product && variantId == variant && designId == design;
   Map<String, Object> toJson() => {
         'productId': productId,
@@ -25,6 +27,7 @@ class CartLine {
         'quantity': quantity,
         'designId': ?designId,
         'designName': ?designName,
+        'designPlacement': ?designPlacement?.toJson(),
       };
 }
 
@@ -58,7 +61,8 @@ List<CartLine> parseCart(String? raw) {
             variantId: row['variantId'] as String,
             quantity: row['quantity'] as int,
             designId: row['designId'] as String?,
-            designName: row['designName'] as String?))
+            designName: row['designName'] as String?,
+            designPlacement: DesignPlacement.fromJson(row['designPlacement'])))
         .toList();
   } on FormatException {
     return [];
@@ -84,7 +88,7 @@ class CartController extends Notifier<List<CartLine>> {
   }
 
   /// Adds one unit; [maxQuantity] is the contract's per-variant limit (stock, capped at 99), shared by all lines of the colour.
-  Future<void> add(String productId, String variantId, int maxQuantity, {String? designId, String? designName}) async {
+  Future<void> add(String productId, String variantId, int maxQuantity, {String? designId, String? designName, DesignPlacement? designPlacement}) async {
     final existing = state.where((line) => line.same(productId, variantId, designId)).firstOrNull;
     final limit = maxQuantity.clamp(0, maxLineQuantity);
     if (variantUnits(state, variantId) >= limit || (existing?.quantity ?? 0) >= maxLineQuantity) {
@@ -92,8 +96,8 @@ class CartController extends Notifier<List<CartLine>> {
     }
     if (existing == null && state.length >= maxCartLines) throw const CartException('Sepette en fazla 100 farklı ürün olabilir.');
     await _write(existing == null
-        ? [...state, CartLine(productId: productId, variantId: variantId, quantity: 1, designId: designId, designName: designName)]
-        : [for (final line in state) line.same(productId, variantId, designId) ? line.withQuantity(line.quantity + 1) : line]);
+        ? [...state, CartLine(productId: productId, variantId: variantId, quantity: 1, designId: designId, designName: designName, designPlacement: designPlacement)]
+        : [for (final line in state) line.same(productId, variantId, designId) ? line.withQuantity(line.quantity + 1, placement: designPlacement) : line]);
   }
 
   Future<void> setQuantity(String productId, String variantId, int quantity, {String? designId}) async {

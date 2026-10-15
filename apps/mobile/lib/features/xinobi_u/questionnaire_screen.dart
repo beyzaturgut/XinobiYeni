@@ -361,7 +361,7 @@ class _ResultState extends ConsumerState<_Result> {
       final design = await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveDesign(token, widget.session.id));
       ref.invalidate(myDesignsProvider);
       if (mounted) setState(() => saved = design);
-      if (announce) messenger.showSnackBar(SnackBar(content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim'))));
+      if (announce && mounted) messenger.showSnackBar(SnackBar(showCloseIcon: true, content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim'))));
       return design;
     } on AccountException catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.message)));
@@ -396,7 +396,7 @@ class _ResultState extends ConsumerState<_Result> {
       // K-12: the "Temsilidir" notice is permanent, readable text.
       Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: text.bodySmall),
       const SizedBox(height: 20),
-      OutlinedButton.icon(onPressed: widget.onOpenPreview, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
+      OutlinedButton.icon(onPressed: () { ScaffoldMessenger.of(context).hideCurrentSnackBar(); widget.onOpenPreview(); }, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
       const SizedBox(height: 8),
       if (ref.watch(authProvider) is SignedIn) ...[
         FilledButton.icon(onPressed: saving ? null : _addToCart, icon: const Icon(Icons.add_shopping_cart), label: Text(saving ? 'Hazırlanıyor…' : 'Sepete ekle')),

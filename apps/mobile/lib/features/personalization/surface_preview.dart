@@ -15,6 +15,19 @@ class DesignPlacement {
   final double rotation;
   final Offset offset;
 
+  Map<String, Object> toJson() => {'cover': cover, 'scale': scale, 'rotation': rotation, 'x': offset.dx, 'y': offset.dy};
+
+  static DesignPlacement? fromJson(Object? value) {
+    if (value is! Map || value['cover'] is! bool) return null;
+    final fields = ['scale', 'rotation', 'x', 'y'].map((key) => value[key]).toList();
+    if (fields.any((item) => item is! num || !item.isFinite)) return null;
+    if ((value['scale'] as num) <= 0 || (value['scale'] as num) > 10) return null;
+    return value['cover'] == true ? const DesignPlacement.cover() : DesignPlacement.place(
+      scale: (value['scale'] as num).toDouble(), rotation: (value['rotation'] as num).toDouble(),
+      offset: Offset((value['x'] as num).toDouble(), (value['y'] as num).toDouble()),
+    );
+  }
+
   DesignPlacement copyWith({double? scale, double? rotation, Offset? offset}) =>
       DesignPlacement.place(scale: scale ?? this.scale, rotation: rotation ?? this.rotation, offset: offset ?? this.offset);
 }

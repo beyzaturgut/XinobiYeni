@@ -8,6 +8,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/features/cart/cart.dart';
 import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/main.dart';
+import 'package:xinobi_mobile/features/personalization/surface_preview.dart';
 
 import 'app_test.dart' show FakeCatalog;
 
@@ -60,6 +61,23 @@ Future<void> pumpApp(WidgetTester tester, String location) async {
 void main() {
   designLineTests();
   setUp(() => SharedPreferences.setMockInitialValues({}));
+
+  test('photo placement survives cart persistence and quantity changes', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final cart = container.read(cartProvider.notifier);
+    await Future<void>.delayed(Duration.zero);
+    const placement = DesignPlacement.place(scale: 0.72, rotation: 0.4, offset: Offset(0.12, -0.18));
+    await cart.add('P1', 'V1', 5, designId: 'photo', designName: 'Fotoğraf', designPlacement: placement);
+    await cart.setQuantity('P1', 'V1', 2, designId: 'photo');
+    final stored = (await SharedPreferences.getInstance()).getString(cartStorageKey);
+    final restored = parseCart(stored).single;
+    expect(restored.quantity, 2);
+    expect(restored.designPlacement!.toJson(), placement.toJson());
+    const changed = DesignPlacement.place(scale: 0.5, rotation: -0.2);
+    await cart.add('P1', 'V1', 5, designId: 'photo', designName: 'Fotoğraf', designPlacement: changed);
+    expect(container.read(cartProvider).single.designPlacement!.toJson(), changed.toJson());
+  });
 
   test('stored cart uses the web format and drops invalid rows', () {
     final lines = parseCart(jsonEncode([

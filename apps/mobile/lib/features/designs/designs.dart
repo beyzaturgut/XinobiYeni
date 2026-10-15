@@ -28,7 +28,7 @@ String designImagePath(String id) => '/api/v1/me/designs/${Uri.encodeComponent(i
 
 /// Puts the design's product in [variantId], its own colour or the first one in stock into the cart; checkout re-checks
 /// ownership, product and stock.
-Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign design, {String? variantId}) async {
+Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign design, {String? variantId, DesignPlacement? placement}) async {
   final messenger = ScaffoldMessenger.of(context);
   final router = GoRouter.of(context);
   try {
@@ -36,7 +36,7 @@ Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign desig
     final variant = [variantId, design.variantId].nonNulls.map((id) => product.variants.where((item) => item.id == id && item.maxQuantity > 0).firstOrNull).nonNulls.firstOrNull ??
         product.variants.where((item) => item.maxQuantity > 0 && item.price != null).firstOrNull;
     if (variant == null) throw const CartException('Bu ürün şu anda stokta yok.');
-    await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name);
+    await ref.read(cartProvider.notifier).add(product.id, variant.id, variant.maxQuantity, designId: design.id, designName: design.name, designPlacement: placement);
     messenger.showSnackBar(SnackBar(
       content: Text('“${design.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.'),
       action: SnackBarAction(label: 'Sepete git', onPressed: () => router.go('/sepet')),
@@ -51,11 +51,12 @@ Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign desig
 /// A saved design worn on its colour's approved surface, placed as the editor starts (an AI pattern covers it, an uploaded
 /// image sits at the default size); colours without an approved surface show the design itself. Labelled "Temsilidir".
 class DesignOnProduct extends ConsumerWidget {
-  const DesignOnProduct({super.key, required this.designId, required this.label, this.productId, this.variant});
+  const DesignOnProduct({super.key, required this.designId, required this.label, this.productId, this.variant, this.placement});
   final String designId;
   final String? productId;
   final String label;
   final VariantDetail? variant;
+  final DesignPlacement? placement;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final path = designImagePath(designId);
@@ -76,7 +77,7 @@ class DesignOnProduct extends ConsumerWidget {
             product: NetworkImage(product),
             design: design,
             mask: NetworkImage(mask),
-            placement: upload ? const DesignPlacement.place() : const DesignPlacement.cover(),
+            placement: placement ?? (upload ? const DesignPlacement.place() : const DesignPlacement.cover()),
             fallback: const ColoredBox(color: XinobiTokens.mediaWarm),
           ),
         ),

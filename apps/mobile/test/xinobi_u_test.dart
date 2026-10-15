@@ -153,10 +153,15 @@ void main() {
     expect(find.text('İşte sana özel yorum.'), findsOneWidget);
     expect(find.text('Advanced s1'), findsNothing);
     expect(fake.generateCalls, 1);
+    ScaffoldMessenger.of(tester.element(find.text('Üründe gelişmiş önizlemeyi aç'))).showSnackBar(
+      SnackBar(duration: const Duration(days: 1), content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () {})),
+    );
+    await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Üründe gelişmiş önizlemeyi aç'));
     await tester.tap(find.text('Üründe gelişmiş önizlemeyi aç'));
     await tester.pumpAndSettle();
     expect(find.text('Advanced s1'), findsOneWidget);
+    expect(find.text('Tasarım hesabına kaydedildi.'), findsNothing);
     router.pop();
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.text('Yeni anket başlat'));

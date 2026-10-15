@@ -166,6 +166,10 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
           const SizedBox(width: 8),
           Expanded(child: OutlinedButton.icon(onPressed: signedIn && designs.isNotEmpty ? () => _chooseSaved(designs) : null, icon: const Icon(Icons.collections_outlined), label: const Text('Tasarımlarım'))),
         ]),
+        if (designImage == null) ...[
+          const SizedBox(height: 8),
+          Text('Başlamak için galeriden bir görsel seç.', style: text.bodySmall),
+        ],
         const SizedBox(height: 16),
         AspectRatio(
           aspectRatio: 1,
@@ -179,7 +183,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
                         const Align(alignment: Alignment.bottomCenter, child: Padding(padding: EdgeInsets.all(8), child: Text('Bu renk için onaylı tasarım yüzeyi yok; başka bir renk seç.', textAlign: TextAlign.center))),
                       ])
                     : designImage == null
-                        ? Stack(fit: StackFit.expand, children: [RemoteImage(variant.imageUrl), const Center(child: Text('Bir görsel seç.'))])
+                        ? RemoteImage(variant.imageUrl)
                         : LayoutBuilder(
                             builder: (context, constraints) => GestureDetector(
                               onPanUpdate: placement.cover
@@ -225,7 +229,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
               ? FilledButton(onPressed: busy || productId == null ? null : _save, child: Text(busy ? 'Kaydediliyor…' : 'Tasarımımı kaydet'))
               : OutlinedButton(onPressed: () => context.go('/hesap'), child: const Text('Kaydetmek için giriş yap')),
         if (current != null && picked == null) ...[
-          FilledButton.icon(onPressed: () => addDesignToCart(context, ref, current, variantId: variant?.id), icon: const Icon(Icons.add_shopping_cart), label: const Text('Sepete ekle')),
+          FilledButton.icon(onPressed: () => addDesignToCart(context, ref, current, variantId: variant?.id, placement: placement), icon: const Icon(Icons.add_shopping_cart), label: const Text('Sepete ekle')),
           const SizedBox(height: 8),
           Text('“${current.name}” Tasarımlarım’da kayıtlı.', style: text.bodySmall),
         ],

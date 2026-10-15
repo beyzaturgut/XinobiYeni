@@ -2,6 +2,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Xinobi.Api.Catalog;
+using Xinobi.Api.LocalCommerce;
 using Xinobi.Api.EmailVerification;
 using Xinobi.Api.Notifications;
 using Xinobi.Api.Orders;
@@ -12,6 +13,8 @@ namespace Xinobi.Api.Identity;
 /// The signed-in customer's own data under /api/v1/me: e-mail change, account deletion, addresses and demo orders.
 /// Shares the filters of the /me group (no-store, Development loopback, problem codes). Legal texts (KVKK, distance sales) come later.
 /// </summary>
+public record AddFavorite(string ProductId);
+
 public static class CustomerEndpoints
 {
     public static void Map(RouteGroupBuilder me, bool rateLimited)
@@ -85,6 +88,34 @@ public static class CustomerEndpoints
             .WithName("DeleteMyAddress")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
+        me.MapGet("/favorites", async Task<Ok<string[]>> (ClaimsPrincipal user, IAccountStore accounts) =>
+                TypedResults.Ok(await accounts.Favorites(Id(user))))
+            .WithName("ListMyFavorites");
+
+        me.MapPost("/favorites", async Task<Results<Created, ProblemHttpResult>> (AddFavorite request, ClaimsPrincipal user, IAccountStore accounts, ICatalogSource source) =>
+            {
+                var productId = ValidProductId(request.ProductId);
+                CommerceState catalog;
+                try { catalog = await source.ReadAsync(); }
+                catch (CatalogUnavailableException) { return AccountEndpoints.Failure(StatusCodes.Status503ServiceUnavailable, "catalog_unavailable", "Katalog şu anda kullanılamıyor."); }
+                if (!catalog.Products.Any(product => product.Active && product.Id == productId))
+                    return AccountEndpoints.Failure(StatusCodes.Status404NotFound, "product_not_found", "Ürün bulunamadı.");
+                await accounts.AddFavorite(Id(user), productId);
+                return TypedResults.Created($"/api/v1/me/favorites/{Uri.EscapeDataString(productId)}");
+            })
+            .WithName("AddMyFavorite")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable);
+
+        me.MapDelete("/favorites/{productId}", async Task<NoContent> (string productId, ClaimsPrincipal user, IAccountStore accounts) =>
+            {
+                await accounts.DeleteFavorite(Id(user), ValidProductId(productId));
+                return TypedResults.NoContent();
+            })
+            .WithName("DeleteMyFavorite")
+            .ProducesProblem(StatusCodes.Status400BadRequest);
+
         // Orders keep the catalogue's relative image path; it is resolved per request, so the web and the app each get a URL they can load.
         me.MapGet("/orders", async Task<Ok<CustomerOrder[]>> (ClaimsPrincipal user, HttpContext http, IAccountStore accounts, IConfiguration configuration, IWebHostEnvironment environment) =>
                 TypedResults.Ok((await accounts.Orders(Id(user))).Select(order => OrderEndpoints.WithImages(order, http, configuration, environment)).ToArray()))
@@ -155,6 +186,14 @@ public static class CustomerEndpoints
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .ProducesProblem(StatusCodes.Status409Conflict);
+    }
+
+    private static string ValidProductId(string? productId)
+    {
+        var value = productId?.Trim() ?? "";
+        if (value.Length is < 1 or > 128 || value.Any(char.IsControl))
+            throw new AccountException("invalid_product", "Geçerli bir ürün seç.");
+        return value;
     }
 
     private static PlaceOrderItem[] Merge(PlaceOrderItem[]? items)

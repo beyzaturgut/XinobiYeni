@@ -23,10 +23,14 @@ public record AccountProfile(string Id, string Name, string Email, DateTimeOffse
 /// <summary>What the panel may show; every action is still checked on the server.</summary>
 public record AdminSession(AccountProfile Account, IReadOnlyCollection<string> Roles, IReadOnlyCollection<string> Permissions);
 public record PermissionCatalogResponse(IReadOnlyList<string> Resources, IReadOnlyCollection<string> Permissions);
+public record AssignAdminRole(string Email, string Role);
+public record CreateAdminInvitation(string Email);
+public record AcceptAdminInvitation(string Token, string Name, string Password);
+public record AdminInvitationResponse(string Id, string Email, DateTimeOffset ExpiresAt, string? PreviewUrl = null);
 public record AuthSession(string AccessToken, DateTimeOffset AccessTokenExpiresAt, string RefreshToken, DateTimeOffset RefreshTokenExpiresAt, AccountProfile Account);
 
 /// <summary>Bearer scheme for mobile (ADR-004 T-03): opaque access tokens looked up in <see cref="IAccountStore"/>.</summary>
-public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, IAccountStore store)
+public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, UrlEncoder encoder, IAccountStore store, IServiceProvider services)
     : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
     public const string SchemeName = "XinobiToken";
@@ -35,7 +39,7 @@ public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOpti
     {
         var header = Request.Headers.Authorization.ToString();
         string? token = header.StartsWith("Bearer ", StringComparison.Ordinal) ? header["Bearer ".Length..].Trim() : null;
-        if (token is null && Request.Cookies.TryGetValue(WebSessionCookies.Access, out var cookie))
+        if (token is null && Request.Cookies.TryGetValue(WebSessionCookies.AccessFor(Request.HttpContext), out var cookie))
         {
             // Cookie sessions (web) must prove same-origin intent on state-changing requests (ADR-004 CSRF).
             if (!HttpMethods.IsGet(Request.Method) && !HttpMethods.IsHead(Request.Method) && !WebSessionCookies.HasCsrfHeader(Request)) return AuthenticateResult.NoResult();
@@ -44,7 +48,11 @@ public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOpti
         if (token is null) return AuthenticateResult.NoResult();
         var account = await store.FindByAccessToken(token);
         if (account is null) return AuthenticateResult.Fail("invalid_token");
-        var identity = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, account.Id), new Claim(ClaimTypes.Email, account.Email), new Claim(ClaimTypes.Name, account.Name), .. PermissionAuthorization.ClaimsFor(account.RoleCodes)], SchemeName);
+        if (account.Kind == AccountKinds.Staff && !await services.GetRequiredService<AdminMfa>().Allowed(token, account.Id, AccountRules.Hash(account.PasswordHash)))
+            return AuthenticateResult.Fail("mfa_required");
+        var identity = new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, account.Id), new Claim(ClaimTypes.Email, account.Email),
+            new Claim(ClaimTypes.Name, account.Name), new Claim(PermissionAuthorization.AccountKindClaim, account.Kind),
+            .. PermissionAuthorization.ClaimsFor(account.RoleCodes)], SchemeName);
         return AuthenticateResult.Success(new AuthenticationTicket(new ClaimsPrincipal(identity), SchemeName));
     }
 }
@@ -55,22 +63,37 @@ public sealed class AccountTokenHandler(IOptionsMonitor<AuthenticationSchemeOpti
 /// </summary>
 public static class WebSessionCookies
 {
-    public const string Access = "xinobi_at";
-    public const string Refresh = "xinobi_rt";
+    public const string Access = "xinobi_customer_at";
+    public const string AdminAccess = "xinobi_admin_at";
+    public const string Refresh = "xinobi_customer_rt";
+    public const string AdminRefresh = "xinobi_admin_rt";
+
+    public static string AccessFor(HttpContext http) => http.GetEndpoint()?.Metadata.GetOrderedMetadata<Microsoft.AspNetCore.Authorization.IAuthorizeData>()
+        .Any(data => data.Policy == PermissionAuthorization.StaffPolicy || data.Policy?.StartsWith("permission:", StringComparison.Ordinal) == true) == true
+        || http.Request.Path.StartsWithSegments("/api/v1/auth/admin") ? AdminAccess : Access;
     public const string CsrfHeader = "X-Xinobi-Csrf";
 
     public static bool HasCsrfHeader(HttpRequest request) => request.Headers[CsrfHeader] == "1";
 
-    public static void Write(HttpContext http, IssuedTokens tokens)
+    public static void Write(HttpContext http, IssuedTokens tokens, bool admin = false)
     {
-        http.Response.Cookies.Append(Access, tokens.AccessToken, Options(http, "/api/v1", tokens.AccessTokenExpiresAt));
-        http.Response.Cookies.Append(Refresh, tokens.RefreshToken, Options(http, "/api/v1/auth/web", tokens.RefreshTokenExpiresAt));
+        ClearLegacy(http);
+        http.Response.Cookies.Append(admin ? AdminAccess : Access, tokens.AccessToken, Options(http, "/api/v1", tokens.AccessTokenExpiresAt));
+        http.Response.Cookies.Append(admin ? AdminRefresh : Refresh, tokens.RefreshToken, Options(http, "/api/v1/auth", tokens.RefreshTokenExpiresAt));
     }
 
-    public static void Clear(HttpContext http)
+    public static void Clear(HttpContext http, bool admin = false)
     {
-        http.Response.Cookies.Delete(Access, Options(http, "/api/v1", null));
-        http.Response.Cookies.Delete(Refresh, Options(http, "/api/v1/auth/web", null));
+        ClearLegacy(http);
+        http.Response.Cookies.Delete(admin ? AdminAccess : Access, Options(http, "/api/v1", null));
+        http.Response.Cookies.Delete(admin ? AdminRefresh : Refresh, Options(http, "/api/v1/auth", null));
+    }
+
+    private static void ClearLegacy(HttpContext http)
+    {
+        // Ambiguous legacy sessions are never adopted; require a fresh kind-specific login.
+        http.Response.Cookies.Delete("xinobi_at", Options(http, "/api/v1", null));
+        http.Response.Cookies.Delete("xinobi_rt", Options(http, "/api/v1/auth", null));
     }
 
     private static CookieOptions Options(HttpContext http, string path, DateTimeOffset? expires) => new()
@@ -93,7 +116,7 @@ public static class AccountEndpoints
     public static void MapAccounts(this WebApplication app)
     {
         var auth = app.MapGroup("/api/v1/auth").WithTags("Account").AllowAnonymous();
-        var me = app.MapGroup("/api/v1/me").WithTags("Account").RequireAuthorization();
+        var me = app.MapGroup("/api/v1/me").WithTags("Account").RequireAuthorization(PermissionAuthorization.CustomerPolicy);
         var admin = app.MapGroup("/api/v1/admin").WithTags("Admin").RequireAuthorization(PermissionAuthorization.StaffPolicy);
         if (AccountStorage.RateLimited(app.Environment, app.Configuration)) auth.RequireRateLimiting("Account");
         foreach (var group in new[] { auth, me, admin })
@@ -147,18 +170,32 @@ public static class AccountEndpoints
                 try { email = AccountRules.NormalizeEmail(request.Email); }
                 catch (AccountException) { return InvalidCredentials(); }
                 var account = request.Password is { Length: > 0 and <= AccountRules.MaxPasswordLength } ? await accounts.Login(email, request.Password) : null;
-                return account is null ? InvalidCredentials() : TypedResults.Ok(Session(account, await accounts.IssueTokens(account.Id)));
+                return account is null || account.Kind != AccountKinds.Customer
+                    ? InvalidCredentials()
+                    : TypedResults.Ok(Session(account, await accounts.IssueTokens(account.Id)));
             })
             .WithName("LoginAccount")
             .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         auth.MapPost("/refresh", async Task<Results<Ok<AuthSession>, ProblemHttpResult>> (RefreshSession request, IAccountStore accounts) =>
             {
-                var (account, tokens) = await accounts.Refresh(request.RefreshToken);
+                var (account, tokens) = await RefreshForKind(accounts, request.RefreshToken, AccountKinds.Customer);
                 return TypedResults.Ok(Session(account, tokens));
             })
             .WithName("RefreshSession")
             .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        auth.MapPost("/admin-invitations/accept", async Task<Results<Ok<AdminMfaChallenge>, ProblemHttpResult>> (AcceptAdminInvitation request, HttpContext http, IAccountStore accounts, AdminMfa mfa) =>
+            {
+                var name = AccountRules.ValidName(request.Name);
+                AccountRules.ValidatePassword(request.Password);
+                var account = await accounts.AcceptAdminInvitation(AccountRules.ValidInvitationToken(request.Token), name, request.Password);
+                WebSessionCookies.Clear(http, admin: true);
+                return TypedResults.Ok(await mfa.Start(account, http.RequestAborted));
+            })
+            .WithName("AcceptAdminInvitation")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status409Conflict);
 
         var web = auth.MapGroup("/web");
         web.AddEndpointFilter(async (context, next) => WebSessionCookies.HasCsrfHeader(context.HttpContext.Request)
@@ -184,7 +221,7 @@ public static class AccountEndpoints
                 try { email = AccountRules.NormalizeEmail(request.Email); }
                 catch (AccountException) { return InvalidCredentials(); }
                 var account = request.Password is { Length: > 0 and <= AccountRules.MaxPasswordLength } ? await accounts.Login(email, request.Password) : null;
-                if (account is null) return InvalidCredentials();
+                if (account is null || account.Kind != AccountKinds.Customer) return InvalidCredentials();
                 WebSessionCookies.Write(http, await accounts.IssueTokens(account.Id));
                 return TypedResults.Ok(Profile(account));
             })
@@ -194,7 +231,7 @@ public static class AccountEndpoints
             {
                 try
                 {
-                    var (account, tokens) = await accounts.Refresh(http.Request.Cookies[WebSessionCookies.Refresh] ?? "");
+                    var (account, tokens) = await RefreshForKind(accounts, http.Request.Cookies[WebSessionCookies.Refresh] ?? "", AccountKinds.Customer);
                     WebSessionCookies.Write(http, tokens);
                     return TypedResults.Ok(Profile(account));
                 }
@@ -240,6 +277,77 @@ public static class AccountEndpoints
             .WithName("ConfirmPasswordReset")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status429TooManyRequests);
+
+        var adminWeb = auth.MapGroup("/admin");
+        adminWeb.MapPost("/password-reset", async (StartAdminPasswordReset request, AdminPasswordRecovery recovery) =>
+            TypedResults.Ok(await recovery.Start(request.Email))).WithName("StartAdminPasswordReset").ProducesProblem(429).ProducesProblem(503);
+        adminWeb.MapPost("/password-reset/complete", async (CompleteAdminPasswordReset request, AdminPasswordRecovery recovery, HttpContext http) =>
+        {
+            await recovery.Complete(request.Token, request.NewPassword);
+            WebSessionCookies.Clear(http, admin: true);
+            return TypedResults.NoContent();
+        }).WithName("CompleteAdminPasswordReset").ProducesProblem(400);
+        adminWeb.AddEndpointFilter(async (context, next) => WebSessionCookies.HasCsrfHeader(context.HttpContext.Request)
+            ? await next(context)
+            : Problem(StatusCodes.Status403Forbidden, "csrf_required", "İstek doğrulanamadı. Sayfayı yenileyip tekrar dene."));
+
+        adminWeb.MapPost("/login", async Task<Results<Ok<AdminMfaChallenge>, ProblemHttpResult>> (LoginAccount request, HttpContext http, IAccountStore accounts, AdminMfa mfa) =>
+            {
+                string email;
+                try { email = AccountRules.NormalizeEmail(request.Email); }
+                catch (AccountException) { return InvalidCredentials(); }
+                var account = request.Password is { Length: > 0 and <= AccountRules.MaxPasswordLength } ? await accounts.Login(email, request.Password) : null;
+                if (account is null || account.Kind != AccountKinds.Staff || account.RoleCodes.Count == 0) return InvalidCredentials();
+                WebSessionCookies.Clear(http, admin: true);
+                return TypedResults.Ok(await mfa.Start(account, http.RequestAborted));
+            })
+            .WithName("LoginAdminWebAccount")
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        adminWeb.MapPost("/mfa/verify", async (VerifyAdminMfa request, HttpContext http, IAccountStore accounts, AdminMfa mfa) =>
+            {
+                var proof = await mfa.Consume(request.ChallengeId, request.Code);
+                var account = await accounts.FindById(proof.AccountId);
+                if (account is null || AccountRules.Hash(account.PasswordHash) != proof.CredentialStamp || account.Kind != AccountKinds.Staff || account.RoleCodes.Count == 0) throw InvalidRefresh();
+                var tokens = await accounts.IssueTokens(account.Id, proof.CredentialStamp);
+                await mfa.Grant(account.Id, tokens, proof.CredentialStamp);
+                WebSessionCookies.Write(http, tokens, admin: true);
+                return TypedResults.Ok(new AdminSession(Profile(account), account.RoleCodes, Roles.PermissionsFor(account.RoleCodes)));
+            }).WithName("VerifyAdminMfa").ProducesProblem(401);
+
+        adminWeb.MapPost("/refresh", async Task<Results<Ok<AccountProfile>, ProblemHttpResult>> (HttpContext http, IAccountStore accounts, AdminMfa mfa) =>
+            {
+                try
+                {
+                    if (!await mfa.Allowed(http.Request.Cookies[WebSessionCookies.AdminRefresh] ?? "")) throw InvalidRefresh();
+                    var (account, tokens) = await RefreshForKind(accounts, http.Request.Cookies[WebSessionCookies.AdminRefresh] ?? "", AccountKinds.Staff);
+                    if (account.RoleCodes.Count == 0)
+                    {
+                        await accounts.Revoke(tokens.RefreshToken);
+                        throw InvalidRefresh();
+                    }
+                    if (!await mfa.Allowed(http.Request.Cookies[WebSessionCookies.AdminRefresh] ?? "", account.Id, AccountRules.Hash(account.PasswordHash)))
+                    { await accounts.Revoke(tokens.RefreshToken); throw InvalidRefresh(); }
+                    await mfa.Grant(account.Id, tokens, AccountRules.Hash(account.PasswordHash));
+                    WebSessionCookies.Write(http, tokens, admin: true);
+                    return TypedResults.Ok(Profile(account));
+                }
+                catch (AccountException)
+                {
+                    WebSessionCookies.Clear(http, admin: true);
+                    throw;
+                }
+            })
+            .WithName("RefreshAdminWebSession")
+            .ProducesProblem(StatusCodes.Status401Unauthorized);
+
+        adminWeb.MapPost("/logout", async Task<NoContent> (HttpContext http, IAccountStore accounts) =>
+            {
+                if (http.Request.Cookies[WebSessionCookies.AdminRefresh] is { Length: > 0 } refresh) await accounts.Revoke(refresh);
+                WebSessionCookies.Clear(http, admin: true);
+                return TypedResults.NoContent();
+            })
+            .WithName("LogoutAdminWebSession");
 
         auth.MapPost("/logout", async Task<NoContent> (LogoutSession request, IAccountStore accounts) =>
             {
@@ -313,6 +421,52 @@ public static class AccountEndpoints
             .WithName("GetPermissionCatalog")
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status403Forbidden);
+
+        admin.MapPost("/roles", async Task<Results<Ok<AdminSession>, ProblemHttpResult>> (AssignAdminRole request, IAccountStore accounts) =>
+            {
+                if (!string.Equals(request.Role, Roles.Admin, StringComparison.Ordinal))
+                    return Problem(StatusCodes.Status400BadRequest, "role_not_assignable", "Bu uç yalnız admin rolünü atayabilir.");
+                var account = await accounts.AssignRole(AccountRules.NormalizeEmail(request.Email), Roles.Admin, existingStaffOnly: true);
+                return account is null
+                    ? Problem(StatusCodes.Status404NotFound, "account_not_found", "Bu e-posta ile kayıtlı hesap bulunamadı.")
+                    : TypedResults.Ok(new AdminSession(Profile(account), account.RoleCodes, Roles.PermissionsFor(account.RoleCodes)));
+            })
+            .RequireAuthorization(policy => policy.RequireRole(Roles.SuperAdmin))
+            .WithName("AssignAdminRole")
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
+        admin.MapPost("/invitations", async Task<Results<Created<AdminInvitationResponse>, ProblemHttpResult>> (
+                CreateAdminInvitation request, ClaimsPrincipal user, IAccountStore accounts, IAdminInvitationEmailSender sender,
+                IConfiguration configuration, CancellationToken cancellationToken) =>
+            {
+                if (!sender.IsConfigured) throw new EmailVerificationException("Davet e-postası gönderimi yapılandırılmadı.", 503);
+                var email = AccountRules.NormalizeEmail(request.Email);
+                var token = AccountRules.NewToken();
+                var inviterId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var invitation = await accounts.CreateAdminInvitation(email, inviterId, token);
+                var baseUrl = configuration["Admin:InvitationBaseUrl"] ?? "http://127.0.0.1:5173/";
+                var separator = baseUrl.Contains('?') ? '&' : '?';
+                var acceptanceUrl = $"{baseUrl}{separator}invitation={Uri.EscapeDataString(token)}";
+                try { await sender.Send(email, acceptanceUrl, cancellationToken); }
+                catch
+                {
+                    await accounts.CancelAdminInvitation(invitation.Id, inviterId);
+                    throw;
+                }
+                return TypedResults.Created($"/api/v1/admin/invitations/{invitation.Id}",
+                    new AdminInvitationResponse(invitation.Id, invitation.Email, invitation.ExpiresAt, sender.IsPreview ? acceptanceUrl : null));
+            })
+            .RequireAuthorization(policy => policy.RequireRole(Roles.SuperAdmin))
+            .WithName("CreateAdminInvitation")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status403Forbidden)
+            .ProducesProblem(StatusCodes.Status409Conflict)
+            .ProducesProblem(StatusCodes.Status503ServiceUnavailable);
     }
 
     private static AuthSession Session(AccountRecord account, IssuedTokens tokens) => new(
@@ -322,7 +476,18 @@ public static class AccountEndpoints
 
     public static AccountProfile Profile(AccountRecord account) => new(account.Id, account.Name, account.Email, account.CreatedAt, account.Phone);
 
+    private static async Task<(AccountRecord Account, IssuedTokens Tokens)> RefreshForKind(IAccountStore accounts, string refreshToken, string requiredKind)
+    {
+        var refreshed = await accounts.Refresh(refreshToken);
+        if (refreshed.Account.Kind == requiredKind) return refreshed;
+        await accounts.Revoke(refreshed.Tokens.RefreshToken);
+        throw InvalidRefresh();
+    }
+
     private static ProblemHttpResult InvalidCredentials() => Problem(StatusCodes.Status401Unauthorized, "invalid_credentials", "E-posta veya parola hatalı.");
+
+    private static AccountException InvalidRefresh() =>
+        new("invalid_refresh_token", "Oturumun sona erdi. Tekrar giriş yap.", StatusCodes.Status401Unauthorized);
 
     private static ProblemHttpResult Problem(int status, string code, string title) =>
         TypedResults.Problem(statusCode: status, title: title, extensions: new Dictionary<string, object?> { ["code"] = code });

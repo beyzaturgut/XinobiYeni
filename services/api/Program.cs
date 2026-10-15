@@ -20,6 +20,7 @@ using System.Security.Claims;
 using Xinobi.Api.Features.ProductSurfaces.Development;
 using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
 using Xinobi.Api.Notifications;
+using Xinobi.Api.Audit;
 
 if (args.Contains(Cm101CandidateCommand.Mode, StringComparer.Ordinal))
 {
@@ -39,11 +40,20 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<LocalCommerceStore>();
     builder.Services.AddSingleton(TimeProvider.System);
     if (builder.Configuration["Email:DeliveryMode"] == "Preview")
+    {
         builder.Services.AddSingleton<IVerificationEmailSender, PreviewVerificationEmailSender>();
+        builder.Services.AddSingleton<IAdminInvitationEmailSender, PreviewAdminInvitationEmailSender>();
+    }
     else if (builder.Configuration["Email:DeliveryMode"] == "Smtp")
+    {
         builder.Services.AddSingleton<IVerificationEmailSender, SmtpVerificationEmailSender>();
+        builder.Services.AddSingleton<IAdminInvitationEmailSender, SmtpAdminInvitationEmailSender>();
+    }
     else
+    {
         builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+        builder.Services.AddHttpClient<IAdminInvitationEmailSender, ResendAdminInvitationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+    }
     builder.Services.AddSingleton<EmailVerificationStore>();
     builder.Services.AddSingleton<DevFileAccountStore>();
     builder.Services.AddSingleton<SqlAccountStore>();
@@ -90,9 +100,15 @@ var sqlAccountsOutsideDevelopment = !builder.Environment.IsDevelopment() && Acco
 if (sqlAccountsOutsideDevelopment)
 {
     if (builder.Configuration["Email:DeliveryMode"] == "Smtp")
+    {
         builder.Services.AddSingleton<IVerificationEmailSender, SmtpVerificationEmailSender>();
+        builder.Services.AddSingleton<IAdminInvitationEmailSender, SmtpAdminInvitationEmailSender>();
+    }
     else if (builder.Configuration["Email:DeliveryMode"] is null or "Resend")
+    {
         builder.Services.AddHttpClient<IVerificationEmailSender, ResendVerificationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+        builder.Services.AddHttpClient<IAdminInvitationEmailSender, ResendAdminInvitationEmailSender>(client => client.Timeout = TimeSpan.FromSeconds(20));
+    }
     else
         // Preview shows codes in responses; it must never serve real accounts.
         throw new InvalidOperationException("Email:DeliveryMode must be Smtp or Resend outside Development.");
@@ -121,7 +137,11 @@ if (builder.Configuration["Catalog:SnapshotPath"] is { Length: > 0 } snapshotPat
     builder.Services.TryAddSingleton<ICatalogSource>(new SnapshotCatalogSource(snapshotPath));
 builder.Services.TryAddSingleton<ICatalogSource, UnavailableCatalogSource>();
 builder.Services.TryAddSingleton<IAccountStore, UnavailableAccountStore>();
+builder.Services.TryAddSingleton<IAdminInvitationEmailSender, UnavailableAdminInvitationEmailSender>();
 builder.Services.TryAddSingleton(TimeProvider.System);
+builder.Services.AddSingleton<AdminMfa>();
+builder.Services.TryAddSingleton<IVerificationEmailSender, UnavailableSecurityEmailSender>();
+builder.Services.AddSingleton<AdminPasswordRecovery>();
 // Feature stores are registered everywhere so the contract lists the routes; outside Development they need Features:StorageProvider=SqlServer, else 503.
 builder.Services.AddSingleton<Xinobi.Api.Infrastructure.FeatureDocuments>();
 // Product media and customer designs: a local folder (Development data directory, or Storage:LocalRoot on a server); otherwise 503.
@@ -156,7 +176,10 @@ builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAssertion(context => context.User.Identity?.IsAuthenticated == true || context.Resource is HttpContext { } http && http.GetEndpoint() is null)
         .Build();
-    options.AddPolicy(PermissionAuthorization.StaffPolicy, policy => policy.RequireAuthenticatedUser().RequireClaim(ClaimTypes.Role));
+    options.AddPolicy(PermissionAuthorization.CustomerPolicy, policy => policy.RequireAuthenticatedUser()
+        .RequireClaim(PermissionAuthorization.AccountKindClaim, AccountKinds.Customer));
+    options.AddPolicy(PermissionAuthorization.StaffPolicy, policy => policy.RequireAuthenticatedUser()
+        .RequireClaim(PermissionAuthorization.AccountKindClaim, AccountKinds.Staff).RequireClaim(ClaimTypes.Role));
 });
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionAuthorization.PolicyProvider>();
 builder.Services.AddSingleton<ISqlServerReadinessProbe, SqlServerReadinessProbe>();
@@ -206,7 +229,18 @@ if (builder.Configuration.GetValue<bool>("FeatureTransfer:Run"))
 
 if (args.Length >= 2 && args[0] == SuperAdminBootstrap.Command)
 {
+    AuditExecution.Current = new AuditActor(null, [], "console.super-admin-bootstrap", Guid.NewGuid().ToString("N"));
     Environment.ExitCode = await SuperAdminBootstrap.Run(app.Services.GetRequiredService<IAccountStore>(), args[1], Console.Out);
+    return;
+}
+
+if (args.Length >= 2 && args[0] == SuperAdminPasswordReset.Command)
+{
+    AuditExecution.Current = new AuditActor(null, [], "console.super-admin-password-reset", Guid.NewGuid().ToString("N"));
+    Environment.ExitCode = await SuperAdminPasswordReset.Run(
+        app.Services.GetRequiredService<IAccountStore>(), args[1], app.Environment.IsProduction(),
+        app.Configuration.GetValue<bool>(SuperAdminPasswordReset.RecoveryFlag), Console.In, Console.Out,
+        SuperAdminPasswordReset.ReadHiddenPassword);
     return;
 }
 
@@ -243,6 +277,7 @@ else
     if (xinobiUOnTestServer || sqlAccountsOutsideDevelopment) app.UseRateLimiter();
 }
 app.UseAuthentication();
+app.UseMiddleware<AdminAuditMiddleware>();
 app.UseAuthorization();
 app.MapLocalCommerce();
 if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"))
@@ -255,6 +290,7 @@ Xinobi.Api.Quotes.QuoteEndpoints.MapPublicQuotes(app);
 Xinobi.Api.Assistant.AssistantEndpoints.MapAssistant(app);
 app.MapXinobiU();
 app.MapAccounts();
+app.MapAudit();
 
 var api = app.MapGroup("/api/v1").AllowAnonymous();
 

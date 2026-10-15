@@ -15,7 +15,10 @@ public static class TestStaff
         var account = await accounts.Register("Panel Yöneticisi", email, "guclu-parola-1");
         await accounts.AssignRole(email, Roles.SuperAdmin);
         var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", (await accounts.IssueTokens(account.Id)).AccessToken);
+        var tokens = await accounts.IssueTokens(account.Id);
+        // Authorization fixtures explicitly model a completed MFA; MFA protocol has separate negative tests.
+        await factory.Services.GetRequiredService<AdminMfa>().Grant(account.Id, tokens);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
         return client;
     }
 }

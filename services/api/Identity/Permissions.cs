@@ -44,10 +44,12 @@ public static class PermissionCatalog
 public static class Roles
 {
     public const string SuperAdmin = "super_admin";
+    public const string Admin = "admin";
 
     private static readonly FrozenDictionary<string, FrozenSet<string>> BuiltIn = new Dictionary<string, FrozenSet<string>>
     {
         [SuperAdmin] = PermissionCatalog.All,
+        [Admin] = PermissionCatalog.All.Where(permission => permission != "settings.staff").ToFrozenSet(StringComparer.Ordinal),
     }.ToFrozenDictionary(StringComparer.Ordinal);
 
     public static bool Exists(string role) => BuiltIn.ContainsKey(role);
@@ -59,6 +61,8 @@ public static class Roles
 public static class PermissionAuthorization
 {
     public const string PermissionClaim = "xinobi:permission";
+    public const string AccountKindClaim = "xinobi:account_kind";
+    public const string CustomerPolicy = "customer";
     public const string StaffPolicy = "staff";
     private const string Prefix = "permission:";
 

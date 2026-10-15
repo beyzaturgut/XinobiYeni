@@ -59,7 +59,8 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
     private static async Task<AccountRecord> Record(XinobiDbContext db, User user)
     {
         var roles = await db.UserRoles.AsNoTracking().Where(x => x.UserId == user.Id).Join(db.Roles, ur => ur.RoleId, r => r.Id, (_, r) => r.Code).OrderBy(x => x).ToArrayAsync();
-        return new AccountRecord(Id(user.Id), user.DisplayName ?? "", user.Email, user.PasswordHash ?? "", user.CreatedAt, roles.Length == 0 ? null : roles, user.Phone);
+        return new AccountRecord(Id(user.Id), user.DisplayName ?? "", user.Email, user.PasswordHash ?? "", user.CreatedAt,
+            roles.Length == 0 ? null : roles, user.Phone, roles.Length == 0 ? AccountKinds.Customer : AccountKinds.Staff);
     }
 
     public Task<AccountRecord> Register(string name, string email, string password) => Run(RegistryLock, async db =>
@@ -90,8 +91,14 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         return hasher.VerifyHashedPassword(account, account.PasswordHash, password) == PasswordVerificationResult.Failed ? null : account;
     });
 
-    public Task<IssuedTokens> IssueTokens(string accountId) => Run(Lock(accountId), async db =>
+    public Task<IssuedTokens> IssueTokens(string accountId, string? credentialStamp = null) => Run(credentialStamp is null ? Lock(accountId) : RegistryLock, async db =>
     {
+        if (credentialStamp is not null)
+        {
+            var current = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Key(accountId) && x.Status == UserStatuses.Active);
+            if (current is null || AccountRules.Hash(current.PasswordHash ?? "") != credentialStamp)
+                throw new AccountException("invalid_mfa", "Giriş doğrulaması geçersiz. Yeniden giriş yap.", 401);
+        }
         var tokens = Issue(db, Key(accountId), Guid.NewGuid());
         await Prune(db, Key(accountId));
         await db.SaveChangesAsync();
@@ -167,11 +174,20 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
     });
 
     public Task<AccountRecord?> FindById(string accountId) => Run(null, db => Account(db, Key(accountId)));
+    public Task<AccountRecord?> FindStaffByEmail(string email) => Run(null, async db =>
+    {
+        var user = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.NormalizedEmail == email && x.Status == UserStatuses.Active);
+        var account = user is null ? null : await Record(db, user);
+        return account?.RoleCodes.Any(Roles.Exists) == true ? account : null;
+    });
 
-    public Task<AccountRecord?> AssignRole(string email, string role) => Run(RegistryLock, async db =>
+    public Task<AccountRecord?> AssignRole(string email, string role, bool existingStaffOnly = false) => Run(RegistryLock, async db =>
     {
         var user = await db.Users.FirstOrDefaultAsync(x => x.NormalizedEmail == email);
         if (user is null) return null;
+        // Role-bearing legacy accounts remain staff even when their old Kind field says customer.
+        if (existingStaffOnly && !await db.UserRoles.AnyAsync(x => x.UserId == user.Id))
+            throw new AccountException("admin_invitation_required", "Yeni yönetici hesabı davet akışıyla oluşturulmalıdır.", StatusCodes.Status409Conflict);
         var entity = await db.Roles.FirstOrDefaultAsync(x => x.Code == role);
         if (entity is null)
         {
@@ -187,6 +203,76 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
     });
 
     public Task<bool> AnyWithRole(string role) => Run(null, db => db.UserRoles.Join(db.Roles, ur => ur.RoleId, r => r.Id, (_, r) => r.Code).AnyAsync(code => code == role));
+
+    public Task<AdminInvitationRecord> CreateAdminInvitation(string email, string invitedByAccountId, string token) => Run(RegistryLock, async db =>
+    {
+        var now = clock.GetUtcNow();
+        var inviterId = Key(invitedByAccountId);
+        var isSuperAdmin = await db.UserRoles.Where(x => x.UserId == inviterId)
+            .Join(db.Roles, userRole => userRole.RoleId, role => role.Id, (_, role) => role.Code)
+            .AnyAsync(code => code == Roles.SuperAdmin);
+        if (!isSuperAdmin)
+            throw new AccountException("inviter_forbidden", "Yalnız süper yönetici davet oluşturabilir.", StatusCodes.Status403Forbidden);
+        if (await db.Users.AnyAsync(x => x.NormalizedEmail == email))
+            throw new AccountException("email_taken", "Bu e-posta ile hesap zaten var.", StatusCodes.Status409Conflict);
+        if (await db.AdminInvitations.AnyAsync(x => x.NormalizedEmail == email && x.AcceptedAt == null && x.CancelledAt == null && x.ExpiresAt > now))
+            throw new AccountException("invitation_pending", "Bu e-posta için geçerli bir davet zaten var.", StatusCodes.Status409Conflict);
+        var entity = new AdminInvitation
+        {
+            Id = Guid.NewGuid(), Email = email, NormalizedEmail = email, TokenHash = AccountRules.Hash(token), InvitedByUserId = inviterId,
+            CreatedAt = now, ExpiresAt = now.AddHours(24),
+        };
+        db.AdminInvitations.Add(entity);
+        await db.SaveChangesAsync();
+        return Invitation(entity);
+    });
+
+    public Task CancelAdminInvitation(string invitationId, string cancelledByAccountId) => Run(RegistryLock, async db =>
+    {
+        var invitation = await db.AdminInvitations.FirstOrDefaultAsync(x => x.Id == Key(invitationId) && x.AcceptedAt == null && x.CancelledAt == null);
+        if (invitation is not null)
+        {
+            invitation.CancelledAt = clock.GetUtcNow();
+            invitation.CancelledByUserId = Key(cancelledByAccountId);
+            await db.SaveChangesAsync();
+        }
+        return true;
+    });
+
+    public Task<AccountRecord> AcceptAdminInvitation(string token, string name, string password) => Run(RegistryLock, async db =>
+    {
+        var now = clock.GetUtcNow();
+        var hash = AccountRules.Hash(token ?? "");
+        var invitation = await db.AdminInvitations.FirstOrDefaultAsync(x => x.TokenHash == hash);
+        if (invitation is null || invitation.AcceptedAt is not null || invitation.CancelledAt is not null || invitation.ExpiresAt <= now)
+            throw new AccountException("invalid_invitation", "Davet geçersiz, kullanılmış veya süresi dolmuş.");
+        if (await db.Users.AnyAsync(x => x.NormalizedEmail == invitation.NormalizedEmail))
+            throw new AccountException("email_taken", "Bu e-posta ile hesap zaten var.", StatusCodes.Status409Conflict);
+        var draft = new AccountRecord(Id(Guid.NewGuid()), name, invitation.Email, "", now, [Roles.Admin], Kind: AccountKinds.Staff);
+        var account = draft with { PasswordHash = hasher.HashPassword(draft, password) };
+        var user = new User
+        {
+            Id = Key(account.Id), Email = invitation.Email, NormalizedEmail = invitation.NormalizedEmail, DisplayName = name,
+            PasswordHash = account.PasswordHash, Kind = UserKinds.Staff, Status = UserStatuses.Active, CreatedAt = now, UpdatedAt = now,
+        };
+        var role = await db.Roles.FirstOrDefaultAsync(x => x.Code == Roles.Admin);
+        if (role is null)
+        {
+            role = new Role { Id = Guid.NewGuid(), Code = Roles.Admin, Name = Roles.Admin };
+            db.Roles.Add(role);
+        }
+        db.Users.Add(user);
+        db.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = role.Id, AssignedAt = now, AssignedByUserId = invitation.InvitedByUserId });
+        invitation.AcceptedAt = now;
+        invitation.AcceptedUserId = user.Id;
+        await db.SaveChangesAsync();
+        return account;
+    });
+
+    private static AdminInvitationRecord Invitation(AdminInvitation value) => new(Id(value.Id), value.Email, value.TokenHash,
+        Id(value.InvitedByUserId), value.CreatedAt, value.ExpiresAt, value.AcceptedAt,
+        value.AcceptedUserId is { } accepted ? Id(accepted) : null, value.CancelledAt,
+        value.CancelledByUserId is { } cancelled ? Id(cancelled) : null);
 
     public Task<AccountRecord?> UpdateProfile(string accountId, string name, string? phone) => Run(Lock(accountId), async db =>
     {
@@ -288,6 +374,25 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         return true;
     });
 
+
+
+    public Task<string[]> Favorites(string accountId) => Run(null, async db => await db.CustomerFavorites.AsNoTracking()
+        .Where(x => x.UserId == Key(accountId)).OrderByDescending(x => x.CreatedAt).Select(x => x.ProductId).ToArrayAsync());
+
+    public Task AddFavorite(string accountId, string productId) => Run(Lock(accountId), async db =>
+    {
+        var userId = Key(accountId);
+        if (!await db.CustomerFavorites.AnyAsync(x => x.UserId == userId && x.ProductId == productId))
+        {
+            db.CustomerFavorites.Add(new CustomerFavorite { UserId = userId, ProductId = productId, CreatedAt = clock.GetUtcNow() });
+            await db.SaveChangesAsync();
+        }
+        return true;
+    });
+
+    public Task<bool> DeleteFavorite(string accountId, string productId) => Run(Lock(accountId), async db =>
+        await db.CustomerFavorites.Where(x => x.UserId == Key(accountId) && x.ProductId == productId).ExecuteDeleteAsync() > 0);
+
     private static CustomerOrder Order(SalesOrder x, IEnumerable<SalesOrderLine> lines) => new(
         Id(x.Id), x.Number, x.CreatedAt, x.Status, JsonSerializer.Deserialize<CustomerAddress>(x.AddressSnapshotJson, Json)!,
         [.. lines.OrderBy(line => line.Position).Select(line => new CustomerOrderLine(line.ProductReference, line.VariantReference, line.Name, line.Color, line.ImageUrl,
@@ -382,6 +487,42 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         await db.SaveChangesAsync();
     }
 
+    public Task<bool> ResetPasswordForRole(string email, string requiredRole, string newPassword, string? credentialStamp = null) =>
+        Run(RegistryLock, db => ResetPasswordCore(db,email,requiredRole,newPassword,credentialStamp));
+
+    public Task<bool> CompleteAdminPasswordReset(string token,string password) => Run(RegistryLock,async db =>
+    {
+        var hash=AccountRules.Hash(token);
+        var reset=await db.AdminPasswordResets.FirstOrDefaultAsync(x=>x.TokenHash==hash);
+        if(reset is null||reset.ConsumedAt!=null||reset.ExpiresAt<=clock.GetUtcNow())return false;
+        var email=await db.Users.Where(x=>x.Id==reset.UserId).Select(x=>x.NormalizedEmail).FirstOrDefaultAsync();
+        if(email is null)return false;
+        reset.ConsumedAt=clock.GetUtcNow();
+        var success=await ResetPasswordCore(db,email,reset.RequiredRole,password,reset.CredentialStamp);
+        await db.SaveChangesAsync();
+        return success;
+    });
+
+    private async Task<bool> ResetPasswordCore(XinobiDbContext db,string email,string requiredRole,string newPassword,string? credentialStamp)
+    {
+        var user = await db.Users.FirstOrDefaultAsync(x => x.NormalizedEmail == email);
+        if (user is null || !await db.UserRoles.Where(x => x.UserId == user.Id)
+                .Join(db.Roles, ur => ur.RoleId, role => role.Id, (_, role) => role.Code)
+                .AnyAsync(code => code == requiredRole)) return false;
+        var account = await Record(db, user);
+        if (credentialStamp is not null && AccountRules.Hash(account.PasswordHash) != credentialStamp) return false;
+        user.PasswordHash = hasher.HashPassword(account, newPassword);
+        user.UpdatedAt = clock.GetUtcNow();
+        var now = clock.GetUtcNow();
+        db.AuditLogs.Add(new AuditLog { ActorUserId = null, Action = credentialStamp is null ? "console.super-admin-password-reset" : "auth.admin-password-reset", EntityType = "User",
+            EntityId = Id(user.Id), TraceId = AuditExecution.Current?.TraceId ?? Guid.NewGuid().ToString("N"), OccurredAt = now,
+            SafeDiff = credentialStamp is null ? "{\"credentialChanged\":true,\"sessionsRevoked\":true,\"actorSource\":\"console\"}" : "{\"credentialChanged\":true,\"sessionsRevoked\":true,\"actorSource\":\"email-proof\"}" });
+        await db.RefreshSessions.Where(x => x.UserId == user.Id && x.RevokedAt == null).ExecuteUpdateAsync(x => x.SetProperty(s => s.RevokedAt, now));
+        await db.AccessSessions.Where(x => x.UserId == user.Id).ExecuteDeleteAsync();
+        await db.SaveChangesAsync();
+        return true;
+    }
+
     public async Task<(CustomerOrder Order, AccountRecord Account)> ChangeOrder(string? accountId, string orderId, Func<CustomerOrder, CustomerOrder> change)
     {
         var id = Key(orderId);
@@ -413,13 +554,15 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         }).ToArray();
     });
 
+
+
     /// <summary>
     /// One-time import of the Development file store into empty SQL identity/order tables, in one transaction. Rows are read
     /// back and compared; any difference rolls everything back. Existing SQL accounts are never overwritten.
     /// </summary>
     public Task<AccountImportResult> Import(AccountSnapshot snapshot) => Run(RegistryLock, async db =>
     {
-        if (await db.Users.AnyAsync() || await db.SalesOrders.AnyAsync() || await db.CustomerAddresses.AnyAsync() || await db.RefreshSessions.AnyAsync())
+        if (await db.Users.AnyAsync() || await db.SalesOrders.AnyAsync() || await db.CustomerAddresses.AnyAsync() || await db.CustomerFavorites.AnyAsync() || await db.RefreshSessions.AnyAsync() || await db.AdminInvitations.AnyAsync())
             throw new InvalidOperationException("SQL account tables are not empty; import refused.");
         var now = clock.GetUtcNow();
         foreach (var account in snapshot.Accounts)
@@ -428,7 +571,7 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
             db.Users.Add(new User
             {
                 Id = Key(account.Id), Email = account.Email, NormalizedEmail = account.Email, DisplayName = account.Name, Phone = account.Phone,
-                PasswordHash = account.PasswordHash, Kind = account.RoleCodes.Count > 0 ? UserKinds.Staff : UserKinds.Customer, Status = UserStatuses.Active,
+                PasswordHash = account.PasswordHash, Kind = account.Kind, Status = UserStatuses.Active,
                 CreatedAt = account.CreatedAt, UpdatedAt = now,
             });
         }
@@ -439,6 +582,16 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
             foreach (var account in snapshot.Accounts.Where(account => account.RoleCodes.Contains(code)))
                 db.UserRoles.Add(new UserRole { UserId = Key(account.Id), RoleId = role.Id, AssignedAt = now });
         }
+        foreach (var invitation in snapshot.AdminInvitations ?? [])
+            db.AdminInvitations.Add(new AdminInvitation
+            {
+                Id = Key(invitation.Id), Email = invitation.Email, NormalizedEmail = invitation.Email, TokenHash = invitation.TokenHash,
+                InvitedByUserId = Key(invitation.InvitedByAccountId), CreatedAt = invitation.CreatedAt, ExpiresAt = invitation.ExpiresAt,
+                AcceptedAt = invitation.AcceptedAt, AcceptedUserId = invitation.AcceptedAccountId is null ? null : Key(invitation.AcceptedAccountId),
+                CancelledAt = invitation.CancelledAt, CancelledByUserId = invitation.CancelledByAccountId is null ? null : Key(invitation.CancelledByAccountId),
+            });
+        foreach (var favorite in snapshot.Favorites ?? [])
+            db.CustomerFavorites.Add(new CustomerFavorite { UserId = Key(favorite.AccountId), ProductId = favorite.ProductId, CreatedAt = favorite.CreatedAt });
         // Only sessions still valid are carried over; expired ones would be pruned anyway.
         foreach (var session in snapshot.RefreshTokens.Where(x => x.ExpiresAt > now))
             db.RefreshSessions.Add(new StoredRefreshSession { TokenHash = session.Hash, FamilyId = Key(session.FamilyId), UserId = Key(session.AccountId), ExpiresAt = session.ExpiresAt, UsedAt = session.UsedAt, RevokedAt = session.RevokedAt });
@@ -474,6 +627,9 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
             var addresses = (await db.CustomerAddresses.AsNoTracking().Where(x => x.UserId == Key(account.Id)).OrderBy(x => x.Position).ToArrayAsync()).Select(Address);
             if (JsonSerializer.Serialize(addresses, Json) != JsonSerializer.Serialize(snapshot.Addresses.Where(x => x.AccountId == account.Id).Select(x => x.Value), Json))
                 throw new InvalidOperationException("Imported addresses differ from the source.");
+            var favorites = await db.CustomerFavorites.AsNoTracking().Where(x => x.UserId == Key(account.Id)).OrderByDescending(x => x.CreatedAt).Select(x => x.ProductId).ToArrayAsync();
+            var expectedFavorites = (snapshot.Favorites ?? []).Where(x => x.AccountId == account.Id).OrderByDescending(x => x.CreatedAt).Select(x => x.ProductId).ToArray();
+            if (!favorites.SequenceEqual(expectedFavorites)) throw new InvalidOperationException("Imported favorites differ from the source.");
         }
         return new AccountImportResult(snapshot.Accounts.Length, snapshot.Addresses.Length, snapshot.Orders.Length,
             snapshot.RefreshTokens.Count(x => x.ExpiresAt > now), snapshot.AccessTokens.Count(x => x.ExpiresAt > now));

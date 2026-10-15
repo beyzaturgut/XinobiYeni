@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -29,6 +30,8 @@ public sealed class AuthorizationTests : IDisposable
         {
             services.RemoveAll<IVerificationEmailSender>();
             services.AddSingleton<IVerificationEmailSender, SilentSender>();
+            services.RemoveAll<IAdminInvitationEmailSender>();
+            services.AddSingleton<IAdminInvitationEmailSender, SilentInvitationSender>();
         });
     });
 
@@ -37,6 +40,13 @@ public sealed class AuthorizationTests : IDisposable
         public bool IsConfigured => true;
         public bool IsPreview => true;
         public Task Send(string email, string code, CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+
+    private sealed class SilentInvitationSender : IAdminInvitationEmailSender
+    {
+        public bool IsConfigured => true;
+        public bool IsPreview => true;
+        public Task Send(string email, string acceptanceUrl, CancellationToken cancellationToken) => Task.CompletedTask;
     }
 
     private static async Task<string> Register(HttpClient client, string email)
@@ -51,6 +61,28 @@ public sealed class AuthorizationTests : IDisposable
     private static Task<HttpResponseMessage> Get(HttpClient client, string path, string? token)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, path);
+        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return client.SendAsync(request);
+    }
+
+    private static async Task<string> StaffToken(WebApplicationFactory<Program> factory, IAccountStore accounts, string email)
+    {
+        var account = (await accounts.Login(email, "guclu-parola-1"))!;
+        var tokens = await accounts.IssueTokens(account.Id);
+        await factory.Services.GetRequiredService<AdminMfa>().Grant(account.Id, tokens);
+        return tokens.AccessToken;
+    }
+
+    private static Task<HttpResponseMessage> Post(HttpClient client, string path, string? token, object body)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(body) };
+        if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return client.SendAsync(request);
+    }
+
+    private static Task<HttpResponseMessage> Delete(HttpClient client, string path, string? token)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Delete, path);
         if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return client.SendAsync(request);
     }
@@ -106,6 +138,30 @@ public sealed class AuthorizationTests : IDisposable
         }
     }
 
+
+
+
+    [Fact]
+    public async Task FavoritesAreAuthenticatedIdempotentAndOwnedByTheCustomer()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Get(client, "/api/v1/me/favorites", null)).StatusCode);
+
+        var first = await Register(client, "favori-bir@example.com");
+        var second = await Register(client, "favori-iki@example.com");
+        Assert.Equal(HttpStatusCode.NotFound, (await Post(client, "/api/v1/me/favorites", first, new AddFavorite("olmayan-urun"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Created, (await Post(client, "/api/v1/me/favorites", first, new AddFavorite("DEMO-P101"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Created, (await Post(client, "/api/v1/me/favorites", first, new AddFavorite("DEMO-P101"))).StatusCode);
+        Assert.Equal(["DEMO-P101"], (await (await Get(client, "/api/v1/me/favorites", first)).Content.ReadFromJsonAsync<string[]>())!);
+        Assert.Empty((await (await Get(client, "/api/v1/me/favorites", second)).Content.ReadFromJsonAsync<string[]>())!);
+
+        Assert.Equal(HttpStatusCode.NoContent, (await Delete(client, "/api/v1/me/favorites/DEMO-P101", second)).StatusCode);
+        Assert.Equal(["DEMO-P101"], (await (await Get(client, "/api/v1/me/favorites", first)).Content.ReadFromJsonAsync<string[]>())!);
+        Assert.Equal(HttpStatusCode.NoContent, (await Delete(client, "/api/v1/me/favorites/DEMO-P101", first)).StatusCode);
+        Assert.Empty((await (await Get(client, "/api/v1/me/favorites", first)).Content.ReadFromJsonAsync<string[]>())!);
+    }
+
     [Fact]
     public async Task TheFirstSuperAdminIsBootstrappedOnceFromTheConsole()
     {
@@ -117,6 +173,7 @@ public sealed class AuthorizationTests : IDisposable
         Assert.Equal(3, await SuperAdminBootstrap.Run(accounts, "sahip@example.com", output));
         var owner = await Register(client, "sahip@example.com");
         Assert.Equal(0, await SuperAdminBootstrap.Run(accounts, " Sahip@Example.com ", output));
+        owner = await StaffToken(factory, accounts, "sahip@example.com");
         await Register(client, "ikinci@example.com");
         Assert.Equal(2, await SuperAdminBootstrap.Run(accounts, "ikinci@example.com", output));
         Assert.False((await accounts.FindById((await accounts.Login("ikinci@example.com", "guclu-parola-1"))!.Id))!.RoleCodes.Any());
@@ -125,8 +182,162 @@ public sealed class AuthorizationTests : IDisposable
         var session = (await (await Get(client, "/api/v1/admin/session", owner)).Content.ReadFromJsonAsync<AdminSession>())!;
         Assert.Equal([Roles.SuperAdmin], session.Roles);
         Assert.Equal(PermissionCatalog.All.Count, session.Permissions.Count);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, "/api/v1/me", owner)).StatusCode);
         var catalog = (await (await Get(client, "/api/v1/admin/permissions", owner)).Content.ReadFromJsonAsync<PermissionCatalogResponse>())!;
         Assert.Equal(17, catalog.Resources.Count);
+    }
+
+    [Fact]
+    public async Task SuperAdminPasswordRecoveryRequiresTheRoleAndRevokesSessions()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        await Register(client, "owner@example.com");
+        var owner = await accounts.AssignRole("owner@example.com", Roles.SuperAdmin);
+        var issued = await accounts.IssueTokens(owner!.Id);
+        var output = new StringWriter();
+
+        Assert.Equal(0, await SuperAdminPasswordReset.Run(accounts, owner.Email, false, false, TextReader.Null, output, () => "new-secure-password-2"));
+        Assert.Null(await accounts.Login(owner.Email, "guclu-parola-1"));
+        Assert.NotNull(await accounts.Login(owner.Email, "new-secure-password-2"));
+        Assert.Null(await accounts.FindByAccessToken(issued.AccessToken));
+        await Assert.ThrowsAsync<AccountException>(() => accounts.Refresh(issued.RefreshToken));
+        Assert.DoesNotContain("new-secure-password-2", output.ToString());
+
+        await Register(client, "customer@example.com");
+        Assert.Equal(3, await SuperAdminPasswordReset.Run(accounts, "customer@example.com", false, false, TextReader.Null, new StringWriter(), () => "another-secure-password-3"));
+    }
+
+    [Fact]
+    public async Task ProductionRecoveryRequiresTheFlagAndExplicitConfirmation()
+    {
+        using var factory = Factory();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var passwordRead = false;
+        string ReadPassword() { passwordRead = true; return "unused-secure-password"; }
+
+        Assert.Equal(5, await SuperAdminPasswordReset.Run(accounts, "owner@example.com", true, false, new StringReader("RESET"), new StringWriter(), ReadPassword));
+        Assert.False(passwordRead);
+        Assert.Equal(6, await SuperAdminPasswordReset.Run(accounts, "owner@example.com", true, true, new StringReader("NO"), new StringWriter(), ReadPassword));
+        Assert.False(passwordRead);
+    }
+
+    [Fact]
+    public async Task OnlySuperAdminCanAssignTheLimitedAdminRole()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var ownerToken = await Register(client, "owner@example.com");
+        Assert.Equal(0, await SuperAdminBootstrap.Run(accounts, "owner@example.com", new StringWriter()));
+        ownerToken = await StaffToken(factory, accounts, "owner@example.com");
+        var customerToken = await Register(client, "customer@example.com");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Post(client, "/api/v1/admin/roles", null, new AssignAdminRole("customer@example.com", Roles.Admin))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Post(client, "/api/v1/admin/roles", customerToken, new AssignAdminRole("customer@example.com", Roles.Admin))).StatusCode);
+        var assigned = await Post(client, "/api/v1/admin/roles", ownerToken, new AssignAdminRole("customer@example.com", Roles.Admin));
+        Assert.Equal(HttpStatusCode.Conflict, assigned.StatusCode);
+        Assert.Equal("admin_invitation_required", await Code(assigned));
+        var customer = (await accounts.Login("customer@example.com", "guclu-parola-1"))!;
+        Assert.Equal(AccountKinds.Customer, customer.Kind);
+        Assert.Empty(customer.RoleCodes);
+        Assert.Equal(HttpStatusCode.OK, (await Get(client, "/api/v1/me", customerToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, "/api/v1/admin/session", customerToken)).StatusCode);
+        await accounts.CreateAdminInvitation("staff@example.com", (await accounts.Login("owner@example.com", "guclu-parola-1"))!.Id, "role-test-invitation");
+        await accounts.AcceptAdminInvitation("role-test-invitation", "Staff", "guclu-parola-2");
+        assigned = await Post(client, "/api/v1/admin/roles", ownerToken, new AssignAdminRole("staff@example.com", Roles.Admin));
+        Assert.Equal(HttpStatusCode.OK, assigned.StatusCode);
+        var session = (await assigned.Content.ReadFromJsonAsync<AdminSession>())!;
+        Assert.Contains(Roles.Admin, session.Roles);
+        Assert.DoesNotContain("settings.staff", session.Permissions);
+        Assert.Equal(PermissionCatalog.All.Count - 1, session.Permissions.Count);
+
+        var adminTokens = await accounts.IssueTokens(session.Account.Id);
+        await factory.Services.GetRequiredService<AdminMfa>().Grant(session.Account.Id, adminTokens);
+        var adminToken = adminTokens.AccessToken;
+        await Register(client, "other@example.com");
+        Assert.Equal(HttpStatusCode.Forbidden, (await Post(client, "/api/v1/admin/roles", adminToken, new AssignAdminRole("other@example.com", Roles.Admin))).StatusCode);
+        var forbiddenRole = await Post(client, "/api/v1/admin/roles", ownerToken, new AssignAdminRole("other@example.com", Roles.SuperAdmin));
+        Assert.Equal(HttpStatusCode.BadRequest, forbiddenRole.StatusCode);
+        Assert.Equal("role_not_assignable", await Code(forbiddenRole));
+        Assert.False((await accounts.Login("other@example.com", "guclu-parola-1"))!.RoleCodes.Any());
+    }
+
+    [Fact]
+    public async Task SuperAdminInvitationCreatesASeparateSingleUseAdminAccount()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var ownerToken = await Register(client, "owner@example.com");
+        Assert.Equal(0, await SuperAdminBootstrap.Run(accounts, "owner@example.com", new StringWriter()));
+        ownerToken = await StaffToken(factory, accounts, "owner@example.com");
+        var customerToken = await Register(client, "customer@example.com");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Post(client, "/api/v1/admin/invitations", null, new CreateAdminInvitation("staff@example.com"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Post(client, "/api/v1/admin/invitations", customerToken, new CreateAdminInvitation("staff@example.com"))).StatusCode);
+        var created = await Post(client, "/api/v1/admin/invitations", ownerToken, new CreateAdminInvitation("staff@example.com"));
+        Assert.Equal(HttpStatusCode.Created, created.StatusCode);
+        var invitation = (await created.Content.ReadFromJsonAsync<AdminInvitationResponse>())!;
+        Assert.NotNull(invitation.PreviewUrl);
+        var token = QueryHelpers.ParseQuery(new Uri(invitation.PreviewUrl!).Query)["invitation"].ToString();
+
+        var accepted = await Post(client, "/api/v1/auth/admin-invitations/accept", null, new AcceptAdminInvitation(token, "Panel Yöneticisi", "guclu-parola-2"));
+        Assert.Equal(HttpStatusCode.OK, accepted.StatusCode);
+        var challenge = (await accepted.Content.ReadFromJsonAsync<AdminMfaChallenge>())!;
+        client.DefaultRequestHeaders.Add(WebSessionCookies.CsrfHeader, "1");
+        var verified = await client.PostAsJsonAsync("/api/v1/auth/admin/mfa/verify", new VerifyAdminMfa(challenge.ChallengeId, challenge.PreviewCode!));
+        var session = (await verified.Content.ReadFromJsonAsync<AdminSession>())!;
+        Assert.Equal([Roles.Admin], session.Roles);
+        Assert.DoesNotContain(Roles.SuperAdmin, session.Roles);
+        var staff = await accounts.Login("staff@example.com", "guclu-parola-2");
+        Assert.NotNull(staff);
+        Assert.Equal(AccountKinds.Staff, staff!.Kind);
+        var staffTokens = await accounts.IssueTokens(staff.Id);
+        await factory.Services.GetRequiredService<AdminMfa>().Grant(staff.Id, staffTokens);
+        var staffToken = staffTokens.AccessToken;
+        Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, "/api/v1/me", staffToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await Get(client, "/api/v1/admin/session", staffToken)).StatusCode);
+        Assert.Equal("invalid_invitation", await Code(await Post(client, "/api/v1/auth/admin-invitations/accept", null,
+            new AcceptAdminInvitation(token, "İkinci", "guclu-parola-3"))));
+    }
+
+    [Fact]
+    public async Task CustomerAndStaffLoginSurfacesAreSeparated()
+    {
+        using var factory = Factory();
+        using var client = factory.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var ownerToken = await Register(client, "owner@example.com");
+        var customerToken = await Register(client, "customer@example.com");
+        Assert.Equal(0, await SuperAdminBootstrap.Run(accounts, "owner@example.com", new StringWriter()));
+        ownerToken = await StaffToken(factory, accounts, "owner@example.com");
+
+        static HttpRequestMessage Login(string path, string email) {
+            var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(new LoginAccount(email, "guclu-parola-1")) };
+            request.Headers.Add(WebSessionCookies.CsrfHeader, "1");
+            return request;
+        }
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(Login("/api/v1/auth/web/login", "owner@example.com"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.SendAsync(Login("/api/v1/auth/admin/login", "customer@example.com"))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await client.SendAsync(Login("/api/v1/auth/admin/login", "owner@example.com"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync("/api/v1/auth/login", new LoginAccount("owner@example.com", "guclu-parola-1"))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, "/api/v1/me", ownerToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.OK, (await Get(client, "/api/v1/me", customerToken)).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Get(client, "/api/v1/admin/session", customerToken)).StatusCode);
+
+        async Task<HttpResponseMessage> Refresh(string path, string refreshToken) {
+            var request = new HttpRequestMessage(HttpMethod.Post, path) { Content = JsonContent.Create(new { }) };
+            request.Headers.Add(WebSessionCookies.CsrfHeader, "1");
+            request.Headers.Add("Cookie", $"{WebSessionCookies.Refresh}={refreshToken}");
+            return await client.SendAsync(request);
+        }
+        var ownerRefresh = (await accounts.IssueTokens((await accounts.Login("owner@example.com", "guclu-parola-1"))!.Id)).RefreshToken;
+        var customerRefresh = (await accounts.IssueTokens((await accounts.Login("customer@example.com", "guclu-parola-1"))!.Id)).RefreshToken;
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Refresh("/api/v1/auth/web/refresh", ownerRefresh)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await Refresh("/api/v1/auth/admin/refresh", customerRefresh)).StatusCode);
     }
 
     [Fact]
@@ -139,7 +350,7 @@ public sealed class AuthorizationTests : IDisposable
         // A staff role that grants nothing: passes the staff gate, holds no permission.
         await Register(client, "stajyer@example.com");
         await accounts.AssignRole("stajyer@example.com", "intern");
-        var intern = (await accounts.IssueTokens((await accounts.Login("stajyer@example.com", "guclu-parola-1"))!.Id)).AccessToken;
+        var intern = await StaffToken(factory, accounts, "stajyer@example.com");
         using var staff = await TestStaff.Client(factory);
 
         foreach (var path in new[] { "/api/v1/local-commerce/orders", "/api/v1/local-commerce/quotes", "/api/v1/local-commerce/assistant/leads", "/api/v1/local-commerce/surfaces" })

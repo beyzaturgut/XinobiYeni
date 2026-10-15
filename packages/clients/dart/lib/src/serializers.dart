@@ -14,11 +14,17 @@ import 'package:built_value/iso_8601_date_time_serializer.dart';
 import 'package:xinobi_api_client/src/date_serializer.dart';
 import 'package:xinobi_api_client/src/model/date.dart';
 
+import 'package:xinobi_api_client/src/model/accept_admin_invitation.dart';
 import 'package:xinobi_api_client/src/model/account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/account_profile.dart';
+import 'package:xinobi_api_client/src/model/add_favorite.dart';
+import 'package:xinobi_api_client/src/model/admin_invitation_response.dart';
+import 'package:xinobi_api_client/src/model/admin_mfa_challenge.dart';
+import 'package:xinobi_api_client/src/model/admin_password_reset_started.dart';
 import 'package:xinobi_api_client/src/model/admin_session.dart';
 import 'package:xinobi_api_client/src/model/announcement_item.dart';
 import 'package:xinobi_api_client/src/model/announcement_list.dart';
+import 'package:xinobi_api_client/src/model/assign_admin_role.dart';
 import 'package:xinobi_api_client/src/model/assistant_action.dart';
 import 'package:xinobi_api_client/src/model/assistant_config.dart';
 import 'package:xinobi_api_client/src/model/assistant_conversation_view.dart';
@@ -30,6 +36,8 @@ import 'package:xinobi_api_client/src/model/assistant_message.dart';
 import 'package:xinobi_api_client/src/model/assistant_message_request.dart';
 import 'package:xinobi_api_client/src/model/assistant_product.dart';
 import 'package:xinobi_api_client/src/model/assistant_reply.dart';
+import 'package:xinobi_api_client/src/model/audit_entry.dart';
+import 'package:xinobi_api_client/src/model/audit_page.dart';
 import 'package:xinobi_api_client/src/model/auth_session.dart';
 import 'package:xinobi_api_client/src/model/availability.dart';
 import 'package:xinobi_api_client/src/model/cancel_my_order.dart';
@@ -37,8 +45,10 @@ import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
 import 'package:xinobi_api_client/src/model/change_my_password.dart';
+import 'package:xinobi_api_client/src/model/complete_admin_password_reset.dart';
 import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
 import 'package:xinobi_api_client/src/model/confirm_password_reset.dart';
+import 'package:xinobi_api_client/src/model/create_admin_invitation.dart';
 import 'package:xinobi_api_client/src/model/create_quote.dart';
 import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
@@ -93,12 +103,14 @@ import 'package:xinobi_api_client/src/model/review_summary_list.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
+import 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
 import 'package:xinobi_api_client/src/model/start_password_reset.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
 import 'package:xinobi_api_client/src/model/track_quote_message.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
+import 'package:xinobi_api_client/src/model/verify_admin_mfa.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_answer.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_generation_request.dart';
 import 'package:xinobi_api_client/src/model/xinobi_u_option.dart';
@@ -111,11 +123,17 @@ import 'package:xinobi_api_client/src/model/xinobi_u_variant.dart';
 part 'serializers.g.dart';
 
 @SerializersFor([
+  AcceptAdminInvitation,
   AccountEmailVerification,
   AccountProfile,
+  AddFavorite,
+  AdminInvitationResponse,
+  AdminMfaChallenge,
+  AdminPasswordResetStarted,
   AdminSession,
   AnnouncementItem,
   AnnouncementList,
+  AssignAdminRole,
   AssistantAction,
   AssistantConfig,
   AssistantConversationView,
@@ -127,6 +145,8 @@ part 'serializers.g.dart';
   AssistantMessageRequest,
   AssistantProduct,
   AssistantReply,
+  AuditEntry,
+  AuditPage,
   AuthSession,
   Availability,
   CancelMyOrder,
@@ -134,8 +154,10 @@ part 'serializers.g.dart';
   CategoryItem,
   CategoryList,
   ChangeMyPassword,
+  CompleteAdminPasswordReset,
   ConfirmEmailChange,
   ConfirmPasswordReset,
+  CreateAdminInvitation,
   CreateQuote,
   CreateXinobiUSession,
   CustomerAddress,
@@ -190,12 +212,14 @@ part 'serializers.g.dart';
   SaveCustomerAddress,
   SaveDesignFromSession,
   StartAccountEmailVerification,
+  StartAdminPasswordReset,
   StartEmailChange,
   StartPasswordReset,
   SubmitReview,
   TrackQuoteMessage,
   UpdateMyAccount,
   VariantDetail,
+  VerifyAdminMfa,
   XinobiUAnswer,
   XinobiUGenerationRequest,
   XinobiUOption,
@@ -297,6 +321,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(QuoteItem)]),
         () => ListBuilder<QuoteItem>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AuditEntry)]),
+        () => ListBuilder<AuditEntry>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OrderRequestLine)]),

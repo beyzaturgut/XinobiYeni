@@ -292,7 +292,7 @@ public sealed class AccountTests : IDisposable
         await Register(client, password: "web-parola-12");
         using var login = new HttpRequestMessage(HttpMethod.Post, "/api/v1/auth/web/login") { Content = JsonContent.Create(new LoginAccount("ayse@example.com", "web-parola-12")) };
         login.Headers.Add("X-Xinobi-Csrf", "1");
-        var access = (await client.SendAsync(login)).Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("xinobi_at=")).Split(';')[0];
+        var access = (await client.SendAsync(login)).Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("xinobi_customer_at=")).Split(';')[0];
 
         async Task<HttpResponseMessage> Change(bool csrf)
         {
@@ -305,7 +305,7 @@ public sealed class AccountTests : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, (await Change(csrf: false)).StatusCode);
         var changed = await Change(csrf: true);
         Assert.Equal(HttpStatusCode.NoContent, changed.StatusCode);
-        Assert.Contains(changed.Headers.GetValues("Set-Cookie"), c => c.StartsWith("xinobi_at=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(changed.Headers.GetValues("Set-Cookie"), c => c.StartsWith("xinobi_customer_at=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase));
         Assert.Empty(await changed.Content.ReadAsStringAsync());
     }
 
@@ -326,12 +326,12 @@ public sealed class AccountTests : IDisposable
         var response = await client.SendAsync(request);
         response.EnsureSuccessStatusCode();
         var cookies = response.Headers.GetValues("Set-Cookie").ToArray();
-        Assert.Contains(cookies, c => c.StartsWith("xinobi_at=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase) && c.Contains("samesite=lax", StringComparison.OrdinalIgnoreCase) && c.Contains("path=/api/v1"));
-        Assert.Contains(cookies, c => c.StartsWith("xinobi_rt=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase) && c.Contains("path=/api/v1/auth/web"));
+        Assert.Contains(cookies, c => c.StartsWith("xinobi_customer_at=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase) && c.Contains("samesite=lax", StringComparison.OrdinalIgnoreCase) && c.Contains("path=/api/v1"));
+        Assert.Contains(cookies, c => c.StartsWith("xinobi_customer_rt=") && c.Contains("httponly", StringComparison.OrdinalIgnoreCase) && c.Contains("path=/api/v1/auth"));
         var body = await response.Content.ReadAsStringAsync();
         Assert.DoesNotContain("Token", body, StringComparison.OrdinalIgnoreCase);
-        var access = cookies.Single(c => c.StartsWith("xinobi_at=")).Split(';')[0];
-        var refresh = cookies.Single(c => c.StartsWith("xinobi_rt=")).Split(';')[0];
+        var access = cookies.Single(c => c.StartsWith("xinobi_customer_at=")).Split(';')[0];
+        var refresh = cookies.Single(c => c.StartsWith("xinobi_customer_rt=")).Split(';')[0];
 
         async Task<HttpResponseMessage> Send(HttpMethod method, string path, string cookie, bool csrf)
         {
@@ -345,11 +345,11 @@ public sealed class AccountTests : IDisposable
         Assert.Equal(HttpStatusCode.OK, (await Send(HttpMethod.Get, "/api/v1/me", access, csrf: false)).StatusCode);
         var refreshed = await Send(HttpMethod.Post, "/api/v1/auth/web/refresh", refresh, csrf: true);
         refreshed.EnsureSuccessStatusCode();
-        var newRefresh = refreshed.Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("xinobi_rt=")).Split(';')[0];
+        var newRefresh = refreshed.Headers.GetValues("Set-Cookie").Single(c => c.StartsWith("xinobi_customer_rt=")).Split(';')[0];
         Assert.NotEqual(refresh, newRefresh);
         var logout = await Send(HttpMethod.Post, "/api/v1/auth/web/logout", newRefresh, csrf: true);
         Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
-        Assert.Contains(logout.Headers.GetValues("Set-Cookie"), c => c.StartsWith("xinobi_rt=;") && c.Contains("expires=Thu, 01 Jan 1970", StringComparison.OrdinalIgnoreCase));
+        Assert.Contains(logout.Headers.GetValues("Set-Cookie"), c => c.StartsWith("xinobi_customer_rt=;") && c.Contains("expires=Thu, 01 Jan 1970", StringComparison.OrdinalIgnoreCase));
         Assert.Equal(HttpStatusCode.Unauthorized, (await Send(HttpMethod.Post, "/api/v1/auth/web/refresh", newRefresh, csrf: true)).StatusCode);
     }
 

@@ -28,6 +28,43 @@ public sealed class SqlWritesFactAttribute : FactAttribute
 /// <summary>The SQL account store keeps the file store's rules: tokens, rotation, addresses, idempotent orders and the one-time import.</summary>
 public sealed class SqlAccountIntegrationTests
 {
+    [SqlWritesFact]
+    public async Task FavoritesPersistPerCustomerAndCascadeOnAccountDeletion()
+    {
+        var services = new ServiceCollection();
+        services.AddXinobiPersistence(Environment.GetEnvironmentVariable("XINOBI_TEST_SQL")!);
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<SqlAccountStore>();
+        await using var provider = services.BuildServiceProvider();
+        var store = provider.GetRequiredService<SqlAccountStore>();
+        await using var scope = provider.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<XinobiDbContext>();
+        var firstEmail = $"favori-{Guid.NewGuid():N}@xinobi-test.invalid";
+        var secondEmail = $"favori-{Guid.NewGuid():N}@xinobi-test.invalid";
+        try
+        {
+            var first = await store.Register("Favori Bir", firstEmail, "guclu-parola-1");
+            var second = await store.Register("Favori İki", secondEmail, "guclu-parola-2");
+            await store.AddFavorite(first.Id, "DEMO-P101");
+            await store.AddFavorite(first.Id, "DEMO-P101");
+            Assert.Equal(["DEMO-P101"], await store.Favorites(first.Id));
+            var reopened = new SqlAccountStore(provider.GetRequiredService<IServiceScopeFactory>(), TimeProvider.System);
+            Assert.Equal(["DEMO-P101"], await reopened.Favorites(first.Id));
+            Assert.True(await reopened.DeleteFavorite(first.Id, "DEMO-P101"));
+            Assert.Empty(await store.Favorites(first.Id));
+            await store.AddFavorite(first.Id, "DEMO-P101");
+            Assert.Empty(await store.Favorites(second.Id));
+            Assert.False(await store.DeleteFavorite(second.Id, "DEMO-P101"));
+            Assert.True(await store.Delete(first.Id, "guclu-parola-1"));
+            Assert.False(await db.CustomerFavorites.AnyAsync(row => row.UserId == Guid.Parse(first.Id)));
+        }
+        finally
+        {
+            await db.Users.Where(x => x.NormalizedEmail == firstEmail || x.NormalizedEmail == secondEmail).ExecuteDeleteAsync();
+        }
+    }
+
+
     private static readonly SaveCustomerAddress Home = new("Ev", "Ayşe Yılmaz", "+905321234567", "İstanbul", "Kadıköy", "Moda Cad. No: 1", "34710", false);
 
     private static CustomerOrder NewOrder(CustomerAddress address) => new(Guid.NewGuid().ToString("N"), "XN-261009-1234", DateTimeOffset.UtcNow, "received", address,

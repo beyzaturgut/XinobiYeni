@@ -48,13 +48,13 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 
 final api = XinobiApiClient().getAccountApi();
-final SaveCustomerAddress saveCustomerAddress = ; // SaveCustomerAddress |
+final AcceptAdminInvitation acceptAdminInvitation = ; // AcceptAdminInvitation |
 
 try {
-    final response = await api.addMyAddress(saveCustomerAddress);
+    final response = await api.acceptAdminInvitation(acceptAdminInvitation);
     print(response);
 } on DioException catch (e) {
-    print("Exception when calling AccountApi->addMyAddress: $e\n");
+    print("Exception when calling AccountApi->acceptAdminInvitation: $e\n");
 }
 
 ```
@@ -65,14 +65,18 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+[*AccountApi*](doc/AccountApi.md) | [**acceptAdminInvitation**](doc/AccountApi.md#acceptadmininvitation) | **POST** /api/v1/auth/admin-invitations/accept |
 [*AccountApi*](doc/AccountApi.md) | [**addMyAddress**](doc/AccountApi.md#addmyaddress) | **POST** /api/v1/me/addresses |
+[*AccountApi*](doc/AccountApi.md) | [**addMyFavorite**](doc/AccountApi.md#addmyfavorite) | **POST** /api/v1/me/favorites |
 [*AccountApi*](doc/AccountApi.md) | [**cancelMyOrder**](doc/AccountApi.md#cancelmyorder) | **POST** /api/v1/me/orders/{id}/cancellation |
 [*AccountApi*](doc/AccountApi.md) | [**changeMyPassword**](doc/AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
+[*AccountApi*](doc/AccountApi.md) | [**completeAdminPasswordReset**](doc/AccountApi.md#completeadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset/complete |
 [*AccountApi*](doc/AccountApi.md) | [**confirmMyEmailChange**](doc/AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
 [*AccountApi*](doc/AccountApi.md) | [**confirmPasswordReset**](doc/AccountApi.md#confirmpasswordreset) | **POST** /api/v1/auth/password-reset/confirm |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAccount**](doc/AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyAddress**](doc/AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyDesign**](doc/AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
+[*AccountApi*](doc/AccountApi.md) | [**deleteMyFavorite**](doc/AccountApi.md#deletemyfavorite) | **DELETE** /api/v1/me/favorites/{productId} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**getMyDesignImage**](doc/AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
@@ -80,16 +84,20 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**getOrderOptions**](doc/AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [*AccountApi*](doc/AccountApi.md) | [**listMyDesigns**](doc/AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
+[*AccountApi*](doc/AccountApi.md) | [**listMyFavorites**](doc/AccountApi.md#listmyfavorites) | **GET** /api/v1/me/favorites |
 [*AccountApi*](doc/AccountApi.md) | [**listMyNotifications**](doc/AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [*AccountApi*](doc/AccountApi.md) | [**listMyOrders**](doc/AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [*AccountApi*](doc/AccountApi.md) | [**listMyQuotes**](doc/AccountApi.md#listmyquotes) | **GET** /api/v1/me/quotes |
 [*AccountApi*](doc/AccountApi.md) | [**listMyReviews**](doc/AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**loginAccount**](doc/AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
+[*AccountApi*](doc/AccountApi.md) | [**loginAdminWebAccount**](doc/AccountApi.md#loginadminwebaccount) | **POST** /api/v1/auth/admin/login |
 [*AccountApi*](doc/AccountApi.md) | [**loginWebAccount**](doc/AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
+[*AccountApi*](doc/AccountApi.md) | [**logoutAdminWebSession**](doc/AccountApi.md#logoutadminwebsession) | **POST** /api/v1/auth/admin/logout |
 [*AccountApi*](doc/AccountApi.md) | [**logoutSession**](doc/AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
 [*AccountApi*](doc/AccountApi.md) | [**logoutWebSession**](doc/AccountApi.md#logoutwebsession) | **POST** /api/v1/auth/web/logout |
 [*AccountApi*](doc/AccountApi.md) | [**markMyNotificationsRead**](doc/AccountApi.md#markmynotificationsread) | **POST** /api/v1/me/notifications/read |
 [*AccountApi*](doc/AccountApi.md) | [**placeMyOrder**](doc/AccountApi.md#placemyorder) | **POST** /api/v1/me/orders |
+[*AccountApi*](doc/AccountApi.md) | [**refreshAdminWebSession**](doc/AccountApi.md#refreshadminwebsession) | **POST** /api/v1/auth/admin/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**refreshSession**](doc/AccountApi.md#refreshsession) | **POST** /api/v1/auth/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**refreshWebSession**](doc/AccountApi.md#refreshwebsession) | **POST** /api/v1/auth/web/refresh |
 [*AccountApi*](doc/AccountApi.md) | [**registerAccount**](doc/AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
@@ -100,14 +108,19 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**returnMyOrder**](doc/AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [*AccountApi*](doc/AccountApi.md) | [**saveMyDesign**](doc/AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
+[*AccountApi*](doc/AccountApi.md) | [**startAdminPasswordReset**](doc/AccountApi.md#startadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset |
 [*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startPasswordReset**](doc/AccountApi.md#startpasswordreset) | **POST** /api/v1/auth/password-reset |
 [*AccountApi*](doc/AccountApi.md) | [**submitMyReview**](doc/AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAccount**](doc/AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAddress**](doc/AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**uploadMyDesign**](doc/AccountApi.md#uploadmydesign) | **POST** /api/v1/me/designs/upload |
+[*AccountApi*](doc/AccountApi.md) | [**verifyAdminMfa**](doc/AccountApi.md#verifyadminmfa) | **POST** /api/v1/auth/admin/mfa/verify |
+[*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
+[*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
+[*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConfig**](doc/AssistantApi.md#getassistantconfig) | **GET** /api/v1/assistant/config |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConversation**](doc/AssistantApi.md#getassistantconversation) | **GET** /api/v1/assistant/conversations/{id} |
 [*AssistantApi*](doc/AssistantApi.md) | [**requestAssistantHandoff**](doc/AssistantApi.md#requestassistanthandoff) | **POST** /api/v1/assistant/conversations/{id}/handoff |
@@ -137,11 +150,17 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [AcceptAdminInvitation](doc/AcceptAdminInvitation.md)
  - [AccountEmailVerification](doc/AccountEmailVerification.md)
  - [AccountProfile](doc/AccountProfile.md)
+ - [AddFavorite](doc/AddFavorite.md)
+ - [AdminInvitationResponse](doc/AdminInvitationResponse.md)
+ - [AdminMfaChallenge](doc/AdminMfaChallenge.md)
+ - [AdminPasswordResetStarted](doc/AdminPasswordResetStarted.md)
  - [AdminSession](doc/AdminSession.md)
  - [AnnouncementItem](doc/AnnouncementItem.md)
  - [AnnouncementList](doc/AnnouncementList.md)
+ - [AssignAdminRole](doc/AssignAdminRole.md)
  - [AssistantAction](doc/AssistantAction.md)
  - [AssistantConfig](doc/AssistantConfig.md)
  - [AssistantConversationView](doc/AssistantConversationView.md)
@@ -153,6 +172,8 @@ Class | Method | HTTP request | Description
  - [AssistantMessageRequest](doc/AssistantMessageRequest.md)
  - [AssistantProduct](doc/AssistantProduct.md)
  - [AssistantReply](doc/AssistantReply.md)
+ - [AuditEntry](doc/AuditEntry.md)
+ - [AuditPage](doc/AuditPage.md)
  - [AuthSession](doc/AuthSession.md)
  - [Availability](doc/Availability.md)
  - [CancelMyOrder](doc/CancelMyOrder.md)
@@ -160,8 +181,10 @@ Class | Method | HTTP request | Description
  - [CategoryItem](doc/CategoryItem.md)
  - [CategoryList](doc/CategoryList.md)
  - [ChangeMyPassword](doc/ChangeMyPassword.md)
+ - [CompleteAdminPasswordReset](doc/CompleteAdminPasswordReset.md)
  - [ConfirmEmailChange](doc/ConfirmEmailChange.md)
  - [ConfirmPasswordReset](doc/ConfirmPasswordReset.md)
+ - [CreateAdminInvitation](doc/CreateAdminInvitation.md)
  - [CreateQuote](doc/CreateQuote.md)
  - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
  - [CustomerAddress](doc/CustomerAddress.md)
@@ -216,12 +239,14 @@ Class | Method | HTTP request | Description
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
+ - [StartAdminPasswordReset](doc/StartAdminPasswordReset.md)
  - [StartEmailChange](doc/StartEmailChange.md)
  - [StartPasswordReset](doc/StartPasswordReset.md)
  - [SubmitReview](doc/SubmitReview.md)
  - [TrackQuoteMessage](doc/TrackQuoteMessage.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)
+ - [VerifyAdminMfa](doc/VerifyAdminMfa.md)
  - [XinobiUAnswer](doc/XinobiUAnswer.md)
  - [XinobiUGenerationRequest](doc/XinobiUGenerationRequest.md)
  - [XinobiUOption](doc/XinobiUOption.md)

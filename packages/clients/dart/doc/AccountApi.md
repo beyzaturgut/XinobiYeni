@@ -9,14 +9,18 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**acceptAdminInvitation**](AccountApi.md#acceptadmininvitation) | **POST** /api/v1/auth/admin-invitations/accept |
 [**addMyAddress**](AccountApi.md#addmyaddress) | **POST** /api/v1/me/addresses |
+[**addMyFavorite**](AccountApi.md#addmyfavorite) | **POST** /api/v1/me/favorites |
 [**cancelMyOrder**](AccountApi.md#cancelmyorder) | **POST** /api/v1/me/orders/{id}/cancellation |
 [**changeMyPassword**](AccountApi.md#changemypassword) | **PUT** /api/v1/me/password |
+[**completeAdminPasswordReset**](AccountApi.md#completeadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset/complete |
 [**confirmMyEmailChange**](AccountApi.md#confirmmyemailchange) | **PUT** /api/v1/me/email |
 [**confirmPasswordReset**](AccountApi.md#confirmpasswordreset) | **POST** /api/v1/auth/password-reset/confirm |
 [**deleteMyAccount**](AccountApi.md#deletemyaccount) | **POST** /api/v1/me/deletion |
 [**deleteMyAddress**](AccountApi.md#deletemyaddress) | **DELETE** /api/v1/me/addresses/{id} |
 [**deleteMyDesign**](AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
+[**deleteMyFavorite**](AccountApi.md#deletemyfavorite) | **DELETE** /api/v1/me/favorites/{productId} |
 [**getMyAccount**](AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [**getMyDesignImage**](AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
@@ -24,16 +28,20 @@ Method | HTTP request | Description
 [**getOrderOptions**](AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [**listMyDesigns**](AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
+[**listMyFavorites**](AccountApi.md#listmyfavorites) | **GET** /api/v1/me/favorites |
 [**listMyNotifications**](AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
 [**listMyOrders**](AccountApi.md#listmyorders) | **GET** /api/v1/me/orders |
 [**listMyQuotes**](AccountApi.md#listmyquotes) | **GET** /api/v1/me/quotes |
 [**listMyReviews**](AccountApi.md#listmyreviews) | **GET** /api/v1/me/reviews |
 [**loginAccount**](AccountApi.md#loginaccount) | **POST** /api/v1/auth/login |
+[**loginAdminWebAccount**](AccountApi.md#loginadminwebaccount) | **POST** /api/v1/auth/admin/login |
 [**loginWebAccount**](AccountApi.md#loginwebaccount) | **POST** /api/v1/auth/web/login |
+[**logoutAdminWebSession**](AccountApi.md#logoutadminwebsession) | **POST** /api/v1/auth/admin/logout |
 [**logoutSession**](AccountApi.md#logoutsession) | **POST** /api/v1/auth/logout |
 [**logoutWebSession**](AccountApi.md#logoutwebsession) | **POST** /api/v1/auth/web/logout |
 [**markMyNotificationsRead**](AccountApi.md#markmynotificationsread) | **POST** /api/v1/me/notifications/read |
 [**placeMyOrder**](AccountApi.md#placemyorder) | **POST** /api/v1/me/orders |
+[**refreshAdminWebSession**](AccountApi.md#refreshadminwebsession) | **POST** /api/v1/auth/admin/refresh |
 [**refreshSession**](AccountApi.md#refreshsession) | **POST** /api/v1/auth/refresh |
 [**refreshWebSession**](AccountApi.md#refreshwebsession) | **POST** /api/v1/auth/web/refresh |
 [**registerAccount**](AccountApi.md#registeraccount) | **POST** /api/v1/auth/register |
@@ -44,13 +52,56 @@ Method | HTTP request | Description
 [**returnMyOrder**](AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [**saveMyDesign**](AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
+[**startAdminPasswordReset**](AccountApi.md#startadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset |
 [**startMyEmailChange**](AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
 [**startPasswordReset**](AccountApi.md#startpasswordreset) | **POST** /api/v1/auth/password-reset |
 [**submitMyReview**](AccountApi.md#submitmyreview) | **POST** /api/v1/me/reviews |
 [**updateMyAccount**](AccountApi.md#updatemyaccount) | **PATCH** /api/v1/me |
 [**updateMyAddress**](AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
 [**uploadMyDesign**](AccountApi.md#uploadmydesign) | **POST** /api/v1/me/designs/upload |
+[**verifyAdminMfa**](AccountApi.md#verifyadminmfa) | **POST** /api/v1/auth/admin/mfa/verify |
 
+
+# **acceptAdminInvitation**
+> AdminMfaChallenge acceptAdminInvitation(acceptAdminInvitation)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final AcceptAdminInvitation acceptAdminInvitation = ; // AcceptAdminInvitation |
+
+try {
+    final response = api.acceptAdminInvitation(acceptAdminInvitation);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->acceptAdminInvitation: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **acceptAdminInvitation** | [**AcceptAdminInvitation**](AcceptAdminInvitation.md)|  |
+
+### Return type
+
+[**AdminMfaChallenge**](AdminMfaChallenge.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **addMyAddress**
 > CustomerAddress addMyAddress(saveCustomerAddress)
@@ -90,6 +141,46 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **addMyFavorite**
+> addMyFavorite(addFavorite)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final AddFavorite addFavorite = ; // AddFavorite |
+
+try {
+    api.addMyFavorite(addFavorite);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->addMyFavorite: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **addFavorite** | [**AddFavorite**](AddFavorite.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -174,6 +265,46 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **completeAdminPasswordReset**
+> completeAdminPasswordReset(completeAdminPasswordReset)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final CompleteAdminPasswordReset completeAdminPasswordReset = ; // CompleteAdminPasswordReset |
+
+try {
+    api.completeAdminPasswordReset(completeAdminPasswordReset);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->completeAdminPasswordReset: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **completeAdminPasswordReset** | [**CompleteAdminPasswordReset**](CompleteAdminPasswordReset.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -362,6 +493,46 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **String**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteMyFavorite**
+> deleteMyFavorite(productId)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String productId = productId_example; // String |
+
+try {
+    api.deleteMyFavorite(productId);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->deleteMyFavorite: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **productId** | **String**|  |
 
 ### Return type
 
@@ -649,6 +820,43 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **listMyFavorites**
+> BuiltList<String> listMyFavorites()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.listMyFavorites();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->listMyFavorites: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+**BuiltList&lt;String&gt;**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listMyNotifications**
 > Inbox listMyNotifications()
 
@@ -838,6 +1046,47 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **loginAdminWebAccount**
+> AdminMfaChallenge loginAdminWebAccount(loginAccount)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final LoginAccount loginAccount = ; // LoginAccount |
+
+try {
+    final response = api.loginAdminWebAccount(loginAccount);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->loginAdminWebAccount: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **loginAccount** | [**LoginAccount**](LoginAccount.md)|  |
+
+### Return type
+
+[**AdminMfaChallenge**](AdminMfaChallenge.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **loginWebAccount**
 > AccountProfile loginWebAccount(loginAccount)
 
@@ -876,6 +1125,42 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **logoutAdminWebSession**
+> logoutAdminWebSession()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    api.logoutAdminWebSession();
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->logoutAdminWebSession: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1032,6 +1317,43 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **refreshAdminWebSession**
+> AccountProfile refreshAdminWebSession()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.refreshAdminWebSession();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->refreshAdminWebSession: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**AccountProfile**](AccountProfile.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -1444,6 +1766,47 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **startAdminPasswordReset**
+> AdminPasswordResetStarted startAdminPasswordReset(startAdminPasswordReset)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final StartAdminPasswordReset startAdminPasswordReset = ; // StartAdminPasswordReset |
+
+try {
+    final response = api.startAdminPasswordReset(startAdminPasswordReset);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->startAdminPasswordReset: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **startAdminPasswordReset** | [**StartAdminPasswordReset**](StartAdminPasswordReset.md)|  |
+
+### Return type
+
+[**AdminPasswordResetStarted**](AdminPasswordResetStarted.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **startMyEmailChange**
 > AccountEmailVerification startMyEmailChange(startEmailChange)
 
@@ -1694,6 +2057,47 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: multipart/form-data
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **verifyAdminMfa**
+> AdminSession verifyAdminMfa(verifyAdminMfa)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final VerifyAdminMfa verifyAdminMfa = ; // VerifyAdminMfa |
+
+try {
+    final response = api.verifyAdminMfa(verifyAdminMfa);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->verifyAdminMfa: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **verifyAdminMfa** | [**VerifyAdminMfa**](VerifyAdminMfa.md)|  |
+
+### Return type
+
+[**AdminSession**](AdminSession.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

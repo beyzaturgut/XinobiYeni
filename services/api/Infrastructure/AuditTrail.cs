@@ -73,7 +73,11 @@ public sealed class AuditTrail(FeatureDocuments documents, IConfiguration config
             {
                 await using var scope = scopes.CreateAsyncScope();
                 var db = scope.ServiceProvider.GetRequiredService<Xinobi.Persistence.XinobiDbContext>();
-                var query = db.AuditLogs.AsNoTracking();
+                // This existing screen is the request-attempt trail (with an HTTP status).
+                // Atomic business-change/console entries share the append-only SQL table,
+                // but are exposed by the detailed audit API, not mislabelled as status 0 here.
+                var query = db.AuditLogs.AsNoTracking()
+                    .Where(x => x.SafeDiff != null && x.SafeDiff.Contains("\"status\":"));
                 if (!string.IsNullOrEmpty(entityType)) query = query.Where(x => x.EntityType == entityType);
                 var rows = await query.OrderByDescending(x => x.Id).Take(limit).ToArrayAsync();
                 return rows.Select(x => new AuditEntry(x.Id.ToString(), x.OccurredAt, x.ActorUserId?.ToString("N"), x.Action, x.EntityType, x.EntityId, Status(x.SafeDiff), x.TraceId)).ToArray();

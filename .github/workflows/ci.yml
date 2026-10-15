@@ -57,6 +57,19 @@ jobs:
       - name: Install web dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Set up Flutter for Dart contract generation
+        # Contract generation also runs Dart's built_value serializer generator.
+        # Use the same SDK bundle as the mobile job.
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.5
+          channel: stable
+          cache: true
+
+      - name: Install generated Dart client dependencies
+        working-directory: packages/clients/dart
+        run: dart pub get
+
       - name: Check generated API contracts
         run: pnpm contracts:check
 

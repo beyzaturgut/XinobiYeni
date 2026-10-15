@@ -105,7 +105,7 @@ public sealed partial class AssistantEngine(AssistantStore store, ITextModelProv
     private static string Fact(CommerceState state, CommerceProduct product)
     {
         var prices = product.Variants.Select(variant => state.Prices.GetValueOrDefault(variant.Id)).Where(cents => cents > 0).ToArray();
-        var price = prices.Length == 0 ? "fiyat tanımlı değil" : prices.Distinct().Count() > 1 ? $"{prices.Min() / 100m:N2} TL'den başlayan" : $"{prices[0] / 100m:N2} TL";
+        var price = prices.Length == 0 ? "fiyat tanımlı değil" : prices.Distinct().Count() > 1 ? string.Create(Turkish, $"{prices.Min() / 100m:N2} TL'den başlayan") : string.Create(Turkish, $"{prices[0] / 100m:N2} TL");
         var specs = product.Specs is { Length: > 0 } list ? " · özellikler: " + string.Join("; ", list.Select(spec => $"{spec.Name}={spec.Value}")) : "";
         return $"[P:{product.Id}] {product.Name} · {product.Category} · {price} · {StockText(product.Variants.Sum(variant => variant.Stock))} · renkler: {string.Join(", ", product.Variants.Select(variant => variant.Color))} · XINOBI U: {(CatalogProjection.IsPersonalizable(product) ? "var" : "yok")}{specs} · açıklama: {Truncate(product.Description, 200)}";
     }

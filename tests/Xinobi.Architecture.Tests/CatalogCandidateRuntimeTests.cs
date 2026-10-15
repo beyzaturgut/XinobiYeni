@@ -7,9 +7,26 @@ using Xinobi.Api.Catalog;
 using Xinobi.Api.LocalCommerce;
 using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
 namespace Xinobi.Architecture.Tests;
-public sealed class CatalogCandidateRuntimeTests
+public sealed class CatalogCandidateRuntimeTests : IDisposable
 {
- private static readonly string Root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../../"));
+ private readonly string directory=Path.Combine(Path.GetTempPath(),"xinobi-catalog-candidate-test-"+Guid.NewGuid().ToString("N"));
+ private string Data=>Path.Combine(directory,"catalog");
+ public CatalogCandidateRuntimeTests()
+ {
+  // CI owns a complete snapshot and decoded media; never read untracked owner QA data.
+  Directory.CreateDirectory(Path.Combine(Data,"media"));
+  var products=Enumerable.Range(1,2).Select(i=>{
+   var name=i.ToString("x32")+".png";
+   using var bitmap=new SKBitmap(64,64);bitmap.Erase(i==1?SKColors.Blue:SKColors.Red);
+   using var image=SKImage.FromBitmap(bitmap);using var png=image.Encode(SKEncodedImageFormat.Png,100);
+   File.WriteAllBytes(Path.Combine(Data,"media",name),png.ToArray());
+   return new CommerceProduct("test-product-"+i,"Test product "+i,"Test",true,"Isolated fixture","Test",
+    [new CommerceVariant("test-variant-"+i,"TEST-"+i,"Test",1,"/api/v1/local-commerce/media/"+name)],Personalizable:true);
+  }).ToArray();
+  var state=new CommerceState(products,new Dictionary<string,long>(),new CommerceContent([],"",""));
+  File.WriteAllText(Path.Combine(Data,"state.json"),JsonSerializer.Serialize(state,new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+ }
+ public void Dispose(){if(Directory.Exists(directory))Directory.Delete(directory,true);}
  private sealed class MockHttp(CatalogCandidateRequest expected,byte[] source):HttpMessageHandler
  {
   public int Calls;
@@ -25,10 +42,10 @@ public sealed class CatalogCandidateRuntimeTests
  [Fact]
  public async Task IneligibleMissingOrExternalImagesCannotClaimAttemptOrReadCredential()
  {
-  var data=Path.Combine(Root,"services/api/App_Data/real-catalog-qa");var state=await new SnapshotCatalogSource(Path.Combine(data,"state.json")).ReadAsync();
+  var data=Data;var state=await new SnapshotCatalogSource(Path.Combine(data,"state.json")).ReadAsync();
   var p=state.Products.First(p=>p.Personalizable==true);var v=p.Variants.First();
   foreach(var invalid in new[]{p with{Active=false},p with{Personalizable=false},p with{Variants=[v with{Image="https://external.invalid/product.png"}]},p with{Variants=[v with{Image=""}]},p with{Variants=[v with{Image="/api/v1/local-commerce/media/"+new string('a',32)+".png"}]}}){
-   var directory=Path.Combine(Root,"services/api/App_Data/integration-runtime/catalog-denied-"+Guid.NewGuid());
+   var directory=Path.Combine(this.directory,"catalog-denied-"+Guid.NewGuid());
    var runtime=new CatalogCandidateRuntime(new FakeCatalog(state with{Products=[invalid]}),Path.Combine(data,"media"),directory);
    var request=new CatalogCandidateRequest(Guid.NewGuid(),p.Id,v.Id,new string('0',64),1,1,"body",true);
    await Assert.ThrowsAnyAsync<Exception>(()=>runtime.ExecuteAsync(request,()=>throw new Exception("Credential must not load"),()=>throw new Exception("HTTP must not load"),true));
@@ -38,11 +55,12 @@ public sealed class CatalogCandidateRuntimeTests
  [Fact]
  public async Task TwoRealCatalogVariantsMockProviderCreatesOnlyIsolatedPendingAndCannotRetry()
  {
-  var data=Path.Combine(Root,"services/api/App_Data/real-catalog-qa");var catalog=new SnapshotCatalogSource(Path.Combine(data,"state.json"));var state=await catalog.ReadAsync();
+  var data=Data;var catalog=new SnapshotCatalogSource(Path.Combine(data,"state.json"));var state=await catalog.ReadAsync();
+  Assert.Equal(2,state.Products.Count(p=>p.Active&&p.Personalizable==true));
   foreach(var product in state.Products.Where(p=>p.Active&&p.Personalizable==true)){
    var variant=product.Variants.First();var bytes=File.ReadAllBytes(Path.Combine(data,"media",Path.GetFileName(variant.Image)));using var info=SKBitmap.Decode(bytes);
    var request=new CatalogCandidateRequest(Guid.NewGuid(),product.Id,variant.Id,Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),info.Width,info.Height,"designable body",true);
-   var directory=Path.Combine(Root,"services/api/App_Data/integration-runtime/catalog-mock-"+Guid.NewGuid());var runtime=new CatalogCandidateRuntime(catalog,Path.Combine(data,"media"),directory);var http=new MockHttp(request,bytes);
+   var directory=Path.Combine(this.directory,"catalog-mock-"+Guid.NewGuid());var runtime=new CatalogCandidateRuntime(catalog,Path.Combine(data,"media"),directory);var http=new MockHttp(request,bytes);
    var id=await runtime.ExecuteAsync(request,()=>"fake-test-only",()=>http,true);Assert.Equal(request.AttemptId,id);Assert.Equal(1,http.Calls);Assert.False(Directory.Exists(Path.Combine(directory,"accepted")));
    using var metadata=JsonDocument.Parse(File.ReadAllText(Path.Combine(directory,"pending",id.ToString(),"candidate.json")));Assert.Equal("pending",metadata.RootElement.GetProperty("status").GetString());Assert.False(metadata.RootElement.GetProperty("approved").GetBoolean());Assert.Equal(product.Id,metadata.RootElement.GetProperty("productId").GetString());
    var loads=0;await Assert.ThrowsAsync<SegmentationProviderException>(()=>runtime.ExecuteAsync(request,()=>{loads++;return "fake";},()=>throw new Exception(),true));Assert.Equal(0,loads);
@@ -62,10 +80,10 @@ public sealed class CatalogCandidateRuntimeTests
  [Fact]
  public async Task PresetsAndManualRetainAllBoundedChoicesAsPendingWithoutApproval()
  {
-  var data=Path.Combine(Root,"services/api/App_Data/real-catalog-qa");var catalog=new SnapshotCatalogSource(Path.Combine(data,"state.json"));var p=(await catalog.ReadAsync()).Products.First(p=>p.Active&&p.Personalizable==true);var v=p.Variants.First();var bytes=File.ReadAllBytes(Path.Combine(data,"media",Path.GetFileName(v.Image)));using var info=SKBitmap.Decode(bytes);
+  var data=Data;var catalog=new SnapshotCatalogSource(Path.Combine(data,"state.json"));var p=(await catalog.ReadAsync()).Products.First(p=>p.Active&&p.Personalizable==true);var v=p.Variants.First();var bytes=File.ReadAllBytes(Path.Combine(data,"media",Path.GetFileName(v.Image)));using var info=SKBitmap.Decode(bytes);
   foreach(var mode in new[]{"upper","lower","both","manual"}){
    var prompts=mode switch{"upper"=>new[]{"upper teapot body"},"lower"=>new[]{"lower kettle body"},"both"=>new[]{"upper teapot body","lower kettle body"},_=>new[]{"coffee machine designable body"}};
-   var request=new CatalogCandidateRequest(Guid.NewGuid(),p.Id,v.Id,Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),info.Width,info.Height,prompts[0],true,mode,true);var directory=Path.Combine(Root,"services/api/App_Data/integration-runtime/multi-runtime-"+Guid.NewGuid());var runtime=new CatalogCandidateRuntime(catalog,Path.Combine(data,"media"),directory);var handler=new MultiHttp(prompts,bytes,info.Width,info.Height);
+   var request=new CatalogCandidateRequest(Guid.NewGuid(),p.Id,v.Id,Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(),info.Width,info.Height,prompts[0],true,mode,true);var directory=Path.Combine(this.directory,"multi-runtime-"+Guid.NewGuid());var runtime=new CatalogCandidateRuntime(catalog,Path.Combine(data,"media"),directory);var handler=new MultiHttp(prompts,bytes,info.Width,info.Height);
    var id=await runtime.ExecuteAsync(request,()=>"fake-mock-only",()=>handler,true);Assert.Equal(1,handler.Calls);using var record=JsonDocument.Parse(File.ReadAllText(Path.Combine(directory,"pending",id.ToString(),"candidate.json")));var options=record.RootElement.GetProperty("options");Assert.Equal(prompts.Length*2,options.GetArrayLength());Assert.Equal(options.GetArrayLength(),options.EnumerateArray().Select(o=>o.GetProperty("id").GetGuid()).Distinct().Count());Assert.All(options.EnumerateArray(),o=>Assert.True(File.Exists(Path.Combine(directory,"pending",id.ToString(),o.GetProperty("file").GetString()!))));Assert.False(record.RootElement.GetProperty("approved").GetBoolean());Assert.False(Directory.Exists(Path.Combine(directory,"accepted")));await Assert.ThrowsAsync<SegmentationProviderException>(()=>runtime.ExecuteAsync(request,()=>throw new Exception("credential must not load twice"),()=>handler,true));Assert.Equal(1,handler.Calls);
   }
  }

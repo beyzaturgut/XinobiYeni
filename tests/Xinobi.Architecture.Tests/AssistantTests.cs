@@ -107,6 +107,11 @@ public sealed class AssistantTests : IDisposable
     [Fact]
     public async Task TheModelPhrasesTheAnswerFromCheckedFactsOnly()
     {
+        var previousCulture = System.Globalization.CultureInfo.CurrentCulture;
+        try
+        {
+        // CI is not Turkish; catalogue facts must keep Turkish money formatting regardless of host culture.
+        System.Globalization.CultureInfo.CurrentCulture = System.Globalization.CultureInfo.GetCultureInfo("en-US");
         model.Configured = true;
         using var factory = Factory();
         using var client = factory.CreateClient();
@@ -138,6 +143,11 @@ public sealed class AssistantTests : IDisposable
         var rules = await Read<AssistantReply>(await Ask(client, "kahve makinesi"));
         Assert.Equal("rules", rules.Reply.Source);
         Assert.Equal(2, model.Calls.Count);
+        }
+        finally
+        {
+            System.Globalization.CultureInfo.CurrentCulture = previousCulture;
+        }
     }
 
     private static SaveAssistantPolicy Policy(int revision, int limit) => new(revision, AssistantStore.DefaultPolicy.SystemPrompt, "Merhaba, ben Nobi.", ["Çay makinesi öner"], limit, 30,

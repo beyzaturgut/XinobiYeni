@@ -192,8 +192,8 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
-// Behind IIS ARR on the same machine (https://host/api → http://localhost:API port), trust the scheme and client
-// address that the loopback proxy forwards, so HTTPS-only admin writes and Secure cookies see the original request.
+// Behind IIS ARR on the same machine (http(s)://host/api → http://localhost:API port), trust the scheme, host and client
+// address that the loopback proxy forwards, so admin origin checks and Secure cookies see the original request.
 var behindReverseProxy = !builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("ReverseProxy:Enabled");
 if (behindReverseProxy)
     builder.Services.Configure<ForwardedHeadersOptions>(options =>

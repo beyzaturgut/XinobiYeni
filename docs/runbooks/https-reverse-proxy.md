@@ -1,9 +1,11 @@
-# HTTPS girişi ve /api yönlendirmesi (IIS ARR)
+# HTTP girişi ve /api yönlendirmesi (IIS ARR)
 
 Web ve admin `XinobiYeni` sitesinden (8014 ve 443) sunulur. API ayrı `XinobiYeniApi`
-sitesinde (`http://localhost:8024`) çalışır. Tarayıcı yalnız tek kaynağı görür:
-`https://109.104.120.91/` web, `/admin/` panel, `/api/v1/` API. Mobil uygulama
-8024'e doğrudan bağlanmaya devam eder.
+sitesinde (`http://localhost:8024`) çalışır. IP'li test sunucusunun ana adresi
+HTTP'dir; tarayıcı yalnız tek kaynağı görür: `http://109.104.120.91:8014/` web,
+`/admin/` panel, `/api/v1/` API. Kendi imzalı HTTPS girişi (443) aynı kurallarla
+çalışmaya devam eder ama ana adres değildir. Mobil uygulama 8024'e doğrudan
+bağlanmaya devam eder.
 
 ## 1. ARR proxy'yi aç
 
@@ -15,20 +17,21 @@ Aynı ekranda **Preserve client IP in the following header** `X-Forwarded-For` k
 
 IIS Manager → **XinobiYeni** sitesi → **URL Rewrite** → sağda
 **View Server Variables** → **Add** → `HTTP_X_FORWARDED_PROTO`.
-Aynı şekilde `HTTP_X_FORWARDED_HOST` ekle. Kurallar dış HTTPS host'unu API'ye
+Aynı şekilde `HTTP_X_FORWARDED_HOST` ekle. Kurallar dış host'u (port dahil) API'ye
 iletir; API `ReverseProxy:AllowedHosts` listesindeki host'lara ve yalnız loopback
 proxy'ye güvenir. Böylece admin'in Origin kontrolü backend `localhost:8024`
 yerine dış adresle eşleşir. Yeni API paketi izinli host olarak `109.104.120.91`
 üretir; alan adına geçilirse bu liste güncellenir.
 
-## 2b. Admin'in HTTPS zorunluluğu için kilidi aç
+## 2b. Admin HTTP üzerinden
 
-`out/admin/web.config` `<access sslFlags="Ssl" />` kullanır; IIS bu bölümü varsayılan
-olarak kilitler ve panel 500.19 (0x80070021) döner. Bir kez, yönetici PowerShell'de:
-
-```powershell
-& "$env:windir\system32\inetsrv\appcmd.exe" unlock config -section:system.webServer/security/access
-```
+`out/admin/web.config` artık HTTPS zorunlu kılmaz; `security/access` bölümünün kilidini
+açmaya gerek yoktur. API admin yazmalarını yalnız sitenin kendi kaynağından (Origin)
+kabul eder; HTTP'de kabul etmesi için `AdminCatalog:RequireHttps=false` gerekir
+(4. adım). HTTP'de parola ve oturum çerezi şifresiz taşınır: bu yalnız IP'li test
+sunucusu için kabul edilir. Alan adı ve güvenilir sertifika geldiğinde
+`XINOBI_PUBLIC_ORIGIN=https://<alan-adı>` ile paketleyip `RequireHttps` değerini
+`true` yapın.
 
 ## 3. Yönlendirme kuralları
 
@@ -41,16 +44,19 @@ paket kurulursa site 500 döner.
 ## 4. API ayarları
 
 `C:\inetpub\wwwroot\XinobiYeniApi\api\appsettings.Production.json` paketle gelir ve
-`ReverseProxy:Enabled=true` içerir. Admin katalog yazımı için
+`ReverseProxy:Enabled=true` ve `AdminCatalog:RequireHttps=false` içerir; sunucudaki
+mevcut dosyayla birleştirirken bu iki değeri koru. Alternatif olarak
+`tools/repair-iis-catalog.ps1` (varsayılan `-PublicOrigin http://109.104.120.91:8014`)
+bu ayarları mevcut dosyaya yazar. Admin katalog yazımı için
 `live-sql-catalog.md` bölümündeki `AdminCatalog`, `Accounts`, `Email`, `Storage`
 ayarlarını ve sunucudaki `ConnectionStrings__Xinobi` değişkenini ekle.
 `ReverseProxy:Enabled` yalnız loopback'ten gelen yönlendirme başlıklarına güvenir.
 
 ## 5. Doğrulama
 
-- `https://109.104.120.91/api/v1/health/ready` → 200
-- `https://109.104.120.91/api/v1/catalog/storefront` → 200; yalnız aktif ürünler
-- `https://109.104.120.91/admin/` → yönetici girişi
+- `http://109.104.120.91:8014/api/v1/health/ready` → 200
+- `http://109.104.120.91:8014/api/v1/catalog/storefront` → 200; yalnız aktif ürünler
+- `http://109.104.120.91:8014/admin/` → yönetici girişi
 - Girişten sonra panel oturumu açılıyor; katalogda bir fiyatı kaydedip geri al.
 
 ## Sertifika
@@ -82,7 +88,7 @@ yanıta girmez; stok bilgisi sepet sınırı olan 99 ile sınırlanır.
 2. İki forwarded değişkenine izin ver ve ARR proxy'yi etkinleştir.
 3. API paketinin `api/` içeriğini `C:\inetpub\wwwroot\XinobiYeniApi\api`
    dizinine uygula. Mevcut SQL, e-posta, depolama ve AdminCatalog ayarlarını koru.
-   `Catalog:AssetBaseUrl` HTTPS girişini göstermeli. API pool'unu recycle et.
+   `Catalog:AssetBaseUrl` `http://109.104.120.91:8014` olmalı. API pool'unu recycle et.
 4. `/api/v1/catalog/storefront` yanıtı 200 olmadan yeni webi uygulama.
 5. Birleşik web/admin ZIP'inin `out/` içeriğini
    `C:\inetpub\wwwroot\XinobiYeni\out` dizinine kopyala. `out\admin\index.html`
@@ -91,8 +97,8 @@ yanıta girmez; stok bilgisi sepet sınırı olan 99 ile sınırlanır.
 6. Anonim web kataloğunu, yönetici girişini ve geçici ürün ekleme/fiyat güncellemesini
    web/mobilde doğrula. Yalnız test ürününü kaldır. Gerçek ürün değiştirme.
 
-HTTPS `/admin/` 404 dönerse IIS access logundaki `s-sitename`/site ID,
-`sc-status` ve `sc-substatus` değerlerini kontrol et. 443 binding'i `XinobiYeni`
+`/admin/` 404 dönerse IIS access logundaki `s-sitename`/site ID,
+`sc-status` ve `sc-substatus` değerlerini kontrol et. 443 ve 8014 binding'leri `XinobiYeni`
 sitesine ait olmalı; admin API sitesinden sunulmaz. Fiziksel yolun altında
 `admin\index.html` bulunduğunu kontrol et. 500.19, 403.4 ve 404 farklı sorunlardır;
 404 için access bölümünün kilidini açmak tek başına çözüm değildir.

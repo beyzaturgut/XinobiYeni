@@ -28,14 +28,16 @@ public static class LocalCommerceEndpoints
     private static RouteGroupBuilder CreatePanelGroup(WebApplication app, bool development)
     {
         var group = app.MapGroup("/api/v1/local-commerce").WithTags("LocalCommerce").RequirePanelPermissions().ExcludeFromDescription();
+        // The IP test server serves the site over plain HTTP (AdminCatalog:RequireHttps=false); the admin must still share its origin.
+        var requireHttps = app.Configuration.GetValue("AdminCatalog:RequireHttps", true);
         group.AddEndpointFilter(async (context, next) =>
         {
             var request = context.HttpContext;
             if (development && request.Connection.RemoteIpAddress is { } address && !IPAddress.IsLoopback(address)) return Results.StatusCode(403);
-            if (!development && !request.Request.IsHttps) return Results.StatusCode(403);
+            if (!development && requireHttps && !request.Request.IsHttps) return Results.StatusCode(403);
             var origin = request.Request.Headers.Origin.ToString();
             if (origin.Length > 0 && (development ? !AllowedOrigin(origin)
-                : !string.Equals(origin, $"https://{request.Request.Host}", StringComparison.OrdinalIgnoreCase))) return Results.StatusCode(403);
+                : !string.Equals(origin, $"{request.Request.Scheme}://{request.Request.Host}", StringComparison.OrdinalIgnoreCase))) return Results.StatusCode(403);
             request.Response.Headers.CacheControl = "no-store";
             try { return await next(context); }
             catch (Xinobi.Api.Infrastructure.ProblemException error) { return Results.Json(new { message = error.Message, code = error.Code }, statusCode: error.Status); }

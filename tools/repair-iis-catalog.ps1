@@ -5,14 +5,14 @@ param(
     [string]$WebDirectory = 'C:\inetpub\wwwroot\XinobiYeni\out',
     [string]$StorageRoot = 'C:\XinobiData',
     [string]$ApiPool = 'XinobiYeniApi',
-    [string]$PublicOrigin = 'https://109.104.120.91',
+    [string]$PublicOrigin = 'http://109.104.120.91:8014',
     [string]$BackupRoot = 'C:\XinobiBackups'
 )
 $ErrorActionPreference = 'Stop'
 $configPath = Join-Path $ApiDirectory 'appsettings.Production.json'
 if (!(Test-Path -LiteralPath $configPath -PathType Leaf)) { throw 'API production settings not found.' }
 $origin = [Uri]$PublicOrigin
-if ($origin.Scheme -ne 'https') { throw 'PublicOrigin must use HTTPS.' }
+if ($origin.Scheme -ne 'https' -and $origin.Scheme -ne 'http') { throw 'PublicOrigin must be an http:// or https:// address.' }
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
 
 function Set-SectionValue($document, [string]$section, [string]$name, $value) {
@@ -66,6 +66,8 @@ Set-SectionValue $config 'Catalog' 'StorageProvider' 'SqlServer'
 Set-SectionValue $config 'Catalog' 'AssetBaseUrl' ($PublicOrigin.TrimEnd('/'))
 Set-SectionValue $config 'Accounts' 'StorageProvider' 'SqlServer'
 Set-SectionValue $config 'AdminCatalog' 'Enabled' $true
+# The admin saves over the public origin's scheme; the IP test server uses plain HTTP.
+Set-SectionValue $config 'AdminCatalog' 'RequireHttps' ($origin.Scheme -eq 'https')
 Set-SectionValue $config 'Storage' 'LocalRoot' $StorageRoot
 Set-SectionValue $config 'ReverseProxy' 'Enabled' $true
 Set-SectionValue $config 'ReverseProxy' 'AllowedHosts' @($origin.DnsSafeHost)

@@ -25,7 +25,7 @@ async function map(value){
 await map(state); // Keep packaged media copies for existing asset references; the catalog itself comes from the API.
 await publishProductPreviews(root,publicDir,state);
 // XINOBI U on the test server (ADR-002 Ek B); the API must list this site's origin in XinobiU:AllowedOrigins.
-// Same-origin through the site's /api proxy, so the page works over HTTPS without mixed content.
+// Same-origin through the site's /api proxy, over HTTP (8014) or the HTTPS entry alike.
 // IIS ARR forwards /api to the API site; needs ARR proxy and HTTP_X_FORWARDED_PROTO allowed (docs/runbooks/https-reverse-proxy.md).
 const apiOrigin=process.env.XINOBI_API_ORIGIN||'http://localhost:8024';
 const designApi=process.env.XINOBI_DESIGN_API_URL??'/api/v1/design-studio';

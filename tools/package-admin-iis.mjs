@@ -6,7 +6,8 @@ import {createHash} from 'node:crypto';
 const root=process.cwd();
 const sha=spawnSync('git',['rev-parse','--short','HEAD'],{encoding:'utf8'}).stdout.trim();
 const api=process.env.VITE_COMMERCE_API_URL||'/api/v1/local-commerce';
-if(!api.startsWith('/api/')&&!/^https:\/\//.test(api))throw new Error('Production admin requires a same-origin API path or HTTPS API URL.');
+// Same-origin only: the API accepts admin writes solely from its own public origin.
+if(!api.startsWith('/api/'))throw new Error('Production admin requires a same-origin API path such as /api/v1/local-commerce.');
 const env={...process.env,VITE_COMMERCE_API_URL:api};
 for(const command of [['pnpm',['--filter','admin','exec','tsc','-b']],['pnpm',['--filter','admin','exec','vite','build','--base=/admin/']]]){
  const result=spawnSync(command[0],command[1],{stdio:'inherit',env});if(result.status!==0)process.exit(result.status||1);
@@ -14,7 +15,7 @@ for(const command of [['pnpm',['--filter','admin','exec','tsc','-b']],['pnpm',['
 const temporary=await mkdtemp(path.join(tmpdir(),'xinobi-admin-package-'));
 await cp(path.join(root,'apps/admin/dist'),path.join(temporary,'admin'),{recursive:true});
 await writeFile(path.join(temporary,'admin/web.config'),`<?xml version="1.0" encoding="utf-8"?>
-<configuration><system.webServer><security><access sslFlags="Ssl" /></security><defaultDocument enabled="true"><files><clear /><add value="index.html" /></files></defaultDocument></system.webServer></configuration>`);
+<configuration><system.webServer><defaultDocument enabled="true"><files><clear /><add value="index.html" /></files></defaultDocument></system.webServer></configuration>`);
 await mkdir(path.join(root,'paketler','web'),{recursive:true});
 const artifact=path.join(root,'paketler','web',`XinobiYeni-admin-${sha}.zip`);
 // Build a fresh archive so removed chunks from a previous build cannot survive.

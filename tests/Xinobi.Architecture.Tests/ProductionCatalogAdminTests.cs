@@ -99,6 +99,36 @@ public sealed class ProductionCatalogAdminTests
     }
 
     [Fact]
+    public async Task HttpTestServerAcceptsSameOriginAdminWritesOnlyWhenHttpsIsNotRequired()
+    {
+        using var factory = Factory().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("ReverseProxy:Enabled", "true");
+            builder.UseSetting("AdminCatalog:RequireHttps", "false");
+            builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, LoopbackProxy>());
+        });
+        using var staff = await TestStaff.Client(factory);
+        staff.DefaultRequestHeaders.Add("X-Forwarded-Proto", "http");
+        staff.DefaultRequestHeaders.Add("X-Forwarded-Host", "109.104.120.91:8014");
+        staff.DefaultRequestHeaders.Add("Origin", "http://109.104.120.91:8014");
+        Assert.Equal(HttpStatusCode.BadRequest, (await staff.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        staff.DefaultRequestHeaders.Remove("Origin");
+        staff.DefaultRequestHeaders.Add("Origin", "http://evil.example");
+        Assert.Equal(HttpStatusCode.Forbidden, (await staff.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+
+        using var strict = Factory().WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("ReverseProxy:Enabled", "true");
+            builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, LoopbackProxy>());
+        });
+        using var strictStaff = await TestStaff.Client(strict);
+        strictStaff.DefaultRequestHeaders.Add("X-Forwarded-Proto", "http");
+        strictStaff.DefaultRequestHeaders.Add("X-Forwarded-Host", "109.104.120.91:8014");
+        strictStaff.DefaultRequestHeaders.Add("Origin", "http://109.104.120.91:8014");
+        Assert.Equal(HttpStatusCode.Forbidden, (await strictStaff.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+    }
+
+    [Fact]
     public void LiveAdminRejectsFileCatalogAtStartup()
     {
         using var factory = Factory().WithWebHostBuilder(builder => builder.UseSetting("Catalog:StorageProvider", "File"));

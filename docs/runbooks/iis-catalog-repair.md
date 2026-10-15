@@ -20,7 +20,8 @@ Script Windows PowerShell 5.1 söz dizimiyle hazırlanmıştır; geliştirme Mac
 
 Script mevcut production JSON'u web kökü dışında yedekler; diğer ayarları ve
 sırları korur. SQL Accounts/Catalog, AdminCatalog, Storage ve HTTPS proxy ayarını
-birleştirir. Web paketindeki hash adlı medya dosyalarını kalıcı `media` dizinine
+birleştirir. Varsayılan genel adres `http://109.104.120.91:8014`'tür; HTTP adreste
+`AdminCatalog:RequireHttps=false`, `https://` adreste `true` yazılır. Web paketindeki hash adlı medya dosyalarını kalıcı `media` dizinine
 kopyalar; farklı mevcut dosyaların üzerine yazmaz. API pool kimliğine depolama
 dizini izni verir ve yalnız API pool'unu recycle eder. SQL migration, import veya
 hesap/ürün değişikliği yapmaz. Makine Storage__LocalRoot ayarı varsa onu kullanır.

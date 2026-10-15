@@ -45,8 +45,11 @@ SMTP sağlayıcınız Resend ise `DeliveryMode` değeri `Resend` olmalı. SMTP/R
 kimlik bilgileri ve `ConnectionStrings__Xinobi` sunucuda kalır. Depolama dizini
 web kökünün dışında tutulur; API pool kimliğine bu dizinde Modify izni verilir.
 Mevcut yüklenen dosyalar bu dizinin `media` alt klasöründe bulunmalıdır.
-Admin ve API aynı HTTPS kaynağında sunulmalıdır (örneğin `/admin/` ve `/api/v1/`).
-Başka Origin ve HTTP üzerinden katalog yönetimi reddedilir.
+Admin ve API aynı kaynakta sunulmalıdır (örneğin `/admin/` ve `/api/v1/`); başka
+Origin'den katalog yönetimi reddedilir. Varsayılan olarak HTTP üzerinden yazma da
+reddedilir. IP'li test sunucusu HTTP'den (`http://109.104.120.91:8014`) çalıştığı
+için orada `"AdminCatalog": { "Enabled": true, "RequireHttps": false }` kullanılır
+(bkz. `https-reverse-proxy.md`).
 
 İlk yönetici hesabı SQL hesap deposunda kayıtlı olmalıdır. İlk süper yönetici
 sunucu konsolunda API dizininden oluşturulur:

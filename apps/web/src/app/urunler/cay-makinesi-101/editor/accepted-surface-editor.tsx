@@ -7,8 +7,8 @@ import LocalPatternPreview from "../../../../features/product-personalization/lo
 import { loadAcceptedSurface, type RenderingInputs } from "./accepted-surface-api";
 import styles from "./editor.module.css";
 import { previewUnavailableMessage } from "../../../../features/product-personalization/variant-preview-readiness";
-import { commerceRequest, type CommerceState, type Variant } from "../../../../../../../packages/commerce/client";
-import { commerceApi } from "../../../../lib/commerce";
+import type { Variant } from "../../../../../../../packages/commerce/client";
+import { loadCommerceState } from "../../../../lib/commerce";
 import detailStyles from "../product.module.css";
 import type { PlacementTransferHandle } from "../../../../features/product-personalization/preview-placement-transfer";
 
@@ -70,7 +70,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
     const controller = new AbortController();
     async function load() {
       try {
-        const catalog = await commerceRequest<CommerceState>(commerceApi, '/state');
+        const catalog = await loadCommerceState();
         const product = catalog.products.find(item => item.id === productId);
         if (!product || !product.variants.some(item => item.id === sessionVariantId)) throw new Error('Invalid session catalog identity');
         const supported = await Promise.all(product.variants.map(async variant => {

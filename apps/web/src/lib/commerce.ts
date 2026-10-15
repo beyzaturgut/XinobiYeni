@@ -1,12 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { commerceRequest, localApi, type CommerceState } from '../../../../packages/commerce/client';
-export { mediaUrl, money, productGallery } from '../../../../packages/commerce/client';
+export { mediaUrl, money, productGallery, randomCommerceId } from '../../../../packages/commerce/client';
 export const commerceApi = process.env.NEXT_PUBLIC_COMMERCE_API_URL || (process.env.NODE_ENV === 'development' ? localApi : '');
 const snapshotUrl = process.env.NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL || '';
 const catalogUrl = process.env.NEXT_PUBLIC_CATALOG_URL || (process.env.NODE_ENV === 'development' || snapshotUrl ? '' : '/api/v1/catalog/storefront');
 let pendingState: Promise<CommerceState> | undefined;
-function loadCommerceState() {
+export function loadCommerceState() {
   // Header and page hooks read the same endpoint. Share only an in-flight
   // request; each later refresh still reads the current catalog.
   pendingState ??= commerceRequest<CommerceState>(catalogUrl ? '' : commerceApi, catalogUrl || (commerceApi ? '/state' : snapshotUrl))

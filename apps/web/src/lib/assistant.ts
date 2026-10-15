@@ -1,5 +1,5 @@
 'use client';
-import {commerceApi} from './commerce';
+import {commerceApi,randomCommerceId} from './commerce';
 
 export type Money={amountMinor:number;currency:string};
 export type AssistantProduct={id:string;name:string;category:string;imageUrl?:string|null;priceFrom?:Money|null;inStock:boolean;personalizable:boolean};
@@ -12,8 +12,8 @@ const clientKey='xinobi-nobi-client',conversationKey='xinobi-nobi-conversation';
 
 /** A random id this browser keeps; anonymous conversations belong to it. */
 export function clientId(){
-  try{let id=localStorage.getItem(clientKey);if(!id){id=crypto.randomUUID();localStorage.setItem(clientKey,id)}return id}
-  catch{return crypto.randomUUID()}
+  try{let id=localStorage.getItem(clientKey);if(!id){id=randomCommerceId();localStorage.setItem(clientKey,id)}return id}
+  catch{return randomCommerceId()}
 }
 export const storedConversation=()=>{try{return localStorage.getItem(conversationKey)}catch{return null}};
 export const rememberConversation=(id:string|null)=>{try{if(id)localStorage.setItem(conversationKey,id);else localStorage.removeItem(conversationKey)}catch{}};

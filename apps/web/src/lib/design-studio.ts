@@ -1,5 +1,5 @@
 'use client';
-import { commerceApi } from './commerce';
+import { commerceApi, randomCommerceId } from './commerce';
 import type { Product, Variant } from '../../../../packages/commerce/client';
 export type Question = { id: string; axis: string; axisLabel: string; text: string; options: { id: string; label: string }[] };
 export type Answer = { questionId: string; optionId: string };
@@ -18,7 +18,7 @@ export function browserId() {
   const key = 'xinobi-u-browser';
   const existing = localStorage.getItem(key);
   if (existing) return existing;
-  const id = crypto.randomUUID(); localStorage.setItem(key, id); return id;
+  const id = randomCommerceId(); localStorage.setItem(key, id); return id;
 }
 export function sessionKey(product: string, variant: string) { return `xinobi-u-session:${product}:${variant}`; }
 export function rememberSession(session: DesignSession) {

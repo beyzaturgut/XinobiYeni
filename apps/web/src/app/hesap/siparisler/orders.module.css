@@ -38,5 +38,6 @@
 .dialogActions{display:flex;justify-content:flex-end;gap:10px}.dialogActions button{min-height:42px;padding:0 18px;border:1px solid #c2c2c2;border-radius:6px;background:#fff;cursor:pointer;font:inherit;font-size:13px}
 .dialogActions .primary{background:#262626;border-color:#262626;color:#fff}.dialogActions .primary:disabled{opacity:.5;cursor:not-allowed}
 .error{padding:10px;border:1px solid #bf7979;border-radius:6px;color:#8b2424!important}
+.loadError{max-width:900px;margin:0 0 18px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:12px;border:1px solid #bf7979;border-radius:6px;color:#8b2424;font-size:13px}.loadError button{min-height:36px;padding:0 12px;border:1px solid #8b2424;border-radius:5px;background:#fff;color:#8b2424;cursor:pointer}.loadError button:disabled{opacity:.55}
 @media(max-width:620px){.shipment{grid-template-columns:1fr 1fr}.steps span{font-size:11px}}
 .lineDesign{width:64px;height:64px;border-radius:8px;overflow:hidden;background:#f1f1f1}

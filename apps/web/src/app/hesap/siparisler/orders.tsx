@@ -51,7 +51,7 @@ function OrderCard({order,options,focused,onCancel}:{order:CustomerOrder;options
       {canCancel(order)&&<button type="button" onClick={onCancel}>{order.status==='preparing'?'İptal talebi oluştur':'Siparişi iptal et'}</button>}
       {cancelPending&&<span>İptal talebin değerlendiriliyor.</span>}
       {Object.keys(left).length>0&&<Link href={`/hesap/siparisler/iade?siparis=${order.id}`}>İade talebi oluştur</Link>}
-      {order.status==='delivered'&&<Link href={`/urunler/detay?id=${encodeURIComponent(order.lines[0].productId)}#degerlendirmeler`}>Ürünü değerlendir</Link>}
+      {order.status==='delivered'&&<Link href="/hesap/degerlendirmelerim">Ürünü değerlendir</Link>}
       {order.status==='shipped'&&<span>Kargodaki sipariş iptal edilemez; teslimattan sonra {options?.returnWindowDays??14} gün içinde iade talebi oluşturabilirsin.</span>}
     </div>
   </section>;
@@ -61,10 +61,11 @@ function OrderCard({order,options,focused,onCancel}:{order:CustomerOrder;options
 export default function Orders(){
   const {user,orders,ready}=useDemoCommerce();
   const focus=useSearchParams().get('siparis');
-  const [options,setOptions]=useState<OrderOptions|null>(null),[cancelling,setCancelling]=useState<CustomerOrder|null>(null);
+  const [options,setOptions]=useState<OrderOptions|null>(null),[cancelling,setCancelling]=useState<CustomerOrder|null>(null),[loadError,setLoadError]=useState(''),[refreshing,setRefreshing]=useState(false);
+  async function reload(){setRefreshing(true);setLoadError('');try{const [nextOptions]=await Promise.all([orderOptions(),refreshOrders()]);setOptions(nextOptions)}catch(error){setLoadError(error instanceof Error?error.message:'Siparişler yenilenemedi.')}finally{setRefreshing(false)}}
   useEffect(()=>{
     if(!user)return;
-    let active=true;orderOptions().then(value=>{if(active)setOptions(value)}).catch(()=>{});
+    let active=true;orderOptions().then(value=>{if(active)setOptions(value)}).catch(error=>{if(active)setLoadError(error instanceof Error?error.message:'Sipariş seçenekleri yüklenemedi.')});
     // The store moves orders along from the panel; keep the list fresh while the page is open.
     const timer=window.setInterval(()=>{if(document.visibilityState==='visible')void refreshOrders().catch(()=>{})},10000);
     return()=>{active=false;window.clearInterval(timer)};
@@ -72,8 +73,9 @@ export default function Orders(){
   return <div className={styles.shell}>
     <div className={styles.title}><h1>Siparişlerim</h1></div>
     <div className={styles.notice}><p>Demo siparişler: ödeme alınmaz ve stok ayrılmaz. Kargo, iptal ve iade adımları mağaza panelinden yürütülür; her değişiklikte bildirim alırsın.</p></div>
+    {loadError&&<div className={styles.loadError} role="alert"><span>{loadError}</span><button type="button" disabled={refreshing} onClick={()=>void reload()}>{refreshing?'Yenileniyor…':'Tekrar dene'}</button></div>}
     {!ready?<p role="status">Siparişler yükleniyor…</p>:!user?<Link href="/hesap">Siparişlerini görmek için giriş yap →</Link>:orders.length===0?<><p>Henüz siparişin yok.</p><Link href="/urunler">Ürünleri keşfet →</Link></>:
-      <div className={styles.orderList}>{orders.map(order=><OrderCard key={order.id} order={order} options={options} focused={order.id===focus} onCancel={()=>setCancelling(order)}/>)}</div>}
+      <div className={styles.orderList}>{orders.map(order=><OrderCard key={order.id} order={order} options={options} focused={order.id===focus} onCancel={()=>options?setCancelling(order):setLoadError('İptal seçenekleri henüz yüklenemedi. Tekrar deneyin.')}/>)}</div>}
     {cancelling&&options&&<CancelDialog key={cancelling.id} order={cancelling} options={options} onClose={()=>setCancelling(null)}/>}
   </div>;
 }

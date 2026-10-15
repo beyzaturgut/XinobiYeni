@@ -161,6 +161,10 @@ export async function saveAddress(address:AddressInput,id?:string){
   return saved!;
 }
 
+export async function favoriteProductIds(){return (await signedIn<string[]>('/me/favorites'))??[]}
+export async function addFavorite(productId:string){await signedIn('/me/favorites',{method:'POST',body:JSON.stringify({productId})})}
+export async function deleteFavorite(productId:string){await signedIn(`/me/favorites/${encodeURIComponent(productId)}`,{method:'DELETE'})}
+
 export async function deleteAddress(id:string){
   await signedIn(`/me/addresses/${encodeURIComponent(id)}`,{method:'DELETE'});
   publish({addresses:(await signedIn<CustomerAddress[]>('/me/addresses'))??[]});

@@ -1,10 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useFavorites } from "../../lib/favorites";
 import { useEffect, useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import CompareToggle from "../../components/compare-toggle";
 import styles from "./catalog.module.css";
-import CatalogProductCard, { catalogFavoriteStorageKey, type CatalogProductCardData } from "../../components/catalog-product-card";
+import CatalogProductCard, { type CatalogProductCardData } from "../../components/catalog-product-card";
 
 
 type Category = string;
@@ -20,23 +22,26 @@ export default function Catalog() {
   const [category, setCategory] = useState<Category>("Tümü");
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const router = useRouter();
+  const productIds = useMemo(() => products.map(product => product.id), [products]);
+  const favorites = useFavorites(productIds);
+  const [favoriteError, setFavoriteError] = useState<string>();
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const selectedCategory = new URLSearchParams(window.location.search).get("category");
       if (selectedCategory) setCategory(categoryLabel(selectedCategory));
-      try { setFavorites(JSON.parse(localStorage.getItem(catalogFavoriteStorageKey) || "[]")); } catch { setFavorites([]); }
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
 
-  function toggleFavorite(id: string) {
-    setFavorites((current) => {
-      const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id];
-      localStorage.setItem(catalogFavoriteStorageKey, JSON.stringify(next));
-      return next;
-    });
+  async function toggleFavorite(id: string) {
+    setFavoriteError(undefined);
+    try { await favorites.toggle(id); }
+    catch (cause) {
+      if (!favorites.signedIn) { router.push("/hesap"); return; }
+      setFavoriteError(cause instanceof Error ? cause.message : "Favori işlemi tamamlanamadı.");
+    }
   }
 
   const activeCategory = categories.includes(category) ? category : 'Tümü';
@@ -47,13 +52,13 @@ export default function Catalog() {
   }, [activeCategory, query, sort, products]);
 
   return <section id="catalog" className={styles.catalog} aria-label="Ürün kataloğu">
-    {error && <p role="alert">{error}</p>}
+    {(error || favorites.error || favoriteError) && <p role="alert">{error || favorites.error || favoriteError}</p>}
     <div className={styles.toolbar}>
       <div className={styles.search}><label className={styles.toolbarLabel} htmlFor="product-search">Ürünlerde ara</label><div><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></svg><input id="product-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Ürün, kategori veya renk" /></div></div>
       <div className={styles.sort}><label className={styles.toolbarLabel} htmlFor="product-sort">Sırala</label><select id="product-sort" value={sort} onChange={(event) => setSort(event.target.value)}><option value="featured">Öne çıkanlar</option><option value="name">Ürün adı</option></select></div>
       <div className={styles.categoryBar} aria-label="Kategori filtresi">{categories.map((item) => <button type="button" key={item} className={activeCategory === item ? styles.activeCategory : ""} aria-pressed={activeCategory === item} onClick={() => setCategory(item)}>{item}</button>)}</div>
     </div>
     <div className={styles.resultSummary} aria-live="polite"><strong>{visibleProducts.length} ürün</strong><span>Ürünler</span></div>
-    {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <CatalogProductCard key={product.id} product={product} cardHref={product.href || '/urunler'} favorite={favorites.includes(product.id)} onToggleFavorite={() => toggleFavorite(product.id)} footerExtra={state ? <div className={styles.compareButton}><CompareToggle productId={product.id} name={product.name} compact /></div> : undefined} action={<><span>{money(product.price)}{stockText(product.stock) && <><br />{stockText(product.stock)}</>}</span>{product.href ? <span className={styles.inspect}>İncele <b aria-hidden="true">→</b></span> : <span>İncele →</span>}</>} />)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
+    {visibleProducts.length > 0 ? <div className={styles.grid}>{visibleProducts.map((product) => <CatalogProductCard key={product.id} product={product} cardHref={product.href || '/urunler'} favorite={favorites.ids.includes(product.id)} onToggleFavorite={() => void toggleFavorite(product.id)} footerExtra={state ? <div className={styles.compareButton}><CompareToggle productId={product.id} name={product.name} compact /></div> : undefined} action={<><span>{money(product.price)}{stockText(product.stock) && <><br />{stockText(product.stock)}</>}</span>{product.href ? <span className={styles.inspect}>İncele <b aria-hidden="true">→</b></span> : <span>İncele →</span>}</>} />)}</div> : <div className={styles.empty}><span aria-hidden="true">⌕</span><h2>Aradığınız ürün bulunamadı.</h2><p>Arama ifadenizi değiştirin veya başka bir kategori seçin.</p><button type="button" onClick={() => { setCategory("Tümü"); setQuery(""); }}>Filtreleri temizle</button></div>}
   </section>;
 }

@@ -29,7 +29,9 @@ await publishProductPreviews(root,publicDir,state);
 // IIS ARR forwards /api to the API site; needs ARR proxy and HTTP_X_FORWARDED_PROTO allowed (docs/runbooks/https-reverse-proxy.md).
 const apiOrigin=process.env.XINOBI_API_ORIGIN||'http://localhost:8024';
 const designApi=process.env.XINOBI_DESIGN_API_URL??'/api/v1/design-studio';
-const build=spawnSync('pnpm',['--filter','web','build'],{stdio:'inherit',env:{...process.env,NEXT_PUBLIC_COMMERCE_API_URL:'',NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL:'',NEXT_PUBLIC_CATALOG_URL:'/api/v1/catalog/storefront',NEXT_PUBLIC_DESIGN_API_URL:designApi}});
+// Accounts, verification, reviews and saved designs also derive /api/v1 from this base.
+// Keep it enabled while the anonymous storefront reads its separate public catalog endpoint.
+const build=spawnSync('pnpm',['--filter','web','build'],{stdio:'inherit',env:{...process.env,NEXT_PUBLIC_COMMERCE_API_URL:'/api/v1/local-commerce',NEXT_PUBLIC_COMMERCE_SNAPSHOT_URL:'',NEXT_PUBLIC_CATALOG_URL:'/api/v1/catalog/storefront',NEXT_PUBLIC_DESIGN_API_URL:designApi}});
 if(build.status!==0)process.exit(build.status||1);
 const out=path.join(web,'out');
 await writeFile(path.join(out,'web.config'),`<?xml version="1.0" encoding="utf-8"?><configuration><system.webServer><defaultDocument enabled="true"><files><clear/><add value="index.html"/></files></defaultDocument><staticContent><remove fileExtension=".webp"/><mimeMap fileExtension=".webp" mimeType="image/webp"/></staticContent><rewrite><rules><rule name="API (HTTPS)" stopProcessing="true"><match url="^api/(.*)"/><conditions><add input="{HTTPS}" pattern="^on$"/></conditions><serverVariables><set name="HTTP_X_FORWARDED_HOST" value="{HTTP_HOST}"/><set name="HTTP_X_FORWARDED_PROTO" value="https"/></serverVariables><action type="Rewrite" url="${apiOrigin}/api/{R:1}"/></rule><rule name="API (HTTP)" stopProcessing="true"><match url="^api/(.*)"/><serverVariables><set name="HTTP_X_FORWARDED_HOST" value="{HTTP_HOST}"/><set name="HTTP_X_FORWARDED_PROTO" value="http"/></serverVariables><action type="Rewrite" url="${apiOrigin}/api/{R:1}"/></rule></rules></rewrite></system.webServer></configuration>`);

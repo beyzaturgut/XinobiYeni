@@ -3,7 +3,7 @@ using System.Net.Http.Json;
 
 namespace Xinobi.Api.EmailVerification;
 
-public enum VerificationPurpose { Email, PasswordReset }
+public enum VerificationPurpose { Email, PasswordReset, AdminMfa, AdminPasswordReset }
 
 public interface IVerificationEmailSender
 {
@@ -16,7 +16,11 @@ public interface IVerificationEmailSender
 
 public static class VerificationEmailText
 {
-    public static (string Subject, string Body) For(VerificationPurpose purpose, string code) => purpose == VerificationPurpose.PasswordReset
+    public static (string Subject, string Body) For(VerificationPurpose purpose, string code) => purpose == VerificationPurpose.AdminMfa
+        ? ("Xinobi yönetici giriş kodun", $"Yönetici giriş kodun: {code}\nKod 10 dakika geçerlidir. Kodu kimseyle paylaşma. Bu işlemi sen başlatmadıysan hesabının parolasını değiştir.")
+        : purpose == VerificationPurpose.AdminPasswordReset
+        ? ("Xinobi yönetici parola sıfırlama bağlantın", $"Yönetici parolanı sıfırlamak için bağlantıyı aç: {code}\nBağlantı 10 dakika geçerlidir ve yalnız bir kez kullanılabilir. Bu işlemi sen başlatmadıysan bu e-postayı dikkate alma.")
+        : purpose == VerificationPurpose.PasswordReset
         ? ("Xinobi parola sıfırlama kodun",
             $"Parola sıfırlama kodun: {code}\nKod 10 dakika geçerlidir. Parolanı sıfırladığında tüm cihazlardaki oturumların kapanır. Bu işlemi sen başlatmadıysan bu e-postayı dikkate alma; parolan değişmez.")
         : ("Xinobi e-posta doğrulama kodun",

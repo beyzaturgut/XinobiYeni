@@ -9,6 +9,45 @@ namespace Xinobi.Architecture.Tests;
 
 public sealed class AdminMfaTests
 {
+    private sealed class CapturingEmail : IVerificationEmailSender
+    {
+        public bool IsConfigured => true;
+        public string? Delivered { get; private set; }
+        public VerificationPurpose Purpose { get; private set; }
+        public Task Send(string email, string code, CancellationToken cancellationToken)
+        { Delivered = code; return Task.CompletedTask; }
+        public Task Send(string email, string code, VerificationPurpose purpose, CancellationToken cancellationToken)
+        { Purpose = purpose; return Send(email, code, cancellationToken); }
+    }
+
+    [Fact]
+    public async Task RealEmailDeliversSecretsWithoutExposingThemInResponses()
+    {
+        using var factory = new IsolatedApiFactory();
+        var environment = factory.Services.GetRequiredService<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>();
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var account = await accounts.Register("Staff", "delivery@example.invalid", "initial-password-1");
+        await accounts.AssignRole(account.Email, Roles.SuperAdmin);
+        account = (await accounts.FindById(account.Id))!;
+        var sender = new CapturingEmail();
+        var mfa = new AdminMfa(sender, TimeProvider.System, environment);
+        var challenge = await mfa.Start(account, CancellationToken.None);
+        Assert.Null(challenge.PreviewCode);
+        Assert.Equal(VerificationPurpose.AdminMfa, sender.Purpose);
+        Assert.Equal(account.Id, (await mfa.Consume(challenge.ChallengeId, sender.Delivered!)).AccountId);
+        var recovery = new AdminPasswordRecovery(accounts, TimeProvider.System, environment, sender);
+        Assert.Null((await recovery.Start(account.Email)).PreviewUrl);
+        Assert.Equal(VerificationPurpose.AdminPasswordReset, sender.Purpose);
+        var token = Uri.UnescapeDataString(new Uri(sender.Delivered!).Fragment.Split('=')[1]);
+        await recovery.Complete(token, "replacement-password-2");
+        Assert.NotNull(await accounts.Login(account.Email, "replacement-password-2"));
+
+        environment.EnvironmentName = "Production";
+        // Real email must not enable non-persistent production security state.
+        Assert.Equal(503, (await Assert.ThrowsAsync<AccountException>(() => mfa.Start(account, CancellationToken.None))).Status);
+        Assert.Equal(503, (await Assert.ThrowsAsync<AccountException>(() => recovery.Start(account.Email))).Status);
+    }
+
     [Fact]
     public async Task PreviewSecurityFlowsFailClosedOutsideDevelopmentAndResetLinksExpire()
     {

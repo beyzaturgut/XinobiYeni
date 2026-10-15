@@ -13,6 +13,60 @@ namespace Xinobi.Architecture.Tests;
 
 public sealed class AdminMfaSqlTests
 {
+    private sealed class DeliveredEmail : IVerificationEmailSender
+    {
+        public bool IsConfigured => true;
+        public string? Secret { get; private set; }
+        public Task Send(string email, string code, CancellationToken cancellationToken)
+        { Secret = code; return Task.CompletedTask; }
+    }
+
+    [SqlWritesFact]
+    public async Task ProductionEmailMfaAndRecoveryUseSqlWithoutPreviewSecrets()
+    {
+        var sender = new DeliveredEmail();
+        using var factory = Factory(Environment.GetEnvironmentVariable("XINOBI_TEST_SQL")!).WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("environment", "Production");
+            builder.UseSetting("Accounts:StorageProvider", "SqlServer");
+            builder.UseSetting("Email:DeliveryMode", "Smtp");
+            builder.UseSetting("Admin:PublicOrigin", "http://109.104.120.91:8014");
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<IVerificationEmailSender>();
+                services.AddSingleton<IVerificationEmailSender>(sender);
+            });
+        });
+        using var client = Client(factory);
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var email = Guid.NewGuid().ToString("N") + "@production-mfa.invalid";
+        var owner = await accounts.Register("Production Test", email, "initial-password-1");
+        await using var scope = factory.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<XinobiDbContext>();
+        try
+        {
+            await accounts.AssignRole(email, Roles.SuperAdmin);
+            var login = await client.PostAsJsonAsync("/api/v1/auth/admin/login", new LoginAccount(email, "initial-password-1"));
+            Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+            var challenge = (await login.Content.ReadFromJsonAsync<AdminMfaChallenge>())!;
+            Assert.Null(challenge.PreviewCode);
+            Assert.Equal(6, sender.Secret!.Length);
+            var verified = await client.PostAsJsonAsync("/api/v1/auth/admin/mfa/verify", new VerifyAdminMfa(challenge.ChallengeId, sender.Secret));
+            Assert.Equal(HttpStatusCode.OK, verified.StatusCode);
+            client.DefaultRequestHeaders.Add("Cookie", Cookies(verified));
+            Assert.Equal(HttpStatusCode.OK, (await client.GetAsync("/api/v1/admin/session")).StatusCode);
+            var recovery = factory.Services.GetRequiredService<AdminPasswordRecovery>();
+            Assert.Null((await recovery.Start(email)).PreviewUrl);
+            Assert.StartsWith("http://109.104.120.91:8014/admin/#password-reset=", sender.Secret);
+            var token = Uri.UnescapeDataString(new Uri(sender.Secret!).Fragment.Split('=')[1]);
+            await recovery.Complete(token, "replacement-password-2");
+            Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/v1/admin/session")).StatusCode);
+            Assert.NotNull(await accounts.Login(email, "replacement-password-2"));
+            await Assert.ThrowsAsync<AccountException>(() => recovery.Complete(token, "replacement-password-3"));
+        }
+        finally { await db.Users.Where(x => x.Id == Guid.Parse(owner.Id)).ExecuteDeleteAsync(); }
+    }
+
     private sealed class RefuseAudit : SaveChangesInterceptor
     {
         public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData data,InterceptionResult<int> result,CancellationToken cancellationToken=default)

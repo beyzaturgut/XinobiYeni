@@ -6,7 +6,9 @@ param(
     [string]$StorageRoot = 'C:\XinobiData',
     [string]$ApiPool = 'XinobiYeniApi',
     [string]$PublicOrigin = 'http://109.104.120.91:8014',
-    [string]$BackupRoot = 'C:\XinobiBackups'
+    [string]$BackupRoot = 'C:\XinobiBackups',
+    [switch]$EnableServices,
+    [string]$SenderEmail = 'xinobi.verify@gmail.com'
 )
 $ErrorActionPreference = 'Stop'
 $configPath = Join-Path $ApiDirectory 'appsettings.Production.json'
@@ -26,7 +28,7 @@ function Set-SectionValue($document, [string]$section, [string]$name, $value) {
 if ($config.Storage -and $config.Storage.LocalRoot) { $StorageRoot = $config.Storage.LocalRoot }
 $environmentStorage = [Environment]::GetEnvironmentVariable('Storage__LocalRoot', 'Machine')
 if ($environmentStorage) { $StorageRoot = $environmentStorage }
-if ($config.Email -and $config.Email.DeliveryMode -eq 'Preview') {
+if (!$EnableServices -and $config.Email -and $config.Email.DeliveryMode -eq 'Preview') {
     throw 'Production cannot use Preview email. Configure the real Smtp or Resend provider first.'
 }
 $appcmd = Join-Path $env:windir 'system32\inetsrv\appcmd.exe'
@@ -71,7 +73,24 @@ Set-SectionValue $config 'AdminCatalog' 'RequireHttps' ($origin.Scheme -eq 'http
 Set-SectionValue $config 'Storage' 'LocalRoot' $StorageRoot
 Set-SectionValue $config 'ReverseProxy' 'Enabled' $true
 Set-SectionValue $config 'ReverseProxy' 'AllowedHosts' @($origin.DnsSafeHost)
-# Existing ConnectionStrings, SMTP/Resend credentials and all other sections remain intact.
+if ($EnableServices) {
+    Set-SectionValue $config 'Features' 'StorageProvider' 'SqlServer'
+    Set-SectionValue $config 'Admin' 'PublicOrigin' ($PublicOrigin.TrimEnd('/'))
+    Set-SectionValue $config 'Email' 'DeliveryMode' 'Smtp'
+    Set-SectionValue $config 'Email' 'From' $SenderEmail
+    if (!$config.Email.PSObject.Properties['Smtp']) {
+        $config.Email | Add-Member -NotePropertyName 'Smtp' -NotePropertyValue ([pscustomobject]@{})
+    }
+    $config.Email.Smtp | Add-Member -NotePropertyName 'Host' -NotePropertyValue 'smtp.gmail.com' -Force
+    $config.Email.Smtp | Add-Member -NotePropertyName 'Port' -NotePropertyValue 587 -Force
+    $config.Email.Smtp | Add-Member -NotePropertyName 'Username' -NotePropertyValue $SenderEmail -Force
+    Set-SectionValue $config 'XinobiU' 'Enabled' $true
+    Set-SectionValue $config 'XinobiU' 'AllowedOrigins' @($PublicOrigin.TrimEnd('/'))
+    Set-SectionValue $config 'Assistant' 'ExternalInferenceEnabled' $true
+    Set-SectionValue $config 'DesignStudio' 'ExternalInferenceEnabled' $true
+    Write-Host 'Services configured. Verify SQL migrations 0001-0009, Gmail app password and Cloudflare credentials separately. No migration or provider request was made.'
+}
+# Existing ConnectionStrings, SMTP/Resend credentials and unrelated settings remain intact.
 $temporaryConfig = $configPath + '.repair.tmp'
 $json = $config | ConvertTo-Json -Depth 100
 [IO.File]::WriteAllText($temporaryConfig, $json, (New-Object Text.UTF8Encoding($false)))
@@ -79,7 +98,13 @@ $json = $config | ConvertTo-Json -Depth 100
 # File.Replace then rejects it. Use a real, unique backup path on the same volume.
 $replaceBackup = Join-Path $backup 'appsettings.Production.before-replace.json'
 [IO.File]::Replace($temporaryConfig, $configPath, $replaceBackup)
-& $appcmd recycle apppool "/apppool.name:$ApiPool"
-if ($LASTEXITCODE -ne 0) { throw 'Settings saved, but API pool recycle failed. Recycle it from IIS Manager.' }
+$poolState = & $appcmd list apppool $ApiPool /text:state
+if ($LASTEXITCODE -ne 0) { throw 'Settings saved, but API pool was not found. Check the ApiPool parameter.' }
+if (($poolState | Out-String).Trim() -eq 'Started') {
+    & $appcmd recycle apppool "/apppool.name:$ApiPool"
+} else {
+    & $appcmd start apppool "/apppool.name:$ApiPool"
+}
+if ($LASTEXITCODE -ne 0) { throw 'Settings saved, but API pool restart failed. Start it from IIS Manager.' }
 Write-Host "Repair applied. Copied media files: $copied. Backup: $backup"
 Write-Host 'Verify health/ready, one product image and administrator login. No SQL migration or import was run.'

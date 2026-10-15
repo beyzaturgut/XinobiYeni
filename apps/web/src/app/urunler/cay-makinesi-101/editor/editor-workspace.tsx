@@ -1,11 +1,13 @@
 "use client";
 
-import { useImperativeHandle, useLayoutEffect, useRef, useState, type Ref } from "react";
+import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState, type Ref } from "react";
 import ProductPatternPreview, { type PatternTransform } from "./product-pattern-preview";
 import styles from "./editor.module.css";
 import { DEFAULT_CURVATURE_STRENGTH } from "./product-surface-warp";
 import type { RenderingInputs } from "./accepted-surface-api";
 import { loadPreviewGeometry, transferPreviewPlacements, type PlacementTransferHandle, type PreviewPlacements } from "../../../../features/product-personalization/preview-placement-transfer";
+
+import type {DesignPlacement} from "../../../../lib/design-placement";
 
 type Layer = { id: number; type: "Metin" | "Şekil"; name: string; locked: boolean; visible: boolean };
 const initialLayers: Layer[] = [
@@ -13,7 +15,7 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png", artworkSrc, onUpload, uploadBusy = false, xinobiPreview = false, placementRef }: { renderingInputs: RenderingInputs; patternSrc?: string; artworkSrc?: string; placementMode?: "pattern" | "artwork"; onUpload?: () => void; uploadBusy?: boolean; xinobiPreview?: boolean; placementRef?: Ref<PlacementTransferHandle> }) {
+export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", patternSrc = "/assets/personalization/sample-pattern.png", artworkSrc, onUpload, uploadBusy = false, xinobiPreview = false, placementRef, onPlacementChange }: { renderingInputs: RenderingInputs; patternSrc?: string; artworkSrc?: string; placementMode?: "pattern" | "artwork"; onUpload?: () => void; uploadBusy?: boolean; xinobiPreview?: boolean; placementRef?: Ref<PlacementTransferHandle>; onPlacementChange?:(value:DesignPlacement)=>void }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
@@ -22,6 +24,9 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
   const [curvatureStrength, setCurvatureStrength] = useState(DEFAULT_CURVATURE_STRENGTH);
   const [artworkTransform, setArtworkTransform] = useState<PatternTransform>({ x: renderingInputs.width / 2, y: renderingInputs.height * .65, scale: 1, rotation: 0 });
   const [patternBodyAdjustments, setPatternBodyAdjustments] = useState<PreviewPlacements['bodyAdjustments']>();
+  useEffect(() => {
+    onPlacementChange?.({sourceWidth:renderingInputs.width,sourceHeight:renderingInputs.height,surfaceVersion:renderingInputs.surfaceVersion,...patternTransform,curvatureStrength,bodyAdjustments:patternBodyAdjustments});
+  }, [onPlacementChange,renderingInputs.width,renderingInputs.height,renderingInputs.surfaceVersion,patternTransform,curvatureStrength,patternBodyAdjustments]);
   const snapshot = useRef({ inputs: renderingInputs, pattern: patternTransform, artwork: artworkTransform, artworkSrc, bodyAdjustments: patternBodyAdjustments });
   useLayoutEffect(() => {
     snapshot.current = { inputs: renderingInputs, pattern: patternTransform, artwork: artworkTransform, artworkSrc, bodyAdjustments: patternBodyAdjustments };

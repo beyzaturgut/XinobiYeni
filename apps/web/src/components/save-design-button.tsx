@@ -4,13 +4,14 @@ import {useState} from 'react';
 import {saveDesignFromSession,uploadDesign,useDemoCommerce,type MyDesign} from '../lib/demo-commerce';
 import {useCommerce} from '../lib/commerce';
 import {addToCart} from '../lib/cart';
+import type {DesignPlacement} from '../lib/design-placement';
 import styles from './save-design.module.css';
 
 type Source={sessionId:string}|{file:Blob;productId:string;variantId:string|null};
 
 /** "Sepete ekle" and "Tasarımımı kaydet" for an AI result (session) or an own image (file). A cart line needs a saved
  *  design, so adding saves it first, once. Signed-out shoppers are sent to sign in. */
-export default function SaveDesignButton({source}:{source:Source}){
+export default function SaveDesignButton({source,placement}:{source:Source;placement?:DesignPlacement}){
   const {user,ready}=useDemoCommerce();
   const {state}=useCommerce();
   const [design,setDesign]=useState<MyDesign|null>(null),[busy,setBusy]=useState(false),[added,setAdded]=useState(''),[error,setError]=useState('');
@@ -25,9 +26,9 @@ export default function SaveDesignButton({source}:{source:Source}){
   const add=()=>run(async()=>{
     const saved=await save();
     const product=state?.products.find(item=>item.id===saved.productId);
-    const variant=product?.variants.find(item=>item.id===saved.variantId&&item.stock>0)??product?.variants.find(item=>item.stock>0);
+    const variant=product?.variants.find(item=>item.id===saved.variantId&&item.stock>0)??(placement?undefined:product?.variants.find(item=>item.stock>0));
     if(!product?.active||!variant)throw new Error('Bu ürün şu anda stokta yok.');
-    addToCart(product.id,variant.id,variant.stock,{id:saved.id,name:saved.name});
+    addToCart(product.id,variant.id,variant.stock,{id:saved.id,name:saved.name,placement});
     setAdded(`“${saved.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.`);
   });
   return <div className={styles.wrap}>

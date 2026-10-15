@@ -5,8 +5,10 @@ import EditorWorkspace from '../../app/urunler/cay-makinesi-101/editor/editor-wo
 import {prepareLocalPattern} from './local-pattern-image';
 import SaveDesignButton from '../../components/save-design-button';
 import styles from '../../app/xinobi-u/studio.module.css';
+import type {DesignPlacement} from '../../lib/design-placement';
 import type {PlacementTransferHandle} from './preview-placement-transfer';
 export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPreview=false,placementRef,product,variant}:{inputs:RenderingInputs;initialPatternSrc?:string;xinobiPreview?:boolean;placementRef?:Ref<PlacementTransferHandle>;product?:string;variant?:string}){
+ const [savedPlacement,setSavedPlacement]=useState<DesignPlacement>();
  const [file,setFile]=useState<File|null>(null);
  const [pattern,setPattern]=useState<string|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  const activeUrl=useRef<string|null>(null),generation=useRef(0),fileInput=useRef<HTMLInputElement>(null);
@@ -38,7 +40,7 @@ export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPrev
    <p id="local-image-help">PNG, JPEG veya WebP · Büyük görseller önizleme için otomatik optimize edilir. İşlenmiş görsel en fazla 4096 piksel/kenar, 8 megapiksel ve 8 MiB olur. Görsel bu tarayıcıda önizlenir; yalnız “Tasarımımı kaydet” dersen hesabına yüklenir ve yalnız sen görürsün.</p>
    {busy&&<p role="status">Görsel hazırlanıyor…</p>}{error&&<p role="alert" className={styles.error}>{error}</p>}
   </div>
-  {previewPattern&&<EditorWorkspace key={composeArtwork?'composed':pattern?'artwork':'pattern'} renderingInputs={inputs} patternSrc={previewPattern} placementMode={!composeArtwork&&pattern?'artwork':'pattern'} artworkSrc={composeArtwork?pattern??undefined:undefined} onUpload={()=>fileInput.current?.click()} uploadBusy={busy} xinobiPreview={xinobiPreview} placementRef={placementRef}/>}
-  {file&&product&&!composeArtwork&&<SaveDesignButton key={pattern} source={{file,productId:product,variantId:variant??null}}/>}
+  {previewPattern&&<EditorWorkspace key={composeArtwork?'composed':pattern?'artwork':'pattern'} renderingInputs={inputs} onPlacementChange={setSavedPlacement} patternSrc={previewPattern} placementMode={!composeArtwork&&pattern?'artwork':'pattern'} artworkSrc={composeArtwork?pattern??undefined:undefined} onUpload={()=>fileInput.current?.click()} uploadBusy={busy} xinobiPreview={xinobiPreview} placementRef={placementRef}/>}
+  {file&&product&&!composeArtwork&&<SaveDesignButton key={pattern} placement={savedPlacement} source={{file,productId:product,variantId:variant??null}}/>}
  </>;
 }

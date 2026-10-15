@@ -9,13 +9,14 @@ const root=path.resolve('apps/web/out');
 const bundle=JSON.parse(await readFile(path.join(root,'assets/product-previews/DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6/DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1/inputs.json'),'utf8'));
 const product=bundle.productReference,variant=bundle.variantReference;
 const id='abcdef123456';
-const session={id,status:'ready',product:{id:product,name:'HTTP Preview Product'},variant:{id:variant,color:'Test',image:bundle.sourceImage},questions:[],answers:[],imageUrl:`/api/v1/design-studio/sessions/${id}/image`};
+const session={id,status:'ready',product:{id:product,name:'HTTP Preview Product'},variant:{id:variant,color:'Test',image:bundle.sourceImage,stock:10,sku:'PHOTO-TEST'},questions:[],answers:[],imageUrl:`/api/v1/design-studio/sessions/${id}/image`};
 const types={'.js':'text/javascript','.css':'text/css','.png':'image/png','.webp':'image/webp','.json':'application/json','.svg':'image/svg+xml','.woff2':'font/woff2'};
-let created=0,patternReads=0,privateCatalogReads=0,brokenHero=false;
+let created=0,patternReads=0,privateCatalogReads=0,brokenHero=false,signedInFixture=false,uploadedPhoto=null;
 const errors=[];
 const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'});
 try{
  const page=await browser.newPage({viewport:{width:390,height:844}});page.setDefaultTimeout(20000);
+ await page.addInitScript(()=>{const create=URL.createObjectURL;URL.createObjectURL=function(blob){window.__lastPreviewBlob=blob;return create.call(URL,blob);};});
  page.on('pageerror',error=>errors.push(error.message));
  await page.route('http://xinobi-mobile.test/**',async route=>{
   const request=route.request(),url=new URL(request.url());
@@ -32,8 +33,17 @@ try{
   }
   if(url.pathname==='/api/v1/design-studio/status')return route.fulfill({json:{configured:true}});
   if(url.pathname===`/api/v1/catalog/products/${product}`)return route.fulfill({json:{id:product,variants:[{id:variant,imageUrl:bundle.sourceImage}]}});
-  if(url.pathname==='/api/v1/catalog/storefront')return route.fulfill({json:{products:[{id:product,name:'HTTP Preview Product',category:'Test',active:true,variants:[session.variant]}],prices:{},categories:['Test'],content:{slides:[]}}});
+  if(url.pathname==='/api/v1/catalog/storefront')return route.fulfill({json:{products:[{id:product,name:'HTTP Preview Product',category:'Test',active:true,variants:[session.variant]}],prices:{[variant]:250000},categories:['Test'],content:{slides:[]}}});
   if(url.pathname==='/api/v1/local-commerce/state')privateCatalogReads++;
+  if(signedInFixture&&url.pathname==='/api/v1/me')return route.fulfill({json:{id:'customer',name:'Photo Customer',email:'photo@example.invalid'}});
+  if(signedInFixture&&url.pathname==='/api/v1/me/designs/upload'){
+   // Chromium interception omits multipart file bytes. Reuse the exact prepared Blob observed in the editor.
+   assert.ok(uploadedPhoto?.length>0);
+   return route.fulfill({json:{id:'photodesign',kind:'upload',name:'Photo test',productId:product,variantId:variant,productName:'HTTP Preview Product',imageUrl:'/api/v1/me/designs/photodesign/image'}});
+  }
+  if(url.pathname==='/api/v1/me/designs/photodesign/image')return route.fulfill({body:uploadedPhoto,contentType:'image/png'});
+  if(signedInFixture&&url.pathname==='/api/v1/me/designs')return route.fulfill({json:[{id:'photodesign',kind:'upload'}]});
+  if(signedInFixture&&url.pathname.startsWith('/api/v1/me/'))return route.fulfill({json:url.pathname.endsWith('/inbox')?{items:[],unread:0}:[]});
   if(url.pathname.startsWith('/api/'))return route.fulfill({status:401,json:{code:'unauthorized'}});
   let file=path.resolve(root,'.'+decodeURIComponent(url.pathname));
   if(file!==root&&!file.startsWith(root+path.sep))return route.fulfill({status:404});
@@ -76,4 +86,31 @@ try{
  assert.equal(await hero.getByRole('alert').count(),0);
  assert.deepEqual(errors,[]);
  console.log('PASS: mobile homepage renders the approved product at its actual dimensions and shows the fallback photo if preview media fails.');
+ brokenHero=false;signedInFixture=true;
+ await page.goto(`http://xinobi-mobile.test/xinobi-u/kendi-gorselin/?product=${product}&variant=${variant}`);
+ await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();
+ await page.locator('#local-pattern').setInputFiles(path.join(root,'assets/personalization/sample-pattern.png'));
+ await page.locator('canvas[role=img]').first().waitFor();
+ const original=await page.locator('canvas[role=img]').first().evaluate(canvas=>canvas.toDataURL());
+ await page.locator('#pattern-scale').fill('0.55');
+ await page.locator('#pattern-rotation').fill('17');
+ await page.locator('#pattern-x').fill('1400');
+ await page.locator('#pattern-curvature').fill('0.5');
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()!==previous,original);
+ const designed=await page.locator('canvas[role=img]').first().evaluate(canvas=>canvas.toDataURL());
+ uploadedPhoto=Buffer.from(await page.evaluate(async()=>Array.from(new Uint8Array(await window.__lastPreviewBlob.arrayBuffer()))));
+ await page.getByRole('button',{name:'Sepete ekle',exact:true}).click();
+ await page.getByText(/sepete eklendi/).waitFor();
+ const line=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1'))[0]);
+ assert.equal(line.designPlacement.scale,0.55);assert.equal(line.designPlacement.rotation,17);assert.equal(line.designPlacement.x,1400);
+ assert.ok(uploadedPhoto?.length>0,'Uploaded photo must contain bytes');
+ await page.goto('http://xinobi-mobile.test/sepet/');
+ const cartCanvas=page.locator('canvas[role=img]').first();
+ try{await cartCanvas.waitFor();}catch(error){throw new Error(JSON.stringify({alerts:await page.getByRole('alert').allTextContents(),bytes:uploadedPhoto?.length,signature:uploadedPhoto?.subarray(0,16).toString('hex'),line,errors}),{cause:error});}
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()===previous,designed);
+ assert.equal(await cartCanvas.evaluate(canvas=>canvas.toDataURL()),designed);
+ await page.reload();await cartCanvas.waitFor();
+ await page.waitForFunction(previous=>document.querySelector('canvas[role=img]')?.toDataURL()===previous,designed);
+ console.log('PASS: uploaded photo cart image matches the editor pixels after placement edits and after reloading the cart.');
+
 }finally{await browser.close();}

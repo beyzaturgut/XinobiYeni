@@ -79,6 +79,25 @@ try{
  const heroScale=Math.min(1,1280/Math.max(bundle.inputs.width,bundle.inputs.height));
  assert.equal(size.width,Math.round(bundle.inputs.width*heroScale));
  assert.equal(size.height,Math.round(bundle.inputs.height*heroScale));
+ for(const width of [320,390,430,768,1440]){
+  await page.setViewportSize({width,height:844});
+  const layout=await hero.locator('canvas').evaluate(canvas=>{
+   const frame=canvas.parentElement.parentElement;
+   const visual=frame.parentElement;
+   const rect=element=>{const r=element.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height};};
+   return {image:rect(canvas),frame:rect(frame),questions:rect(visual.querySelector('h3').parentElement),art:rect(visual.querySelector('strong').parentElement),ratio:canvas.width/canvas.height};
+  });
+  const {image,frame,questions,art,ratio}=layout;
+  assert.ok(image.left>=frame.left-1&&image.right<=frame.right+1&&image.top>=frame.top-1&&image.bottom<=frame.bottom+1,`Complete product must fit at ${width}px: ${JSON.stringify(layout)}`);
+  assert.ok(Math.abs(image.width/image.height-ratio)<0.01,`Product must retain its aspect ratio at ${width}px`);
+  if(width<=700){
+   assert.ok(image.bottom<=questions.top&&image.bottom<=art.top,`Cards must not cover the product at ${width}px`);
+  }
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.getByRole('button',{name:'Çerez tercih panelini kapat',exact:true}).click();
+ await hero.screenshot({path:'artifacts/mobile-personalization-layout.png'});
+ console.log('PASS: the complete homepage product retains its aspect ratio at 320–1440px, with mobile cards below the product.');
  brokenHero=true;
  const failure=page.waitForResponse(response=>new URL(response.url()).pathname===new URL(bundle.inputs.source.url,'http://xinobi-mobile.test').pathname&&response.status()===404);
  await page.reload();await failure;

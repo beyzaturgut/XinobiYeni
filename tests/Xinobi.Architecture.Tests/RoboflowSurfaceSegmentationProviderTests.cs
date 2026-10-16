@@ -67,6 +67,21 @@ public sealed class RoboflowSurfaceSegmentationProviderTests
         Assert.Equal(1, handler.Calls);
     }
 
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task EmptyPredictionsAreNoMatchRatherThanMalformedResponse(bool automatic)
+    {
+        var handler = new MockHandler((_, _) => Task.FromResult(Response(automatic ? Automatic() : Interactive())));
+        var provider = Provider(handler);
+        var error = await Assert.ThrowsAsync<SegmentationProviderException>(() => automatic
+            ? provider.GenerateAutomaticAsync(new(Source, Intent), default)
+            : provider.GenerateInteractiveAsync(new(Source, Intent, [new SourcePoint(1, 1, PointIntent.Keep)]), default));
+        Assert.Equal("provider_no_mask", error.Message);
+        Assert.Equal(422, error.Status);
+        Assert.Equal(1, handler.Calls);
+    }
+
     [Fact]
     public async Task MissingScoreUsesStableProviderOrderWithoutInventingConfidence()
     {

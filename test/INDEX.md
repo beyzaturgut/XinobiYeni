@@ -197,3 +197,5 @@
 - 16.10.2026 · [TST-122 pasif Roboflow düğmesi](2026-10-16/TST-122-guided-mask-unsaved-brush.md) — Kaydedilmemiş boyamadan tek düğmeyle kaydet/segment; sağlayıcı hatasında kılavuz korunur, tekrar boyama uygulanmaz. İzole tarayıcı normal/hata senaryoları, admin build/lint başarılı.
 
 - 16.10.2026 · [TST-123 yüzey API 401](2026-10-16/TST-123-surface-admin-session-refresh.md) — Tek personel refresh ve özgün isteği bir kez tekrar; refresh reddinde boyamayı koruyan giriş yönlendirmesi. İki izole tarayıcı senaryosu, admin build/lint başarılı.
+
+- 16.10.2026 · [TST-124 Roboflow boş sonuç ayrımı](2026-10-16/TST-124-roboflow-empty-result-diagnostics.md) — Boş eşleşme/bozuk maske/bozuk şema ayrı mesajlar, kısa tarif açıklaması; 59/59 sahte sağlayıcı testi ve admin build/lint geçti. Geçmiş gerçek hatanın nedeni kesinleşmedi, yeni inference yok.

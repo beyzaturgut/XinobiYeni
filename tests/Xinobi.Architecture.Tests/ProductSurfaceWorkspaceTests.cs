@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Http;
 using SkiaSharp;
 using Xinobi.Api.Catalog;
@@ -34,6 +35,13 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         // Explicit values override the developer's user-secrets, so a real key is never used here.
         builder.UseSetting("ProductSurfaces:Roboflow:ApiKey", key ?? "");
         builder.UseSetting("ProductSurfaces:Roboflow:DailyLimit", limit.ToString());
+        // Local settings are loaded after UseSetting; override them last so real credentials and local flags cannot enter this fixture.
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
+        {
+            ["ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"] = experimental.ToString(),
+            ["ProductSurfaces:Roboflow:ApiKey"] = key ?? "",
+            ["ProductSurfaces:Roboflow:DailyLimit"] = limit.ToString()
+        }));
         builder.ConfigureServices(services => services.Configure<HttpClientFactoryOptions>("roboflow", options =>
             options.HttpMessageHandlerBuilderActions.Add(handler => handler.PrimaryHandler = roboflow)));
     });
@@ -102,7 +110,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         Assert.Equal("roboflow-text", drafted.Draft!.Method);
         var call = Assert.Single(roboflow.Calls);
         Assert.Equal("/sam3/concept_segment", call.Path);
-        Assert.Equal("Bearer test-key", call.Auth);
+        Assert.True(call.Auth == "Bearer test-key", "Expected isolated test credential.");
         Assert.Contains("kettle body", call.Body);
         Assert.Equal(300 * 1600, Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")).Inside);
 

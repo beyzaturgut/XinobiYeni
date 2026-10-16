@@ -84,7 +84,8 @@ public sealed class RoboflowSurfaceSegmentationProvider(HttpClient client, Robof
                 if (group.Predictions.ValueKind != JsonValueKind.Array) throw new InvalidDataException();
                 total += group.Predictions.GetArrayLength();
             }
-            if (total < 1 || total > limit || (!automatic && total != 1)) throw new InvalidDataException();
+            if (total == 0) throw new SegmentationProviderException("provider_no_mask", 422);
+            if (total > limit || (!automatic && total != 1)) throw new InvalidDataException();
             var normalizer = new RoboflowMaskNormalizer();
             var normalized = new List<(ValidatedAlignedMask Mask, byte[] Bytes, double? Score, int Order, int Prompt)>();
             foreach (var group in groups)

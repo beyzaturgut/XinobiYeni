@@ -401,7 +401,9 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         "provider_rate_limited" => "Roboflow şu anda çok fazla istek alıyor. Biraz sonra tekrar dene.",
         "provider_timeout" => "Roboflow zamanında yanıt vermedi. Tekrar deneyebilirsin.",
         "provider_request_rejected" => "Roboflow isteği reddetti. Tarifi veya noktaları değiştir.",
-        "provider_invalid_mask" or "provider_invalid_response" => "Roboflow geçerli bir maske döndürmedi. Tarifi değiştir ya da elle çiz.",
+        "provider_no_mask" => "Roboflow bu tarif veya işaretlerle bir bölge bulamadı. Kısa bir bölge adı (ör. lower kettle body) kullan ya da Fırça ile bölgenin içini boyayıp elle gösterme düğmesini kullan. Önceki taslağın korundu.",
+        "provider_invalid_mask" => "Roboflow maske döndürdü ancak maske fotoğraf boyutu veya piksel doğrulamasından geçmedi (provider_invalid_mask). Bu teknik bir yanıt sorunu; otomatik tekrar yapılmadı, önceki taslak korundu.",
+        "provider_invalid_response" => "Roboflow yanıtı beklenen maske biçiminde okunamadı (provider_invalid_response). Bu teknik bir yanıt sorunu; otomatik tekrar yapılmadı, önceki taslak korundu.",
         _ => "Roboflow'a ulaşılamadı. Biraz sonra tekrar dene ya da maskeyi elle çiz.",
     };
 }

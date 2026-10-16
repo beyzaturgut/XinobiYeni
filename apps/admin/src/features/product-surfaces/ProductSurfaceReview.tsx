@@ -3,14 +3,19 @@ import { ReviewError, reviewRequest, type MaskStroke, type Point, type ReviewSta
 import { SurfaceReviewPreview } from './SurfaceReviewPreview'
 import { SurfaceMaskCorrection } from './SurfaceMaskCorrection'
 import './product-surfaces.css'
+import SurfaceMasks from './SurfaceMasks'
 import CatalogSourceSelection from './CatalogSourceSelection'
 
 export default function ProductSurfaceReview() {
+  const [guided, setGuided] = useState(false)
   const [catalogSelected, setCatalogSelected] = useState(false)
   const [demoBusy, setDemoBusy] = useState(false)
   return <>
+    <button type="button" disabled={demoBusy} onClick={() => setGuided(value => !value)}>{guided ? 'Mevcut katalog incelemesine dön' : 'Elle gösterilen ortak ürün maskesini dene'}</button>
+    {guided ? <><p style={{ overflowWrap: 'anywhere' }}>Geliştirme denemesi. API’de ProductSurfaces:ExperimentalCatalogWorkspace:Enabled açık olmalı. Onaylanan maske yerel katalogda seçilen renklere kaydedilir.</p><SurfaceMasks /></> : <>
     <CatalogSourceSelection disabled={demoBusy} onSelected={setCatalogSelected} />
     <div hidden={catalogSelected}><DemoSurfaceReview onInteractionState={setDemoBusy} /></div>
+    </>}
   </>
 }
 

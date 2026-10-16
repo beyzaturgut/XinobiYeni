@@ -187,6 +187,79 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         Assert.Equal("variant_not_found", await Code(await client.GetAsync(Root + "/DEMO-P101/missing")));
     }
 
+    [Fact]
+    public async Task RoughGuideUsesInteriorPointsAndOneCallThenSharesApprovalWithColors()
+    {
+        using var factory = Factory();
+        using var client = await TestStaff.Client(factory);
+        // Same model and placement: use the source photograph for a second test colour.
+        var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
+        var product = state.Products.Single(p => p.Id == "DEMO-P101");
+        var reference = product.Variants.Single(v => v.Id == "DEMO-V101-B");
+        var redId = "DEMO-V101-R";
+        (await client.PutAsJsonAsync("/api/v1/local-commerce/products/DEMO-P101", product with
+        { Variants = [.. product.Variants.Select(v => v.Id == redId ? v with { Image = reference.Image } : v)] })).EnsureSuccessStatusCode();
+        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
+        Assert.Empty(roboflow.Calls);
+        var refined = await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt)));
+        Assert.Equal("roboflow-guide", refined.Draft!.Method);
+        var call = Assert.Single(roboflow.Calls);
+        Assert.Equal("/sam3/visual_segment", call.Path);
+        using var payload = JsonDocument.Parse(call.Body);
+        var points = payload.RootElement.GetProperty("prompts").GetProperty("prompts")[0].GetProperty("points");
+        Assert.InRange(points.GetArrayLength(), 1, 12);
+        Assert.All(points.EnumerateArray(), point => Assert.True(point.GetProperty("positive").GetBoolean()));
+        // Provider output may extend beyond the rough guide: it is not clipped to the brush.
+        Assert.Equal(300 * 1600, Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")).Inside);
+        var colors = refined.Colors.Where(c => c.VariantId == reference.Id || c.VariantId == redId).ToArray();
+        var approval = await Ok(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(colors, true, refined.Draft.UpdatedAt)));
+        var detail = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P101"))!;
+        Assert.All(detail.Variants.Where(v => colors.Any(c => c.VariantId == v.Id)), v => Assert.EndsWith(approval.ApprovedMask!, v.SurfaceMaskUrl));
+        Assert.Single(roboflow.Calls); // Sharing never incurs per-colour inference.
+        foreach (var color in colors)
+        {
+            var bundle = await client.GetFromJsonAsync<JsonElement>($"/api/v1/dev/product-surfaces/commerce-mask/DEMO-P101/{color.VariantId}/rendering-inputs");
+            Assert.Equal(color.VariantId, bundle.GetProperty("variantReference").GetString());
+            Assert.True(bundle.GetProperty("previewAvailable").GetBoolean());
+            var input = bundle.GetProperty("inputs");
+            Assert.StartsWith(approval.ApprovedMask!, input.GetProperty("mask").GetProperty("url").GetString());
+            Assert.Equal(1066, input.GetProperty("width").GetInt32());
+        }
+    }
+
+    [Fact]
+    public async Task StaleGuideAndUnconfirmedOrMismatchedColorApprovalAreRejectedWithoutPartialUpdate()
+    {
+        using var factory = Factory();
+        using var client = await TestStaff.Client(factory);
+        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
+        Assert.Equal("draft_changed", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt.AddSeconds(-1)))));
+        Assert.Empty(roboflow.Calls);
+        var colors = manual.Colors.Where(c => c.VariantId == "DEMO-V101-B").ToArray();
+        Assert.Equal("same_placement_required", await Code(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(colors, false, manual.Draft.UpdatedAt))));
+        Assert.Equal("color_dimensions_mismatch", await Code(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest([colors[0] with { Width = 1 }], true, manual.Draft.UpdatedAt))));
+        Assert.Equal("image_changed", await Code(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest([colors[0] with { Image = "/changed.png" }], true, manual.Draft.UpdatedAt))));
+        var unchanged = await Ok(await client.GetAsync(Tea));
+        Assert.Null(unchanged.ApprovedMask);
+        Assert.NotNull(unchanged.Draft);
+    }
+
+    [Fact]
+    public void GuideSamplesAvoidThinSpillsAndRejectThinOutlines()
+    {
+        using var bitmap = new SKBitmap(160, 160);
+        bitmap.Erase(SKColors.Transparent);
+        for (var y = 40; y < 120; y++) for (var x = 40; x < 120; x++) bitmap.SetPixel(x, y, SKColors.White);
+        for (var x = 120; x < 150; x++) bitmap.SetPixel(x, 80, SKColors.White); // rough edge spill
+        using var png = bitmap.Encode(SKEncodedImageFormat.Png, 100);
+        var points = Xinobi.Api.Infrastructure.MaskProcessing.ManualGuidePoints.Sample(png.ToArray());
+        Assert.All(points, point => { Assert.InRange(point.X, 42, 118); Assert.InRange(point.Y, 42, 118); });
+        bitmap.Erase(SKColors.Transparent);
+        for (var x = 20; x < 140; x++) bitmap.SetPixel(x, 80, SKColors.White);
+        using var thin = bitmap.Encode(SKEncodedImageFormat.Png, 100);
+        Assert.Equal("guide_too_thin", Assert.Throws<SurfaceException>(() => Xinobi.Api.Infrastructure.MaskProcessing.ManualGuidePoints.Sample(thin.ToArray())).Code);
+    }
+
     public void Dispose()
     {
         if (Directory.Exists(data)) Directory.Delete(data, recursive: true);

@@ -8,14 +8,15 @@ import './surface-masks.css'
 type Status = 'none' | 'draft' | 'approved' | 'stale'
 type Summary = { productId: string; productName: string; variantId: string; color: string; image: string; status: Status; draftUpdatedAt: string | null }
 type Draft = { image: string; method: string; prompt: string | null; score: number | null; updatedAt: string }
-type Detail = { productId: string; productName: string; variantId: string; color: string; image: string; width: number; height: number; status: Status; approvedMask: string | null; draft: Draft | null; provider: { configured: boolean; usedToday: number; dailyLimit: number } }
+type Color = { variantId: string; color: string; image: string; width: number; height: number }
+type Detail = { productId: string; productName: string; variantId: string; color: string; image: string; width: number; height: number; status: Status; approvedMask: string | null; draft: Draft | null; provider: { configured: boolean; usedToday: number; dailyLimit: number }; colors: Color[] }
 type Point = { x: number; y: number; keep: boolean }
 type Tool = 'prompt' | 'points' | 'brush'
 
 const root = `${commerceApi}/surfaces`
 const asset = (path: string) => mediaUrl(path, commerceApi, 'http://127.0.0.1:3000')
 const statusText: Record<Status, string> = { none: 'Maske yok', draft: 'Taslak', approved: 'Onaylı', stale: 'Eski fotoğraf' }
-const methodText = (method: string) => method.replace('roboflow-text', 'Roboflow (tarif)').replace('roboflow-points', 'Roboflow (noktalar)').replace('approved', 'Onaylı maske').replace(/^brush$/, 'Fırça').replace(/\+brush$/, ' + fırça')
+const methodText = (method: string) => method.replace('roboflow-guide', 'Roboflow (elle gösterilen bölge)').replace('roboflow-text', 'Roboflow (tarif)').replace('roboflow-points', 'Roboflow (noktalar)').replace('approved', 'Onaylı maske').replace(/^brush$/, 'Fırça').replace(/\+brush$/, ' + fırça')
 
 async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
   const response = await fetch(root + path, { method, credentials: 'include', headers: body === undefined ? { 'X-Xinobi-Csrf': '1' } : { 'Content-Type': 'application/json', 'X-Xinobi-Csrf': '1' }, body: body === undefined ? undefined : JSON.stringify(body) })
@@ -44,7 +45,7 @@ export default function SurfaceMasks() {
   const counts = items.reduce<Record<Status, number>>((all, item) => ({ ...all, [item.status]: all[item.status] + 1 }), { none: 0, draft: 0, approved: 0, stale: 0 })
   return <section className="surface-masks" aria-label="Ürün yüzey maskeleri">
     <aside className="surface-list">
-      <p className="surface-intro">Desenin ürünün hangi bölgesine giydirileceğini her renk için belirle. Onaylı maske, müşteri tasarımını yalnız o bölgeye uygular.</p>
+      <p className="surface-intro">Bir referans renkte desen bölgesini kabaca boya, Roboflow ile sınırlarını bul ve aynı konumdaki renklere tek onayla uygula.</p>
       <label>Ürün veya renk ara<input value={query} onChange={event => setQuery(event.target.value)} /></label>
       <div className="surface-filters" role="group" aria-label="Durum filtresi">{(['all', 'none', 'draft', 'approved', 'stale'] as const).map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{value === 'all' ? `Tümü (${items.length})` : `${statusText[value]} (${counts[value]})`}</button>)}</div>
       {error && <p role="alert" className="surface-error">{error}</p>}
@@ -60,18 +61,23 @@ export default function SurfaceMasks() {
 function SurfaceEditor({ productId, variantId, onChanged }: { productId: string; variantId: string; onChanged: () => void }) {
   const path = `/${encodeURIComponent(productId)}/${encodeURIComponent(variantId)}`
   const [detail, setDetail] = useState<Detail | null>(null), [busy, setBusy] = useState(''), [error, setError] = useState(''), [notice, setNotice] = useState('')
-  const [tool, setTool] = useState<Tool>('prompt'), [prompt, setPrompt] = useState('lower kettle body')
+  const [tool, setTool] = useState<Tool>('brush'), [prompt, setPrompt] = useState('lower kettle body')
   const [points, setPoints] = useState<Point[]>([]), [keep, setKeep] = useState(true)
   const [strokes, setStrokes] = useState<MaskStroke[]>([]), [erase, setErase] = useState(false), [radius, setRadius] = useState(24)
   const [base, setBase] = useState<ImageData | null>(null), [showing, setShowing] = useState<'draft' | 'approved'>('draft')
   const canvas = useRef<HTMLCanvasElement>(null), stage = useRef<HTMLImageElement>(null)
+  const [patternPreview, setPatternPreview] = useState(false), [previewColor, setPreviewColor] = useState(variantId)
+  const [colors, setColors] = useState<string[]>([variantId]), [samePlacement, setSamePlacement] = useState(false)
   const [active, setActive] = useState<MaskStroke | null>(null)
 
+  const busyRef = useRef(false)
   const run = useCallback(async (label: string, action: () => Promise<Detail>, done?: string) => {
-    setBusy(label); setError(''); setNotice('')
-    try { const next = await action(); setDetail(next); setStrokes([]); setPoints([]); if (done) setNotice(done); onChanged() }
+    if (busyRef.current) return
+    busyRef.current = true
+    setBusy(label); setError(''); setNotice(''); setShowing('draft')
+    try { const next = await action(); setDetail(next); setStrokes([]); setPoints([]); setSamePlacement(false); if (done) setNotice(done); onChanged() }
     catch (problem) { setError(problem instanceof Error ? problem.message : 'İşlem tamamlanamadı.') }
-    finally { setBusy('') }
+    finally { busyRef.current = false; setBusy('') }
   }, [onChanged])
   useEffect(() => { void run('Yükleniyor…', () => request<Detail>(path)) }, [path, run])
 
@@ -91,9 +97,11 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
     if (!base || !detail) return null
     const data = new Uint8ClampedArray(base.data)
     try { paint(data, detail.width, detail.height, [...strokes, ...(active ? [active] : [])]) } catch { return null }
-    for (let i = 0; i < data.length; i += 4) { data[i] = 220; data[i + 1] = 40; data[i + 2] = 130; data[i + 3] = Math.round(data[i + 3] * .5) }
+    for (let i = 0; i < data.length; i += 4) { const tile = Math.max(8, Math.round(detail.width / 24))
+      const light = (Math.floor((i / 4 % detail.width) / tile) + Math.floor(Math.floor(i / 4 / detail.width) / tile)) % 2 === 0
+      data[i] = patternPreview ? light ? 250 : 30 : 220; data[i + 1] = patternPreview ? light ? 200 : 90 : 40; data[i + 2] = patternPreview ? light ? 90 : 160 : 130; data[i + 3] = Math.round(data[i + 3] * (patternPreview ? .85 : .5)) }
     return new ImageData(data, detail.width, detail.height)
-  }, [base, detail, strokes, active])
+  }, [base, detail, strokes, active, patternPreview])
   useEffect(() => { if (overlay && canvas.current) canvas.current.getContext('2d')!.putImageData(overlay, 0, 0) }, [overlay])
 
   function source(event: ReactPointerEvent) {
@@ -101,7 +109,7 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
     return { x: Math.max(0, Math.min(detail!.width - .01, (event.clientX - rect.left) * detail!.width / rect.width)), y: Math.max(0, Math.min(detail!.height - .01, (event.clientY - rect.top) * detail!.height / rect.height)) }
   }
   function down(event: ReactPointerEvent) {
-    if (!detail || busy) return
+    if (!detail || busy || previewColor !== variantId) return
     const point = source(event)
     if (tool === 'points') { if (points.length < 20) setPoints(current => [...current, { ...point, keep: event.altKey ? !keep : keep }]); return }
     if (tool !== 'brush') return
@@ -127,9 +135,10 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
     <header><div><h2>{detail.productName}</h2><p>{detail.color} · {detail.width}×{detail.height} px · <em data-status={detail.status}>{statusText[detail.status]}</em></p></div>
       {detail.draft && detail.approvedMask && <div className="surface-toggle" role="group" aria-label="Gösterilen maske"><button aria-pressed={view === 'draft'} onClick={() => setShowing('draft')}>Taslak</button><button aria-pressed={view === 'approved'} onClick={() => setShowing('approved')}>Onaylı</button></div>}</header>
     {detail.status === 'stale' && <p className="surface-warning">Bu rengin fotoğrafı onaydan sonra değişti; eski maske vitrinde kullanılmıyor. Yeni fotoğraf için maskeyi yeniden hazırla.</p>}
+    {previewColor !== variantId && <p role="status">Ortak maskeyi seçilen renkte inceliyorsun. Boyamak için referans rengine dön.</p>}
     <div className="surface-workspace">
       <div className={`surface-stage tool-${tool}`} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
-        <img ref={stage} src={asset(detail.image)} alt={`${detail.productName}, ${detail.color}`} draggable={false} />
+        <img ref={stage} src={asset(detail.colors.find(color => color.variantId === previewColor)?.image ?? detail.image)} alt={`${detail.productName}, ${detail.colors.find(color => color.variantId === previewColor)?.color ?? detail.color}`} draggable={false} />
         <canvas ref={canvas} width={detail.width} height={detail.height} aria-hidden="true" />
         {points.map((point, index) => <span key={index} className={point.keep ? 'point keep' : 'point exclude'} style={{ left: `${point.x / detail.width * 100}%`, top: `${point.y / detail.height * 100}%` }} aria-hidden="true">{point.keep ? '+' : '−'}</span>)}
         {busy && <div className="surface-busy" role="status">{busy}</div>}
@@ -144,8 +153,30 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
           <div className="surface-row-actions"><button className="primary" disabled={!!busy || !detail.provider.configured || points.length === 0} onClick={() => run('Roboflow çalışıyor…', () => request<Detail>(`${path}/segment`, 'POST', { points }), 'Noktalara göre taslak hazır.')}>Noktalarla bul</button><button disabled={!points.length} onClick={() => setPoints([])}>Noktaları temizle</button></div></div>}
         {tool === 'brush' && <div className="surface-panel"><div className="surface-toggle" role="group" aria-label="Fırça"><button aria-pressed={!erase} onClick={() => setErase(false)}>Ekle</button><button aria-pressed={erase} onClick={() => setErase(true)}>Sil</button></div>
           <label>Fırça boyutu: {radius} px<input type="range" min={1} max={32} value={radius} onChange={event => setRadius(Number(event.target.value))} /></label>
-          <p className="surface-hint">{basis === 'empty' ? 'Maske yok: fırçayla bölgeyi baştan çizebilirsin.' : `Düzeltmeler ${basis === 'draft' ? 'taslağa' : 'onaylı maskeden yeni bir taslağa'} uygulanır.`} {strokes.length}/100 çizgi.</p>
+          <p className="surface-hint">{basis === 'empty' ? 'Desen uygulanacak bölgenin içini kabaca boya. Küçük kenar taşmalarını Roboflow sonucu üzerinde inceleyeceğiz.' : `Düzeltmeler ${basis === 'draft' ? 'taslağa' : 'onaylı maskeden yeni bir taslağa'} uygulanır.`} {strokes.length}/100 çizgi.</p>
           <div className="surface-row-actions"><button className="primary" disabled={!canBrush} onClick={() => run('Uygulanıyor…', () => request<Detail>(`${path}/strokes`, 'POST', { strokes, base: basis }), 'Fırça düzeltmeleri taslağa uygulandı.')}>Düzeltmeleri uygula</button><button disabled={!strokes.length} onClick={() => setStrokes(current => current.slice(0, -1))}>Son çizgiyi geri al</button></div></div>}
+        <div className="surface-panel">
+          <h3>Elle göster → Roboflow ile sınırları bul</h3>
+          <p>Önce fırça çizgilerini uygula. Roboflow çizimin içinden alınan işaretlerle ürün fotoğrafındaki bölgeyi yeniden çıkarır. Kaba fırça sınırı son maskeyi kesmez; sonucu inceleyip gerekirse düzelt.</p>
+          <button className="primary" disabled={!!busy || !!active || strokes.length > 0 || !detail.draft || !detail.provider.configured} onClick={() => {
+            if (window.confirm('Ürün fotoğrafı ve boyanan bölgenin iç işaretleri Roboflow’a gönderilecek; kredi kullanılabilir. Sınırları bulalım mı?'))
+              void run('Roboflow sınırları buluyor…', () => request<Detail>(`${path}/segment`, 'POST', { useDraftGuide: true, expectedDraftUpdatedAt: detail.draft!.updatedAt }), 'Roboflow taslağı hazır. Kenarları, kulpu ve logoyu kontrol et; ardından renkleri seçip onayla.')
+          }}>Boyadığım bölgeyi Roboflow ile bul</button>
+        </div>
+        <div className="surface-panel">
+          <label><input type="checkbox" checked={patternPreview} onChange={event => setPatternPreview(event.target.checked)} />Maske içinde örnek desen göster</label>
+          <label>Önizleme rengi<select value={previewColor} disabled={!!busy || !!active || strokes.length > 0} onChange={event => setPreviewColor(event.target.value)}>{detail.colors.filter(color => color.width === detail.width && color.height === detail.height).map(color => <option key={color.variantId} value={color.variantId}>{color.color}</option>)}</select></label>
+          <p>Örnek desen yalnızca maskenin kapladığı alanı gösterir. Fiziksel baskı çıktısı değildir.</p>
+          <h3>Ortak maske uygulanacak renkler</h3>
+          <p>Fotoğraflarda ürün aynı ölçekte, açıda ve konumda olmalı. Aynı piksel boyutu tek başına hizalama garantisi değildir. Mevcut renk maskeleri seçiminizle güncellenir.</p>
+          {detail.colors.map(color => {
+            const compatible = color.width === detail.width && color.height === detail.height
+            return <label key={color.variantId}><input type="checkbox" checked={colors.includes(color.variantId)} disabled={!!busy || color.variantId === variantId || !compatible} onChange={event => setColors(current => event.target.checked ? [...current, color.variantId] : current.filter(id => id !== color.variantId))} />
+              <img src={asset(color.image)} alt="" width={48} height={64} style={{ objectFit: 'contain' }} />{color.color}{!compatible && ' · Görsel boyutu farklı / okunamadı'}</label>
+          })}
+          <label><input type="checkbox" checked={samePlacement} disabled={!!busy} onChange={event => setSamePlacement(event.target.checked)} />Seçtiğim fotoğrafların aynı konumda olduğunu ve maske kenarları ile logo/kulp alanlarını kontrol ettim.</label>
+          <button className="approve" disabled={!!busy || !!active || !detail.draft || strokes.length > 0 || !samePlacement} onClick={() => run('Renklere uygulanıyor…', () => request<Detail>(`${path}/approval/colors`, 'POST', { colors: detail.colors.filter(color => colors.includes(color.variantId)), samePlacementConfirmed: samePlacement, expectedDraftUpdatedAt: detail.draft!.updatedAt }), 'Ortak maske seçilen renklerde onaylandı. Her renk aynı bölgeye desen uygular.')}>Seçilen renklerde onayla</button>
+        </div>
         <dl className="surface-facts">
           {detail.draft && <><dt>Taslak</dt><dd>{methodText(detail.draft.method)}{detail.draft.prompt ? ` · “${detail.draft.prompt}”` : ''}{detail.draft.score != null ? ` · skor ${detail.draft.score.toFixed(2)}` : ''}</dd></>}
           <dt>Roboflow</dt><dd>{detail.provider.configured ? `Bugün ${quota} çağrı` : 'Anahtar tanımlı değil; fırçayla çizebilirsin.'}</dd>

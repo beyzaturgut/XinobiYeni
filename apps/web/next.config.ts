@@ -30,6 +30,7 @@ export default function config(phase: string): NextConfig {
         { source: "/api/v1/xinobi-u/:path*", destination: `http://127.0.0.1:${xinobiUApiPort}/api/v1/xinobi-u/:path*` },
         { source: "/api/v1/design-studio/:path*", destination: "http://127.0.0.1:5021/api/v1/design-studio/:path*" },
         { source: "/api/v1/design-studio/sessions/:id", destination: "http://127.0.0.1:5013/api/v1/design-studio/sessions/:id" },
+        { source: "/api/v1/dev/product-surfaces/commerce-mask/:product/:variant/rendering-inputs/", destination: `http://127.0.0.1:${port}/api/v1/dev/product-surfaces/commerce-mask/:product/:variant/rendering-inputs` },
         { source: "/api/v1/dev/product-surfaces/commerce/:product/:variant/rendering-inputs/", destination: "http://127.0.0.1:"+port+"/api/v1/dev/product-surfaces/commerce/:product/:variant/rendering-inputs" },
         { source: "/api/v1/design-studio/sessions/:id/image", destination: "http://127.0.0.1:"+port+"/api/v1/design-studio/sessions/:id/image" }, {
         source: "/api/v1/dev/product-surfaces/:product/:variant/rendering-inputs/",

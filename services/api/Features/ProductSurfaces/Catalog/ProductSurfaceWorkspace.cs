@@ -16,11 +16,14 @@ public sealed record SurfaceDraft(string ProductId, string VariantId, string Ima
 public sealed record SurfaceSummary(string ProductId, string ProductName, string VariantId, string Color, string Image, string Status, DateTimeOffset? DraftUpdatedAt);
 
 public sealed record SurfaceDetail(string ProductId, string ProductName, string VariantId, string Color, string Image, int Width, int Height,
-    string Status, string? ApprovedMask, SurfaceDraft? Draft, SurfaceProviderStatus Provider);
+    string Status, string? ApprovedMask, SurfaceDraft? Draft, SurfaceProviderStatus Provider, SurfaceColor[] Colors);
+
+public sealed record SurfaceColor(string VariantId, string Color, string Image, int Width, int Height);
+public sealed record SurfaceApprovalRequest(SurfaceColor[] Colors, bool SamePlacementConfirmed, DateTimeOffset ExpectedDraftUpdatedAt);
 
 public sealed record SurfaceProviderStatus(bool Configured, int UsedToday, int DailyLimit);
 
-public sealed record SurfaceSegmentRequest(string? Prompt, SurfacePoint[]? Points);
+public sealed record SurfaceSegmentRequest(string? Prompt, SurfacePoint[]? Points, bool UseDraftGuide = false, DateTimeOffset? ExpectedDraftUpdatedAt = null);
 public sealed record SurfacePoint(double X, double Y, bool Keep);
 /// <summary><c>Base</c>: "draft" (default when one exists), "approved" or "empty".</summary>
 public sealed record SurfaceStrokeRequest(SurfaceStroke[] Strokes, string? Base);
@@ -97,6 +100,21 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
             })).ToArray()));
     }
 
+    public async Task<object> RenderingInputs(string productId, string variantId)
+    {
+        var (product, variant) = await Find(productId, variantId);
+        if (!product.Active || variant.ApprovedSurfaceMask is not { } mask)
+            return new { scope = "development-preview", productReference = productId, variantReference = variantId, previewAvailable = false, inputs = (object?)null };
+        var source = InspectSource(variant.Image);
+        var maskBytes = SourceBytes(mask);
+        new AlignedImageInspector().ValidateMask(maskBytes, "dev:shared-mask", source, source);
+        var sha = Convert.ToHexString(SHA256.HashData(maskBytes)).ToLowerInvariant();
+        return new { scope = "development-preview", productReference = productId, variantReference = variantId, previewAvailable = true,
+            inputs = new { surfaceVersion = sha, sourceMediaVersion = source.Sha256, width = source.Width, height = source.Height,
+                source = new { url = variant.Image + "?v=" + source.Sha256, sha256 = source.Sha256 },
+                mask = new { url = mask + "?v=" + sha, sha256 = sha }, brandingRequired = false, branding = (object?)null } };
+    }
+
     public async Task<SurfaceDetail> Detail(string productId, string variantId)
     {
         var (product, variant) = await Find(productId, variantId);
@@ -108,7 +126,12 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
     {
         var draft = DraftFor(state, product.Id, variant);
         return new SurfaceDetail(product.Id, product.Name, variant.Id, variant.Color, variant.Image, source.Width, source.Height,
-            StatusOf(variant, draft), variant.ApprovedSurfaceMask, draft, Provider(state));
+            StatusOf(variant, draft), variant.ApprovedSurfaceMask, draft, Provider(state),
+            product.Variants.Where(v => !string.IsNullOrEmpty(v.Image)).Select(v =>
+            {
+                try { var identity = InspectSource(v.Image); return new SurfaceColor(v.Id, v.Color, v.Image, identity.Width, identity.Height); }
+                catch (SurfaceException) { return new SurfaceColor(v.Id, v.Color, v.Image, 0, 0); }
+            }).ToArray());
     }
 
     public async Task<byte[]> DraftMask(string productId, string variantId)
@@ -126,6 +149,15 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         var key = ApiKey ?? throw new SurfaceException("provider_not_configured", "Roboflow anahtarı tanımlı değil. Maskeyi elle çizebilirsin.", StatusCodes.Status503ServiceUnavailable);
         var prompt = request.Prompt?.Trim();
         var points = request.Points ?? [];
+        SurfaceDraft? guide = null;
+        if (request.UseDraftGuide)
+        {
+            if (points.Length > 0 || !string.IsNullOrEmpty(prompt)) throw new SurfaceException("guide_exclusive", "Kılavuz ile tarif/nokta isteği birleştirilemez.");
+            guide = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)))
+                ?? throw new SurfaceException("draft_not_found", "Önce bölgeyi fırçayla boyayıp taslağı kaydedin.");
+            if (guide.UpdatedAt != request.ExpectedDraftUpdatedAt) throw new SurfaceException("draft_changed", "Kılavuz değişti; güncel taslağı inceleyin.", 409);
+            points = ManualGuidePoints.Sample(await File.ReadAllBytesAsync(DraftPath(guide.MaskFile)));
+        }
         if (points.Length == 0 && string.IsNullOrEmpty(prompt)) throw new SurfaceException("prompt_required", "Bir tarif (ör. \"kettle body\") yaz ya da fotoğrafta nokta seç.");
         if (prompt is { Length: > 120 }) throw new SurfaceException("prompt_too_long", "Tarif en fazla 120 karakter olabilir.");
         if (points.Length > 20) throw new SurfaceException("too_many_points", "En fazla 20 nokta seçebilirsin.");
@@ -157,8 +189,16 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         }
         catch (SegmentationProviderException error) { throw new SurfaceException(error.Message, ProviderMessage(error.Message), error.Status); }
         catch (ArgumentOutOfRangeException) { throw new SurfaceException("invalid_point", "Noktalar fotoğrafın içinde olmalı."); }
+        var current = await Find(productId, variantId);
+        if (current.Variant.Image != variant.Image || InspectSource(current.Variant.Image) != source)
+            throw new SurfaceException("image_changed", "Fotoğraf işlem sırasında değişti; sonuç kaydedilmedi.", 409);
         var candidate = result.Candidates[0];
-        return await SaveDraft(product, variant, source, buffer.Bytes(candidate.Mask.AssetReference), points.Length == 0 ? "roboflow-text" : "roboflow-points", prompt, candidate.Score?.Value);
+        if (guide is not null)
+        {
+            var currentGuide = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)));
+            if (currentGuide != guide) throw new SurfaceException("draft_changed", "Kılavuz işlem sırasında değişti; sonuç kaydedilmedi.", 409);
+        }
+        return await SaveDraft(product, variant, source, buffer.Bytes(candidate.Mask.AssetReference), request.UseDraftGuide ? "roboflow-guide" : points.Length == 0 ? "roboflow-text" : "roboflow-points", prompt, candidate.Score?.Value, guide);
     }
 
     /// <summary>Brush corrections (add/remove) on the draft, the approved mask or an empty canvas. The result becomes the draft.</summary>
@@ -193,9 +233,11 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         return await SaveDraft(product, variant, source, corrected.Bytes, method, draft?.Prompt, draft?.Score);
     }
 
-    private async Task<SurfaceDetail> SaveDraft(CommerceProduct product, CommerceVariant variant, SourceMediaIdentity source, byte[] mask, string method, string? prompt, double? score) =>
+    private async Task<SurfaceDetail> SaveDraft(CommerceProduct product, CommerceVariant variant, SourceMediaIdentity source, byte[] mask, string method, string? prompt, double? score, SurfaceDraft? expectedDraft = null) =>
         await Locked(async state =>
         {
+            if (expectedDraft is not null && DraftFor(state, product.Id, variant) != expectedDraft)
+                throw new SurfaceException("draft_changed", "Kılavuz değişti; sonuç kaydedilmedi.", 409);
             var file = $"{Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant()}.png";
             System.IO.Directory.CreateDirectory(DraftPath(""));
             await File.WriteAllBytesAsync(DraftPath(file), mask);
@@ -228,6 +270,49 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
             File.Delete(DraftPath(draft.MaskFile));
             await Write(state);
             return DetailOf(state, product, updated, source);
+        });
+    }
+
+    /// <summary>One explicit approval applies the same coordinates to selected, same-sized colour photographs.</summary>
+    public async Task<SurfaceDetail> ApproveColors(string productId, string variantId, SurfaceApprovalRequest request)
+    {
+        if (!request.SamePlacementConfirmed || request.Colors is not { Length: > 0 and <= 100 } ||
+            request.Colors.Select(c => c.VariantId).Distinct().Count() != request.Colors.Length || !request.Colors.Any(c => c.VariantId == variantId))
+            throw new SurfaceException("same_placement_required", "Aynı konumdaki renkleri ve referans rengini açıkça seçin.");
+        var (product, variant) = await Find(productId, variantId);
+        var source = InspectSource(variant.Image);
+        return await Locked(async state =>
+        {
+            var draft = DraftFor(state, productId, variant) ?? throw new SurfaceException("draft_not_found", "Onaylanacak taslak yok.");
+            if (draft.UpdatedAt != request.ExpectedDraftUpdatedAt) throw new SurfaceException("draft_changed", "Taslak değişti; yeniden inceleyin.", 409);
+            foreach (var color in request.Colors)
+            {
+                var target = product.Variants.SingleOrDefault(v => v.Id == color.VariantId);
+                if (target is null || target.Image != color.Image) throw new SurfaceException("image_changed", "Renk fotoğrafı değişti.", 409);
+                var identity = InspectSource(target.Image);
+                if (identity.Width != source.Width || identity.Height != source.Height || color.Width != identity.Width || color.Height != identity.Height)
+                    throw new SurfaceException("color_dimensions_mismatch", "Ortak maske için renk fotoğrafları aynı boyutta ve aynı konumda olmalı.", 409);
+            }
+            var bytes = await File.ReadAllBytesAsync(DraftPath(draft.MaskFile));
+            new AlignedImageInspector().ValidateMask(bytes, "dev:shared-surface-approval", source, source);
+            var media = $"{Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant()}.png";
+            await files.Save(Xinobi.Api.Infrastructure.FileAreas.Media, media, new MemoryStream(bytes), "image/png");
+            var mask = "/api/v1/local-commerce/media/" + media;
+            var expected = request.Colors.ToDictionary(c => c.VariantId);
+            CommerceVariant? updated = null;
+            await commerce.Update(current =>
+            {
+                var live = current.Products.SingleOrDefault(p => p.Id == productId) ?? throw new SurfaceException("product_not_found", "Ürün bulunamadı.", 404);
+                foreach (var color in expected.Values)
+                    if (!live.Variants.Any(v => v.Id == color.VariantId && v.Image == color.Image))
+                        throw new SurfaceException("image_changed", "Renk fotoğrafı işlem sırasında değişti.", 409);
+                var variants = live.Variants.Select(v => expected.ContainsKey(v.Id) ? v with { SurfaceMask = mask, SurfaceImage = v.Image } : v).ToArray();
+                updated = variants.Single(v => v.Id == variantId);
+                return current with { Products = [.. current.Products.Select(p => p.Id == productId ? p with { Variants = variants } : p)] };
+            });
+            state.Drafts.Remove(draft);
+            await Write(state);
+            return DetailOf(state, product, updated!, source);
         });
     }
 

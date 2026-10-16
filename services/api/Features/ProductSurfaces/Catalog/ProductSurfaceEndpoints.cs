@@ -12,6 +12,15 @@ public static class ProductSurfaceEndpoints
     public static void MapProductSurfaces(this WebApplication app)
     {
         if (!app.Environment.IsDevelopment()) return;
+        // Read-only bridge for the experimental storefront. No staff session or provider call is needed to view a public product mask.
+        app.MapGet("/api/v1/dev/product-surfaces/commerce-mask/{productId}/{variantId}/rendering-inputs",
+            async Task<IResult> (string productId, string variantId, HttpContext context, ProductSurfaceWorkspace surfaces) =>
+            {
+                if (context.Connection.RemoteIpAddress is { } address && !IPAddress.IsLoopback(address)) return Results.StatusCode(403);
+                context.Response.Headers.CacheControl = "no-store";
+                try { return Results.Ok(await surfaces.RenderingInputs(productId, variantId)); }
+                catch (SurfaceException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Status); }
+            });
         var group = app.MapGroup("/api/v1/local-commerce/surfaces").WithTags("ProductSurfaces").RequirePanelPermissions().RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {
@@ -33,6 +42,7 @@ public static class ProductSurfaceEndpoints
         group.MapPost("/{productId}/{variantId}/strokes", async (string productId, string variantId, SurfaceStrokeRequest request, ProductSurfaceWorkspace surfaces) =>
             Results.Ok(await surfaces.Paint(productId, variantId, request)));
         group.MapPost("/{productId}/{variantId}/approval", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Approve(productId, variantId)));
+        group.MapPost("/{productId}/{variantId}/approval/colors", async (string productId, string variantId, SurfaceApprovalRequest request, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.ApproveColors(productId, variantId, request)));
         group.MapDelete("/{productId}/{variantId}/approval", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Revoke(productId, variantId)));
         group.MapDelete("/{productId}/{variantId}/draft", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Discard(productId, variantId)));
     }

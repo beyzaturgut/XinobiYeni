@@ -191,3 +191,5 @@
 - 14.10.2026 · [TST-120 SEO temeli](2026-10-14/TST-120-seo-foundation.md) — Faz04: `NEXT_PUBLIC_SITE_URL` yokken (test sunucusu) robots/sitemap/meta ile indeks kapalı; alan adıyla canonical, 8 URL’lik sitemap, özel sayfa engeli; ana sayfa Organization/WebSite ve ürün detayı Product JSON-LD. seo.spec 2/2, tam web e2e 119/0/1.
 
 - 16.10.2026 · [Faz kayıtları belge denetimi](2026-10-16/REP-20261016-phase-document-audit.md) — Faz00–11 oran tutarlılığı, commit eşlemesi, dosya bağlantıları ve diff kontrolü; yeni uygulama test koşusu yok.
+
+- 16.10.2026 · [TST-121 kaba kılavuz ve ortak renk maskesi](2026-10-16/TST-121-guided-shared-mask.md) — İç noktalardan sahte SAM3 visual, tek maskeyi seçili renklere tek onayla aktarım; .NET 422/23 atlandı/0, admin tarayıcı akışı ve web adapter kontrolü. Gerçek inference yok.

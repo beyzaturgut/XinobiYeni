@@ -156,6 +156,8 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 **16.10 güncel kayıt:** [Commit → faz eşlemesi ve ölçüm gerekçesi](../docs/tasks/phase-audit-2026-10-16.md). Yönetici daveti/MFA, audit farkı, favori API’si ve yerleşim koruma işleri işlendi. Eski deploy/SQL satırları son doğrulanmış tarihsel kanıttır; DEPLOY-011 de yalnız hazırlanmış olarak kayıtlı. 0006–0009 dosyalarının varlığı hedef veritabanına uygulandıkları anlamına gelmez. Yeni uygulama testi veya resmi kabul verilmedi.
 
+**16.10 ortak yüzey denemesi:** Faz06/10: kaba boyamadan iç noktalarla Roboflow aday üretimi; seçili aynı konumlu renklerde ortak maske onayı; web Development renderer bağlantısı. [TST-121](../test/2026-10-16/TST-121-guided-shared-mask.md): .NET 422/23 atlandı/0, izole admin tarayıcı akışı ve web adapter kontrolü başarılı. Gerçek Roboflow çağrısı ve canlı yayın yok; sonraki adım gerçek bir ürünle görsel kenar/hizalama denemesi. Faz oranları/kabul değişmedi.
+
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |

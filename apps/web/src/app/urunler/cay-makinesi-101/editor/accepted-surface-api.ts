@@ -31,9 +31,25 @@ async function loadCatalogSurface(product:string,variant:string,signal:AbortSign
  }if(input.mask.sha256!==input.surfaceVersion)throw Error('Invalid mask version');const preview=catalogPreviewDimensions(input.width,input.height);return {...input,assetWidth:input.width,assetHeight:input.height,...preview,surfaceTreatment:'metallic-ink',...(product===CM121_PRODUCT&&variant===CM121_VARIANT?{surfaceInkExposureStops:0.55}:{})};
 }
 
+// Explicitly approved experimental catalogue masks. The exact product/variant remains part of every lookup.
+async function loadSharedCommerceSurface(product:string,variant:string,signal:AbortSignal):Promise<RenderingInputs|null>{
+ const response=await fetch('/api/v1/dev/product-surfaces/commerce-mask/'+encodeURIComponent(product)+'/'+encodeURIComponent(variant)+'/rendering-inputs',{signal,cache:'no-store'});
+ if(response.status===404)return null;if(!response.ok)throw Error('Shared mask unavailable');
+ const value=await response.json();
+ if(value.scope!=='development-preview'||value.productReference!==product||value.variantReference!==variant)throw Error('Invalid shared mask identity');
+ if(value.previewAvailable===false&&value.inputs===null)return null;
+ const input=value.inputs as RenderingInputs;
+ if(value.previewAvailable!==true||!input||!Number.isInteger(input.width)||!Number.isInteger(input.height)||input.width<=0||input.height<=0||input.width>MAX_CATALOG_SOURCE_DIMENSION||input.height>MAX_CATALOG_SOURCE_DIMENSION||input.width*input.height>MAX_CATALOG_SOURCE_PIXELS||!checksum.test(input.surfaceVersion)||!checksum.test(input.sourceMediaVersion)||input.brandingRequired!==false||input.branding!==null)throw Error('Invalid shared mask bundle');
+ const sourcePath=/^\/(?:api\/v1\/local-commerce\/media\/[a-f0-9]{32}\.(?:png|jpg|webp)|assets\/[a-zA-Z0-9/_-]+\.(?:png|jpg|webp))\?v=[a-f0-9]{64}$/;
+ const maskPath=/^\/api\/v1\/local-commerce\/media\/[a-f0-9]{32}\.png\?v=[a-f0-9]{64}$/;
+ if(!input.source||!input.mask||!checksum.test(input.source.sha256)||!checksum.test(input.mask.sha256)||!sourcePath.test(input.source.url)||!maskPath.test(input.mask.url)||!input.source.url.endsWith('?v='+input.source.sha256)||!input.mask.url.endsWith('?v='+input.mask.sha256)||input.source.sha256!==input.sourceMediaVersion||input.mask.sha256!==input.surfaceVersion)throw Error('Invalid shared mask media');
+ return {...input,assetWidth:input.width,assetHeight:input.height,...catalogPreviewDimensions(input.width,input.height),surfaceTreatment:'metallic-ink'};
+}
+
 export async function loadAcceptedSurface(variantReference:string,signal:AbortSignal,commerceProduct?:string):Promise<RenderingInputs|null>{
  // Live builds read only published bundles; the e2e build opts into the development bridge (NEXT_PUBLIC_DEV_SURFACE_BRIDGE=1).
  if(process.env.NODE_ENV!=='development'&&process.env.NEXT_PUBLIC_DEV_SURFACE_BRIDGE!=='1')return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
+ if(commerceProduct&&process.env.NODE_ENV==='development'){const shared=await loadSharedCommerceSurface(commerceProduct,variantReference,signal);if(shared)return shared;}
  if(commerceProduct&&commerceProduct!=='DEMO-P101'){const generic=await loadCatalogSurface(commerceProduct,variantReference,signal);if(generic)return generic;}
  const productReference=commerceProduct??"cay-makinesi-101";
  const cm=commerceProduct===CM_PRODUCT&&variantReference===CM_VARIANT;

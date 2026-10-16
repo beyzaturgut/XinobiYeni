@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { commerceApi, mediaUrl } from '../../commerce'
+import { refreshAdminSession } from '../../admin-api'
 import { paint } from './SurfaceMaskCorrection'
 import type { MaskStroke } from './product-surfaces-api'
 import './surface-masks.css'
@@ -19,7 +20,11 @@ const statusText: Record<Status, string> = { none: 'Maske yok', draft: 'Taslak',
 const methodText = (method: string) => method.replace('roboflow-guide', 'Roboflow (elle gösterilen bölge)').replace('roboflow-text', 'Roboflow (tarif)').replace('roboflow-points', 'Roboflow (noktalar)').replace('approved', 'Onaylı maske').replace(/^brush$/, 'Fırça').replace(/\+brush$/, ' + fırça')
 
 async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
-  const response = await fetch(root + path, { method, credentials: 'include', headers: body === undefined ? { 'X-Xinobi-Csrf': '1' } : { 'Content-Type': 'application/json', 'X-Xinobi-Csrf': '1' }, body: body === undefined ? undefined : JSON.stringify(body) })
+  const send = () => fetch(root + path, { method, credentials: 'include', headers: body === undefined ? { 'X-Xinobi-Csrf': '1' } : { 'Content-Type': 'application/json', 'X-Xinobi-Csrf': '1' }, body: body === undefined ? undefined : JSON.stringify(body) })
+  let response = await send()
+  if (response.status === 401 && await refreshAdminSession()) response = await send()
+  if (response.status === 401) throw new Error('Yönetici oturumun sona erdi. Paneli başka sekmede açıp yeniden giriş yap; ardından boyamanı kaybetmeden burada tekrar dene.')
+  if (response.status === 403) throw new Error('Bu hesapla ürün yüzeyini değiştirme yetkin yok.')
   const payload = await response.json().catch(() => ({}))
   if (!response.ok) throw new Error(payload.message || `Yüzey servisi hata verdi (${response.status}).`)
   return payload as T

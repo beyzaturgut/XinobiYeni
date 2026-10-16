@@ -195,3 +195,5 @@
 - 16.10.2026 · [TST-121 kaba kılavuz ve ortak renk maskesi](2026-10-16/TST-121-guided-shared-mask.md) — İç noktalardan sahte SAM3 visual, tek maskeyi seçili renklere tek onayla aktarım; .NET 422/23 atlandı/0, admin tarayıcı akışı ve web adapter kontrolü. Gerçek inference yok.
 
 - 16.10.2026 · [TST-122 pasif Roboflow düğmesi](2026-10-16/TST-122-guided-mask-unsaved-brush.md) — Kaydedilmemiş boyamadan tek düğmeyle kaydet/segment; sağlayıcı hatasında kılavuz korunur, tekrar boyama uygulanmaz. İzole tarayıcı normal/hata senaryoları, admin build/lint başarılı.
+
+- 16.10.2026 · [TST-123 yüzey API 401](2026-10-16/TST-123-surface-admin-session-refresh.md) — Tek personel refresh ve özgün isteği bir kez tekrar; refresh reddinde boyamayı koruyan giriş yönlendirmesi. İki izole tarayıcı senaryosu, admin build/lint başarılı.

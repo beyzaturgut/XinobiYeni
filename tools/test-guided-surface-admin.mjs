@@ -8,6 +8,7 @@ const adminRequire = createRequire(path.resolve('apps/admin/package.json'));
 const { createServer } = await import(pathToFileURL(adminRequire.resolve('vite')).href);
 const { chromium } = require('@playwright/test');
 const sharp = createRequire(require.resolve('next/package.json'))('sharp');
+async function run() {
 const server = await createServer({ root: path.resolve('apps/admin'), configFile: path.resolve('apps/admin/vite.config.ts'), server: { host: '127.0.0.1', port: 5188, strictPort: true } });
 await server.listen();
 let browser;
@@ -21,6 +22,9 @@ try {
  const mask = await sharp(alpha, { raw: { width: 200, height: 300, channels: 4 } }).png().toBuffer();
  const colors = [{ variantId: 'blue', color: 'Mavi', image: '/test-blue.png', width: 200, height: 300 }, { variantId: 'red', color: 'Kırmızı', image: '/test-red.png', width: 200, height: 300 }, { variantId: 'small', color: 'Küçük', image: '/test-small.png', width: 100, height: 150 }];
  const failFirst = process.argv.includes('--provider-failure');
+ const expiredSession = process.argv.includes('--expired-session');
+ const failedRefresh = process.argv.includes('--failed-refresh');
+ let refreshes = 0;
  let draft = null, approved = false, segmentCalls = 0, approvals = 0, saves = 0;
  const detail = () => ({ productId: 'test', productName: 'Test ürün', variantId: 'blue', color: 'Mavi', image: colors[0].image, width: 200, height: 300, status: approved ? 'approved' : draft ? 'draft' : 'none', approvedMask: approved ? '/test-mask.png' : null, draft, provider: { configured: true, usedToday: segmentCalls, dailyLimit: 50 }, colors });
  await page.route('**/*', async route => {
@@ -28,6 +32,11 @@ try {
   if (!['127.0.0.1', 'localhost'].includes(u.hostname)) return route.abort();
   if (/^\/test-.*\.png$/.test(u.pathname)) return route.fulfill({ body: u.pathname.includes('mask') ? mask : photo, contentType: 'image/png' });
   if (u.pathname === '/api/v1/admin/session') return route.fulfill({ json: { account: { name: 'Test Admin' }, permissions: ['catalog.read', 'catalog.write', 'reports.read'] } });
+  if (u.pathname === '/api/v1/auth/admin/refresh') {
+   refreshes++; assert.equal(req.headers()['x-xinobi-csrf'], '1');
+   return route.fulfill({ status: failedRefresh ? 401 : 200, json: {} });
+  }
+  if (u.pathname === '/api/v1/auth/web/refresh') throw Error('Customer refresh must never be used for surface masking');
   const root = '/api/v1/local-commerce/surfaces';
   if (u.pathname === root) return route.fulfill({ json: colors.map(c => ({ ...c, productId: 'test', productName: 'Test ürün', status: approved ? 'approved' : 'none' })) });
   if (u.pathname === root + '/test/blue/draft.png') return route.fulfill({ body: mask, contentType: 'image/png' });
@@ -38,6 +47,7 @@ try {
     draft = { method: 'brush', prompt: null, score: null, updatedAt: '2026-10-16T10:00:00Z' };
    }
    if (u.pathname.endsWith('/segment')) {
+    if (expiredSession && (refreshes === 0 || failedRefresh)) return route.fulfill({ status: 401, json: {} });
     assert.equal(req.postDataJSON().useDraftGuide, true); assert.equal(req.postDataJSON().expectedDraftUpdatedAt, draft.updatedAt);
     segmentCalls++;
     if (failFirst && segmentCalls === 1) return route.fulfill({ status: 503, json: { message: 'Test sağlayıcı hatası' } });
@@ -66,6 +76,13 @@ try {
  page.on('dialog', dialog => dialog.accept());
  assert.equal(await generate.isEnabled(), true); // Unsaved brush strokes must be accepted directly.
  await generate.click();
+ if (failedRefresh) {
+  await page.getByText('Yönetici oturumun sona erdi.', { exact: false }).waitFor();
+  assert.equal(refreshes, 1); assert.equal(saves, 1); assert.equal(segmentCalls, 0);
+  assert.equal(await generate.isEnabled(), true);
+  console.log('PASS: expired staff refresh gives recovery instructions, saved guide preserved, zero inference, no customer refresh');
+  return;
+ }
  if (failFirst) {
   await page.getByText('Test sağlayıcı hatası', { exact: true }).waitFor();
   assert.equal(await generate.isEnabled(), true);
@@ -86,6 +103,9 @@ try {
  await page.waitForTimeout(150);
  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
  await approve.click(); await page.getByText('Ortak maske seçilen renklerde onaylandı.', { exact: false }).waitFor();
- assert.equal(segmentCalls, failFirst ? 2 : 1); assert.equal(saves, 1); assert.equal(approvals, 1); assert.deepEqual(errors, []);
+ assert.equal(segmentCalls, failFirst ? 2 : 1); assert.equal(saves, 1); assert.equal(approvals, 1); assert.deepEqual(errors, []); assert.equal(refreshes, expiredSession ? 1 : 0);
  console.log('PASS: brush guide, explicit inference, pattern/color preview, incompatible colour blocked, one approval for two colours, no browser errors');
 } finally { await browser?.close(); await server.close(); }
+
+}
+await run();

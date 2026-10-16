@@ -160,6 +160,8 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 **16.10 panel geri bildirimi:** Gri/pasif Roboflow düğmesi düzeltildi; ayrı fırça kaydı gerekmeden önce kaydet/sonra segment akışı, pasiflik nedeni ve hata sonrası tekrar güvenliği. [TST-122](../test/2026-10-16/TST-122-guided-mask-unsaved-brush.md); gerçek sağlayıcı çağrısı yapılmadı.
 
+**16.10 yüzey API 401:** Yüzey ekranına paylaşılan personel cookie yenilemesi eklendi; 401 sonrası tek refresh/tekrar, tam oturum kaybında boyamayı koruyan giriş açıklaması. [TST-123](../test/2026-10-16/TST-123-surface-admin-session-refresh.md); gerçek inference yok.
+
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |

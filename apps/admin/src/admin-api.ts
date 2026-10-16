@@ -2,6 +2,14 @@ import {commerceApi} from './commerce'
 
 let refreshing:Promise<boolean>|undefined
 
+// All panel modules renew staff cookies through this one shared request, never customer cookies.
+export async function refreshAdminSession():Promise<boolean>{
+ const api=commerceApi.replace(/\/local-commerce\/?$/,'')
+ if(!api)return false
+ refreshing??=fetch(api+'/auth/admin/refresh',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','X-Xinobi-Csrf':'1'},body:'{}',signal:AbortSignal.timeout(20000)}).then(value=>value.ok).catch(()=>false).finally(()=>{refreshing=undefined})
+ return refreshing
+}
+
 export async function adminCall<T>(path:string,body?:unknown):Promise<T>{
  const api=commerceApi.replace(/\/local-commerce\/?$/,'')
  if(!api)throw new Error('Yönetim API adresi yapılandırılmadı.')
@@ -12,8 +20,7 @@ export async function adminCall<T>(path:string,body?:unknown):Promise<T>{
   // The panel can remain open longer than the access cookie. Renew only through
   // the staff refresh endpoint, which still enforces the existing MFA grant.
   if(response.status===401&&path.startsWith('/admin/')){
-   refreshing??=fetch(api+'/auth/admin/refresh',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json','X-Xinobi-Csrf':'1'},body:'{}',signal:AbortSignal.timeout(20000)}).then(value=>value.ok).catch(()=>false).finally(()=>{refreshing=undefined})
-   if(await refreshing)response=await send()
+   if(await refreshAdminSession())response=await send()
   }
  }
  catch{throw new Error('Yönetim servisine ulaşılamadı. Lütfen daha sonra tekrar dene.')}

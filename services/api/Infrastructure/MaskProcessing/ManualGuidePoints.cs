@@ -3,7 +3,7 @@ using Xinobi.Api.Features.ProductSurfaces.Catalog;
 
 namespace Xinobi.Api.Infrastructure.MaskProcessing;
 
-/// <summary>Samples the interior of a rough painted guide, never its uncertain edge. No model training or final-mask clipping.</summary>
+/// <summary>Samples the interior of a rough painted guide, never its uncertain edge. Sampling only; final bounds are applied separately by GuidedMaskBounds.</summary>
 public static class ManualGuidePoints
 {
     public static SurfacePoint[] Sample(byte[] png)

@@ -164,6 +164,8 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 **16.10 Roboflow genel maske hatası:** Geçerli boş sonuç ile bozuk maske/yanıt ayrıldı; kısa metin hedefi açıklaması eklendi. [TST-124](../test/2026-10-16/TST-124-roboflow-empty-result-diagnostics.md), 59/59. Gerçek geçmiş çağrı kök nedeni belirlenmedi; yeni kredili çağrı yapılmadı.
 
+**16.10 boyama sınırı:** Elle gösterme çıktısı artık kılavuzla kesiştirilir; varsayılan tolerans 0, açık seçimle 0–16 kaynak pikseli. Örtüşmeyen sonuçta boyama korunur. [TST-125](../test/2026-10-16/TST-125-guided-mask-containment.md), 62/62 ve admin akışı başarılı. Önceki geniş AI taslakları değişmedi; gerçek kalite kabulü verilmedi.
+
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |

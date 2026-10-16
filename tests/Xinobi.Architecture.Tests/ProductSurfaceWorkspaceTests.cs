@@ -207,7 +207,8 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         var redId = "DEMO-V101-R";
         (await client.PutAsJsonAsync("/api/v1/local-commerce/products/DEMO-P101", product with
         { Variants = [.. product.Variants.Select(v => v.Id == redId ? v with { Image = reference.Image } : v)] })).EnsureSuccessStatusCode();
-        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
+        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = new[] { new { operation = "add", radius = 32, points = new[] { new { x = 450, y = 800 }, new { x = 650, y = 800 } } } }, @base = "empty" }));
+        var guideMask = await client.GetByteArrayAsync(Tea + "/draft.png");
         Assert.Empty(roboflow.Calls);
         var refined = await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt)));
         Assert.Equal("roboflow-guide", refined.Draft!.Method);
@@ -217,8 +218,12 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         var points = payload.RootElement.GetProperty("prompts").GetProperty("prompts")[0].GetProperty("points");
         Assert.InRange(points.GetArrayLength(), 1, 12);
         Assert.All(points.EnumerateArray(), point => Assert.True(point.GetProperty("positive").GetBoolean()));
-        // Provider output may extend beyond the rough guide: it is not clipped to the brush.
-        Assert.Equal(300 * 1600, Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")).Inside);
+        // The provider returns a huge stripe; only pixels in the guide survive.
+        var bounded = await client.GetByteArrayAsync(Tea + "/draft.png");
+        Assert.Equal(Coverage(guideMask).Inside, Coverage(bounded).Inside);
+        using (var guideBitmap = SKBitmap.Decode(guideMask))
+        using (var resultBitmap = SKBitmap.Decode(bounded))
+            Assert.All(resultBitmap.Pixels.Zip(guideBitmap.Pixels), pair => Assert.True(pair.First.Alpha == 0 || pair.Second.Alpha > 0));
         var colors = refined.Colors.Where(c => c.VariantId == reference.Id || c.VariantId == redId).ToArray();
         var approval = await Ok(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(colors, true, refined.Draft.UpdatedAt)));
         var detail = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P101"))!;
@@ -250,6 +255,42 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         var unchanged = await Ok(await client.GetAsync(Tea));
         Assert.Null(unchanged.ApprovedMask);
         Assert.NotNull(unchanged.Draft);
+    }
+
+    [Fact]
+    public async Task UnrelatedInferencePreservesPaintedGuideAndInvalidToleranceUsesNoCall()
+    {
+        using var factory = Factory();
+        using var client = await TestStaff.Client(factory);
+        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
+        var before = await client.GetByteArrayAsync(Tea + "/draft.png");
+        Assert.Equal("invalid_guide_tolerance", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt, 99))));
+        Assert.Empty(roboflow.Calls);
+        Assert.Equal("guide_no_overlap", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft.UpdatedAt))));
+        Assert.Equal(before, await client.GetByteArrayAsync(Tea + "/draft.png"));
+        Assert.Single(roboflow.Calls);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(3)]
+    public void GuidedMaskCannotEscapeExplicitTolerance(int tolerance)
+    {
+        using var guide = new SKBitmap(80, 80);
+        using var candidate = new SKBitmap(80, 80);
+        guide.Erase(SKColors.Transparent); candidate.Erase(SKColors.Transparent);
+        for (var y = 30; y < 50; y++) for (var x = 30; x < 50; x++) guide.SetPixel(x, y, SKColors.White);
+        for (var y = 10; y < 70; y++) for (var x = 10; x < 70; x++) candidate.SetPixel(x, y, SKColors.White);
+        using var guidePng = guide.Encode(SKEncodedImageFormat.Png, 100);
+        using var candidatePng = candidate.Encode(SKEncodedImageFormat.Png, 100);
+        var source = new Xinobi.Api.Infrastructure.MediaValidation.AlignedImageInspector().InspectSource(candidatePng.ToArray(), "test");
+        var result = Xinobi.Api.Infrastructure.MaskProcessing.GuidedMaskBounds.Apply(candidatePng.ToArray(), guidePng.ToArray(), source, tolerance);
+        using var bitmap = SKBitmap.Decode(result);
+        for (var y = 0; y < 80; y++) for (var x = 0; x < 80; x++)
+        {
+            var distance = Math.Max(30 - x, Math.Max(0, x - 49)) + Math.Max(30 - y, Math.Max(0, y - 49));
+            Assert.Equal(distance <= tolerance, bitmap.GetPixel(x, y).Alpha == 255);
+        }
     }
 
     [Fact]

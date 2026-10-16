@@ -23,7 +23,7 @@ public sealed record SurfaceApprovalRequest(SurfaceColor[] Colors, bool SamePlac
 
 public sealed record SurfaceProviderStatus(bool Configured, int UsedToday, int DailyLimit);
 
-public sealed record SurfaceSegmentRequest(string? Prompt, SurfacePoint[]? Points, bool UseDraftGuide = false, DateTimeOffset? ExpectedDraftUpdatedAt = null);
+public sealed record SurfaceSegmentRequest(string? Prompt, SurfacePoint[]? Points, bool UseDraftGuide = false, DateTimeOffset? ExpectedDraftUpdatedAt = null, int GuideTolerancePixels = 0);
 public sealed record SurfacePoint(double X, double Y, bool Keep);
 /// <summary><c>Base</c>: "draft" (default when one exists), "approved" or "empty".</summary>
 public sealed record SurfaceStrokeRequest(SurfaceStroke[] Strokes, string? Base);
@@ -150,13 +150,16 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         var prompt = request.Prompt?.Trim();
         var points = request.Points ?? [];
         SurfaceDraft? guide = null;
+        byte[]? guideBytes = null;
         if (request.UseDraftGuide)
         {
+            if (request.GuideTolerancePixels is < 0 or > 16) throw new SurfaceException("invalid_guide_tolerance", "Kenar toleransı 0–16 kaynak pikseli olmalı.");
             if (points.Length > 0 || !string.IsNullOrEmpty(prompt)) throw new SurfaceException("guide_exclusive", "Kılavuz ile tarif/nokta isteği birleştirilemez.");
             guide = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)))
                 ?? throw new SurfaceException("draft_not_found", "Önce bölgeyi fırçayla boyayıp taslağı kaydedin.");
             if (guide.UpdatedAt != request.ExpectedDraftUpdatedAt) throw new SurfaceException("draft_changed", "Kılavuz değişti; güncel taslağı inceleyin.", 409);
-            points = ManualGuidePoints.Sample(await File.ReadAllBytesAsync(DraftPath(guide.MaskFile)));
+            guideBytes = await File.ReadAllBytesAsync(DraftPath(guide.MaskFile));
+            points = ManualGuidePoints.Sample(guideBytes);
         }
         if (points.Length == 0 && string.IsNullOrEmpty(prompt)) throw new SurfaceException("prompt_required", "Bir tarif (ör. \"kettle body\") yaz ya da fotoğrafta nokta seç.");
         if (prompt is { Length: > 120 }) throw new SurfaceException("prompt_too_long", "Tarif en fazla 120 karakter olabilir.");
@@ -198,7 +201,9 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
             var currentGuide = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)));
             if (currentGuide != guide) throw new SurfaceException("draft_changed", "Kılavuz işlem sırasında değişti; sonuç kaydedilmedi.", 409);
         }
-        return await SaveDraft(product, variant, source, buffer.Bytes(candidate.Mask.AssetReference), request.UseDraftGuide ? "roboflow-guide" : points.Length == 0 ? "roboflow-text" : "roboflow-points", prompt, candidate.Score?.Value, guide);
+        var mask = buffer.Bytes(candidate.Mask.AssetReference);
+        if (guideBytes is not null) mask = GuidedMaskBounds.Apply(mask, guideBytes, source, request.GuideTolerancePixels);
+        return await SaveDraft(product, variant, source, mask, request.UseDraftGuide ? "roboflow-guide" : points.Length == 0 ? "roboflow-text" : "roboflow-points", prompt, candidate.Score?.Value, guide);
     }
 
     /// <summary>Brush corrections (add/remove) on the draft, the approved mask or an empty canvas. The result becomes the draft.</summary>

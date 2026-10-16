@@ -48,7 +48,7 @@ try {
    }
    if (u.pathname.endsWith('/segment')) {
     if (expiredSession && (refreshes === 0 || failedRefresh)) return route.fulfill({ status: 401, json: {} });
-    assert.equal(req.postDataJSON().useDraftGuide, true); assert.equal(req.postDataJSON().expectedDraftUpdatedAt, draft.updatedAt);
+    assert.equal(req.postDataJSON().useDraftGuide, true); assert.equal(req.postDataJSON().guideTolerancePixels, 0); assert.equal(req.postDataJSON().expectedDraftUpdatedAt, draft.updatedAt);
     segmentCalls++;
     if (failFirst && segmentCalls === 1) return route.fulfill({ status: 503, json: { message: 'Test sağlayıcı hatası' } });
     draft = { ...draft, method: 'roboflow-guide', updatedAt: '2026-10-16T10:00:01Z' };

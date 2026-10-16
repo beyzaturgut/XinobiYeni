@@ -7,9 +7,11 @@ Amaç: Yeni ürünün bir referans renginde kaba boyama yapıp Roboflow SAM3 ile
 1. Geliştirme panelinde **Ürün yüzeyi incele → Elle gösterilen ortak ürün maskesini dene**.
 2. Referans rengi seç. Fırçayla uygulanacak bölgenin içini dolu olarak boya. İnce bir çevre çizgisi yeterli değildir.
 3. **Boyadığım bölgeyi Roboflow ile bul**. Bekleyen çizgiler otomatik kaydedilir. Bu açık işlem fotoğrafı ve en fazla 12 iç noktayı `/sam3/visual_segment` çağrısına gönderir. Çizim yapmak ve renk seçmek çağrı yapmaz; bu model eğitimi değildir.
-4. Dönen taslağı incele, gerekirse fırça veya dahil/hariç noktalarıyla düzelt. Kaba boyama sınırı AI sonucunu kesmez. İçten örnekleme ince kenar taşmalarını azaltmaya yardımcı olur; kusursuz semantik sınır garantisi vermez. Kulp, ağız, metal ve logo alanları kontrol edilir.
+4. Dönen taslağı incele, gerekirse fırça veya dahil/hariç noktalarıyla düzelt. AI sonucu kaba boyamanın izin verdiği alanla kesiştirilir. Varsayılan kenar toleransı 0: boyamanın dışına çıkamaz. İsteğe bağlı 0–16 kaynak pikseli Manhattan toleransı küçük genişlemeye izin verir; tolerans artarsa korunan boşluklar da daralabilir. İçten örnekleme ince kenar taşmalarını azaltmaya yardımcı olur; kusursuz semantik sınır garantisi vermez. AI ile boyama yeterince örtüşmezse taslak değiştirilmeden hata döner. Kulp, ağız, metal ve logo alanları kontrol edilir.
 5. **Maske içinde örnek desen göster** ile alanı kontrol et. **Önizleme rengi** ile diğer renk fotoğraflarındaki aynı koordinatları incele.
 6. Uygulanacak renkleri seç; aynı konum/ölçek/açı ve sınır incelemesini işaretle; **Seçilen renklerde onayla**. Seçili renklerin mevcut maskeleri tek katalog güncellemesinde değiştirilir. Ek inference yoktur.
+
+Daha önce genişlemiş AI taslağı yeni kılavuz olarak kullanılmamalıdır. Yeni sınırlandırmayı denemek için o taslağı silip istenen bölgeyi yeniden boyayın; önceki boyamanın hatlarını son AI sonucundan otomatik geri çıkaramayız.
 
 ## Koşullar ve veri
 

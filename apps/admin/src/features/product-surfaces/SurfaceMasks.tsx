@@ -71,6 +71,7 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
   const [strokes, setStrokes] = useState<MaskStroke[]>([]), [erase, setErase] = useState(false), [radius, setRadius] = useState(24)
   const [base, setBase] = useState<ImageData | null>(null), [showing, setShowing] = useState<'draft' | 'approved'>('draft')
   const canvas = useRef<HTMLCanvasElement>(null), stage = useRef<HTMLImageElement>(null)
+  const [guideTolerance, setGuideTolerance] = useState(0)
   const [patternPreview, setPatternPreview] = useState(false), [previewColor, setPreviewColor] = useState(variantId)
   const [colors, setColors] = useState<string[]>([variantId]), [samePlacement, setSamePlacement] = useState(false)
   const [active, setActive] = useState<MaskStroke | null>(null)
@@ -162,14 +163,15 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
           <div className="surface-row-actions"><button className="primary" disabled={!canBrush} onClick={() => run('Uygulanıyor…', () => request<Detail>(`${path}/strokes`, 'POST', { strokes, base: basis }), 'Fırça düzeltmeleri taslağa uygulandı.')}>Düzeltmeleri uygula</button><button disabled={!strokes.length} onClick={() => setStrokes(current => current.slice(0, -1))}>Son çizgiyi geri al</button></div></div>}
         <div className="surface-panel">
           <h3>Elle göster → Roboflow ile sınırları bul</h3>
-          <p>Bölgeyi boya ve aşağıdaki düğmeye bas. Çizimin önce kaydedilir; Roboflow içinden alınan işaretlerle ürün fotoğrafındaki bölgeyi yeniden çıkarır. Kaba fırça sınırı son maskeyi kesmez; sonucu inceleyip gerekirse düzelt.</p>
+          <p>Bölgeyi boya ve aşağıdaki düğmeye bas. Çizimin önce kaydedilir; Roboflow içinden alınan işaretlerle ürün fotoğrafındaki bölgeyi yeniden çıkarır. Sonuç boyadığın alanla sınırlandırılır. Tolerans 0 iken çizimin dışına çıkmaz; küçük kenar düzeltmeleri için toleransı artırabilirsin.</p>
+          <label>Kenar toleransı: {guideTolerance} kaynak pikseli<input type="range" min={0} max={16} value={guideTolerance} disabled={!!busy} onChange={event => setGuideTolerance(Number(event.target.value))} /></label>
           <button className="primary" disabled={!!busy || !!active || (!strokes.length && !detail.draft) || !detail.provider.configured} onClick={() => {
             if (window.confirm('Ürün fotoğrafı ve boyanan bölgenin iç işaretleri Roboflow’a gönderilecek; kredi kullanılabilir. Sınırları bulalım mı?'))
               void run('Roboflow sınırları buluyor…', async () => {
                 const guide = strokes.length ? await request<Detail>(`${path}/strokes`, 'POST', { strokes, base: basis }) : detail
                 // Keep the successfully saved guide when inference fails; retry must not apply strokes twice.
                 if (strokes.length) { setDetail(guide); setStrokes([]) }
-                return request<Detail>(`${path}/segment`, 'POST', { useDraftGuide: true, expectedDraftUpdatedAt: guide.draft!.updatedAt })
+                return request<Detail>(`${path}/segment`, 'POST', { useDraftGuide: true, expectedDraftUpdatedAt: guide.draft!.updatedAt, guideTolerancePixels: guideTolerance })
               }, 'Roboflow taslağı hazır. Kenarları, kulpu ve logoyu kontrol et; ardından renkleri seçip onayla.')
           }}>Boyadığım bölgeyi Roboflow ile bul</button>
           {!detail.provider.configured ? <p className="surface-hint">Roboflow anahtarı tanımlı değil; bu işlem için sunucu ayarı gerekiyor.</p>

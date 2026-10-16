@@ -84,6 +84,8 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 
 **16.10 ortak maske denemesi:** Kaba fırça kılavuzundan iç noktalarla Roboflow visual aday üretimi, seçili aynı konumdaki renklere tek onay, örnek desen/renk önizlemesi ve web Development rendering köprüsü eklendi. [Akış ve sınırlar](../docs/runbooks/guided-shared-product-mask.md), [TST-121](../test/2026-10-16/TST-121-guided-shared-mask.md). Gerçek AI kenar kalitesi denenmedi; %45 tahmini ve faz kabulü değişmedi.
 
+**16.10 boyama sınırı:** Elle gösterme çıktısı artık kılavuzla kesiştirilir; varsayılan tolerans 0, açık seçimle 0–16 kaynak pikseli. Örtüşmeyen sonuçta boyama korunur. [TST-125](../test/2026-10-16/TST-125-guided-mask-containment.md), 62/62 ve admin akışı başarılı. Önceki geniş AI taslakları değişmedi; gerçek kalite kabulü verilmedi.
+
 **Sonraki adım:** D04 baskı ölçülerini almak; T-04 tuval birimini karara bağlamak.
 
 ## 6. Yedi rol inceleme ve PM nihai onayı

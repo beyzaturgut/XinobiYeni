@@ -199,3 +199,5 @@
 - 16.10.2026 · [TST-123 yüzey API 401](2026-10-16/TST-123-surface-admin-session-refresh.md) — Tek personel refresh ve özgün isteği bir kez tekrar; refresh reddinde boyamayı koruyan giriş yönlendirmesi. İki izole tarayıcı senaryosu, admin build/lint başarılı.
 
 - 16.10.2026 · [TST-124 Roboflow boş sonuç ayrımı](2026-10-16/TST-124-roboflow-empty-result-diagnostics.md) — Boş eşleşme/bozuk maske/bozuk şema ayrı mesajlar, kısa tarif açıklaması; 59/59 sahte sağlayıcı testi ve admin build/lint geçti. Geçmiş gerçek hatanın nedeni kesinleşmedi, yeni inference yok.
+
+- 16.10.2026 · [TST-125 boyama dışına taşmayı sınırlama](2026-10-16/TST-125-guided-mask-containment.md) — AI sonucu kılavuz ve 0–16 piksel açık toleransla sınırlı; boş örtüşmede taslak korunur. 62/62 ve izole admin tarayıcı testi geçti, gerçek inference yok.

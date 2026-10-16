@@ -5,8 +5,8 @@ Amaç: Yeni ürünün bir referans renginde kaba boyama yapıp Roboflow SAM3 ile
 ## Panel akışı
 
 1. Geliştirme panelinde **Ürün yüzeyi incele → Elle gösterilen ortak ürün maskesini dene**.
-2. Referans rengi seç. Fırçayla uygulanacak bölgenin içini dolu olarak boya; **Düzeltmeleri uygula**. İnce bir çevre çizgisi yeterli değildir.
-3. **Boyadığım bölgeyi Roboflow ile bul**. Bu açık işlem fotoğrafı ve en fazla 12 iç noktayı `/sam3/visual_segment` çağrısına gönderir. Çizim yapmak ve renk seçmek çağrı yapmaz; bu model eğitimi değildir.
+2. Referans rengi seç. Fırçayla uygulanacak bölgenin içini dolu olarak boya. İnce bir çevre çizgisi yeterli değildir.
+3. **Boyadığım bölgeyi Roboflow ile bul**. Bekleyen çizgiler otomatik kaydedilir. Bu açık işlem fotoğrafı ve en fazla 12 iç noktayı `/sam3/visual_segment` çağrısına gönderir. Çizim yapmak ve renk seçmek çağrı yapmaz; bu model eğitimi değildir.
 4. Dönen taslağı incele, gerekirse fırça veya dahil/hariç noktalarıyla düzelt. Kaba boyama sınırı AI sonucunu kesmez. İçten örnekleme ince kenar taşmalarını azaltmaya yardımcı olur; kusursuz semantik sınır garantisi vermez. Kulp, ağız, metal ve logo alanları kontrol edilir.
 5. **Maske içinde örnek desen göster** ile alanı kontrol et. **Önizleme rengi** ile diğer renk fotoğraflarındaki aynı koordinatları incele.
 6. Uygulanacak renkleri seç; aynı konum/ölçek/açı ve sınır incelemesini işaretle; **Seçilen renklerde onayla**. Seçili renklerin mevcut maskeleri tek katalog güncellemesinde değiştirilir. Ek inference yoktur.

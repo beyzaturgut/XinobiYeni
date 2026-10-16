@@ -157,11 +157,19 @@ function SurfaceEditor({ productId, variantId, onChanged }: { productId: string;
           <div className="surface-row-actions"><button className="primary" disabled={!canBrush} onClick={() => run('Uygulanıyor…', () => request<Detail>(`${path}/strokes`, 'POST', { strokes, base: basis }), 'Fırça düzeltmeleri taslağa uygulandı.')}>Düzeltmeleri uygula</button><button disabled={!strokes.length} onClick={() => setStrokes(current => current.slice(0, -1))}>Son çizgiyi geri al</button></div></div>}
         <div className="surface-panel">
           <h3>Elle göster → Roboflow ile sınırları bul</h3>
-          <p>Önce fırça çizgilerini uygula. Roboflow çizimin içinden alınan işaretlerle ürün fotoğrafındaki bölgeyi yeniden çıkarır. Kaba fırça sınırı son maskeyi kesmez; sonucu inceleyip gerekirse düzelt.</p>
-          <button className="primary" disabled={!!busy || !!active || strokes.length > 0 || !detail.draft || !detail.provider.configured} onClick={() => {
+          <p>Bölgeyi boya ve aşağıdaki düğmeye bas. Çizimin önce kaydedilir; Roboflow içinden alınan işaretlerle ürün fotoğrafındaki bölgeyi yeniden çıkarır. Kaba fırça sınırı son maskeyi kesmez; sonucu inceleyip gerekirse düzelt.</p>
+          <button className="primary" disabled={!!busy || !!active || (!strokes.length && !detail.draft) || !detail.provider.configured} onClick={() => {
             if (window.confirm('Ürün fotoğrafı ve boyanan bölgenin iç işaretleri Roboflow’a gönderilecek; kredi kullanılabilir. Sınırları bulalım mı?'))
-              void run('Roboflow sınırları buluyor…', () => request<Detail>(`${path}/segment`, 'POST', { useDraftGuide: true, expectedDraftUpdatedAt: detail.draft!.updatedAt }), 'Roboflow taslağı hazır. Kenarları, kulpu ve logoyu kontrol et; ardından renkleri seçip onayla.')
+              void run('Roboflow sınırları buluyor…', async () => {
+                const guide = strokes.length ? await request<Detail>(`${path}/strokes`, 'POST', { strokes, base: basis }) : detail
+                // Keep the successfully saved guide when inference fails; retry must not apply strokes twice.
+                if (strokes.length) { setDetail(guide); setStrokes([]) }
+                return request<Detail>(`${path}/segment`, 'POST', { useDraftGuide: true, expectedDraftUpdatedAt: guide.draft!.updatedAt })
+              }, 'Roboflow taslağı hazır. Kenarları, kulpu ve logoyu kontrol et; ardından renkleri seçip onayla.')
           }}>Boyadığım bölgeyi Roboflow ile bul</button>
+          {!detail.provider.configured ? <p className="surface-hint">Roboflow anahtarı tanımlı değil; bu işlem için sunucu ayarı gerekiyor.</p>
+            : !strokes.length && !detail.draft ? <p className="surface-hint">Düğmeyi açmak için önce uygulanacak bölgeyi fırçayla boya.</p>
+            : active ? <p className="surface-hint">Boyamayı bitirmek için fareyi veya parmağını bırak.</p> : null}
         </div>
         <div className="surface-panel">
           <label><input type="checkbox" checked={patternPreview} onChange={event => setPatternPreview(event.target.checked)} />Maske içinde örnek desen göster</label>

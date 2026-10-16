@@ -193,3 +193,5 @@
 - 16.10.2026 · [Faz kayıtları belge denetimi](2026-10-16/REP-20261016-phase-document-audit.md) — Faz00–11 oran tutarlılığı, commit eşlemesi, dosya bağlantıları ve diff kontrolü; yeni uygulama test koşusu yok.
 
 - 16.10.2026 · [TST-121 kaba kılavuz ve ortak renk maskesi](2026-10-16/TST-121-guided-shared-mask.md) — İç noktalardan sahte SAM3 visual, tek maskeyi seçili renklere tek onayla aktarım; .NET 422/23 atlandı/0, admin tarayıcı akışı ve web adapter kontrolü. Gerçek inference yok.
+
+- 16.10.2026 · [TST-122 pasif Roboflow düğmesi](2026-10-16/TST-122-guided-mask-unsaved-brush.md) — Kaydedilmemiş boyamadan tek düğmeyle kaydet/segment; sağlayıcı hatasında kılavuz korunur, tekrar boyama uygulanmaz. İzole tarayıcı normal/hata senaryoları, admin build/lint başarılı.

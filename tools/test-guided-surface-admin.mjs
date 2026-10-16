@@ -20,7 +20,8 @@ try {
  for (let y = 80; y < 260; y++) for (let x = 40; x < 160; x++) alpha.set([255, 255, 255, 255], (y * 200 + x) * 4);
  const mask = await sharp(alpha, { raw: { width: 200, height: 300, channels: 4 } }).png().toBuffer();
  const colors = [{ variantId: 'blue', color: 'Mavi', image: '/test-blue.png', width: 200, height: 300 }, { variantId: 'red', color: 'Kırmızı', image: '/test-red.png', width: 200, height: 300 }, { variantId: 'small', color: 'Küçük', image: '/test-small.png', width: 100, height: 150 }];
- let draft = null, approved = false, segmentCalls = 0, approvals = 0;
+ const failFirst = process.argv.includes('--provider-failure');
+ let draft = null, approved = false, segmentCalls = 0, approvals = 0, saves = 0;
  const detail = () => ({ productId: 'test', productName: 'Test ürün', variantId: 'blue', color: 'Mavi', image: colors[0].image, width: 200, height: 300, status: approved ? 'approved' : draft ? 'draft' : 'none', approvedMask: approved ? '/test-mask.png' : null, draft, provider: { configured: true, usedToday: segmentCalls, dailyLimit: 50 }, colors });
  await page.route('**/*', async route => {
   const req = route.request(), u = new URL(req.url());
@@ -33,12 +34,14 @@ try {
   if (u.pathname.startsWith(root + '/test/blue')) {
    assert.equal(req.headers()['x-xinobi-csrf'], '1');
    if (u.pathname.endsWith('/strokes')) {
-    assert.ok(req.postDataJSON().strokes.length > 0); assert.equal(segmentCalls, 0);
+    saves++; assert.ok(req.postDataJSON().strokes.length > 0); assert.equal(segmentCalls, 0);
     draft = { method: 'brush', prompt: null, score: null, updatedAt: '2026-10-16T10:00:00Z' };
    }
    if (u.pathname.endsWith('/segment')) {
     assert.equal(req.postDataJSON().useDraftGuide, true); assert.equal(req.postDataJSON().expectedDraftUpdatedAt, draft.updatedAt);
-    segmentCalls++; draft = { ...draft, method: 'roboflow-guide', updatedAt: '2026-10-16T10:00:01Z' };
+    segmentCalls++;
+    if (failFirst && segmentCalls === 1) return route.fulfill({ status: 503, json: { message: 'Test sağlayıcı hatası' } });
+    draft = { ...draft, method: 'roboflow-guide', updatedAt: '2026-10-16T10:00:01Z' };
    }
    if (u.pathname.endsWith('/approval/colors')) {
     const input = req.postDataJSON(); assert.equal(input.samePlacementConfirmed, true);
@@ -59,10 +62,15 @@ try {
  const stage = page.locator('.surface-stage'); const box = await stage.boundingBox();
  await page.mouse.move(box.x + box.width * .45, box.y + box.height * .5);
  await page.mouse.down(); await page.mouse.move(box.x + box.width * .55, box.y + box.height * .6, { steps: 6 }); await page.mouse.up();
- await page.getByRole('button', { name: 'Düzeltmeleri uygula', exact: true }).click();
  const generate = page.getByRole('button', { name: 'Boyadığım bölgeyi Roboflow ile bul' }); await generate.waitFor();
  page.on('dialog', dialog => dialog.accept());
+ assert.equal(await generate.isEnabled(), true); // Unsaved brush strokes must be accepted directly.
  await generate.click();
+ if (failFirst) {
+  await page.getByText('Test sağlayıcı hatası', { exact: true }).waitFor();
+  assert.equal(await generate.isEnabled(), true);
+  await generate.click();
+ }
  await page.getByText('Roboflow taslağı hazır.', { exact: false }).waitFor();
  await page.getByLabel('Maske içinde örnek desen göster').check();
  await page.getByLabel('Önizleme rengi').selectOption('red');
@@ -78,6 +86,6 @@ try {
  await page.waitForTimeout(150);
  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
  await approve.click(); await page.getByText('Ortak maske seçilen renklerde onaylandı.', { exact: false }).waitFor();
- assert.equal(segmentCalls, 1); assert.equal(approvals, 1); assert.deepEqual(errors, []);
+ assert.equal(segmentCalls, failFirst ? 2 : 1); assert.equal(saves, 1); assert.equal(approvals, 1); assert.deepEqual(errors, []);
  console.log('PASS: brush guide, explicit inference, pattern/color preview, incompatible colour blocked, one approval for two colours, no browser errors');
 } finally { await browser?.close(); await server.close(); }

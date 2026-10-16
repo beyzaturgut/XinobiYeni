@@ -46,7 +46,7 @@ Yönetim uçları (yalnız role dayalı yetki): `GET /api/v1/admin/marketplaces/
 
 `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` içinde her kanalın `mock/sandbox/live`, mağaza/erişim kararı, son güvenli commit, migration, son başarılı cursor, bekleyen inbox/outbox, başarısız iş ve kayıtlı düzeltme adımını oku. `git status` ve DB migration durumunu karşılaştır. Önce işin tekrar anahtarını/dış sipariş ID'sini ve sağlayıcı son durumunu doğrula; doğrudan kör replay yapma. Karantinadaki SKU eşlemesini düzelt, tek işi çalıştır, sonuç/kanıt ve sıradaki adımı Faz00'a yaz. Bir kanaldaki tamamlanma diğerlerine taşınmaz.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 

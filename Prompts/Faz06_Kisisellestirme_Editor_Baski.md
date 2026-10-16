@@ -1,6 +1,6 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
-**Durum (14.10.2026):** Bloke (D04) · geliştirme ~40 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
+**Durum (16.10.2026):** Bloke (D04) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
 
 ## 1. Amaç, bağımlılık, karar kapısı
 
@@ -63,11 +63,13 @@ Analiz2 K-12 ve K-14–K-21 için Web Designer iki ayrı giriş yolunu tasarlar:
 
 **Teslim kanıtı:** Creative tasarım dosyası/prototip ve FE teslim notu; D04 fiziksel ölçü/çıktı profili kararı; migration/OpenAPI/JSON şema; geometri ve render karşılaştırma vektörleri; ekran ve panel kaydı; örnek sipariş satırı/sürüm/çıktı hash'i; erişim, eşzamanlılık, hatadan dönüş test raporu; Faz00 commit/karar/sonraki adım girdisi.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~40 % · kalan ~60 % · Statü: Bloke (D04, T-04)**
+**Geliştirme ~45 % · kalan ~55 % · Statü: Bloke (D04, T-04)**
+
+**16.10 güncellemesi (kod/commit incelemesi):** Görsel yükleme optimizasyonu, varyantlar arasında kompozisyonun korunması, editör → Tasarımlarım → sepet boyunca fotoğraf yerleşiminin web/mobilde taşınması eklendi (`62f971a`, `865f20a`, `8d99783`, `f4adc49`). HTTP tasarım oturumu ve herkese açık katalog önizlemesi düzeltildi (`19ac66f`). Baskı sürümü/PrintArea/çıktı kabulü açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | İş | Durum | Kanıt / eksik |
 |---|---|---|

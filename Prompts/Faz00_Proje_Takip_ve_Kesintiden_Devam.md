@@ -122,37 +122,39 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-14 · Claude Code; 09.10 17:28 – 13.10 17:36 kayıt açığı (31 commit) geri dolduruldu, faz denetimi yapıldı (TST-115) |
+| Son güncelleme ve sorumlu | 2026-10-16 · Codex; `880cff0..f4adc49` commitleri fazlara işlendi; belge/kod incelemesi, yeni uygulama testi yok |
 | Aktif faz/görev ID | **Faz06/10 XINOBI U ve kişiselleştirilmiş sepet**: tasarım ekranlarından sepete ekleme, sepette ürün üzerinde tasarım (web+mobil), mobil onaylı yüzeyler webin yayımlanmış paketinden. **Faz03 03.11 canlı**: IIS’te SQL katalog, HTTPS ARR altında API (DEPLOY-008–010 hazırlandı). Faz02 web onayı ertelendi (F02-A17) |
-| Repo/branch/HEAD | `main` · uygulama kodu `b1573d0`; `feature/xinobi-u-unified-ai-qa` üç kez main’e alındı (`b38d13d`, `57a1969`, `74032cd`) · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
+| Repo/branch/HEAD | `main` · uygulama kodu `f4adc49`; `feature/xinobi-u-unified-ai-qa` üç kez main’e alındı (`b38d13d`, `57a1969`, `74032cd`) · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
 | Geliştirme/test/canlı ortamları | macOS + Docker’sız CI; uzak SQL Server 2022 Express `XinobiYeniDB` üzerinde 0001–0005 migration’ları uygulandı, yerel API SQL’den okuyor (TST-113/114); canlı önizleme IIS `109.104.120.91` HTTPS 443 (web/admin) + loopback ARR ile API 8024 |
 | Son çalışan uygulama komutu/URL | `pnpm dev:local:background` (API 5003, web 3000, admin 5173; log `/tmp/xinobi-local.log`); mobil `flutter run -d emulator-5554` (Pixel_8). Son hazırlanan paketler DEPLOY-008 (`d1639f6` web+API), DEPLOY-009 (`42dc4d8`), DEPLOY-010 (`dfbc972`); **uzak IIS uygulaması ve canlı smoke kaydı yok** |
 | Son test komutu ve sonucu | TST-120 (14.10): tam web e2e **119 geçti / 0 başarısız / 1 atlandı**. TST-117: .NET 389/14/0, Flutter 56/56. TST-115 (14.10, HEAD `b1573d0`): .NET 385 geçti / 13 atlandı / 0 başarısız; Flutter, lint ve TypeScript sonuçları raporda. Önceki: TST-114 .NET 341/4/0, Flutter 50/50; TST-108 web e2e 107/107 |
-| Değişen dosyalar / migration | Migration’lar 0001 InitialCore, 0002 CatalogCommerce, 0003 CustomerIdentityOrders, 0004 FeatureDocuments, 0005 OrderLinePersonalization — **hepsi XinobiYeniDB’ye uygulandı**. 10–13 Ekim’de yeni migration yok |
-| Aktif hata/yarım iş | DEPLOY-008–010 uzak sunucuda uygulanmadı (canlı `/api/v1/assistant/config` 503 `feature_unavailable`, `Features:StorageProvider=SqlServer` bekliyor); yedek VERIFYONLY/restore provası yapılmadı; AuditLog yazımı (03.06), parola sıfırlama, ödeme (D03/D05), baskı alanı/çıktısı (D04/T-04), Mikro ve pazaryerleri yok; `design/a11y-audit.md` yok; §7 rol/PM onayları boş |
-| Sonraki en küçük güvenli adım | DEPLOY-008→010 paketlerini RDP’de yedekleyip uygulamak ve canlı smoke’u DEPLOY kaydına yazmak; kod tarafında 03.03 parola sıfırlama, sonra sitemap/SEO ve `design/a11y-audit.md`. Karar tarafında D03 (ödeme) ve D04 (baskı ölçüsü) sahipleri ve hedef tarihleri |
+| Değişen dosyalar / migration | Migration’lar 0001 InitialCore, 0002 CatalogCommerce, 0003 CustomerIdentityOrders, 0004 FeatureDocuments, 0005 OrderLinePersonalization — **hepsi XinobiYeniDB’ye uygulandı**. Ek olarak 0006–0009 migration dosyaları hazır; hedef SQL uygulaması doğrulanmadı |
+| Aktif hata/yarım iş | DEPLOY-008–011 uzak uygulama/smoke kanıtı eksik (önceki Nobi 503 bulgusunun güncel durumu doğrulanmadı); yedek VERIFYONLY/restore provası yapılmadı; AuditLog kapsam doğrulaması (03.06), ödeme (D03/D05), baskı alanı/çıktısı (D04/T-04), Mikro ve pazaryerleri yok; `design/a11y-audit.md` yok; §7 rol/PM onayları boş |
+| Sonraki en küçük güvenli adım | DEPLOY-008→010 paketlerini RDP’de yedekleyip uygulamak ve canlı smoke’u DEPLOY kaydına yazmak; kod tarafında yönetici daveti/MFA ve favori eşitlemesini güncel ortamda doğrulamak, ürün bazlı SEO ve `design/a11y-audit.md`. Karar tarafında D03 (ödeme) ve D04 (baskı ölçüsü) sahipleri ve hedef tarihleri |
 | Geri alma / devam noktası | `b1573d0` (TST-115 ile doğrulanmış HEAD); SQL’de 5 migration, geri alma script’leri `infra/db/migrations`; Cloudflare’a yeni çağrı yapılmadı |
 
-### 5.1 Faz ilerleme ve eksik özeti — 14.10.2026
+### 5.1 Faz ilerleme ve eksik özeti — 16.10.2026
 
-**Ölçüm kuralı:** "Geliştirme %" her faz dosyasındaki görev listesinin kod/belge/test kanıtına göre tahminidir (tamam = 1, kısmi = 0,5 civarı, yok/bloke = 0). "Kabul" §7’deki rol + PM kapısıdır. **Hiçbir faz kabul edilmedi; bu nedenle resmi olarak tamamen biten faz yoktur.** Ayrıntılı görev tabloları ilgili faz dosyasının "Uygulama durumu — 14.10.2026" bölümündedir.
+**Ölçüm kuralı:** "Geliştirme %" her faz dosyasındaki görev listesinin kod/belge/test kanıtına göre tahminidir (tamam = 1, kısmi = 0,5 civarı, yok/bloke = 0). "Kabul" §7’deki rol + PM kapısıdır. **Hiçbir faz kabul edilmedi; bu nedenle resmi olarak tamamen biten faz yoktur.** Ayrıntılı görev tabloları ilgili faz dosyasının "Uygulama durumu — 16.10.2026" bölümündedir.
 
 | Faz | Geliştirme % | Kalan % | Statü | Başlıca eksikler |
 |---|---|---|---|---|
 | 00 | 85 | 15 | Devam | Takvim/sprint tablosu boş; D kararlarına sahip ve hedef tarih yazılmadı; §7 rol/PM kayıtları boş |
 | 01 | 45 | 55 | Bloke (müşteri kararları) | D02–D14 açık (D01 kısmi); gerçek as-is görüşme kanıtı, takvim (01.15), veri/geçiş envanteri (01.17), kalite/maliyet hedefleri (01.18) yok |
 | 02 | 60 | 40 | Devam | `design/a11y-audit.md` yok (F02-A07); gerçek cihaz ve ekran okuyucu QA (A01/A02/A16); WEB-001 dışındaki ekran kaynakları (A08); mobil referans ekranlar (A10); BRIEF/ORTAK/WEB TASARIM onayları kayıtsız, A17 ertelendi |
-| 03 | 71 | 29 | Devam | 03.06 alan bazlı önce/sonra farkı (yazım ve okuma 14.10’da eklendi, TST-116); yönetici daveti yok (parola sıfırlama 14.10, TST-117); inbox/dead-letter ve ayrı worker işlevsiz (şablon); zararlı dosya taraması (T-07); yedek doğrulama/restore provası; T-08/09/10/11; sepet hâlâ tarayıcıda |
+| 03 | 75 | 25 | Devam | 03.06 kritik modül audit kapsamı (önce/sonra ve roller kodda mevcut); yönetici daveti/MFA eklendi; güncel SQL uçtan uca doğrulaması açık; inbox/dead-letter ve ayrı worker işlevsiz (şablon); zararlı dosya taraması (T-07); yedek doğrulama/restore provası; T-08/09/10/11; sepet hâlâ tarayıcıda |
 | 04 | 50 | 50 | Devam | Kampanya/kupon, depo bazlı stok hareketi, marka/doküman; CMS sayfa/blog/SSS/iletişim formu; ürün sayfaları için sitemap/statik SEO ve analitik (robots/sitemap/canonical/JSON-LD temeli 14.10, TST-120); medya kütüphanesi; CSV içe aktarma; 301 haritası; gerçek dashboard/rapor; Desenler (D13) |
-| 05 | 47 | 53 | Bloke (D03/D05/D11) | Ödeme (kart/3DS/havale), sunucu sepeti, stok rezervasyonu, kargo firma/ücret, yasal onay kaydı, İYS izni, iade ödemesi, push gönderimi (Firebase yok) |
-| 06 | 40 | 60 | Bloke (D04/T-04) | Fiziksel `PrintArea` (mm), değişmez `DesignVersion`, şablonlar, metin/katman, ön/arka yüz, geri/ileri, baskı çıktısı render işçisi, panelde çıktı indirme, fiyat farkı |
+| 05 | 52 | 48 | Bloke (D03/D05/D11) | Ödeme (kart/3DS/havale), sunucu sepeti, stok rezervasyonu, kargo firma/ücret, yasal onay kaydı, İYS izni, iade ödemesi, push gönderimi (Firebase yok) |
+| 06 | 45 | 55 | Bloke (D04/T-04) | Fiziksel `PrintArea` (mm), değişmez `DesignVersion`, şablonlar, metin/katman, ön/arka yüz, geri/ileri, baskı çıktısı render işçisi, panelde çıktı indirme, fiyat farkı |
 | 07 | 45 | 55 | Bloke (D07) | Teklif → sipariş dönüşümü, firma/kurumsal başvuru, teklifsiz toplu sipariş, ek dosya, outbox e-posta şablonları, rapor |
 | 08 | 5 | 95 | Bloke (D02/D06) | Yalnız panel prototip ekranı; `IMikroClient`, eşleme/senkron/mutabakat yok |
 | 09 | 5 | 95 | Bloke (D06) | Yalnız panel prototip ekranı; Trendyol/Hepsiburada/N11 adaptörleri, merkezi sipariş yok |
 | 10 | 50 | 50 | Devam | Moderasyon, kota/maliyet ölçümü (D08), soru havuzu yönetimi (10.09A), resmi özellik bayrağı (10.09B/T-09), arka plan kaldırma/genişletme, WhatsApp devri, PoC/CTO kaydı |
-| 11 | 20 | 80 | Devam (mobil) | iOS kanıtı, push, ödeme, UAT, güvenlik/yük testi, yedek-geri yükleme provası, mağaza yayını, eğitim, teknik doküman, cutover, D09/D14 |
+| 11 | 22 | 78 | Devam (mobil) | iOS kanıtı, push, ödeme, UAT, güvenlik/yük testi, yedek-geri yükleme provası, mağaza yayını, eğitim, teknik doküman, cutover, D09/D14 |
 
-**Ağırlıksız ortalama geliştirme:** ~43 %. **Kayıtsız adım denetimi (14.10):** `5da3dba..b1573d0` arası 31 commit Faz00’da ve `test/` altında kayıtsızdı → [tasks-2026-10-13-addendum](../docs/tasks/tasks-2026-10-13-addendum.md) ve TST-115 ile kapatıldı. DEPLOY-008/009/010 kayıtları mevcut fakat uzak uygulama/smoke sonucu yok. Faz04–11 dosyalarında daha önce hiç durum notu yoktu; bu denetimle eklendi.
+**Ağırlıksız ortalama geliştirme:** ~45 % (12 fazın eşit ağırlıklı ortalaması: %44,9; Faz01–11: %41,3). **Kayıtsız adım denetimi (14.10):** `5da3dba..b1573d0` arası 31 commit Faz00’da ve `test/` altında kayıtsızdı → [tasks-2026-10-13-addendum](../docs/tasks/tasks-2026-10-13-addendum.md) ve TST-115 ile kapatıldı. DEPLOY-008/009/010 kayıtları mevcut fakat uzak uygulama/smoke sonucu yok. Faz04–11 dosyalarında daha önce hiç durum notu yoktu; bu denetimle eklendi.
+
+**16.10 güncel kayıt:** [Commit → faz eşlemesi ve ölçüm gerekçesi](../docs/tasks/phase-audit-2026-10-16.md). Yönetici daveti/MFA, audit farkı, favori API’si ve yerleşim koruma işleri işlendi. Eski deploy/SQL satırları son doğrulanmış tarihsel kanıttır; DEPLOY-011 de yalnız hazırlanmış olarak kayıtlı. 0006–0009 dosyalarının varlığı hedef veritabanına uygulandıkları anlamına gelmez. Yeni uygulama testi veya resmi kabul verilmedi.
 
 ### Oturum kaydı şablonu — yeni satır üste
 

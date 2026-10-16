@@ -57,11 +57,13 @@ API önerisi: `POST /api/v1/ai/design-jobs` (prompt, tema, renk, stil, sektör, 
 
 Kanıt paketi: müşteri D05/D08/D10 kayıtları; Creative handoff ve FE kabulü; migration ve OpenAPI farkı; otomatik test komutları/sonuçları; gerçek sağlayıcı iş/ücret referansları maskelenmiş örnek; ürün-tasarım-sipariş sürümü; asistan kaynak/lead/devir UAT ekranları; güvenlik ve yetki testleri. Gerçek servis yoksa bu faz `Bloke` kalır; mock çıktısı canlı kabul yerine yazılmaz.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
 **Geliştirme ~50 % · kalan ~50 % · Statü: Devam (D05/D08/D10 açık)**
+
+**16.10 güncellemesi (kod/commit incelemesi):** XINOBI U aktif renk saklama ve açık önizleme navigasyonu eklendi (`f22a7ae`); yüklenen görsel varyantlar arasında korunuyor (`62f971a`). Bunlar mevcut kısmi önizleme işini iyileştirir; sağlayıcı/moderasyon/kota ve baskı açıklarını kapatmadığı için oran değişmedi. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | ID | Durum | Kanıt / eksik |
 |---|---|---|

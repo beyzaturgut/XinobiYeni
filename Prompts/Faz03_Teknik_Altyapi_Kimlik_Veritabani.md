@@ -1,6 +1,6 @@
 # Faz03 — Teknik temel, kimlik ve veritabanı iskeleti
 
-> **Durum (14.10.2026):** Devam · geliştirme ~65 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Plan / uygulanmadı. Bu dosyadaki yedi rol değerlendirmesi bir kontrol listesidir; gerçek kişilerin onayı değildir. Uygulama tamamlanınca kanıt yollarını ve ayrı ayrı kararları doldurun. Son geçişi her koşulda PM verir.
+> **Durum (16.10.2026):** Devam · geliştirme ~75 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Plan / uygulanmadı. Bu dosyadaki yedi rol değerlendirmesi bir kontrol listesidir; gerçek kişilerin onayı değildir. Uygulama tamamlanınca kanıt yollarını ve ayrı ayrı kararları doldurun. Son geçişi her koşulda PM verir.
 
 ## 1. Bağlayıcı kaynak, sınır ve ön koşullar
 
@@ -78,20 +78,22 @@ API: `/api/v1/auth/register|login|refresh|logout|password-reset`, `/api/v1/admin
 
 **09.10.2026 katalog hazırlığı:** [TST-111](../test/2026-10-09/TST-111-sql-catalog-preparation.md): 0002 katalog migration'ı, SQL depo, mevcut sözleşmeyi koruyan facade ve doğrulamalı aktarım hazır; tam .NET 315 geçti / 1 gerçek SQL testi atlandı, Release 0/0. COPY_ONLY/CHECKSUM yedeği alındı; `RESTORE VERIFYONLY` Msg262 sunucu yetkisi nedeniyle başarısız olduğundan DBA kontrolü bekleniyor. Katalog migration'ı, gerçek SQL entegrasyon testi ve yerel aktarım henüz yapılmadı; Development mevcut dosya deposuyla devam eder. Hesap/sipariş ve diğer modüllerin SQL bağlantısı ayrı sonraki işlerdir.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~65 % · kalan ~35 % · Statü: Devam**
+**Geliştirme ~75 % · kalan ~25 % · Statü: Devam**
+
+**16.10 güncellemesi (kod/commit incelemesi):** Yönetici daveti/rol atama, ayrı personel-müşteri oturumları, e-posta MFA ve yönetici kurtarma eklendi (`fc715ec`, `c618feb`); 0006–0009 migration dosyaları mevcut, hedef SQL uygulama kanıtı bu denetimde doğrulanmadı. Audit için güvenli alanların önce/sonra farkı ve roller `TransactionalAudit` içinde var; tüm kritik modül kapsamı ayrıca doğrulanmalı. CI Dart SDK/izole fixture ve bağımlılık düzeltmeleri eklendi (`18888a4`, `5cbe7da`, `ef66c03`, `456444e`). Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | ID | Durum | Kanıt / eksik |
 |---|---|---|
 | 03.01 | Tamam | README, pnpm/dotnet araç zinciri, `pnpm dev:local:background` |
 | 03.02 | Tamam | `/api/v1/health/live|ready`, `RequestCorrelationMiddleware`, OpenAPI + TS/Dart istemcileri |
-| 03.03 | Kısmi | Kayıt/giriş/yenileme/çıkış, e-posta doğrulama kodu, web cookie+CSRF, mobil refresh (TST-098/099); **parola sıfırlama 14.10’da eklendi** (hesap ifşa etmez, tüm oturumları kapatır; web+mobil, [TST-117](../test/2026-10-14/TST-117-password-reset.md)). Eksik: yönetici daveti/rol atama ekranı |
+| 03.03 | Tamam (kod) | Kayıt/giriş/yenileme/çıkış, e-posta doğrulama kodu, web cookie+CSRF, mobil refresh (TST-098/099); **parola sıfırlama 14.10’da eklendi** (hesap ifşa etmez, tüm oturumları kapatır; web+mobil, [TST-117](../test/2026-10-14/TST-117-password-reset.md)). Yönetici daveti/rol atama ve MFA eklendi (`fc715ec`, `c618feb`); güncel uçtan uca test bu denetimde çalıştırılmadı |
 | 03.04 | Tamam | İzin kataloğu, `RequirePermission`, panel uçları personel oturumuna bağlı (`12f543c`, TST-100/114) |
 | 03.05 | Tamam | 0001 XinobiYeniDB’ye uygulandı (TST-110) |
-| 03.06 | Kısmi (14.10) | `AuditMiddleware` panel/yönetim değişiklik denemelerini (başarılı, 4xx, 401/403, 5xx) aktör/işlem/kayıt/sonuç/istek no ile `ops.AuditLogs`’a yazar, gövde saklanmaz; `GET /local-commerce/audit` yalnız `audit.read`; panelde Denetim kaydı ([TST-116](../test/2026-10-14/TST-116-audit-trail.md)). Eksik: alan bazlı önce/sonra farkı ve rol alanı |
+| 03.06 | Kısmi (14.10) | `AuditMiddleware` panel/yönetim değişiklik denemelerini (başarılı, 4xx, 401/403, 5xx) aktör/işlem/kayıt/sonuç/istek no ile `ops.AuditLogs`’a yazar, gövde saklanmaz; `GET /local-commerce/audit` yalnız `audit.read`; panelde Denetim kaydı ([TST-116](../test/2026-10-14/TST-116-audit-trail.md)). Güvenli alan bazlı önce/sonra farkı ve rol eklendi (`fc715ec`, `TransactionalAudit`); tüm kritik modüllerin kapsam doğrulaması açık |
 | 03.07 | Kısmi | Outbox sahiplenme ve SQL’de işçiler (`7db18d6`); inbox yalnız tablo; dead-letter/panel yok; `services/worker` hâlâ şablon döngü |
 | 03.08 | Kısmi | `IFileStore` (`fa8d720`), MIME/görüntü doğrulama; kısa ömürlü imzalı URL, `/api/v1/media/uploads` finalize sözleşmesi ve zararlı içerik taraması (T-07) yok |
 | 03.09 | Tamam | Panel girişi/rota izinleri, mobil kimlik kabuğu |
@@ -99,7 +101,7 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 | 03.11 | Kısmi | Katalog, hesap, sipariş, özellik belgeleri SQL’de (TST-113); canlı IIS SQL katalog (DEPLOY-008 hazırlandı). Sepet tarayıcıda (`xinobi-cart-v1`), XINOBI U oturumları SQL’de değil, `state.json` Development’ta duruyor |
 | 03.12 | Kısmi | T-03/T-05/T-06 kapandı (ADR-004); T-07, T-08, T-09 (yalnız `XinobiU:Enabled`/`Features:*` ayarları), T-10, T-11 açık |
 
-**Sonraki adım:** yönetici daveti ve rol atama ekranı (03.03/03.04); 03.10 restore provası.
+**Sonraki adım:** yönetici yaşam döngüsünü güncel SQL ortamında doğrulamak; 03.10 restore provası.
 
 ## 7. Yedi rol kontrolü ve PM son kararı
 

@@ -189,3 +189,5 @@
 - 14.10.2026 · [TST-119 web e2e güncel XINOBI U akışı](2026-10-14/TST-119-web-e2e-current-flows.md) — Test API demo kataloğu ve asset adresi, production e2e derlemesinde env ile açılan geliştirme önizleme köprüsü (canlı değişmedi), kaldırılan demo sayfalarına bağlı testler `/urunler/detay` ve `/xinobi-u/renk`’e taşındı. Onaylı CM101 piksel referansı güncellemesiyle tam paket **117 geçti / 0 başarısız / 1 atlandı**.
 
 - 14.10.2026 · [TST-120 SEO temeli](2026-10-14/TST-120-seo-foundation.md) — Faz04: `NEXT_PUBLIC_SITE_URL` yokken (test sunucusu) robots/sitemap/meta ile indeks kapalı; alan adıyla canonical, 8 URL’lik sitemap, özel sayfa engeli; ana sayfa Organization/WebSite ve ürün detayı Product JSON-LD. seo.spec 2/2, tam web e2e 119/0/1.
+
+- 16.10.2026 · [Faz kayıtları belge denetimi](2026-10-16/REP-20261016-phase-document-audit.md) — Faz00–11 oran tutarlılığı, commit eşlemesi, dosya bağlantıları ve diff kontrolü; yeni uygulama test koşusu yok.

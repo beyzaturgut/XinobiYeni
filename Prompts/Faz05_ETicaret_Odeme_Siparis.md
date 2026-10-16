@@ -53,17 +53,19 @@
 
 `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` içindeki *Son güvenli durum*, D02/D03/D05/D10, aktif commit/branch, migration sürümü, son geçen test, mock/gerçek sağlayıcı ve açık blokajı oku; `git status`, migration geçmişi ve veritabanı şemasını doğrula. Önce tekrarlanabilir kritik senaryoyu çalıştır; ödemeyi manuel yeniden başlatmadan provider işlem ID'siyle sorgula. Bekleyen outbox'ı idempotency anahtarı korunarak işle; test kanıtını ve sonraki tek işi Faz00'a yaz. Faz05 durumu yalnız tüm kanıtlar ve gerekli gerçek karar/onaylar mevcutsa `Tamamlandı` olur.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~45 % · kalan ~55 % · Statü: Bloke (D03/D05/D10/D11)**
+**Geliştirme ~52 % · kalan ~48 % · Statü: Bloke (D03/D05/D10/D11)**
+
+**16.10 güncellemesi (kod/commit incelemesi):** Web favorileri hesap API’siyle kalıcı hale geldi (`fc715ec`, `754db13`); mobil favorilerin aynı API ile eşitlenmesi bu kayıtta doğrulanmadı. Hesabım değerlendirmeleri, adres silme onayı, sipariş hata/aksiyonları ve bildirim okundu durumunun saklanması eklendi (`8f3adc4`, `2550209`, `b210122`, `1f02e1f`). Kayıt e-posta doğrulaması ve parola sıfırlama ekran geçişi düzeltildi (`fd52a16`, `5f704cf`). Ödeme, sunucu sepeti ve stok rezervasyonu açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | İş | Durum | Kanıt / eksik |
 |---|---|---|
 | Üyelik, profil, adres (en çok 10), hesap silme | Tamam | `/api/v1/me/*`, web+mobil (TST-098/099, `1354a08`) |
 | Parola sıfırlama | Tamam (14.10) | `/auth/password-reset`, web + mobil ekran (TST-117) |
-| Favoriler | Kısmi | Web ve mobil cihazda; sunucu `/me/favorites` yok |
+| Favoriler | Kısmi | Web `/me/favorites` ile hesapta kalıcı (`754db13`); mobil eşitleme kanıtı açık |
 | Sepet | Kısmi | Tarayıcı/cihaz deposu; kişiselleştirilmiş satır (`49d3f35`, `265c48d`); sunucu sepeti ve `checkout/quote` yok |
 | Sipariş (sunucu fiyatlı, idempotent) | Kısmi | Ödeme almayan demo sipariş, 0003/0005 tabloları; stok rezervasyonu yok |
 | Ödeme (kart/3DS/taksit/havale, webhook, iade) | Bloke | D03/D05 |

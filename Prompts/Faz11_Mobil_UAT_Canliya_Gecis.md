@@ -76,11 +76,13 @@ Web Designer ve Creative Designer, Analiz2 ana sayfa/XINOBI U/Nobi hiyerarşisin
 4. **Mobil mağaza:** İmzalı paket ve yasal varlıklarla iOS/Android başvurularını ayrı izle. Onay/reddin tarihi, build ve mağaza bağlantısını Faz00'a yaz; reddi düzeltip yeniden gönder. Uygulama eski sürümünün API ile çalışma penceresi ve zorunlu güncelleme kararı belgelenir. Proje tam kabulü her iki mağaza yayını ve smoke doğrulamasına bağlıdır.
 5. **Devir:** Katalog, fiyat/stok, ödeme/iade, teklif, baskı, AI ayarı, Mikro/pazaryeri hata düzeltme, yedek/restore ve müşteri destek yolları için adım adım rehber ve eğitim kaydı verilir; erişim en az yetkiyle sahiplerine aktarılır.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~20 % · kalan ~80 % · Statü: Devam (yalnız mobil geliştirme)**
+**Geliştirme ~22 % · kalan ~78 % · Statü: Devam (yalnız mobil geliştirme)**
+
+**16.10 güncellemesi (kod/commit incelemesi):** Mobilde fotoğraf yerleşiminin kaydetme/sepet boyunca korunması, ana sayfa ürün boyutu ve Türkçe Material bileşenleri iyileştirildi (`8d99783`, `fc706b4`, `1b5cde5`, `f4adc49`). HTTP IIS hazırlığı DEPLOY-011 ile kayıtlı; uzak uygulama/smoke, iOS, UAT ve mağaza kabulü kanıtlanmadı. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | ID | Durum | Kanıt / eksik |
 |---|---|---|

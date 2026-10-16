@@ -1,6 +1,6 @@
 # Faz07 — Kurumsal teklif ve toplu sipariş
 
-**Durum (14.10.2026):** Bloke (D07) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–5, 6.2–6.3, 7–8; müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`; Faz01 D07 kararı. Durum ve kanıtlar Faz00'da tutulur.
+**Durum (16.10.2026):** Bloke (D07) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–5, 6.2–6.3, 7–8; müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`; Faz01 D07 kararı. Durum ve kanıtlar Faz00'da tutulur.
 
 ## Amaç ve sınır
 
@@ -72,7 +72,7 @@ Her engel Faz00'da sahibi, hangi testin engellendiği, güvenli ilerlenebilecek 
 - Talep yanlışlıkla ücretli siparişe dönüşmez; onaylı sürümden dönüşüm tekrarında tek sipariş üretilir; firma ve panel yetki sınırları korunur.
 - Yedi rolün gerçek inceleme kayıtları alınır; müşteri D07/UAT kararı ayrı belgelenir; PM son kapıyı açık kanıtlara göre onaylar veya blokeyi bildirir.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 

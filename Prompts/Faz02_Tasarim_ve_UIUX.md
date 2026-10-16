@@ -1,6 +1,6 @@
 # Faz02 — Xinobi yaratıcı yön, UI/UX ve tasarım teslimi
 
-**Durum (14.10.2026):** Devam · geliştirme ~60 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Faz sahibi:** Sr. Creative Designer (temsili 20+ yıl uzman rolü) · **Nihai kapı sahibi:** Proje Yöneticisi (PM)  
+**Durum (16.10.2026):** Devam · geliştirme ~60 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Faz sahibi:** Sr. Creative Designer (temsili 20+ yıl uzman rolü) · **Nihai kapı sahibi:** Proje Yöneticisi (PM)
 **Kaynak ve öncelik:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2–5, §6.4, D04/D08/D09/D10 ve `Xinobi_Proje_Kapsami(4).md` UI/UX, web, panel, kişiselleştirme, mobil, AI kapsamı. Çelişkide müşteri kapsamı ile doğrulanmış karar kaydı esastır.  
 **Kapsam:** Yalnız belirtilen web, yönetim paneli, iOS/Android, basit/gelişmiş editör, AI üretim ve asistan arayüzü; özellik ekleme yetkisi vermez.
 
@@ -66,11 +66,13 @@ Bu tokenler tasarım kararı önerisidir. Creative Designer, gerçek logo ve ür
 - Panelde yetki yok, boş/kayıt var/hata/yeniden dene; ödeme, dosya yükleme ve AI'da bekleme/başarı/hata durumları açılıp gösterilir. İki mobil platformun akışları ayrı doğrulanır.
 - Creative Designer'ın kaynak dosyası ve FE/UI/UX handoff kaydı incelenir. Sadece örnek görsel veya referans pano ile faz kapatılamaz.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
 **Geliştirme ~60 % · kalan ~40 % · Statü: Devam (A17 ertelendi)**
+
+**16.10 güncellemesi (kod/commit incelemesi):** Ana sayfa ürün önizlemesi web/mobil boyutları düzeltildi; görselin ekran görüntüsünü alma arayüzü kaldırıldı (`8703cc9`, `fc706b4`, `495eef1`). Mobil Material diyalogları ve tarih seçici Türkçeleştirildi (`1b5cde5`). Tasarım onayı ve cihaz/erişilebilirlik kapıları açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | Madde | Durum | Kanıt / eksik |
 |---|---|---|

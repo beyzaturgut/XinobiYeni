@@ -1,6 +1,6 @@
 # Faz04 — Ürün kataloğu, içerik ve yayın
 
-**Durum (14.10.2026):** Devam · geliştirme ~50 %; ayrıntı "Uygulama durumu — 14.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
+**Durum (16.10.2026):** Devam · geliştirme ~50 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
 
 ## 1. Amaç, bağımlılık, sınır
 
@@ -70,16 +70,18 @@ Web Designer, Analiz2 K-01–K-11 ana sayfa sırası ve etkileşimini Faz02'de o
 
 **Teslim kanıtı:** migration ve geri alma notu; OpenAPI ve örnek istek/yanıt; onaylı Creative/prototip/FE teslimi; ekran kayıtları; medya lisans ve gerçek ürün görsel eşlemesi; birim/entegrasyon/erişilebilirlik/SEO test sonuçları; rol/denetim testi; Faz00 değişiklik/karar/commit ve sonraki adım kaydı.
 
-## Uygulama durumu — 14.10.2026
+## Uygulama durumu — 16.10.2026
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~45 % · kalan ~55 % · Statü: Devam (D02/D13 açık)**
+**Geliştirme ~50 % · kalan ~50 % · Statü: Devam (D02/D13 açık)**
+
+**16.10 güncellemesi (kod/commit incelemesi):** SEO temeli TST-120 ile kayıtlı. HTTP test sitesinde katalog kimliği üretimi düzeltildi (`dfada16`); ana sayfa ürün görseli boyutları düzeltildi. Katalog değişikliklerinin audit altyapısı mevcut; yayın doğrulaması ve tüm alan kapsamı açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | İş | Durum | Kanıt / eksik |
 |---|---|---|
 | Kategori/ürün/varyant/fiyat/stok şeması | Kısmi | 0002 CatalogCommerce (6 tablo) uygulandı; marka, doküman, depo bazlı stok, `InventoryMovement`, `ChannelPrice`, kampanya/kupon, CMS tabloları yok |
-| Katalog API ve panel CRUD | Kısmi | Panel ürün/varyant/fiyat/kategori/galeri, production’da korumalı SQL yönetimi (`81543aa`); yayın doğrulaması ve audit yok |
+| Katalog API ve panel CRUD | Kısmi | Panel ürün/varyant/fiyat/kategori/galeri, production’da korumalı SQL yönetimi (`81543aa`); audit altyapısı var (`2a60693`, `fc715ec`); yayın doğrulaması ve audit kapsam kontrolü açık |
 | Web katalog, arama, filtre, karşılaştırma, ürün detay | Tamam | `/urunler`, `/arama`, `/karsilastir`; renk/varyant galerisi; TST-108 |
 | Ana sayfa içerik ve duyurular | Tamam | Panelden kategori görseli, öne çıkan ürünler, duyurular |
 | Kampanya/kupon | Yok | Panelde yalnız fiyat önizleme prototipi (TST-081) |

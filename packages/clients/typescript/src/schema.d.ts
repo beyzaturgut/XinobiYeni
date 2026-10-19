@@ -1124,6 +1124,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/reports/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description SQL kayıt sayımları; tahsilat veya net satış değildir. from dahil, until hariç UTC günleridir (yyyy-MM-dd). until verilmezse isteğin alındığı an kullanılır. Müşteri sayısı, aralıkta kaydolan ve personel rolü olmayan müşteri hesaplarıdır; tüm hesap durumları dahildir. */
+        get: operations["GetAdminReportSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -1220,6 +1237,20 @@ export interface components {
             account: components["schemas"]["AccountProfile"];
             roles: string[];
             permissions: string[];
+        };
+        AdminSummary: {
+            /** Format: date-time */
+            fromInclusive: null | string;
+            /** Format: date-time */
+            untilExclusive: string;
+            /** Format: date-time */
+            generatedAt: string;
+            timeZone: string;
+            /** Format: int32 */
+            orderCount: number;
+            /** Format: int32 */
+            registeredCustomerCount: number;
+            orderStatuses: components["schemas"]["OrderStatusCount"][];
         };
         AnnouncementItem: {
             id: string;
@@ -1585,6 +1616,11 @@ export interface components {
             shippedAt: string;
             /** Format: date-time */
             deliveredAt: null | string;
+        };
+        OrderStatusCount: {
+            status: string;
+            /** Format: int32 */
+            count: number;
         };
         PermissionCatalogResponse: {
             resources: string[];
@@ -5118,6 +5154,65 @@ export interface operations {
             };
             /** @description Forbidden */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetAdminReportSummary: {
+        parameters: {
+            query?: {
+                from?: string;
+                until?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminSummary"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Unauthorized */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Forbidden */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:xinobi_api_client/src/api_util.dart';
 import 'package:xinobi_api_client/src/model/admin_invitation_response.dart';
 import 'package:xinobi_api_client/src/model/admin_session.dart';
+import 'package:xinobi_api_client/src/model/admin_summary.dart';
 import 'package:xinobi_api_client/src/model/assign_admin_role.dart';
 import 'package:xinobi_api_client/src/model/audit_page.dart';
 import 'package:xinobi_api_client/src/model/create_admin_invitation.dart';
@@ -204,6 +205,89 @@ class AdminApi {
     }
 
     return Response<AdminInvitationResponse>(
+      data: _responseData,
+      headers: _response.headers,
+      isRedirect: _response.isRedirect,
+      requestOptions: _response.requestOptions,
+      redirects: _response.redirects,
+      statusCode: _response.statusCode,
+      statusMessage: _response.statusMessage,
+      extra: _response.extra,
+    );
+  }
+
+  /// getAdminReportSummary
+  /// SQL kayıt sayımları; tahsilat veya net satış değildir. from dahil, until hariç UTC günleridir (yyyy-MM-dd). until verilmezse isteğin alındığı an kullanılır. Müşteri sayısı, aralıkta kaydolan ve personel rolü olmayan müşteri hesaplarıdır; tüm hesap durumları dahildir.
+  ///
+  /// Parameters:
+  /// * [from]
+  /// * [until]
+  /// * [cancelToken] - A [CancelToken] that can be used to cancel the operation
+  /// * [headers] - Can be used to add additional headers to the request
+  /// * [extras] - Can be used to add flags to the request
+  /// * [validateStatus] - A [ValidateStatus] callback that can be used to determine request success based on the HTTP status of the response
+  /// * [onSendProgress] - A [ProgressCallback] that can be used to get the send progress
+  /// * [onReceiveProgress] - A [ProgressCallback] that can be used to get the receive progress
+  ///
+  /// Returns a [Future] containing a [Response] with a [AdminSummary] as data
+  /// Throws [DioException] if API call or serialization fails
+  Future<Response<AdminSummary>> getAdminReportSummary({
+    String? from,
+    String? until,
+    CancelToken? cancelToken,
+    Map<String, dynamic>? headers,
+    Map<String, dynamic>? extra,
+    ValidateStatus? validateStatus,
+    ProgressCallback? onSendProgress,
+    ProgressCallback? onReceiveProgress,
+  }) async {
+    final _path = r'/api/v1/admin/reports/summary';
+    final _options = Options(
+      method: r'GET',
+      headers: <String, dynamic>{
+        ...?headers,
+      },
+      extra: <String, dynamic>{
+        'secure': <Map<String, String>>[],
+        ...?extra,
+      },
+      validateStatus: validateStatus,
+    );
+
+    final _queryParameters = <String, dynamic>{
+      if (from != null) r'from': encodeQueryParameter(_serializers, from, const FullType(String)),
+      if (until != null) r'until': encodeQueryParameter(_serializers, until, const FullType(String)),
+    };
+
+    final _response = await _dio.request<Object>(
+      _path,
+      options: _options,
+      queryParameters: _queryParameters,
+      cancelToken: cancelToken,
+      onSendProgress: onSendProgress,
+      onReceiveProgress: onReceiveProgress,
+    );
+
+    AdminSummary? _responseData;
+
+    try {
+      final rawResponse = _response.data;
+      _responseData = rawResponse == null ? null : _serializers.deserialize(
+        rawResponse,
+        specifiedType: const FullType(AdminSummary),
+      ) as AdminSummary;
+
+    } catch (error, stackTrace) {
+      throw DioException(
+        requestOptions: _response.requestOptions,
+        response: _response,
+        type: DioExceptionType.unknown,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+
+    return Response<AdminSummary>(
       data: _responseData,
       headers: _response.headers,
       isRedirect: _response.isRedirect,

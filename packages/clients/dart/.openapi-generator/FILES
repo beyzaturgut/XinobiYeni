@@ -11,6 +11,7 @@ doc/AdminInvitationResponse.md
 doc/AdminMfaChallenge.md
 doc/AdminPasswordResetStarted.md
 doc/AdminSession.md
+doc/AdminSummary.md
 doc/AnnouncementItem.md
 doc/AnnouncementList.md
 doc/AssignAdminRole.md
@@ -65,6 +66,7 @@ doc/OrderPersonalization.md
 doc/OrderRequest.md
 doc/OrderRequestLine.md
 doc/OrderShipment.md
+doc/OrderStatusCount.md
 doc/PermissionCatalogResponse.md
 doc/PlaceOrder.md
 doc/PlaceOrderItem.md
@@ -138,6 +140,7 @@ lib/src/model/admin_invitation_response.dart
 lib/src/model/admin_mfa_challenge.dart
 lib/src/model/admin_password_reset_started.dart
 lib/src/model/admin_session.dart
+lib/src/model/admin_summary.dart
 lib/src/model/announcement_item.dart
 lib/src/model/announcement_list.dart
 lib/src/model/assign_admin_role.dart
@@ -190,6 +193,7 @@ lib/src/model/order_personalization.dart
 lib/src/model/order_request.dart
 lib/src/model/order_request_line.dart
 lib/src/model/order_shipment.dart
+lib/src/model/order_status_count.dart
 lib/src/model/permission_catalog_response.dart
 lib/src/model/place_order.dart
 lib/src/model/place_order_item.dart

@@ -23,7 +23,7 @@ export default function AiAdmin() {
   useEffect(() => {
     let active = true
     const done = (run: () => void) => { if (active) { run(); setError('') } }
-    const fail = (e: unknown) => { if (active) setError(e instanceof Error ? e.message : 'Yüklenemedi.') }
+    const fail = (e: unknown) => { if (active) {setPolicies([]);setSources([]);setConversations([]);setLeads([]);setUsage(null);setDraft(null);setEditing(null);setModelConfigured(false);setError(e instanceof Error ? e.message : 'Yüklenemedi.')} }
     if (tab === 'Politika ve istem') commerceRequest<{ modelConfigured: boolean; items: Policy[] }>(commerceApi, '/assistant/policies').then(value => done(() => { setPolicies(value.items); setModelConfigured(value.modelConfigured) })).catch(fail)
     if (tab === 'Bilgi kaynakları') commerceRequest<Source[]>(commerceApi, '/assistant/knowledge').then(value => done(() => setSources(value))).catch(fail)
     if (tab === 'Konuşmalar') commerceRequest<Conversation[]>(commerceApi, '/assistant/conversations').then(value => done(() => setConversations(value))).catch(fail)
@@ -38,7 +38,7 @@ export default function AiAdmin() {
   }
   const current = policies.at(-1)
   return <section aria-label="AI yönetimi">
-    <div className="integration-status"><strong>Cloudflare Workers AI</strong><span>Metin modeli: {modelConfigured ? 'bağlı' : 'yapılandırılmadı · Nobi kural tabanlı yanıt verir'}</span><span>XINOBI U görsel üretimi: aynı hesap</span></div>
+    <div className="integration-status"><strong>Cloudflare Workers AI</strong><span>Metin modeli: {modelConfigured ? 'yapılandırıldı · başarılı sağlayıcı çağrısı ayrıca doğrulanmalı' : 'yapılandırılmadı · Nobi kural tabanlı yanıt verir'}</span><span>XINOBI U görsel üretimi: bu metin modeli yanıtıyla doğrulanmaz</span></div>
     <div className="catalog-tabs" role="group" aria-label="AI bölümleri">{tabs.map(item => <button key={item} aria-pressed={tab === item} onClick={() => { setTab(item); setNotice(''); setError('') }}>{item}</button>)}</div>
     {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
 

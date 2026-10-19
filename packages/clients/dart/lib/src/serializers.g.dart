@@ -15,6 +15,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AdminMfaChallenge.serializer)
       ..add(AdminPasswordResetStarted.serializer)
       ..add(AdminSession.serializer)
+      ..add(AdminSummary.serializer)
       ..add(AnnouncementItem.serializer)
       ..add(AnnouncementList.serializer)
       ..add(AssignAdminRole.serializer)
@@ -66,6 +67,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(OrderRequest.serializer)
       ..add(OrderRequestLine.serializer)
       ..add(OrderShipment.serializer)
+      ..add(OrderStatusCount.serializer)
       ..add(PermissionCatalogResponse.serializer)
       ..add(PlaceOrder.serializer)
       ..add(PlaceOrderItem.serializer)
@@ -160,6 +162,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(OrderRequestLine)]),
           () => ListBuilder<OrderRequestLine>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(OrderStatusCount)]),
+          () => ListBuilder<OrderStatusCount>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(PlaceOrderItem)]),
           () => ListBuilder<PlaceOrderItem>())

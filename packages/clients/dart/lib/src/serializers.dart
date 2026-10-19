@@ -22,6 +22,7 @@ import 'package:xinobi_api_client/src/model/admin_invitation_response.dart';
 import 'package:xinobi_api_client/src/model/admin_mfa_challenge.dart';
 import 'package:xinobi_api_client/src/model/admin_password_reset_started.dart';
 import 'package:xinobi_api_client/src/model/admin_session.dart';
+import 'package:xinobi_api_client/src/model/admin_summary.dart';
 import 'package:xinobi_api_client/src/model/announcement_item.dart';
 import 'package:xinobi_api_client/src/model/announcement_list.dart';
 import 'package:xinobi_api_client/src/model/assign_admin_role.dart';
@@ -73,6 +74,7 @@ import 'package:xinobi_api_client/src/model/order_personalization.dart';
 import 'package:xinobi_api_client/src/model/order_request.dart';
 import 'package:xinobi_api_client/src/model/order_request_line.dart';
 import 'package:xinobi_api_client/src/model/order_shipment.dart';
+import 'package:xinobi_api_client/src/model/order_status_count.dart';
 import 'package:xinobi_api_client/src/model/permission_catalog_response.dart';
 import 'package:xinobi_api_client/src/model/place_order.dart';
 import 'package:xinobi_api_client/src/model/place_order_item.dart';
@@ -131,6 +133,7 @@ part 'serializers.g.dart';
   AdminMfaChallenge,
   AdminPasswordResetStarted,
   AdminSession,
+  AdminSummary,
   AnnouncementItem,
   AnnouncementList,
   AssignAdminRole,
@@ -182,6 +185,7 @@ part 'serializers.g.dart';
   OrderRequest,
   OrderRequestLine,
   OrderShipment,
+  OrderStatusCount,
   PermissionCatalogResponse,
   PlaceOrder,
   PlaceOrderItem,
@@ -317,6 +321,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(QuoteItemRequest)]),
         () => ListBuilder<QuoteItemRequest>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(OrderStatusCount)]),
+        () => ListBuilder<OrderStatusCount>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(QuoteItem)]),

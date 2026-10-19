@@ -11,6 +11,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**assignAdminRole**](AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [**createAdminInvitation**](AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[**getAdminReportSummary**](AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [**getAdminSession**](AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [**listAdminAudit**](AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
@@ -95,6 +96,51 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAdminReportSummary**
+> AdminSummary getAdminReportSummary(from, until)
+
+
+
+SQL kayıt sayımları; tahsilat veya net satış değildir. from dahil, until hariç UTC günleridir (yyyy-MM-dd). until verilmezse isteğin alındığı an kullanılır. Müşteri sayısı, aralıkta kaydolan ve personel rolü olmayan müşteri hesaplarıdır; tüm hesap durumları dahildir.
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String from = from_example; // String |
+final String until = until_example; // String |
+
+try {
+    final response = api.getAdminReportSummary(from, until);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminReportSummary: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **from** | **String**|  | [optional]
+ **until** | **String**|  | [optional]
+
+### Return type
+
+[**AdminSummary**](AdminSummary.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json, application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

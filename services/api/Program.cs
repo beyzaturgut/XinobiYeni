@@ -291,6 +291,7 @@ Xinobi.Api.Assistant.AssistantEndpoints.MapAssistant(app);
 app.MapXinobiU();
 app.MapAccounts();
 app.MapAudit();
+Xinobi.Api.Reports.AdminSummaryEndpoints.MapAdminSummary(app);
 
 var api = app.MapGroup("/api/v1").AllowAnonymous();
 

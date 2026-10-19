@@ -118,6 +118,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**verifyAdminMfa**](doc/AccountApi.md#verifyadminmfa) | **POST** /api/v1/auth/admin/mfa/verify |
 [*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminReportSummary**](doc/AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
@@ -158,6 +159,7 @@ Class | Method | HTTP request | Description
  - [AdminMfaChallenge](doc/AdminMfaChallenge.md)
  - [AdminPasswordResetStarted](doc/AdminPasswordResetStarted.md)
  - [AdminSession](doc/AdminSession.md)
+ - [AdminSummary](doc/AdminSummary.md)
  - [AnnouncementItem](doc/AnnouncementItem.md)
  - [AnnouncementList](doc/AnnouncementList.md)
  - [AssignAdminRole](doc/AssignAdminRole.md)
@@ -209,6 +211,7 @@ Class | Method | HTTP request | Description
  - [OrderRequest](doc/OrderRequest.md)
  - [OrderRequestLine](doc/OrderRequestLine.md)
  - [OrderShipment](doc/OrderShipment.md)
+ - [OrderStatusCount](doc/OrderStatusCount.md)
  - [PermissionCatalogResponse](doc/PermissionCatalogResponse.md)
  - [PlaceOrder](doc/PlaceOrder.md)
  - [PlaceOrderItem](doc/PlaceOrderItem.md)

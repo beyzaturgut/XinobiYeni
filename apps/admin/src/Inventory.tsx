@@ -22,7 +22,7 @@ export default function Inventory({products,onSave}:{products:Product[];onSave:(
         writing.current=true;setBusy(true);setNotice('');setError('')
         try{await onSave({...product,variants:product.variants.map(item=>item.id===variant.id?{...item,stock}:item)});setNotice(`${variant.sku} stoğu kaydedildi.`)}catch(problem){setError(problem instanceof Error?problem.message:'Stok kaydedilemedi.')}finally{writing.current=false;setBusy(false)}
       }}><label>{variant.color} · {variant.sku}<input key={`${variant.id}-${variant.stock}`} aria-label={`${variant.sku} web stoğu`} name="stock" type="number" min="0" step="1" defaultValue={variant.stock} required/></label><button>Stoğu kaydet</button></form>)}</fieldset>)}
-      {count===0&&<div className="empty-widget"><strong>{products.length?'Filtreye uygun varyant yok':'Katalog stok verisi kullanılamıyor veya katalog boş'}</strong><p>Depo stoğu veya örnek ürün üretilmez.</p></div>}
+      {count===0&&<div className="empty-widget"><strong>{products.length?'Filtreye uygun varyant yok':'Katalogda varyant yok'}</strong><p>Depo stoğu veya örnek ürün üretilmez.</p></div>}
       {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
     </>}
   </section>

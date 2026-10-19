@@ -14,9 +14,10 @@ export default function Notifications() {
   const [data, setData] = useState<Response | null>(null), [channel, setChannel] = useState(''), [status, setStatus] = useState(''), [error, setError] = useState(''), [notice, setNotice] = useState(''), [reload, setReload] = useState(0)
   useEffect(() => {
     let active = true
-    const fetchOnce = () => commerceRequest<Response>(commerceApi, `/notifications?${new URLSearchParams({ ...(channel && { channel }), ...(status && { status }) })}`)
-      .then(value => { if (active) { setData(value); setError('') } })
-      .catch(e => { if (active) setError(e instanceof Error ? e.message : 'Bildirimler yüklenemedi.') })
+    let latest=0
+    const fetchOnce = () => {const request=++latest;return commerceRequest<Response>(commerceApi, `/notifications?${new URLSearchParams({ ...(channel && { channel }), ...(status && { status }) })}`)
+      .then(value => { if (active&&request===latest) { setData(value); setError('') } })
+      .catch(e => { if (active&&request===latest) {setData(null);setError(e instanceof Error ? e.message : 'Bildirimler yüklenemedi.')} })}
     void fetchOnce()
     const timer = window.setInterval(() => void fetchOnce(), 10000)
     return () => { active = false; window.clearInterval(timer) }
@@ -26,7 +27,7 @@ export default function Notifications() {
     <div className="integration-status">{data?.channels.map(item => <span key={item.channel}><strong>{channelText[item.channel]}</strong> {item.configured ? 'yapılandırıldı' : 'yapılandırılmadı'}</span>)}</div>
     <p className="panel-notice">Sipariş, kargo, iptal ve iade olayları müşterinin uygulama içi kutusuna düşer; e-posta, SMS ve push sıraya alınıp en fazla 5 kez denenir. Geliştirme ortamında SMS ve push önizlemedir; example.com gibi test alan adlarına e-posta gönderilmez. Push için mobil uygulamaya Firebase projesi eklenmelidir.</p>
     <div className="order-filters"><label>Kanal<select value={channel} onChange={event => setChannel(event.target.value)}><option value="">Tümü</option>{Object.entries(channelText).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><label>Durum<select value={status} onChange={event => setStatus(event.target.value)}><option value="">Tümü</option>{Object.entries(statusText).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><button onClick={load}>Yenile</button></div>
-    {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
+    {error && <p role="alert">{error} <button onClick={load}>Tekrar dene</button></p>}{!data&&!error&&<p role="status">Bildirimler yükleniyor…</p>}{notice && <p role="status">{notice}</p>}
     <div className="table-scroll"><table><caption>Son 300 bildirim</caption><thead><tr>{['Zaman', 'Kanal', 'Alıcı', 'Başlık', 'Durum', 'Deneme', 'Hata', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
       <tbody>{data?.items.map(item => <tr key={item.id}><td>{date(item.createdAt)}</td><td>{channelText[item.channel] ?? item.channel}</td><td>{item.channel === 'email' || item.channel === 'sms' ? mask(item.recipient) : '—'}</td><td>{item.title}</td><td><span className="order-state">{statusText[item.status] ?? item.status}</span></td><td>{item.attempts}</td><td>{item.lastError ?? ''}</td><td>{item.status === 'failed' && <button onClick={async () => { try { await commerceRequest(commerceApi, `/notifications/${item.id}/retry`, 'POST', {}); setNotice('Yeniden sıraya alındı.'); load() } catch (e) { setNotice(e instanceof Error ? e.message : 'Yeniden denenemedi.') } }}>Yeniden dene</button>}</td></tr>)}</tbody></table></div>
     {data && data.items.length === 0 && <div className="empty-widget"><strong>Kayıt yok</strong><p>Siparişlerde bir değişiklik olduğunda bildirimler burada görünür.</p></div>}

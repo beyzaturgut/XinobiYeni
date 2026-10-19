@@ -19,8 +19,7 @@ import AuditLog from './AuditLog'
 import { useAdminSession } from './AdminAccess'
 import { initialAdminState } from './settings-model'
 import { initialMappings } from './integration-model'
-import { initialPrices, initialCampaigns } from './pricing-model'
-import { initialProducts } from './catalog-data'
+import { initialCampaigns } from './pricing-model'
 import './App.css'
 import './panel.css'
 import './navigation.css'
@@ -37,8 +36,8 @@ export default function App() {
     const restore=()=>setView(initialView(location.search,permission=>session?.permissions.includes(permission)??(import.meta.env.DEV&&import.meta.env.VITE_ADMIN_ACCESS==='off')))
     window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore)
   },[session])
-  const [products, setProducts] = useState(initialProducts)
-  const [prices, setPrices] = useState(initialPrices), [campaigns, setCampaigns] = useState(initialCampaigns)
+  const [products, setProducts] = useState<Product[]>([])
+  const [prices, setPrices] = useState<Record<string,number>>({}), [campaigns, setCampaigns] = useState(initialCampaigns)
   const [commerce, setCommerce] = useState<CommerceState | null>(null)
   const [apiNotice, setApiNotice] = useState(commerceApi ? 'Ortak içerik API’sine bağlanılıyor…' : 'İçerik API adresi yapılandırılmadı.')
   useEffect(() => {
@@ -46,7 +45,7 @@ export default function App() {
     let active = true
     commerceRequest<CommerceState>(commerceApi, '/state').then(state => {
       if (active) { setCommerce(state); setProducts(state.products); setPrices(state.prices); setApiNotice('Local API bağlı · Değişiklikler web’e yansır') }
-    }).catch(() => { if (active) setApiNotice('Local API’ye bağlanılamadı. Kayıt işlemleri kullanılamıyor.') })
+    }).catch(error => { if (active) {setCommerce(null);setProducts([]);setPrices({});setApiNotice(error instanceof Error?error.message:'İçerik API’sine bağlanılamadı. Kayıt işlemleri kullanılamıyor.')} })
     return () => { active = false }
   }, [])
   async function persist(route: string, method: string, body?: unknown) {

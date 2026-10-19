@@ -1,5 +1,12 @@
 import { localApi } from '../../../packages/commerce/client'
+import { downscaleImage } from '../../../packages/commerce/client'
+import { adminRequest } from './admin-request'
 export * from '../../../packages/commerce/client'
+export const commerceRequest = adminRequest
+export async function uploadMedia(base: string, file: File, maxEdge = 2560) {
+  const form = new FormData(); form.append('file', await downscaleImage(file, maxEdge))
+  return (await adminRequest<{src:string}>(base, '/media', 'POST', form)).src
+}
 const configuredApi = import.meta.env.VITE_COMMERCE_API_URL || (import.meta.env.DEV ? localApi : '')
 // Keep Development cookies same-site when opening the panel on either loopback alias.
 // Production and explicitly configured non-loopback services are never rewritten.

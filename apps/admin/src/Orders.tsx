@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
+import {useAdminSession} from './AdminAccess'
 
 /** Design images on order lines are served by the panel API with the staff session. */
 const designUrl = (path: string) => commerceApi.replace(/\/api\/v1\/local-commerce\/?$/, '') + path
@@ -22,6 +23,9 @@ const openRequests = (order: Order) => order.requests?.filter(item => item.statu
 
 /** Order desk: every customer's demo order with shipping, status changes and cancel/return decisions. Each change notifies the customer. */
 export default function Orders() {
+  const permissions=useAdminSession()?.permissions??[]
+  const canWrite=permissions.includes('orders.write'),canCancel=permissions.includes('orders.cancel')
+  const writing=useRef(false)
   const [items, setItems] = useState<StaffOrder[]>([]), [options, setOptions] = useState<Options | null>(null)
   const [query, setQuery] = useState(''), [status, setStatus] = useState('Tümü'), [selectedId, setSelectedId] = useState<string | null>(null)
   const [error, setError] = useState(commerceApi ? '' : 'Sipariş API adresi yapılandırılmadı.'), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false), [reload, setReload] = useState(0)
@@ -30,9 +34,10 @@ export default function Orders() {
   useEffect(() => {
     if (!commerceApi) return
     let active = true
-    const fetchOnce = () => commerceRequest<StaffOrder[]>(commerceApi, '/orders')
-      .then(value => { if (active) { setItems(value); setError('') } })
-      .catch(e => { if (active) setError(e instanceof Error ? e.message : 'Siparişler yüklenemedi.') })
+    let latest=0
+    const fetchOnce = () => {const request=++latest;return commerceRequest<StaffOrder[]>(commerceApi, '/orders')
+      .then(value => { if (active&&request===latest) { setItems(value); setError('') } })
+      .catch(e => { if (active&&request===latest) {setItems([]);setError(e instanceof Error ? e.message : 'Siparişler yüklenemedi.')} })}
     void fetchOnce()
     const timer = window.setInterval(() => { if (document.visibilityState === 'visible') void fetchOnce() }, 15000)
     return () => { active = false; window.clearInterval(timer) }
@@ -44,13 +49,14 @@ export default function Orders() {
     (status === 'Tümü' || (status === 'Açık talep' ? openRequests(order).length > 0 : statusText[order.status] === status)) &&
     `${order.number} ${customerName} ${customerEmail} ${order.lines.map(line => line.name).join(' ')}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
   async function act(route: string, body: unknown, done: string) {
-    if (!selected || busy) return
+    if (!selected || writing.current || error || !(route.startsWith('/requests/')?canCancel:canWrite)) return
+    writing.current=true
     setBusy(true); setNotice('')
     try {
       await commerceRequest(commerceApi, `/orders/${encodeURIComponent(selected.order.id)}${route}`, 'POST', body)
-      load(); setNotice(done + ' Müşteriye bildirim gönderildi.'); setNote('')
+      load(); setNotice(done + ' Bildirim kuyruğa alındı; teslim durumu bildirim kayıtlarından izlenir.'); setNote('')
     } catch (e) { setNotice(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
-    finally { setBusy(false) }
+    finally { writing.current=false;setBusy(false) }
   }
   function open(id: string, button: HTMLButtonElement) { trigger.current = button; setSelectedId(id); setNotice(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
   function close() { dialog.current?.close(); trigger.current?.focus() }
@@ -69,8 +75,8 @@ export default function Orders() {
         <dl><div><dt>Müşteri</dt><dd>{selected.customerName} · {selected.customerEmail} · {phone(selected.customerPhone)}</dd></div><div><dt>Teslimat</dt><dd>{order.address.fullName} · {phone(order.address.phone)} · {order.address.line}, {order.address.district}/{order.address.city}</dd></div><div><dt>Tutar</dt><dd>{money(order.total)}</dd></div>{order.shipment && <div><dt>Kargo</dt><dd>{order.shipment.carrier} · {order.shipment.trackingNumber}{order.shipment.deliveredAt ? ` · teslim ${date(order.shipment.deliveredAt)}` : ''}</dd></div>}</dl>
         <ul className="order-lines">{order.lines.map((line, index) => <li key={index}>{line.name} · {line.color} · {line.quantity} adet · {money(line.lineTotal)}{line.personalization && <div className="order-design">{line.personalization.imageUrl && <a href={designUrl(line.personalization.imageUrl)} target="_blank" rel="noreferrer"><img src={designUrl(line.personalization.imageUrl)} alt={`${line.personalization.name} tasarımı`} /></a>}<span>Kişiselleştirilmiş · {line.personalization.kind === 'ai' ? 'AI tasarımı' : 'Müşteri görseli'}: <strong>{line.personalization.name}</strong> · Temsilidir; üretim dosyası ayrıca kontrol edilir.</span></div>}</li>)}</ul>
         {order.requests?.map(request => <div className="quote-detail" key={request.id}><h3>{request.type === 'cancel' ? 'İptal talebi' : 'İade talebi'} · {requestText[request.status]}</h3><p>{request.reason}{request.description ? ` — ${request.description}` : ''}</p>{request.type === 'return' && <p>Ürünler: {request.lines.map(line => `${order.lines.find(item => item.variantId === line.variantId)?.name ?? line.variantId} × ${line.quantity}`).join(', ')}</p>}{request.resolution && <p>Not: {request.resolution}</p>}
-          {request.status === 'requested' && <div className="dialog-actions"><button disabled={busy} onClick={() => void act(`/requests/${request.id}`, { decision: 'approve', resolution: note || null }, request.type === 'cancel' ? 'Sipariş iptal edildi.' : 'İade onaylandı.')}>{request.type === 'cancel' ? 'İptali onayla' : 'İadeyi onayla'}</button><button disabled={busy} onClick={() => void act(`/requests/${request.id}`, { decision: 'reject', resolution: note || null }, 'Talep reddedildi.')}>Reddet</button></div>}
-          {request.status === 'approved' && <div className="dialog-actions"><button disabled={busy} onClick={() => void act(`/requests/${request.id}`, { decision: 'complete', resolution: note || null }, 'İade tamamlandı.')}>Ürün depoya ulaştı · iadeyi tamamla</button></div>}
+          {request.status === 'requested' && <div className="dialog-actions"><button disabled={busy||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'approve', resolution: note || null }, request.type === 'cancel' ? 'Sipariş iptal edildi.' : 'İade onaylandı.')}>{request.type === 'cancel' ? 'İptali onayla' : 'İadeyi onayla'}</button><button disabled={busy||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'reject', resolution: note || null }, 'Talep reddedildi.')}>Reddet</button></div>}
+          {request.status === 'approved' && <div className="dialog-actions"><button disabled={busy||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'complete', resolution: note || null }, 'İade tamamlandı.')}>Ürün depoya ulaştı · iadeyi tamamla</button></div>}
         </div>)}
         <label>Not (müşteriye iletilir, isteğe bağlı)<textarea rows={2} maxLength={500} value={note} onChange={event => setNote(event.target.value)} /></label>
         {(order.status === 'received' || order.status === 'preparing') && <form className="catalog-form" onSubmit={event => { event.preventDefault(); void act('/shipment', { carrier, trackingNumber: tracking, trackingUrl: trackingUrl || null }, 'Sipariş kargoya verildi.') }}>
@@ -78,12 +84,12 @@ export default function Orders() {
           <label>Kargo firması<select required value={carrier} onChange={event => setCarrier(event.target.value)}><option value="">Seç</option>{options?.carriers.map(item => <option key={item}>{item}</option>)}</select></label>
           <label>Takip numarası<input required value={tracking} onChange={event => setTracking(event.target.value)} maxLength={40} /></label>
           <label>Takip bağlantısı (isteğe bağlı, https://)<input type="url" value={trackingUrl} onChange={event => setTrackingUrl(event.target.value)} maxLength={500} /></label>
-          <button disabled={busy}>Kargoya verildi olarak işaretle</button>
+          <button disabled={busy||!canWrite||!options}>Kargoya verildi olarak işaretle</button>
         </form>}
         <div className="dialog-actions">
-          {order.status === 'received' && <button disabled={busy} onClick={() => void act('/status', { status: 'preparing', note: note || null }, 'Sipariş hazırlanıyor.')}>Hazırlanmaya başla</button>}
-          {order.status === 'shipped' && <button disabled={busy} onClick={() => void act('/status', { status: 'delivered', note: note || null }, 'Sipariş teslim edildi.')}>Teslim edildi</button>}
-          {(order.status === 'received' || order.status === 'preparing') && <button disabled={busy} onClick={() => { if (window.confirm(`${order.number} iptal edilsin mi?`)) void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.') }}>Siparişi iptal et</button>}
+          {order.status === 'received' && <button disabled={busy||!canWrite} onClick={() => void act('/status', { status: 'preparing', note: note || null }, 'Sipariş hazırlanıyor.')}>Hazırlanmaya başla</button>}
+          {order.status === 'shipped' && <button disabled={busy||!canWrite} onClick={() => void act('/status', { status: 'delivered', note: note || null }, 'Sipariş teslim edildi.')}>Teslim edildi</button>}
+          {(order.status === 'received' || order.status === 'preparing') && <button disabled={busy||!canWrite} onClick={() => { if (window.confirm(`${order.number} iptal edilsin mi?`)) void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.') }}>Siparişi iptal et</button>}
         </div>
         {notice && <p role="status">{notice}</p>}
         <h3>Geçmiş</h3>

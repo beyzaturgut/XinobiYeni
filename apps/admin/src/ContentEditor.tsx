@@ -48,7 +48,7 @@ function ContentEditor({ content, products, categories, announcements, onPublish
   }
 
   async function saveContent() {
-    try { await onSave({ ...content, slides, buttonColor, categoryProducts, categoryImages, titaniumImage, featuredProducts: featuredProducts.filter(Boolean) }); setNotice('İçerik kaydedildi; local web güncelleniyor.') }
+    try { await onSave({ ...content, slides, buttonColor, categoryProducts, categoryImages, titaniumImage, featuredProducts: featuredProducts.filter(Boolean) }); setNotice('İçerik kaydedildi.') }
     catch (error) { setNotice(error instanceof Error ? error.message : 'İçerik kaydedilemedi.') }
   }
   const source = (src: string) => mediaUrl(src, commerceApi, 'http://127.0.0.1:3000')

@@ -21,7 +21,7 @@ const date = (value: string) => new Date(value).toLocaleString('tr-TR', { day: '
 const phone = (value?: string | null) => value?.startsWith('+90') ? `0${value.slice(3, 6)} ${value.slice(6, 9)} ${value.slice(9, 11)} ${value.slice(11)}` : value ?? '—'
 const openRequests = (order: Order) => order.requests?.filter(item => item.status === 'requested' || item.status === 'approved') ?? []
 
-/** Order desk: every customer's demo order with shipping, status changes and cancel/return decisions. Each change notifies the customer. */
+/** Order desk: customer orders with shipping, status changes and cancel/return decisions. Each change notifies the customer. */
 export default function Orders() {
   const permissions=useAdminSession()?.permissions??[]
   const canWrite=permissions.includes('orders.write'),canCancel=permissions.includes('orders.cancel')
@@ -64,7 +64,7 @@ export default function Orders() {
   return <section aria-label="Sipariş listesi">
     <div className="order-filters"><label>Sipariş veya müşteri ara<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Sipariş no, müşteri, e-posta, ürün" /></label><label htmlFor="order-status">Durum<select id="order-status" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Açık talep', ...Object.values(statusText)].map(item => <option key={item}>{item}</option>)}</select></label><button onClick={() => { setQuery(''); setStatus('Tümü') }}>Filtreleri temizle</button><button onClick={load}>Yenile</button></div>
     {error && <p role="alert">{error}</p>}
-    <p role="status">{filtered.length} sipariş · Demo siparişlerde ödeme alınmaz; kargo ve iade adımları müşteriye bildirilir.</p>
+    <p role="status">{filtered.length} sipariş · Bu ekran ödeme tahsilatı gerçekleştirmez.</p>
     <div className="table-scroll"><table><caption>Web ve mobil siparişleri</caption><thead><tr>{['Sipariş', 'Müşteri', 'Tarih', 'Durum', 'Talep', 'Tutar', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
       <tbody>{filtered.map(({ order, customerName, customerEmail }) => <tr key={order.id}><th scope="row">{order.number}</th><td>{customerName}<br /><small>{customerEmail}</small></td><td>{date(order.createdAt)}</td><td><span className="order-state">{statusText[order.status] ?? order.status}</span></td><td>{openRequests(order).map(item => <span className="order-state" key={item.id}>{item.type === 'cancel' ? 'İptal' : 'İade'} · {requestText[item.status]}</span>)}</td><td>{money(order.total)}</td><td><button aria-label={`${order.number} detayını aç`} onClick={event => open(order.id, event.currentTarget)}>İncele</button></td></tr>)}</tbody></table></div>
     {filtered.length === 0 && !error && <div className="empty-widget"><strong>{items.length ? 'Filtrelere uygun sipariş yok' : 'Henüz sipariş yok'}</strong><p>{items.length ? 'Aramayı veya durum seçimini değiştirin.' : 'Web veya mobilden verilen siparişler burada görünür.'}</p></div>}

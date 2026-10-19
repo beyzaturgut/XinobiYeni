@@ -29,6 +29,7 @@ try{
   await page.getByRole('button',{name:'Bugün',exact:true}).click()
   await page.locator('#widget-orders').locator('xpath=ancestor::section[1]').locator('.metric strong').filter({hasText:'2'}).waitFor()
   release();await page.waitForTimeout(150)
+  assert.ok(requests>=2,'A changed period must make a new summary request')
   assert.equal(await page.locator('#widget-orders').locator('xpath=ancestor::section[1]').locator('.metric strong').textContent(),'2')
   mode='error';await page.getByRole('button',{name:'Yenile',exact:true}).click()
   await page.getByRole('alert').filter({hasText:'SQL report unavailable'}).waitFor()

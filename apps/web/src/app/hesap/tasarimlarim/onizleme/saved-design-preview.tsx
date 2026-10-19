@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import {useCallback,useEffect,useState} from 'react';
+import {useEffect,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {designImageUrl,myDesigns,useDemoCommerce,type MyDesign} from '../../../../lib/demo-commerce';
 import {useCommerce} from '../../../../lib/commerce';
@@ -22,10 +22,11 @@ export default function SavedDesignPreview(){
   },[user,id]);
   const product=state?.products.find(item=>item.id===design?.productId);
   const [variant,setVariant]=useState(''),[notice,setNotice]=useState('');
-  const [placement,setPlacement]=useState<DesignPlacement>();
+  const [placementEdit,setPlacementEdit]=useState<{key:string;value:DesignPlacement}>();
   const chosen=variant||design?.variantId||product?.variants[0]?.id||'';
-  useEffect(()=>{setPlacement(design?readDesignPlacement(design.id,design.productId,chosen):undefined)},[design,chosen]);
-  const updatePlacement=useCallback((value:DesignPlacement)=>{setPlacement(value);if(design)saveDesignPlacement(design.id,design.productId,chosen,value)},[design,chosen]);
+  const placementKey=JSON.stringify([design?.id,design?.productId,chosen]);
+  const placement=placementEdit?.key===placementKey?placementEdit.value:design?readDesignPlacement(design.id,design.productId,chosen):undefined;
+  function updatePlacement(value:DesignPlacement){setPlacementEdit({key:placementKey,value});if(design)saveDesignPlacement(design.id,design.productId,chosen,value)}
   if(!ready)return <main className={styles.main}><p role="status">Yükleniyor…</p></main>;
   if(!user)return <main className={styles.main}><Link href="/hesap">Giriş yap →</Link></main>;
   if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/hesap/tasarimlarim">Tasarımlarıma dön</Link></main>;

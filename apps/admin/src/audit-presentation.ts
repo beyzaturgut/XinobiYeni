@@ -38,3 +38,8 @@ export function auditDate(value:string):string{
  const date=new Date(value)
  return Number.isNaN(date.getTime())?'Tarih bilgisi geçersiz':new Intl.DateTimeFormat('tr-TR',{timeZone:'Europe/Istanbul',day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(date)
 }
+export function auditActor(actorId:string|null|undefined,account?:{name:string;id?:unknown}):string{
+ const normalize=(id:string)=>id.replace(/-/g,'').toLowerCase()
+ if(actorId&&typeof account?.id==='string'&&normalize(actorId)===normalize(account.id)&&account.name.trim())return account.name
+ return actorId?'Kullanıcı (ad bilgisi yok)':'İşlemi yapan belirtilmemiş'
+}

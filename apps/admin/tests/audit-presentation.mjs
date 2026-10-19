@@ -1,7 +1,7 @@
 // Presentation/HTTP fixtures only. No SQL, existing profile, credentials or real audit writes.
 import assert from 'node:assert/strict'
 import {createRequire} from 'node:module'
-import {auditAction,auditDate,auditResult} from '../src/audit-presentation.ts'
+import {auditAction,auditActor,auditDate,auditResult} from '../src/audit-presentation.ts'
 import {navigationItems} from '../src/admin-navigation.ts'
 for(const [code,label] of [[200,'Başarılı'],[201,'Başarılı'],[204,'Başarılı'],[202,'İşleme alındı'],[400,'İşlem gerçekleştirilemedi'],[401,'Oturum gerekli'],[403,'Yetki reddedildi'],[409,'İşlem çakışması'],[503,'Servis kullanılamıyor'],[500,'Sunucu hatası'],[302,'Yönlendirme'],[0,'Sonuç bilgisi yok']])assert.equal(auditResult(code),label)
 assert.equal(auditAction('PUT local-commerce/prices/{id}'),'Ürün fiyatı güncelleme')
@@ -12,6 +12,9 @@ assert.equal(auditAction('POST local-commerce/orders/{id}/requests/{requestId}')
 assert.equal(auditAction('POST unknown/provider'),'Diğer yönetim işlemi')
 assert.ok(auditDate('2026-10-19T00:00:00Z').includes('03:00:00'))
 assert.equal(auditDate('invalid'),'Tarih bilgisi geçersiz')
+assert.equal(auditActor('ABC-123',{id:'abc123',name:'Known name'}),'Known name')
+assert.equal(auditActor('different',{id:'abc123',name:'Known name'}),'Kullanıcı (ad bilgisi yok)')
+assert.equal(auditActor(null,{id:'abc123',name:'Known name'}),'İşlemi yapan belirtilmemiş')
 const {chromium}=createRequire(new URL('../../web/package.json',import.meta.url))('@playwright/test')
 const browser=await chromium.launch({channel:'chrome',headless:true}),base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/'
 try{

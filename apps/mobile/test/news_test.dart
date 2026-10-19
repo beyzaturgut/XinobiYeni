@@ -54,7 +54,10 @@ void main() {
     expect(find.text('Duyuru · 06.10.2026'), findsOneWidget);
     expect((await SharedPreferences.getInstance()).getStringList(seenAnnouncementsKey)?.toSet(), {'A1', 'A2'});
 
-    await tester.pageBack();
+    // The app uses Turkish Material tooltips; pageBack() searches for English
+    // "Back" and then a Cupertino button instead of the visible Material one.
+    expect(find.byType(BackButton), findsOneWidget);
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.byTooltip('Haber ve duyurular'), findsOneWidget);
   });

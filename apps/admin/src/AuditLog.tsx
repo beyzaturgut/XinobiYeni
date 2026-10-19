@@ -1,27 +1,44 @@
-import { useEffect, useState } from 'react'
-import { commerceApi, commerceRequest } from './commerce'
+import {useEffect,useState} from 'react'
+import {commerceApi,commerceRequest} from './commerce'
+import {useAdminSession} from './AdminAccess'
+import {auditAction,auditAreas,auditDate,auditResult} from './audit-presentation'
+import './audit-log.css'
 
-type Entry = { id: string; occurredAt: string; actorId?: string | null; action: string; entityType: string; entityId: string; status: number; traceId?: string | null }
-const areas: Record<string, string> = { catalog: 'Katalog', pricing: 'Fiyat', content: 'İçerik', media: 'Medya', orders: 'Siparişler', quotes: 'Teklifler', ai: 'AI', notifications: 'Bildirimler', admin: 'Yönetim' }
-const date = (value: string) => new Date(value).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
-const result = (status: number) => status < 300 ? 'Başarılı' : status === 401 || status === 403 ? 'Yetkisiz' : status < 500 ? 'Reddedildi' : 'Hata'
-
-/** Read-only audit trail (Faz03 03.06): every panel change attempt with actor, route and result; bodies are never stored. */
-export default function AuditLog() {
-  const [items, setItems] = useState<Entry[] | null>(null), [area, setArea] = useState(''), [error, setError] = useState(''), [reload, setReload] = useState(0)
-  useEffect(() => {
-    let active = true
-    commerceRequest<Entry[]>(commerceApi, `/audit?${new URLSearchParams({ limit: '200', ...(area && { entityType: area }) })}`)
-      .then(value => { if (active) { setItems(value); setError('') } })
-      .catch(e => { if (active) {setItems(null);setError(e instanceof Error ? e.message : 'Denetim kaydı yüklenemedi.')} })
-    return () => { active = false }
-  }, [area, reload])
-  return <section aria-label="Denetim kaydı">
-    <p className="panel-notice">Paneldeki her değişiklik denemesi (başarılı, reddedilen ve yetkisiz) kim, ne zaman, hangi kayıt ve sonuçla burada listelenir. İstek içeriği (fiyat, adres, mesaj) saklanmaz; kayıtlar düzenlenemez veya silinemez.</p>
-    <div className="order-filters"><label>Alan<select value={area} onChange={event => setArea(event.target.value)}><option value="">Tümü</option>{Object.entries(areas).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><button onClick={() => setReload(value => value + 1)}>Yenile</button></div>
-    {error && <p role="alert">{error} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
-    <div className="table-scroll"><table><caption>Son 200 kayıt</caption><thead><tr>{['Zaman', 'Kullanıcı', 'Alan', 'İşlem', 'Kayıt', 'Sonuç', 'İstek no'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
-      <tbody>{items?.map(item => <tr key={item.id}><td>{date(item.occurredAt)}</td><td>{item.actorId ? item.actorId.slice(0, 8) : 'Oturumsuz'}</td><td>{areas[item.entityType] ?? item.entityType}</td><td><code>{item.action}</code></td><td>{item.entityId}</td><td><span className="order-state">{result(item.status)} · {item.status}</span></td><td><code>{item.traceId?.slice(0, 12)}</code></td></tr>)}</tbody></table></div>
-    {items && items.length === 0 && <div className="empty-widget"><strong>Kayıt yok</strong><p>Panelde bir değişiklik yapıldığında burada görünür.</p></div>}
-  </section>
+type Entry={id:string;occurredAt:string;actorId?:string|null;action:string;entityType:string;entityId:string;status:number;traceId?:string|null}
+type Snapshot={key:string;items:Entry[];error:string}
+export default function AuditLog(){
+ const canRead=useAdminSession()?.permissions.includes('audit.read')??false
+ const [area,setArea]=useState(''),[reload,setReload]=useState(0),[snapshot,setSnapshot]=useState<Snapshot|null>(null)
+ const key=area+':'+reload,current=snapshot?.key===key?snapshot:null
+ useEffect(()=>{
+  if(!canRead)return
+  let active=true
+  const request=commerceApi?commerceRequest<Entry[]>(commerceApi,'/audit?'+new URLSearchParams({limit:'200',...(area&&{entityType:area})})):Promise.reject(new Error('Denetim servisi adresi yapılandırılmadı.'))
+  request.then(items=>{if(active)setSnapshot({key,items,error:''})}).catch(error=>{if(active)setSnapshot({key,items:[],error:error instanceof Error?error.message:'Denetim kaydı yüklenemedi.'})})
+  return()=>{active=false}
+ },[area,key,canRead])
+ if(!canRead)return <section aria-label="Denetim kaydı"><p role="alert">İşlem geçmişini görüntüleme yetkiniz yok.</p></section>
+ return <section aria-label="Denetim kaydı" className="audit-log">
+  <p className="panel-notice">Yönetim işlem denemelerini ve sonuçlarını inceleyebilirsiniz. Bu kayıtlar tek başına sipariş, tahsilat veya teslimat gerçekleştiğini göstermez. Kayıtlar değiştirilemez veya silinemez.</p>
+  <div className="order-filters"><label>Alan<select aria-label="Alan" value={area} onChange={event=>setArea(event.target.value)}><option value="">Tümü</option>{Object.entries(auditAreas).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><button onClick={()=>setReload(value=>value+1)}>Yenile</button></div>
+  <p className="audit-help">Seçilen alanın en yeni 200 kaydı gösterilir. Tarih ve saat: Türkiye saati (Europe/Istanbul). Mevcut kaynak kullanıcı adını ve test/canlı ayrımını belirtmiyor; bilinmeyen bilgiler tahmin edilmez.</p>
+  {!current&&<p role="status">İşlem geçmişi yükleniyor…</p>}
+  {current?.error&&<p role="alert">{current.error} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
+  {current&&!current.error&&<><div className="table-scroll audit-table"><table><caption>İşlem geçmişi · En fazla 200 kayıt</caption><thead><tr>{['Tarih / saat','İşlem','İşlemi yapan','İlgili kayıt','Sonuç'].map(title=><th key={title} scope="col">{title}</th>)}</tr></thead><tbody>{current.items.map(item=><tr key={item.id}>
+   <td><time dateTime={item.occurredAt}>{auditDate(item.occurredAt)}</time></td>
+   <th scope="row"><span>{auditAction(item.action)}</span><details><summary>Teknik detaylar</summary><dl>
+    <div><dt>Kayıt numarası</dt><dd>{item.id}</dd></div>
+    <div><dt>Endpoint / işlem</dt><dd><code>{item.action}</code></dd></div>
+    <div><dt>HTTP kodu</dt><dd>{item.status}</dd></div>
+    <div><dt>Kullanıcı kimliği</dt><dd>{item.actorId||'Belirtilmemiş'}</dd></div>
+    <div><dt>Kayıt türü</dt><dd>{item.entityType}</dd></div>
+    <div><dt>Hedef kayıt kimliği</dt><dd>{item.entityId}</dd></div>
+    <div><dt>İstek / ilişkilendirme numarası</dt><dd>{item.traceId||'Belirtilmemiş'}</dd></div>
+    <div><dt>Kaydedilen zaman</dt><dd>{item.occurredAt}</dd></div>
+   </dl></details></th>
+   <td>{item.actorId?'Kullanıcı (ad bilgisi yok)':'İşlemi yapan belirtilmemiş'}</td>
+   <td>{auditAreas[item.entityType]??'İlgili kayıt'} · {item.entityId&&item.entityId!=='-'?'Kayıt kimliği ayrıntılarda':'Hedef belirtilmemiş'}</td>
+   <td><span className="order-state">{auditResult(item.status)}</span></td>
+  </tr>)}</tbody></table></div>{current.items.length===0&&<div className="empty-widget"><strong>Kayıt bulunamadı</strong><p>Seçilen alan için gösterilebilecek işlem kaydı yok.</p></div>}</>}
+ </section>
 }

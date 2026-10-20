@@ -8,20 +8,26 @@ const row = { id: 'design-a', kind: 'upload', productId: 'product-a', productNam
 const paged = (items = [row], page = 1, total = items.length) => ({ items, page, pageSize: 20, total, totalPages: Math.ceil(total / 20) })
 const gate = () => { let release; const promise = new Promise(resolve => { release = resolve }); return { promise, release } }
 let passed = 0
-async function fixture({ permissions = ['print.read'], list, detail, refresh = false } = {}) {
+const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=', 'base64')
+async function fixture({ permissions = ['print.read'], list, detail, image, refresh = false } = {}) {
   const context = await browser.newContext(), page = await context.newPage(), errors = [], requests = []
-  let reads = 0, details = 0
+  let reads = 0, details = 0, images = 0
   page.on('pageerror', error => errors.push(error.message))
   await context.route('**/api/v1/**', async route => {
     const request = route.request(), url = new URL(request.url()), path = url.pathname
     requests.push({ path, method: request.method() })
     const reply = result => result?.abort ? route.abort('failed') : route.fulfill({ status: result?.status || 200, contentType: 'application/json', body: JSON.stringify(result?.body ?? {}) })
-    if (path.endsWith('/auth/admin/refresh')) { assert.ok(refresh); return reply({ status: 401 }) }
+    if (path.endsWith('/auth/admin/refresh')) { assert.ok(refresh); return reply({ status: refresh === 'success' ? 200 : 401 }) }
     assert.equal(request.method(), 'GET', 'Metadata UI must not write')
     if (path.endsWith('/admin/session')) return reply({ body: { account: { name: 'Synthetic staff' }, permissions } })
     if (path.endsWith('/local-commerce/state')) return reply({ status: 503, body: { code: 'catalog_unavailable', title: 'Katalog kullanılamıyor' } })
     if (path.endsWith('/local-commerce/notifications')) return reply({ body: { channels: [], items: [] } })
     if (path.endsWith('/admin/designs')) { assert.equal(url.searchParams.get('pageSize'), '20'); return reply(await list?.(Number(url.searchParams.get('page')), ++reads) ?? { body: paged() }) }
+    if (path.includes('/admin/designs/') && path.endsWith('/image')) {
+      const result = await image?.(decodeURIComponent(path.split('/').at(-2)), ++images)
+      if (result?.status || result?.abort) return reply(result)
+      return route.fulfill({ status: 200, contentType: 'image/png', body: result?.bytes ?? png, headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } })
+    }
     if (path.includes('/admin/designs/')) return reply(await detail?.(decodeURIComponent(path.split('/').at(-1)), ++details) ?? { body: { ...row, mime: 'image/png', AccountId: 'PRIVATE-ACCOUNT', File: 'PRIVATE-FILE', Profile: ['PRIVATE-PROFILE'], Name: 'PRIVATE-NAME' } })
     throw new Error('Unexpected API dependency: ' + path)
   })
@@ -39,7 +45,8 @@ try {
     await inspect.focus(); await f.page.keyboard.press('Enter')
     const dialog = f.page.getByRole('dialog'); await dialog.getByText('image/png', { exact: true }).waitFor()
     assert.doesNotMatch(await dialog.innerText(), /PRIVATE-/)
-    assert.equal(await dialog.locator('img,a[download],textarea').count(), 0)
+    await dialog.getByRole('img').waitFor(); await dialog.getByRole('img').evaluate(img => img.decode())
+    assert.equal(await dialog.locator('a[download],textarea').count(), 0)
     assert.equal(await f.section.getByRole('button', { name: /Üretime|indir|oluştur|not.*kaydet/i }).count(), 0)
     assert.equal(await f.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, `Overflow ${width}`)
     await f.page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden' })
@@ -77,5 +84,21 @@ try {
     await f.section.getByRole('button', { name: 'İncele', exact: true }).click(); await f.page.getByRole('dialog').getByText('image/current').waitFor(); slow.release(); await f.page.waitForTimeout(150)
     assert.equal(await f.page.getByText('STALE-MIME', { exact: true }).count(), 0); await f.close()
   }
-  console.log(`PASS: ${passed} Chrome fixture scenarios; metadata/list/detail, errors/retry, permission/session, pagination/stale, 4 widths and keyboard; no real SQL or print writes`)
+  for (const status of [403, 404, 503, 'network', 'invalid']) {
+    let fail = true
+    const f = await fixture({ image: () => fail ? status === 'network' ? { abort: true } : status === 'invalid' ? { bytes: Buffer.from('not an image') } : { status, body: { title: 'Fixture image unavailable' } } : {} })
+    await f.section.getByRole('button', { name: 'İncele', exact: true }).click()
+    const preview = f.page.getByRole('region', { name: 'Kayıtlı tasarım görseli' }); await preview.getByRole('alert').waitFor()
+    assert.equal(await preview.getByRole('img').count(), 0)
+    fail = false; await preview.getByRole('button', { name: 'Görseli tekrar dene' }).click(); await preview.getByRole('img').waitFor(); await preview.getByRole('img').evaluate(img => img.decode()); await f.close()
+  }
+  { const f = await fixture({ refresh: true, image: () => ({ status: 401 }) }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click(); await f.page.getByRole('heading', { name: /giriş/i }).waitFor(); await f.close() }
+  { const f = await fixture({ refresh: 'success', image: (_, n) => n === 1 ? { status: 401 } : {} }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click(); const img = f.page.getByRole('dialog').getByRole('img'); await img.waitFor(); await img.evaluate(image => image.decode()); assert.equal(f.requests.filter(request => request.path.endsWith('/auth/admin/refresh')).length, 1); await f.close() }
+  { const slow = gate(), started = gate(); const f = await fixture({ list: () => ({ body: paged([row, { ...row, id: 'design-b', productName: 'Second product' }]) }), detail: id => ({ body: { ...row, id, productName: id === 'design-b' ? 'Second product' : row.productName, mime: 'image/png' } }), image: async id => { if (id === 'design-a') { started.release(); await slow.promise; return { bytes: Buffer.from('obsolete broken image') } } return {} } })
+    await f.section.getByRole('button', { name: 'İncele', exact: true }).first().click(); await started.promise
+    await f.page.getByText('Tasarım görseli yükleniyor…').waitFor(); await f.page.keyboard.press('Escape')
+    await f.section.getByRole('button', { name: 'İncele', exact: true }).nth(1).click(); const img = f.page.getByRole('dialog').getByRole('img'); await img.waitFor(); await img.evaluate(image => image.decode()); slow.release(); await f.page.waitForTimeout(150)
+    assert.match(await img.getAttribute('alt'), /Second product/); assert.equal(await f.page.getByRole('dialog').getByRole('alert').count(), 0); await f.close()
+  }
+  console.log(`PASS: ${passed} Chrome fixture scenarios; metadata/image, errors/retry, permission/session, pagination/stale selection, 4 widths and keyboard; no real SQL or print writes`)
 } finally { await browser.close() }

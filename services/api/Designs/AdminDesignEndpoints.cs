@@ -30,6 +30,29 @@ public static class AdminDesignEndpoints
         designs.MapGet("/{id}", async (string id, SavedDesignStore store) => await store.AdminDetails(id))
             .WithName("GetAdminDesign").Produces<AdminDesignDetails>()
             .ProducesProblem(400).ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(503);
+        designs.MapGet("/{id}/image", async (string id, SavedDesignStore store, HttpContext http) =>
+            {
+                var file = await store.AdminImage(id);
+                http.Response.Headers["X-Content-Type-Options"] = "nosniff";
+                return Results.Stream(file.Content, file.ContentType);
+            })
+            .WithName("GetAdminDesignImage")
+            .Produces(200, contentType: "image/png", additionalContentTypes: ["image/jpeg", "image/webp"])
+            .AddOpenApiOperationTransformer((operation, _, _) =>
+            {
+                operation.Responses!["200"] = new OpenApiResponse
+                {
+                    Description = "Kayıtlı tasarım görseli",
+                    Content = new Dictionary<string, OpenApiMediaType>
+                    {
+                        ["image/png"] = new() { Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" } },
+                        ["image/jpeg"] = new() { Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" } },
+                        ["image/webp"] = new() { Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" } }
+                    }
+                };
+                return Task.CompletedTask;
+            })
+            .ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(503);
     }
 
     private static int Number(string? value, int fallback) => value is null ? fallback

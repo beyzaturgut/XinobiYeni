@@ -31,9 +31,12 @@ async function loadCatalogSurface(product:string,variant:string,signal:AbortSign
  }if(input.mask.sha256!==input.surfaceVersion)throw Error('Invalid mask version');const preview=catalogPreviewDimensions(input.width,input.height);return {...input,assetWidth:input.width,assetHeight:input.height,...preview,surfaceTreatment:'metallic-ink',...(product===CM121_PRODUCT&&variant===CM121_VARIANT?{surfaceInkExposureStops:0.55}:{})};
 }
 
+// Without the opt-in same-origin proxy the local API is called directly; its CORS policy admits the local web origin.
+const sharedSurfaceOrigin=/^https?:\/\//.test(commerceApi)?new URL(commerceApi).origin:'';
+
 // Explicitly approved experimental catalogue masks. The exact product/variant remains part of every lookup.
 async function loadSharedCommerceSurface(product:string,variant:string,signal:AbortSignal):Promise<RenderingInputs|null>{
- const response=await fetch('/api/v1/dev/product-surfaces/commerce-mask/'+encodeURIComponent(product)+'/'+encodeURIComponent(variant)+'/rendering-inputs',{signal,cache:'no-store'});
+ const response=await fetch(sharedSurfaceOrigin+'/api/v1/dev/product-surfaces/commerce-mask/'+encodeURIComponent(product)+'/'+encodeURIComponent(variant)+'/rendering-inputs',{signal,cache:'no-store'});
  if(response.status===404)return null;if(!response.ok)throw Error('Shared mask unavailable');
  const value=await response.json();
  if(value.scope!=='development-preview'||value.productReference!==product||value.variantReference!==variant)throw Error('Invalid shared mask identity');
@@ -43,7 +46,7 @@ async function loadSharedCommerceSurface(product:string,variant:string,signal:Ab
  const sourcePath=/^\/(?:api\/v1\/local-commerce\/media\/[a-f0-9]{32}\.(?:png|jpg|webp)|assets\/[a-zA-Z0-9/_-]+\.(?:png|jpg|webp))\?v=[a-f0-9]{64}$/;
  const maskPath=/^\/api\/v1\/local-commerce\/media\/[a-f0-9]{32}\.png\?v=[a-f0-9]{64}$/;
  if(!input.source||!input.mask||!checksum.test(input.source.sha256)||!checksum.test(input.mask.sha256)||!sourcePath.test(input.source.url)||!maskPath.test(input.mask.url)||!input.source.url.endsWith('?v='+input.source.sha256)||!input.mask.url.endsWith('?v='+input.mask.sha256)||input.source.sha256!==input.sourceMediaVersion||input.mask.sha256!==input.surfaceVersion)throw Error('Invalid shared mask media');
- return {...input,assetWidth:input.width,assetHeight:input.height,...catalogPreviewDimensions(input.width,input.height),surfaceTreatment:'metallic-ink'};
+ return {...input,source:{...input.source,url:sharedSurfaceOrigin+input.source.url},mask:{...input.mask,url:sharedSurfaceOrigin+input.mask.url},assetWidth:input.width,assetHeight:input.height,...catalogPreviewDimensions(input.width,input.height),surfaceTreatment:'metallic-ink'};
 }
 
 export async function loadAcceptedSurface(variantReference:string,signal:AbortSignal,commerceProduct?:string):Promise<RenderingInputs|null>{

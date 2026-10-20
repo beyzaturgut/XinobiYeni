@@ -35,7 +35,7 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailab
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi. Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin.</PreviewStatus>;
   if (!state.inputs) return <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>;
-  if(saved.onPlacementChange)return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} {...saved}/>;
+  if(saved.onPlacementChange)return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} fillMask={saved.initialPlacement?.fillMask} {...saved}/>;
   return <LocalPatternPreview inputs={state.inputs} initialPatternSrc={patternSrc ?? "/assets/personalization/sample-pattern.png"} xinobiPreview={xinobiPreview} />;
 }
 function AcceptedSurfaceRoute() {
@@ -101,6 +101,14 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
   async function selectPreviewVariant(variantId: string) {
     const next = surfaces[variantId];
     if (!next || !inputs || switching || variantId === activeVariantId) return;
+    // Colours approved with one shared mask keep identical surface coordinates; the placement carries over unchanged.
+    if (next.mask.sha256 === inputs.mask.sha256 && next.width === inputs.width && next.height === inputs.height) {
+      transferGeneration.current++;
+      setPlacementWarning("");
+      setActiveVariantId(variantId);
+      try { localStorage.setItem(activeVariantKey, variantId); } catch { /* Keep the in-memory selection. */ }
+      return;
+    }
     const ticket = ++transferGeneration.current;
     setSwitching(true);
     setPlacementWarning("");
@@ -115,7 +123,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
     }
     setSwitching(false);
   }
-  return <>
+  return <div className={styles.xinobiLayout}>
     <section className={styles.previewVariants} aria-label="Önizleme rengi" data-session-variant={sessionVariantId} data-preview-variant={activeVariantId} data-active-variant={activeVariantId}>
       <fieldset className={detailStyles.variants}>
         <legend>Önizleme rengi: <strong>{selected?.color || originalColor}</strong></legend>
@@ -134,7 +142,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
       : variants.length ? <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>
       : originalColor ? <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>
       : <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}
-  </>;
+  </div>;
 }
 export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage, xinobiPreview = false, designId, ...saved }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean; designId?: string } & SavedPlacementProps = {}) {
   if (xinobiPreview && commerceProduct && commerceVariant) return <XinobiVariantPreview key={commerceProduct+':'+commerceVariant+':'+(designId ?? '')} designId={designId} productId={commerceProduct} sessionVariantId={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage}/>;

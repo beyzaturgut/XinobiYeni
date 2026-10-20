@@ -33,6 +33,7 @@ type ProductPatternPreviewProps = {
   brandingOverlaySrc?: string;
   patternSrc: string;
   placementMode?: "pattern" | "artwork";
+  fillMask?: boolean;
   /** A single artwork overlay uses the existing mask/warp, without repainting the product. */
   transparentProduct?: boolean;
   children?: React.ReactNode;
@@ -100,11 +101,11 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ errorFallback, onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", transparentProduct = false, children, onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+export default function ProductPatternPreview({ errorFallback, onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", fillMask = false, transparentProduct = false, children, onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
   const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
   const ASSET_WIDTH = assetWidth, ASSET_HEIGHT = assetHeight;
   const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
-  const centerX = sourceWidth / 2, centerY = sourceHeight * .65;
+  const centerX = sourceWidth / 2, centerY = sourceHeight * (fillMask ? .5 : .65);
   const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
   const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -228,7 +229,7 @@ export default function ProductPatternPreview({ errorFallback, onRendered, surfa
     buffer.rotate(rotation * Math.PI / 180);
     buffer.scale(scale, scale);
     if (placementMode === "artwork") buffer.drawImage(pattern, -artwork.width / 2, -artwork.height / 2, artwork.width, artwork.height);
-    else { const ratio = SOURCE_WIDTH / 1066; buffer.drawImage(pattern, -pattern.naturalWidth * ratio / 2, -pattern.naturalHeight * ratio / 2, pattern.naturalWidth * ratio, pattern.naturalHeight * ratio); }
+    else { const ratio = fillMask ? Math.max(SOURCE_WIDTH / pattern.naturalWidth, SOURCE_HEIGHT / pattern.naturalHeight) : SOURCE_WIDTH / 1066; buffer.drawImage(pattern, -pattern.naturalWidth * ratio / 2, -pattern.naturalHeight * ratio / 2, pattern.naturalWidth * ratio, pattern.naturalHeight * ratio); }
     buffer.restore();
     }
     if(!warpEachBodyBeforeMask){
@@ -250,7 +251,7 @@ export default function ProductPatternPreview({ errorFallback, onRendered, surfa
     // antialiased logo pixels a second time; artwork remains inside the mask.
     if (branding && !transparentProduct) context.drawImage(branding, 0, 0);
     onRendered?.(canvasRef.current!);
-  }, [result, status, x, y, scale, rotation, bodyPlacementAdjustments, curvatureStrength, placementMode, transparentProduct, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, effectiveSurfaceInkExposureStops, onRendered]);
+  }, [result, status, x, y, scale, rotation, bodyPlacementAdjustments, curvatureStrength, placementMode, fillMask, transparentProduct, SOURCE_WIDTH, SOURCE_HEIGHT, centerX, centerY, surfaceTreatment, effectiveSurfaceInkExposureStops, onRendered]);
 
   // Hit the rendered, warped and mask-clipped artwork alpha, not the whole product.
   const draggable = placementMode === "artwork" && !!onArtworkMove && status === "ready";

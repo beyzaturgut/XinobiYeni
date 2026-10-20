@@ -15,7 +15,7 @@ function message(problem: unknown) {
   return problem instanceof Error ? problem.message : 'Tasarım kayıtları yüklenemedi.'
 }
 
-function DesignOrderReferences({ designId }: { designId: string }) {
+function DesignOrderReferences({ designId, onOpenOrder }: { designId: string; onOpenOrder?: (id: string) => void }) {
   const [data, setData] = useState<OrderPage | null>(null), [page, setPage] = useState(1), [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(true), [error, setError] = useState('')
   const version = useRef(0)
@@ -37,15 +37,15 @@ function DesignOrderReferences({ designId }: { designId: string }) {
     {loading && <p role="status">İlişkili siparişler yükleniyor…</p>}
     {error && <p role="alert">{error} <button onClick={() => load()}>Siparişleri tekrar dene</button></p>}
     {!loading && !error && data && <><p role="status">{data.total} ilişkili sipariş · Sayfa {data.totalPages ? data.page : 1}/{data.totalPages || 1}</p>
-      {data.total === 0 ? <p>İlişkili sipariş bulunamadı.</p> : <><div className="table-scroll"><table><caption>Sipariş referansları · saat dilimi Europe/Istanbul</caption><thead><tr><th scope="col">Sipariş numarası</th><th scope="col">Tarih</th></tr></thead><tbody>{data.items?.map(order => <tr key={order.id}><th scope="row">{order.number}</th><td>{date(order.createdAt!)}</td></tr>)}</tbody></table></div>
+      {data.total === 0 ? <p>İlişkili sipariş bulunamadı.</p> : <><div className="table-scroll"><table><caption>Sipariş referansları · saat dilimi Europe/Istanbul</caption><thead><tr><th scope="col">Sipariş numarası</th><th scope="col">Tarih</th></tr></thead><tbody>{data.items?.map(order => <tr key={order.id}><th scope="row"><button disabled={!order.id || !onOpenOrder} onClick={() => order.id && onOpenOrder?.(order.id)} aria-label={`${order.number} sipariş detayını aç`}>{order.number}</button></th><td>{date(order.createdAt!)}</td></tr>)}</tbody></table></div>
         {!data.items?.length && <p>Bu sayfada kayıt yok. Önceki sayfaya dönebilirsiniz.</p>}
-        <p>Sipariş detayına doğrudan geçiş henüz kullanılamıyor.</p></>}
+        </>}
       <div className="periods" aria-label="İlişkili sipariş sayfaları"><button disabled={data.page! <= 1} onClick={() => load(page - 1)}>Önceki sipariş sayfası</button><button disabled={!data.totalPages || data.page! >= data.totalPages} onClick={() => load(page + 1)}>Sonraki sipariş sayfası</button></div>
     </>}
   </section>
 }
 
-export default function PrintOperations(_props: { notes: Record<string, string>; onNote: (id: string, note: string) => void }) {
+export default function PrintOperations({ onOpenOrder }: { notes: Record<string, string>; onNote: (id: string, note: string) => void; onOpenOrder?: (id: string) => void }) {
   const permissions = useAdminSession()?.permissions ?? []
   const canReadOrders = permissions.includes('print.read') && permissions.includes('orders.read')
   const [data, setData] = useState<DesignPage | null>(null), [page, setPage] = useState(1), [reload, setReload] = useState(0)
@@ -99,7 +99,7 @@ export default function PrintOperations(_props: { notes: Record<string, string>;
           {imageLoading && <p role="status">Tasarım görseli yükleniyor…</p>}
           {imageError && <p role="alert">{imageError} <button onClick={() => { setImageUrl(''); setImageError(''); setImageLoading(true); setImageReload(value => value + 1) }}>Görseli tekrar dene</button></p>}
           {imageUrl && <img src={imageUrl} alt={`${detail.productName} için kaydedilen tasarım`} style={{ maxWidth: '100%', maxHeight: '50vh', objectFit: 'contain' }} onLoad={() => setImageLoading(false)} onError={() => { setImageUrl(''); setImageLoading(false); setImageError('Tasarım görseli görüntülenemedi.') }} />}
-        </section>{canReadOrders && detail.id && <DesignOrderReferences key={detail.id} designId={detail.id} />}</>}<button onClick={close}>Kapat</button>
+        </section>{canReadOrders && detail.id && <DesignOrderReferences key={detail.id} designId={detail.id} onOpenOrder={onOpenOrder} />}</>}<button onClick={close}>Kapat</button>
     </div></dialog>
   </section>
 }

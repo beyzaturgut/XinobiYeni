@@ -134,5 +134,5 @@ try {
     await f.section.getByRole('button', { name: 'İncele', exact: true }).first().click(); await started.promise; await f.page.keyboard.press('Escape')
     await f.section.getByRole('button', { name: 'İncele', exact: true }).nth(1).click(); const related = f.page.getByRole('region', { name: 'İlişkili siparişler' }); await related.getByText('NEW-DESIGN-ORDER-0', { exact: true }).waitFor(); slow.release(); await f.page.waitForTimeout(150); assert.equal(await related.getByText('OLD-DESIGN-ORDER-0').count(), 0); await f.close()
   }
-  console.log(`PASS: ${passed} Chrome fixture scenarios; dual permissions/no unauthorized order calls, references/pages/errors/stale, image regressions, 4 widths/keyboard; detail navigation blocked by missing API; no real writes`)
+  console.log(`PASS: ${passed} Chrome fixture scenarios; dual permissions/no unauthorized order calls, references/pages/errors/stale, image regressions, 4 widths/keyboard; no real writes`)
 } finally { await browser.close() }

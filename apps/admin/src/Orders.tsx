@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 import {useAdminSession} from './AdminAccess'
+import { adminCall } from './admin-api'
 
 /** Design images on order lines are served by the panel API with the staff session. */
 const designUrl = (path: string) => commerceApi.replace(/\/api\/v1\/local-commerce\/?$/, '') + path
@@ -22,7 +23,7 @@ const phone = (value?: string | null) => value?.startsWith('+90') ? `0${value.sl
 const openRequests = (order: Order) => order.requests?.filter(item => item.status === 'requested' || item.status === 'approved') ?? []
 
 /** Order desk: customer orders with shipping, status changes and cancel/return decisions. Each change notifies the customer. */
-export default function Orders() {
+export default function Orders({ requestedOrderId = '', onClearRequested, onBackToDesign }: { requestedOrderId?: string; onClearRequested?: () => void; onBackToDesign?: () => void }) {
   const permissions=useAdminSession()?.permissions??[]
   const canWrite=permissions.includes('orders.write'),canCancel=permissions.includes('orders.cancel')
   const writing=useRef(false)
@@ -34,6 +35,25 @@ export default function Orders() {
   const [optionsLoading, setOptionsLoading] = useState(Boolean(commerceApi)), [optionsError, setOptionsError] = useState(''), [optionsReload, setOptionsReload] = useState(0)
   const [carrier, setCarrier] = useState(''), [tracking, setTracking] = useState(''), [trackingUrl, setTrackingUrl] = useState(''), [note, setNote] = useState('')
   const dialog = useRef<HTMLDialogElement>(null), trigger = useRef<HTMLButtonElement | null>(null)
+  const [direct, setDirect] = useState<{ id: string; data?: StaffOrder; error?: string } | null>(null), [directReload, setDirectReload] = useState(0)
+  const directVersion = useRef(0)
+  const canRead = permissions.includes('orders.read')
+  useEffect(() => {
+    if (!requestedOrderId || !canRead) return
+    let active = true
+    const version = ++directVersion.current
+    dialog.current?.showModal()
+    void adminCall<StaffOrder>(`/admin/orders/${encodeURIComponent(requestedOrderId)}`)
+      .then(data => { if (active && version === directVersion.current) {
+        if (data.order.id !== requestedOrderId.replaceAll('-', '').toLowerCase()) throw new Error('Sipariş yanıtı seçilen kayıtla eşleşmiyor.')
+        setDirect({ id: requestedOrderId, data })
+      } })
+      .catch(problem => { if (active && version === directVersion.current) setDirect({ id: requestedOrderId, error: (problem as { status?: number })?.status === 404 ? 'Sipariş bulunamadı.' : problem instanceof Error ? problem.message : 'Sipariş detayı yüklenemedi.' }) })
+    return () => { active = false }
+  }, [requestedOrderId, directReload, canRead])
+  function retryDirect() { directVersion.current++; setDirect(null); setDirectReload(value => value + 1) }
+  const directLoading = Boolean(requestedOrderId && canRead && direct?.id !== requestedOrderId)
+  const directError = direct?.id === requestedOrderId ? direct.error : ''
   useEffect(() => {
     if (!commerceApi) return
     let active = true
@@ -58,11 +78,11 @@ export default function Orders() {
       .finally(() => { if (active&&request===optionsVersion.current) setOptionsLoading(false) })
     return () => { active = false }
   }, [optionsReload])
-  const load = () => {orderVersion.current++;setLoading(true);setError('');setReload(value => value + 1)}
+  const load = () => {orderVersion.current++;setLoading(true);setError('');setReload(value => value + 1);if(requestedOrderId)retryDirect()}
   const retryOptions = () => {optionsVersion.current++;setOptions(null);setOptionsLoading(true);setOptionsError('');setOptionsReload(value => value + 1)}
   const ready = !loading && !error
-  const actionsDisabled = busy || !ready
-  const selected = items.find(item => item.order.id === selectedId) ?? null
+  const actionsDisabled = busy || !ready || directLoading || Boolean(directError)
+  const selected = requestedOrderId ? (canRead && direct?.id === requestedOrderId ? direct.data ?? null : null) : items.find(item => item.order.id === selectedId) ?? null
   const filtered = items.filter(({ order, customerName, customerEmail }) =>
     (status === 'Tümü' || (status === 'Açık talep' ? openRequests(order).length > 0 : statusText[order.status] === status)) &&
     `${order.number} ${customerName} ${customerEmail} ${order.lines.map(line => line.name).join(' ')}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
@@ -76,9 +96,9 @@ export default function Orders() {
     } catch (e) { setNotice(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
     finally { writing.current=false;setBusy(false) }
   }
-  function open(id: string, button: HTMLButtonElement) { trigger.current = button; setSelectedId(id); setNotice(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
+  function open(id: string, button: HTMLButtonElement) { onClearRequested?.(); trigger.current = button; setSelectedId(id); setNotice(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
   function restoreFocus() { (trigger.current?.isConnected ? trigger.current : refreshButton.current)?.focus() }
-  function close() { dialog.current?.close(); restoreFocus() }
+  function close() { directVersion.current++; onClearRequested?.(); dialog.current?.close(); restoreFocus() }
   const order = selected?.order
   return <section aria-label="Sipariş listesi">
     <div className="order-filters"><label>Sipariş veya müşteri ara<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Sipariş no, müşteri, e-posta, ürün" /></label><label htmlFor="order-status">Durum<select id="order-status" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Açık talep', ...Object.values(statusText)].map(item => <option key={item}>{item}</option>)}</select></label><button onClick={() => { setQuery(''); setStatus('Tümü') }}>Filtreleri temizle</button><button ref={refreshButton} onClick={load}>Yenile</button></div>
@@ -92,6 +112,7 @@ export default function Orders() {
     {filtered.length === 0 && <div className="empty-widget"><strong>{items.length ? 'Filtrelere uygun sipariş yok' : 'Henüz sipariş yok'}</strong><p>{items.length ? 'Aramayı veya durum seçimini değiştirin.' : 'Web veya mobilden verilen siparişler burada görünür.'}</p></div>}</>}
     <dialog ref={dialog} className="order-dialog" aria-labelledby="order-detail-title" onClose={restoreFocus} onCancel={event => { event.preventDefault(); close() }}>
       <header className="dialog-heading"><h2 id="order-detail-title">{order?.number ?? 'Sipariş'}</h2><button onClick={close} aria-label="Sipariş detayını kapat">×</button></header>
+      {requestedOrderId && <div className="dialog-body">{directLoading && <p role="status">Sipariş detayı yükleniyor…</p>}{directError && <p role="alert">{directError} <button onClick={retryDirect}>Sipariş detayını tekrar dene</button></p>}{onBackToDesign && <button onClick={onBackToDesign}>Tasarım yönetimine dön</button>}</div>}
       {selected && order && <div className="dialog-body">
         {loading && <p role="status">Siparişler yükleniyor; işlemler geçici olarak kapalı.</p>}
         {optionsLoading && <p role="status">Sipariş seçenekleri yükleniyor…</p>}

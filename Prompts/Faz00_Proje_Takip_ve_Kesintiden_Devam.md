@@ -166,6 +166,12 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 **16.10 boyama sınırı:** Elle gösterme çıktısı artık kılavuzla kesiştirilir; varsayılan tolerans 0, açık seçimle 0–16 kaynak pikseli. Örtüşmeyen sonuçta boyama korunur. [TST-125](../test/2026-10-16/TST-125-guided-mask-containment.md), 62/62 ve admin akışı başarılı. Önceki geniş AI taslakları değişmedi; gerçek kalite kabulü verilmedi.
 
+**16.10 yerel eğri/PNG denemesi — PUSH YOK:** Kullanıcı yalnız yerel deneme ve “geri dön” talimatında başlangıca dönme istedi. Başlangıç `adac37a`, checkpoint `/private/tmp/xinobi-curve-trial-20261016-adac37a/manifest.json`. Eğri çizimi ve PNG importu eklendi; [kullanım/geri dönüş](../docs/runbooks/local-curve-png-trial.md), [TST-126](../test/2026-10-16/TST-126-local-curve-png-trial.md). Commit/push yapılmadı; faz oranı/kabul değişmedi.
+
+**16.10 yerel PNG hizalama desteği — PUSH YOK:** Yüklemenin uzun kenarı 2000 px küçülttüğü doğrulandı. Aktif varyant fotoğrafını SHA kontrollü, resize/crop olmadan indirme düğmesi eklendi. [TST-127](../test/2026-10-16/TST-127-exact-mask-source-download.md); bildirilen gerçek maske kaymasının tek nedeni kesinleştirilmedi. Geri dönüş `adac37a` aynı.
+
+**16.10 kaynak tabanlı maske promptu — PUSH YOK:** Seçili ürün/renk ve fotoğraf boyutu/SHA ile otomatik prompt; (0,0), ölçek1, RGBA alpha ve crop/trim kuralları, düzenlenebilir yüzey hedefi, kopyala ve pano reddinde seçim. [TST-128](../test/2026-10-16/TST-128-source-bound-mask-prompt.md), admin build/lint ve browser başarılı. Gerçek AI çağrısı yok; hizalama garantisi verilmedi. Geri dönüş `adac37a` korunuyor.
+
 ### Oturum kaydı şablonu — yeni satır üste
 
 | Tarih/saat TR | Faz/görev | Branch / commit öncesi-sonrası | Yapılan dosya ve işlem | Çalıştırılan komut/sonuç | Kanıt | Sonraki atomik adım | Kim |
@@ -540,3 +546,7 @@ Sonraki tek güvenli canlı adım: DBA'nın `tools/sql/verify-catalog-backup.sql
 ### Panel güvenliği, dosya deposu, arka plan işleri, kişiselleştirilmiş sipariş / 09.10.2026
 
 [TST-114](../test/2026-10-09/TST-114-panel-security-storage-jobs-personalised-order.md): Panel uçları personel oturumu ve rota iznine bağlandı (`12f543c`); sahibin hesabı süper yönetici. `IFileStore` ile medya ve tasarımlar tek depoda, sunucuda `Storage:LocalRoot`; R2/S3 için gerekenler runbook'ta (`fa8d720`). Bildirim kuyruğu sahiplenmeli, işçiler SQL ortamında da çalışıyor, saatlik oturum temizliği (`7db18d6`). Analiz2 adımı: kayıtlı tasarım sepete eklenir, sahiplik/ürün/kişiselleştirme sunucuda denetlenir, görsel siparişe kopyalanır; 0005 uygulandı; web, mobil ve panelde gösterim (`49618a1`, `0fa22a2`). .NET **341/4 atlandı/0**, Flutter 50/50. Açık: kişiselleştirme ücreti, kişiselleştirilmiş iade kuralı, üretim dosyası kontrolü, R2/S3 hesabı, XINOBI U oturumlarının SQL'e taşınması, D10.
+
+Yerel logo promptu düzeltmesi (16.10.2026): [TST-129](../test/2026-10-16/TST-129-photo-specific-logo-mask-prompt.md). Basılı logo çizgisi/fiziksel etiket ayrımı ve renderer alfa sözleşmesi eklendi; marka/renk/konum fotoğraftan incelenir. Build/lint ve browser başarılı; push yok, faz yüzdeleri değişmedi.
+
+Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST-130-anonymous-approved-mask-preview.md). Commerce-mask GET default-deny 401 sorunu AllowAnonymous ile çözüldü; yönetim korunuyor. 13/13, gerçek ürün önizlemesi hazır/PNG 200; push yok, faz yüzdeleri değişmedi.

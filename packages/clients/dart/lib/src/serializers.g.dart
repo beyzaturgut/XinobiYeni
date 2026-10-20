@@ -15,6 +15,8 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AdminCustomerPage.serializer)
       ..add(AdminCustomerRow.serializer)
       ..add(AdminDesignDetails.serializer)
+      ..add(AdminDesignOrderPage.serializer)
+      ..add(AdminDesignOrderReference.serializer)
       ..add(AdminDesignPage.serializer)
       ..add(AdminDesignRow.serializer)
       ..add(AdminInvitationResponse.serializer)
@@ -123,6 +125,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AdminCustomerRow)]),
           () => ListBuilder<AdminCustomerRow>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(AdminDesignOrderReference)]),
+          () => ListBuilder<AdminDesignOrderReference>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AdminDesignRow)]),
           () => ListBuilder<AdminDesignRow>())

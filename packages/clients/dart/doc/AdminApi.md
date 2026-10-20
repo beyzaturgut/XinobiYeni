@@ -19,6 +19,7 @@ Method | HTTP request | Description
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [**listAdminAudit**](AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
 [**listAdminCustomers**](AdminApi.md#listadmincustomers) | **GET** /api/v1/admin/customers |
+[**listAdminDesignOrders**](AdminApi.md#listadmindesignorders) | **GET** /api/v1/admin/designs/{id}/orders | Tasarım kimliğine bağlı sipariş referansları; müşteri bilgisi içermez.
 [**listAdminDesigns**](AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
 
 
@@ -430,6 +431,51 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**AdminCustomerPage**](AdminCustomerPage.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listAdminDesignOrders**
+> AdminDesignOrderPage listAdminDesignOrders(id, page, pageSize)
+
+Tasarım kimliğine bağlı sipariş referansları; müşteri bilgisi içermez.
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final int page = 56; // int |
+final int pageSize = 56; // int |
+
+try {
+    final response = api.listAdminDesignOrders(id, page, pageSize);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->listAdminDesignOrders: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **page** | **int**|  | [optional]
+ **pageSize** | **int**|  | [optional]
+
+### Return type
+
+[**AdminDesignOrderPage**](AdminDesignOrderPage.md)
 
 ### Authorization
 

@@ -11,6 +11,8 @@ doc/AdminCustomerDetails.md
 doc/AdminCustomerPage.md
 doc/AdminCustomerRow.md
 doc/AdminDesignDetails.md
+doc/AdminDesignOrderPage.md
+doc/AdminDesignOrderReference.md
 doc/AdminDesignPage.md
 doc/AdminDesignRow.md
 doc/AdminInvitationResponse.md
@@ -146,6 +148,8 @@ lib/src/model/admin_customer_details.dart
 lib/src/model/admin_customer_page.dart
 lib/src/model/admin_customer_row.dart
 lib/src/model/admin_design_details.dart
+lib/src/model/admin_design_order_page.dart
+lib/src/model/admin_design_order_reference.dart
 lib/src/model/admin_design_page.dart
 lib/src/model/admin_design_row.dart
 lib/src/model/admin_invitation_response.dart

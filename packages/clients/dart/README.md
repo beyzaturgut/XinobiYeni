@@ -121,6 +121,7 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**getAdminCustomer**](doc/AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminDesign**](doc/AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminDesignImage**](doc/AdminApi.md#getadmindesignimage) | **GET** /api/v1/admin/designs/{id}/image |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminOrder**](doc/AdminApi.md#getadminorder) | **GET** /api/v1/admin/orders/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminReportSummary**](doc/AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
@@ -255,6 +256,7 @@ Class | Method | HTTP request | Description
  - [ReviewSummaryList](doc/ReviewSummaryList.md)
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
+ - [StaffOrder](doc/StaffOrder.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartAdminPasswordReset](doc/StartAdminPasswordReset.md)
  - [StartEmailChange](doc/StartEmailChange.md)

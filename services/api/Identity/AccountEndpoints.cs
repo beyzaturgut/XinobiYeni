@@ -121,6 +121,7 @@ public static class AccountEndpoints
         AdminCustomerEndpoints.Map(admin);
         Designs.AdminDesignEndpoints.Map(admin);
         Orders.AdminDesignOrderEndpoints.Map(admin);
+        Orders.AdminOrderDetailEndpoints.Map(admin);
         if (AccountStorage.RateLimited(app.Environment, app.Configuration)) auth.RequireRateLimiting("Account");
         foreach (var group in new[] { auth, me, admin })
         {

@@ -69,7 +69,9 @@ public static class OrderEndpoints
         panel.MapGet("/orders", async (HttpContext http, IAccountStore accounts, IConfiguration configuration, IWebHostEnvironment environment) =>
             TypedResults.Ok((await accounts.AllOrders()).Select(item => item with { Order = WithImages(item.Order, http, configuration, environment, "/api/v1/local-commerce/orders") }).ToArray()));
         panel.MapGet("/orders/{id}/lines/{line:int}/design", async (string id, int line, IAccountStore accounts, Designs.SavedDesignStore designs) =>
-            await DesignImage((await accounts.AllOrders()).FirstOrDefault(item => item.Order.Id == id)?.Order, line, designs));
+            await DesignImage(accounts is SqlAccountStore sql
+                ? (await sql.StaffOrderById(Guid.TryParse(id, out var key) ? key : Guid.Empty))?.Order
+                : (await accounts.AllOrders()).FirstOrDefault(item => item.Order.Id == id)?.Order, line, designs));
         panel.MapGet("/order-options", (IConfiguration configuration) => TypedResults.Ok(Options(configuration)));
 
         panel.MapPost("/orders/{id}/status", async (string id, SetOrderStatus request, IAccountStore accounts, NotificationCenter notifications, TimeProvider clock) =>

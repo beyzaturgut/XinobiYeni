@@ -14,6 +14,7 @@ Method | HTTP request | Description
 [**getAdminCustomer**](AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [**getAdminDesign**](AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |
 [**getAdminDesignImage**](AdminApi.md#getadmindesignimage) | **GET** /api/v1/admin/designs/{id}/image |
+[**getAdminOrder**](AdminApi.md#getadminorder) | **GET** /api/v1/admin/orders/{id} |
 [**getAdminReportSummary**](AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [**getAdminSession**](AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
@@ -225,6 +226,47 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/problem+json, image/png, image/jpeg, image/webp
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAdminOrder**
+> StaffOrder getAdminOrder(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+
+try {
+    final response = api.getAdminOrder(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminOrder: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**StaffOrder**](StaffOrder.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

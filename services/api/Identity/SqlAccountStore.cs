@@ -540,6 +540,18 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         });
     }
 
+    /// <summary>Direct staff read by primary key; same DTO as AllOrders, without its newest-1000 limit.</summary>
+    public Task<StaffOrder?> StaffOrderById(Guid id) => Run<StaffOrder?>(null, async db =>
+    {
+        var order = await db.SalesOrders.AsNoTracking().SingleOrDefaultAsync(row => row.Id == id);
+        if (order is null) return null;
+        var user = await db.Users.AsNoTracking().SingleOrDefaultAsync(row => row.Id == order.UserId)
+            ?? throw new AccountUnavailableException();
+        var lines = await db.SalesOrderLines.AsNoTracking().Where(row => row.OrderId == id).ToArrayAsync();
+        try { return new StaffOrder(Order(order, lines), Id(user.Id), user.DisplayName ?? "", user.Email, user.Phone); }
+        catch (JsonException) { throw new AccountUnavailableException(); }
+    });
+
     public Task<StaffOrder[]> AllOrders() => Run(null, async db =>
     {
         var orders = await db.SalesOrders.AsNoTracking().OrderByDescending(x => x.CreatedAt).Take(1000).ToArrayAsync();

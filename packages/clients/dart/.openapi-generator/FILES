@@ -105,6 +105,7 @@ doc/ReviewSummary.md
 doc/ReviewSummaryList.md
 doc/SaveCustomerAddress.md
 doc/SaveDesignFromSession.md
+doc/StaffOrder.md
 doc/StartAccountEmailVerification.md
 doc/StartAdminPasswordReset.md
 doc/StartEmailChange.md
@@ -239,6 +240,7 @@ lib/src/model/review_summary.dart
 lib/src/model/review_summary_list.dart
 lib/src/model/save_customer_address.dart
 lib/src/model/save_design_from_session.dart
+lib/src/model/staff_order.dart
 lib/src/model/start_account_email_verification.dart
 lib/src/model/start_admin_password_reset.dart
 lib/src/model/start_email_change.dart

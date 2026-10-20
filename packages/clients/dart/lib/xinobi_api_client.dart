@@ -117,6 +117,7 @@ export 'package:xinobi_api_client/src/model/review_summary.dart';
 export 'package:xinobi_api_client/src/model/review_summary_list.dart';
 export 'package:xinobi_api_client/src/model/save_customer_address.dart';
 export 'package:xinobi_api_client/src/model/save_design_from_session.dart';
+export 'package:xinobi_api_client/src/model/staff_order.dart';
 export 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 export 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
 export 'package:xinobi_api_client/src/model/start_email_change.dart';

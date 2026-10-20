@@ -22,7 +22,7 @@ export default function Reviews({ productName }: { productName: (id: string) => 
     if(writing.current||!canWrite||error||loaded!==`${status}:${reload}`)return
     writing.current=true
     setBusy(review.id)
-    try { await commerceRequest(commerceApi, `/reviews/${review.id}/moderation`, 'POST', { status: decision, note: notes[review.id]?.note || null, reply: notes[review.id]?.reply || review.storeReply || null }); setReload(value => value + 1) }
+    try { await commerceRequest(commerceApi, `/reviews/${review.id}/moderation`, 'POST', { status: decision, note: notes[review.id]?.note || null, reply: notes[review.id]?.reply ?? review.storeReply ?? null }); setReload(value => value + 1) }
     catch (e) { setError(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
     finally { writing.current=false;setBusy('') }
   }

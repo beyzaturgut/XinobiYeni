@@ -27,6 +27,8 @@ export 'package:xinobi_api_client/src/model/admin_customer_details.dart';
 export 'package:xinobi_api_client/src/model/admin_customer_page.dart';
 export 'package:xinobi_api_client/src/model/admin_customer_row.dart';
 export 'package:xinobi_api_client/src/model/admin_design_details.dart';
+export 'package:xinobi_api_client/src/model/admin_design_order_page.dart';
+export 'package:xinobi_api_client/src/model/admin_design_order_reference.dart';
 export 'package:xinobi_api_client/src/model/admin_design_page.dart';
 export 'package:xinobi_api_client/src/model/admin_design_row.dart';
 export 'package:xinobi_api_client/src/model/admin_invitation_response.dart';

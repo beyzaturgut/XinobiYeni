@@ -22,6 +22,8 @@ import 'package:xinobi_api_client/src/model/admin_customer_details.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_page.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_row.dart';
 import 'package:xinobi_api_client/src/model/admin_design_details.dart';
+import 'package:xinobi_api_client/src/model/admin_design_order_page.dart';
+import 'package:xinobi_api_client/src/model/admin_design_order_reference.dart';
 import 'package:xinobi_api_client/src/model/admin_design_page.dart';
 import 'package:xinobi_api_client/src/model/admin_design_row.dart';
 import 'package:xinobi_api_client/src/model/admin_invitation_response.dart';
@@ -139,6 +141,8 @@ part 'serializers.g.dart';
   AdminCustomerPage,
   AdminCustomerRow,
   AdminDesignDetails,
+  AdminDesignOrderPage,
+  AdminDesignOrderReference,
   AdminDesignPage,
   AdminDesignRow,
   AdminInvitationResponse,
@@ -365,6 +369,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(VariantDetail)]),
         () => ListBuilder<VariantDetail>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AdminDesignOrderReference)]),
+        () => ListBuilder<AdminDesignOrderReference>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustomerOrderLine)]),

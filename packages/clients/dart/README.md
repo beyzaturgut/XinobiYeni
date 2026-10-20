@@ -126,6 +126,7 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminCustomers**](doc/AdminApi.md#listadmincustomers) | **GET** /api/v1/admin/customers |
+[*AdminApi*](doc/AdminApi.md) | [**listAdminDesignOrders**](doc/AdminApi.md#listadmindesignorders) | **GET** /api/v1/admin/designs/{id}/orders | Tasarım kimliğine bağlı sipariş referansları; müşteri bilgisi içermez.
 [*AdminApi*](doc/AdminApi.md) | [**listAdminDesigns**](doc/AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConfig**](doc/AssistantApi.md#getassistantconfig) | **GET** /api/v1/assistant/config |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConversation**](doc/AssistantApi.md#getassistantconversation) | **GET** /api/v1/assistant/conversations/{id} |
@@ -164,6 +165,8 @@ Class | Method | HTTP request | Description
  - [AdminCustomerPage](doc/AdminCustomerPage.md)
  - [AdminCustomerRow](doc/AdminCustomerRow.md)
  - [AdminDesignDetails](doc/AdminDesignDetails.md)
+ - [AdminDesignOrderPage](doc/AdminDesignOrderPage.md)
+ - [AdminDesignOrderReference](doc/AdminDesignOrderReference.md)
  - [AdminDesignPage](doc/AdminDesignPage.md)
  - [AdminDesignRow](doc/AdminDesignRow.md)
  - [AdminInvitationResponse](doc/AdminInvitationResponse.md)

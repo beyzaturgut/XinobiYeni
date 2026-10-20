@@ -6,7 +6,7 @@
 
 ## Kurulum
 
-API ZIP'ini sunucuda bir klasöre açın; yönetici Windows PowerShell'de o klasörde:
+API ZIP'ini sunucuda site klasörünün **dışında** bir klasöre açın (örn. `C:\XinobiDeploy\api-<commit>`; site klasörüne açılırsa betik durur); yönetici Windows PowerShell'de o klasörde:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install-api.ps1 -WhatIf
@@ -14,7 +14,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install-api.ps1
 ```
 
 Betik:
-1. `appsettings.Server.json` yoksa (ilk kez) ayarları çalışan `api\appsettings.Production.json`'dan, o da katalog ayarı içermiyorsa `C:\XinobiBackups` altındaki en yeni yedekten kopyalar. `AdminCatalog.Enabled=true` içeren dosya bulamazsa hiçbir şeyi değiştirmeden durur.
+1. `appsettings.Server.json` yoksa (ilk kez) ayarları çalışan `api\appsettings.Production.json`'dan, o da katalog ayarı içermiyorsa `C:\XinobiBackups` ve `XinobiYeniApi\Backup Deploy` altındaki en yeni yedekten kopyalar. `AdminCatalog.Enabled=true` içeren dosya bulamazsa hiçbir şeyi değiştirmeden durur.
 2. API havuzunu durdurur, eski `api` klasörünü `api-previous-<tarih>` olarak saklar (silmez), yenisini kopyalar, havuzu başlatır. Kopyalama hata verirse eski klasörü geri koyar.
 3. `health/ready` ve admin katalog (`/api/v1/local-commerce/state` → 401 beklenir) kontrolünü yazar.
 

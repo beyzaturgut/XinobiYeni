@@ -15,6 +15,10 @@ $ErrorActionPreference = 'Stop'
 $package = Join-Path $PSScriptRoot 'api'
 $apiDirectory = Join-Path $SiteRoot 'api'
 if (!(Test-Path -LiteralPath (Join-Path $package 'Xinobi.Api.dll') -PathType Leaf)) { throw 'Run this script from the extracted API ZIP folder (api\Xinobi.Api.dll not found next to it).' }
+# The package must be extracted elsewhere: its api folder cannot also be the site's api folder that gets replaced.
+if ((Resolve-Path -LiteralPath $PSScriptRoot).Path.TrimEnd('\') -ieq (Resolve-Path -LiteralPath $SiteRoot).Path.TrimEnd('\')) {
+    throw "Extract the API ZIP to another folder (for example C:\XinobiDeploy\api-<commit>) and run install-api.ps1 there, not inside $SiteRoot. Nothing was changed."
+}
 $appcmd = Join-Path $env:windir 'system32\inetsrv\appcmd.exe'
 if (!(Test-Path -LiteralPath $appcmd)) { throw 'IIS appcmd not found.' }
 
@@ -29,8 +33,10 @@ function Test-ServerSettings([string]$path) {
 $settingsSource = $null
 if (!(Test-ServerSettings $ServerSettings)) {
     $candidates = @(Join-Path $apiDirectory 'appsettings.Production.json')
-    if (Test-Path -LiteralPath $BackupRoot) {
-        $candidates += Get-ChildItem -LiteralPath $BackupRoot -Recurse -File -Include 'appsettings.Production*.json' |
+    # Repair backups and the manual copies kept next to the site (for example "Backup Deploy\api-backup-deploy-007").
+    foreach ($folder in @($BackupRoot, (Join-Path $SiteRoot 'Backup Deploy'))) {
+        if (!(Test-Path -LiteralPath $folder)) { continue }
+        $candidates += Get-ChildItem -LiteralPath $folder -Recurse -File -Include 'appsettings.Production*.json' |
             Sort-Object LastWriteTime -Descending | ForEach-Object { $_.FullName }
     }
     $settingsSource = $candidates | Where-Object { Test-ServerSettings $_ } | Select-Object -First 1

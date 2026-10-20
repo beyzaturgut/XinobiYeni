@@ -16,13 +16,18 @@ await mkdir(path.join(publicDir,'assets/deploy-media'),{recursive:true});
 async function map(value){
  if(typeof value==='string'&&value.startsWith('/api/v1/local-commerce/media/')){
   const name=path.basename(value);if(!/^[a-f0-9]{32}\.(png|jpg|webp|mp4|webm)$/.test(name))throw new Error('Invalid media name');
-  await copyFile(path.join(root,'services/api/App_Data/local-commerce/media',name),path.join(publicDir,'assets/deploy-media',name));return '/assets/deploy-media/'+name;
+  // Media uploaded through the live admin exists only in the server's media store; it needs no packaged copy.
+  try{await copyFile(path.join(root,'services/api/App_Data/local-commerce/media',name),path.join(publicDir,'assets/deploy-media',name));}
+  catch(error){if(error.code!=='ENOENT')throw error;serverOnlyMedia.add(name);}
+  return '/assets/deploy-media/'+name;
  }
  if(Array.isArray(value))return Promise.all(value.map(map));
  if(value&&typeof value==='object')return Object.fromEntries(await Promise.all(Object.entries(value).map(async([key,value])=>[key,await map(value)])));
  return value;
 }
+const serverOnlyMedia=new Set();
 await map(state); // Keep packaged media copies for existing asset references; the catalog itself comes from the API.
+if(serverOnlyMedia.size)console.log(`${serverOnlyMedia.size} media file(s) exist only on the server (uploaded through the live admin); not packaged.`);
 await publishProductPreviews(root,publicDir,state);
 // XINOBI U on the test server (ADR-002 Ek B); the API must list this site's origin in XinobiU:AllowedOrigins.
 // Same-origin through the site's /api proxy, over HTTP (8014) or the HTTPS entry alike.

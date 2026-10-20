@@ -119,11 +119,13 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminCustomer**](doc/AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminDesign**](doc/AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminReportSummary**](doc/AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminCustomers**](doc/AdminApi.md#listadmincustomers) | **GET** /api/v1/admin/customers |
+[*AdminApi*](doc/AdminApi.md) | [**listAdminDesigns**](doc/AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConfig**](doc/AssistantApi.md#getassistantconfig) | **GET** /api/v1/assistant/config |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConversation**](doc/AssistantApi.md#getassistantconversation) | **GET** /api/v1/assistant/conversations/{id} |
 [*AssistantApi*](doc/AssistantApi.md) | [**requestAssistantHandoff**](doc/AssistantApi.md#requestassistanthandoff) | **POST** /api/v1/assistant/conversations/{id}/handoff |
@@ -160,6 +162,9 @@ Class | Method | HTTP request | Description
  - [AdminCustomerDetails](doc/AdminCustomerDetails.md)
  - [AdminCustomerPage](doc/AdminCustomerPage.md)
  - [AdminCustomerRow](doc/AdminCustomerRow.md)
+ - [AdminDesignDetails](doc/AdminDesignDetails.md)
+ - [AdminDesignPage](doc/AdminDesignPage.md)
+ - [AdminDesignRow](doc/AdminDesignRow.md)
  - [AdminInvitationResponse](doc/AdminInvitationResponse.md)
  - [AdminMfaChallenge](doc/AdminMfaChallenge.md)
  - [AdminPasswordResetStarted](doc/AdminPasswordResetStarted.md)

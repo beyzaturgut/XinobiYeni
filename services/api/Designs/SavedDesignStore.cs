@@ -41,6 +41,34 @@ public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore file
     public async Task<MyDesign[]> Mine(string accountId) =>
         (await store.Read()).Designs.Where(design => design.AccountId == accountId).OrderByDescending(design => design.CreatedAt).Select(View).ToArray();
 
+    private async Task<SavedDesign[]> AdminSnapshot()
+    {
+        var state = await store.ReadRequired();
+        if (state.Designs is null || state.Designs.Any(design => design is null || string.IsNullOrWhiteSpace(design.Id)
+            || string.IsNullOrWhiteSpace(design.Kind) || string.IsNullOrWhiteSpace(design.ProductId)
+            || string.IsNullOrWhiteSpace(design.ProductName) || string.IsNullOrWhiteSpace(design.Mime) || design.CreatedAt == default)
+            || state.Designs.Select(design => design.Id).Distinct(StringComparer.Ordinal).Count() != state.Designs.Count)
+            throw ProblemException.Unavailable("Tasarım kayıtları");
+        return state.Designs.OrderByDescending(design => design.CreatedAt).ThenBy(design => design.Id, StringComparer.Ordinal).ToArray();
+    }
+
+    public async Task<AdminDesignPage> AdminList(int page, int pageSize)
+    {
+        if (page < 1 || pageSize is < 1 or > 100)
+            throw new ProblemException("invalid_page", "Sayfa en az 1, sayfa boyutu 1–100 olmalı.");
+        var designs = await AdminSnapshot();
+        var offset = ((long)page - 1) * pageSize;
+        var rows = offset >= designs.Length ? [] : designs.Skip((int)offset).Take(pageSize).Select(AdminDesignRow.From).ToArray();
+        return new(rows, page, pageSize, designs.Length, (int)Math.Ceiling((double)designs.Length / pageSize));
+    }
+
+    public async Task<AdminDesignDetails> AdminDetails(string id)
+    {
+        var design = (await AdminSnapshot()).SingleOrDefault(design => design.Id == id)
+            ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
+        return new(design.Id, design.Kind, design.ProductId, design.ProductName, design.VariantId, design.Color, design.CreatedAt, design.Mime);
+    }
+
     /// <summary>Stores <paramref name="bytes"/> as a new design of the account; refuses past <see cref="MaxPerAccount"/>.</summary>
     public async Task<MyDesign> Add(string accountId, string kind, string name, string productId, string productName, string? variantId, string? color, string[] profile, byte[] bytes)
     {

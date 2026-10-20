@@ -112,6 +112,7 @@ import 'package:xinobi_api_client/src/model/review_summary.dart';
 import 'package:xinobi_api_client/src/model/review_summary_list.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
+import 'package:xinobi_api_client/src/model/staff_order.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
@@ -231,6 +232,7 @@ part 'serializers.g.dart';
   ReviewSummaryList,
   SaveCustomerAddress,
   SaveDesignFromSession,
+  StaffOrder,
   StartAccountEmailVerification,
   StartAdminPasswordReset,
   StartEmailChange,

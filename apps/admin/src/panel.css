@@ -47,3 +47,6 @@ td small{color:#9a9a9a}
 .quote-desk{display:grid;gap:18px}.quote-desk tr[aria-selected=true]{background:#f3f4f6}
 .quote-messages{list-style:none;margin:0;padding:0;display:grid;gap:8px}.quote-messages li{padding:8px 10px;border-radius:6px;background:#f3f4f6;font-size:12px}.quote-messages li[data-from=store]{background:#111;color:#fff}.quote-messages p{margin:4px 0 0;color:inherit}
 .order-design{display:flex;gap:10px;align-items:center;margin:6px 0}.order-design img{width:72px;height:72px;object-fit:cover;border-radius:6px;background:#f1f1f1}
+
+/* Catalogue colour swatch next to the HEX code of a variant. */
+.catalog-form label:has(.catalog-colour-swatch){position:relative}.catalog-colour-swatch{position:absolute;right:10px;bottom:12px;width:20px;height:20px;border:1px solid #bbb;border-radius:50%;pointer-events:none}

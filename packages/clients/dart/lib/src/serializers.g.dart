@@ -11,6 +11,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(AccountEmailVerification.serializer)
       ..add(AccountProfile.serializer)
       ..add(AddFavorite.serializer)
+      ..add(AdminCustomerDetails.serializer)
+      ..add(AdminCustomerPage.serializer)
+      ..add(AdminCustomerRow.serializer)
       ..add(AdminInvitationResponse.serializer)
       ..add(AdminMfaChallenge.serializer)
       ..add(AdminPasswordResetStarted.serializer)
@@ -114,6 +117,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(XinobiUSession.serializer)
       ..add(XinobiUStatus.serializer)
       ..add(XinobiUVariant.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(AdminCustomerRow)]),
+          () => ListBuilder<AdminCustomerRow>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(AnnouncementItem)]),
           () => ListBuilder<AnnouncementItem>())

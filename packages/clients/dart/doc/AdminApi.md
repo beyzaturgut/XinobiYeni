@@ -11,10 +11,12 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**assignAdminRole**](AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [**createAdminInvitation**](AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[**getAdminCustomer**](AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [**getAdminReportSummary**](AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [**getAdminSession**](AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [**listAdminAudit**](AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
+[**listAdminCustomers**](AdminApi.md#listadmincustomers) | **GET** /api/v1/admin/customers |
 
 
 # **assignAdminRole**
@@ -95,6 +97,47 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAdminCustomer**
+> AdminCustomerDetails getAdminCustomer(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+
+try {
+    final response = api.getAdminCustomer(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminCustomer: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**AdminCustomerDetails**](AdminCustomerDetails.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -266,5 +309,50 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/json, application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listAdminCustomers**
+> AdminCustomerPage listAdminCustomers(page, pageSize, query)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final int page = 56; // int |
+final int pageSize = 56; // int |
+final String query = query_example; // String |
+
+try {
+    final response = api.listAdminCustomers(page, pageSize, query);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->listAdminCustomers: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int**|  | [optional]
+ **pageSize** | **int**|  | [optional]
+ **query** | **String**|  | [optional]
+
+### Return type
+
+[**AdminCustomerPage**](AdminCustomerPage.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

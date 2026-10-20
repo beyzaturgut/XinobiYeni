@@ -50,9 +50,11 @@ async function loadSharedCommerceSurface(product:string,variant:string,signal:Ab
 }
 
 export async function loadAcceptedSurface(variantReference:string,signal:AbortSignal,commerceProduct?:string):Promise<RenderingInputs|null>{
- // Live builds read only published bundles; the e2e build opts into the development bridge (NEXT_PUBLIC_DEV_SURFACE_BRIDGE=1).
+ // Masks approved in the admin (catalog SQL) come first; the API answers 404 where that workspace is off.
+ // An unavailable or invalid shared mask must not hide a published bundle; only cancellation propagates.
+ if(commerceProduct){try{const shared=await loadSharedCommerceSurface(commerceProduct,variantReference,signal);if(shared)return shared;}catch(error){if(signal.aborted)throw error;}}
+ // Live builds otherwise read only published bundles; the e2e build opts into the development bridge (NEXT_PUBLIC_DEV_SURFACE_BRIDGE=1).
  if(process.env.NODE_ENV!=='development'&&process.env.NEXT_PUBLIC_DEV_SURFACE_BRIDGE!=='1')return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
- if(commerceProduct&&process.env.NODE_ENV==='development'){const shared=await loadSharedCommerceSurface(commerceProduct,variantReference,signal);if(shared)return shared;}
  if(commerceProduct&&commerceProduct!=='DEMO-P101'){const generic=await loadCatalogSurface(commerceProduct,variantReference,signal);if(generic)return generic;}
  const productReference=commerceProduct??"cay-makinesi-101";
  const cm=commerceProduct===CM_PRODUCT&&variantReference===CM_VARIANT;

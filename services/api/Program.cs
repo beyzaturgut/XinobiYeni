@@ -127,6 +127,8 @@ if (!builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>
         || string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Xinobi")))
         throw new InvalidOperationException("AdminCatalog:Enabled requires SQL Server catalog, SQL Server accounts and ConnectionStrings:Xinobi.");
     builder.Services.AddSingleton<LocalCommerceStore>();
+    // Admin product-surface masks (uploaded WebP masks, no inference) on the SQL catalog; see ProductSurfaceEndpoints.
+    builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceWorkspace>();
 }
 if (builder.Configuration["Catalog:StorageProvider"] == "SqlServer")
     builder.Services.Replace(ServiceDescriptor.Singleton<ICatalogSource>(services => new SqlCatalogSource(services.GetRequiredService<SqlCommerceStore>())));
@@ -278,8 +280,7 @@ app.UseAuthentication();
 app.UseMiddleware<AdminAuditMiddleware>();
 app.UseAuthorization();
 app.MapLocalCommerce();
-if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"))
-    Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
+Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
 app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();

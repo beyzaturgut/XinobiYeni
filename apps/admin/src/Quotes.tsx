@@ -23,7 +23,10 @@ export default function Quotes() {
     commerceRequest<Quote[]>(commerceApi, `/quotes${status ? `?status=${status}` : ''}`).then(value => { if (active) { setItems(value); setLoaded(`${status}:${reload}`); setError('') } }).catch(e => { if (active) {setItems([]);setLoaded(`${status}:${reload}`);setError(e instanceof Error ? e.message : 'Teklifler yüklenemedi.')} })
     return () => { active = false }
   }, [status, reload])
-  const visibleItems=loaded===`${status}:${reload}`&&!error?items:[]
+  const loading=loaded!==`${status}:${reload}`
+  const currentError=loading?'':error
+  const ready=!loading&&!currentError
+  const visibleItems=ready?items:[]
   const quote = visibleItems.find(item => item.id === selectedId)
   async function act(route: string, body: unknown, done: string) {
     if (!quote || writing.current || !canWrite) return false
@@ -42,12 +45,12 @@ export default function Quotes() {
   return <section aria-label="Kurumsal teklifler">
     <p className="panel-notice">Firmalar web veya mobil formdan talep gönderir; kod ve e-posta ile takip eder. Teklif ve mesaj bildirimleri kuyruğa alınır; teslim durumu bildirim kayıtlarından izlenir. Talep ödeme emri değildir; siparişe dönüşüm D07 kararını bekliyor.</p>
     <div className="order-filters"><label>Durum<select value={status} onChange={event => setStatus(event.target.value)}><option value="">Tümü</option>{Object.entries(statusText).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><button onClick={() => setReload(value => value + 1)}>Yenile</button></div>
-    {error && <p role="alert">{error} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
-    {loaded!==`${status}:${reload}`&&!error&&<p role="status">Teklifler yükleniyor…</p>}
+    {currentError && <p role="alert">{currentError} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
+    {loading&&<p role="status">Teklifler yükleniyor…</p>}
     <div className="quote-desk">
-      <div className="table-scroll"><table><caption>{items.length} talep</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
+      <div className="table-scroll"><table><caption>{ready?`${items.length} talep`:'Kurumsal teklif talepleri'}</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
         <tbody>{visibleItems.map(item => <tr key={item.id} aria-selected={item.id === selectedId}><th scope="row">{item.code}</th><td>{item.company}<br /><small>{item.contactName}</small></td><td>{item.items.map(line => `${line.productName} × ${line.quantity}`).join(', ')}</td><td>{date(item.createdAt)}</td><td><span className="order-state">{statusText[item.status]}</span>{item.messages.at(-1)?.from === 'customer' && <span className="order-state">Yeni mesaj</span>}</td><td>{tl(item.offer?.total)}</td><td><button disabled={busy} onClick={() => select(item)}>Aç</button></td></tr>)}</tbody></table></div>
-      {loaded===`${status}:${reload}`&&items.length === 0 && !error && <div className="empty-widget"><strong>Talep yok</strong><p>Web veya mobilden gelen kurumsal talepler burada görünür.</p></div>}
+      {ready&&items.length === 0 && <div className="empty-widget"><strong>Talep yok</strong><p>Web veya mobilden gelen kurumsal talepler burada görünür.</p></div>}
       {notice&&<p role="status">{notice}</p>}
       {quote && <article className="quote-detail">
         <h2>{quote.code} · {quote.company} <span className="order-state">{statusText[quote.status]}</span></h2>

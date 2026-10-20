@@ -62,7 +62,8 @@ export async function loadAcceptedSurface(variantReference:string,signal:AbortSi
  if(!response.ok)throw new Error("Preview unavailable");
  const value=await response.json();
  if(value.scope!=="development-preview"||value.productReference!==productReference||value.variantReference!==variantReference)throw new Error("Invalid preview bundle");
- if(value.previewAvailable===false&&value.inputs===null)return null;
+ // A bridge without its own review for this variant must not hide the packaged reviewed bundle that live builds use.
+ if(value.previewAvailable===false&&value.inputs===null)return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
  const input=value.inputs as RenderingInputs|undefined;
  const supported=cm|| (commerceProduct?commerceProduct==="DEMO-P101"&&variantReference==="DEMO-V101-B":variantReference==="blue");
  if(value.previewAvailable!==true||!supported||!input||input.width!==(cm?3543:1066)||input.height!==(cm?5315:1600)||!checksum.test(input.surfaceVersion)||typeof input.sourceMediaVersion!=="string"||!input.sourceMediaVersion||!(cm?catalogMedia(input.source):media(input.source))||!(cm?catalogMedia(input.mask):media(input.mask))||typeof input.brandingRequired!=="boolean"||(input.branding!==null&&!(cm?catalogMedia(input.branding):media(input.branding)))||(input.brandingRequired&&!input.branding))throw new Error("Invalid preview inputs");

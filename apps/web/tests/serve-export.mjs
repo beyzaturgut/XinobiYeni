@@ -10,7 +10,7 @@ http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url, 'http://127.0.0.1:3010');
     if (req.method !== 'GET') { res.writeHead(405).end(); return; }
-    if (url.pathname === '/api/v1/local-commerce/state' || url.pathname === '/api/v1/catalog/storefront' || /^\/api\/v1\/dev\/product-surfaces\/(?:commerce\/)?[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+\/rendering-inputs$/.test(url.pathname)) {
+    if (url.pathname === '/api/v1/local-commerce/state' || url.pathname === '/api/v1/catalog/storefront' || /^\/api\/v1\/catalog\/products\/[a-zA-Z0-9-]+$/.test(url.pathname) || /^\/api\/v1\/dev\/product-surfaces\/(?:commerce\/)?[a-zA-Z0-9-]+\/[a-zA-Z0-9-]+\/rendering-inputs$/.test(url.pathname)) {
       const response = await fetch(`http://127.0.0.1:${apiPort}` + url.pathname);
       res.writeHead(response.status, { 'Content-Type': response.headers.get('content-type') || 'application/json', 'Cache-Control': 'no-store' });
       res.end(Buffer.from(await response.arrayBuffer())); return;

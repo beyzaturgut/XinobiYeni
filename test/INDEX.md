@@ -219,3 +219,4 @@
 - 20.10.2026 · [TST-131 renk başına maske hizalama](2026-10-20/TST-131-per-colour-mask-alignment.md) — Ortak maske her renkte kaydırma/ölçek/dönüş ile oturtulur, hizalanan renk kendi PNG'sini alır. 14/14, admin build ve browser testleri geçti; tam .NET'te TST-130 kaynaklı 1 yetki testi başarısız. Local/push yok.
 - 20.10.2026 · [TST-132 web önizlemede ortak onaylı maske](2026-10-20/TST-132-web-shared-mask-preview.md) — Maske API'den doğrudan alınır; aynı maskeli renkler arasında yerleşim aktarımsız geçer
 - 20.10.2026 · [TST-133 admin maskelemede yalnız PNG](2026-10-20/TST-133-png-only-admin-masking.md) — Eğri/fırça/Roboflow/hizalama ve eski katalog incelemesi admin+API'den kaldırıldı
+- 20.10.2026 · [TST-134 XINOBI önizleme e2e kök nedeni](2026-10-20/TST-134-xinobi-preview-e2e-regression.md) — CM121 yayın paketi orijinal boyutta yayımlanıyordu; test kataloğu/proxy eksikti. 11 önizleme testi geçiyor

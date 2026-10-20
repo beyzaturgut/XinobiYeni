@@ -52,7 +52,7 @@ Yüzdeler efor/süre ölçümü değil, görev kapsamına göre yaklaşık geli�
 
 ## Yeni açık eksikler
 
-- **Web e2e gerilemesi (Faz06/10):** 11 XINOBI önizleme testi 14.10 ile 20.10 arasında kırıldı; kök neden incelenmedi.
+- **Web e2e (Faz06/10):** 11 XINOBI önizleme testi — [TST-134](../../test/2026-10-20/TST-134-xinobi-preview-e2e-regression.md) ile kök neden bulundu ve düzeltildi. Önizlemeyle ilgisiz açık: favori testi (giriş zorunlu), 2 EXIF JPEG testi.
 - **Public endpoint listesi (Faz03):** `OnlyListedAreasArePublic` için rendering-inputs ya izinli listeye eklenmeli ya da anonim erişim geri alınmalı.
 - **Maskeleme (Faz06):** Yalnız resim (kayıpsız WebP) yüklemeli akış kaldı; maske üretimi panel dışında AI/elle yapılıyor, piksel hizası garanti değil. Eski Tea Maker inceleme API'si, CM101 aday komutu ve `tools/local-mask-editor` kodda duruyor (varsayılan kapalı).
 - **Commit'lenmemiş/yayınlanmamış:** Değişiklikler `feature/surface-masking-preview-20261020` branch'inde; `main`'e PR ve canlı paket yok.

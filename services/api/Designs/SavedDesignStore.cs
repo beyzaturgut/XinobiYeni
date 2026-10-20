@@ -69,6 +69,29 @@ public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore file
         return new(design.Id, design.Kind, design.ProductId, design.ProductName, design.VariantId, design.Color, design.CreatedAt, design.Mime);
     }
 
+    /// <summary>Approved staff-only read; never exposes the owner or storage key.</summary>
+    public async Task<StoredFile> AdminImage(string id)
+    {
+        var design = (await AdminSnapshot()).SingleOrDefault(item => item.Id == id)
+            ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
+        if (design.Mime is not ("image/png" or "image/jpeg" or "image/webp"))
+            throw ProblemException.Unavailable("Tasarım görseli");
+        try
+        {
+            FileAreas.CheckedKey(FileAreas.Designs, design.File);
+            var file = await files.Open(FileAreas.Designs, design.File)
+                ?? throw ProblemException.NotFound("design_image_not_found", "Tasarım görseli bulunamadı.");
+            if (file.ContentType != design.Mime)
+            {
+                await file.DisposeAsync();
+                throw ProblemException.Unavailable("Tasarım görseli");
+            }
+            return file;
+        }
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or ArgumentException)
+        { throw ProblemException.Unavailable("Tasarım görseli"); }
+    }
+
     /// <summary>Stores <paramref name="bytes"/> as a new design of the account; refuses past <see cref="MaxPerAccount"/>.</summary>
     public async Task<MyDesign> Add(string accountId, string kind, string name, string productId, string productName, string? variantId, string? color, string[] profile, byte[] bytes)
     {

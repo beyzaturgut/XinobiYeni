@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { adminCall } from './admin-api'
 import { commerceApi, commerceRequest } from './commerce'
+import { useAdminSession } from './AdminAccess'
 import type { components } from '../../../packages/clients/typescript/src/schema'
 
 type DesignPage = components['schemas']['AdminDesignPage']
 type Design = components['schemas']['AdminDesignDetails']
+type OrderPage = components['schemas']['AdminDesignOrderPage']
 const date = (value: string) => new Date(value).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })
 function message(problem: unknown) {
   const status = (problem as { status?: number })?.status
@@ -13,7 +15,39 @@ function message(problem: unknown) {
   return problem instanceof Error ? problem.message : 'Tasarım kayıtları yüklenemedi.'
 }
 
+function DesignOrderReferences({ designId }: { designId: string }) {
+  const [data, setData] = useState<OrderPage | null>(null), [page, setPage] = useState(1), [reload, setReload] = useState(0)
+  const [loading, setLoading] = useState(true), [error, setError] = useState('')
+  const version = useRef(0)
+  useEffect(() => {
+    let active = true
+    const request = ++version.current
+    void adminCall<OrderPage>(`/admin/designs/${encodeURIComponent(designId)}/orders?page=${page}&pageSize=20`)
+      .then(value => { if (active && request === version.current) setData(value) })
+      .catch(problem => { if (active && request === version.current) {
+        const status = (problem as { status?: number })?.status
+        setData(null); setError(status === 404 ? 'İlişkili sipariş kaynağı bulunamadı.' : status === 503 ? 'İlişkili sipariş kaynağı şu anda kullanılamıyor.' : problem instanceof Error ? problem.message : 'İlişkili siparişler yüklenemedi.')
+      } })
+      .finally(() => { if (active && request === version.current) setLoading(false) })
+    return () => { active = false }
+  }, [designId, page, reload])
+  function load(next = page) { version.current++; setData(null); setError(''); setLoading(true); setPage(next); setReload(value => value + 1) }
+  return <section aria-label="İlişkili siparişler"><h3>İlişkili siparişler</h3>
+    <button onClick={() => load()}>Siparişleri yenile</button>
+    {loading && <p role="status">İlişkili siparişler yükleniyor…</p>}
+    {error && <p role="alert">{error} <button onClick={() => load()}>Siparişleri tekrar dene</button></p>}
+    {!loading && !error && data && <><p role="status">{data.total} ilişkili sipariş · Sayfa {data.totalPages ? data.page : 1}/{data.totalPages || 1}</p>
+      {data.total === 0 ? <p>İlişkili sipariş bulunamadı.</p> : <><div className="table-scroll"><table><caption>Sipariş referansları · saat dilimi Europe/Istanbul</caption><thead><tr><th scope="col">Sipariş numarası</th><th scope="col">Tarih</th></tr></thead><tbody>{data.items?.map(order => <tr key={order.id}><th scope="row">{order.number}</th><td>{date(order.createdAt!)}</td></tr>)}</tbody></table></div>
+        {!data.items?.length && <p>Bu sayfada kayıt yok. Önceki sayfaya dönebilirsiniz.</p>}
+        <p>Sipariş detayına doğrudan geçiş henüz kullanılamıyor.</p></>}
+      <div className="periods" aria-label="İlişkili sipariş sayfaları"><button disabled={data.page! <= 1} onClick={() => load(page - 1)}>Önceki sipariş sayfası</button><button disabled={!data.totalPages || data.page! >= data.totalPages} onClick={() => load(page + 1)}>Sonraki sipariş sayfası</button></div>
+    </>}
+  </section>
+}
+
 export default function PrintOperations(_props: { notes: Record<string, string>; onNote: (id: string, note: string) => void }) {
+  const permissions = useAdminSession()?.permissions ?? []
+  const canReadOrders = permissions.includes('print.read') && permissions.includes('orders.read')
   const [data, setData] = useState<DesignPage | null>(null), [page, setPage] = useState(1), [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(true), [error, setError] = useState(''), [query, setQuery] = useState('')
   const [selectedId, setSelectedId] = useState(''), [detail, setDetail] = useState<Design | null>(null)
@@ -65,7 +99,7 @@ export default function PrintOperations(_props: { notes: Record<string, string>;
           {imageLoading && <p role="status">Tasarım görseli yükleniyor…</p>}
           {imageError && <p role="alert">{imageError} <button onClick={() => { setImageUrl(''); setImageError(''); setImageLoading(true); setImageReload(value => value + 1) }}>Görseli tekrar dene</button></p>}
           {imageUrl && <img src={imageUrl} alt={`${detail.productName} için kaydedilen tasarım`} style={{ maxWidth: '100%', maxHeight: '50vh', objectFit: 'contain' }} onLoad={() => setImageLoading(false)} onError={() => { setImageUrl(''); setImageLoading(false); setImageError('Tasarım görseli görüntülenemedi.') }} />}
-        </section></>}<button onClick={close}>Kapat</button>
+        </section>{canReadOrders && detail.id && <DesignOrderReferences key={detail.id} designId={detail.id} />}</>}<button onClick={close}>Kapat</button>
     </div></dialog>
   </section>
 }

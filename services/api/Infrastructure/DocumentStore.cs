@@ -84,6 +84,34 @@ public sealed class DocumentStore<T>(FeatureDocuments documents, IServiceScopeFa
         finally { gate.Release(); }
     }
 
+    /// <summary>Strict, non-mutating read for Admin metadata: missing/null/malformed sources are unavailable, not empty.</summary>
+    public async Task<T> ReadRequired()
+    {
+        try
+        {
+            string? json;
+            if (documents.UsesSql)
+            {
+                await using var scope = scopes.CreateAsyncScope();
+                var db = scope.ServiceProvider.GetRequiredService<Xinobi.Persistence.XinobiDbContext>();
+                // A single JSON row is a coherent snapshot; no application lock, SaveChanges or implicit creation.
+                json = await db.FeatureDocuments.AsNoTracking().Where(row => row.Name == name)
+                    .Select(row => row.Json).SingleOrDefaultAsync();
+            }
+            else
+            {
+                await gate.WaitAsync();
+                try { json = await File.ReadAllTextAsync(FilePath); }
+                finally { gate.Release(); }
+            }
+            if (string.IsNullOrWhiteSpace(json)) throw ProblemException.Unavailable(feature);
+            return JsonSerializer.Deserialize<T>(json, JsonOptions) ?? throw ProblemException.Unavailable(feature);
+        }
+        catch (Exception error) when (error is JsonException or IOException or UnauthorizedAccessException
+            or Microsoft.Data.SqlClient.SqlException or InvalidOperationException { InnerException: Microsoft.Data.SqlClient.SqlException })
+        { throw ProblemException.Unavailable(feature); }
+    }
+
     /// <summary>Runs <paramref name="change"/> on the current document under the lock and saves it unless it throws.</summary>
     public async Task<TResult> Update<TResult>(Func<T, TResult> change)
     {

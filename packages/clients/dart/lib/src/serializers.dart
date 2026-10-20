@@ -21,6 +21,9 @@ import 'package:xinobi_api_client/src/model/add_favorite.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_details.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_page.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_row.dart';
+import 'package:xinobi_api_client/src/model/admin_design_details.dart';
+import 'package:xinobi_api_client/src/model/admin_design_page.dart';
+import 'package:xinobi_api_client/src/model/admin_design_row.dart';
 import 'package:xinobi_api_client/src/model/admin_invitation_response.dart';
 import 'package:xinobi_api_client/src/model/admin_mfa_challenge.dart';
 import 'package:xinobi_api_client/src/model/admin_password_reset_started.dart';
@@ -135,6 +138,9 @@ part 'serializers.g.dart';
   AdminCustomerDetails,
   AdminCustomerPage,
   AdminCustomerRow,
+  AdminDesignDetails,
+  AdminDesignPage,
+  AdminDesignRow,
   AdminInvitationResponse,
   AdminMfaChallenge,
   AdminPasswordResetStarted,
@@ -287,6 +293,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(PlaceOrderItem)]),
         () => ListBuilder<PlaceOrderItem>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AdminDesignRow)]),
+        () => ListBuilder<AdminDesignRow>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OrderEvent)]),

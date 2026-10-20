@@ -10,6 +10,9 @@ doc/AdminApi.md
 doc/AdminCustomerDetails.md
 doc/AdminCustomerPage.md
 doc/AdminCustomerRow.md
+doc/AdminDesignDetails.md
+doc/AdminDesignPage.md
+doc/AdminDesignRow.md
 doc/AdminInvitationResponse.md
 doc/AdminMfaChallenge.md
 doc/AdminPasswordResetStarted.md
@@ -142,6 +145,9 @@ lib/src/model/add_favorite.dart
 lib/src/model/admin_customer_details.dart
 lib/src/model/admin_customer_page.dart
 lib/src/model/admin_customer_row.dart
+lib/src/model/admin_design_details.dart
+lib/src/model/admin_design_page.dart
+lib/src/model/admin_design_row.dart
 lib/src/model/admin_invitation_response.dart
 lib/src/model/admin_mfa_challenge.dart
 lib/src/model/admin_password_reset_started.dart

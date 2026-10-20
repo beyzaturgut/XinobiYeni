@@ -119,6 +119,7 @@ public static class AccountEndpoints
         var me = app.MapGroup("/api/v1/me").WithTags("Account").RequireAuthorization(PermissionAuthorization.CustomerPolicy);
         var admin = app.MapGroup("/api/v1/admin").WithTags("Admin").RequireAuthorization(PermissionAuthorization.StaffPolicy);
         AdminCustomerEndpoints.Map(admin);
+        Designs.AdminDesignEndpoints.Map(admin);
         if (AccountStorage.RateLimited(app.Environment, app.Configuration)) auth.RequireRateLimiting("Account");
         foreach (var group in new[] { auth, me, admin })
         {

@@ -1,7 +1,8 @@
-export type AdminView = 'audit' | 'reviews' | 'notifications' | 'surfaces' | 'dashboard' | 'orders' | 'content' | 'catalog' | 'inventory' | 'pricing' | 'quotes' | 'print' | 'integrations' | 'ai' | 'settings'
+export type AdminView = 'customers' | 'audit' | 'reviews' | 'notifications' | 'surfaces' | 'dashboard' | 'orders' | 'content' | 'catalog' | 'inventory' | 'pricing' | 'quotes' | 'print' | 'integrations' | 'ai' | 'settings'
 export type NavigationItem = { view: AdminView; label: string; permission: string; owner:'top'|'side'; category: string; section: string }
 // Exactly one primary navigation owner per existing screen; both menus are independent.
 export const navigationItems: readonly NavigationItem[] = [
+  { view:'customers', label:'Müşteriler', permission:'customers.read', owner:'top', category:'Müşteriler', section:'Müşteri yönetimi' },
   { view:'orders', label:'Siparişler', permission:'orders.read', owner:'top', category:'Siparişler', section:'Operasyon' },
   { view:'catalog', label:'Katalog', permission:'catalog.read', owner:'top', category:'Ürünler', section:'Katalog' },
   { view:'inventory', label:'Stok ve depolar', permission:'inventory.read', owner:'top', category:'Ürünler', section:'Operasyon' },

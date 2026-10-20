@@ -18,6 +18,9 @@ import 'package:xinobi_api_client/src/model/accept_admin_invitation.dart';
 import 'package:xinobi_api_client/src/model/account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/account_profile.dart';
 import 'package:xinobi_api_client/src/model/add_favorite.dart';
+import 'package:xinobi_api_client/src/model/admin_customer_details.dart';
+import 'package:xinobi_api_client/src/model/admin_customer_page.dart';
+import 'package:xinobi_api_client/src/model/admin_customer_row.dart';
 import 'package:xinobi_api_client/src/model/admin_invitation_response.dart';
 import 'package:xinobi_api_client/src/model/admin_mfa_challenge.dart';
 import 'package:xinobi_api_client/src/model/admin_password_reset_started.dart';
@@ -129,6 +132,9 @@ part 'serializers.g.dart';
   AccountEmailVerification,
   AccountProfile,
   AddFavorite,
+  AdminCustomerDetails,
+  AdminCustomerPage,
+  AdminCustomerRow,
   AdminInvitationResponse,
   AdminMfaChallenge,
   AdminPasswordResetStarted,
@@ -237,6 +243,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(PublicReview)]),
         () => ListBuilder<PublicReview>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(AdminCustomerRow)]),
+        () => ListBuilder<AdminCustomerRow>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CategoryItem)]),

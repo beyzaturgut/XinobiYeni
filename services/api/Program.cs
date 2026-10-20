@@ -61,10 +61,8 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IAccountStore>(services => AccountStorage.UsesSql(builder.Configuration, services.GetRequiredService<LocalCommerceStore>().DataDirectory)
         ? services.GetRequiredService<SqlAccountStore>() : services.GetRequiredService<DevFileAccountStore>());
     builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
-    // Per-variant surface masking (admin); Roboflow only on an explicit admin action, key from user-secrets.
+    // Per-variant surface masking (admin): PNG masks only, no inference.
     builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceWorkspace>();
-    builder.Services.AddHttpClient("roboflow", client => client.Timeout = TimeSpan.FromSeconds(130))
-        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
     builder.Services.AddSingleton<DesignSessionStore>();

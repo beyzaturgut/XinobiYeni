@@ -12,7 +12,7 @@ public static class ProductSurfaceEndpoints
     public static void MapProductSurfaces(this WebApplication app)
     {
         if (!app.Environment.IsDevelopment()) return;
-        // Read-only bridge for the experimental storefront. No staff session or provider call is needed to view a public product mask.
+        // Read-only bridge for the experimental storefront. No staff session is needed to view a public product mask.
         app.MapGet("/api/v1/dev/product-surfaces/commerce-mask/{productId}/{variantId}/rendering-inputs",
             async Task<IResult> (string productId, string variantId, HttpContext context, ProductSurfaceWorkspace surfaces) =>
             {
@@ -20,7 +20,7 @@ public static class ProductSurfaceEndpoints
                 context.Response.Headers.CacheControl = "no-store";
                 try { return Results.Ok(await surfaces.RenderingInputs(productId, variantId)); }
                 catch (SurfaceException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Status); }
-            });
+            }).AllowAnonymous(); // Public, read-only preview; Development and loopback checks still apply.
         var group = app.MapGroup("/api/v1/local-commerce/surfaces").WithTags("ProductSurfaces").RequirePanelPermissions().RequireRateLimiting("DesignStudio");
         group.AddEndpointFilter(async (context, next) =>
         {
@@ -37,10 +37,9 @@ public static class ProductSurfaceEndpoints
         group.MapGet("/{productId}/{variantId}", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Detail(productId, variantId)));
         group.MapGet("/{productId}/{variantId}/draft.png", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) =>
             Results.File(await surfaces.DraftMask(productId, variantId), "image/png"));
-        group.MapPost("/{productId}/{variantId}/segment", async (string productId, string variantId, SurfaceSegmentRequest request, ProductSurfaceWorkspace surfaces, CancellationToken token) =>
-            Results.Ok(await surfaces.Segment(productId, variantId, request, token)));
-        group.MapPost("/{productId}/{variantId}/strokes", async (string productId, string variantId, SurfaceStrokeRequest request, ProductSurfaceWorkspace surfaces) =>
-            Results.Ok(await surfaces.Paint(productId, variantId, request)));
+        group.MapGet("/{productId}/{variantId}/draft.webp", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) =>
+            Results.File(Xinobi.Api.Infrastructure.MaskProcessing.ManualSurfaceMasks.ExportWebp(await surfaces.DraftMask(productId, variantId)), "image/webp"));
+        group.MapPost("/{productId}/{variantId}/mask", async (string productId, string variantId, SurfaceWebpRequest request, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.ImportWebp(productId, variantId, request)));
         group.MapPost("/{productId}/{variantId}/approval", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Approve(productId, variantId)));
         group.MapPost("/{productId}/{variantId}/approval/colors", async (string productId, string variantId, SurfaceApprovalRequest request, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.ApproveColors(productId, variantId, request)));
         group.MapDelete("/{productId}/{variantId}/approval", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Revoke(productId, variantId)));

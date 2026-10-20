@@ -1,49 +1,37 @@
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Http;
 using SkiaSharp;
 using Xinobi.Api.Catalog;
-using Xinobi.Api.Features.ProductSurfaces;
 using Xinobi.Api.Features.ProductSurfaces.Catalog;
 using Xinobi.Api.LocalCommerce;
 
 namespace Xinobi.Architecture.Tests;
 
 /// <summary>
-/// Admin surface masking for every variant (/api/v1/local-commerce/surfaces). Roboflow is replaced by a recording handler:
-/// no network call is made. Seed variant DEMO-V101-B uses the real 1066×1600 Tea Maker photo.
+/// Admin surface masking for every variant (/api/v1/local-commerce/surfaces): WebP uploads only, no inference.
+/// Seed variant DEMO-V101-B uses the real 1066×1600 Tea Maker photo.
 /// </summary>
 public sealed class ProductSurfaceWorkspaceTests : IDisposable
 {
     private const string Root = "/api/v1/local-commerce/surfaces";
     private const string Tea = Root + "/DEMO-P101/DEMO-V101-B";
     private readonly string data = Path.Combine(Path.GetTempPath(), "xinobi-surfaces-" + Guid.NewGuid());
-    private readonly FakeRoboflow roboflow = new();
 
-    private WebApplicationFactory<Program> Factory(string? key = "test-key", int limit = 50, bool experimental = true) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(bool experimental = true) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("ProductSurfaces:ExperimentalCatalogWorkspace:Enabled", experimental.ToString());
         builder.UseSetting("LocalCommerce:DataDirectory", data);
         builder.UseSetting("DesignStudio:WorkerEnabled", "false");
-        // Explicit values override the developer's user-secrets, so a real key is never used here.
-        builder.UseSetting("ProductSurfaces:Roboflow:ApiKey", key ?? "");
-        builder.UseSetting("ProductSurfaces:Roboflow:DailyLimit", limit.ToString());
-        // Local settings are loaded after UseSetting; override them last so real credentials and local flags cannot enter this fixture.
+        // Local settings are loaded after UseSetting; override them last so local flags cannot enter this fixture.
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"] = experimental.ToString(),
-            ["ProductSurfaces:Roboflow:ApiKey"] = key ?? "",
-            ["ProductSurfaces:Roboflow:DailyLimit"] = limit.ToString()
+            ["ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"] = experimental.ToString()
         }));
-        builder.ConfigureServices(services => services.Configure<HttpClientFactoryOptions>("roboflow", options =>
-            options.HttpMessageHandlerBuilderActions.Add(handler => handler.PrimaryHandler = roboflow)));
     });
 
     [Fact]
@@ -53,31 +41,29 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         using var client = factory.CreateClient();
         var response = await client.GetAsync(Root);
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        Assert.Empty(roboflow.Calls);
-    }
-
-    /// <summary>Answers SAM3 like Roboflow does: one RLE prediction covering a band of columns.</summary>
-    private sealed class FakeRoboflow : HttpMessageHandler
-    {
-        public readonly List<(string Path, string? Auth, string Body)> Calls = [];
-        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-        {
-            Calls.Add((request.RequestUri!.AbsolutePath, request.Headers.Authorization?.ToString(), await request.Content!.ReadAsStringAsync(cancellationToken)));
-            const int width = 1066, height = 1600;
-            // Column-major runs: background, then columns 400–699 inside, then background.
-            long before = 400L * height, inside = 300L * height, after = (long)width * height - before - inside;
-            var prediction = new { format = "rle", confidence = 0.84, masks = new { size = new[] { height, width }, counts = new[] { before, inside, after } } };
-            object body = request.RequestUri.AbsolutePath.EndsWith("concept_segment")
-                ? new { prompt_results = new[] { new { prompt_index = 0, predictions = new[] { prediction } } } }
-                : new { predictions = new[] { prediction } };
-            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json") };
-        }
     }
 
     private static async Task<SurfaceDetail> Ok(HttpResponseMessage response)
     {
         Assert.True(response.IsSuccessStatusCode, await response.Content.ReadAsStringAsync());
         return (await response.Content.ReadFromJsonAsync<SurfaceDetail>())!;
+    }
+
+    [Fact]
+    public async Task SurfaceListIncludesOnlyExplicitlyPersonalizableProducts()
+    {
+        using var factory = Factory();
+        using var client = await TestStaff.Client(factory);
+        var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
+        var product = state.Products.First(p => p.Id == "DEMO-P101");
+        foreach (bool? enabled in new bool?[] { true, false, null })
+        {
+            (await client.PutAsJsonAsync("/api/v1/local-commerce/products/" + product.Id, product with { Personalizable = enabled })).EnsureSuccessStatusCode();
+            var items = (await client.GetFromJsonAsync<SurfaceSummary[]>(Root))!;
+            Assert.Equal(enabled == true, items.Any(item => item.ProductId == product.Id));
+            var current = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
+            Assert.All(items, item => Assert.True(current.Products.Single(p => p.Id == item.ProductId).Personalizable == true));
+        }
     }
 
     private static async Task<string?> Code(HttpResponseMessage response)
@@ -93,30 +79,39 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         return (inside, bitmap.Pixels.Length);
     }
 
-    private static readonly object[] Strokes = [new { operation = "add", radius = 20, points = new[] { new { x = 100, y = 100 }, new { x = 200, y = 200 } } }];
-    private static readonly object Stroke = new { strokes = Strokes };
+    /// <summary>A same-sized WebP whose white rectangle is the designable area.</summary>
+    private static byte[] Mask(bool transparent = true, int width = 1066)
+    {
+        using var bitmap = new SKBitmap(width, 1600);
+        bitmap.Erase(transparent ? SKColors.Transparent : SKColors.Black);
+        using var canvas = new SKCanvas(bitmap);
+        using var paint = new SKPaint { Color = SKColors.White };
+        canvas.DrawRect(100, 500, 500, 600, paint);
+        using var pixels = bitmap.PeekPixels();
+        using var png = pixels.Encode(new SKWebpEncoderOptions(SKWebpEncoderCompression.Lossless, 100))!;
+        return png.ToArray();
+    }
+
+    private static async Task<SurfaceDetail> Draft(HttpClient client, string path = Tea)
+    {
+        var source = await Ok(await client.GetAsync(path));
+        return await Ok(await client.PostAsJsonAsync(path + "/mask", new SurfaceWebpRequest(source.Image, source.SourceSha256, Convert.ToBase64String(Mask()), "alpha")));
+    }
 
     [Fact]
-    public async Task RoboflowDraftCanBeCorrectedApprovedAndReachesTheCatalogue()
+    public async Task WebpDraftIsApprovedAndReachesTheCatalogue()
     {
         using var factory = Factory();
         using var client = await TestStaff.Client(factory);
-        var list = (await client.GetFromJsonAsync<JsonElement>(Root));
+        var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
+        var product = state.Products.Single(p => p.Id == "DEMO-P101");
+        (await client.PutAsJsonAsync("/api/v1/local-commerce/products/" + product.Id, product with { Personalizable = true })).EnsureSuccessStatusCode();
+        var list = await client.GetFromJsonAsync<JsonElement>(Root);
         Assert.Contains(list.EnumerateArray(), item => item.GetProperty("variantId").GetString() == "DEMO-V101-B" && item.GetProperty("status").GetString() == "none");
-
-        var drafted = await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null)));
+        var drafted = await Draft(client);
         Assert.Equal("draft", drafted.Status);
         Assert.Equal((1066, 1600), (drafted.Width, drafted.Height));
-        Assert.Equal("roboflow-text", drafted.Draft!.Method);
-        var call = Assert.Single(roboflow.Calls);
-        Assert.Equal("/sam3/concept_segment", call.Path);
-        Assert.True(call.Auth == "Bearer test-key", "Expected isolated test credential.");
-        Assert.Contains("kettle body", call.Body);
-        Assert.Equal(300 * 1600, Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")).Inside);
-
-        var painted = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", Stroke));
-        Assert.Equal("roboflow-text+brush", painted.Draft!.Method);
-        Assert.True(Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")).Inside > 300 * 1600, "The brush adds to the Roboflow mask.");
+        Assert.Equal(500 * 600, Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")).Inside);
 
         var approved = await Ok(await client.PostAsync(Tea + "/approval", null));
         Assert.Equal("approved", approved.Status);
@@ -126,43 +121,18 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         Assert.Equal("http://localhost" + approved.ApprovedMask, detail.Variants.Single(v => v.Id == "DEMO-V101-B").SurfaceMaskUrl);
         Assert.Null(detail.Variants.Single(v => v.Id == "DEMO-V101-R").SurfaceMaskUrl);
         Assert.Equal(HttpStatusCode.OK, (await client.GetAsync(approved.ApprovedMask)).StatusCode);
+        Assert.Equal("none", (await Ok(await client.DeleteAsync(Tea + "/approval"))).Status);
     }
 
-    [Fact]
-    public async Task PointsUseVisualSegmentAndTheBrushAloneCanDrawAMask()
+    [Theory]
+    [InlineData("segment")]
+    [InlineData("strokes")]
+    [InlineData("curves")]
+    public async Task RetiredMaskingToolsAreNotMapped(string tool)
     {
         using var factory = Factory();
         using var client = await TestStaff.Client(factory);
-        var pointed = await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, [new SurfacePoint(500, 800, true), new SurfacePoint(100, 100, false)])));
-        Assert.Equal("roboflow-points", pointed.Draft!.Method);
-        Assert.Equal("/sam3/visual_segment", roboflow.Calls.Single().Path);
-        Assert.Equal("invalid_point", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, [new SurfacePoint(5000, 1, true)]))));
-
-        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
-        Assert.Equal("brush", manual.Draft!.Method);
-        var (inside, _) = Coverage(await client.GetByteArrayAsync(Tea + "/draft.png"));
-        Assert.InRange(inside, 1, 300 * 1600 - 1);
-        Assert.Equal("none", (await Ok(await client.DeleteAsync(Tea + "/draft"))).Status);
-    }
-
-    [Fact]
-    public async Task WithoutAKeyOnlyTheBrushWorksAndTheDailyLimitHolds()
-    {
-        using (var noKey = Factory(key: null))
-        using (var client = await TestStaff.Client(noKey))
-        {
-            var refused = await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null));
-            Assert.Equal(HttpStatusCode.ServiceUnavailable, refused.StatusCode);
-            Assert.Equal("provider_not_configured", await Code(refused));
-            Assert.False((await Ok(await client.GetAsync(Tea))).Provider.Configured);
-            Assert.Empty(roboflow.Calls);
-        }
-        using var limited = Factory(limit: 1);
-        using var limitedClient = await TestStaff.Client(limited);
-        await Ok(await limitedClient.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null)));
-        var second = await limitedClient.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null));
-        Assert.Equal(HttpStatusCode.TooManyRequests, second.StatusCode);
-        Assert.Single(roboflow.Calls);
+        Assert.Equal(HttpStatusCode.NotFound, (await client.PostAsJsonAsync(Tea + "/" + tool, new { })).StatusCode);
     }
 
     [Fact]
@@ -170,7 +140,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     {
         using var factory = Factory();
         using var client = await TestStaff.Client(factory);
-        await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest("kettle body", null)));
+        await Draft(client);
         var approved = await Ok(await client.PostAsync(Tea + "/approval", null));
 
         var state = (await client.GetFromJsonAsync<CommerceState>("/api/v1/local-commerce/state"))!;
@@ -196,7 +166,7 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     }
 
     [Fact]
-    public async Task RoughGuideUsesInteriorPointsAndOneCallThenSharesApprovalWithColors()
+    public async Task OneApprovalSharesTheWebpMaskWithSamePlacementColors()
     {
         using var factory = Factory();
         using var client = await TestStaff.Client(factory);
@@ -207,31 +177,16 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
         var redId = "DEMO-V101-R";
         (await client.PutAsJsonAsync("/api/v1/local-commerce/products/DEMO-P101", product with
         { Variants = [.. product.Variants.Select(v => v.Id == redId ? v with { Image = reference.Image } : v)] })).EnsureSuccessStatusCode();
-        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = new[] { new { operation = "add", radius = 32, points = new[] { new { x = 450, y = 800 }, new { x = 650, y = 800 } } } }, @base = "empty" }));
-        var guideMask = await client.GetByteArrayAsync(Tea + "/draft.png");
-        Assert.Empty(roboflow.Calls);
-        var refined = await Ok(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt)));
-        Assert.Equal("roboflow-guide", refined.Draft!.Method);
-        var call = Assert.Single(roboflow.Calls);
-        Assert.Equal("/sam3/visual_segment", call.Path);
-        using var payload = JsonDocument.Parse(call.Body);
-        var points = payload.RootElement.GetProperty("prompts").GetProperty("prompts")[0].GetProperty("points");
-        Assert.InRange(points.GetArrayLength(), 1, 12);
-        Assert.All(points.EnumerateArray(), point => Assert.True(point.GetProperty("positive").GetBoolean()));
-        // The provider returns a huge stripe; only pixels in the guide survive.
-        var bounded = await client.GetByteArrayAsync(Tea + "/draft.png");
-        Assert.Equal(Coverage(guideMask).Inside, Coverage(bounded).Inside);
-        using (var guideBitmap = SKBitmap.Decode(guideMask))
-        using (var resultBitmap = SKBitmap.Decode(bounded))
-            Assert.All(resultBitmap.Pixels.Zip(guideBitmap.Pixels), pair => Assert.True(pair.First.Alpha == 0 || pair.Second.Alpha > 0));
+        var refined = await Draft(client);
         var colors = refined.Colors.Where(c => c.VariantId == reference.Id || c.VariantId == redId).ToArray();
-        var approval = await Ok(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(colors, true, refined.Draft.UpdatedAt)));
+        var approval = await Ok(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(colors, true, refined.Draft!.UpdatedAt)));
         var detail = (await client.GetFromJsonAsync<ProductDetail>("/api/v1/catalog/products/DEMO-P101"))!;
         Assert.All(detail.Variants.Where(v => colors.Any(c => c.VariantId == v.Id)), v => Assert.EndsWith(approval.ApprovedMask!, v.SurfaceMaskUrl));
-        Assert.Single(roboflow.Calls); // Sharing never incurs per-colour inference.
+        using var visitor = factory.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
+        Assert.Equal(HttpStatusCode.Unauthorized, (await visitor.GetAsync(Tea)).StatusCode);
         foreach (var color in colors)
         {
-            var bundle = await client.GetFromJsonAsync<JsonElement>($"/api/v1/dev/product-surfaces/commerce-mask/DEMO-P101/{color.VariantId}/rendering-inputs");
+            var bundle = await visitor.GetFromJsonAsync<JsonElement>($"/api/v1/dev/product-surfaces/commerce-mask/DEMO-P101/{color.VariantId}/rendering-inputs");
             Assert.Equal(color.VariantId, bundle.GetProperty("variantReference").GetString());
             Assert.True(bundle.GetProperty("previewAvailable").GetBoolean());
             var input = bundle.GetProperty("inputs");
@@ -241,13 +196,12 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     }
 
     [Fact]
-    public async Task StaleGuideAndUnconfirmedOrMismatchedColorApprovalAreRejectedWithoutPartialUpdate()
+    public async Task UnconfirmedOrMismatchedColorApprovalIsRejectedWithoutPartialUpdate()
     {
         using var factory = Factory();
         using var client = await TestStaff.Client(factory);
-        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
-        Assert.Equal("draft_changed", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt.AddSeconds(-1)))));
-        Assert.Empty(roboflow.Calls);
+        var manual = await Draft(client);
+        Assert.Equal("draft_changed", await Code(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(manual.Colors.Where(c => c.VariantId == "DEMO-V101-B").ToArray(), true, manual.Draft!.UpdatedAt.AddSeconds(-1)))));
         var colors = manual.Colors.Where(c => c.VariantId == "DEMO-V101-B").ToArray();
         Assert.Equal("same_placement_required", await Code(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest(colors, false, manual.Draft.UpdatedAt))));
         Assert.Equal("color_dimensions_mismatch", await Code(await client.PostAsJsonAsync(Tea + "/approval/colors", new SurfaceApprovalRequest([colors[0] with { Width = 1 }], true, manual.Draft.UpdatedAt))));
@@ -258,55 +212,41 @@ public sealed class ProductSurfaceWorkspaceTests : IDisposable
     }
 
     [Fact]
-    public async Task UnrelatedInferencePreservesPaintedGuideAndInvalidToleranceUsesNoCall()
+    public async Task WebpImportSupportsAlphaAndBlackWhiteAndRejectsBadSizeWithoutChangingDraft()
     {
         using var factory = Factory();
         using var client = await TestStaff.Client(factory);
-        var manual = await Ok(await client.PostAsJsonAsync(Tea + "/strokes", new { strokes = Strokes, @base = "empty" }));
+        var source = await Ok(await client.GetAsync(Tea));
+        async Task<HttpResponseMessage> Import(byte[] png, string mode) => await client.PostAsJsonAsync(Tea + "/mask", new SurfaceWebpRequest(source.Image, source.SourceSha256, Convert.ToBase64String(png), mode));
+        var alpha = await Ok(await Import(Mask(), "alpha"));
+        var expected = await client.GetByteArrayAsync(Tea + "/draft.png");
+        Assert.Equal("webp-alpha", alpha.Draft!.Method);
+        await Ok(await Import(Mask(transparent: false), "luminance"));
+        Assert.Equal(Coverage(expected), Coverage(await client.GetByteArrayAsync(Tea + "/draft.png")));
         var before = await client.GetByteArrayAsync(Tea + "/draft.png");
-        Assert.Equal("invalid_guide_tolerance", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft!.UpdatedAt, 99))));
-        Assert.Empty(roboflow.Calls);
-        Assert.Equal("guide_no_overlap", await Code(await client.PostAsJsonAsync(Tea + "/segment", new SurfaceSegmentRequest(null, null, true, manual.Draft.UpdatedAt))));
+        Assert.Equal("mask_dimensions_mismatch", await Code(await Import(Mask(width: 500), "alpha")));
+        Assert.Equal("mask_empty_or_full", await Code(await Import(Mask(transparent: false), "alpha")));
+        Assert.Equal("invalid_mask_webp", await Code(await Import([1, 2, 3], "alpha")));
+        var missing = await client.PostAsJsonAsync(Tea + "/mask", new { image = source.Image, sourceSha256 = source.SourceSha256, mode = "alpha" });
+        Assert.Equal(HttpStatusCode.BadRequest, missing.StatusCode);
+        Assert.Contains("verisi eksik", await missing.Content.ReadAsStringAsync());
+        using var pngBitmap = SKBitmap.Decode(Mask());
+        using var pngData = pngBitmap.Encode(SKEncodedImageFormat.Png, 100);
+        Assert.Equal("invalid_mask_webp", await Code(await Import(pngData.ToArray(), "alpha")));
+        Assert.Equal("invalid_mask_webp", await Code(await Import(pngData.ToArray(), "luminance")));
+        using var jpegData = pngBitmap.Encode(SKEncodedImageFormat.Jpeg, 100);
+        Assert.Equal("invalid_mask_webp", await Code(await Import(jpegData.ToArray(), "luminance")));
+        using var exported = await client.GetAsync(Tea + "/draft.webp");
+        Assert.Equal("image/webp", exported.Content.Headers.ContentType!.MediaType);
+        var exportedBytes = await exported.Content.ReadAsByteArrayAsync();
+        Assert.Equal(Coverage(before), Coverage(exportedBytes));
+        using var storedBitmap = SKBitmap.Decode(before);
+        using var exportedBitmap = SKBitmap.Decode(exportedBytes);
+        Assert.Equal(storedBitmap.Width, exportedBitmap.Width);
+        Assert.Equal(storedBitmap.Height, exportedBitmap.Height);
+        Assert.Equal(storedBitmap.Pixels.Select(pixel => pixel.Alpha), exportedBitmap.Pixels.Select(pixel => pixel.Alpha));
+        Assert.Equal("WEBP", System.Text.Encoding.ASCII.GetString(exportedBytes, 8, 4));
         Assert.Equal(before, await client.GetByteArrayAsync(Tea + "/draft.png"));
-        Assert.Single(roboflow.Calls);
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(3)]
-    public void GuidedMaskCannotEscapeExplicitTolerance(int tolerance)
-    {
-        using var guide = new SKBitmap(80, 80);
-        using var candidate = new SKBitmap(80, 80);
-        guide.Erase(SKColors.Transparent); candidate.Erase(SKColors.Transparent);
-        for (var y = 30; y < 50; y++) for (var x = 30; x < 50; x++) guide.SetPixel(x, y, SKColors.White);
-        for (var y = 10; y < 70; y++) for (var x = 10; x < 70; x++) candidate.SetPixel(x, y, SKColors.White);
-        using var guidePng = guide.Encode(SKEncodedImageFormat.Png, 100);
-        using var candidatePng = candidate.Encode(SKEncodedImageFormat.Png, 100);
-        var source = new Xinobi.Api.Infrastructure.MediaValidation.AlignedImageInspector().InspectSource(candidatePng.ToArray(), "test");
-        var result = Xinobi.Api.Infrastructure.MaskProcessing.GuidedMaskBounds.Apply(candidatePng.ToArray(), guidePng.ToArray(), source, tolerance);
-        using var bitmap = SKBitmap.Decode(result);
-        for (var y = 0; y < 80; y++) for (var x = 0; x < 80; x++)
-        {
-            var distance = Math.Max(30 - x, Math.Max(0, x - 49)) + Math.Max(30 - y, Math.Max(0, y - 49));
-            Assert.Equal(distance <= tolerance, bitmap.GetPixel(x, y).Alpha == 255);
-        }
-    }
-
-    [Fact]
-    public void GuideSamplesAvoidThinSpillsAndRejectThinOutlines()
-    {
-        using var bitmap = new SKBitmap(160, 160);
-        bitmap.Erase(SKColors.Transparent);
-        for (var y = 40; y < 120; y++) for (var x = 40; x < 120; x++) bitmap.SetPixel(x, y, SKColors.White);
-        for (var x = 120; x < 150; x++) bitmap.SetPixel(x, 80, SKColors.White); // rough edge spill
-        using var png = bitmap.Encode(SKEncodedImageFormat.Png, 100);
-        var points = Xinobi.Api.Infrastructure.MaskProcessing.ManualGuidePoints.Sample(png.ToArray());
-        Assert.All(points, point => { Assert.InRange(point.X, 42, 118); Assert.InRange(point.Y, 42, 118); });
-        bitmap.Erase(SKColors.Transparent);
-        for (var x = 20; x < 140; x++) bitmap.SetPixel(x, 80, SKColors.White);
-        using var thin = bitmap.Encode(SKEncodedImageFormat.Png, 100);
-        Assert.Equal("guide_too_thin", Assert.Throws<SurfaceException>(() => Xinobi.Api.Infrastructure.MaskProcessing.ManualGuidePoints.Sample(thin.ToArray())).Code);
     }
 
     public void Dispose()

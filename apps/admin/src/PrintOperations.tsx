@@ -1,14 +1,56 @@
-import { useState } from 'react'
-const designs: { id: string; order: string; variant: string; product: string; image: string; boundVersion: string; versions: { id: string; revision: number; created: string; areaVersion: string; profile: string; findings: { severity: string; message: string }[]; outputs: { face: string; status: string; reference: string; error: string }[] }[] }[] = []
-// This prototype has no connected design/print API; absence is not an empty SQL result.
-const sourceUnavailable = true
-const labels:Record<string,string>={queued:'Kuyrukta',running:'İşleniyor',failed:'Başarısız',ready:'Örnek çıktı tamamlandı'}
-export default function PrintOperations({ notes, onNote }:{notes:Record<string,string>;onNote:(id:string,note:string)=>void}){
- const [query,setQuery]=useState(''),[status,setStatus]=useState('Tümü'),[selectedId,setSelectedId]=useState(''),[versionId,setVersionId]=useState(''),[note,setNote]=useState(''),[notice,setNotice]=useState(''),[retry,setRetry]=useState(''),[error,setError]=useState('')
- const selected=designs.find(item=>item.id===selectedId),version=selected?.versions.find(item=>item.id===versionId)
- const filtered=designs.filter(item=>`${item.id} ${item.order} ${item.product} ${item.variant}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR'))&&(status==='Tümü'||item.versions.some(v=>v.outputs.some(output=>output.status===status))))
- function show(id:string,vid:string){if(sourceUnavailable)return;if(note.trim()!==(notes[versionId]||'').trim()&&!window.confirm('Kaydedilmemiş inceleme notu silinsin mi?'))return;setSelectedId(id);setVersionId(vid);setNote(notes[vid]||'');setRetry('');setNotice('');setError('')}
- return <section aria-label="Tasarım ve baskı operasyonları"><p className="panel-notice">Tasarım ve baskı işlemleri henüz kullanıma açık değil. Fiziksel ölçü, DPI, renk profili ve üretim onayı için D04/T-04 kararları bekleniyor.</p><div className="order-filters"><label>Tasarım veya sipariş ara<input disabled={sourceUnavailable} aria-describedby="print-source-status" value={query} onChange={e=>setQuery(e.target.value)}/></label><label>Çıktı durumu<select disabled={sourceUnavailable} aria-describedby="print-source-status" aria-label="Çıktı durum filtresi" value={status} onChange={e=>setStatus(e.target.value)}><option value="Tümü">Tümü</option>{Object.entries(labels).map(([key,label])=><option value={key} key={key}>{label}</option>)}</select></label><button disabled={sourceUnavailable} onClick={()=>{setQuery('');setStatus('Tümü')}}>Filtreleri temizle</button></div><div className="table-scroll"><table><caption>Örnek tasarım/sipariş sürüm bağları</caption><thead><tr>{['Tasarım','Sipariş','Ürün / varyant','Siparişin bağlı sürümü','Sürüm sayısı','İşlem'].map(item=><th key={item} scope="col">{item}</th>)}</tr></thead><tbody>{filtered.map(item=><tr key={item.id}><th scope="row">{item.id}</th><td>{item.order}</td><td>{item.product}</td><td>{item.boundVersion}</td><td>{item.versions.length}</td><td><button disabled={sourceUnavailable} aria-label={`${item.id} baskı detayını aç`} onClick={()=>show(item.id,item.boundVersion)}>İncele</button></td></tr>)}</tbody></table></div>{sourceUnavailable?<p id="print-source-status" role="status">Tasarım/baskı veri kaynağı henüz bağlı değil. Liste ve işlemler kullanılamıyor; bu durum kayıt bulunmadığı anlamına gelmez.</p>:!filtered.length&&<p role="status">Filtrelere uygun tasarım yok.</p>}
- {selected&&version&&<section className="quote-detail" aria-labelledby="print-title"><h2 id="print-title">{selected.id} · Tasarım ve çıktı incelemesi</h2><div className="print-overview"><img src={selected.image} alt={`${selected.product} temsili ürün referansı`}/><div><p>{selected.product}</p><p>Varyant: {selected.variant}</p><p>Siparişin bağlı sürümü: <strong>{selected.boundVersion}</strong></p><p>Seçili sürüm: <strong>{version.id}</strong></p><p>Ürün görseli referanstır; fiziksel baskı önizlemesi değildir.</p></div></div><div className="catalog-tabs" role="group" aria-label="Tasarım sürümleri">{selected.versions.map(item=><button disabled={sourceUnavailable} key={item.id} aria-pressed={version.id===item.id} onClick={()=>show(selected.id,item.id)}>Tasarım sürümü {item.revision}</button>)}</div><dl><div><dt>Sürüm zamanı</dt><dd>{version.created}</dd></div><div><dt>Alan kural sürümü</dt><dd>{version.areaVersion} · örnek</dd></div><div><dt>Çıktı profili</dt><dd>{version.profile}</dd></div><div><dt>Fiziksel ölçü / DPI eşiği</dt><dd>D04 kararı bekleniyor</dd></div><div><dt>Üretim kabulü</dt><dd>Doğrulanmadı</dd></div></dl><h3>Kalite bulguları</h3><ul>{version.findings.map(item=><li key={item.message}><strong>{item.severity}:</strong> {item.message}</li>)}</ul><div className="table-scroll"><table><caption>Seçili sürümün yüz bazlı örnek çıktıları</caption><thead><tr>{['Yüz','İş referansı','Durum','Hata','İşlem'].map(item=><th key={item} scope="col">{item}</th>)}</tr></thead><tbody>{version.outputs.map(output=><tr key={output.reference}><th scope="row">{output.face}</th><td>{output.reference}</td><td>{labels[output.status]}</td><td>{output.error||'—'}</td><td>{output.status==='failed'&&<button disabled={sourceUnavailable} onClick={()=>setRetry(`${version.id} | ${version.areaVersion} | çıktı profili tanımsız | ${output.face}`)}>Yeniden deneme planını göster</button>}<button disabled>{output.status==='ready'?'Yetkili dosya indir · API bekleniyor':'Dosya hazır değil'}</button></td></tr>)}</tbody></table></div>{retry&&<p role="status">Örnek tekrar referansı: {retry}. Aynı tasarım/alan/profil sürümü için mevcut iş sorgulanmalı; bu eylem iş kuyruğu veya çıktı oluşturmadı.</p>}<div className="catalog-form"><label>Operatör inceleme notu<textarea disabled={sourceUnavailable} rows={3} maxLength={1000} value={note} onChange={e=>setNote(e.target.value)}/></label><button disabled={sourceUnavailable} onClick={()=>{if(sourceUnavailable)return;if(!note.trim()){setError('İnceleme notu girin.');return}onNote(version.id,note.trim());setError('');setNotice('Not yalnız bu oturumda tutuldu; kalıcı kayıt, üretim onayı veya audit oluşturulmadı.')}}>İnceleme notunu geçici tut</button>{error&&<p role="alert" className="catalog-error">{error}</p>}{notice&&<p role="status">{notice}</p>}<button disabled>Üretime onayla · D04/API bekleniyor</button><button disabled>Gerçek baskı dosyası oluştur · D04/API bekleniyor</button></div></section>}
- </section>
+import { useEffect, useRef, useState } from 'react'
+import { adminCall } from './admin-api'
+import type { components } from '../../../packages/clients/typescript/src/schema'
+
+type DesignPage = components['schemas']['AdminDesignPage']
+type Design = components['schemas']['AdminDesignDetails']
+const date = (value: string) => new Date(value).toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })
+function message(problem: unknown) {
+  const status = (problem as { status?: number })?.status
+  if (status === 404) return 'Tasarım kaydı bulunamadı. Listeyi yenileyebilirsiniz.'
+  if (status === 503) return 'Tasarım veri kaynağı şu anda kullanılamıyor. Bu durum kayıt olmadığı anlamına gelmez.'
+  return problem instanceof Error ? problem.message : 'Tasarım kayıtları yüklenemedi.'
+}
+
+export default function PrintOperations(_props: { notes: Record<string, string>; onNote: (id: string, note: string) => void }) {
+  const [data, setData] = useState<DesignPage | null>(null), [page, setPage] = useState(1), [reload, setReload] = useState(0)
+  const [loading, setLoading] = useState(true), [error, setError] = useState(''), [query, setQuery] = useState('')
+  const [selectedId, setSelectedId] = useState(''), [detail, setDetail] = useState<Design | null>(null)
+  const [detailLoading, setDetailLoading] = useState(false), [detailError, setDetailError] = useState('')
+  const listVersion = useRef(0), detailVersion = useRef({ value: 0 }), dialog = useRef<HTMLDialogElement>(null), trigger = useRef<HTMLButtonElement | null>(null)
+  useEffect(() => {
+    const version = ++listVersion.current
+    const detailGuard = detailVersion.current
+    let active = true
+    adminCall<DesignPage>(`/admin/designs?page=${page}&pageSize=20`)
+      .then(value => { if (active && version === listVersion.current) { setData(value); setError('') } })
+      .catch(problem => { if (active && version === listVersion.current) { setData(null); setError(message(problem)) } })
+      .finally(() => { if (active && version === listVersion.current) setLoading(false) })
+    return () => { active = false; detailGuard.value++ }
+  }, [page, reload])
+  function close() { detailVersion.current.value++; dialog.current?.close(); setSelectedId(''); setDetail(null); setDetailError(''); setDetailLoading(false); trigger.current?.focus() }
+  function load(next = page) { listVersion.current++; close(); setLoading(true); setData(null); setError(''); setQuery(''); setPage(next); setReload(value => value + 1) }
+  async function readDetail(id: string) {
+    const version = ++detailVersion.current.value
+    setSelectedId(id); setDetail(null); setDetailError(''); setDetailLoading(true)
+    try { const value = await adminCall<Design>(`/admin/designs/${encodeURIComponent(id)}`); if (version === detailVersion.current.value) setDetail(value) }
+    catch (problem) { if (version === detailVersion.current.value) setDetailError(message(problem)) }
+    finally { if (version === detailVersion.current.value) setDetailLoading(false) }
+  }
+  const ready = !loading && !error && data !== null
+  const rows = ready ? (data.items ?? []).filter(item => [item.id, item.kind, item.productId, item.productName, item.variantId, item.color].join(' ').toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR'))) : []
+  return <section aria-label="Tasarım ve baskı operasyonları">
+    <p className="panel-notice">Kayıtlı tasarımların yalnız temel bilgileri gösterilir. Baskı üretimi, sürüm, onay ve indirme işlemleri kullanıma açık değildir; D04/T-04 kararları bekleniyor.</p>
+    <div className="order-filters"><label>Bu sayfada tasarım ara<input disabled={!ready} value={query} onChange={event => setQuery(event.target.value)} /></label><button disabled={!ready || !query} onClick={() => setQuery('')}>Aramayı temizle</button><button onClick={() => load()}>Yenile</button></div>
+    {loading && <p role="status">Tasarım kayıtları yükleniyor…</p>}
+    {error && <p role="alert">{error} <button onClick={() => load()}>Tekrar dene</button></p>}
+    {ready && <><p role="status">{data.total} tasarım · Sayfa {data.totalPages ? data.page : 1}/{data.totalPages || 1} · Saat dilimi: Europe/Istanbul</p>
+      <div className="table-scroll"><table><caption>Kayıtlı tasarım bilgileri · en yeni kayıt önce</caption><thead><tr>{['Tasarım', 'Tür', 'Ürün / varyant', 'Renk', 'Kayıt zamanı', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead><tbody>{rows.map(item => <tr key={item.id}><th scope="row">{item.id}</th><td>{item.kind}</td><td>{item.productName}<br /><small>{item.productId} · {item.variantId || '—'}</small></td><td>{item.color || '—'}</td><td>{date(item.createdAt!)}</td><td><button onClick={event => { trigger.current = event.currentTarget; dialog.current?.showModal(); void readDetail(item.id!) }}>İncele</button></td></tr>)}</tbody></table></div>
+      {!rows.length && <p role="status">{query ? 'Bu sayfada aramaya uygun tasarım yok.' : data.total === 0 ? 'Henüz kayıtlı tasarım yok.' : 'Bu sayfada tasarım yok. Önceki sayfaya dönebilirsiniz.'}</p>}
+      <div className="periods" aria-label="Tasarım sayfaları"><button disabled={data.page <= 1} onClick={() => load(page - 1)}>← Önceki</button><button disabled={!data.totalPages || data.page! >= data.totalPages} onClick={() => load(page + 1)}>Sonraki →</button></div></>}
+    <dialog ref={dialog} aria-labelledby="design-detail-title" onCancel={event => { event.preventDefault(); close() }} onClose={() => trigger.current?.focus()}><header className="dialog-heading"><h2 id="design-detail-title">Tasarım bilgileri</h2><button aria-label="Tasarım detayını kapat" onClick={close}>×</button></header><div className="dialog-body">
+      {detailLoading && <p role="status">Tasarım detayı yükleniyor…</p>}{detailError && <p role="alert">{detailError} <button onClick={() => void readDetail(selectedId)}>Tekrar dene</button></p>}
+      {detail && <dl>{[['Tasarım', detail.id], ['Tür', detail.kind], ['Ürün kimliği', detail.productId], ['Ürün', detail.productName], ['Varyant', detail.variantId], ['Renk', detail.color], ['Kayıt zamanı (Europe/Istanbul)', date(detail.createdAt!)], ['Dosya türü', detail.mime]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || '—'}</dd></div>)}</dl>}<button onClick={close}>Kapat</button>
+    </div></dialog>
+  </section>
 }

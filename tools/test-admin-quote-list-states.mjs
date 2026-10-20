@@ -8,13 +8,20 @@ const gate = () => { let release; const promise = new Promise(resolve => { relea
 const quote = { id: 'fixture', code: 'FIXTURE-1', company: 'Synthetic company', contactName: 'Synthetic', email: 'test@example.invalid', items: [{ productId: 'p', productName: 'Fixture product', quantity: 10 }], status: 'received', createdAt: '2026-10-20T00:00:00Z', messages: [], history: [] }
 const ok = (body = [quote]) => ({ status: 200, body })
 let passed = 0
-async function fixture(read = async () => ok(), permissions = ['quotes.read', 'quotes.write']) {
+async function fixture(read = async () => ok(), permissions = ['quotes.read', 'quotes.write'], mutate) {
  const context = await browser.newContext(), page = await context.newPage(), errors = []
- let calls = 0
+ let calls = 0, posts = 0
  page.on('pageerror', error => errors.push(error.message))
  await context.route('**/api/v1/**', async route => {
   const request = route.request(), url = new URL(request.url())
-  assert.equal(request.method(), 'GET', 'No business writes allowed')
+  if (request.method() === 'POST') {
+   assert.ok(mutate, 'No unexpected writes allowed')
+   assert.ok(permissions.includes('quotes.write'))
+   assert.ok(url.pathname.endsWith('/local-commerce/quotes/fixture/status'))
+   const result = await mutate(++posts, request.postDataJSON())
+   return route.fulfill({ status: result.status, contentType: 'application/json', body: JSON.stringify(result.body) })
+  }
+  assert.equal(request.method(), 'GET', 'No unexpected writes allowed')
   let result
   if (url.pathname.endsWith('/admin/session')) result = ok({ account: { name: 'Synthetic' }, permissions })
   else if (url.pathname.endsWith('/local-commerce/state')) result = { status: 503, body: { title: 'Fixture catalog unavailable' } }
@@ -26,7 +33,7 @@ async function fixture(read = async () => ok(), permissions = ['quotes.read', 'q
  })
  await page.goto(origin + '/?view=quotes')
  const section = page.getByRole('region', { name: 'Kurumsal teklifler' })
- return { page, section, close: async () => { assert.deepEqual(errors, []); await context.close(); passed++ } }
+ return { page, section, posts: () => posts, close: async () => { assert.deepEqual(errors, []); await context.close(); passed++ } }
 }
 try {
  { const wait = gate(), f = await fixture(async () => { await wait.promise; return ok() })
@@ -56,11 +63,43 @@ try {
    await f.section.getByText('1 talep', { exact: true }).waitFor(); await f.section.getByRole('button', { name: 'Yenile', exact: true }).click()
    await f.section.getByText('Teklifler yükleniyor…', { exact: true }).waitFor(); assert.equal(await f.section.getByText('1 talep', { exact: true }).count(), 0)
    wait.release(); await f.section.getByRole('alert').waitFor(); assert.equal(await f.section.getByRole('button', { name: 'Aç', exact: true }).count(), 0); await f.close() }
- { const f = await fixture(undefined, ['quotes.read']); await f.section.getByRole('button', { name: 'Aç', exact: true }).click()
+ { const f = await fixture(async () => ok([{ ...quote, messages: [{ from: 'store', text: 'Fixture readable message', at: quote.createdAt }], history: [{ status: 'received', actor: 'customer', at: quote.createdAt, note: 'Fixture readable history' }] }]), ['quotes.read']); await f.section.getByRole('button', { name: 'Aç', exact: true }).click()
+   await f.section.getByText('Fixture readable message', { exact: true }).waitFor()
+   await f.section.getByText(/Fixture readable history/).waitFor()
    assert.equal(await f.section.getByRole('button', { name: 'Teklifi gönder', exact: true }).count(), 0)
-   const close = f.section.getByRole('button', { name: 'Talebi kapat', exact: true }); assert.equal(await close.isEnabled(), true)
-   // Existing read-only action guard must not issue a POST, even if the legacy button is visible.
-   f.page.on('dialog', dialog => dialog.accept()); await close.click(); await f.close() }
+   assert.equal(await f.section.getByRole('button', { name: 'Talebi kapat', exact: true }).isEnabled(), false)
+   assert.equal(await f.section.getByRole('button', { name: 'İncelemeye al', exact: true }).isEnabled(), false)
+   for (const width of [1440, 1280, 768, 390]) {
+    await f.page.setViewportSize({ width, height: 900 })
+    const button = f.section.getByRole('button', { name: 'Talebi kapat', exact: true })
+    await button.evaluate(element => element.click())
+    assert.equal(f.posts(), 0)
+    assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1))
+   }
+   assert.equal(f.posts(), 0); await f.close() }
+ for (const status of ['reviewing', 'closed']) {
+  const wait = gate(), started = gate(); let current = quote
+  const f = await fixture(async () => ok([current]), undefined, async (n, payload) => {
+   assert.equal(payload.status, status); started.release(); await wait.promise
+   current = { ...quote, status }; return ok(current)
+  })
+  await f.section.getByRole('button', { name: 'Aç', exact: true }).click()
+  f.page.on('dialog', dialog => dialog.accept())
+  const button = f.section.getByRole('button', { name: status === 'closed' ? 'Talebi kapat' : 'İncelemeye al', exact: true })
+  await button.focus(); await f.page.keyboard.press('Enter'); await started.promise
+  assert.equal(await button.isEnabled(), false)
+  await button.evaluate(element => { element.click(); element.click() }); assert.equal(f.posts(), 1)
+  wait.release(); await f.section.getByText(status === 'closed' ? 'Talep kapatıldı.' : 'İncelemeye alındı.', { exact: true }).waitFor()
+  assert.equal(f.posts(), 1); await f.close()
+ }
+ { const f = await fixture(undefined, undefined, async () => ({ status: 503, body: { title: 'Fixture status unavailable' } }))
+   await f.section.getByRole('button', { name: 'Aç', exact: true }).click()
+   await f.section.getByLabel('Firmaya mesaj', { exact: true }).fill('Keep after failure')
+   const button = f.section.getByRole('button', { name: 'İncelemeye al', exact: true }); await button.click()
+   await f.section.getByText('Fixture status unavailable', { exact: true }).waitFor()
+   assert.equal(await button.isEnabled(), true)
+   assert.equal(await f.section.getByRole('textbox', { name: /^Firmaya mesaj/ }).inputValue(), 'Keep after failure')
+   assert.equal(f.posts(), 1); await f.close() }
  for (const width of [1440, 1280, 768, 390]) {
   const f = await fixture(); await f.page.setViewportSize({ width, height: 900 }); const open = f.section.getByRole('button', { name: 'Aç', exact: true })
   await open.focus(); await f.page.keyboard.press('Enter'); await f.section.getByLabel('Firmaya mesaj', { exact: true }).waitFor()

@@ -9,9 +9,9 @@ const paged = (items = [row], page = 1, total = items.length) => ({ items, page,
 const gate = () => { let release; const promise = new Promise(resolve => { release = resolve }); return { promise, release } }
 let passed = 0
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=', 'base64')
-async function fixture({ permissions = ['print.read'], list, detail, image, refresh = false } = {}) {
+async function fixture({ permissions = ['print.read'], list, detail, image, orders, refresh = false } = {}) {
   const context = await browser.newContext(), page = await context.newPage(), errors = [], requests = []
-  let reads = 0, details = 0, images = 0
+  let reads = 0, details = 0, images = 0, orderReads = 0
   page.on('pageerror', error => errors.push(error.message))
   await context.route('**/api/v1/**', async route => {
     const request = route.request(), url = new URL(request.url()), path = url.pathname
@@ -23,6 +23,10 @@ async function fixture({ permissions = ['print.read'], list, detail, image, refr
     if (path.endsWith('/local-commerce/state')) return reply({ status: 503, body: { code: 'catalog_unavailable', title: 'Katalog kullanılamıyor' } })
     if (path.endsWith('/local-commerce/notifications')) return reply({ body: { channels: [], items: [] } })
     if (path.endsWith('/admin/designs')) { assert.equal(url.searchParams.get('pageSize'), '20'); return reply(await list?.(Number(url.searchParams.get('page')), ++reads) ?? { body: paged() }) }
+    if (path.includes('/admin/designs/') && path.endsWith('/orders')) {
+      assert.ok(permissions.includes('print.read') && permissions.includes('orders.read'), 'Both permissions required before any order request')
+      return reply(await orders?.(decodeURIComponent(path.split('/').at(-2)), Number(url.searchParams.get('page')), ++orderReads) ?? { body: { items: [], total: 0, page: 1, pageSize: 20, totalPages: 0 } })
+    }
     if (path.includes('/admin/designs/') && path.endsWith('/image')) {
       const result = await image?.(decodeURIComponent(path.split('/').at(-2)), ++images)
       if (result?.status || result?.abort) return reply(result)
@@ -33,7 +37,7 @@ async function fixture({ permissions = ['print.read'], list, detail, image, refr
   })
   await page.goto(origin + '/?view=print')
   const section = page.getByRole('region', { name: 'Tasarım ve baskı operasyonları' })
-  return { page, section, requests, close: async () => { assert.deepEqual(errors, []); await context.close(); passed++ } }
+  return { page, section, requests, close: async () => { assert.deepEqual(errors, []); if (!permissions.includes('orders.read')) assert.equal(orderReads, 0); await context.close(); passed++ } }
 }
 try {
   for (const width of [1440, 1280, 768, 390]) {
@@ -100,5 +104,35 @@ try {
     await f.section.getByRole('button', { name: 'İncele', exact: true }).nth(1).click(); const img = f.page.getByRole('dialog').getByRole('img'); await img.waitFor(); await img.evaluate(image => image.decode()); slow.release(); await f.page.waitForTimeout(150)
     assert.match(await img.getAttribute('alt'), /Second product/); assert.equal(await f.page.getByRole('dialog').getByRole('alert').count(), 0); await f.close()
   }
-  console.log(`PASS: ${passed} Chrome fixture scenarios; metadata/image, errors/retry, permission/session, pagination/stale selection, 4 widths and keyboard; no real SQL or print writes`)
+  const permissions = ['print.read', 'orders.read']
+  const refs = (count, page = 1, prefix = 'REF') => ({ items: Array.from({ length: Math.min(20, Math.max(0, count - (page - 1) * 20)) }, (_, i) => ({ id: `${prefix}-${(page - 1) * 20 + i}`, number: `${prefix}-${(page - 1) * 20 + i}`, createdAt: row.createdAt })), page, pageSize: 20, total: count, totalPages: Math.ceil(count / 20) })
+  for (const count of [0, 1, 21]) {
+    const f = await fixture({ permissions, orders: (_, page) => ({ body: refs(count, page) }) }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click()
+    const related = f.page.getByRole('region', { name: 'İlişkili siparişler' }); await related.getByText(new RegExp(`^${count} ilişkili sipariş`)).waitFor()
+    assert.equal(await related.getByText('İlişkili sipariş bulunamadı.', { exact: true }).count(), count === 0 ? 1 : 0)
+    if (count === 21) { await related.getByRole('button', { name: 'Sonraki sipariş sayfası' }).click(); await related.getByText('REF-20', { exact: true }).waitFor(); await related.getByRole('button', { name: 'Önceki sipariş sayfası' }).click(); await related.getByText('REF-0', { exact: true }).waitFor() }
+    assert.equal(await related.locator('a').count(), 0, 'No unreliable order detail link')
+    await f.close()
+  }
+  for (const status of [403, 404, 503, 'network']) {
+    let fail = true
+    const f = await fixture({ permissions, orders: () => fail ? status === 'network' ? { abort: true } : { status, body: { title: 'Fixture error' } } : { body: refs(1) } }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click()
+    const related = f.page.getByRole('region', { name: 'İlişkili siparişler' }); await related.getByRole('alert').waitFor(); assert.equal(await related.getByText('İlişkili sipariş bulunamadı.').count(), 0)
+    fail = false; await related.getByRole('button', { name: 'Siparişleri tekrar dene' }).click(); await related.getByText('REF-0', { exact: true }).waitFor(); await f.close()
+  }
+  { const f = await fixture({ permissions, refresh: true, orders: () => ({ status: 401 }) }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click(); await f.page.getByRole('heading', { name: /giriş/i }).waitFor(); await f.close() }
+  { const slow = gate(), started = gate(); let mode = 'slow'; const f = await fixture({ permissions, orders: async () => { if (mode === 'slow') { started.release(); await slow.promise; return { body: refs(1, 1, 'STALE-ORDER') } } return { body: refs(1, 1, 'CURRENT-ORDER') } } }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click(); await started.promise
+    const related = f.page.getByRole('region', { name: 'İlişkili siparişler' }); await related.getByText('İlişkili siparişler yükleniyor…').waitFor(); assert.equal(await related.getByText('İlişkili sipariş bulunamadı.').count(), 0)
+    mode = 'current'; await related.getByRole('button', { name: 'Siparişleri yenile' }).click(); await related.getByText('CURRENT-ORDER-0', { exact: true }).waitFor(); slow.release(); await f.page.waitForTimeout(150); assert.equal(await related.getByText('STALE-ORDER-0').count(), 0); await f.close()
+  }
+  for (const width of [1440, 1280, 768, 390]) {
+    const f = await fixture({ permissions, orders: () => ({ body: refs(1) }) }); await f.page.setViewportSize({ width, height: 900 }); await f.section.getByRole('button', { name: 'İncele', exact: true }).click(); const related = f.page.getByRole('region', { name: 'İlişkili siparişler' }); await related.getByText('REF-0', { exact: true }).waitFor()
+    await related.getByRole('button', { name: 'Siparişleri yenile' }).focus(); assert.equal(await related.getByRole('button', { name: 'Siparişleri yenile' }).evaluate(b => b === document.activeElement), true)
+    assert.equal(await f.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false); await f.page.keyboard.press('Escape'); await f.page.getByRole('dialog').waitFor({ state: 'hidden' }); await f.close()
+  }
+  { const slow = gate(), started = gate(); const f = await fixture({ permissions, list: () => ({ body: paged([row, { ...row, id: 'design-b' }]) }), detail: id => ({ body: { ...row, id, mime: 'image/png' } }), orders: async id => { if (id === 'design-a') { started.release(); await slow.promise; return { body: refs(1, 1, 'OLD-DESIGN-ORDER') } } return { body: refs(1, 1, 'NEW-DESIGN-ORDER') } } })
+    await f.section.getByRole('button', { name: 'İncele', exact: true }).first().click(); await started.promise; await f.page.keyboard.press('Escape')
+    await f.section.getByRole('button', { name: 'İncele', exact: true }).nth(1).click(); const related = f.page.getByRole('region', { name: 'İlişkili siparişler' }); await related.getByText('NEW-DESIGN-ORDER-0', { exact: true }).waitFor(); slow.release(); await f.page.waitForTimeout(150); assert.equal(await related.getByText('OLD-DESIGN-ORDER-0').count(), 0); await f.close()
+  }
+  console.log(`PASS: ${passed} Chrome fixture scenarios; dual permissions/no unauthorized order calls, references/pages/errors/stale, image regressions, 4 widths/keyboard; detail navigation blocked by missing API; no real writes`)
 } finally { await browser.close() }

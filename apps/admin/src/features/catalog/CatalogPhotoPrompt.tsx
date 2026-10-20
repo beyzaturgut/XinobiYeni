@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import type { Product } from '../../commerce'
 import PromptBox from '../prompt-box/PromptBox'
+import { copyPromptText } from '../prompt-box/copy-text'
 import './catalog-photo-prompt.css'
 import { buildCatalogPhotoPrompt, defaultCoating, defaultProtectedParts } from './catalog-photo-prompt'
 
@@ -16,8 +17,8 @@ export default function CatalogPhotoPrompt({ product }: { product: Product }) {
   const ready = Boolean(product.name.trim() && product.variants.length && product.variants.every(v => v.color.trim() && /^#[0-9a-f]{6}$/i.test(v.hex ?? '')))
   async function copy() {
     setError(''); setCopied('')
-    try { await navigator.clipboard.writeText(prompt); setCopied(prompt) }
-    catch { textarea.current?.closest('details')?.setAttribute('open', ''); textarea.current?.focus(); textarea.current?.select(); setError('Panoya yazılamadı. Metin seçildi; ⌘C veya Ctrl+C ile kopyalayabilirsin.') }
+    if (await copyPromptText(prompt, textarea.current)) setCopied(prompt)
+    else setError('Panoya yazılamadı. Metin seçildi; ⌘C veya Ctrl+C ile kopyalayabilirsin.')
   }
   return <section className="catalog-photo-prompt" aria-label="XINOBI U katalog görseli promptu">
     <div className="catalog-photo-prompt-side">

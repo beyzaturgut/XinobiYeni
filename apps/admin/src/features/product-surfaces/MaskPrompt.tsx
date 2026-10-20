@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import PromptBox from '../prompt-box/PromptBox'
+import { copyPromptText } from '../prompt-box/copy-text'
 import { buildMaskPrompt, defaultMaskTarget, type MaskPromptSource } from './mask-prompt'
 
 export default function MaskPrompt({ source, disabled }: { source: MaskPromptSource; disabled: boolean }) {
@@ -8,14 +9,8 @@ export default function MaskPrompt({ source, disabled }: { source: MaskPromptSou
   const prompt = buildMaskPrompt(source, target)
   async function copy() {
     setCopyError(''); setCopiedText('')
-    try {
-      await navigator.clipboard.writeText(prompt)
-      setCopiedText(prompt)
-    } catch {
-      textarea.current?.closest('details')?.setAttribute('open', '')
-      textarea.current?.focus(); textarea.current?.select()
-      setCopyError('Tarayıcı panoya yazmaya izin vermedi. Metin seçildi; ⌘C veya Ctrl+C ile kopyalayabilirsin.')
-    }
+    if (await copyPromptText(prompt, textarea.current)) setCopiedText(prompt)
+    else setCopyError('Tarayıcı panoya yazmaya izin vermedi. Metin seçildi; ⌘C veya Ctrl+C ile kopyalayabilirsin.')
   }
   return <section className="surface-panel mask-prompt" aria-label="Yapay zeka için maskeleme promptu">
     <h3>Maskeleme promptu</h3>

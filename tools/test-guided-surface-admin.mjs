@@ -26,7 +26,9 @@ try {
  const colors = [{ variantId: 'blue', color: 'Mavi', image: '/test-blue.png', width: 200, height: 300 }, { variantId: 'red', color: 'Kırmızı', image: '/test-red.png', width: 200, height: 300 }, { variantId: 'small', color: 'Küçük', image: '/test-small.png', width: 100, height: 150 }];
  const maskPromptTest = process.argv.includes('--mask-prompt');
  if (maskPromptTest) await page.addInitScript(() => {
-  window.__copiedPrompts = []; window.__clipboardDenied = false;
+  window.__copiedPrompts = []; window.__clipboardDenied = false; window.__execCopy = true;
+  // The legacy copy used on plain-HTTP sites copies the selected textarea text.
+  document.execCommand = command => { if (command !== 'copy' || !window.__execCopy) return false; const el = document.activeElement; window.__copiedPrompts.push(el.value.slice(el.selectionStart, el.selectionEnd)); return true; };
   Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async value => { if (window.__clipboardDenied) throw Error('denied'); window.__copiedPrompts.push(value); } } });
  });
  const expiredSession = process.argv.includes('--expired-session');
@@ -95,7 +97,15 @@ try {
   await page.getByRole('button', { name: 'Promptu kopyala', exact: true }).click();
   const smaller = await page.evaluate(() => window.__copiedPrompts.at(-1));
   assert.ok(smaller.includes('100 × 150')); assert.ok(smaller.includes('x = 0…99; y = 0…149')); assert.ok(!smaller.includes('200 × 300'));
+  // Clipboard API refused (as on the plain-HTTP live site): the selected-text copy still copies the whole prompt.
   await page.evaluate(() => { window.__clipboardDenied = true; });
+  const before = await page.evaluate(() => window.__copiedPrompts.length);
+  await page.getByRole('button', { name: 'Prompt kopyalandı', exact: true }).click();
+  await page.waitForFunction(count => window.__copiedPrompts.length > count, before);
+  assert.equal(await page.evaluate(() => window.__copiedPrompts.at(-1)), smaller);
+  assert.equal(await page.getByText('Tarayıcı panoya yazmaya izin vermedi.', { exact: false }).count(), 0);
+  // Both refused: the text stays selected with the ⌘C hint.
+  await page.evaluate(() => { window.__execCopy = false; });
   await page.getByRole('button', { name: 'Prompt kopyalandı', exact: true }).click();
   await page.getByText('Tarayıcı panoya yazmaya izin vermedi.', { exact: false }).waitFor();
   assert.equal(await page.getByRole('button', { name: 'Prompt kopyalandı', exact: true }).count(), 0);
@@ -105,7 +115,7 @@ try {
   await page.screenshot({ path:'/tmp/xinobi-mask-prompt.png',fullPage:true });
   await page.setViewportSize({width:390,height:844}); await page.waitForTimeout(150);
   assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
-  console.log('PASS: source-bound prompt dimensions/color/hash, editable target, clipboard content, variant changes, clipboard denial selection, responsive, zero write calls');
+  console.log('PASS: source-bound prompt dimensions/color/hash, editable target, clipboard content, variant changes, clipboard denial falls back to selected-text copy, then selection hint, responsive, zero write calls');
   return;
  }
  // Only the WebP flow remains: no drawing tabs, brush, points or Roboflow controls.

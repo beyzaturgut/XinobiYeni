@@ -2,6 +2,8 @@
 [CmdletBinding(SupportsShouldProcess = $true)]
 param(
     [string]$ApiDirectory = 'C:\inetpub\wwwroot\XinobiYeniApi\api',
+    # Server-only settings outside the api folder (loaded by the API on Windows; survives redeploys).
+    [string]$ServerSettings = 'C:\XinobiData\config\appsettings.Server.json',
     [string]$WebDirectory = 'C:\inetpub\wwwroot\XinobiYeni\out',
     [string]$StorageRoot = 'C:\XinobiData',
     [string]$ApiPool = 'XinobiYeniApi',
@@ -11,8 +13,17 @@ param(
     [string]$SenderEmail = 'xinobi.verify@gmail.com'
 )
 $ErrorActionPreference = 'Stop'
-$configPath = Join-Path $ApiDirectory 'appsettings.Production.json'
-if (!(Test-Path -LiteralPath $configPath -PathType Leaf)) { throw 'API production settings not found.' }
+$configPath = $ServerSettings
+if (!(Test-Path -LiteralPath $configPath -PathType Leaf)) {
+    # First run after the move: start from the settings in the api folder; they are copied, not moved.
+    $apiSettings = Join-Path $ApiDirectory 'appsettings.Production.json'
+    if (!(Test-Path -LiteralPath $apiSettings -PathType Leaf)) { throw 'API production settings not found.' }
+    if ($WhatIfPreference) { Write-Host "Would copy $apiSettings to $configPath." ; $configPath = $apiSettings }
+    else {
+        New-Item -ItemType Directory -Path (Split-Path -Parent $configPath) -Force | Out-Null
+        Copy-Item -LiteralPath $apiSettings -Destination $configPath
+    }
+}
 $origin = [Uri]$PublicOrigin
 if ($origin.Scheme -ne 'https' -and $origin.Scheme -ne 'http') { throw 'PublicOrigin must be an http:// or https:// address.' }
 $config = Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json
@@ -62,6 +73,7 @@ if (!(Get-ChildItem -LiteralPath $mediaDirectory -File | Select-Object -First 1)
     throw 'No product media found. Restore assets\deploy-media from the combined web/admin ZIP, then retry.'
 }
 & icacls.exe $StorageRoot /grant "IIS AppPool\${ApiPool}:(OI)(CI)M" | Out-Null
+if ($configPath -eq $ServerSettings) { & icacls.exe (Split-Path -Parent $ServerSettings) /grant "IIS AppPool\${ApiPool}:(OI)(CI)R" | Out-Null }
 if ($LASTEXITCODE -ne 0) { throw 'Could not grant the API pool access to the media directory.' }
 
 Set-SectionValue $config 'Catalog' 'StorageProvider' 'SqlServer'

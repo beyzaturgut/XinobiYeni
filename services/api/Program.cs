@@ -29,6 +29,16 @@ if (args.Contains(Cm101CandidateCommand.Mode, StringComparer.Ordinal))
 }
 
 var builder = WebApplication.CreateBuilder(args);
+// Server-only settings (SQL, admin catalog, storage, e-mail, provider keys) live outside the deployed api folder, so
+// replacing that folder on a redeploy keeps them. They override the packaged appsettings.Production.json; environment
+// variables and the command line still win (docs/runbooks/iis-api-install.md).
+if (!builder.Environment.IsDevelopment() && (Environment.GetEnvironmentVariable("XINOBI_SERVER_SETTINGS")
+        ?? (OperatingSystem.IsWindows() ? @"C:\XinobiData\config\appsettings.Server.json" : null)) is { } serverSettings)
+{
+    builder.Configuration.AddJsonFile(serverSettings, optional: true, reloadOnChange: false);
+    builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddCommandLine(args);
+}
 
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<SqlCommerceStore>();

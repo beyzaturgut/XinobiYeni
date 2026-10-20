@@ -86,6 +86,8 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 
 **16.10 güncellemesi (kod/commit incelemesi):** Yönetici daveti/rol atama, ayrı personel-müşteri oturumları, e-posta MFA ve yönetici kurtarma eklendi (`fc715ec`, `c618feb`); 0006–0009 migration dosyaları mevcut, hedef SQL uygulama kanıtı bu denetimde doğrulanmadı. Audit için güvenli alanların önce/sonra farkı ve roller `TransactionalAudit` içinde var; tüm kritik modül kapsamı ayrıca doğrulanmalı. CI Dart SDK/izole fixture ve bağımlılık düzeltmeleri eklendi (`18888a4`, `5cbe7da`, `ef66c03`, `456444e`). Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
+**20.10 güncellemesi:** Panel isteklerinde ortak personel oturum yenilemesi, API’nin verdiği gerçek yetkilerin gösterilmesi, eski/ yetkisiz işlemlerin engellenmesi ve audit kayıtlarının Türkçe sunumu (`697ec23`, `51eca15`, `7a84da0`, `9ecc480`, `ccb5d22`); maskeli salt okunur müşteri dizini (`b4d37ca`). İzole kabul: .NET 429/24/0 ([admin-technical-acceptance](../test/2026-10-19/admin-technical-acceptance.md)); gerçek oturum açmış tarayıcı kabulü yapılmadı. **Yeni açık:** `AuthorizationTests.OnlyListedAreasArePublic` başarısız (anonim `commerce-mask/.../rendering-inputs`, TST-130) — izinli listeye ekleme veya anonim erişimi geri alma kararı. Kalıcı ayar yazma sözleşmesi/şeması yok. Oran değişmedi. [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md)
+
 | ID | Durum | Kanıt / eksik |
 |---|---|---|
 | 03.01 | Tamam | README, pnpm/dotnet araç zinciri, `pnpm dev:local:background` |

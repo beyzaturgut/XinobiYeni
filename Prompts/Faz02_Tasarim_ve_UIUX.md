@@ -74,6 +74,8 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 
 **16.10 güncellemesi (kod/commit incelemesi):** Ana sayfa ürün önizlemesi web/mobil boyutları düzeltildi; görselin ekran görüntüsünü alma arayüzü kaldırıldı (`8703cc9`, `fc706b4`, `495eef1`). Mobil Material diyalogları ve tarih seçici Türkçeleştirildi (`1b5cde5`). Tasarım onayı ve cihaz/erişilebilirlik kapıları açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
+**20.10 güncellemesi:** Panelde iş alanı/operasyon menüleri ayrıldı ve geliştirme kopyaları kaldırıldı (`76c0f6d`, `6dcb01b`). XINOBI U ürün önizleme ekranı yeniden tasarlandı: masaüstünde büyük sabit sahne + renk/görsel/yerleşim kartları, mobilde ürün önce (`250deff`). Eksik: yeni önizleme için `design/a11y-audit.md` ve gerçek cihaz/ekran okuyucu kontrolü; Creative/Web Designer onayı yok. Oran değişmedi. [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md)
+
 | Madde | Durum | Kanıt / eksik |
 |---|---|---|
 | 1 Envanter ve IA | Tamam | `design/screen-inventory.md` |

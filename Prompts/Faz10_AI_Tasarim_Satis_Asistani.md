@@ -65,6 +65,8 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 
 **16.10 güncellemesi (kod/commit incelemesi):** XINOBI U aktif renk saklama ve açık önizleme navigasyonu eklendi (`f22a7ae`); yüklenen görsel varyantlar arasında korunuyor (`62f971a`). Bunlar mevcut kısmi önizleme işini iyileştirir; sağlayıcı/moderasyon/kota ve baskı açıklarını kapatmadığı için oran değişmedi. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
+**20.10 güncellemesi:** AI tasarımı ortak onaylı maskeyle tüm renklerde ürün üzerinde gösteriliyor; önizleme ekranı yeniden tasarlandı (`250deff`). Roboflow tabanlı maske adayı üretimi kaldırıldı (`12455a4`); AI sağlayıcısı yalnız Cloudflare tasarım üretiminde. **Yeni açık:** `xinobi-result` ve XINOBI önizleme e2e testleri başarısız (Faz06 gerilemesi). Moderasyon, kota/maliyet, soru havuzu yönetimi ve resmi bayrak eksikleri sürüyor. Oran değişmedi. [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md)
+
 | ID | Durum | Kanıt / eksik |
 |---|---|---|
 | 10.01 | Bloke | D05/D08/D10 kararları yok |

@@ -12,6 +12,11 @@ export function buildCatalogPhotoPrompt(product: Product, referenceId: string, c
   const variants = reference ? [reference, ...product.variants.filter(v => v.id !== reference.id)] : []
   return `Eklediğim ana görseldeki ${JSON.stringify(product.name || '[ÜRÜN ADI EKSİK]')} ürününden aşağıdaki kurallara uygun ${variants.length} ayrı katalog görseli hazırla. Amaç aynı ürünün dış kaplamasını katalogdaki renklerde göstermektir. Görseller tek desen maskesiyle kullanılacağı için piksel düzeyinde aynı hizada olmalıdır.
 
+ÇIKTI ÖZETİ (her dosya için zorunlu)
+- Format: KAYIPSIZ WebP (.webp). PNG, JPEG veya kayıplı WebP teslim etme.
+- Boyut: tam 1333 × 2000 piksel; opak saf beyaz #FFFFFF fon.
+- Yöntem: Ürünü görsel üretim modeliyle yeniden çizme. İşlemi kodla yap (Python + Pillow/OpenCV/NumPy): kaynak pikselleri koru, yalnız arka planı ayır ve kaplama maskesinde rengi dönüştür. Yeniden çizim kenarları bozar ve rengi tutturamaz. Kod çalıştıramıyorsan bunu en başta söyle ve üretme.
+
 ÜRÜNE AİT GÜNCEL BİLGİLER
 Ürün kimliği: ${product.id}
 Kategori: ${JSON.stringify(product.category)}
@@ -23,6 +28,12 @@ KAYNAĞA SADAKAT
 - Şekli, oranları, kamera açısını, perspektifi ve bütün parçaları yalnız ana görselden al. Aynalama, döndürme veya yeniden tasarlama.
 - Dekoru, diğer nesneleri ve ortamı kaldır. Cam parçalar ve kulp boşluklarından görünen ortamı da temizle; arkalarında beyaz fon görünsün. Camın kendi çizgilerini ve yansımalarını koru.
 - Logo ve yazıların kaynak şekli, konumu, boyutu ve rengini koru. Okunamayan ayrıntıları uydurma. Basılı logonun yalnız gerçek çizgilerini koru; çevresindeki kaplanabilir gövdeyi dikdörtgen olarak hariç tutma. Gerçek fiziksel etiket varsa kendi sınırını koru.
+
+KENAR KALİTESİ VE ARKA PLAN AYIRMA
+- Ürünü fondan temiz ayır: kenarlarda eski fondan kalan açık/koyu saçak, hale, çift kontur, basamaklı (pikselli) kenar veya yarı saydam kalıntı olmasın.
+- Kenar geçişi 1–2 piksel yumuşak (anti-aliasing) olsun ve saf beyaza karışsın. Kenar piksellerindeki eski fon rengini temizle (renk arındırma / decontamination); kulp ve gövde kenarı beyaz fonda gri veya renkli çizgi bırakmasın.
+- Kulp içi boşluklar, kulp ile gövde arası, ağız altı ve taban çevresi gibi kapalı/yarı kapalı boşlukları ayrıca kontrol et: buralarda eski fon veya yansıma kalmasın, saf beyaz olsun.
+- Kenarları kalınlaştırma, inceltme veya yeniden çizme; ürün sınırı kaynakla aynı kalsın.
 
 ORTAK TUVAL VE YERLEŞİM
 - Her dosyanın gerçek boyutu tam 1333 × 2000 piksel; opak saf beyaz #FFFFFF arka plan.
@@ -42,6 +53,12 @@ YÜZEY VE PARLAKLIK
 - Aşırı krom, ayna etkisi, patlayan beyaz alan veya keskin beyaz ışık şeritleri oluşturma. Düz, gölgesiz boyama yapma.
 - Parlama ve gölgelerin konumu, şekli ve dağılımı bütün renklerde aynı olsun. HEX ana tondur; ışık ve gölgede doğal açık/koyu karşılıklarını kullan.
 
+RENK DÖNÜŞÜMÜ VE DOĞRULUĞU
+- Dönüşümü parlaklığı koruyan bir renk uzayında yap (ör. LAB: L kanalı kaynaktan, renk kanalları hedef HEX'ten); düz boya veya renk katmanı bindirme yapma.
+- Kaplama alanının orta tonlarının (parlama ve koyu gölge hariç) ortalaması hedef HEX'e yakın olsun: LAB'de ΔE ≤ 5. Tonu pembeye, turuncuya veya griye kaydırma; doygunluğu hedef HEX'ten fazla artırma.
+- Kaplama alanının hiçbir yerinde eski renk kalmasın: dökme ağzı ve ucu, alt kenar şeridi, iki gövdenin birleşim çizgisi, gövde kenarlarındaki yansımalar dahil.
+- Her dosya için ölçtüğün ortalama orta ton HEX değerini ve ΔE'yi raporla.
+
 RENKLER VE DOSYA ADLARI (ilk satır ortak kalıp)
 ${variants.map((v, i) => `${i + 1}. ${JSON.stringify(v.color || '[RENK EKSİK]')} — ${/^#[0-9a-f]{6}$/i.test(v.hex || '') ? v.hex : '[GEÇERLİ HEX EKSİK]'}; SKU: ${JSON.stringify(v.sku)}; varyant: ${v.id}\n   ${slug(v.sku || product.name)}-${slug(v.color)}-${i + 1}-1333x2000.webp`).join('\n')}
 
@@ -55,7 +72,8 @@ ZORUNLU İŞLEM SIRASI
 7. Maskenin dışındaki çözülmüş RGB pikselleri bütün dosyalarda birebir aynı tut.
 
 TESLİM VE DOĞRULAMA
-- Her görseli ayrı kayıpsız WebP olarak ve bütün dosyaları tek ZIP içinde teslim et. Kayıplı WebP'ye sessizce geçme.
+- Her görseli ayrı KAYIPSIZ WebP (.webp) olarak ve bütün dosyaları tek ZIP içinde teslim et. PNG/JPEG veya kayıplı WebP'ye sessizce geçme.
+- Kenarları %200–400 yakınlaştırarak kontrol et: kulplar, kulp içleri, ağız ve taban çevresinde saçak, hale veya eski fon kalmadığını doğrula.
 - Kaydedilen dosyaları tekrar aç; formatı, kayıpsız kodlamayı ve her birinin 1333 × 2000 piksel olduğunu doğrula.
 - (0,0) konumu, ölçek 1 ve dönüş 0 ile üst üste koy; dış sınırlar ve bütün parçalar tam çakışmalı.
 - Çözülmüş piksel karşılaştırmasında farkların yalnız kaplama maskesinde kaldığını doğrula; maske dışı farklı piksel sayısını ve dosya boyutlarını raporla.

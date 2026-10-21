@@ -44,7 +44,7 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
     private string StatePath => Path.Combine(DirectoryPath, "sessions.json");
     public string AssetDirectory => Path.Combine(DirectoryPath, "assets");
     public Channel<string> Queue { get; } = Channel.CreateUnbounded<string>(new UnboundedChannelOptions { SingleReader = true });
-    public static bool Eligible(CommerceProduct product) => product.Active && (product.Personalizable ?? (product.Category.Contains("Çay") || product.Category.Contains("Kahve")));
+    public static bool Eligible(CommerceProduct product) => product.Active && Xinobi.Api.Catalog.CatalogProjection.IsPersonalizable(product);
     private async Task<DesignDiskState> ReadCore() => File.Exists(StatePath) ? JsonSerializer.Deserialize<DesignDiskState>(await File.ReadAllTextAsync(StatePath), JsonOptions)! : new(new(), new());
     private async Task SaveCore(DesignDiskState state)
     {

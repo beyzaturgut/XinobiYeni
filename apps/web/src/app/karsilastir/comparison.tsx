@@ -10,7 +10,7 @@ import type {Product} from '../../../../../packages/commerce/client';
 import styles from './compare.module.css';
 
 type Row={label:string;cells:ReactNode[];values:string[]};
-const personalizable=(product:Product)=>product.personalizable??(product.category.includes('Çay')||product.category.includes('Kahve'));
+const personalizable=(product:Product)=>product.personalizable===true;
 
 /** Side-by-side comparison of up to four products: price, colours, stock, rating, XINOBI U and every technical spec. */
 export default function Comparison(){

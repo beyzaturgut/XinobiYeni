@@ -12,7 +12,10 @@ const seedFile = path.join(os.tmpdir(), "xinobi-e2e-seed.json");
 {
   const demo = JSON.parse(readFileSync(path.join(root, "tests/fixtures/demo-commerce.json"), "utf8"));
   const previews = JSON.parse(readFileSync(path.join(root, "fixtures/product-surfaces/xinobi-u-accepted/catalog-state.fragment.json"), "utf8"));
-  writeFileSync(seedFile, JSON.stringify({ ...demo, products: [...demo.products, ...previews.products.filter((p: { id: string }) => !demo.products.some((d: { id: string }) => d.id === p.id))] }));
+  // XINOBI U lists only products explicitly marked personalizable; the packaged preview products are XINOBI U products.
+  const previewProducts = previews.products.filter((p: { id: string }) => !demo.products.some((d: { id: string }) => d.id === p.id))
+    .map((p: { personalizable?: boolean | null }) => ({ ...p, personalizable: p.personalizable ?? true }));
+  writeFileSync(seedFile, JSON.stringify({ ...demo, products: [...demo.products, ...previewProducts] }));
 }
 
 export default defineConfig({

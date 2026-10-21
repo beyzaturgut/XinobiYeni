@@ -36,7 +36,8 @@
           "stock": 0,
           "image": "/assets/products/tea-maker-101-rose-gold.webp"
         }
-      ]
+      ],
+      "personalizable": true
     },
     {
       "id": "DEMO-P102",
@@ -60,7 +61,8 @@
           "stock": 0,
           "image": "/assets/products/coffee-maker-101-gold.webp"
         }
-      ]
+      ],
+      "personalizable": true
     },
     {
       "id": "DEMO-P103",
@@ -94,7 +96,8 @@
           "stock": 0,
           "image": "/assets/products/coffee-maker-102.webp"
         }
-      ]
+      ],
+      "personalizable": true
     },
     {
       "id": "DEMO-P105",

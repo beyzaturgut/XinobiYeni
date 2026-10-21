@@ -14,7 +14,7 @@ public sealed class CatalogProjection(CommerceState state, Func<string?, string?
 
     // Until every product carries an explicit flag, tea and coffee machines are personalizable (README, XINOBI U scope).
     public static bool IsPersonalizable(CommerceProduct product) =>
-        product.Personalizable ?? (product.Category.Contains("Çay", StringComparison.Ordinal) || product.Category.Contains("Kahve", StringComparison.Ordinal));
+        product.Personalizable == true; // Only products the admin explicitly marked for XINOBI U; no category fallback.
 
     public const int CartLineLimit = 99;
 

@@ -151,6 +151,17 @@ public sealed class CatalogTests : IDisposable
         Assert.Contains(search.Items, product => product.Id == "DEMO-P101");
     }
 
+    [Theory]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    [InlineData(null, false)] // An unmarked tea or coffee product is not XINOBI U; the category no longer decides.
+    public void OnlyProductsMarkedInTheAdminArePersonalizable(bool? marked, bool expected)
+    {
+        var product = new Xinobi.Api.LocalCommerce.CommerceProduct("p", "Çay Makinesi", "Çay makineleri", true, "", "", [], marked);
+        Assert.Equal(expected, Xinobi.Api.Catalog.CatalogProjection.IsPersonalizable(product));
+        Assert.Equal(expected, Xinobi.Api.DesignStudio.DesignSessionStore.Eligible(product));
+    }
+
     [Fact]
     public async Task ProductDetailCarriesPriceAvailabilityAndAbsoluteImages()
     {

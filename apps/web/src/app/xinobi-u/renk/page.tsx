@@ -14,7 +14,7 @@ import detailStyles from '../../urunler/cay-makinesi-101/product.module.css';
 import type { Product } from '../../../../../../packages/commerce/client';
 
 function isPersonalizable(product: Product) {
-  return product.active && (product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve')));
+  return product.active && product.personalizable === true;
 }
 
 function ColorSelection() {

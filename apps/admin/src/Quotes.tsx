@@ -56,6 +56,13 @@ export default function Quotes() {
         <h2>{quote.code} · {quote.company} <span className="order-state">{statusText[quote.status]}</span></h2>
         <dl><div><dt>Yetkili</dt><dd>{quote.contactName} · {quote.email}{quote.phone ? ` · ${quote.phone}` : ''}</dd></div><div><dt>Vergi no</dt><dd>{quote.taxNumber ?? '—'}</dd></div><div><dt>Kişiselleştirme</dt><dd>{quote.personalization ? quote.personalizationNote || 'İsteniyor' : 'Yok'}</dd></div><div><dt>Hedef tarih</dt><dd>{quote.desiredDate ?? '—'}</dd></div><div><dt>Amaç</dt><dd>{quote.purpose ?? '—'}</dd></div></dl>
         {quote.note && <p>Not: {quote.note}</p>}
+        <section aria-label="Kayıtlı teklif özeti">
+          <h3>Kayıtlı teklif</h3>
+          {quote.offer ? <>
+            <dl><div><dt>Geçerlilik tarihi</dt><dd>{new Date(quote.offer.validUntil).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })}</dd></div><div><dt>Teklif notu</dt><dd>{quote.offer.note || 'Not belirtilmemiş.'}</dd></div></dl>
+            <div className="table-scroll"><table><caption>Kayıtlı teklif birim fiyatları</caption><thead><tr><th scope="col">Ürün</th><th scope="col">Birim fiyat</th></tr></thead><tbody>{quote.items.map(item => <tr key={item.productId}><th scope="row">{item.productName}</th><td>{tl(item.unitPrice)}</td></tr>)}</tbody></table></div>
+          </> : <p>Henüz teklif oluşturulmamış.</p>}
+        </section>
         {open && <form className="catalog-form" onSubmit={event => { event.preventDefault(); if (priced) void act('/offer', { lines: quote.items.map(item => ({ productId: item.productId, unitPriceMinor: Math.round(Number(prices[item.productId].replace(',', '.')) * 100) })), validUntil, note: offerNote || null }, 'Teklif kaydedildi; bildirim kuyruğa alındı.') }}>
           <h3>{quote.offer ? 'Teklifi güncelle' : 'Teklif hazırla'}</h3>
           {quote.items.map(item => <label key={item.productId}>{item.productName} · {item.quantity} adet · birim fiyat (TL)<input inputMode="decimal" required value={prices[item.productId] ?? ''} onChange={event => setPrices(current => ({ ...current, [item.productId]: event.target.value }))} /></label>)}

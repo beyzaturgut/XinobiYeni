@@ -36,6 +36,25 @@ async function fixture(read = async () => ok(), permissions = ['quotes.read', 'q
  return { page, section, posts: () => posts, close: async () => { assert.deepEqual(errors, []); await context.close(); passed++ } }
 }
 try {
+ { let reads=0
+   const rows=Array.from({length:45},(_,i)=>({...quote,id:`q${i}`,code:`CODE-${String(i).padStart(2,'0')}`,company:i===25?'ÖZEL FİRMA':'Standard',items:[{...quote.items[0],productName:i===44?'ÇELİK ÜRÜN':'Standard product'}]}))
+   const f=await fixture(async(n,status)=>{reads++;return ok(status?rows.slice(0,2):rows)})
+   await f.section.getByText('45 talep',{exact:true}).waitFor()
+   const next=f.section.getByRole('button',{name:'Sonraki teklif sayfası'}),prev=f.section.getByRole('button',{name:'Önceki teklif sayfası'}),search=f.section.getByRole('textbox',{name:'Yüklenen tekliflerde ara'})
+   assert.equal(await prev.isEnabled(),false);assert.equal(await f.section.getByRole('button',{name:'Aç',exact:true}).count(),20)
+   await f.section.getByRole('button',{name:'Aç',exact:true}).first().click()
+   await f.section.getByLabel('Firmaya mesaj',{exact:true}).fill('Retained search draft')
+   await next.click();await f.section.getByText(/Sayfa 2\/3/).waitFor();await next.click();await f.section.getByText(/Sayfa 3\/3/).waitFor()
+   assert.equal(await next.isEnabled(),false);assert.equal(await f.section.getByRole('button',{name:'Aç',exact:true}).count(),5)
+   for(const term of ['code-00','özel firma','çelik ürün']){await search.fill(term);await f.section.getByText('1 talep',{exact:true}).waitFor();await f.section.getByText(/Sayfa 1\/1/).waitFor()}
+   await search.fill('missing');await f.section.getByText('Aramaya uygun talep yok',{exact:true}).waitFor()
+   await f.section.getByRole('button',{name:'Aramayı temizle'}).click();await f.section.getByText('45 talep',{exact:true}).waitFor()
+   assert.equal(reads,1);assert.equal(await f.section.getByRole('textbox',{name:/^Firmaya mesaj/}).inputValue(),'Retained search draft')
+   await next.click();await f.section.getByRole('combobox').selectOption('reviewing');await f.section.getByText('2 talep',{exact:true}).waitFor();await f.section.getByText(/Sayfa 1\/1/).waitFor()
+   await search.fill('code-01');await f.section.getByText('1 talep',{exact:true}).waitFor();assert.equal(reads,2)
+   for(const width of [1440,1280,768,390]){await f.page.setViewportSize({width,height:900});await search.focus();await f.page.keyboard.press('Tab');assert.ok(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))}
+   assert.equal(f.posts(),0);await f.close()
+ }
  for (const status of ['offered', 'accepted', 'rejected', 'closed']) for (const write of [false, true]) {
   const saved = { ...quote, status, offer: { total: { amountMinor: 12340, currency: 'TRY' }, validUntil: '2026-11-02', note: 'Fixture saved offer note' }, items: [{ ...quote.items[0], unitPrice: { amountMinor: 1234, currency: 'TRY' } }] }
   const f = await fixture(async () => ok([saved]), write ? ['quotes.read', 'quotes.write'] : ['quotes.read'])

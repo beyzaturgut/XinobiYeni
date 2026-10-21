@@ -7,12 +7,13 @@ import { pathToFileURL } from 'node:url';
 import path from 'node:path';
 const require = createRequire(path.resolve('apps/web/package.json'));
 const adminRequire = createRequire(path.resolve('apps/admin/package.json'));
-const { createServer } = await import(pathToFileURL(adminRequire.resolve('vite')).href);
+const { createServer, preview } = await import(pathToFileURL(adminRequire.resolve('vite')).href);
 const { chromium } = require('@playwright/test');
 const sharp = createRequire(require.resolve('next/package.json'))('sharp');
 async function run() {
-const server = await createServer({ root: path.resolve('apps/admin'), configFile: path.resolve('apps/admin/vite.config.ts'), server: { host: '127.0.0.1', port: 5188, strictPort: true } });
-await server.listen();
+const production = process.argv.includes('--production');
+const server = production ? await preview({ root: path.resolve('apps/admin'), configFile: path.resolve('apps/admin/vite.config.ts'), preview: { host: '127.0.0.1', port: 5188, strictPort: true } }) : await createServer({ root: path.resolve('apps/admin'), configFile: path.resolve('apps/admin/vite.config.ts'), server: { host: '127.0.0.1', port: 5188, strictPort: true } });
+if (!production) await server.listen();
 let browser;
 try {
  browser = await chromium.launch({ headless: true, executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
@@ -155,7 +156,7 @@ try {
  await approve.click(); await page.getByText('Ortak maske seçilen renklerde onaylandı.', { exact: false }).waitFor();
  assert.equal(webpSaves, 1); assert.equal(approvals, 1); assert.deepEqual(errors, []); assert.equal(refreshes, expiredSession ? 1 : 0);
  console.log('PASS: exact source download, WebP draft upload, pattern/colour preview at shared coordinates, incompatible colour blocked, one approval for two colours, retired tools absent, no browser errors');
-} finally { await browser?.close(); await server.close(); }
+} finally { await browser?.close(); if (production) await new Promise(resolve => server.httpServer.close(resolve)); else await server.close(); }
 
 }
 await run();

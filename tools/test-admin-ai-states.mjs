@@ -9,14 +9,14 @@ const policy={revision:1,systemPrompt:'Fixture prompt',greeting:'Fixture hello',
 const source={id:'a',title:'Source A',body:'Fixture body',keywords:[],status:'draft',version:1,updatedAt:policy.createdAt}
 const ok=body=>({status:200,body})
 let passed=0
-async function fixture(read,write){
+async function fixture(read,write,permissions=['ai.read','ai.write']){
  const context=await browser.newContext(),page=await context.newPage(),counts={},errors=[];let posts=0
  page.on('pageerror',e=>errors.push(e.message))
  await context.route('**/api/v1/**',async route=>{
   const req=route.request(),path=new URL(req.url()).pathname;let result
   if(path.endsWith('/auth/admin/refresh'))result={status:401,body:{}}
-  else if(req.method()!=='GET'){assert.ok(write,'Unexpected mutation');posts++;result=await write(path,req.postDataJSON())}
-  else if(path.endsWith('/admin/session'))result=ok({account:{name:'Synthetic'},permissions:['ai.read','ai.write']})
+  else if(req.method()!=='GET'){assert.ok(permissions.includes('ai.write'),'Read-only mutation forbidden');assert.ok(write,'Unexpected mutation');posts++;result=await write(path,req.postDataJSON())}
+  else if(path.endsWith('/admin/session'))result=ok({account:{name:'Synthetic'},permissions})
   else if(path.endsWith('/local-commerce/state'))result={status:503,body:{title:'Fixture catalog'}}
   else {counts[path]=(counts[path]||0)+1;result=await read(path,counts[path])}
   if(result.abort)return route.abort('failed')
@@ -27,6 +27,38 @@ async function fixture(read,write){
 }
 const defaults=path=>ok(path.endsWith('/policies')?{modelConfigured:false,items:[policy]}:path.endsWith('/usage')?{days:[],aiCallsToday:0,dailyAiLimit:0,costRatesSet:false,note:'Fixture'}:[])
 try{
+ const lead={id:'l',conversationId:'c',name:'Fixture lead',email:'fixture@example.invalid',topic:'Fixture topic',createdAt:policy.createdAt,status:'new'}
+ const conversation={id:'c',channel:'web',createdAt:policy.createdAt,updatedAt:policy.createdAt,messages:[{id:'m',role:'user',text:'Fixture conversation text',productIds:[],at:policy.createdAt}],leadSent:false,handedOff:false}
+ const records=path=>path.endsWith('/knowledge')?ok([source]):path.endsWith('/leads')?ok([lead]):path.endsWith('/conversations')?ok([conversation]):defaults(path)
+ {const f=await fixture(async path=>records(path),undefined,['ai.read'])
+  const disabled=async name=>{const b=f.section.getByRole('button',{name,exact:true});assert.equal(await b.isEnabled(),false);await b.evaluate(el=>el.click());assert.equal(f.posts(),0)}
+  await f.section.getByText('Yürürlükteki politika · sürüm 1',{exact:true}).waitFor();await disabled('Yeni sürüm hazırla')
+  await f.tab('Bilgi kaynakları');await f.section.getByText('Source A',{exact:true}).waitFor();for(const name of ['+ Yeni kaynak','Onayla','Arşivle','Düzenle'])await disabled(name)
+  await f.tab('Konuşmalar');await f.section.getByRole('button',{name:'Oku',exact:true}).click();await f.section.getByText('Fixture conversation text',{exact:true}).waitFor()
+  await f.tab('Talepler');await f.section.getByText('Fixture lead',{exact:true}).waitFor();await disabled('İletişime geçildi');await disabled('Kapat')
+  await f.tab('Kullanım ve maliyet');await f.section.getByText('Kullanım kaydı yok.',{exact:true}).waitFor();assert.equal(f.posts(),0);await f.close()
+ }
+ for(const action of ['policy','create','edit','approve','archive','contact','close']){
+  const wait=gate(),started=gate();let payload
+  const f=await fixture(async path=>records(path),async(path,body)=>{payload={path,body};started.release();await wait.promise;return ok({})})
+  let button
+  if(action==='policy'){await f.section.getByRole('button',{name:'Yeni sürüm hazırla'}).click();await f.section.getByLabel('Değişiklik gerekçesi',{exact:true}).fill('Fixture reason');button=f.section.getByRole('button',{name:'Yürürlüğe al'})}
+  else if(['create','edit','approve','archive'].includes(action)){
+   await f.tab('Bilgi kaynakları')
+   if(action==='create'||action==='edit'){await f.section.getByRole('button',{name:action==='create'?'+ Yeni kaynak':'Düzenle',exact:true}).click();await f.section.getByLabel('Başlık',{exact:true}).fill('Fixture updated');await f.section.getByRole('textbox',{name:/^Metin/}).fill('Fixture updated body');button=f.section.getByRole('button',{name:'Taslağı kaydet'})}
+   else button=f.section.getByRole('button',{name:action==='approve'?'Onayla':'Arşivle',exact:true})
+  }else{await f.tab('Talepler');f.page.on('dialog',dialog=>dialog.accept('Fixture note'));button=f.section.getByRole('button',{name:action==='contact'?'İletişime geçildi':'Kapat',exact:true})}
+  await button.focus();await f.page.keyboard.press('Enter');await started.promise;assert.equal(await button.isEnabled(),false)
+  if(['policy','create','edit'].includes(action))await button.evaluate(el=>{el.form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}));el.form.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true}))})
+  else await button.evaluate(el=>{el.click();el.click()})
+  assert.equal(f.posts(),1);assert.ok(payload.path.includes('/assistant/'))
+  if(action==='policy')assert.equal(payload.body.baseRevision,1)
+  wait.release();await f.section.getByRole('status').filter({hasText:/yürürlükte|kaydedildi|onaylandı|arşivlendi|güncellendi|kapatıldı/}).waitFor();assert.equal(f.posts(),1);await f.close()
+ }
+ {const f=await fixture(async path=>records(path),async()=>({status:503,body:{title:'Fixture write unavailable'}}))
+  await f.tab('Bilgi kaynakları');await f.section.getByRole('button',{name:'Düzenle',exact:true}).click();await f.section.getByLabel('Başlık',{exact:true}).fill('Keep failed mutation draft');await f.section.getByRole('button',{name:'Taslağı kaydet'}).click()
+  await f.section.getByText('Fixture write unavailable',{exact:true}).waitFor();assert.equal(await f.section.getByLabel('Başlık',{exact:true}).inputValue(),'Keep failed mutation draft');assert.equal(await f.section.getByRole('button',{name:'Taslağı kaydet'}).isEnabled(),true);await f.close()
+ }
  for(const [tab,end,empty] of [['Politika ve istem','policies','Politika kaydı yok.'],['Bilgi kaynakları','knowledge','Bilgi kaynağı yok.'],['Konuşmalar','conversations','Konuşma kaydı yok.'],['Talepler','leads','Talep yok'],['Kullanım ve maliyet','usage','Kullanım kaydı yok.']]){
   const wait=gate(),f=await fixture(async path=>{if(path.endsWith('/'+end)){await wait.promise;return end==='policies'?ok({modelConfigured:false,items:[]}):defaults(path)}return defaults(path)})
   if(end!=='policies')await f.tab(tab)

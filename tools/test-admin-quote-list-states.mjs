@@ -36,6 +36,33 @@ async function fixture(read = async () => ok(), permissions = ['quotes.read', 'q
  return { page, section, posts: () => posts, close: async () => { assert.deepEqual(errors, []); await context.close(); passed++ } }
 }
 try {
+ for (const status of ['offered', 'accepted', 'rejected', 'closed']) for (const write of [false, true]) {
+  const saved = { ...quote, status, offer: { total: { amountMinor: 12340, currency: 'TRY' }, validUntil: '2026-11-02', note: 'Fixture saved offer note' }, items: [{ ...quote.items[0], unitPrice: { amountMinor: 1234, currency: 'TRY' } }] }
+  const f = await fixture(async () => ok([saved]), write ? ['quotes.read', 'quotes.write'] : ['quotes.read'])
+  await f.section.getByRole('button', { name: 'Aç', exact: true }).focus(); await f.page.keyboard.press('Enter')
+  const summary = f.section.getByRole('region', { name: 'Kayıtlı teklif özeti' })
+  await summary.getByText('02.11.2026', { exact: true }).waitFor(); await summary.getByText('Fixture saved offer note', { exact: true }).waitFor()
+  assert.equal((await summary.getByRole('cell').innerText()).replace(/\s/g, ''), new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(12.34).replace(/\s/g, ''))
+  if (write && status === 'offered') {
+   await f.section.getByRole('textbox', { name: /^Teklif notu \(/ }).fill('Unsaved offer draft')
+   await f.section.getByLabel('Firmaya mesaj', { exact: true }).fill('Unsaved message draft')
+   await summary.getByText('Fixture saved offer note', { exact: true }).waitFor()
+   assert.equal(await f.section.getByRole('textbox', { name: /^Teklif notu \(/ }).inputValue(), 'Unsaved offer draft')
+  }
+  for (const width of [1440, 1280, 768, 390]) { await f.page.setViewportSize({ width, height: 900 }); assert.ok(await f.page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)) }
+  assert.equal(f.posts(), 0); await f.close()
+ }
+ { const f = await fixture(); await f.section.getByRole('button', { name: 'Aç', exact: true }).click()
+   const summary = f.section.getByRole('region', { name: 'Kayıtlı teklif özeti' }); await summary.getByText('Henüz teklif oluşturulmamış.', { exact: true }).waitFor()
+   assert.equal(await summary.getByRole('table').count(), 0); assert.equal(f.posts(), 0); await f.close() }
+ { const wait = gate(), started = gate(), saved = { ...quote, offer: { total: { amountMinor: 1000, currency: 'TRY' }, validUntil: '2026-11-02', note: 'OLD SUMMARY' } }
+   const f = await fixture(async (n, status) => { if (status === 'reviewing') { started.release(); await wait.promise; return ok([saved]) } return n === 1 ? ok([saved]) : { status: 503, body: { title: 'Fixture summary unavailable' } } })
+   await f.section.getByRole('button', { name: 'Aç', exact: true }).click(); await f.section.getByRole('region', { name: 'Kayıtlı teklif özeti' }).getByText('OLD SUMMARY', { exact: true }).waitFor()
+   await f.section.getByRole('combobox').selectOption('reviewing'); await started.promise
+   assert.equal(await f.section.getByRole('region', { name: 'Kayıtlı teklif özeti' }).count(), 0)
+   await f.section.getByRole('combobox').selectOption(''); await f.section.getByRole('alert').waitFor()
+   wait.release(); await f.page.waitForTimeout(100); assert.equal(await f.section.getByText('OLD SUMMARY', { exact: true }).count(), 0)
+   assert.equal(f.posts(), 0); await f.close() }
  { const wait = gate(), f = await fixture(async () => { await wait.promise; return ok() })
    await f.section.getByText('Teklifler yükleniyor…', { exact: true }).waitFor()
    assert.equal(await f.section.getByText('0 talep', { exact: true }).count(), 0)

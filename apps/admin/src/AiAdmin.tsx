@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
+import { useAdminSession } from './AdminAccess'
 
 type Policy = { revision: number; systemPrompt: string; greeting: string; quickReplies: string[]; dailyAiLimit: number; maxMessagesPerConversation: number; model: string; temperature: number; whatsAppNumber?: string | null; inputCostPerMillionTokens?: number | null; outputCostPerMillionTokens?: number | null; reason: string; createdAt: string }
 type Source = { id: string; title: string; body: string; keywords: string[]; status: 'draft' | 'approved' | 'archived'; validUntil?: string | null; version: number; updatedAt: string }
@@ -15,6 +16,9 @@ const leadStatus = { new: 'Yeni', contacted: 'İletişime geçildi', closed: 'Ka
 
 /** Nobi and AI management: policy revisions, knowledge sources, conversations, leads, usage and estimated cost. */
 export default function AiAdmin() {
+  const canWrite = useAdminSession()?.permissions.includes('ai.write') ?? false
+  const writing = useRef(false)
+  const [busy, setBusy] = useState(false)
   const [tab, setTab] = useState<typeof tabs[number]>('Politika ve istem'), [reload, setReload] = useState(0), [error, setError] = useState(''), [notice, setNotice] = useState('')
   const [policies, setPolicies] = useState<Policy[]>([]), [modelConfigured, setModelConfigured] = useState(false), [draft, setDraft] = useState<(Policy & { quick: string }) | null>(null)
   const [sources, setSources] = useState<Source[]>([]), [editing, setEditing] = useState<{ id?: string; title: string; body: string; keywords: string; validUntil: string } | null>(null)
@@ -36,13 +40,15 @@ export default function AiAdmin() {
     return () => { active = false }
   }, [tab, reload])
   async function post(route: string, body: unknown, method = 'POST', done = 'Kaydedildi.') {
-    if (!ready) return false
+    if (!ready || !canWrite || writing.current) return false
     if (route === '/assistant/policies' && draft?.revision !== policies.at(-1)?.revision) return false
     if (route.startsWith('/assistant/knowledge/') && editing?.id && route.endsWith(`/${editing.id}`) && !sources.some(source=>source.id===editing.id)) return false
     const version = requestVersion.current
+    writing.current = true; setBusy(true)
     setNotice('')
     try { await commerceRequest(commerceApi, route, method, body); if(version!==requestVersion.current)return false; setReload(value => value + 1); setNotice(done); return true }
     catch (e) { if(version===requestVersion.current)setNotice(e instanceof Error ? e.message : 'Kaydedilemedi.'); return false }
+    finally { writing.current = false; setBusy(false) }
   }
   const current = policies.at(-1)
   return <section aria-label="AI yönetimi">
@@ -57,9 +63,9 @@ export default function AiAdmin() {
       <div className="quote-detail"><h2>Yürürlükteki politika · sürüm {current.revision}</h2>
         <dl><div><dt>Model</dt><dd>{current.model} · sıcaklık {current.temperature}</dd></div><div><dt>Günlük AI yanıt sınırı</dt><dd>{current.dailyAiLimit === 0 ? 'Kapalı (yalnız kural tabanlı)' : current.dailyAiLimit}</dd></div><div><dt>Konuşma başına mesaj</dt><dd>{current.maxMessagesPerConversation}</dd></div><div><dt>WhatsApp devri</dt><dd>{current.whatsAppNumber ? `+${current.whatsAppNumber}` : 'Tanımlı değil · iletişim formu gösterilir'}</dd></div><div><dt>Birim maliyet (1M token, TL)</dt><dd>{current.inputCostPerMillionTokens ?? '—'} girdi · {current.outputCostPerMillionTokens ?? '—'} çıktı</dd></div><div><dt>Karşılama</dt><dd>{current.greeting}</dd></div><div><dt>Hızlı yanıtlar</dt><dd>{current.quickReplies.join(' · ')}</dd></div></dl>
         <p className="ai-prompt">{current.systemPrompt}</p><p>Gerekçe: {current.reason}{current.revision > 1 ? ` · ${date(current.createdAt)}` : ''}</p>
-        {!draft && <button onClick={() => setDraft({ ...current, quick: current.quickReplies.join('\n'), reason: '' })}>Yeni sürüm hazırla</button>}
+        {!draft && <button disabled={!canWrite || busy} onClick={() => { if(canWrite)setDraft({ ...current, quick: current.quickReplies.join('\n'), reason: '' }) }}>Yeni sürüm hazırla</button>}
       </div>
-      {draft && <form className="catalog-form" onSubmit={async event => { event.preventDefault(); if (await post('/assistant/policies', { baseRevision: current.revision, systemPrompt: draft.systemPrompt, greeting: draft.greeting, quickReplies: draft.quick.split('\n'), dailyAiLimit: draft.dailyAiLimit, maxMessagesPerConversation: draft.maxMessagesPerConversation, model: draft.model, temperature: draft.temperature, whatsAppNumber: draft.whatsAppNumber || null, inputCostPerMillionTokens: draft.inputCostPerMillionTokens ?? null, outputCostPerMillionTokens: draft.outputCostPerMillionTokens ?? null, reason: draft.reason }, 'POST', 'Yeni politika sürümü yürürlükte.')) setDraft(null) }}>
+      {canWrite && draft && <form className="catalog-form" onSubmit={async event => { event.preventDefault(); if (await post('/assistant/policies', { baseRevision: current.revision, systemPrompt: draft.systemPrompt, greeting: draft.greeting, quickReplies: draft.quick.split('\n'), dailyAiLimit: draft.dailyAiLimit, maxMessagesPerConversation: draft.maxMessagesPerConversation, model: draft.model, temperature: draft.temperature, whatsAppNumber: draft.whatsAppNumber || null, inputCostPerMillionTokens: draft.inputCostPerMillionTokens ?? null, outputCostPerMillionTokens: draft.outputCostPerMillionTokens ?? null, reason: draft.reason }, 'POST', 'Yeni politika sürümü yürürlükte.')) setDraft(null) }}>
         <h3>Sürüm {current.revision + 1} taslağı</h3>
         <label>Yönerge (sistem istemi)<textarea rows={12} maxLength={6000} value={draft.systemPrompt} onChange={e => setDraft({ ...draft, systemPrompt: e.target.value })} /></label>
         <label>Karşılama<input maxLength={200} value={draft.greeting} onChange={e => setDraft({ ...draft, greeting: e.target.value })} /></label>
@@ -68,27 +74,27 @@ export default function AiAdmin() {
         <fieldset><label>Model<input value={draft.model} onChange={e => setDraft({ ...draft, model: e.target.value })} /></label><label>WhatsApp numarası (ülke koduyla)<input inputMode="tel" value={draft.whatsAppNumber ?? ''} onChange={e => setDraft({ ...draft, whatsAppNumber: e.target.value })} placeholder="905321234567" /></label><label>1M girdi token maliyeti (TL)<input type="number" step="0.01" min={0} value={draft.inputCostPerMillionTokens ?? ''} onChange={e => setDraft({ ...draft, inputCostPerMillionTokens: e.target.value === '' ? null : Number(e.target.value) })} /></label><label>1M çıktı token maliyeti (TL)<input type="number" step="0.01" min={0} value={draft.outputCostPerMillionTokens ?? ''} onChange={e => setDraft({ ...draft, outputCostPerMillionTokens: e.target.value === '' ? null : Number(e.target.value) })} /></label></fieldset>
         <label>Değişiklik gerekçesi<input required maxLength={300} value={draft.reason} onChange={e => setDraft({ ...draft, reason: e.target.value })} /></label>
         {draft.revision !== current.revision && <p role="alert">Politika sürümü değişti. Taslağınız korunuyor; güncel sürümle karşılaştırmadan yayımlanamaz.</p>}
-        <div className="dialog-actions"><button type="submit" disabled={draft.revision !== current.revision}>Yürürlüğe al</button><button type="button" onClick={() => setDraft(null)}>Vazgeç</button></div>
+        <div className="dialog-actions"><button type="submit" disabled={busy || draft.revision !== current.revision}>Yürürlüğe al</button><button type="button" disabled={busy} onClick={() => setDraft(null)}>Vazgeç</button></div>
       </form>}
       <h3>Sürüm geçmişi</h3><ol className="order-history">{[...policies].reverse().map(item => <li key={item.revision}>Sürüm {item.revision} · {item.reason}{item.revision > 1 ? ` · ${date(item.createdAt)}` : ''}</li>)}</ol>
     </>}
 
     {tab === 'Bilgi kaynakları' && <>
       <p className="panel-notice">Nobi yalnız onaylı ve geçerlilik tarihi geçmemiş kaynakları kullanır. Düzenlenen kaynak taslağa döner ve yeniden onay ister. Teslimat, iade, garanti, bakım gibi mağaza metinlerini buraya ekleyin.</p>
-      {!editing && <button onClick={() => setEditing({ title: '', body: '', keywords: '', validUntil: '' })}>+ Yeni kaynak</button>}
-      {editing && <form className="catalog-form" onSubmit={async event => { event.preventDefault(); if (await post(editing.id ? `/assistant/knowledge/${editing.id}` : '/assistant/knowledge', { title: editing.title, body: editing.body, keywords: editing.keywords.split(','), validUntil: editing.validUntil || null }, editing.id ? 'PUT' : 'POST', 'Kaynak taslak olarak kaydedildi; yayın için onaylayın.')) setEditing(null) }}>
+      {!editing && <button disabled={!canWrite || busy} onClick={() => { if(canWrite)setEditing({ title: '', body: '', keywords: '', validUntil: '' }) }}>+ Yeni kaynak</button>}
+      {canWrite && editing && <form className="catalog-form" onSubmit={async event => { event.preventDefault(); if (await post(editing.id ? `/assistant/knowledge/${editing.id}` : '/assistant/knowledge', { title: editing.title, body: editing.body, keywords: editing.keywords.split(','), validUntil: editing.validUntil || null }, editing.id ? 'PUT' : 'POST', 'Kaynak taslak olarak kaydedildi; yayın için onaylayın.')) setEditing(null) }}>
         <label>Başlık<input required maxLength={120} value={editing.title} onChange={e => setEditing({ ...editing, title: e.target.value })} /></label>
         <label>Metin<textarea required rows={8} maxLength={4000} value={editing.body} onChange={e => setEditing({ ...editing, body: e.target.value })} /></label>
         <label>Anahtar kelimeler (virgülle)<input value={editing.keywords} onChange={e => setEditing({ ...editing, keywords: e.target.value })} placeholder="garanti, servis, arıza" /></label>
         <label>Geçerlilik sonu (isteğe bağlı)<input type="date" value={editing.validUntil} onChange={e => setEditing({ ...editing, validUntil: e.target.value })} /></label>
         {editing.id && !sources.some(source=>source.id===editing.id) && <p role="alert">Düzenlenen kaynak güncel listede yok. Taslağınız korunuyor; kayıt işlemi kapalı.</p>}
-        <div className="dialog-actions"><button type="submit" disabled={Boolean(editing.id && !sources.some(source=>source.id===editing.id))}>Taslağı kaydet</button><button type="button" onClick={() => setEditing(null)}>Vazgeç</button></div>
+        <div className="dialog-actions"><button type="submit" disabled={busy || Boolean(editing.id && !sources.some(source=>source.id===editing.id))}>Taslağı kaydet</button><button type="button" disabled={busy} onClick={() => setEditing(null)}>Vazgeç</button></div>
       </form>}
       <div className="table-scroll"><table><caption>{sources.length} kaynak</caption><thead><tr>{['Başlık', 'Durum', 'Sürüm', 'Geçerlilik', 'Güncelleme', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
         <tbody>{sources.map(source => <tr key={source.id}><th scope="row">{source.title}<br /><small>{source.keywords.join(', ')}</small></th><td><span className="order-state">{sourceStatus[source.status]}</span></td><td>v{source.version}</td><td>{source.validUntil ?? 'Süresiz'}</td><td>{date(source.updatedAt)}</td><td>
-          {source.status !== 'approved' && <button onClick={() => void post(`/assistant/knowledge/${source.id}/status`, { status: 'approved' }, 'POST', 'Kaynak onaylandı; Nobi yanıtlarında kullanılacak.')}>Onayla</button>}
-          {source.status !== 'archived' && <button onClick={() => void post(`/assistant/knowledge/${source.id}/status`, { status: 'archived' }, 'POST', 'Kaynak arşivlendi.')}>Arşivle</button>}
-          <button onClick={() => setEditing({ id: source.id, title: source.title, body: source.body, keywords: source.keywords.join(', '), validUntil: source.validUntil ?? '' })}>Düzenle</button>
+          {source.status !== 'approved' && <button disabled={!canWrite || busy} onClick={() => void post(`/assistant/knowledge/${source.id}/status`, { status: 'approved' }, 'POST', 'Kaynak onaylandı; Nobi yanıtlarında kullanılacak.')}>Onayla</button>}
+          {source.status !== 'archived' && <button disabled={!canWrite || busy} onClick={() => void post(`/assistant/knowledge/${source.id}/status`, { status: 'archived' }, 'POST', 'Kaynak arşivlendi.')}>Arşivle</button>}
+          <button disabled={!canWrite || busy} onClick={() => { if(canWrite)setEditing({ id: source.id, title: source.title, body: source.body, keywords: source.keywords.join(', '), validUntil: source.validUntil ?? '' }) }}>Düzenle</button>
         </td></tr>)}</tbody></table></div>
     </>}
 
@@ -101,8 +107,8 @@ export default function AiAdmin() {
 
     {tab === 'Talepler' && <div className="table-scroll"><table><caption>Nobi'den gelen iletişim talepleri (açık onaylı)</caption><thead><tr>{['Tarih', 'Ad', 'İletişim', 'Konu', 'Durum', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
       <tbody>{leads.map(lead => <tr key={lead.id}><td>{date(lead.createdAt)}</td><td>{lead.name}</td><td>{lead.email}{lead.phone ? <><br />{lead.phone}</> : null}</td><td>{lead.topic}{lead.note ? <><br /><small>Not: {lead.note}</small></> : null}</td><td><span className="order-state">{leadStatus[lead.status]}</span></td><td>
-        {lead.status === 'new' && <button onClick={() => void post(`/assistant/leads/${lead.id}/status`, { status: 'contacted', note: window.prompt('Not (isteğe bağlı)') || null }, 'POST', 'Talep güncellendi.')}>İletişime geçildi</button>}
-        {lead.status !== 'closed' && <button onClick={() => void post(`/assistant/leads/${lead.id}/status`, { status: 'closed', note: null }, 'POST', 'Talep kapatıldı.')}>Kapat</button>}
+        {lead.status === 'new' && <button disabled={!canWrite || busy} onClick={() => { if(canWrite && !writing.current)void post(`/assistant/leads/${lead.id}/status`, { status: 'contacted', note: window.prompt('Not (isteğe bağlı)') || null }, 'POST', 'Talep güncellendi.') }}>İletişime geçildi</button>}
+        {lead.status !== 'closed' && <button disabled={!canWrite || busy} onClick={() => void post(`/assistant/leads/${lead.id}/status`, { status: 'closed', note: null }, 'POST', 'Talep kapatıldı.')}>Kapat</button>}
       </td></tr>)}</tbody></table>{leads.length === 0 && <div className="empty-widget"><strong>Talep yok</strong></div>}</div>}
 
     {tab === 'Kullanım ve maliyet' && usage && <>

@@ -27,6 +27,30 @@ async function fixture(read,write,permissions=['ai.read','ai.write']){
 }
 const defaults=path=>ok(path.endsWith('/policies')?{modelConfigured:false,items:[policy]}:path.endsWith('/usage')?{days:[],aiCallsToday:0,dailyAiLimit:0,costRatesSet:false,note:'Fixture'}:[])
 try{
+ for(const permissions of [['ai.read'],['ai.read','ai.write']]){
+  let reads=0
+  const report={days:[{day:'2026-10-19',feature:'assistant',calls:11,failures:1,inputTokens:10,outputTokens:20,estimatedCost:0.1},{day:'2026-10-20',feature:'assistant',calls:22,failures:0,inputTokens:20,outputTokens:30,estimatedCost:0.2},{day:'2026-10-21',feature:'xinobi_u',calls:33,failures:2,inputTokens:0,outputTokens:0,estimatedCost:null}],aiCallsToday:7,dailyAiLimit:10,costRatesSet:true,note:'Fixture estimate; not an invoice'}
+  const f=await fixture(async path=>{if(path.endsWith('/usage')){reads++;return ok(report)}return defaults(path)},undefined,permissions)
+  await f.tab('Kullanım ve maliyet');await f.section.getByText('7 / 10',{exact:true}).waitFor()
+  const from=f.section.getByLabel('Başlangıç tarihi',{exact:true}),to=f.section.getByLabel('Bitiş tarihi',{exact:true}),table=f.section.getByRole('table')
+  const count=async n=>assert.equal(await table.locator('tbody tr').count(),n)
+  await count(3);await from.fill('2026-10-20');await count(2);await to.fill('2026-10-20');await count(1)
+  await table.getByRole('cell',{name:'22',exact:true}).waitFor()
+  await from.fill('');await count(2);await to.fill('2026-10-19');await count(1)
+  await from.fill('2026-10-21');await f.section.getByText('Başlangıç tarihi bitiş tarihinden sonra olamaz.',{exact:true}).waitFor();assert.equal(await table.count(),0)
+  await f.section.getByRole('button',{name:'Tarihleri temizle'}).click();await count(3)
+  await from.fill('2027-01-01');await f.section.getByText('Seçilen tarih aralığında kayıt yok.',{exact:true}).waitFor();await count(0)
+  await f.section.getByText('7 / 10',{exact:true}).waitFor();assert.equal(reads,1);assert.equal(f.posts(),0)
+  for(const width of [1440,1280,768,390]){await f.page.setViewportSize({width,height:900});await from.focus();await f.page.keyboard.press('Tab');assert.ok(await f.page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))}
+  await f.section.getByRole('button',{name:'Tarihleri temizle'}).click();await count(3);assert.equal(reads,1);await f.close()
+ }
+ {const slow=gate(),started=gate();let reads=0
+  const report={days:[{day:'2026-10-21',feature:'assistant',calls:1,failures:0,inputTokens:0,outputTokens:0}],aiCallsToday:1,dailyAiLimit:10,costRatesSet:false,note:'Fixture'}
+  const f=await fixture(async path=>{if(!path.endsWith('/usage'))return defaults(path);reads++;if(reads===1){started.release();await slow.promise;return ok(report)}if(reads===2)return {status:503,body:{title:'Fixture usage unavailable'}};return ok(report)})
+  await f.tab('Kullanım ve maliyet');await started.promise;await f.tab('Konuşmalar');await f.section.getByText('Konuşma kaydı yok.').waitFor();slow.release();await f.tab('Kullanım ve maliyet')
+  await f.section.getByRole('alert').waitFor();assert.equal(await f.section.getByRole('table').count(),0)
+  await f.section.getByRole('button',{name:'Tekrar dene'}).click();await f.section.getByLabel('Başlangıç tarihi',{exact:true}).waitFor();await f.section.getByLabel('Başlangıç tarihi',{exact:true}).fill('2026-10-21');assert.equal(reads,3);await f.close()
+ }
  const lead={id:'l',conversationId:'c',name:'Fixture lead',email:'fixture@example.invalid',topic:'Fixture topic',createdAt:policy.createdAt,status:'new'}
  const conversation={id:'c',channel:'web',createdAt:policy.createdAt,updatedAt:policy.createdAt,messages:[{id:'m',role:'user',text:'Fixture conversation text',productIds:[],at:policy.createdAt}],leadSent:false,handedOff:false}
  const records=path=>path.endsWith('/knowledge')?ok([source]):path.endsWith('/leads')?ok([lead]):path.endsWith('/conversations')?ok([conversation]):defaults(path)

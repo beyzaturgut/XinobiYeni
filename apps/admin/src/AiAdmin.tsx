@@ -24,6 +24,9 @@ export default function AiAdmin() {
   const [sources, setSources] = useState<Source[]>([]), [editing, setEditing] = useState<{ id?: string; title: string; body: string; keywords: string; validUntil: string } | null>(null)
   const [conversations, setConversations] = useState<Conversation[]>([]), [openConversation, setOpenConversation] = useState('')
   const [leads, setLeads] = useState<Lead[]>([]), [usage, setUsage] = useState<Usage | null>(null)
+  const [usageFrom, setUsageFrom] = useState(''), [usageTo, setUsageTo] = useState('')
+  const invalidUsageRange = Boolean(usageFrom && usageTo && usageFrom > usageTo)
+  const usageRows = invalidUsageRange ? [] : (usage?.days ?? []).filter(row=>(!usageFrom || row.day >= usageFrom) && (!usageTo || row.day <= usageTo))
   const [loaded, setLoaded] = useState(''), [denied, setDenied] = useState(false)
   const requestVersion = useRef(0)
   const loading = loaded !== `${tab}:${reload}`, ready = !loading && !error
@@ -112,10 +115,17 @@ export default function AiAdmin() {
       </td></tr>)}</tbody></table>{leads.length === 0 && <div className="empty-widget"><strong>Talep yok</strong></div>}</div>}
 
     {tab === 'Kullanım ve maliyet' && usage && <>
+      <p>Bugünkü göstergeler tarih filtresinden bağımsızdır.</p>
       <div className="catalog-summary"><div><span>Bugün Nobi AI yanıtı</span><strong>{usage.aiCallsToday} / {usage.dailyAiLimit}</strong></div><div><span>Birim maliyet</span><strong>{usage.costRatesSet ? 'Tanımlı' : 'Girilmedi'}</strong></div></div>
       <p className="panel-notice">{usage.note}{!usage.costRatesSet && ' Tahmini maliyet için Politika sekmesinden 1M token birim fiyatlarını girin.'}</p>
+      <p>API en yeni toplam 120 gün/özellik grubu kaydını sunar; her özellik için 120 gün garantisi yoktur. Tarih filtresi yalnız yüklenen kayıtları süzer; tüm geçmişi sorgulamaz. Günler UTC esaslıdır.</p>
+      <div className="order-filters"><label>Başlangıç tarihi<input type="date" value={usageFrom} aria-invalid={invalidUsageRange} aria-describedby={invalidUsageRange?'usage-date-error':undefined} onChange={event=>setUsageFrom(event.target.value)} /></label><label>Bitiş tarihi<input type="date" value={usageTo} aria-invalid={invalidUsageRange} aria-describedby={invalidUsageRange?'usage-date-error':undefined} onChange={event=>setUsageTo(event.target.value)} /></label><button disabled={!usageFrom&&!usageTo} onClick={()=>{setUsageFrom('');setUsageTo('')}}>Tarihleri temizle</button></div>
+      {invalidUsageRange && <p id="usage-date-error" role="alert">Başlangıç tarihi bitiş tarihinden sonra olamaz.</p>}
+      {!invalidUsageRange && <>
       <div className="table-scroll"><table><caption>Günlük kullanım</caption><thead><tr>{['Gün', 'Özellik', 'Çağrı', 'Hata', 'Girdi token', 'Çıktı token', 'Tahmini maliyet'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
-        <tbody>{usage.days.map(day => <tr key={day.day + day.feature}><td>{new Date(day.day).toLocaleDateString('tr-TR')}</td><td>{day.feature === 'assistant' ? 'Nobi' : 'XINOBI U görsel'}</td><td>{day.calls}</td><td>{day.failures}</td><td>{day.inputTokens}</td><td>{day.outputTokens}</td><td>{day.estimatedCost == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 4 }).format(day.estimatedCost)}</td></tr>)}</tbody></table></div>
+        <tbody>{usageRows.map(day => <tr key={day.day + day.feature}><td>{new Date(day.day).toLocaleDateString('tr-TR')}</td><td>{day.feature === 'assistant' ? 'Nobi' : 'XINOBI U görsel'}</td><td>{day.calls}</td><td>{day.failures}</td><td>{day.inputTokens}</td><td>{day.outputTokens}</td><td>{day.estimatedCost == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 4 }).format(day.estimatedCost)}</td></tr>)}</tbody></table></div>
+      {usage.days.length>0 && usageRows.length===0 && <p>Seçilen tarih aralığında kayıt yok.</p>}
+      </>}
     </>}
     {tab === 'Bilgi kaynakları' && sources.length===0 && <p>Bilgi kaynağı yok.</p>}
     {tab === 'Konuşmalar' && conversations.length===0 && <p>Konuşma kaydı yok.</p>}

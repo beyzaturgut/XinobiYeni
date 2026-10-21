@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 
 type Policy = { revision: number; systemPrompt: string; greeting: string; quickReplies: string[]; dailyAiLimit: number; maxMessagesPerConversation: number; model: string; temperature: number; whatsAppNumber?: string | null; inputCostPerMillionTokens?: number | null; outputCostPerMillionTokens?: number | null; reason: string; createdAt: string }
@@ -20,10 +20,14 @@ export default function AiAdmin() {
   const [sources, setSources] = useState<Source[]>([]), [editing, setEditing] = useState<{ id?: string; title: string; body: string; keywords: string; validUntil: string } | null>(null)
   const [conversations, setConversations] = useState<Conversation[]>([]), [openConversation, setOpenConversation] = useState('')
   const [leads, setLeads] = useState<Lead[]>([]), [usage, setUsage] = useState<Usage | null>(null)
+  const [loaded, setLoaded] = useState(''), [denied, setDenied] = useState(false)
+  const requestVersion = useRef(0)
+  const loading = loaded !== `${tab}:${reload}`, ready = !loading && !error
   useEffect(() => {
     let active = true
-    const done = (run: () => void) => { if (active) { run(); setError('') } }
-    const fail = (e: unknown) => { if (active) {setPolicies([]);setSources([]);setConversations([]);setLeads([]);setUsage(null);setDraft(null);setEditing(null);setModelConfigured(false);setError(e instanceof Error ? e.message : 'Yüklenemedi.')} }
+    const version = ++requestVersion.current
+    const done = (run: () => void) => { if (active && version === requestVersion.current) { run(); setError(''); setDenied(false); setLoaded(`${tab}:${reload}`) } }
+    const fail = (e: unknown) => { if (active && version === requestVersion.current) {setDenied([401,403].includes((e as {status?:number})?.status ?? 0));setError(e instanceof Error ? e.message : 'Yüklenemedi.');setLoaded(`${tab}:${reload}`)} }
     if (tab === 'Politika ve istem') commerceRequest<{ modelConfigured: boolean; items: Policy[] }>(commerceApi, '/assistant/policies').then(value => done(() => { setPolicies(value.items); setModelConfigured(value.modelConfigured) })).catch(fail)
     if (tab === 'Bilgi kaynakları') commerceRequest<Source[]>(commerceApi, '/assistant/knowledge').then(value => done(() => setSources(value))).catch(fail)
     if (tab === 'Konuşmalar') commerceRequest<Conversation[]>(commerceApi, '/assistant/conversations').then(value => done(() => setConversations(value))).catch(fail)
@@ -32,15 +36,22 @@ export default function AiAdmin() {
     return () => { active = false }
   }, [tab, reload])
   async function post(route: string, body: unknown, method = 'POST', done = 'Kaydedildi.') {
+    if (!ready) return false
+    if (route === '/assistant/policies' && draft?.revision !== policies.at(-1)?.revision) return false
+    if (route.startsWith('/assistant/knowledge/') && editing?.id && route.endsWith(`/${editing.id}`) && !sources.some(source=>source.id===editing.id)) return false
+    const version = requestVersion.current
     setNotice('')
-    try { await commerceRequest(commerceApi, route, method, body); setReload(value => value + 1); setNotice(done); return true }
-    catch (e) { setNotice(e instanceof Error ? e.message : 'Kaydedilemedi.'); return false }
+    try { await commerceRequest(commerceApi, route, method, body); if(version!==requestVersion.current)return false; setReload(value => value + 1); setNotice(done); return true }
+    catch (e) { if(version===requestVersion.current)setNotice(e instanceof Error ? e.message : 'Kaydedilemedi.'); return false }
   }
   const current = policies.at(-1)
   return <section aria-label="AI yönetimi">
-    <div className="integration-status"><strong>Cloudflare Workers AI</strong><span>Metin modeli: {modelConfigured ? 'yapılandırıldı · başarılı sağlayıcı çağrısı ayrıca doğrulanmalı' : 'yapılandırılmadı · Nobi kural tabanlı yanıt verir'}</span><span>XINOBI U görsel üretimi: bu metin modeli yanıtıyla doğrulanmaz</span></div>
-    <div className="catalog-tabs" role="group" aria-label="AI bölümleri">{tabs.map(item => <button key={item} aria-pressed={tab === item} onClick={() => { setTab(item); setNotice(''); setError('') }}>{item}</button>)}</div>
-    {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
+    <div className="integration-status"><strong>Cloudflare Workers AI</strong><span>Metin modeli: {tab !== 'Politika ve istem' || !ready ? 'bu görünümde doğrulanmadı' : modelConfigured ? 'yapılandırıldı · başarılı sağlayıcı çağrısı ayrıca doğrulanmalı' : 'yapılandırılmadı · Nobi kural tabanlı yanıt verir'}</span><span>XINOBI U görsel üretimi: bu metin modeli yanıtıyla doğrulanmaz</span></div>
+    <div className="catalog-tabs" role="group" aria-label="AI bölümleri">{tabs.map(item => <button key={item} aria-pressed={tab === item} onClick={() => { if(item!==tab){requestVersion.current++;setLoaded('');setTab(item)} setNotice('') }}>{item}</button>)}</div>
+    {loading && <p role="status">AI yönetim verileri yükleniyor…</p>}
+    {!loading && error && <p role="alert">{error}{!denied && <button onClick={()=>{requestVersion.current++;setLoaded('');setReload(value=>value+1)}}>Tekrar dene</button>}</p>}{notice && <p role="status">{notice}</p>}
+    {ready && <>
+    {tab === 'Politika ve istem' && !current && <p>Politika kaydı yok.</p>}
 
     {tab === 'Politika ve istem' && current && <>
       <div className="quote-detail"><h2>Yürürlükteki politika · sürüm {current.revision}</h2>
@@ -56,7 +67,8 @@ export default function AiAdmin() {
         <fieldset><label>Günlük AI yanıt sınırı<input type="number" min={0} max={5000} value={draft.dailyAiLimit} onChange={e => setDraft({ ...draft, dailyAiLimit: Number(e.target.value) })} /></label><label>Konuşma başına mesaj<input type="number" min={5} max={200} value={draft.maxMessagesPerConversation} onChange={e => setDraft({ ...draft, maxMessagesPerConversation: Number(e.target.value) })} /></label><label>Sıcaklık (0–1)<input type="number" step="0.1" min={0} max={1} value={draft.temperature} onChange={e => setDraft({ ...draft, temperature: Number(e.target.value) })} /></label></fieldset>
         <fieldset><label>Model<input value={draft.model} onChange={e => setDraft({ ...draft, model: e.target.value })} /></label><label>WhatsApp numarası (ülke koduyla)<input inputMode="tel" value={draft.whatsAppNumber ?? ''} onChange={e => setDraft({ ...draft, whatsAppNumber: e.target.value })} placeholder="905321234567" /></label><label>1M girdi token maliyeti (TL)<input type="number" step="0.01" min={0} value={draft.inputCostPerMillionTokens ?? ''} onChange={e => setDraft({ ...draft, inputCostPerMillionTokens: e.target.value === '' ? null : Number(e.target.value) })} /></label><label>1M çıktı token maliyeti (TL)<input type="number" step="0.01" min={0} value={draft.outputCostPerMillionTokens ?? ''} onChange={e => setDraft({ ...draft, outputCostPerMillionTokens: e.target.value === '' ? null : Number(e.target.value) })} /></label></fieldset>
         <label>Değişiklik gerekçesi<input required maxLength={300} value={draft.reason} onChange={e => setDraft({ ...draft, reason: e.target.value })} /></label>
-        <div className="dialog-actions"><button type="submit">Yürürlüğe al</button><button type="button" onClick={() => setDraft(null)}>Vazgeç</button></div>
+        {draft.revision !== current.revision && <p role="alert">Politika sürümü değişti. Taslağınız korunuyor; güncel sürümle karşılaştırmadan yayımlanamaz.</p>}
+        <div className="dialog-actions"><button type="submit" disabled={draft.revision !== current.revision}>Yürürlüğe al</button><button type="button" onClick={() => setDraft(null)}>Vazgeç</button></div>
       </form>}
       <h3>Sürüm geçmişi</h3><ol className="order-history">{[...policies].reverse().map(item => <li key={item.revision}>Sürüm {item.revision} · {item.reason}{item.revision > 1 ? ` · ${date(item.createdAt)}` : ''}</li>)}</ol>
     </>}
@@ -69,7 +81,8 @@ export default function AiAdmin() {
         <label>Metin<textarea required rows={8} maxLength={4000} value={editing.body} onChange={e => setEditing({ ...editing, body: e.target.value })} /></label>
         <label>Anahtar kelimeler (virgülle)<input value={editing.keywords} onChange={e => setEditing({ ...editing, keywords: e.target.value })} placeholder="garanti, servis, arıza" /></label>
         <label>Geçerlilik sonu (isteğe bağlı)<input type="date" value={editing.validUntil} onChange={e => setEditing({ ...editing, validUntil: e.target.value })} /></label>
-        <div className="dialog-actions"><button type="submit">Taslağı kaydet</button><button type="button" onClick={() => setEditing(null)}>Vazgeç</button></div>
+        {editing.id && !sources.some(source=>source.id===editing.id) && <p role="alert">Düzenlenen kaynak güncel listede yok. Taslağınız korunuyor; kayıt işlemi kapalı.</p>}
+        <div className="dialog-actions"><button type="submit" disabled={Boolean(editing.id && !sources.some(source=>source.id===editing.id))}>Taslağı kaydet</button><button type="button" onClick={() => setEditing(null)}>Vazgeç</button></div>
       </form>}
       <div className="table-scroll"><table><caption>{sources.length} kaynak</caption><thead><tr>{['Başlık', 'Durum', 'Sürüm', 'Geçerlilik', 'Güncelleme', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
         <tbody>{sources.map(source => <tr key={source.id}><th scope="row">{source.title}<br /><small>{source.keywords.join(', ')}</small></th><td><span className="order-state">{sourceStatus[source.status]}</span></td><td>v{source.version}</td><td>{source.validUntil ?? 'Süresiz'}</td><td>{date(source.updatedAt)}</td><td>
@@ -97,6 +110,10 @@ export default function AiAdmin() {
       <p className="panel-notice">{usage.note}{!usage.costRatesSet && ' Tahmini maliyet için Politika sekmesinden 1M token birim fiyatlarını girin.'}</p>
       <div className="table-scroll"><table><caption>Günlük kullanım</caption><thead><tr>{['Gün', 'Özellik', 'Çağrı', 'Hata', 'Girdi token', 'Çıktı token', 'Tahmini maliyet'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
         <tbody>{usage.days.map(day => <tr key={day.day + day.feature}><td>{new Date(day.day).toLocaleDateString('tr-TR')}</td><td>{day.feature === 'assistant' ? 'Nobi' : 'XINOBI U görsel'}</td><td>{day.calls}</td><td>{day.failures}</td><td>{day.inputTokens}</td><td>{day.outputTokens}</td><td>{day.estimatedCost == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 4 }).format(day.estimatedCost)}</td></tr>)}</tbody></table></div>
+    </>}
+    {tab === 'Bilgi kaynakları' && sources.length===0 && <p>Bilgi kaynağı yok.</p>}
+    {tab === 'Konuşmalar' && conversations.length===0 && <p>Konuşma kaydı yok.</p>}
+    {tab === 'Kullanım ve maliyet' && (!usage || usage.days.length===0) && <p>Kullanım kaydı yok.</p>}
     </>}
   </section>
 }

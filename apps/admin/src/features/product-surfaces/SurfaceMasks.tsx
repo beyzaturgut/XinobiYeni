@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { commerceApi, mediaUrl } from '../../commerce'
 import { refreshAdminSession } from '../../admin-api'
 import MaskPrompt from './MaskPrompt'
+import { sourceChecksum } from './source-checksum'
 import './surface-masks.css'
 
 // Admin masking for every product colour (/api/v1/local-commerce/surfaces): upload a WebP mask, check it, approve it for same-placement colours.
@@ -109,14 +110,15 @@ function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: s
     if (!detail || busyRef.current) return
     busyRef.current = true; setBusy('Kaynak fotoğraf indiriliyor…'); setError('')
     try {
-      const response = await fetch(asset(detail.image), { credentials: 'include' })
+      const response = await fetch(asset(detail.image), { credentials: 'include', cache: 'no-store' })
       if (!response.ok) throw new Error('Kaynak fotoğraf indirilemedi.')
       const blob = await response.blob()
-      if (await crypto.subtle.digest('SHA-256', await blob.arrayBuffer()).then(hash => Array.from(new Uint8Array(hash), b => b.toString(16).padStart(2, '0')).join('')) !== detail.sourceSha256)
+      if (await sourceChecksum(await blob.arrayBuffer()) !== detail.sourceSha256)
         throw new Error('Kaynak fotoğraf değişti; ürünü yeniden seçin.')
       const url = URL.createObjectURL(blob), link = document.createElement('a')
       const extension = blob.type.includes('webp') ? 'webp' : blob.type.includes('png') ? 'png' : 'jpg'
-      link.href = url; link.download = `maske-kaynagi-${detail.width}x${detail.height}.${extension}`; link.click()
+      link.href = url; link.download = `maske-kaynagi-${detail.width}x${detail.height}.${extension}`
+      document.body.append(link); link.click(); link.remove()
       setTimeout(() => URL.revokeObjectURL(url), 10000)
       setNotice('Panelde kullanılan kaynak fotoğraf indirildi. Maskeyi bu tuval üzerinde, kırpmadan ve ürünü taşımadan hazırlayın.')
     } catch (problem) { setError(problem instanceof Error ? problem.message : 'Kaynak fotoğraf indirilemedi.') }

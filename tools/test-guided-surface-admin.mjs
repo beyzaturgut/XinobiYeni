@@ -19,6 +19,7 @@ try {
  browser = await chromium.launch({ headless: true, executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
  const errors = []; page.on('pageerror', e => errors.push(e.message));
+ if (process.argv.includes('--without-web-crypto')) await page.addInitScript(() => { Object.defineProperty(window.crypto, 'subtle', { configurable: true, value: undefined }); });
  const photo = await sharp({ create: { width: 200, height: 300, channels: 4, background: '#cccccc' } }).png().toBuffer();
  const sourceSha = createHash('sha256').update(photo).digest('hex');
  const alpha = Buffer.alloc(200 * 300 * 4);

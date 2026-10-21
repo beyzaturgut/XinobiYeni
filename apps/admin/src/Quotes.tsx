@@ -15,6 +15,7 @@ export default function Quotes() {
   const canWrite=useAdminSession()?.permissions.includes('quotes.write')??false
   const writing=useRef(false)
   const [loaded,setLoaded]=useState('')
+  const [query, setQuery] = useState(''), [page, setPage] = useState(1)
   const [items, setItems] = useState<Quote[]>([]), [status, setStatus] = useState(''), [selectedId, setSelectedId] = useState(''), [reload, setReload] = useState(0)
   const [error, setError] = useState(''), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false)
   const [prices, setPrices] = useState<Record<string, string>>({}), [validUntil, setValidUntil] = useState(inTenDays()), [offerNote, setOfferNote] = useState(''), [message, setMessage] = useState('')
@@ -27,6 +28,10 @@ export default function Quotes() {
   const currentError=loading?'':error
   const ready=!loading&&!currentError
   const visibleItems=ready?items:[]
+  const search=query.trim().toLocaleLowerCase('tr-TR')
+  const matches=visibleItems.filter(item=>[item.code,item.company,...item.items.map(line=>line.productName)].join(' ').toLocaleLowerCase('tr-TR').includes(search))
+  const totalPages=Math.max(1,Math.ceil(matches.length/20)), currentPage=Math.min(page,totalPages)
+  const pageItems=matches.slice((currentPage-1)*20,currentPage*20)
   const quote = visibleItems.find(item => item.id === selectedId)
   async function act(route: string, body: unknown, done: string) {
     if (!quote || writing.current || !canWrite) return false
@@ -44,13 +49,14 @@ export default function Quotes() {
   const open = canWrite && quote && ['received', 'reviewing', 'offered'].includes(quote.status)
   return <section aria-label="Kurumsal teklifler">
     <p className="panel-notice">Firmalar web veya mobil formdan talep gönderir; kod ve e-posta ile takip eder. Teklif ve mesaj bildirimleri kuyruğa alınır; teslim durumu bildirim kayıtlarından izlenir. Talep ödeme emri değildir; siparişe dönüşüm D07 kararını bekliyor.</p>
-    <div className="order-filters"><label>Durum<select value={status} onChange={event => setStatus(event.target.value)}><option value="">Tümü</option>{Object.entries(statusText).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><button onClick={() => setReload(value => value + 1)}>Yenile</button></div>
+    <div className="order-filters"><label>Durum<select value={status} onChange={event => {setStatus(event.target.value);setPage(1)}}><option value="">Tümü</option>{Object.entries(statusText).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select></label><label>Yüklenen tekliflerde ara<input disabled={!ready} value={query} onChange={event=>{setQuery(event.target.value);setPage(1)}} placeholder="Kod, firma veya ürün" /></label><button disabled={!ready || !query} onClick={()=>{setQuery('');setPage(1)}}>Aramayı temizle</button><button onClick={() => setReload(value => value + 1)}>Yenile</button></div>
     {currentError && <p role="alert">{currentError} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
     {loading&&<p role="status">Teklifler yükleniyor…</p>}
     <div className="quote-desk">
-      <div className="table-scroll"><table><caption>{ready?`${items.length} talep`:'Kurumsal teklif talepleri'}</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
-        <tbody>{visibleItems.map(item => <tr key={item.id} aria-selected={item.id === selectedId}><th scope="row">{item.code}</th><td>{item.company}<br /><small>{item.contactName}</small></td><td>{item.items.map(line => `${line.productName} × ${line.quantity}`).join(', ')}</td><td>{date(item.createdAt)}</td><td><span className="order-state">{statusText[item.status]}</span>{item.messages.at(-1)?.from === 'customer' && <span className="order-state">Yeni mesaj</span>}</td><td>{tl(item.offer?.total)}</td><td><button disabled={busy} onClick={() => select(item)}>Aç</button></td></tr>)}</tbody></table></div>
-      {ready&&items.length === 0 && <div className="empty-widget"><strong>Talep yok</strong><p>Web veya mobilden gelen kurumsal talepler burada görünür.</p></div>}
+      <div className="table-scroll"><table><caption>{ready?`${matches.length} talep`:'Kurumsal teklif talepleri'}</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
+        <tbody>{pageItems.map(item => <tr key={item.id} aria-selected={item.id === selectedId}><th scope="row">{item.code}</th><td>{item.company}<br /><small>{item.contactName}</small></td><td>{item.items.map(line => `${line.productName} × ${line.quantity}`).join(', ')}</td><td>{date(item.createdAt)}</td><td><span className="order-state">{statusText[item.status]}</span>{item.messages.at(-1)?.from === 'customer' && <span className="order-state">Yeni mesaj</span>}</td><td>{tl(item.offer?.total)}</td><td><button disabled={busy} onClick={() => select(item)}>Aç</button></td></tr>)}</tbody></table></div>
+      {ready&&matches.length === 0 && <div className="empty-widget"><strong>{search?'Aramaya uygun talep yok':'Talep yok'}</strong><p>{search?'Aramayı değiştirin veya temizleyin.':'Web veya mobilden gelen kurumsal talepler burada görünür.'}</p></div>}
+      {ready&&<nav className="periods" aria-label="Teklif sayfaları"><span>Yüklenen sonuçlar · Sayfa {currentPage}/{totalPages} · Sayfada 20 kayıt</span><button disabled={currentPage<=1} onClick={()=>setPage(currentPage-1)}>Önceki teklif sayfası</button><button disabled={currentPage>=totalPages} onClick={()=>setPage(currentPage+1)}>Sonraki teklif sayfası</button></nav>}
       {notice&&<p role="status">{notice}</p>}
       {quote && <article className="quote-detail">
         <h2>{quote.code} · {quote.company} <span className="order-state">{statusText[quote.status]}</span></h2>

@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
-import {parseDecimal,previewPrice,validateCampaign,initialCampaigns} from '../apps/admin/src/pricing-model.ts';
+import {parseDecimal,previewPrice,validateCampaign} from '../apps/admin/src/pricing-model.ts';
 assert.equal(parseDecimal('123,45'),12345);assert.equal(parseDecimal('0.01'),1);
 for(const value of ['', '-1','1.234','1e3','NaN','1.2.3'])assert.equal(parseDecimal(value),null);
-const campaign={...initialCampaigns[0],minimum:'0',coupon:''};
+const campaign={id:'TEST-C1',name:'Test percentage',kind:'percent',value:'10',channel:'Web',variantId:'',start:'2026-10-01',end:'2026-10-31',minimum:'0',coupon:'',enabled:true};
 const context={date:'2026-10-03',channel:'Web',variantId:'DEMO-V101-B',coupon:''};
 assert.equal(previewPrice(10005,1,campaign,context).discount,1001);
 assert.equal(previewPrice(10005,1,campaign,context).total,9004);

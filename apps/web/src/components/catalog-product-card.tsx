@@ -5,8 +5,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import styles from "../app/urunler/catalog.module.css";
 
-export const catalogFavoriteStorageKey = "xinobi-demo-favorites";
-
 export type CatalogProductCardData = {
   id: string;
   name: string;

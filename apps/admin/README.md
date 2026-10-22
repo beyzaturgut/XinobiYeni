@@ -25,8 +25,8 @@ Kurumsal teklifler: web ve mobil formdan gelen gerçek talepler (`/api/v1/local-
 
 Tasarım/baskı: sürüm ve sipariş bağı, kalite bulguları, yüz bazlı örnek çıktı durumları ve inceleme notları. Test: `node tools/test-admin-print.mjs`. Üretim, onay ve gerçek dosya indirme kapalı.
 
-Entegrasyonlar: Mikro/Trendyol/Hepsiburada/N11 örnek eşleme, hata ve uzlaştırma izleme. Test: `node tools/test-integration-model.mjs`, `node tools/test-admin-integrations.mjs`. Sağlayıcı bağlantısı, veri yazımı ve gerçek retry kapalıdır.
+Entegrasyonlar: Mikro/Trendyol/Hepsiburada/N11 için veri kaynağı bağlı değil durumu gösterilir. Sağlayıcı bağlantısı, veri yazımı ve gerçek retry kapalıdır. Kullanılmayan demo eşleme/iş modeli, state ve eski prototip testleri kaldırıldı.
 
 AI yönetimi: Nobi'nin sürümlü politikası (yönerge, karşılama, hızlı yanıtlar, model, günlük AI sınırı, WhatsApp numarası, birim maliyet), onay akışlı bilgi kaynakları, konuşmalar (maskeli), iletişim talepleri ve Nobi + XINOBI U kullanım/tahmini maliyet raporu (`/api/v1/local-commerce/assistant/*`). Önceki örnek model ve araçları (TST-085) kaldırıldı.
 
-Rol/ayar/denetim: sabit demo yönetici ve düzenlenebilir operasyon rolü, ayar sürümü ve güvenli önce/sonra oturum kayıtları. Test: `node tools/test-settings-model.mjs`, `node tools/test-admin-settings.mjs`. Gerçek kimlik/API yetkisi, kullanıcı daveti, kalıcı append-only audit ve bildirim gönderimi bağlı değildir.
+Rol/ayar/denetim: izinler gerçek admin oturumundan salt okunur gösterilir; yönetici daveti ve denetim geçmişi API üzerinden çalışır. Sistem ayarları kaydedilemeyen sabit önizlemedir. Kullanılmayan demo rol/ayar değiştirme ve denetim üretme modeli ile eski prototip testleri kaldırıldı.

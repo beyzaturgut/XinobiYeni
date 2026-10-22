@@ -9,7 +9,6 @@ const require=createRequire(import.meta.url);
 const env={...process.env,
   NEXT_PUBLIC_COMMERCE_API_URL:'/api/v1/local-commerce',
   NEXT_PUBLIC_DESIGN_API_URL:'/api/v1/design-studio',
-  NEXT_PUBLIC_EMAIL_VERIFICATION_API_URL:'/api/v1/email-verification',
   // Surface specs exercise the development preview bridge; live builds never set this.
   NEXT_PUBLIC_DEV_SURFACE_BRIDGE:'1',
 };

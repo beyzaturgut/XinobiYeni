@@ -1,0 +1,14 @@
+.catalog-photo-prompt-launcher{grid-column:1/-1;min-width:0;margin:8px 0;border:1px solid #ddd;border-radius:6px;background:#fff}
+.catalog-photo-prompt-launcher>summary{padding:9px 12px;cursor:pointer;font-size:13px;font-weight:600}
+.catalog-photo-prompt-launcher[open]>label,.catalog-photo-prompt-launcher[open]>p{display:block;margin:8px 12px;font-size:13px}
+.catalog-photo-prompt-launcher>label select{margin-left:8px;max-width:100%}
+.catalog-photo-prompt{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2fr);gap:16px;align-items:start;box-sizing:border-box;min-width:0;margin:0 12px 12px;padding:12px 14px;border:1px solid #e3e3e3;border-radius:8px;background:#fff;font-size:13px}
+.catalog-photo-prompt-side{display:grid;gap:8px;min-width:0}
+.catalog-photo-prompt .prompt-box textarea{max-height:160px}
+@media(max-width:760px){.catalog-photo-prompt{grid-template-columns:1fr}}
+.catalog-photo-prompt h3{margin:0;font-size:15px}
+.catalog-photo-prompt-options>summary{cursor:pointer;padding:2px 0;font-size:12px;color:#555}
+.catalog-photo-prompt-options label{display:grid;gap:6px;margin:8px 0;font-size:12px}
+.catalog-photo-prompt-options textarea{box-sizing:border-box;width:100%;padding:8px;border:1px solid #bbb;border-radius:4px;font:inherit;line-height:1.5;resize:vertical}
+.catalog-photo-prompt-options select{max-width:100%;min-height:36px}
+.catalog-photo-prompt p{margin:0;line-height:1.5;color:#555;font-size:12px}

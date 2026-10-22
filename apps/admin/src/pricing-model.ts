@@ -1,6 +1,4 @@
 export type Campaign = { id: string; name: string; kind: 'percent' | 'fixed'; value: string; channel: string; variantId: string; start: string; end: string; minimum: string; coupon: string; enabled: boolean }
-export const initialPrices: Record<string, number> = {}
-export const initialCampaigns: Campaign[] = [{ id: 'DEMO-C1', name: 'Örnek yüzde 10', kind: 'percent', value: '10', channel: 'Web', variantId: '', start: '2026-10-01', end: '2026-10-31', minimum: '1000', coupon: 'DEMO10', enabled: true }]
 export function parseDecimal(value: string): number | null {
   const normalized = value.trim().replace(',', '.')
   if (!/^\d{1,7}(\.\d{1,2})?$/.test(normalized)) return null

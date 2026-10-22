@@ -1,6 +1,6 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
-**Durum (16.10.2026):** Bloke (D04) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
+**Durum (20.10.2026):** Bloke (D04) · geliştirme ~47 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
 
 ## 1. Amaç, bağımlılık, karar kapısı
 
@@ -67,14 +67,14 @@ Analiz2 K-12 ve K-14–K-21 için Web Designer iki ayrı giriş yolunu tasarlar:
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~45 % · kalan ~55 % · Statü: Bloke (D04, T-04)**
+**Geliştirme ~47 % · kalan ~53 % · Statü: Bloke (D04, T-04)**
 
 **16.10 güncellemesi (kod/commit incelemesi):** Görsel yükleme optimizasyonu, varyantlar arasında kompozisyonun korunması, editör → Tasarımlarım → sepet boyunca fotoğraf yerleşiminin web/mobilde taşınması eklendi (`62f971a`, `865f20a`, `8d99783`, `f4adc49`). HTTP tasarım oturumu ve herkese açık katalog önizlemesi düzeltildi (`19ac66f`). Baskı sürümü/PrintArea/çıktı kabulü açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
 | İş | Durum | Kanıt / eksik |
 |---|---|---|
-| Ürün yüzey maskeleri (Roboflow, fırça, onay, aile aktarımı) | Tamam | ProductSurfaces Step 1–5B, `6ff45a0`, panel Ürün yüzeyleri |
-| Basit kişiselleştirme / XINOBI U önizleme | Tamam | Web + mobil onaylı yüzey renderer (`88d80e0`, `b1573d0`) |
+| Ürün yüzey maskeleri | Tamam (20.10 sadeleşti) | Resim yüklemeli akış: kaynak indir → maske promptu → kayıpsız WebP maske taslağı → tek renkte veya aynı boyut/konumdaki renklerde tek onay (`12455a4`, TST-133). Roboflow, fırça, eğri ve renk başına hizalama admin+API’den kaldırıldı; tarihsel kanıt: Step 1–5B, `6ff45a0`, TST-121–131 |
+| Basit kişiselleştirme / XINOBI U önizleme | Tamam | Web + mobil onaylı yüzey renderer (`88d80e0`, `b1573d0`); ortak maskeli renkler arasında geçiş ve ekran yeniden tasarımı (`250deff`, TST-132). Önizleme e2e testleri TST-134 ile geçiyor; CM121 yayın paketinin boyut hatası düzeltildi |
 | Kendi görselini yükleme, taşı/boyut/döndür | Kısmi | Web+mobil (`fe93107`, TST-107); metin, şekil, katman listesi, ön/arka, geri/ileri yok |
 | Kaydet/yeniden aç (Tasarımlarım) | Kısmi | Hesaba bağlı tasarımlar; değişmez `DesignVersion` ve geçmiş yok |
 | Sepet/siparişe tasarım bağlama | Kısmi | Sunucu sahiplik denetimi, siparişe görsel kopyası (`49618a1`); fiyat farkı ve sürüm güncelleme akışı yok |
@@ -85,6 +85,8 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 **16.10 ortak maske denemesi:** Kaba fırça kılavuzundan iç noktalarla Roboflow visual aday üretimi, seçili aynı konumdaki renklere tek onay, örnek desen/renk önizlemesi ve web Development rendering köprüsü eklendi. [Akış ve sınırlar](../docs/runbooks/guided-shared-product-mask.md), [TST-121](../test/2026-10-16/TST-121-guided-shared-mask.md). Gerçek AI kenar kalitesi denenmedi; %45 tahmini ve faz kabulü değişmedi.
 
 **16.10 boyama sınırı:** Elle gösterme çıktısı artık kılavuzla kesiştirilir; varsayılan tolerans 0, açık seçimle 0–16 kaynak pikseli. Örtüşmeyen sonuçta boyama korunur. [TST-125](../test/2026-10-16/TST-125-guided-mask-containment.md), 62/62 ve admin akışı başarılı. Önceki geniş AI taslakları değişmedi; gerçek kalite kabulü verilmedi.
+
+**20.10 güncellemesi:** Maskeleme yalnız resim yüklemeye indirildi; aynı tuvalde üretilmiş renk fotoğraflarına tek ortak maske uygulanıyor (Demo Tasarım 5 renk, 1333×2000). Renk fotoğrafı üretimi için hizalı prompt (`docs/runbooks/colour-photo-generation-prompt.md`, panel Katalog → Medya). Web önizleme ortak maskeyi yerel API’den okuyor; aynı maskeli renklerde yerleşim aktarımı atlanıyor. Kendi desenini yükleme modu eklendi. **Açık eksikler:** ~~11 XINOBI önizleme e2e gerilemesi~~ TST-134 ile düzeltildi (CM121 yayın paketi orijinal boyutta yayımlanıyordu; test kataloğu/proxy eksikti); maske üretiminin piksel hizası garantisiz (AI/elle panel dışı); eski Tea Maker inceleme API’si, CM101 aday komutu ve `tools/local-mask-editor` varsayılan kapalı ama kodda; `068e976` ile baskı kaynağı yokken prototip baskı işlemleri kapatıldı, baskı çıktısı yine yok; PrintArea/DesignVersion D04/T-04. Değişiklikler `feature/surface-masking-preview-20261020` branch’inde, `main`/canlıda değil. [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md)
 
 **Sonraki adım:** D04 baskı ölçülerini almak; T-04 tuval birimini karara bağlamak.
 

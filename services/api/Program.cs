@@ -29,6 +29,16 @@ if (args.Contains(Cm101CandidateCommand.Mode, StringComparer.Ordinal))
 }
 
 var builder = WebApplication.CreateBuilder(args);
+// Server-only settings (SQL, admin catalog, storage, e-mail, provider keys) live outside the deployed api folder, so
+// replacing that folder on a redeploy keeps them. They override the packaged appsettings.Production.json; environment
+// variables and the command line still win (docs/runbooks/iis-api-install.md).
+if (!builder.Environment.IsDevelopment() && (Environment.GetEnvironmentVariable("XINOBI_SERVER_SETTINGS")
+        ?? (OperatingSystem.IsWindows() ? @"C:\XinobiData\config\appsettings.Server.json" : null)) is { } serverSettings)
+{
+    builder.Configuration.AddJsonFile(serverSettings, optional: true, reloadOnChange: false);
+    builder.Configuration.AddEnvironmentVariables();
+    builder.Configuration.AddCommandLine(args);
+}
 
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<SqlCommerceStore>();
@@ -61,10 +71,8 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<IAccountStore>(services => AccountStorage.UsesSql(builder.Configuration, services.GetRequiredService<LocalCommerceStore>().DataDirectory)
         ? services.GetRequiredService<SqlAccountStore>() : services.GetRequiredService<DevFileAccountStore>());
     builder.Services.AddSingleton<ICatalogSource, LocalCommerceCatalogSource>();
-    // Per-variant surface masking (admin); Roboflow only on an explicit admin action, key from user-secrets.
+    // Per-variant surface masking (admin): PNG masks only, no inference.
     builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceWorkspace>();
-    builder.Services.AddHttpClient("roboflow", client => client.Timeout = TimeSpan.FromSeconds(130))
-        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
     builder.Services.AddSingleton<DesignSessionStore>();
@@ -129,6 +137,8 @@ if (!builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>
         || string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("Xinobi")))
         throw new InvalidOperationException("AdminCatalog:Enabled requires SQL Server catalog, SQL Server accounts and ConnectionStrings:Xinobi.");
     builder.Services.AddSingleton<LocalCommerceStore>();
+    // Admin product-surface masks (uploaded WebP masks, no inference) on the SQL catalog; see ProductSurfaceEndpoints.
+    builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceWorkspace>();
 }
 if (builder.Configuration["Catalog:StorageProvider"] == "SqlServer")
     builder.Services.Replace(ServiceDescriptor.Singleton<ICatalogSource>(services => new SqlCatalogSource(services.GetRequiredService<SqlCommerceStore>())));
@@ -280,8 +290,7 @@ app.UseAuthentication();
 app.UseMiddleware<AdminAuditMiddleware>();
 app.UseAuthorization();
 app.MapLocalCommerce();
-if (app.Environment.IsDevelopment() && app.Configuration.GetValue<bool>("ProductSurfaces:ExperimentalCatalogWorkspace:Enabled"))
-    Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
+Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
 app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();

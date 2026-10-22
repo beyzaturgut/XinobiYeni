@@ -18,5 +18,13 @@ export default function ProductPreview(){
  },[]);
  if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/xinobi-u">Ürününü seç ↗</Link></main>;
  if(!session)return <main className={styles.main}><p role="status">Tasarımın yükleniyor…</p></main>;
- return <><header className={styles.main}><p>{session.product.name}</p><Link href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}>Tasarımıma dön</Link><p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><SaveDesignButton source={{sessionId:session.id}}/></header><AcceptedSurfaceEditor xinobiPreview designId={session.id} commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={studioAsset(session.imageUrl!)}/></>;
+ return <><header className={styles.previewTop}>
+  <div className={styles.previewTopText}>
+   <Link className={styles.backLink} href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}><span aria-hidden="true">←</span>Tasarımıma dön</Link>
+   <p className={styles.kicker}>XINOBI U · Ürün önizlemesi</p>
+   <p className={styles.previewTitle}>{session.product.name}</p>
+   <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p>
+  </div>
+  <div className={styles.previewTopActions}><SaveDesignButton source={{sessionId:session.id}}/></div>
+ </header><AcceptedSurfaceEditor xinobiPreview designId={session.id} commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={studioAsset(session.imageUrl!)}/></>;
 }

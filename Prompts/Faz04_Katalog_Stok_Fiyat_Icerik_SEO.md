@@ -1,6 +1,6 @@
 # Faz04 — Ürün kataloğu, içerik ve yayın
 
-**Durum (16.10.2026):** Devam · geliştirme ~50 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
+**Durum (20.10.2026):** Devam · geliştirme ~52 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
 
 ## 1. Amaç, bağımlılık, sınır
 
@@ -74,9 +74,11 @@ Web Designer, Analiz2 K-01–K-11 ana sayfa sırası ve etkileşimini Faz02'de o
 
 Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regression-and-phase-audit.md), HEAD `b1573d0`. Durumlar: **Tamam** (kod/belge + test kanıtı var), **Kısmi**, **Yok**, **Bloke** (karar/erişim bekliyor). Bu tablo rol veya PM onayı değildir; aşağıdaki onay tablosu `Bekliyor` kalır.
 
-**Geliştirme ~50 % · kalan ~50 % · Statü: Devam (D02/D13 açık)**
+**Geliştirme ~52 % · kalan ~48 % · Statü: Devam (D02/D13 açık)**
 
 **16.10 güncellemesi (kod/commit incelemesi):** SEO temeli TST-120 ile kayıtlı. HTTP test sitesinde katalog kimliği üretimi düzeltildi (`dfada16`); ana sayfa ürün görseli boyutları düzeltildi. Katalog değişikliklerinin audit altyapısı mevcut; yayın doğrulaması ve tüm alan kapsamı açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
+
+**20.10 güncellemesi:** SQL’deki sipariş ve müşteri sayılarından güvenli özet rapor (`65c0722`); simüle sonuçlar yerine açık veri kaynağı sınırları, katalog “erişilemiyor” ile “boş” ayrımı, fiyat kaydında doğru sonuç ve çift tıklama koruması, değerlendirme yanıtı temizleme (`84cdabd`, `d6ff7da`, `854e001`, `ff9c277`). Katalog → Medya’da ürüne ve renk HEX’lerine göre hizalı katalog görseli promptu (`a226037`, `dd94f56`, `bfce868`). **Eksikler sürüyor:** ödeme/net ciro raporu D03/D05’e, ziyaret/dönüşüm verisi doğrulanmış olay kaynağına bağlı; depo/rezervasyon hareketi D02/D03; kalıcı ayarlar; kampanya/kupon, CMS, medya kütüphanesi, CSV içe aktarma, ürün sitemap’i. Rapor satırı Kısmi kalır. [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md)
 
 | İş | Durum | Kanıt / eksik |
 |---|---|---|

@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import type { AdminState } from './settings-model'
 import { useAdminSession } from './AdminAccess'
 import { adminCall } from './admin-api'
 import AuditHistory from './AuditHistory'
 type InvitationResponse={email:string;expiresAt:string;previewUrl?:string}
-export default function AdminSettings({state}:{state:AdminState;onChange:(state:AdminState)=>void}) {
+const previewSettings = {currency:'TRY',timezone:'Europe/Istanbul',lowStock:5,orderNotice:true}
+export default function AdminSettings() {
  const session=useAdminSession()
  const canManageStaff=session?.permissions.includes('settings.staff')??(import.meta.env.DEV&&import.meta.env.VITE_ADMIN_ACCESS==='off')
  const canReadAudit=session?.permissions.includes('audit.read')??false
@@ -18,7 +18,7 @@ export default function AdminSettings({state}:{state:AdminState;onChange:(state:
  {tab==='Rol ve yetkiler'&&canManageStaff&&<><div className="table-scroll"><table className="session-permissions"><caption>Oturum izinleri · salt okunur</caption><thead><tr><th scope="col">API oturumunun verdiği izin</th></tr></thead><tbody>{permissions.map(permission=><tr key={permission}><td><code>{permission}</code></td></tr>)}</tbody></table></div>{!session&&<p role="status">Oturum izinleri doğrulanamadı; örnek yetki gösterilmez.</p>}
  <button disabled title="Kalıcı rol düzenleme API'si bağlı değil">Rol kaydı kullanılamıyor</button><p>Bu görünüm yetkileri değiştirmez; rol veya denetim kaydı oluşturulmaz.</p>
  <form className="catalog-form" onSubmit={async event=>{event.preventDefault();if(inviting)return;const form=event.currentTarget;const data=new FormData(form);setInviting(true);setError('');setMessage('');setPreviewUrl('');try{const invitation=await adminCall<InvitationResponse>('/admin/invitations',{email:String(data.get('email')||'').trim()});setMessage(`${invitation.email} adresine yönetici daveti oluşturuldu.`);setPreviewUrl(invitation.previewUrl||'');form.reset()}catch(error){setError(error instanceof Error?error.message:'Davet oluşturulamadı.')}finally{setInviting(false)}}}><h3>Yeni yönetici daveti</h3><label>E-posta adresi<input name="email" type="email" autoComplete="off" required/></label><button disabled={inviting}>{inviting?'Gönderiliyor…':'Yönetici daveti gönder'}</button>{previewUrl&&<a href={previewUrl}>Preview davetini aç</a>}</form></>}
- {tab==='Sistem ayarları'&&<form className="catalog-form" onSubmit={e=>e.preventDefault()}><p role="status">Kalıcı sistem ayarları API'si bağlı değil. Aşağıdaki değerler önizlemedir; gerçek sunucu ayarları olarak doğrulanmadı ve kaydedilemez.</p><label>Para birimi (önizleme)<input value={state.settings.currency} disabled/></label><label>Saat dilimi (önizleme)<input value={state.settings.timezone} disabled/></label><label>Düşük stok eşiği (önizleme)<input type="number" value={state.settings.lowStock} disabled/></label><label><input type="checkbox" checked={state.settings.orderNotice} disabled/> Sipariş bildirim tercihi (önizleme)</label><button type="submit" disabled>Ayar kaydı kullanılamıyor</button></form>}
+ {tab==='Sistem ayarları'&&<form className="catalog-form" onSubmit={e=>e.preventDefault()}><p role="status">Kalıcı sistem ayarları API'si bağlı değil. Aşağıdaki değerler önizlemedir; gerçek sunucu ayarları olarak doğrulanmadı ve kaydedilemez.</p><label>Para birimi (önizleme)<input value={previewSettings.currency} disabled/></label><label>Saat dilimi (önizleme)<input value={previewSettings.timezone} disabled/></label><label>Düşük stok eşiği (önizleme)<input type="number" value={previewSettings.lowStock} disabled/></label><label><input type="checkbox" checked={previewSettings.orderNotice} disabled/> Sipariş bildirim tercihi (önizleme)</label><button type="submit" disabled>Ayar kaydı kullanılamıyor</button></form>}
  {tab==='Denetim geçmişi'&&canReadAudit&&<AuditHistory/>}
  </section>
 }

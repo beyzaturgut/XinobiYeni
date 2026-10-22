@@ -21,7 +21,6 @@ export const navigationItems: readonly NavigationItem[] = [
 ]
 export const topNavigation = [...new Set(navigationItems.filter(item=>item.owner==='top').map(item=>item.category))].map(name=>({name,links:navigationItems.filter(item=>item.owner==='top'&&item.category===name)}))
 export const sideNavigation = [...new Set(navigationItems.filter(item=>item.owner==='side').map(item=>item.section))].map(title=>({title,items:navigationItems.filter(item=>item.owner==='side'&&item.section===title)}))
-export function permissionForView(view:AdminView):string { return navigationItems.find(item=>item.view===view)!.permission }
 export function categoryForView(view:AdminView):string|undefined {
   const item=navigationItems.find(item=>item.view===view)
   return item?.owner==='top'?item.category:undefined

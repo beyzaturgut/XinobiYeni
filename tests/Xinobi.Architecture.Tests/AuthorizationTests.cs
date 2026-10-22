@@ -100,6 +100,8 @@ public sealed class AuthorizationTests : IDisposable
         string[] publicAreas = ["/api/v1/health", "/api/v1/catalog", "/api/v1/content", "/api/v1/design-studio",
             // Development storefront catalog and product media only; the rest of the panel needs staff permissions.
             "/api/v1/local-commerce/state", "/api/v1/local-commerce/media/",
+            // Approved product-surface masks of active products for the storefront preview; read-only, no personal data.
+            "/api/v1/dev/product-surfaces/commerce-mask/",
             "/api/v1/xinobi-u", "/api/v1/email-verification", "/api/v1/auth", "/openapi",
             // Corporate quote form and tracking by code + e-mail: companies ask without an account (Faz07).
             "/api/v1/quotes",

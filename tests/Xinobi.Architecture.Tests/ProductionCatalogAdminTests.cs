@@ -55,6 +55,9 @@ public sealed class ProductionCatalogAdminTests
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/v1/local-commerce/state")).StatusCode);
         foreach (var path in new[] { "products/p", "prices/v", "content" })
             Assert.Equal(HttpStatusCode.Unauthorized, (await client.PutAsJsonAsync("/api/v1/local-commerce/" + path, new { })).StatusCode);
+        // Product-surface masking runs with the live admin catalog and the same staff, origin and HTTPS rules.
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync("/api/v1/local-commerce/surfaces")).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.PostAsJsonAsync("/api/v1/local-commerce/surfaces/p/v/approval", new { })).StatusCode);
         var accounts = factory.Services.GetRequiredService<IAccountStore>();
         var account = await accounts.Register("Test", "test@example.invalid", "guclu-parola-1");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", (await accounts.IssueTokens(account.Id)).AccessToken);
@@ -87,12 +90,14 @@ public sealed class ProductionCatalogAdminTests
         Assert.Equal(HttpStatusCode.BadRequest, (await cookieClient.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
         client.DefaultRequestHeaders.Add("Origin", "https://evil.example");
         Assert.Equal(HttpStatusCode.Forbidden, (await client.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await client.PostAsJsonAsync("/api/v1/local-commerce/surfaces/p/v/approval", new { })).StatusCode);
         client.DefaultRequestHeaders.Remove("Origin");
         using var insecure = factory.CreateClient(new() { BaseAddress = new Uri("http://localhost") });
         insecure.DefaultRequestHeaders.Authorization = client.DefaultRequestHeaders.Authorization;
         Assert.Equal(HttpStatusCode.Forbidden, (await insecure.PutAsJsonAsync("/api/v1/local-commerce/prices/v", new PriceUpdate(0))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await insecure.GetAsync("/api/v1/local-commerce/surfaces")).StatusCode);
         Assert.True(factory.Services.GetRequiredService<LocalCommerceStore>().UsesSql);
-        foreach (var path in new[] { "orders", "quotes", "surfaces", "notifications" })
+        foreach (var path in new[] { "orders", "quotes", "notifications" })
             Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/v1/local-commerce/" + path)).StatusCode);
     }
 

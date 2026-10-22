@@ -31,9 +31,12 @@ async function loadCatalogSurface(product:string,variant:string,signal:AbortSign
  }if(input.mask.sha256!==input.surfaceVersion)throw Error('Invalid mask version');const preview=catalogPreviewDimensions(input.width,input.height);return {...input,assetWidth:input.width,assetHeight:input.height,...preview,surfaceTreatment:'metallic-ink',...(product===CM121_PRODUCT&&variant===CM121_VARIANT?{surfaceInkExposureStops:0.55}:{})};
 }
 
+// Without the opt-in same-origin proxy the local API is called directly; its CORS policy admits the local web origin.
+const sharedSurfaceOrigin=/^https?:\/\//.test(commerceApi)?new URL(commerceApi).origin:'';
+
 // Explicitly approved experimental catalogue masks. The exact product/variant remains part of every lookup.
 async function loadSharedCommerceSurface(product:string,variant:string,signal:AbortSignal):Promise<RenderingInputs|null>{
- const response=await fetch('/api/v1/dev/product-surfaces/commerce-mask/'+encodeURIComponent(product)+'/'+encodeURIComponent(variant)+'/rendering-inputs',{signal,cache:'no-store'});
+ const response=await fetch(sharedSurfaceOrigin+'/api/v1/dev/product-surfaces/commerce-mask/'+encodeURIComponent(product)+'/'+encodeURIComponent(variant)+'/rendering-inputs',{signal,cache:'no-store'});
  if(response.status===404)return null;if(!response.ok)throw Error('Shared mask unavailable');
  const value=await response.json();
  if(value.scope!=='development-preview'||value.productReference!==product||value.variantReference!==variant)throw Error('Invalid shared mask identity');
@@ -43,13 +46,15 @@ async function loadSharedCommerceSurface(product:string,variant:string,signal:Ab
  const sourcePath=/^\/(?:api\/v1\/local-commerce\/media\/[a-f0-9]{32}\.(?:png|jpg|webp)|assets\/[a-zA-Z0-9/_-]+\.(?:png|jpg|webp))\?v=[a-f0-9]{64}$/;
  const maskPath=/^\/api\/v1\/local-commerce\/media\/[a-f0-9]{32}\.png\?v=[a-f0-9]{64}$/;
  if(!input.source||!input.mask||!checksum.test(input.source.sha256)||!checksum.test(input.mask.sha256)||!sourcePath.test(input.source.url)||!maskPath.test(input.mask.url)||!input.source.url.endsWith('?v='+input.source.sha256)||!input.mask.url.endsWith('?v='+input.mask.sha256)||input.source.sha256!==input.sourceMediaVersion||input.mask.sha256!==input.surfaceVersion)throw Error('Invalid shared mask media');
- return {...input,assetWidth:input.width,assetHeight:input.height,...catalogPreviewDimensions(input.width,input.height),surfaceTreatment:'metallic-ink'};
+ return {...input,source:{...input.source,url:sharedSurfaceOrigin+input.source.url},mask:{...input.mask,url:sharedSurfaceOrigin+input.mask.url},assetWidth:input.width,assetHeight:input.height,...catalogPreviewDimensions(input.width,input.height),surfaceTreatment:'metallic-ink'};
 }
 
 export async function loadAcceptedSurface(variantReference:string,signal:AbortSignal,commerceProduct?:string):Promise<RenderingInputs|null>{
- // Live builds read only published bundles; the e2e build opts into the development bridge (NEXT_PUBLIC_DEV_SURFACE_BRIDGE=1).
+ // Masks approved in the admin (catalog SQL) come first; the API answers 404 where that workspace is off.
+ // An unavailable or invalid shared mask must not hide a published bundle; only cancellation propagates.
+ if(commerceProduct){try{const shared=await loadSharedCommerceSurface(commerceProduct,variantReference,signal);if(shared)return shared;}catch(error){if(signal.aborted)throw error;}}
+ // Live builds otherwise read only published bundles; the e2e build opts into the development bridge (NEXT_PUBLIC_DEV_SURFACE_BRIDGE=1).
  if(process.env.NODE_ENV!=='development'&&process.env.NEXT_PUBLIC_DEV_SURFACE_BRIDGE!=='1')return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
- if(commerceProduct&&process.env.NODE_ENV==='development'){const shared=await loadSharedCommerceSurface(commerceProduct,variantReference,signal);if(shared)return shared;}
  if(commerceProduct&&commerceProduct!=='DEMO-P101'){const generic=await loadCatalogSurface(commerceProduct,variantReference,signal);if(generic)return generic;}
  const productReference=commerceProduct??"cay-makinesi-101";
  const cm=commerceProduct===CM_PRODUCT&&variantReference===CM_VARIANT;
@@ -59,7 +64,8 @@ export async function loadAcceptedSurface(variantReference:string,signal:AbortSi
  if(!response.ok)throw new Error("Preview unavailable");
  const value=await response.json();
  if(value.scope!=="development-preview"||value.productReference!==productReference||value.variantReference!==variantReference)throw new Error("Invalid preview bundle");
- if(value.previewAvailable===false&&value.inputs===null)return null;
+ // A bridge without its own review for this variant must not hide the packaged reviewed bundle that live builds use.
+ if(value.previewAvailable===false&&value.inputs===null)return commerceProduct?loadPublishedSurface(commerceProduct,variantReference,signal):null;
  const input=value.inputs as RenderingInputs|undefined;
  const supported=cm|| (commerceProduct?commerceProduct==="DEMO-P101"&&variantReference==="DEMO-V101-B":variantReference==="blue");
  if(value.previewAvailable!==true||!supported||!input||input.width!==(cm?3543:1066)||input.height!==(cm?5315:1600)||!checksum.test(input.surfaceVersion)||typeof input.sourceMediaVersion!=="string"||!input.sourceMediaVersion||!(cm?catalogMedia(input.source):media(input.source))||!(cm?catalogMedia(input.mask):media(input.mask))||typeof input.brandingRequired!=="boolean"||(input.branding!==null&&!(cm?catalogMedia(input.branding):media(input.branding)))||(input.brandingRequired&&!input.branding))throw new Error("Invalid preview inputs");

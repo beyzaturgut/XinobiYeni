@@ -2,7 +2,6 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Xinobi.Api.Infrastructure.MaskProcessing;
 using Xinobi.Api.Infrastructure.MediaValidation;
-using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
 using Xinobi.Api.LocalCommerce;
 
 namespace Xinobi.Api.Features.ProductSurfaces.Catalog;
@@ -10,26 +9,17 @@ namespace Xinobi.Api.Features.ProductSurfaces.Catalog;
 public enum SurfaceStatus { None, Draft, Approved, Stale }
 
 /// <summary>One variant photo's masking work: the current draft and how it was made. The approved mask lives on the variant itself.</summary>
-public sealed record SurfaceDraft(string ProductId, string VariantId, string Image, string MaskFile, string Method, string? Prompt, double? Score, DateTimeOffset UpdatedAt);
+public sealed record SurfaceDraft(string ProductId, string VariantId, string Image, string MaskFile, string Method, DateTimeOffset UpdatedAt);
 
 /// <summary><c>Status</c>: none, draft, approved or stale (approved for a photo the variant no longer uses).</summary>
 public sealed record SurfaceSummary(string ProductId, string ProductName, string VariantId, string Color, string Image, string Status, DateTimeOffset? DraftUpdatedAt);
 
 public sealed record SurfaceDetail(string ProductId, string ProductName, string VariantId, string Color, string Image, int Width, int Height,
-    string Status, string? ApprovedMask, SurfaceDraft? Draft, SurfaceProviderStatus Provider, SurfaceColor[] Colors);
+    string Status, string? ApprovedMask, SurfaceDraft? Draft, SurfaceColor[] Colors, string SourceSha256);
 
 public sealed record SurfaceColor(string VariantId, string Color, string Image, int Width, int Height);
 public sealed record SurfaceApprovalRequest(SurfaceColor[] Colors, bool SamePlacementConfirmed, DateTimeOffset ExpectedDraftUpdatedAt);
-
-public sealed record SurfaceProviderStatus(bool Configured, int UsedToday, int DailyLimit);
-
-public sealed record SurfaceSegmentRequest(string? Prompt, SurfacePoint[]? Points, bool UseDraftGuide = false, DateTimeOffset? ExpectedDraftUpdatedAt = null, int GuideTolerancePixels = 0);
-public sealed record SurfacePoint(double X, double Y, bool Keep);
-/// <summary><c>Base</c>: "draft" (default when one exists), "approved" or "empty".</summary>
-public sealed record SurfaceStrokeRequest(SurfaceStroke[] Strokes, string? Base);
-/// <summary><c>Operation</c>: "add" or "remove"; radius and points in source-photo pixels.</summary>
-public sealed record SurfaceStroke(string Operation, double Radius, SurfaceStrokePoint[] Points);
-public sealed record SurfaceStrokePoint(double X, double Y);
+public sealed record SurfaceWebpRequest(string Image, string SourceSha256, string WebpBase64, string Mode);
 
 public sealed class SurfaceException(string code, string message, int status = StatusCodes.Status400BadRequest) : Exception(message)
 {
@@ -38,25 +28,21 @@ public sealed class SurfaceException(string code, string message, int status = S
 }
 
 /// <summary>
-/// Development workspace behind the admin "Ürün yüzeyi" screen, for every product variant (generalises the Tea Maker review):
-/// the admin asks Roboflow SAM3 for a mask (text prompt or keep/exclude points) and/or paints it by hand, then approves it.
+/// Development workspace behind the admin "Ürün yüzey maskeleri" screen, for every product variant: the admin uploads a WebP mask
+/// as a draft, then approves it for the reference colour or for same-sized, same-placement colours in one step.
 /// Approval copies the mask into commerce media and records it on the variant, so storefront, snapshot and deploy carry it
-/// like the product photo. Roboflow is called only on an explicit admin action, within a daily limit, with a server-side key.
+/// like the product photo. No inference or external calls.
 /// </summary>
-public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.Api.Infrastructure.IFileStore files, IWebHostEnvironment environment, IConfiguration configuration, IHttpClientFactory http, TimeProvider clock)
+public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.Api.Infrastructure.IFileStore files, IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     private readonly SemaphoreSlim gate = new(1, 1);
-    private sealed record State(List<SurfaceDraft> Drafts, Dictionary<string, int> Usage);
+    private sealed record State(List<SurfaceDraft> Drafts);
 
     private string Directory => Path.Combine(commerce.DataDirectory, "product-surfaces");
     private string StatePath => Path.Combine(Directory, "workspace.json");
     private string DraftPath(string file) => Path.Combine(Directory, "drafts", file);
-    private string? ApiKey => configuration["ProductSurfaces:Roboflow:ApiKey"] is { Length: > 0 } key ? key : null;
-    private int DailyLimit => Math.Clamp(configuration.GetValue("ProductSurfaces:Roboflow:DailyLimit", 50), 0, 1000);
-    private string Today => clock.GetUtcNow().ToString("yyyy-MM-dd");
-
-    private async Task<State> Read() => File.Exists(StatePath) ? JsonSerializer.Deserialize<State>(await File.ReadAllTextAsync(StatePath), Json)! : new([], []);
+    private async Task<State> Read() => File.Exists(StatePath) ? JsonSerializer.Deserialize<State>(await File.ReadAllTextAsync(StatePath), Json)! : new([]);
 
     private async Task Write(State state)
     {
@@ -73,17 +59,11 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         finally { gate.Release(); }
     }
 
-    private SurfaceProviderStatus Provider(State state) => new(ApiKey is not null, state.Usage.GetValueOrDefault(Today), DailyLimit);
-
     private static string StatusOf(CommerceVariant variant, SurfaceDraft? draft) => (
         variant.ApprovedSurfaceMask is not null ? SurfaceStatus.Approved
         : draft is not null && draft.Image == variant.Image ? SurfaceStatus.Draft
         : !string.IsNullOrEmpty(variant.SurfaceMask) ? SurfaceStatus.Stale
         : SurfaceStatus.None).ToString().ToLowerInvariant();
-
-    private static MaskStroke[] Strokes(SurfaceStroke[]? strokes) => (strokes ?? []).Select(stroke => new MaskStroke(
-        stroke?.Operation?.ToLowerInvariant() switch { "add" => MaskStrokeOperation.Add, "remove" => MaskStrokeOperation.Remove, _ => throw new SurfaceException("invalid_strokes", "Fırça işlemi \"add\" ya da \"remove\" olmalı.") },
-        stroke.Radius, (stroke.Points ?? []).Select(point => new MaskStrokePoint(point.X, point.Y)).ToArray())).ToArray();
 
     private static SurfaceDraft? DraftFor(State state, string productId, CommerceVariant variant) =>
         state.Drafts.FirstOrDefault(draft => draft.ProductId == productId && draft.VariantId == variant.Id && draft.Image == variant.Image);
@@ -91,7 +71,7 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
     public async Task<SurfaceSummary[]> List()
     {
         var catalogue = await commerce.Read();
-        return await Locked(state => Task.FromResult(catalogue.Products.SelectMany(product => product.Variants
+        return await Locked(state => Task.FromResult(catalogue.Products.Where(product => product.Personalizable == true).SelectMany(product => product.Variants
             .Where(variant => !string.IsNullOrEmpty(variant.Image))
             .Select(variant =>
             {
@@ -126,12 +106,12 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
     {
         var draft = DraftFor(state, product.Id, variant);
         return new SurfaceDetail(product.Id, product.Name, variant.Id, variant.Color, variant.Image, source.Width, source.Height,
-            StatusOf(variant, draft), variant.ApprovedSurfaceMask, draft, Provider(state),
+            StatusOf(variant, draft), variant.ApprovedSurfaceMask, draft,
             product.Variants.Where(v => !string.IsNullOrEmpty(v.Image)).Select(v =>
             {
                 try { var identity = InspectSource(v.Image); return new SurfaceColor(v.Id, v.Color, v.Image, identity.Width, identity.Height); }
                 catch (SurfaceException) { return new SurfaceColor(v.Id, v.Color, v.Image, 0, 0); }
-            }).ToArray());
+            }).ToArray(), source.Sha256);
     }
 
     public async Task<byte[]> DraftMask(string productId, string variantId)
@@ -142,107 +122,28 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
             : throw new SurfaceException("draft_not_found", "Bu renk için taslak maske yok.", StatusCodes.Status404NotFound));
     }
 
-    /// <summary>One Roboflow SAM3 call: text prompt (concept segment) or keep/exclude points (visual segment). The result becomes the draft.</summary>
-    public async Task<SurfaceDetail> Segment(string productId, string variantId, SurfaceSegmentRequest request, CancellationToken cancellationToken)
+    public async Task<SurfaceDetail> ImportWebp(string productId, string variantId, SurfaceWebpRequest request)
     {
         var (product, variant) = await Find(productId, variantId);
-        var key = ApiKey ?? throw new SurfaceException("provider_not_configured", "Roboflow anahtarı tanımlı değil. Maskeyi elle çizebilirsin.", StatusCodes.Status503ServiceUnavailable);
-        var prompt = request.Prompt?.Trim();
-        var points = request.Points ?? [];
-        SurfaceDraft? guide = null;
-        byte[]? guideBytes = null;
-        if (request.UseDraftGuide)
-        {
-            if (request.GuideTolerancePixels is < 0 or > 16) throw new SurfaceException("invalid_guide_tolerance", "Kenar toleransı 0–16 kaynak pikseli olmalı.");
-            if (points.Length > 0 || !string.IsNullOrEmpty(prompt)) throw new SurfaceException("guide_exclusive", "Kılavuz ile tarif/nokta isteği birleştirilemez.");
-            guide = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)))
-                ?? throw new SurfaceException("draft_not_found", "Önce bölgeyi fırçayla boyayıp taslağı kaydedin.");
-            if (guide.UpdatedAt != request.ExpectedDraftUpdatedAt) throw new SurfaceException("draft_changed", "Kılavuz değişti; güncel taslağı inceleyin.", 409);
-            guideBytes = await File.ReadAllBytesAsync(DraftPath(guide.MaskFile));
-            points = ManualGuidePoints.Sample(guideBytes);
-        }
-        if (points.Length == 0 && string.IsNullOrEmpty(prompt)) throw new SurfaceException("prompt_required", "Bir tarif (ör. \"kettle body\") yaz ya da fotoğrafta nokta seç.");
-        if (prompt is { Length: > 120 }) throw new SurfaceException("prompt_too_long", "Tarif en fazla 120 karakter olabilir.");
-        if (points.Length > 20) throw new SurfaceException("too_many_points", "En fazla 20 nokta seçebilirsin.");
-        var bytes = SourceBytes(variant.Image);
-        var source = new AlignedImageInspector().InspectSource(bytes, "commerce:" + variant.Image);
-
-        // Reserve the call before sending it, so parallel clicks cannot exceed the daily limit.
-        await Locked(async state =>
-        {
-            var used = state.Usage.GetValueOrDefault(Today);
-            if (used >= DailyLimit) throw new SurfaceException("daily_limit", $"Bugünkü Roboflow sınırına ({DailyLimit}) ulaşıldı. Maskeyi elle düzeltebilirsin.", StatusCodes.Status429TooManyRequests);
-            state.Usage.Clear();
-            state.Usage[Today] = used + 1;
-            await Write(state);
-            return true;
-        });
-
-        var buffer = new DevelopmentMaskBuffer();
-        var options = new RoboflowSegmentationOptions { ApiKey = key, TimeoutSeconds = Math.Clamp(configuration.GetValue("ProductSurfaces:Roboflow:TimeoutSeconds", 60), 1, 120) };
-        var provider = new RoboflowSurfaceSegmentationProvider(http.CreateClient("roboflow"), options, externalInferenceEnabled: true, _ => bytes, buffer);
-        var surface = new SurfaceIntent("designable-area", string.IsNullOrEmpty(prompt) ? "product body" : prompt);
-        SegmentationResult result;
-        try
-        {
-            result = points.Length == 0
-                ? await provider.GenerateAutomaticAsync(new AutomaticSegmentationRequest(source, surface), cancellationToken)
-                : await provider.GenerateInteractiveAsync(new InteractiveSegmentationRequest(source, surface,
-                    points.Select(point => new SourcePoint(point.X, point.Y, point.Keep ? PointIntent.Keep : PointIntent.Exclude))), cancellationToken);
-        }
-        catch (SegmentationProviderException error) { throw new SurfaceException(error.Message, ProviderMessage(error.Message), error.Status); }
-        catch (ArgumentOutOfRangeException) { throw new SurfaceException("invalid_point", "Noktalar fotoğrafın içinde olmalı."); }
-        var current = await Find(productId, variantId);
-        if (current.Variant.Image != variant.Image || InspectSource(current.Variant.Image) != source)
-            throw new SurfaceException("image_changed", "Fotoğraf işlem sırasında değişti; sonuç kaydedilmedi.", 409);
-        var candidate = result.Candidates[0];
-        if (guide is not null)
-        {
-            var currentGuide = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)));
-            if (currentGuide != guide) throw new SurfaceException("draft_changed", "Kılavuz işlem sırasında değişti; sonuç kaydedilmedi.", 409);
-        }
-        var mask = buffer.Bytes(candidate.Mask.AssetReference);
-        if (guideBytes is not null) mask = GuidedMaskBounds.Apply(mask, guideBytes, source, request.GuideTolerancePixels);
-        return await SaveDraft(product, variant, source, mask, request.UseDraftGuide ? "roboflow-guide" : points.Length == 0 ? "roboflow-text" : "roboflow-points", prompt, candidate.Score?.Value, guide);
+        var source = InspectSource(variant.Image);
+        EnsureManualSource(variant, source, request.Image, request.SourceSha256);
+        if (string.IsNullOrWhiteSpace(request.WebpBase64)) throw new SurfaceException("invalid_mask_webp", "WebP maske verisi eksik. Paneli yenileyip dosyayı tekrar seçin.");
+        if (request.WebpBase64.Length > 12 * 1024 * 1024) throw new SurfaceException("invalid_mask_webp", "WebP dosyası çok büyük; en fazla 8 MB yükleyin.");
+        byte[] webp;
+        try { webp = Convert.FromBase64String(request.WebpBase64); }
+        catch (FormatException) { throw new SurfaceException("invalid_mask_webp", "WebP aktarımı okunamadı."); }
+        var bytes = ManualSurfaceMasks.Webp(webp, request.Mode, source);
+        return await SaveDraft(product, variant, source, bytes, "webp-" + request.Mode);
     }
 
-    /// <summary>Brush corrections (add/remove) on the draft, the approved mask or an empty canvas. The result becomes the draft.</summary>
-    public async Task<SurfaceDetail> Paint(string productId, string variantId, SurfaceStrokeRequest request)
+    private static void EnsureManualSource(CommerceVariant variant, SourceMediaIdentity source, string image, string sha)
     {
-        var (product, variant) = await Find(productId, variantId);
-        var bytes = SourceBytes(variant.Image);
-        var source = new AlignedImageInspector().InspectSource(bytes, "commerce:" + variant.Image);
-        var draft = await Locked(state => Task.FromResult(DraftFor(state, productId, variant)));
-        var basis = request.Base ?? (draft is not null ? "draft" : variant.ApprovedSurfaceMask is not null ? "approved" : "empty");
-        byte[]? parent = basis switch
-        {
-            "draft" => draft is null ? throw new SurfaceException("draft_not_found", "Düzeltilecek taslak yok.") : await File.ReadAllBytesAsync(DraftPath(draft.MaskFile)),
-            "approved" => variant.ApprovedSurfaceMask is { } approved ? SourceBytes(approved) : throw new SurfaceException("approval_not_found", "Onaylı maske yok."),
-            "empty" => null,
-            _ => throw new SurfaceException("invalid_base", "Geçersiz başlangıç maskesi."),
-        };
-        var corrector = new ManualMaskCorrector();
-        var reference = "dev:surface-mask:" + Guid.NewGuid().ToString("N");
-        MaskCorrectionResult corrected;
-        try
-        {
-            corrected = parent is null
-                ? corrector.StartFromStrokes(source, Strokes(request.Strokes), reference)
-                : corrector.Correct(parent, new AlignedImageInspector().ValidateMask(parent, reference + ":parent", source, source), source, Strokes(request.Strokes), reference);
-        }
-        catch (ArgumentException) { throw new SurfaceException("invalid_strokes", "Fırça çizgileri geçersiz (en fazla 100 çizgi, fırça 1–32 px)."); }
-        catch (InvalidDataException error) when (error.Message.Contains("empty or full")) { throw new SurfaceException("mask_empty_or_full", "Maske tamamen boş ya da tamamen dolu olamaz."); }
-        catch (InvalidDataException) { throw new SurfaceException("mask_invalid", "Maske bu fotoğrafla eşleşmiyor. Yeniden başla."); }
-        catch (InvalidOperationException) { throw new SurfaceException("mask_invalid", "Maske bu fotoğrafla eşleşmiyor. Yeniden başla."); }
-        var method = draft?.Method is { } previous && basis == "draft" ? (previous.EndsWith("+brush") ? previous : previous + "+brush") : basis == "empty" ? "brush" : "approved+brush";
-        return await SaveDraft(product, variant, source, corrected.Bytes, method, draft?.Prompt, draft?.Score);
+        if (variant.Image != image || source.Sha256 != sha) throw new SurfaceException("image_changed", "Fotoğraf değişti; ürünü yeniden seçin.", 409);
     }
 
-    private async Task<SurfaceDetail> SaveDraft(CommerceProduct product, CommerceVariant variant, SourceMediaIdentity source, byte[] mask, string method, string? prompt, double? score, SurfaceDraft? expectedDraft = null) =>
+    private async Task<SurfaceDetail> SaveDraft(CommerceProduct product, CommerceVariant variant, SourceMediaIdentity source, byte[] mask, string method) =>
         await Locked(async state =>
         {
-            if (expectedDraft is not null && DraftFor(state, product.Id, variant) != expectedDraft)
-                throw new SurfaceException("draft_changed", "Kılavuz değişti; sonuç kaydedilmedi.", 409);
             var file = $"{Convert.ToHexString(RandomNumberGenerator.GetBytes(16)).ToLowerInvariant()}.png";
             System.IO.Directory.CreateDirectory(DraftPath(""));
             await File.WriteAllBytesAsync(DraftPath(file), mask);
@@ -251,7 +152,7 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
                 state.Drafts.Remove(old);
                 File.Delete(DraftPath(old.MaskFile));
             }
-            state.Drafts.Add(new SurfaceDraft(product.Id, variant.Id, variant.Image, file, method, prompt, score, clock.GetUtcNow()));
+            state.Drafts.Add(new SurfaceDraft(product.Id, variant.Id, variant.Image, file, method, clock.GetUtcNow()));
             await Write(state);
             return DetailOf(state, product, variant, source);
         });
@@ -278,7 +179,10 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         });
     }
 
-    /// <summary>One explicit approval applies the same coordinates to selected, same-sized colour photographs.</summary>
+    /// <summary>
+    /// One explicit approval applies the reference mask unchanged to selected, same-sized colour photographs the admin
+    /// confirmed as the same placement; they all share one mask file.
+    /// </summary>
     public async Task<SurfaceDetail> ApproveColors(string productId, string variantId, SurfaceApprovalRequest request)
     {
         if (!request.SamePlacementConfirmed || request.Colors is not { Length: > 0 and <= 100 } ||
@@ -316,6 +220,7 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
                 return current with { Products = [.. current.Products.Select(p => p.Id == productId ? p with { Variants = variants } : p)] };
             });
             state.Drafts.Remove(draft);
+            File.Delete(DraftPath(draft.MaskFile));
             await Write(state);
             return DetailOf(state, product, updated!, source);
         });
@@ -399,16 +304,4 @@ public sealed class ProductSurfaceWorkspace(LocalCommerceStore commerce, Xinobi.
         if (path is null || !File.Exists(path)) throw new SurfaceException("image_unreadable", "Ürün fotoğrafı bulunamadı.", StatusCodes.Status404NotFound);
         return File.ReadAllBytes(path);
     }
-
-    private static string ProviderMessage(string code) => code switch
-    {
-        "provider_authentication_failed" => "Roboflow anahtarı reddedildi. Anahtarı kontrol et.",
-        "provider_rate_limited" => "Roboflow şu anda çok fazla istek alıyor. Biraz sonra tekrar dene.",
-        "provider_timeout" => "Roboflow zamanında yanıt vermedi. Tekrar deneyebilirsin.",
-        "provider_request_rejected" => "Roboflow isteği reddetti. Tarifi veya noktaları değiştir.",
-        "provider_no_mask" => "Roboflow bu tarif veya işaretlerle bir bölge bulamadı. Kısa bir bölge adı (ör. lower kettle body) kullan ya da Fırça ile bölgenin içini boyayıp elle gösterme düğmesini kullan. Önceki taslağın korundu.",
-        "provider_invalid_mask" => "Roboflow maske döndürdü ancak maske fotoğraf boyutu veya piksel doğrulamasından geçmedi (provider_invalid_mask). Bu teknik bir yanıt sorunu; otomatik tekrar yapılmadı, önceki taslak korundu.",
-        "provider_invalid_response" => "Roboflow yanıtı beklenen maske biçiminde okunamadı (provider_invalid_response). Bu teknik bir yanıt sorunu; otomatik tekrar yapılmadı, önceki taslak korundu.",
-        _ => "Roboflow'a ulaşılamadı. Biraz sonra tekrar dene ya da maskeyi elle çiz.",
-    };
 }

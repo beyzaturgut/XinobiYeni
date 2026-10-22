@@ -14,7 +14,7 @@ import detailStyles from '../../urunler/cay-makinesi-101/product.module.css';
 import type { Product } from '../../../../../../packages/commerce/client';
 
 function isPersonalizable(product: Product) {
-  return product.active && (product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve')));
+  return product.active && product.personalizable === true;
 }
 
 function ColorSelection() {
@@ -61,7 +61,7 @@ function ColorSelection() {
           setNavigating(true);
           sessionStorage.removeItem(sessionKey(product.id, selected!.id));
         }} href={`/xinobi-u/sorular?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(selected!.id)}`}>Sorulara başla →</Link> : readiness === 'error' && selected ? <button className={studioStyles.secondary} onClick={() => setReadinessRetry(value => value + 1)}>Tekrar dene</button> : <button className={studioStyles.primary} disabled>{selected ? readiness === 'loading' ? 'Kontrol ediliyor…' : 'Bu renk için kişiselleştirme kullanılamıyor' : 'Önce rengini seç'}</button>}
-        {canContinue && <div className={studioStyles.entryActions}><Link className={studioStyles.secondary} href={`/xinobi-u/kendi-gorselin?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(selected!.id)}`}>Kendi görselinizi ekleyin</Link><p>Dilediğiniz fotoğrafı veya görseli yükleyerek ürününüzü kişiselleştirin.</p></div>}
+        {canContinue && <div className={studioStyles.entryActions}><Link className={studioStyles.secondary} href={`/xinobi-u/kendi-gorselin?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(selected!.id)}`}>Kendi görselinizi ekleyin</Link><p>Dilediğiniz fotoğrafı veya görseli yükleyerek ürününüzü kişiselleştirin.</p><Link className={studioStyles.secondary} href={`/xinobi-u/kendi-gorselin?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(selected!.id)}&mode=pattern`}>Kendi deseninizi yükleyin</Link><p>Deseninizi ürünün onaylı kişiselleştirme alanının tamamına uygulayın.</p></div>}
         </div>
       </section>
     </div>

@@ -34,7 +34,7 @@ export default function SavedDesignPreview(){
   return <><header className={styles.main}><section className={styles.intro}><p className={styles.kicker}>Tasarımlarım</p><h1>{design.name}</h1><p>{design.productName}</p></section>
     {product&&product.variants.length>1&&<label>Renk <select value={chosen} onChange={event=>setVariant(event.target.value)}>{product.variants.map(item=><option key={item.id} value={item.id}>{item.color}</option>)}</select></label>}
     <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p>{product?.active&&<AddDesign product={product} variantId={chosen} design={design} placement={placement} onNotice={setNotice}/>}<p role="status">{notice}</p><Link href="/hesap/tasarimlarim">← Tasarımlarıma dön</Link></header>
-    {chosen&&<AcceptedSurfaceEditor key={design.id+':'+chosen} commerceProduct={design.productId} commerceVariant={chosen} patternSrc={src} placementMode={design.kind==='upload'?'artwork':'pattern'} initialPlacement={readDesignPlacement(design.id,design.productId,chosen)} onPlacementChange={updatePlacement}/>}</>;
+    {chosen&&<AcceptedSurfaceEditor key={design.id+':'+chosen} commerceProduct={design.productId} commerceVariant={chosen} patternSrc={src} placementMode={placement?.mode??(design.kind==='upload'?'artwork':'pattern')} initialPlacement={readDesignPlacement(design.id,design.productId,chosen)} onPlacementChange={updatePlacement}/>}</>;
 }
 
 type StoreProduct=NonNullable<ReturnType<typeof useCommerce>['state']>['products'][number];

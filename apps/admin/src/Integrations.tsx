@@ -1,8 +1,8 @@
 import {useState} from 'react'
 import type {Product} from './catalog-data'
-import {providers,type Mapping,type Provider} from './integration-model'
+import {providers,type Provider} from './integration-model'
 
-export default function Integrations({products}:{products:Product[];mappings:Mapping[];onMapping:(mapping:Mapping)=>void}){
+export default function Integrations({products}:{products:Product[]}){
   const [provider,setProvider]=useState<Provider>('Mikro'),[tab,setTab]=useState('Eşlemeler')
   return <section aria-label="Entegrasyon izleme">
     <p className="panel-notice">Sağlayıcı durumunu ve kayıtlarını okuyacak yönetim API'si bağlı değil. Bağlantı, teslim veya senkronizasyon başarısı doğrulanmadı; dış sisteme işlem gönderilmez.</p>

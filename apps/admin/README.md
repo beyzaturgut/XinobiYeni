@@ -1,32 +1,30 @@
 # Xinobi yönetim paneli
 
-Ürün, görsel, fiyat, web stoğu ve içerik bölümleri local ortak API’ye bağlıdır. `pnpm dev:local` üç servisi birlikte açar. Kaydedilen değişiklikler web’de iki saniye içinde görünür; sayfa veya servis yenilemesinde korunur. Stok ekranındaki “Web stokları” kaydedilir; depo/rezervasyon örnekleri ve diğer operasyon modülleri demo kapsamındadır. Bannerlar için “Kaydet ve web’i güncelle”, ürün için Kaydet, fiyat ve stok için ilgili kayıt düğmesini kullanın. Local API’nin ayrıntıları kök README’dedir.
+React, TypeScript ve Vite uygulaması. Güncel ortam koşulları ve alışveriş sınırları için [kök README](../../README.md) esas alınmalıdır. Kodun veya bir ekranın bulunması ilgili servisin yayında açık olduğunu kanıtlamaz.
 
-React/Vite/TypeScript yerel prototipi. Siyah yatay kabuk, dar ikon şeridi ve beyaz çalışma alanı.
+## Çalıştırma ve erişim
 
-- Dashboard: 13 kart, dokuz dönem seçimi, örnek/boş/hata durumları; klavyeyle kart sıralama ve demo alanına ait tarayıcı düzeni.
-- Katalog: ürün/SKU arama, durum/kategori filtreleri, demo ürün oluşturma, genel bilgi/varyant/medya/SEO düzenleme ve oturum taslağı. Yenilemede demo verisi sıfırlanır.
-- Siparişler: örnek liste, arama/durum filtresi, erişilebilir native detay dialog'u.
-- İçerik: önceki slider/video ve XINOBI U editörü korunur; değişiklikler oturum önizlemesidir.
-- Gerçek kimlik/rol, ticari API, kalıcı içerik kaydı ve canlı yayın bağlı değildir. Prototipler gerçek yetkilendirme yerine geçmez.
+`pnpm dev:local` API, web ve admin'i birlikte açar; admin varsayılan portu 5173'tür. Yalnız panel için `pnpm --filter admin dev` kullanılabilir; API bağlantısı ayrıca gerekir. Kontroller: `pnpm --filter admin lint`, `pnpm --filter admin build`.
 
-Çalıştırma: `pnpm --filter admin dev`. Kontroller: `pnpm --filter admin lint`, `pnpm --filter admin build`.
-Tarayıcı kontrolü: dist'i 4190 portunda sunup repo kökünde `node tools/test-admin-panel.mjs` çalıştırın.
+Panel gerçek admin oturumunu ve API'nin döndürdüğü izinleri kullanır. Menü ve yazma kontrollerine ek olarak API uçlarında yetkilendirme uygulanır. Yönetici daveti, e-posta MFA, SQL MFA deposu, parola kurtarma ve denetim kodu mevcuttur; sunucu ayarları, SQL şeması ve gerçek e-posta gönderimi yapılandırılmalıdır. Development erişim istisnaları sunucu yetkilendirmesinin yerine geçmez.
 
-Gerçek kullanıcı entegrasyonunda demo localStorage anahtarı kimlik/tenant ve şema sürümüyle değiştirilmeli; demo kaydı gerçek kullanıcı düzenine taşınmamalıdır.
+Development dışındaki katalog düzenleme ve ürün yüzeyi uçları için `AdminCatalog:Enabled=true`, `Catalog:StorageProvider=SqlServer`, `Accounts:StorageProvider=SqlServer` ve `ConnectionStrings:Xinobi` gerekir. Diğer özelliklerin SQL ve dosya depolama koşulları kök README'deki ortam tablosundadır.
 
-Katalog tarayıcı kontrolü: `node tools/test-admin-catalog.mjs` (dist, port 4190).
+## Modüller ve sınırları
 
-Stok/depo: fiziksel, rezerve, satılabilir örnek bakiyeler; hareket geçmişi, katalog mutabakatı ve kayıt oluşturmayan sayım önizlemesi. Test: `node tools/test-admin-inventory.mjs`.
+- Katalog, varyant, medya, fiyat, web stoğu ve içerik ortak API üzerinden kaydedilir. Ürün aktifliği mağaza görünürlüğünü belirler. Dosya yüklemek ürün/içerik kaydını tek başına tamamlamaz.
+- Operasyon özeti, müşteri ve sipariş ekranları yönetim API'lerini okur. Sipariş durumları, kargo kaydı ve iptal/iade taleplerinin yönetimi mevcuttur. Gerçek ödeme, para iadesi, taşıyıcı entegrasyonu ve atomik stok rezervasyonu tamamlanmış kabul edilmez.
+- Stok ekranındaki web stokları kaydedilebilir. Depo/rezervasyon ve sayım önizlemeleri gerçek depo kaynağına bağlı değildir.
+- Fiyat/kampanya bölümünde varyant fiyat kaydı ve oturumluk kampanya taslağı/hesaplama bulunur. Gerçek kupon tüketimi ve ödeme entegrasyonu yoktur. Hesaplama testi: `node tools/test-pricing-model.mjs`.
+- Ürün yüzeyleri kaynak fotoğraf, maske prompt'u, WebP maske yükleme, önizleme ve onay akışını kullanır. Bu işlem fiziksel üretim veya baskı onayı değildir. Ayrıntılar: `docs/runbooks/webp-surface-mask-upload.md`.
+- Kurumsal teklifler API üzerinden gelen talepleri, mesajları ve teklif kararlarını yönetir. Kabulün toplu siparişe dönüşümü tamamlanmış kabul edilmez.
+- Tasarım/baskı ekranındaki prototip inceleme, gerçek üretim dosyası ve üretime onay akışının yerine geçmez; bağlı veri ve uçların durumu ekrandaki açıklamalardan kontrol edilmelidir.
+- Entegrasyon ekranları Mikro/Trendyol/Hepsiburada/N11 için bağlı veri kaynağı olmadığını gösterir. Gerçek sağlayıcı bağlantısı, senkronizasyon veya retry başarısı iddia edilmez.
+- AI yönetimi Nobi politikası, bilgi kaynakları, konuşmalar, iletişim talepleri ve Nobi/XINOBI U kullanım raporlarını API üzerinden yönetir. Sağlayıcı bağlantısı ve özellik deposu ayrıca yapılandırılır.
+- Rol izinleri oturumdan salt okunur gösterilir. Genel rol ve sistem ayarı düzenleme API'leri bağlı değildir; sistem ayarları kaydedilemeyen sabit önizlemedir. Yönetici daveti ve denetim geçmişi kendi API'lerini kullanır.
 
-Fiyat/kampanya: varyant örnek fiyatları, koşullu kampanya taslakları ve tek kampanyalı TRY önizlemesi. Testler: `node tools/test-pricing-model.mjs`, `node tools/test-admin-pricing.mjs`. Gerçek fiyat yayını ve kupon tüketimi kapalıdır.
+## Tarayıcı kontrolleri
 
-Kurumsal teklifler: web ve mobil formdan gelen gerçek talepler (`/api/v1/local-commerce/quotes`); inceleme, mesaj, birim fiyatlı teklif ve kapatma. Firma kod ve e-postayla takip edip kabul veya ret verir. Kabul edilen teklifin toplu siparişe dönüşümü D07 kararını bekliyor. Önceki örnek model ve araçları (TST-082) kaldırıldı.
+Güncel regresyon araçları `apps/admin/tests` altındadır; her dosyanın başındaki sunucu/port koşulları okunmalıdır. `admin-data-honesty.mjs`, varsayılan 5174 portunda sentetik API yanıtlarıyla ayar/entegrasyon ekranlarını, stok kaydını ve farklı ekran genişliklerini kontrol eder. API çağrılarını karşılayan bir test gerçek SQL veya sağlayıcı entegrasyonunu doğrulamaz.
 
-Tasarım/baskı: sürüm ve sipariş bağı, kalite bulguları, yüz bazlı örnek çıktı durumları ve inceleme notları. Test: `node tools/test-admin-print.mjs`. Üretim, onay ve gerçek dosya indirme kapalı.
-
-Entegrasyonlar: Mikro/Trendyol/Hepsiburada/N11 örnek eşleme, hata ve uzlaştırma izleme. Test: `node tools/test-integration-model.mjs`, `node tools/test-admin-integrations.mjs`. Sağlayıcı bağlantısı, veri yazımı ve gerçek retry kapalıdır.
-
-AI yönetimi: Nobi'nin sürümlü politikası (yönerge, karşılama, hızlı yanıtlar, model, günlük AI sınırı, WhatsApp numarası, birim maliyet), onay akışlı bilgi kaynakları, konuşmalar (maskeli), iletişim talepleri ve Nobi + XINOBI U kullanım/tahmini maliyet raporu (`/api/v1/local-commerce/assistant/*`). Önceki örnek model ve araçları (TST-085) kaldırıldı.
-
-Rol/ayar/denetim: sabit demo yönetici ve düzenlenebilir operasyon rolü, ayar sürümü ve güvenli önce/sonra oturum kayıtları. Test: `node tools/test-settings-model.mjs`, `node tools/test-admin-settings.mjs`. Gerçek kimlik/API yetkisi, kullanıcı daveti, kalıcı append-only audit ve bildirim gönderimi bağlı değildir.
+Kök `.github/workflows/ci.yml` panel lint ve build işlemlerini çalıştırır; tarayıcı uçtan uca test adımı içermez. `tools/` altındaki eski prototip testleri topluca güncel kabul testi sayılmamalıdır.

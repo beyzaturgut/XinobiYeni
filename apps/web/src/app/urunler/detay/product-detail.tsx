@@ -44,7 +44,7 @@ export default function ProductDetail() {
     <fieldset className={styles.variants}><legend>Renk: {variant.color}</legend><div>{product.variants.map(item => <button type="button" key={item.id} aria-label={`${item.color} rengini seç`} className={variant.id === item.id ? styles.selectedVariant : ''} onClick={() => { setSelectedId(item.id); setActiveImage(item.image); }} aria-pressed={variant.id === item.id}><span style={{background: item.hex && /^#[a-fA-F0-9]{6}$/.test(item.hex) ? item.hex : undefined}} aria-hidden="true"/><small>{item.color}</small></button>)}</div></fieldset>
     <AddToCart productId={product.id} variantId={variant.id} stock={variant.stock} price={state.prices[variant.id]}/>
     <div className={reviewStyles.compareRow}><CompareToggle productId={product.id} name={product.name}/><Link href="/karsilastir">Karşılaştırmayı aç →</Link></div>
-    {(product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve'))) && <div className={styles.actions}><Link href={`/xinobi-u/sorular?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(variant.id)}`}>XINOBI U ile kişiselleştir <span aria-hidden="true">→</span></Link></div>}
+    {product.personalizable === true && <div className={styles.actions}><Link href={`/xinobi-u/sorular?product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(variant.id)}`}>XINOBI U ile kişiselleştir <span aria-hidden="true">→</span></Link></div>}
     {/* After the purchase controls, so name, price, colours and buttons fit on one screen (description can be long). */}
     {product.description && <p className={`${styles.lead} ${styles.detailDescription}`}>{product.description}</p>}
     </div>

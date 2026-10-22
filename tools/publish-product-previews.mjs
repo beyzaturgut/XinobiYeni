@@ -1,6 +1,7 @@
 import {readFile,writeFile,mkdir,copyFile,rm} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import path from 'node:path';
+import {createRequire} from 'node:module';
 
 // Publish only the existing reviewed visual prototypes; this does not approve physical printing or edit SQL.
 export async function publishProductPreviews(root,publicDir,state){
@@ -33,8 +34,19 @@ export async function publishProductPreviews(root,publicDir,state){
    ['mask',path.join(versionDir,'mask.png'),variant.files['mask.png'].sha256],
    ['branding',path.join(versionDir,'branding.png'),variant.files['branding.png'].sha256]
   ]){
-   await checked(file,hash);
+   const bytes=await checked(file,hash);
    const name=role==='source'?'source.webp':role+'.png';
+   if(role==='source'&&acceptance.workingCopy===true){
+    // The mask was accepted on a bounded working copy of a very large photo; publish that same derivation
+    // (catalog-registry.cjs: fill resize, WebP q92) so the source, mask and branding share one pixel grid.
+    const sharp=await loadSharp(root),info=await sharp(bytes,{limitInputPixels:false}).metadata();
+    if(info.width!==acceptance.originalWidth||info.height!==acceptance.originalHeight)throw Error('Preview source original dimensions mismatch');
+    const working=await sharp(bytes,{limitInputPixels:false,sequentialRead:true}).resize(variant.width,variant.height,{fit:'fill'}).webp({quality:92,effort:4}).toBuffer();
+    const workingHash=createHash('sha256').update(working).digest('hex');
+    await writeFile(path.join(mediaTarget,name),working);
+    media[role]={url:`${base}/${variant.version}/${name}?v=${workingHash}`,sha256:workingHash};
+    continue;
+   }
    await copyFile(file,path.join(mediaTarget,name));
    media[role]={url:`${base}/${variant.version}/${name}?v=${hash}`,sha256:hash};
   }
@@ -45,4 +57,11 @@ export async function publishProductPreviews(root,publicDir,state){
   published.push(variant.variantId);
  }
  return published;
+}
+
+let sharpModule;
+async function loadSharp(root){
+ // The repository has no root sharp dependency; the web app's Next.js install provides it.
+ if(!sharpModule){const web=createRequire(path.join(root,'apps/web/package.json'));sharpModule=createRequire(web.resolve('next/package.json'))('sharp');}
+ return sharpModule;
 }

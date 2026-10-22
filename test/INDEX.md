@@ -205,3 +205,19 @@
 - 16.10.2026 · [TST-124 Roboflow boş sonuç ayrımı](2026-10-16/TST-124-roboflow-empty-result-diagnostics.md) — Boş eşleşme/bozuk maske/bozuk şema ayrı mesajlar, kısa tarif açıklaması; 59/59 sahte sağlayıcı testi ve admin build/lint geçti. Geçmiş gerçek hatanın nedeni kesinleşmedi, yeni inference yok.
 
 - 16.10.2026 · [TST-125 boyama dışına taşmayı sınırlama](2026-10-16/TST-125-guided-mask-containment.md) — AI sonucu kılavuz ve 0–16 piksel açık toleransla sınırlı; boş örtüşmede taslak korunur. 62/62 ve izole admin tarayıcı testi geçti, gerçek inference yok.
+
+- 16.10.2026 · [TST-126 yerel eğri/PNG denemesi](2026-10-16/TST-126-local-curve-png-trial.md) — Push yok; geri dönüş adac37a. Eğri/delik, editable kayıt ve alpha/siyah-beyaz import; .NET 429/23 atlandı/0, son odaklı 13/13, iki admin browser akışı başarılı.
+
+- 16.10.2026 · [TST-127 maske kaynak indirme](2026-10-16/TST-127-exact-mask-source-download.md) — 2000 px yükleme ölçeği doğrulandı; aktif kaynak fotoğraf byte eşitliği/SHA ile indiriliyor. Admin build/lint ve izole browser geçti; local/push yok.
+
+- 16.10.2026 · [TST-128 kaynak tabanlı maskeleme promptu](2026-10-16/TST-128-source-bound-mask-prompt.md) — Dinamik boyut/renk/hash/koordinatlar ve alfa kuralları, hedef düzenleme/kopyalama, pano reddi ve 390px testi başarılı. Local/push yok; AI çağrısı yok.
+
+- 16.10.2026 · [TST-129 fotoğrafa özel logo promptu](2026-10-16/TST-129-photo-specific-logo-mask-prompt.md) — Gerçek logo konturu/etiket ayrımı, dikdörtgen yama önleme; admin build/lint ve browser testi geçti. Local/push yok.
+
+- 16.10.2026 · [TST-130 anonim onaylı maske önizlemesi](2026-10-16/TST-130-anonymous-approved-mask-preview.md) — 401 düzeltildi; 13/13, gerçek ürün previewAvailable=true ve PNG 200. Yerel/push yok.
+
+- 20.10.2026 · [TST-131 renk başına maske hizalama](2026-10-20/TST-131-per-colour-mask-alignment.md) — Ortak maske her renkte kaydırma/ölçek/dönüş ile oturtulur, hizalanan renk kendi PNG'sini alır. 14/14, admin build ve browser testleri geçti; tam .NET'te TST-130 kaynaklı 1 yetki testi başarısız. Local/push yok.
+- 20.10.2026 · [TST-132 web önizlemede ortak onaylı maske](2026-10-20/TST-132-web-shared-mask-preview.md) — Maske API'den doğrudan alınır; aynı maskeli renkler arasında yerleşim aktarımsız geçer
+- 20.10.2026 · [TST-133 admin maskelemede yalnız PNG](2026-10-20/TST-133-png-only-admin-masking.md) — Eğri/fırça/Roboflow/hizalama ve eski katalog incelemesi admin+API'den kaldırıldı
+- 20.10.2026 · [TST-134 XINOBI önizleme e2e kök nedeni](2026-10-20/TST-134-xinobi-preview-e2e-regression.md) — CM121 yayın paketi orijinal boyutta yayımlanıyordu; test kataloğu/proxy eksikti. 11 önizleme testi geçiyor
+- 20.10.2026 · [TST-135 canlıda ürün yüzey maskelemesi](2026-10-20/TST-135-production-surface-masking.md) — Admin maskeleme ve onaylı maske önizlemesi SQL admin kataloğuyla canlıda; .NET 434/25/0, önizleme e2e 34/34

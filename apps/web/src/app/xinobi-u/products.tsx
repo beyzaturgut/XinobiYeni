@@ -12,7 +12,8 @@ import type { Product } from '../../../../../packages/commerce/client';
 type PersonalizableCard = CatalogProductCardData & { href: string };
 
 function isPersonalizable(product: Product) {
-  return product.active && (product.personalizable ?? (product.category.includes('Çay') || product.category.includes('Kahve')));
+  // Only products the admin marked "XINOBI U ile kişiselleştirilebilir"; no category fallback.
+  return product.active && product.personalizable === true;
 }
 
 function toCard(product: Product): PersonalizableCard {

@@ -61,6 +61,8 @@ Kaynak: Faz00 §5.1 denetimi ve [TST-115](../test/2026-10-14/TST-115-head-regres
 
 **16.10 güncellemesi (kod/commit incelemesi):** Web favorileri hesap API’siyle kalıcı hale geldi (`fc715ec`, `754db13`); mobil favorilerin aynı API ile eşitlenmesi bu kayıtta doğrulanmadı. Hesabım değerlendirmeleri, adres silme onayı, sipariş hata/aksiyonları ve bildirim okundu durumunun saklanması eklendi (`8f3adc4`, `2550209`, `b210122`, `1f02e1f`). Kayıt e-posta doğrulaması ve parola sıfırlama ekran geçişi düzeltildi (`fd52a16`, `5f704cf`). Ödeme, sunucu sepeti ve stok rezervasyonu açık. Ayrıntılı kayıt: [faz denetimi](../docs/tasks/phase-audit-2026-10-16.md). Yeni uygulama test koşusu yapılmadı; önceki testler tarihsel kanıttır.
 
+**20.10 güncellemesi:** Panel siparişlerinde yükleme hatası ve güvenli tekrar (`fd0097f`), bildirim tekrarlarında koruma (`6c53359`), maskeli müşteri dizini (`b4d37ca`), SQL sipariş/müşteri sayıları (`65c0722`). Ödeme, sunucu sepeti, rezervasyon, kargo ve yasal onay eksikleri değişmedi (D03/D05/D11). Oran değişmedi. [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md)
+
 | İş | Durum | Kanıt / eksik |
 |---|---|---|
 | Üyelik, profil, adres (en çok 10), hesap silme | Tamam | `/api/v1/me/*`, web+mobil (TST-098/099, `1354a08`) |

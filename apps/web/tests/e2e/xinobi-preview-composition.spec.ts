@@ -6,10 +6,11 @@ for (const width of [390, 1440]) test(`pattern survives single artwork overlay a
   // Upload, full-resolution pixel checks and two accepted-surface renders.
   test.setTimeout(120000);
   let media: {mask:{url:string};branding?:{url:string}} | undefined;
+  // The e2e build renders the packaged reviewed bundle for this variant, as live builds do.
   page.on('response', async response => {
-    if(response.url().includes('/catalog-surfaces/') && response.url().includes('/rendering-inputs') && response.status()===200) {
+    if(response.url().includes('/assets/product-previews/') && response.url().includes('/inputs.json') && response.status()===200) {
       const value=await response.json();
-      if(value.previewAvailable && value.variantReference==='DEMO-V-5a46bb98-c95c-42b9-9f12-e4286f628cca') media=value.inputs;
+      if(value.inputs && value.variantReference==='DEMO-V-5a46bb98-c95c-42b9-9f12-e4286f628cca') media=value.inputs;
     }
   });
   await page.setViewportSize({ width, height: 900 });
@@ -95,11 +96,12 @@ for (const width of [390, 1440]) test(`pattern survives single artwork overlay a
 });
 
 test('accepted colour selection preserves original identity and loads exact surface URLs', async ({ page }) => {
-  const inputs: {productReference:string;variantReference:string;previewAvailable:boolean;inputs?:{source:{url:string};mask:{url:string};branding?:{url:string}}}[]=[];
+  // The e2e build reads the packaged reviewed bundles (/assets/product-previews/{product}/{variant}/inputs.json), as live builds do.
+  const inputs: {productReference:string;variantReference:string;inputs?:{source:{url:string};mask:{url:string};branding?:{url:string}|null}}[]=[];
   const requestedMedia: string[]=[];
-  page.on('request',request=>{if(request.url().includes('/catalog-surfaces/media/'))requestedMedia.push(request.url());});
+  page.on('request',request=>{if(request.url().includes('/assets/product-previews/')&&!request.url().includes('/inputs.json'))requestedMedia.push(request.url());});
   page.on('response', async response => {
-    if(response.url().includes('/catalog-surfaces/') && response.url().includes('/rendering-inputs') && response.status()===200) inputs.push(await response.json());
+    if(response.url().includes('/assets/product-previews/') && response.url().includes('/inputs.json') && response.status()===200) inputs.push(await response.json());
   });
   await page.goto('/xinobi-u/mobil-onizleme/');
   const selector=page.getByRole('region',{name:'Önizleme rengi'});
@@ -116,13 +118,13 @@ test('accepted colour selection preserves original identity and loads exact surf
   await expect(selector).toHaveAttribute("data-active-variant",selected!);
   await page.reload();
   await expect(page.getByRole("region",{name:"Önizleme rengi"})).toHaveAttribute("data-active-variant",selected!);
-  const bundle=inputs.findLast(value=>value.variantReference===selected && value.previewAvailable);
+  const bundle=inputs.findLast(value=>value.variantReference===selected && value.inputs);
   expect(bundle).toBeTruthy();
   for(const media of [bundle!.inputs!.source,bundle!.inputs!.mask,bundle!.inputs!.branding]) if(media) {
     expect(media.url).toContain(`/${bundle!.productReference}/${selected}/`);
     expect(requestedMedia.some(url=>url.endsWith(media.url))).toBe(true);
   }
-  const originalBundle=inputs.find(value=>value.variantReference===original && value.previewAvailable);
+  const originalBundle=inputs.find(value=>value.variantReference===original && value.inputs);
   expect(bundle!.inputs!.mask.url).not.toBe(originalBundle!.inputs!.mask.url);
   await expect(page.locator('#pattern-controls-title')).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

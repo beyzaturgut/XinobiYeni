@@ -1,6 +1,10 @@
 /* Ürün yüzeyleri: variant list beside the masking editor (black-and-white panel palette). */
 .surface-masks{display:grid;grid-template-columns:300px minmax(0,1fr);gap:20px;align-items:start}
-.surface-list{display:grid;gap:12px;max-height:calc(100vh - 220px);overflow:auto;padding-right:4px}
+.surface-side{display:grid;gap:12px;min-width:0}
+.surface-list{display:grid;gap:12px;max-height:55vh;overflow:auto;padding-right:4px}
+.surface-side-tools{display:grid;gap:10px;min-width:0}.surface-side-tools:empty{display:none}
+.surface-source-download{min-height:42px;padding:0 14px;border:1px solid #111;border-radius:8px;background:#111;color:#fff;font:inherit;font-size:14px;font-weight:600;cursor:pointer}.surface-source-download:disabled{opacity:.45;cursor:not-allowed}
+.surface-side-tools .mask-prompt{padding:12px}
 .surface-intro{margin:0;font-size:13px;line-height:1.5;color:#555}
 .surface-list label{display:grid;gap:6px;font-size:12px}.surface-list input{min-height:40px;padding:0 10px;border:1px solid #bbb;border-radius:4px}
 .surface-filters{display:flex;flex-wrap:wrap;gap:6px}.surface-filters button{min-height:32px;padding:0 10px;border:1px solid #ccc;border-radius:999px;background:#fff;font-size:12px;cursor:pointer}.surface-filters button[aria-pressed=true]{background:#111;color:#fff;border-color:#111}
@@ -17,28 +21,25 @@
 .surface-stage{position:relative;justify-self:center;max-width:100%;touch-action:none;user-select:none;background:#f6f6f6;border-radius:8px;overflow:hidden}
 .surface-stage img{display:block;max-width:100%;max-height:calc(100vh - 260px);width:auto;height:auto}
 .surface-stage canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.surface-stage.tool-points,.surface-stage.tool-brush{cursor:crosshair}
-.surface-stage .point{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:15px;color:#fff;box-shadow:0 0 0 2px #fff}
-.point.keep{background:#1d7a45}.point.exclude{background:#b3261e}
 .surface-busy{position:absolute;inset:0;display:grid;place-items:center;background:rgba(255,255,255,.6);font-weight:600}
 .surface-tools{display:grid;gap:12px}
-.surface-tabs{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #ccc;border-radius:6px;overflow:hidden}.surface-tabs button{min-height:40px;border:0;background:#fff;cursor:pointer;font-size:13px}.surface-tabs button[aria-selected=true]{background:#111;color:#fff}
-.surface-panel{display:grid;gap:10px;padding:14px;border:1px solid #e3e3e3;border-radius:8px}
+.surface-panel{display:grid;gap:10px;padding:14px;border:1px solid #e3e3e3;border-radius:8px;background:#fff;min-width:0}
 .surface-panel label{display:grid;gap:6px;font-size:12px}.surface-panel input[type=text],.surface-panel input:not([type]){min-height:40px;padding:0 10px;border:1px solid #bbb;border-radius:4px}
 .surface-hint{margin:0;font-size:12px;line-height:1.5;color:#666}
-.surface-toggle{display:inline-flex;border:1px solid #ccc;border-radius:6px;overflow:hidden}.surface-toggle button{min-height:34px;padding:0 12px;border:0;background:#fff;cursor:pointer;font-size:12px}.surface-toggle button[aria-pressed=true]{background:#111;color:#fff}
-.surface-row-actions,.surface-decisions{display:flex;flex-wrap:wrap;gap:8px}
-.surface-tools button.primary,.surface-decisions .approve{min-height:42px;padding:0 16px;border:1px solid #111;border-radius:4px;background:#111;color:#fff;cursor:pointer;font-weight:600}
-.surface-row-actions button:not(.primary),.surface-decisions button:not(.approve){min-height:42px;padding:0 14px;border:1px solid #bbb;border-radius:4px;background:#fff;cursor:pointer}
+.surface-toggle{display:inline-flex;border:1px solid #ccc;border-radius:6px;overflow:hidden}.surface-toggle button{min-height:34px;padding:0 12px;border:0;background:#fff;cursor:pointer;font-size:12px}.surface-toggle button[aria-pressed=true]{background:#111;color:#fff}.surface-decisions{display:flex;flex-wrap:wrap;gap:8px}
+.surface-tools button.primary,.surface-decisions .approve{min-height:42px;padding:0 16px;border:1px solid #111;border-radius:4px;background:#111;color:#fff;cursor:pointer;font-weight:600}.surface-decisions button:not(.approve){min-height:42px;padding:0 14px;border:1px solid #bbb;border-radius:4px;background:#fff;cursor:pointer}
 .surface-decisions .danger{color:#a32121;border-color:#e6baba}
 .surface-tools button:disabled{opacity:.45;cursor:not-allowed}
 .surface-facts{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;margin:0;font-size:12px}.surface-facts dt{color:#666}.surface-facts dd{margin:0}
 .surface-error{margin:0;padding:10px;border-radius:4px;background:#fff0f0;color:#8b2424;font-size:13px}.surface-ok{margin:0;padding:10px;border-radius:4px;background:#eef6f0;color:#1d5c37;font-size:13px}
-.surface-warning{margin:0;padding:10px 12px;border-radius:4px;background:#fff4d6;color:#6b5000;font-size:13px}
-@media(max-width:1100px){.surface-workspace{grid-template-columns:1fr}.surface-masks{grid-template-columns:1fr}.surface-list{max-height:none}}
+.surface-warning{margin:0;padding:10px 12px;border-radius:4px;background:#fff4d6;color:#6b5000;font-size:13px}@media(max-width:1100px){.surface-workspace{grid-template-columns:1fr}.surface-masks{grid-template-columns:1fr}.surface-list{max-height:none}}
 
 .surface-masks .surface-panel label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px;line-height:1.5}
 .surface-masks .surface-panel input[type=checkbox]{width:18px;height:18px;min-height:18px;flex:0 0 18px}
 .surface-tools button.approve{min-height:42px;padding:0 16px;border:1px solid #111;border-radius:4px;background:#111;color:#fff;cursor:pointer;font-weight:600}
 
 .surface-masks{overflow-wrap:anywhere}
+.surface-mask-download{font-size:13px;color:#145d91}
+
+.mask-prompt h3{margin:0;font-size:15px}
+.mask-prompt>label textarea{display:block;box-sizing:border-box;width:100%;min-width:0;resize:vertical;padding:10px;border:1px solid #bbb;border-radius:4px;background:#fff;color:#222;font:inherit;line-height:1.5}

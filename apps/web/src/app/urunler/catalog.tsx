@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useFavorites } from "../../lib/favorites";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import CompareToggle from "../../components/compare-toggle";
 import styles from "./catalog.module.css";
@@ -19,21 +19,15 @@ export default function Catalog() {
   const { state, error } = useCommerce();
   const products: Product[] = useMemo(() => state ? state.products.filter(product => product.active).map((product, order) => ({ id: product.id, name: product.name, category: categoryLabel(product.category), family: product.category, color: product.variants.map(variant=>variant.color).join(', '), swatch: product.variants[0]?.hex || '#777777', image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), order, colorCount: product.variants.length, price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum,variant)=>sum+variant.stock,0), href: `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : [], [state]);
   const categories = state ? ["Tümü", ...new Set((state.categories ?? state.products.map(product => product.category)).map(categoryLabel))] : fallbackCategories;
-  const [category, setCategory] = useState<Category>("Tümü");
+  const params=useSearchParams();
+  const category=categoryLabel(params.get("category")||"Tümü");
+  function setCategory(value:string){const next=new URLSearchParams(params.toString());if(value==="Tümü")next.delete("category");else next.set("category",value);router.push("/urunler"+(next.size?"?"+next.toString():""),{scroll:false})}
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
   const router = useRouter();
   const productIds = useMemo(() => products.map(product => product.id), [products]);
   const favorites = useFavorites(productIds);
   const [favoriteError, setFavoriteError] = useState<string>();
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      const selectedCategory = new URLSearchParams(window.location.search).get("category");
-      if (selectedCategory) setCategory(categoryLabel(selectedCategory));
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   async function toggleFavorite(id: string) {
     setFavoriteError(undefined);
@@ -45,11 +39,11 @@ export default function Catalog() {
   }
 
   const activeCategory = categories.includes(category) ? category : 'Tümü';
-  const visibleProducts = useMemo(() => {
+  const visibleProducts = (() => {
     const normalizedQuery = query.trim().toLocaleLowerCase("tr-TR");
     const filtered = products.filter((product) => (activeCategory === "Tümü" || product.category === activeCategory) && (!normalizedQuery || `${product.name} ${product.family} ${product.color}`.toLocaleLowerCase("tr-TR").includes(normalizedQuery)));
     return [...filtered].sort((a, b) => sort === "name" ? a.name.localeCompare(b.name, "tr") || a.color.localeCompare(b.color, "tr") : a.order - b.order);
-  }, [activeCategory, query, sort, products]);
+  })();
 
   return <section id="catalog" className={styles.catalog} aria-label="Ürün kataloğu">
     {(error || favorites.error || favoriteError) && <p role="alert">{error || favorites.error || favoriteError}</p>}

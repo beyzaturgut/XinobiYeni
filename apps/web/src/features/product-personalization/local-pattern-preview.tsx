@@ -7,7 +7,7 @@ import SaveDesignButton from '../../components/save-design-button';
 import styles from '../../app/xinobi-u/studio.module.css';
 import type {DesignPlacement} from '../../lib/design-placement';
 import type {PlacementTransferHandle} from './preview-placement-transfer';
-export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPreview=false,placementRef,product,variant,uploadMode="artwork"}:{inputs:RenderingInputs;initialPatternSrc?:string;xinobiPreview?:boolean;placementRef?:Ref<PlacementTransferHandle>;product?:string;variant?:string;uploadMode?:"pattern"|"artwork"}){
+export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPreview=false,placementRef,product,variant,uploadMode="artwork",onDirtyChange}:{inputs:RenderingInputs;initialPatternSrc?:string;xinobiPreview?:boolean;placementRef?:Ref<PlacementTransferHandle>;product?:string;variant?:string;uploadMode?:"pattern"|"artwork";onDirtyChange?:(dirty:boolean)=>void}){
  const [savedPlacement,setSavedPlacement]=useState<DesignPlacement>();
  const [file,setFile]=useState<File|null>(null);
  const [pattern,setPattern]=useState<string|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
@@ -23,11 +23,11 @@ export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPrev
    const prepared=await task;
    if(ticket!==generation.current)return;
    const next=URL.createObjectURL(prepared),previous=activeUrl.current;
-   activeUrl.current=next;setPattern(next);setFile(prepared);if(previous)URL.revokeObjectURL(previous);
+   activeUrl.current=next;setPattern(next);setFile(prepared);onDirtyChange?.(true);if(previous)URL.revokeObjectURL(previous);
   }catch(e){if(ticket===generation.current)setError(e instanceof Error?e.message:'Görsel doğrulanamadı.');}
   finally{if(ticket===generation.current)setBusy(false)}
  }
- function remove(){generation.current++;processing.current?.abort();if(activeUrl.current)URL.revokeObjectURL(activeUrl.current);activeUrl.current=null;setPattern(null);setFile(null);setError('');setBusy(false);}
+ function remove(){generation.current++;processing.current?.abort();if(activeUrl.current)URL.revokeObjectURL(activeUrl.current);activeUrl.current=null;setPattern(null);setFile(null);setError('');setBusy(false);onDirtyChange?.(false);}
  // Only AI/demo XINOBI previews compose artwork over the pattern. The standalone
  // own-image flow and shopping editor retain their single-artwork behaviour.
  const composeArtwork=xinobiPreview&&Boolean(initialPatternSrc);

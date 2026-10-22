@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { commerceApi, mediaUrl } from '../../../lib/commerce';
 import { browserId, designRequest, rememberSession, sessionKey, studioAsset, type DesignSession } from '../../../lib/design-studio';
+import PersonalizationMethods from '../../../components/personalization-methods';
 import SaveDesignButton from '../../../components/save-design-button';
 import { loadCachedAcceptedSurface } from '../../urunler/cay-makinesi-101/editor/accepted-surface-api';
 import styles from '../studio.module.css';
@@ -87,11 +88,11 @@ export default function Questionnaire() {
     finally { setBusy(false); }
   }
   if (!product) return <main className={styles.main}><p role="status">Önce güncel katalogdan bir ürün seçin.</p><Link href="/xinobi-u">Ürün seçimine dön</Link></main>;
-  if (!session) return <main className={styles.main}><p role="status">{error || 'Sana özel sorular hazırlanıyor…'}</p>{error && <><button className={styles.primary} onClick={restart}>Tekrar dene</button><Link href="/xinobi-u">Ürün seçimine dön</Link></>}</main>;
+  if (!session) return <main className={styles.main}><PersonalizationMethods product={product} variant={variant} mode="ai"/><p role="status">{error || 'Sana özel sorular hazırlanıyor…'}</p>{error && <><button className={styles.primary} onClick={restart}>Tekrar dene</button><Link href="/xinobi-u">Ürün seçimine dön</Link></>}</main>;
   const question = session.questions[step];
   const complete = session.questions.every(q => Boolean(answers[q.id]));
   const generating = status === 'queued' || status === 'running';
-  return <main className={styles.main}><div className={styles.questionLayout}><aside className={styles.selection}><div className={styles.selectionImage}><Image src={mediaUrl(session.variant.image, commerceApi)} alt={session.product.name} width={500} height={600} /></div><p className={styles.kicker}>Seçtiğin ürün</p><h2>{session.product.name}</h2><Link href="/xinobi-u">Başka ürün seç ↗</Link></aside><section className={styles.questionPanel} aria-live="polite">
+  return <main className={styles.main}><PersonalizationMethods product={product} variant={variant} mode="ai"/><div className={styles.questionLayout}><aside className={styles.selection}><div className={styles.selectionImage}><Image src={mediaUrl(session.variant.image, commerceApi)} alt={session.product.name} width={500} height={600} /></div><p className={styles.kicker}>Seçtiğin ürün</p><h2>{session.product.name}</h2><Link href="/xinobi-u">Başka ürün seç ↗</Link></aside><section className={styles.questionPanel} aria-live="polite">
     {status === 'questionnaire' && step >= 5 && <button className={styles.freshQuestions} onClick={restart} disabled={busy}>Yeni sorular seç ↻</button>}
     {error && <p className={styles.error} role="alert">{error}</p>}
     {generating ? <div className={styles.result}><p className={styles.kicker}>Tercihlerin tasarıma dönüşüyor</p><h1>Tasarımın hazırlanıyor.</h1><div className={styles.loader} /><p>Bu işlem biraz sürebilir. Sayfayı yenilesen de aynı üretime devam edebilirsin.</p></div> : status === 'failed' ? <div className={styles.result}><h1>Tasarım tamamlanamadı.</h1><p role="alert">Tasarım oluşturulamadı. Lütfen tekrar dene.</p><button className={styles.primary} onClick={restart}>Yeni bir tasarım yolculuğu başlat</button></div> : status === 'ready' && session.imageUrl ? <div className={styles.result}><p className={styles.kicker}>Senin cevapların. Senin tasarımın.</p><h1>İşte sana özel yorum.</h1><div className={styles.artworkFrame}><Image className={styles.artwork} src={studioAsset(session.imageUrl)} alt="Yanıtlarına göre AI ile oluşturulan tasarım" width={800} height={800} unoptimized /><span className={styles.representative}>Temsilidir</span></div><p>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><SaveDesignButton source={{ sessionId: session.id }} /><button className={styles.primary} onClick={() => { rememberSession(session); router.push('/xinobi-u/onizleme'); }}>Üründe gelişmiş önizlemeyi aç</button><button className={styles.secondary} onClick={restart}>Yeni anket başlat</button></div> : step < 5 ? <>

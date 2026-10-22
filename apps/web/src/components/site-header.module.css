@@ -35,3 +35,5 @@
 
 .bellLink{position:relative}
 .compareLink{display:inline-flex;align-items:center;gap:6px}.compareCount{min-width:18px;height:18px;padding:0 5px;display:inline-grid;place-items:center;border-radius:9px;background:#fff;color:#000;font-size:11px;font-weight:600;line-height:1}
+
+.cartLink{position:relative}.chevron{transition:transform .2s}button[aria-expanded="true"] .chevron{transform:rotate(180deg)}

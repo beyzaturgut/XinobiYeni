@@ -1,3 +1,4 @@
+import {Suspense} from "react";
 import type { Metadata } from "next";
 import { pageMetadata } from "../../lib/seo";
 import SiteHeader from "../../components/site-header";
@@ -20,7 +21,7 @@ export default function ProductsPage() {
         <h1 id="catalog-title">Ürünler</h1>
         <span>Ürünleri keşfedin, detaylarında tüm renk seçeneklerini görün.</span>
       </section>
-      <Catalog />
+      <Suspense fallback={<p role="status">Katalog yükleniyor…</p>}><Catalog /></Suspense>
     </main>
     <footer className={styles.footer}><span>© 2026 Xinobi</span><Link href="/">Sessiz teknoloji</Link></footer>
   </div>;

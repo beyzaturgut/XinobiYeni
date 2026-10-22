@@ -9,18 +9,24 @@ const date=(value:string)=>new Date(value).toLocaleDateString('tr-TR',{day:'2-di
 const statusText={pending:'Onay bekliyor',approved:'Yayında',rejected:'Yayınlanmadı'} as const;
 
 /** Approved reviews with the rating breakdown, and a form for customers who received this product. */
-export default function ProductReviews({productId,productName}:{productId:string;productName:string}){
+export default function ProductReviews(props:{productId:string;productName:string}){
+  const {user}=useDemoCommerce();
+  return <Reviews key={props.productId+":"+(user?.id??"guest")} {...props}/>;
+}
+function Reviews({productId,productName}:{productId:string;productName:string}){
   const {user,orders}=useDemoCommerce();
-  const [page,setPage]=useState<ReviewPage|null>(null),[unavailable,setUnavailable]=useState(false),[more,setMore]=useState(1);
+  const [page,setPage]=useState<ReviewPage|null>(null),[unavailable,setUnavailable]=useState(false),[more,setMore]=useState(1),[retry,setRetry]=useState(0);
   const [mine,setMine]=useState<MyReview|null>(null),[rating,setRating]=useState(0),[title,setTitle]=useState(''),[body,setBody]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[editing,setEditing]=useState(false);
-  useEffect(()=>{let active=true;fetchReviews(productId,1).then(value=>{if(active)setPage(value)}).catch(()=>{if(active)setUnavailable(true)});return()=>{active=false}},[productId]);
+  useEffect(()=>{let active=true;fetchReviews(productId,1).then(value=>{if(active)setPage(value)}).catch(()=>{if(active)setUnavailable(true)});return()=>{active=false}},[productId,retry]);
   useEffect(()=>{if(!user)return;let active=true;myReviews().then(list=>{if(active)setMine(list.find(item=>item.productId===productId)??null)}).catch(()=>{});return()=>{active=false}},[user,productId]);
-  if(unavailable)return null;
+
   const purchased=orders.some(order=>order.status==='delivered'&&order.lines.some(line=>line.productId===productId));
   const summary=page?.summary;
   const showForm=user&&purchased&&(!mine||editing);
   return <section id="degerlendirmeler" className={styles.reviews} aria-labelledby="reviews-title">
     <div className={styles.head}><h2 id="reviews-title">Müşteri değerlendirmeleri</h2>{summary&&summary.count>0&&<p className={styles.score}><b aria-hidden="true">{stars(summary.average)}</b><span>{summary.average.toLocaleString('tr-TR')} / 5 · {summary.count} değerlendirme</span></p>}</div>
+    {!page&&!unavailable&&<p role="status">Değerlendirmeler yükleniyor…</p>}
+    {unavailable&&<div role="alert"><p>Değerlendirmeler şu anda yüklenemedi.</p><button type="button" onClick={()=>{setUnavailable(false);setPage(null);setMore(1);setRetry(value=>value+1)}}>Değerlendirmeleri yeniden yükle</button></div>}
     {summary&&summary.count>0&&<ol className={styles.bars} aria-label="Puan dağılımı">{[5,4,3,2,1].map(star=><li key={star}><span>{star} yıldız</span><i><b style={{width:`${(summary.distribution[star-1]/summary.count)*100}%`}}/></i><span>{summary.distribution[star-1]}</span></li>)}</ol>}
     {mine&&!editing&&<div className={styles.mine}><strong>Senin değerlendirmen · {statusText[mine.status]}</strong><p>{stars(mine.rating)} {mine.title}</p><p>{mine.body}</p>{mine.moderationNote&&<small>Not: {mine.moderationNote}</small>}<button type="button" onClick={()=>{setEditing(true);setRating(mine.rating);setTitle(mine.title??'');setBody(mine.body)}}>Düzenle</button></div>}
     {showForm&&<form className={styles.form} onSubmit={async event=>{event.preventDefault();if(!rating||busy)return;setBusy(true);setError('');try{setMine(await submitReview(productId,rating,title,body));setEditing(false)}catch(e){setError(e instanceof Error?e.message:'Gönderilemedi.')}finally{setBusy(false)}}}>
@@ -35,7 +41,8 @@ export default function ProductReviews({productId,productName}:{productId:string
     {!user&&<p className={styles.muted}>Ürünü satın alıp teslim aldıysan <Link href="/hesap">giriş yaparak</Link> değerlendirebilirsin.</p>}
     {user&&!purchased&&!mine&&<p className={styles.muted}>Bu ürünü teslim aldıktan sonra değerlendirebilirsin.</p>}
     {page&&page.items.length===0&&<p className={styles.muted}>Bu ürün için henüz yayınlanmış değerlendirme yok.</p>}
+    {error&&!showForm&&<p role="alert">{error}</p>}
     <ul className={styles.list}>{page?.items.map(review=><li key={review.id}><div><b aria-label={`5 üzerinden ${review.rating}`}>{stars(review.rating)}</b><strong>{review.title}</strong></div><p>{review.body}</p><small>{review.authorName} · {date(review.createdAt)}{review.color?` · ${review.color}`:''} · Doğrulanmış satın alma</small>{review.storeReply&&<blockquote><strong>Xinobi yanıtı:</strong> {review.storeReply}</blockquote>}</li>)}</ul>
-    {page&&summary&&page.items.length<summary.count&&<button type="button" className={styles.more} onClick={async()=>{const next=more+1;const value=await fetchReviews(productId,next);setPage({...value,items:[...page.items,...value.items]});setMore(next)}}>Daha fazla göster</button>}
+    {page&&summary&&page.items.length<summary.count&&<button type="button" className={styles.more} disabled={busy} onClick={async()=>{if(busy)return;setBusy(true);setError('');try{const next=more+1;const value=await fetchReviews(productId,next);setPage({...value,items:[...page.items,...value.items]});setMore(next)}catch{setError('Diğer değerlendirmeler yüklenemedi. Yeniden deneyebilirsin.')}finally{setBusy(false)}}}>Daha fazla göster</button>}
   </section>;
 }

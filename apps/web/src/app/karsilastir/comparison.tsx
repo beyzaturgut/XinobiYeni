@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import {useEffect,useMemo,useState,type ReactNode} from 'react';
-import {useSearchParams} from 'next/navigation';
+import {useRouter,useSearchParams} from 'next/navigation';
 import {commerceApi,mediaUrl,money,stockText,useCommerce} from '../../lib/commerce';
 import {clearCompare,maxCompare,removeCompare,setCompare,toggleCompare,useCompare} from '../../lib/compare';
 import {stars,useReviewSummaries} from '../../lib/reviews';
@@ -16,7 +16,11 @@ const personalizable=(product:Product)=>product.personalizable===true;
 export default function Comparison(){
   const {state,error}=useCommerce();
   const ids=useCompare();
-  const shared=useSearchParams().get('urunler');
+  const params=useSearchParams(),router=useRouter();
+  const shared=params.get('urunler');
+  const table=params.get('view')==='table'||Boolean(shared)&&params.get('view')!=='select';
+  const [query,setQuery]=useState(''),[category,setCategory]=useState(''),[notice,setNotice]=useState('');
+  const show=(view:string)=>{const next=new URLSearchParams(params.toString());next.set('view',view);router.push('/karsilastir?'+next,{scroll:false})};
   // A shared link (?urunler=a,b) replaces the list once.
   useEffect(()=>{if(shared)setCompare(shared.split(',').filter(Boolean).slice(0,maxCompare))},[shared]);
   const [onlyDifferences,setOnlyDifferences]=useState(false);
@@ -25,6 +29,7 @@ export default function Comparison(){
   const products=ids.map(id=>active.find(product=>product.id===id)).filter((product):product is Product=>Boolean(product));
   const summaries=useReviewSummaries(products.map(product=>product.id));
   const candidates=active.filter(product=>!ids.includes(product.id));
+  const available=active.filter(product=>(!category||product.category===category)&&(!query.trim()||`${product.name} ${product.category}`.toLocaleLowerCase('tr-TR').includes(query.trim().toLocaleLowerCase('tr-TR'))));
   const priceOf=(product:Product)=>{const prices=product.variants.map(variant=>state?.prices[variant.id]).filter((value):value is number=>Boolean(value));return prices.length?Math.min(...prices):undefined};
 
   if(!state)return <div className={styles.shell}><p role="status">{error||'Ürünler yükleniyor…'}</p></div>;
@@ -44,16 +49,22 @@ export default function Comparison(){
   return <div className={styles.shell}>
     <header className={styles.head}>
       <div><p className={styles.eyebrow}>Ürün karşılaştırma</p><h1>Yan yana karşılaştır.</h1><p>En fazla {maxCompare} ürünü fiyat, renk, stok, müşteri puanı ve teknik özelliklerine göre karşılaştır.</p></div>
-      {products.length>0&&<div className={styles.headActions}>
+      {table&&products.length>=2&&<div className={styles.headActions}>
         <label className={styles.switch}><input type="checkbox" checked={onlyDifferences} onChange={event=>setOnlyDifferences(event.target.checked)}/>Yalnız farkları göster</label>
         <button type="button" onClick={async()=>{try{await navigator.clipboard.writeText(`${location.origin}/karsilastir?urunler=${ids.join(',')}`);setCopied(true);window.setTimeout(()=>setCopied(false),2000)}catch{}}}>{copied?'Bağlantı kopyalandı':'Bağlantıyı paylaş'}</button>
         <button type="button" onClick={clearCompare}>Listeyi temizle</button>
       </div>}
     </header>
-    {products.length===0?<section className={styles.empty}>
-      <h2>Karşılaştırma listen boş.</h2><p>Ürün kartlarındaki “Karşılaştır” düğmesiyle ya da aşağıdan ürün seçerek başlayabilirsin.</p>
-      <div className={styles.quickPick}>{active.slice(0,8).map(product=><button type="button" key={product.id} onClick={()=>toggleCompare(product.id)}>{(product.originalImage||product.variants[0]?.image)&&<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={96} height={96}/>}<span>{product.name}</span><small>+ Karşılaştırmaya ekle</small></button>)}</div>
+    {!table||products.length<2?<section aria-label="Karşılaştırılacak ürünleri seç">
+      <h2>Ürünlerini seç, sonra karşılaştır.</h2>
+      <div className={styles.filters}><label>Ürün ara<input type="search" value={query} onChange={event=>setQuery(event.target.value)}/></label><label>Kategori<select value={category} onChange={event=>setCategory(event.target.value)}><option value="">Tüm kategoriler</option>{[...new Set(active.map(product=>product.category))].map(name=><option key={name}>{name}</option>)}</select></label></div>
+      <p role="status">{notice||`${products.length} / ${maxCompare} ürün seçildi. Karşılaştırmak için en az 2 ürün seç.`}</p>
+      {ids.some(id=>!active.some(product=>product.id===id))&&<p role="alert">Bazı seçimler artık yayında değil. <button onClick={()=>setCompare(products.map(product=>product.id))}>Kullanılamayan seçimleri kaldır</button></p>}
+      <button type="button" className={styles.continue} disabled={products.length<2} onClick={()=>show('table')}>Seçilen ürünleri karşılaştır ({products.length})</button>
+      <div className={styles.quickPick}>{available.map(product=><button type="button" key={product.id} aria-pressed={ids.includes(product.id)} onClick={()=>{const ok=toggleCompare(product.id);setNotice(ok?'Seçimin güncellendi.':`En fazla ${maxCompare} ürün seçebilirsin. Yeni ürün için bir seçimi kaldır.`)}}>{(product.originalImage||product.variants[0]?.image)&&<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={96} height={96}/>}<span>{product.name}</span><small>{product.category}</small><strong>{ids.includes(product.id)?'✓ Seçildi':'+ Seç'}</strong></button>)}</div>
+      {!available.length&&<p>Aramana uygun ürün bulunamadı.</p>}
     </section>:<>
+      <button type="button" className={styles.continue} onClick={()=>show('select')}>Seçimleri düzenle / Bir ürün daha ekle</button>
       <div className={styles.tableWrap} role="region" aria-label="Seçilen ürünlerin karşılaştırma tablosu" tabIndex={0}>
         <table className={styles.table} style={{['--columns' as string]:products.length}}>
           <thead><tr><th scope="col"><span className={styles.srOnly}>Özellik</span>{products.length===1&&<p className={styles.hint}>Karşılaştırmak için en az bir ürün daha ekle.</p>}</th>{products.map(product=><th scope="col" key={product.id}>
@@ -62,7 +73,7 @@ export default function Comparison(){
             <Link href={`/urunler/detay?id=${encodeURIComponent(product.id)}`}>{product.name}</Link>
             <Link className={styles.inspect} href={`/urunler/detay?id=${encodeURIComponent(product.id)}`}>İncele ve sepete ekle →</Link>
           </th>)}
-          {products.length<maxCompare&&candidates.length>0&&<th scope="col" className={styles.addColumn}><label>Ürün ekle<select value="" onChange={event=>{if(event.target.value)toggleCompare(event.target.value)}}><option value="">Seç…</option>{candidates.map(product=><option key={product.id} value={product.id}>{product.name}</option>)}</select></label></th>}</tr></thead>
+          {products.length<maxCompare&&candidates.length>0&&<th scope="col" className={styles.addColumn}><button type="button" onClick={()=>show('select')}>Bir ürün daha ekle</button></th>}</tr></thead>
           <tbody>{visibleRows.map(row=>{const differs=products.length>1&&new Set(row.values).size>1;return <tr key={row.label} data-differs={differs||undefined}><th scope="row">{row.label}{differs&&<span className={styles.diffDot} aria-label="farklı"/>}</th>{row.cells.map((cell,index)=><td key={products[index].id}>{cell}</td>)}{products.length<maxCompare&&candidates.length>0&&<td/>}</tr>})}
             {onlyDifferences&&visibleRows.length===0&&<tr><td colSpan={products.length+2}>Seçilen ürünler arasında fark bulunamadı.</td></tr>}</tbody>
         </table>

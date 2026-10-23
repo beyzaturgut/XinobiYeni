@@ -7,8 +7,7 @@ import '../../widgets/common.dart';
 import '../../widgets/xinobi_header.dart';
 import '../catalog/catalog_repository.dart';
 
-/// XINOBI U first selects a product family. Colour selection lives on the
-/// following screen so the listing remains the same compact catalogue view.
+/// XINOBI U first selects a product family; the method follows, and the colour is chosen on the placement preview.
 class XinobiUScreen extends ConsumerWidget {
   const XinobiUScreen({super.key});
 
@@ -39,7 +38,7 @@ class XinobiUScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Bir ürün. Binlerce olasılık. Önce ürününü, sonra rengini seç.',
+                    'Bir ürün. Binlerce olasılık. Önce ürününü, sonra tasarım yöntemini seç; rengi önizlemede ayarla.',
                     style: text.bodyMedium,
                   ),
                 ],

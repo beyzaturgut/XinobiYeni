@@ -101,44 +101,66 @@ class _ProductGalleryState extends State<ProductGallery> {
     if (images.isEmpty) {
       return AspectRatio(aspectRatio: 1, child: RemoteImage(null, label: widget.productName));
     }
+    // Design "Ürün detay": photos on a warm grey stage. Multiplying by the stage colour turns the photos' white
+    // backgrounds into the stage, like the web's mix-blend-mode. Modulate (not multiply) keeps transparent pixels transparent.
+    const stage = Color(0xFFF3F3F1);
+    void step(int delta) => widget.onSelected(images[(current + delta + images.length) % images.length].url);
     return Column(children: [
-      AspectRatio(
-        aspectRatio: 1,
-        child: ColoredBox(
-          color: XinobiTokens.surface,
-          child: Stack(children: [
-            Positioned.fill(
-              child: PageView.builder(
-                // Keyed by controller: a swapped controller must start fresh instead of inheriting the old scroll offset.
-                key: ObjectKey(pages),
-                controller: pages,
-                itemCount: images.length,
-                onPageChanged: (page) => widget.onSelected(images[page].url),
-                itemBuilder: (context, page) =>
-                    RemoteImage(images[page].url, label: '${widget.productName}, ${images[page].label}', cacheWidth: stageWidth),
-              ),
-            ),
-            if (images.length > 1)
-              Positioned(
-                right: 12,
-                bottom: 12,
-                child: Semantics(
-                  liveRegion: true,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(color: XinobiTokens.surface.withValues(alpha: .92), borderRadius: BorderRadius.circular(999)),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      child: Text('${current + 1} / ${images.length}', style: Theme.of(context).textTheme.bodySmall),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 12, XinobiTokens.gutterMobile, 0),
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: ColoredBox(
+              color: stage,
+              child: Stack(children: [
+                Positioned.fill(
+                  child: PageView.builder(
+                    // Keyed by controller: a swapped controller must start fresh instead of inheriting the old scroll offset.
+                    key: ObjectKey(pages),
+                    controller: pages,
+                    itemCount: images.length,
+                    onPageChanged: (page) => widget.onSelected(images[page].url),
+                    itemBuilder: (context, page) => Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: ColorFiltered(
+                        colorFilter: const ColorFilter.mode(stage, BlendMode.modulate),
+                        child: RemoteImage(images[page].url, label: '${widget.productName}, ${images[page].label}', cacheWidth: stageWidth),
+                      ),
                     ),
                   ),
                 ),
-              ),
-          ]),
+                if (images.length > 1)
+                  Positioned(
+                    left: 14,
+                    right: 14,
+                    bottom: 14,
+                    child: Row(children: [
+                      Semantics(
+                        liveRegion: true,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(color: XinobiTokens.surface, borderRadius: BorderRadius.circular(999)),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            child: Text('${current + 1} / ${images.length}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF111111))),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      _StageButton(icon: Icons.chevron_left, tooltip: 'Önceki görsel', onPressed: () => step(-1)),
+                      const SizedBox(width: 8),
+                      _StageButton(icon: Icons.chevron_right, tooltip: 'Sonraki görsel', onPressed: () => step(1)),
+                    ]),
+                  ),
+              ]),
+            ),
+          ),
         ),
       ),
       if (images.length > 1 && thumbs.isNotEmpty)
         SizedBox(
-          height: 80,
+          height: 76,
           child: ListView.separated(
             padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 8, XinobiTokens.gutterMobile, 0),
             scrollDirection: Axis.horizontal,
@@ -155,16 +177,19 @@ class _ProductGalleryState extends State<ProductGallery> {
                 onTap: () => widget.onSelected(thumb.url),
                 child: InkWell(
                   onTap: () => widget.onSelected(thumb.url),
-                  borderRadius: BorderRadius.circular(XinobiTokens.radiusSmall),
+                  borderRadius: BorderRadius.circular(10),
                   child: Container(
-                    width: 72,
-                    padding: const EdgeInsets.all(3),
+                    width: 64,
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: XinobiTokens.surface,
-                      borderRadius: BorderRadius.circular(XinobiTokens.radiusSmall),
-                      border: Border.all(color: selected ? XinobiTokens.ink : XinobiTokens.line, width: selected ? 2 : 1),
+                      color: stage,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: selected ? const Color(0xFF111111) : const Color(0xFFE0E0E0), width: selected ? 2 : 1),
                     ),
-                    child: RemoteImage(thumb.url, cacheWidth: (72 * MediaQuery.devicePixelRatioOf(context)).round()),
+                    child: ColorFiltered(
+                      colorFilter: const ColorFilter.mode(stage, BlendMode.modulate),
+                      child: RemoteImage(thumb.url, cacheWidth: (64 * MediaQuery.devicePixelRatioOf(context)).round()),
+                    ),
                   ),
                 ),
               );
@@ -173,4 +198,19 @@ class _ProductGalleryState extends State<ProductGallery> {
         ),
     ]);
   }
+}
+
+class _StageButton extends StatelessWidget {
+  const _StageButton({required this.icon, required this.tooltip, required this.onPressed});
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: tooltip,
+        onPressed: onPressed,
+        style: IconButton.styleFrom(backgroundColor: XinobiTokens.surface, foregroundColor: const Color(0xFF111111), fixedSize: const Size(40, 40)),
+        icon: Icon(icon),
+      );
 }

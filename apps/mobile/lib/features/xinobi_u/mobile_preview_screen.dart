@@ -13,6 +13,7 @@ class XinobiMobilePreviewScreen extends StatefulWidget {
     this.previewUri,
     this.productId,
     this.variantId,
+    this.pattern = false,
   });
 
   /// The design session is resolved by the web route. The generated artwork
@@ -20,6 +21,9 @@ class XinobiMobilePreviewScreen extends StatefulWidget {
   final String? sessionId;
   final String? productId;
   final String? variantId;
+
+  /// Opens the own-image flow on the pattern upload instead of the image upload.
+  final bool pattern;
 
   /// Optional injection point for a widget test. Production uses the single
   /// build-time URL from [xinobiMobilePreviewUri].
@@ -46,6 +50,7 @@ class _XinobiMobilePreviewScreenState extends State<XinobiMobilePreviewScreen> {
               ? xinobiOwnImageUri(
                   productId: widget.productId ?? '',
                   variantId: widget.variantId ?? '',
+                  pattern: widget.pattern,
                 )
               : xinobiMobilePreviewUri(sessionId: widget.sessionId)),
     );
@@ -170,7 +175,7 @@ class _XinobiMobilePreviewScreenState extends State<XinobiMobilePreviewScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Ürün önizlemesi'),
+          title: Text(widget.productId != null ? 'XINOBI U' : 'Ürün önizlemesi'),
           actions: [
             IconButton(
               tooltip: 'Yeniden yükle',

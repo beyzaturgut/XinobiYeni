@@ -209,21 +209,21 @@ void main() {
     expect(find.text('Kahve Makinesi 101'), findsNothing);
   });
 
-  testWidgets('XINOBI U opens the separate colour screen from the card action', (tester) async {
+  testWidgets('XINOBI U opens the method screen from the card action; the colour is picked later', (tester) async {
     await pumpApp(tester, location: '/xinobi-u');
     final action = find.text('XINOBI U ile kişiselleştir →');
     expect(action, findsOneWidget);
     await tester.tap(action);
     await tester.pumpAndSettle();
-    expect(find.text('Renk: seçin'), findsOneWidget);
-    expect(find.bySemanticsLabel('Lacivert rengini seç'), findsOneWidget);
+    expect(find.text('Tasarımını nasıl oluşturmak istersin?'), findsOneWidget);
+    expect(find.bySemanticsLabel('Lacivert rengini seç'), findsNothing);
   });
 
-  testWidgets('XINOBI U card identity opens the same colour screen', (tester) async {
+  testWidgets('XINOBI U card identity opens the same method screen', (tester) async {
     await pumpApp(tester, location: '/xinobi-u');
     await tester.tap(find.text('Çay Makinesi 101'));
     await tester.pumpAndSettle();
-    expect(find.text('Renk: seçin'), findsOneWidget);
+    expect(find.text('Tasarımını nasıl oluşturmak istersin?'), findsOneWidget);
   });
 
   testWidgets('product detail switches price and stock with the selected colour', (tester) async {

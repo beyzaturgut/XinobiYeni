@@ -31,5 +31,8 @@ img { max-width: 100%; }
   header[data-mobile-three-column] { grid-template-columns: 52px minmax(0,1fr) auto; }
 }
 
+/* Inside the mobile app's WebView (?mobile=1) the app bar and tabs replace the site's own header, Nobi and compare tray. */
+html[data-embedded="app"] [data-app-chrome] { display: none !important; }
+
 /* Keep page titles compact so the content starts near the header. */
 main h1 { font-size: clamp(24px, 2.6vw, 34px) !important; line-height: 1.2 !important; letter-spacing: -.025em !important; }

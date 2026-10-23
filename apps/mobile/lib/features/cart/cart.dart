@@ -87,17 +87,18 @@ class CartController extends Notifier<List<CartLine>> {
     await (await SharedPreferences.getInstance()).setString(cartStorageKey, jsonEncode(lines.map((line) => line.toJson()).toList()));
   }
 
-  /// Adds one unit; [maxQuantity] is the contract's per-variant limit (stock, capped at 99), shared by all lines of the colour.
-  Future<void> add(String productId, String variantId, int maxQuantity, {String? designId, String? designName, DesignPlacement? designPlacement}) async {
+  /// Adds [quantity] units (one by default); [maxQuantity] is the contract's per-variant limit (stock, capped at 99), shared by all lines of the colour.
+  Future<void> add(String productId, String variantId, int maxQuantity, {String? designId, String? designName, DesignPlacement? designPlacement, int quantity = 1}) async {
+    if (quantity < 1 || quantity > maxLineQuantity) throw const CartException('Geçerli adet girin.');
     final existing = state.where((line) => line.same(productId, variantId, designId)).firstOrNull;
     final limit = maxQuantity.clamp(0, maxLineQuantity);
-    if (variantUnits(state, variantId) >= limit || (existing?.quantity ?? 0) >= maxLineQuantity) {
+    if (variantUnits(state, variantId) + quantity > limit || (existing?.quantity ?? 0) + quantity > maxLineQuantity) {
       throw const CartException('Bu renk için sepetteki adet mevcut stok sınırına ulaştı.');
     }
     if (existing == null && state.length >= maxCartLines) throw const CartException('Sepette en fazla 100 farklı ürün olabilir.');
     await _write(existing == null
-        ? [...state, CartLine(productId: productId, variantId: variantId, quantity: 1, designId: designId, designName: designName, designPlacement: designPlacement)]
-        : [for (final line in state) line.same(productId, variantId, designId) ? line.withQuantity(line.quantity + 1, placement: designPlacement) : line]);
+        ? [...state, CartLine(productId: productId, variantId: variantId, quantity: quantity, designId: designId, designName: designName, designPlacement: designPlacement)]
+        : [for (final line in state) line.same(productId, variantId, designId) ? line.withQuantity(line.quantity + quantity, placement: designPlacement) : line]);
   }
 
   Future<void> setQuantity(String productId, String variantId, int quantity, {String? designId}) async {

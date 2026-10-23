@@ -8,10 +8,12 @@ Android emülatörü varsayılan olarak `http://10.0.2.2:5003`, iOS simülatör�
 
 ```sh
 flutter pub get
-flutter run -d emulator-5554 --dart-define=XINOBI_WEB_PREVIEW_URL=http://10.0.2.2:3000
+adb reverse tcp:3000 tcp:3000
+adb reverse tcp:5003 tcp:5003
+flutter run -d emulator-5554 --dart-define=XINOBI_WEB_PREVIEW_URL=http://127.0.0.1:3000
 ```
 
-XINOBI U (renk seçimi, onaylı yüzeyler, önizleme) web kaynağını `XINOBI_WEB_PREVIEW_URL` ile bulur; verilmezse renkler "kullanılamıyor" görünür. Yerel web 3000'de çalışır; APK için `tools/build-apk.mjs` aynı değişkeni okur.
+XINOBI U'nun yükleme ve yerleşim adımları (renk seçimi önizlemede) web kaynağını `XINOBI_WEB_PREVIEW_URL` ile bulur ve WebView'da `mobile=1` ile açılır; verilmezse "kullanılamıyor" görünür. Yerel web sayfası katalog API'sine tarayıcıdan `127.0.0.1:5003` ile bağlanır ve API yalnız `127.0.0.1:3000` kaynağını kabul eder; bu yüzden emülatörde iki port `adb reverse` ile bilgisayara yönlendirilir ve web adresi `127.0.0.1:3000` verilir. APK için `tools/build-apk.mjs` aynı değişkeni okur.
 
 ## Doğrulama
 

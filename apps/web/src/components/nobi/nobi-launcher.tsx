@@ -20,6 +20,6 @@ export default function NobiLauncher(){
       <header className={styles.head}><div><NobiMark compact/><div><p>NOBI</p><h2 id="nobi-title">Size nasıl yardımcı olabilirim?</h2></div></div><button type="button" onClick={()=>setOpen(false)} aria-label="Nobi panelini kapat">×</button></header>
       {open&&<NobiChat onNavigate={()=>setOpen(false)}/>}
     </section>
-    <button className={styles.launcher} type="button" aria-label="Nobi’ye sor" aria-expanded={open} aria-controls="nobi-panel" onClick={()=>setOpen(value=>!value)}><NobiMark/><b>Nobi’ye sor</b></button>
+    <button className={styles.launcher} data-app-chrome="" type="button" aria-label="Nobi’ye sor" aria-expanded={open} aria-controls="nobi-panel" onClick={()=>setOpen(value=>!value)}><NobiMark/><b>Nobi’ye sor</b></button>
   </>;
 }

@@ -23,8 +23,10 @@ const onPreview=()=>typeof window!=='undefined'&&window.location.hash===previewH
 /** Steps 3 (upload) and 4 (placement) share this component, so the locally prepared image survives the step change.
  *  A changed query would remount the page, so the step is a history entry with a hash (the back button returns to
  *  the upload) and the upload type only rewrites the address. */
-function Flow({product,variant,initialMode}:{product:string;variant:string;initialMode:Mode}){
+function Flow({product,variant,initialMode,embedded}:{product:string;variant:string;initialMode:Mode;embedded:boolean}){
  const [mode,setMode]=useState(initialMode),[previewing,setPreviewing]=useState(onPreview);
+ // In the mobile app the app bar leads back to its own method screen; the site's chrome and web back links stay hidden.
+ useEffect(()=>{if(!embedded)return;document.documentElement.dataset.embedded='app';return()=>{delete document.documentElement.dataset.embedded}},[embedded]);
  useEffect(()=>{const sync=()=>setPreviewing(onPreview());window.addEventListener('popstate',sync);window.addEventListener('hashchange',sync);return()=>{window.removeEventListener('popstate',sync);window.removeEventListener('hashchange',sync)}},[]);
  const {state}=useCommerce();
  const {user,ready:accountReady}=useDemoCommerce();
@@ -34,7 +36,7 @@ function Flow({product,variant,initialMode}:{product:string;variant:string;initi
  const local=useLocalPatternFile();
  const start=selected&&accepted.status==="ready"?startingVariant(selected,accepted.surfaces,variant):undefined;
  const active=selected?.variants.find(item=>item.id===activeId&&accepted.surfaces[item.id])??start;
- const href=(next:Mode=mode)=>{const query=new URLSearchParams({product,variant});if(next==='pattern')query.set('mode','pattern');return '/xinobi-u/kendi-gorselin?'+query};
+ const href=(next:Mode=mode)=>{const query=new URLSearchParams({product,variant});if(next==='pattern')query.set('mode','pattern');if(embedded)query.set('mobile','1');return '/xinobi-u/kendi-gorselin?'+query};
  const openPreview=()=>{window.history.pushState(null,'',window.location.pathname+window.location.search+previewHash);setPreviewing(true);window.scrollTo(0,0)};
  const backToUpload=()=>{if(onPreview())window.history.back();else setPreviewing(false)};
  const switchMode=(next:Mode)=>{if(next===mode)return;setMode(next);window.history.replaceState(window.history.state,'',href(next).replace('/kendi-gorselin?','/kendi-gorselin/?'))};
@@ -53,7 +55,7 @@ function Flow({product,variant,initialMode}:{product:string;variant:string;initi
  </main>;
  const image=start?.image||selected?.originalImage;
  return <main className={flow.page} data-product-reference={product} data-variant-reference={start?.id??variant}>
-  <FlowSteps current={2} backHref={methodHref} backLabel="Yönteme dön"/>
+  <FlowSteps current={2} backHref={methodHref} backLabel="Yönteme dön" hideBack={embedded}/>
   <div className={styles.uploadLayout}>
    <section className={styles.upload} aria-label={pattern?'Desen yükleme':'Görsel yükleme'}>
     <p className={flow.kicker}>XINOBI U · Adım 3 / 4</p>
@@ -73,7 +75,7 @@ function Flow({product,variant,initialMode}:{product:string;variant:string;initi
      </div>:<div className={`${styles.drop} ${dragging?styles.dragging:''}`} onDragOver={(event:DragEvent)=>{event.preventDefault();setDragging(true)}} onDragLeave={()=>setDragging(false)} onDrop={(event:DragEvent)=>{event.preventDefault();setDragging(false);pick(event.dataTransfer.files?.[0])}}>
       <span className={styles.dropIcon} aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
       <p className={styles.dropTitle}>{pattern?'Desenini buraya sürükle':'Görselini buraya sürükle'}</p>
-      <p>ya da bilgisayarından bir dosya seç</p>
+      <p>{embedded?'ya da cihazından bir dosya seç':'ya da bilgisayarından bir dosya seç'}</p>
       <div className={styles.dropActions}><label className={styles.pick}>Dosya seç<input id="local-pattern" type="file" accept={accept} disabled={local.busy} aria-describedby="local-image-help" onChange={event=>{const input=event.currentTarget,file=input.files?.[0];pick(file);input.value=''}}/></label><button type="button" className={styles.sample} disabled={local.busy} onClick={()=>void trySample()}>Örnek görselle dene</button></div>
      </div>}
      {local.busy&&<div className={styles.busy}><p role="status">Görsel hazırlanıyor…</p><button type="button" className={flow.secondary} onClick={local.cancel}>Hazırlamayı iptal et</button></div>}
@@ -82,19 +84,19 @@ function Flow({product,variant,initialMode}:{product:string;variant:string;initi
      <div className={styles.privacy}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p id="local-image-help">Görselin yalnızca bu tarayıcıda önizlenir. <strong>Tasarımımı kaydet</strong> dersen hesabına yüklenir ve yalnızca sen görürsün.</p></div>
     </>}
     <div className={`${flow.actions} ${styles.uploadActions}`}>
-     <Link className={flow.secondary} href={methodHref}>Geri</Link>
+     {!embedded&&<Link className={flow.secondary} href={methodHref}>Geri</Link>}
      {ready&&local.url?<button type="button" className={flow.primary} onClick={openPreview}>Önizlemeye geç →</button>:<button type="button" className={flow.primary} disabled>{pattern?'Önizlemeye geçmek için desen yükle':'Önizlemeye geçmek için görsel yükle'}</button>}
     </div>
    </section>
    <aside className={styles.aside} aria-label="Seçtiğin ürün">
     {selected&&<div className={styles.productCard}>
      <div className={styles.productImage}>{image&&<Image src={mediaUrl(image,commerceApi)} alt={selected.name} width={400} height={400}/>}</div>
-     <div className={styles.productText}><p className={styles.productKicker}>Seçtiğin ürün</p><p className={styles.productName}>{selected.name}</p><p>Rengi ve görselin yerleşimini bir sonraki adımda önizleme üzerinde ayarlayacaksın.</p><Link href="/xinobi-u">Başka ürün seç <span aria-hidden="true">→</span></Link></div>
+     <div className={styles.productText}><p className={styles.productKicker}>Seçtiğin ürün</p><p className={styles.productName}>{selected.name}</p><p>Rengi ve görselin yerleşimini bir sonraki adımda önizleme üzerinde ayarlayacaksın.</p>{!embedded&&<Link href="/xinobi-u">Başka ürün seç <span aria-hidden="true">→</span></Link>}</div>
     </div>}
     <div className={styles.tips}><p>İyi bir sonuç için</p><ul><li>Net ve yüksek çözünürlüklü bir görsel seç.</li><li>Önemli öğeleri görselin ortasına yakın tut.</li><li>Desenlerde kenarları birbirine uyan, tekrar eden görseller daha iyi sonuç verir.</li></ul></div>
    </aside>
   </div>
  </main>;
 }
-function Entry(){const query=useSearchParams();const product=query.get("product")??"",variant=query.get("variant")??"";return <Flow key={product} product={product} variant={variant} initialMode={query.get("mode")==="pattern"?"pattern":"artwork"}/>}
+function Entry(){const query=useSearchParams();const product=query.get("product")??"",variant=query.get("variant")??"";return <Flow key={product} product={product} variant={variant} initialMode={query.get("mode")==="pattern"?"pattern":"artwork"} embedded={query.get("mobile")==="1"}/>}
 export default function OwnImageEntry(){return <Suspense fallback={<p role="status">Seçim yükleniyor…</p>}><Entry/></Suspense>}

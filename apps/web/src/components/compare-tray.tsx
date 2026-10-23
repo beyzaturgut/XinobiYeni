@@ -13,7 +13,7 @@ export default function CompareTray(){
   const {state}=useCommerce();
   if(!ids.length||path?.startsWith('/karsilastir'))return null;
   const products=ids.map(id=>state?.products.find(product=>product.id===id)).filter(product=>product!==undefined);
-  return <aside className={styles.tray} aria-label="Karşılaştırma listesi">
+  return <aside className={styles.tray} data-app-chrome="" aria-label="Karşılaştırma listesi">
     <ul>{products.map(product=><li key={product.id}>{(product.originalImage||product.variants[0]?.image)?<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={44} height={44}/>:<span/>}<span>{product.name}</span><button type="button" aria-label={`${product.name} ürününü karşılaştırmadan çıkar`} onClick={()=>removeCompare(product.id)}>×</button></li>)}
       {Array.from({length:ids.length<maxCompare?1:0},(_,i)=><li key={'empty'+i} className={styles.slot}><Link href="/karsilastir?view=select">Bir ürün daha ekle</Link></li>)}</ul>
     <div><Link className={styles.trayCta} href={ids.length>=2?"/karsilastir?view=table":"/karsilastir?view=select"}>Karşılaştır ({ids.length})</Link><button type="button" onClick={clearCompare}>Temizle</button></div>

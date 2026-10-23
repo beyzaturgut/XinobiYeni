@@ -45,10 +45,11 @@ Uri? xinobiMobilePreviewUri({
   );
 }
 
-/// Opens the shared local-artwork editor with an exact catalog identity.
+/// Opens the shared local-artwork upload and placement steps with an exact catalog identity; [pattern] opens the pattern upload.
 Uri? xinobiOwnImageUri({
   required String productId,
   required String variantId,
+  bool pattern = false,
   String override = const String.fromEnvironment('XINOBI_WEB_PREVIEW_URL'),
 }) {
   final base = xinobiMobilePreviewUri(override: override);
@@ -63,6 +64,7 @@ Uri? xinobiOwnImageUri({
     queryParameters: {
       'product': productId,
       'variant': variantId,
+      if (pattern) 'mode': 'pattern',
       'mobile': '1',
     },
   );

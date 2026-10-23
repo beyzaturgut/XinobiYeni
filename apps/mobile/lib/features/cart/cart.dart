@@ -11,15 +11,19 @@ import '../personalization/surface_preview.dart';
 /// [designId]/[designName] make a personalised line with one of the customer's saved designs; the same colour with another design
 /// (or none) is a separate line. Prices and stock always come from the current catalog; checkout re-checks them on the server.
 class CartLine {
-  const CartLine({required this.productId, required this.variantId, required this.quantity, this.designId, this.designName, this.designPlacement});
+  const CartLine({required this.productId, required this.variantId, required this.quantity, this.designId, this.designName, this.designPlacement, this.configurationId, this.configurationRevision, this.configurationPlacement});
   final String productId;
   final String variantId;
   final int quantity;
   final String? designId;
   final String? designName;
   final DesignPlacement? designPlacement;
+  final String? configurationId;
+  final int? configurationRevision;
+  final Map<String, dynamic>? configurationPlacement;
+  String get key => '$productId:$variantId:${designId ?? ""}${configurationId == null ? "" : ":$configurationId:$configurationRevision"}';
 
-  CartLine withQuantity(int value, {DesignPlacement? placement}) => CartLine(productId: productId, variantId: variantId, quantity: value, designId: designId, designName: designName, designPlacement: placement ?? designPlacement);
+  CartLine withQuantity(int value, {DesignPlacement? placement}) => CartLine(productId: productId, variantId: variantId, quantity: value, designId: designId, designName: designName, designPlacement: placement ?? designPlacement, configurationId: configurationId, configurationRevision: configurationRevision, configurationPlacement: configurationPlacement);
   bool same(String product, String variant, [String? design]) => productId == product && variantId == variant && designId == design;
   Map<String, Object> toJson() => {
         'productId': productId,
@@ -27,7 +31,9 @@ class CartLine {
         'quantity': quantity,
         'designId': ?designId,
         'designName': ?designName,
-        'designPlacement': ?designPlacement?.toJson(),
+        'designPlacement': ?configurationPlacement ?? designPlacement?.toJson(),
+        'configurationId': ?configurationId,
+        'configurationRevision': ?configurationRevision,
       };
 }
 
@@ -55,6 +61,7 @@ List<CartLine> parseCart(String? raw) {
         .whereType<Map>()
         .where((row) => row['productId'] is String && row['variantId'] is String && row['quantity'] is int && row['quantity'] > 0 && row['quantity'] <= maxLineQuantity)
         .where((row) => row['designId'] == null || (_text(row['designId'], 64) && _text(row['designName'], 60)))
+        .where((row) => row['configurationId'] == null && row['configurationRevision'] == null || row['designId'] != null && row['configurationId'] is String && RegExp(r'^[a-f0-9]{32}$').hasMatch(row['configurationId']) && row['configurationRevision'] is int && row['configurationRevision'] > 0)
         .take(maxCartLines)
         .map((row) => CartLine(
             productId: row['productId'] as String,
@@ -62,7 +69,9 @@ List<CartLine> parseCart(String? raw) {
             quantity: row['quantity'] as int,
             designId: row['designId'] as String?,
             designName: row['designName'] as String?,
-            designPlacement: DesignPlacement.fromJson(row['designPlacement'])))
+            designPlacement: DesignPlacement.fromJson(row['designPlacement']) ?? DesignPlacement.fromJson(row['legacyDesignPlacement']),
+            configurationId: row['configurationId'] as String?, configurationRevision: row['configurationRevision'] as int?,
+            configurationPlacement: row['designPlacement'] is Map && row['designPlacement']['surfaceVersion'] is String ? Map<String,dynamic>.from(row['designPlacement']) : null))
         .toList();
   } on FormatException {
     return [];
@@ -70,9 +79,10 @@ List<CartLine> parseCart(String? raw) {
 }
 
 class CartController extends Notifier<List<CartLine>> {
+  late Future<void> ready;
   @override
   List<CartLine> build() {
-    _load();
+    ready = _load();
     return const [];
   }
 
@@ -110,8 +120,24 @@ class CartController extends Notifier<List<CartLine>> {
 
   Future<void> remove(String productId, String variantId, {String? designId}) => setQuantity(productId, variantId, 0, designId: designId);
 
+  /// Native and WebView carts use the same exact row identity and immutable revision.
+  Future<void> replaceFromPreview(List<CartLine> rows, List<CartLine> expected) async {
+    if (canonicalCart(state) != canonicalCart(expected)) throw const CartException('Sepet başka bir işlemde değişti. Önizlemeyi yeniden aç.');
+    await _write(rows);
+  }
+  Future<void> setLineQuantity(String key, int quantity) async {
+    if (quantity < 0 || quantity > maxLineQuantity) throw const CartException('Geçerli adet girin.');
+    if (!state.any((line) => line.key == key)) throw const CartException('Sepet satırı kaldırılmış.');
+    await _write([for (final line in state) if (line.key != key || quantity > 0) line.key == key ? line.withQuantity(quantity) : line]);
+  }
+
   /// After a placed order.
   Future<void> clear() => _write(const []);
+}
+
+String canonicalCart(List<CartLine> rows) {
+  Object? ordered(Object? value) => value is Map ? {for (final key in value.keys.map((key) => key.toString()).toList()..sort()) key: ordered(value[key])} : value is List ? value.map(ordered).toList() : value;
+  return jsonEncode(ordered(rows.map((row) => row.toJson()).toList()));
 }
 
 final cartProvider = NotifierProvider<CartController, List<CartLine>>(CartController.new);
@@ -147,7 +173,7 @@ CartItem resolveCartLine(CartLine line, ProductDetail? product, [int? units]) {
       ? CartProblem.noPrice
       : variant.maxQuantity <= 0
           ? CartProblem.outOfStock
-          : line.quantity > variant.maxQuantity
+          : (units ?? line.quantity) > variant.maxQuantity
               ? CartProblem.overStock
               : CartProblem.none;
   return CartItem(line: line, product: product, variant: variant, problem: problem);

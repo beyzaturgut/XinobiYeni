@@ -1,4 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../personalization/native_commerce_bridge.dart';
+import '../designs/design_configurations.dart';
+import '../account/auth.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -6,10 +11,11 @@ import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 import '../../core/api_config.dart';
 
-class XinobiMobilePreviewScreen extends StatefulWidget {
+class XinobiMobilePreviewScreen extends ConsumerStatefulWidget {
   const XinobiMobilePreviewScreen({
     super.key,
     this.sessionId,
+    this.designId, this.configurationId, this.revision, this.cartLine,
     this.previewUri,
     this.productId,
     this.variantId,
@@ -19,6 +25,8 @@ class XinobiMobilePreviewScreen extends StatefulWidget {
   /// The design session is resolved by the web route. The generated artwork
   /// URL is deliberately not passed through Flutter or the WebView.
   final String? sessionId;
+  final String? designId, configurationId, cartLine;
+  final int? revision;
   final String? productId;
   final String? variantId;
 
@@ -30,12 +38,13 @@ class XinobiMobilePreviewScreen extends StatefulWidget {
   final Uri? previewUri;
 
   @override
-  State<XinobiMobilePreviewScreen> createState() =>
+  ConsumerState<XinobiMobilePreviewScreen> createState() =>
       _XinobiMobilePreviewScreenState();
 }
 
-class _XinobiMobilePreviewScreenState extends State<XinobiMobilePreviewScreen> {
+class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewScreen> {
   WebViewController? _controller;
+  Uri? _trustedUri;
   bool _loading = true;
   bool _canGoBack = false;
   String? _error;
@@ -46,7 +55,7 @@ class _XinobiMobilePreviewScreenState extends State<XinobiMobilePreviewScreen> {
     final ownImage = widget.productId != null || widget.variantId != null;
     _createController(
       widget.previewUri ??
-          (ownImage
+          (widget.designId != null ? xinobiSavedDesignUri(designId: widget.designId!, variantId: widget.variantId, configurationId: widget.configurationId, revision: widget.revision, line: widget.cartLine) : ownImage
               ? xinobiOwnImageUri(
                   productId: widget.productId ?? '',
                   variantId: widget.variantId ?? '',
@@ -61,10 +70,45 @@ class _XinobiMobilePreviewScreenState extends State<XinobiMobilePreviewScreen> {
       _error = 'Mobil önizleme adresi yapılandırılmamış. APK için XINOBI_WEB_PREVIEW_URL verin.';
       return;
     }
+    _trustedUri = uri;
     final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..addJavaScriptChannel('XinobiCommerce', onMessageReceived: (message) async {
+        final current = await _controller?.currentUrl();
+        if (current == null || Uri.tryParse(current)?.origin != _trustedUri?.origin) return;
+        Map<String, dynamic> request;
+        try {
+          if(message.message.length > 12 * 1024 * 1024) return;
+          request = jsonDecode(message.message) as Map<String, dynamic>;
+        } catch (_) { return; }
+        final Map<String, dynamic> reply;
+        if (request['action'] == 'login') {
+          if (mounted && ref.read(authProvider) is! SignedIn) {
+            final subscription = ref.listenManual(authProvider, (previous, next) {
+              if (next is SignedIn && mounted && context.canPop()) context.pop();
+            });
+            try { await context.push('/hesap'); } finally { subscription.close(); }
+          }
+          reply = {'id': request['id'], 'status': 204};
+        } else {
+          reply = await ref.read(nativeCommerceBridgeProvider).handle(message.message);
+        }
+        if (!mounted || Uri.tryParse(await _controller?.currentUrl() ?? '')?.origin != _trustedUri?.origin) return;
+        if(request['action'] == 'account' && (request['payload'] as Map?)?['method'] != 'GET') { ref.invalidate(designConfigurationsProvider); }
+        await _controller?.runJavaScript('window.dispatchEvent(new CustomEvent("xinobi-commerce-response", {detail: ${jsonEncode(reply)}}));');
+      })
       ..setNavigationDelegate(
         NavigationDelegate(
+          onNavigationRequest: (request) {
+            final target = Uri.tryParse(request.url);
+            if (target == null || !['http', 'https'].contains(target.scheme) || target.origin != uri.origin) return NavigationDecision.prevent;
+            final path = target.path.replaceAll(RegExp(r'/$'), '');
+            if (['/sepet', '/favoriler', '/hesap'].contains(path)) {
+              if (mounted) context.go(path);
+              return NavigationDecision.prevent;
+            }
+            return path.startsWith('/xinobi-u/') || path.startsWith('/hesap/tasarimlarim') ? NavigationDecision.navigate : NavigationDecision.prevent;
+          },
           onPageStarted: (_) {
             if (mounted) {
               setState(() {

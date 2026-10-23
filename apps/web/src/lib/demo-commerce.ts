@@ -1,6 +1,7 @@
 'use client';
 import {useSyncExternalStore} from 'react';
 import type {DesignPlacement} from './design-placement';
+import {isNativeCommerce,nativeAccountResponse} from './native-commerce';
 import {commerceApi} from './commerce';
 
 // Accounts are real: the shared /api/v1/auth and /api/v1/me contract (web: HttpOnly session cookies + CSRF header, ADR-004).
@@ -35,7 +36,7 @@ async function call<T>(path:string,init:RequestInit={}):Promise<T|null>{
   let response:Response;
   // FormData sets its own multipart boundary, so only JSON bodies get a Content-Type here.
   const type:Record<string,string>=init.body instanceof FormData?{}:{'Content-Type':'application/json'};
-  try{response=await fetch(api+path,{...init,credentials:'include',cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...type,'X-Xinobi-Csrf':'1',...init.headers}})}
+  try{response=isNativeCommerce()?await nativeAccountResponse(path,init):await fetch(api+path,{...init,credentials:'include',cache:'no-store',signal:AbortSignal.timeout(30000),headers:{...type,'X-Xinobi-Csrf':'1',...init.headers}})}
   catch{throw new Error('Hesap servisine ulaşılamadı. Lütfen tekrar dene.')}
   if(response.status===204)return null;
   const body=await response.json().catch(()=>null);
@@ -43,12 +44,18 @@ async function call<T>(path:string,init:RequestInit={}):Promise<T|null>{
   return body as T;
 }
 
+// Private thumbnails can expire together. Rotate the cookie session once, then
+// retry their reads; concurrent refreshes must not race a rotating refresh token.
+let refreshing:Promise<DemoUser|null>|null=null;
+function refreshWebSession(){return refreshing??=call<DemoUser>('/auth/web/refresh',{method:'POST'}).finally(()=>{refreshing=null})}
+
 /** Runs a signed-in request; an expired access cookie is refreshed once and the request retried. */
 async function signedIn<T>(path:string,init:RequestInit={}):Promise<T|null>{
   try{return await call<T>(path,init)}
   catch(error){
     if((error as {status?:number}).status!==401)throw error;
-    try{publish({user:(await call<DemoUser>('/auth/web/refresh',{method:'POST'}))??undefined})}
+    if(isNativeCommerce()){signedOut();throw new Error('Uygulamada hesabına giriş yap.');}
+    try{publish({user:(await refreshWebSession())??undefined})}
     catch{signedOut();throw new Error('Oturumun sona erdi. Tekrar giriş yap.')}
     return call<T>(path,init);
   }
@@ -92,10 +99,11 @@ async function loadSession(){
   try{publish({user:(await call<DemoUser>('/me'))??undefined,ready:true})}
   catch(error){
     if((error as {status?:number}).status!==401){publish({ready:true});return}
-    try{publish({user:(await call<DemoUser>('/auth/web/refresh',{method:'POST'}))??undefined,ready:true})}
+    if(isNativeCommerce()){signedOut();return}
+    try{publish({user:(await refreshWebSession())??undefined,ready:true})}
     catch{signedOut();return}
   }
-  if(session.user)await loadAccountData().catch(()=>{});
+  if(session.user&&!isNativeCommerce())await loadAccountData().catch(()=>{});
 }
 
 function subscribe(callback:()=>void){
@@ -203,7 +211,13 @@ export async function deleteDesign(id:string){await signedIn(`/me/designs/${enco
 /** Design images need the session; they are fetched with it and shown from an object URL the caller revokes. */
 export async function privateImageUrl(path:string){
   if(!api)throw new Error('Hesap servisi kullanılamıyor.');
-  const response=await fetch(api.replace(/\/api\/v1$/,'')+path,{credentials:'include',cache:'no-store'});
+  const read=()=>isNativeCommerce()?nativeAccountResponse(path.replace(/^\/api\/v1/,''),{},true):fetch(api.replace(/\/api\/v1$/,'')+path,{credentials:'include',cache:'no-store'});
+  let response=await read();
+  if(response.status===401){
+    if(isNativeCommerce()){signedOut();throw new Error('Uygulamada hesabına giriş yap.');}
+    try{publish({user:(await refreshWebSession())??undefined});response=await read()}
+    catch{signedOut();throw new Error('Oturumun sona erdi. Tekrar giriş yap.')}
+  }
   if(!response.ok)throw new Error('Tasarım görseli yüklenemedi.');
   return URL.createObjectURL(await response.blob());
 }
@@ -254,3 +268,12 @@ export async function saveDesignConfiguration(designId:string,variantId:string,p
 export async function setDesignConfigurationFavorite(id:string,favorite:boolean){await signedIn(`/me/design-configurations/${encodeURIComponent(id)}/favorite`,{method:'PUT',body:JSON.stringify({favorite})})}
 
 export async function getDesignConfiguration(id:string,revision:number){return (await signedIn<MyDesignConfiguration>(`/me/design-configurations/${encodeURIComponent(id)}/revisions/${revision}`))!}
+
+export const configurationPreviewPath=(id:string,revision:number)=>`/api/v1/me/design-configurations/${encodeURIComponent(id)}/revisions/${revision}/preview`;
+export async function saveConfigurationPreview(configuration:MyDesignConfiguration,canvas:HTMLCanvasElement){
+ const {designPreviewBlob}=await import('./design-preview');
+ const body=new FormData();body.append('file',await designPreviewBlob(canvas),'preview.jpg');
+ await signedIn(`/me/design-configurations/${configuration.id}/revisions/${configuration.revision}/preview`,{method:'PUT',body});
+}
+
+export const refreshAccountSession=()=>loadSession();

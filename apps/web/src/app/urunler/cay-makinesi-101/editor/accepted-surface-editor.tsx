@@ -1,15 +1,17 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import EditorWorkspace from "./editor-workspace";
 import type {DesignPlacement} from "../../../../lib/design-placement";
+import PlacementStudio from "../../../xinobi-u/kendi-gorselin/placement-studio";
+import SaveDesignButton from "../../../../components/save-design-button";
 import LocalPatternPreview from "../../../../features/product-personalization/local-pattern-preview";
 import { loadAcceptedSurface, type RenderingInputs } from "./accepted-surface-api";
 import styles from "./editor.module.css";
 import { previewUnavailableMessage } from "../../../../features/product-personalization/variant-preview-readiness";
-import type { Variant } from "../../../../../../../packages/commerce/client";
+import type { Product, Variant } from "../../../../../../../packages/commerce/client";
 import { loadCommerceState } from "../../../../lib/commerce";
 import detailStyles from "../product.module.css";
 import type { PlacementTransferHandle } from "../../../../features/product-personalization/preview-placement-transfer";
@@ -21,7 +23,7 @@ function PreviewStatus({ error = false, children }: { error?: boolean; children:
     <Link href="/urunler/cay-makinesi-101">Ürüne dön</Link>
   </section>;
 }
-type SavedPlacementProps={placementMode?:"pattern"|"artwork";initialPlacement?:DesignPlacement;onPlacementChange?:(value:DesignPlacement)=>void};
+type SavedPlacementProps={renderEditor?:(inputs:RenderingInputs,initial?:DesignPlacement)=>ReactNode;placementMode?:"pattern"|"artwork";initialPlacement?:DesignPlacement;onRendered?:(canvas:HTMLCanvasElement)=>void;onPlacementChange?:(value:DesignPlacement)=>void};
 function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailableMessage, xinobiPreview = false, ...saved }: { variant: string; commerceProduct?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean } & SavedPlacementProps) {
   const [resetPlacement,setResetPlacement]=useState(false);
   const [state, setState] = useState<{ variant: string; inputs?: RenderingInputs | null; error?: boolean }>({ variant });
@@ -37,6 +39,7 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailab
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi. Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin.</PreviewStatus>;
   if (!state.inputs) return <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>;
   if(saved.initialPlacement&&saved.initialPlacement.surfaceVersion!==state.inputs.surfaceVersion&&!resetPlacement)return <section role="alert"><p>Ürün yüzeyi değişti. Eski yerleşim bu yüzeye otomatik uygulanmaz.</p><button onClick={()=>setResetPlacement(true)}>Güncel yüzeye yeniden yerleştir</button></section>;
+  if(saved.renderEditor)return <>{saved.renderEditor(state.inputs,resetPlacement?undefined:saved.initialPlacement)}</>;
   if(saved.onPlacementChange)return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} fillMask={saved.initialPlacement?.fillMask} {...saved} initialPlacement={resetPlacement?undefined:saved.initialPlacement}/>;
   return <LocalPatternPreview inputs={state.inputs} initialPatternSrc={patternSrc ?? "/assets/personalization/sample-pattern.png"} xinobiPreview={xinobiPreview} />;
 }
@@ -59,6 +62,10 @@ export function DevelopmentReferenceLink({ href, children }: { href: string; chi
 function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavailableMessage, designId }: { productId: string; sessionVariantId: string; patternSrc?: string; unavailableMessage?: string; designId?: string }) {
   // Active design colour is separate from immutable generation identity.
   // Persist only its catalog ID; restored IDs must pass accepted-surface checks.
+  const [product,setProduct]=useState<Product>();
+  const [prices,setPrices]=useState<Record<string,number>>({});
+  const [placement,setPlacement]=useState<DesignPlacement>();
+  const [previewCanvas,setPreviewCanvas]=useState<HTMLCanvasElement|null>(null);
   const [activeVariantId, setActiveVariantId] = useState(sessionVariantId);
   const activeVariantKey = `xinobi-u-active-variant:${productId}:${designId ?? sessionVariantId}`;
   const [variants, setVariants] = useState<Variant[]>([]);
@@ -87,6 +94,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
           const accepted = supported.filter((value): value is {variant: Variant; inputs: RenderingInputs} => value !== null);
           let saved: string | null = null;
           try { saved = localStorage.getItem(activeVariantKey); } catch { /* Storage can be unavailable. */ }
+          setProduct(product);setPrices(catalog.prices);
           setActiveVariantId(accepted.some(value => value.variant.id === saved) ? saved! : sessionVariantId);
           setVariants(accepted.map(value => value.variant));
           setSurfaces(Object.fromEntries(accepted.map(value => [value.variant.id, value.inputs])));
@@ -125,6 +133,7 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
     }
     setSwitching(false);
   }
+  if(designId&&product&&selected&&inputs)return <PlacementStudio product={product} variants={variants} surfaces={surfaces} active={selected} onActiveChange={id=>{setActiveVariantId(id);try{localStorage.setItem(activeVariantKey,id)}catch{}}} mode="pattern" cover={false} patternUrl={patternSrc??"/assets/personalization/sample-pattern.png"} source={{name:'AI tasarımı',type:'',size:0}} sourceDescription="AI ile oluşturuldu" changeHref="" onChange={()=>{}} price={prices[selected.id]} onDraftChange={setPlacement} onRendered={setPreviewCanvas} actions={<SaveDesignButton stacked previewCanvas={previewCanvas} placement={placement?.surfaceVersion===inputs.surfaceVersion?placement:undefined} source={{sessionId:designId,productId,variantId:activeVariantId}}/>}/>;
   return <div className={styles.xinobiLayout}>
     <section className={styles.previewVariants} aria-label="Önizleme rengi" data-session-variant={sessionVariantId} data-preview-variant={activeVariantId} data-active-variant={activeVariantId}>
       <fieldset className={detailStyles.variants}>

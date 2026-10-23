@@ -299,9 +299,10 @@ class AuthController extends Notifier<AuthState> {
   AccountRepository get _repository => ref.read(accountRepositoryProvider);
   TokenStore get _tokens => ref.read(tokenStoreProvider);
 
+  late Future<void> ready;
   @override
   AuthState build() {
-    _restore();
+    ready = _restore();
     return const AuthLoading();
   }
 

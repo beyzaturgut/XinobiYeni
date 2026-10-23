@@ -72,6 +72,16 @@ public sealed class SavedDesignTests : IDisposable
     }
 
     [Fact]
+    public void GeneratedDesignNamesFitTheCartWithoutRejectingTheDesign()
+    {
+        Assert.Equal(60, SavedDesignStore.CleanName(null, new string('a', 90)).Length);
+        Assert.DoesNotContain('\n', SavedDesignStore.CleanName(null, "Uzun\nürün adı"));
+        var unicode = SavedDesignStore.CleanName(null, new string('a', 59) + "😀 tasarımı");
+        Assert.Equal(59, unicode.Length);
+        Assert.Equal("invalid_name", Assert.Throws<ProblemException>(() => SavedDesignStore.CleanName(new string('a', 90), "Tasarım")).Code);
+    }
+
+    [Fact]
     public void OnlyImageContentIsAccepted()
     {
         Assert.Equal(("image/png", ".png"), SavedDesignStore.DetectImage(Png));
@@ -199,6 +209,14 @@ public sealed class SavedDesignTests : IDisposable
         await File.WriteAllBytesAsync(Path.Combine(root, mediaVersion, "mask.png"), Png);
         var first = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, Favorite: true))));
         Assert.Equal(1, first.Revision); Assert.Equal(64, first.SourceSha256.Length);
+        var previewRoute = $"/api/v1/me/design-configurations/{first.Id}/revisions/1/preview";
+        byte[] jpegPreview = [255, 216, 255, 217];
+        using var previewUpload = new MultipartFormDataContent { { new ByteArrayContent(jpegPreview), "file", "preview.jpg" } };
+        (await Send(client, HttpMethod.Put, previewRoute, token, previewUpload)).EnsureSuccessStatusCode();
+        Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
+        Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, previewRoute, other)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(previewRoute)).StatusCode);
+
         Assert.Single(await Read<MyDesignConfiguration[]>(await Send(client, HttpMethod.Get, "/api/v1/me/design-configurations", token)));
         Assert.Empty(await Read<MyDesignConfiguration[]>(await Send(client, HttpMethod.Get, "/api/v1/me/design-configurations", other)));
         var address = await Read<CustomerAddress>(await Send(client, HttpMethod.Post, "/api/v1/me/addresses", token,
@@ -217,6 +235,8 @@ public sealed class SavedDesignTests : IDisposable
         }
         var second = await Read<MyDesignConfiguration>(secondResponse);
         Assert.Equal(2, second.Revision);
+        Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, previewRoute.Replace("/1/", "/2/"), token)).StatusCode);
+        Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
         Assert.Equal("configuration_changed", await Code(await Send(client, HttpMethod.Post, route, token,
             JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, first.Id, 1)))));
         var old = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Get, $"/api/v1/me/design-configurations/{first.Id}/revisions/1", token));
@@ -228,6 +248,7 @@ public sealed class SavedDesignTests : IDisposable
         Assert.Equal("attachment", download.Content.Headers.ContentDisposition?.DispositionType); Assert.Equal(Png, await download.Content.ReadAsByteArrayAsync());
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync($"/api/v1/local-commerce/orders/{order.Id}/lines/0/design?download=true")).StatusCode);
         (await Send(client, HttpMethod.Delete, $"/api/v1/me/designs/{design.Id}", token)).EnsureSuccessStatusCode();
+        Assert.Null(await factory.Services.GetRequiredService<IFileStore>().Open(FileAreas.Designs, $"preview-{first.Id}-1.jpg"));
         var retained = await Read<CustomerOrder>(await Send(client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}", token));
         Assert.Equal(25, retained.Lines[0].Personalization!.Placement!.X);
         Assert.Equal(Png, await (await Send(client, HttpMethod.Get, retained.Lines[0].Personalization!.ImageUrl!, token)).Content.ReadAsByteArrayAsync());

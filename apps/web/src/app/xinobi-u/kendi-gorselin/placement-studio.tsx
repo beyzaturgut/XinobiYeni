@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import {useCallback,useRef,useState} from "react";
+import {useCallback,useRef,useState,type ReactNode} from "react";
 import ProductPatternPreview,{type PatternTransform} from "../../urunler/cay-makinesi-101/editor/product-pattern-preview";
 import {defaultPatternTransform,usePatternPlacement} from "../../urunler/cay-makinesi-101/editor/use-pattern-placement";
 import {DEFAULT_CURVATURE_STRENGTH} from "../../urunler/cay-makinesi-101/editor/product-surface-warp";
@@ -18,12 +18,16 @@ const validHex=(hex?:string|null)=>Boolean(hex&&/^#[a-fA-F0-9]{6}$/.test(hex));
 const signed=(value:number,unit:string)=>(value>0?'+':'')+value+' '+unit;
 
 /** Step 4: the uploaded image on the selected colour's accepted surface, with the placement controls of the design. */
-export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price}:{product:Product;variants:Variant[];surfaces:Record<string,RenderingInputs>;active:Variant;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file:File;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
+export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription}:{product:Product;variants:Variant[];surfaces:Record<string,RenderingInputs>;active:Variant;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
  const inputs=surfaces[active.id];
- const fillMask=mode==='pattern';
+ const fillMask=initialPlacement?.fillMask??cover??mode==='pattern';
+ const renderKey=JSON.stringify([inputs.source.url,inputs.mask.url,patternUrl,mode,fillMask]);
+ const [preview,setPreview]=useState<{key:string;canvas:HTMLCanvasElement}|null>(null);
+ const previewCanvas=preview?.key===renderKey?preview.canvas:null;
  const [placement,setPlacement]=useState<DesignPlacement>();
- const onPlacementChange=useCallback((value:DesignPlacement)=>setPlacement(value),[]);
- const {patternTransform,setPatternTransform,curvatureStrength,setCurvatureStrength,patternBodyAdjustments,transfer}=usePatternPlacement({renderingInputs:inputs,placementMode:mode,fillMask,onPlacementChange});
+ const onPlacementChange=useCallback((value:DesignPlacement)=>{setPlacement(value);onDraftChange?.(value)},[onDraftChange]);
+ const {patternTransform,setPatternTransform,curvatureStrength,setCurvatureStrength,patternBodyAdjustments,transfer}=usePatternPlacement({renderingInputs:inputs,placementMode:mode,fillMask,onPlacementChange,initialPlacement});
+ const rendered=useCallback((canvas:HTMLCanvasElement)=>{setPreview({key:renderKey,canvas});onRendered?.(canvas)},[onRendered,renderKey]);
  const [past,setPast]=useState<Snapshot[]>([]),[future,setFuture]=useState<Snapshot[]>([]);
  const [zoom,setZoom]=useState(100),[showArea,setShowArea]=useState(true);
  const [switching,setSwitching]=useState(false),[notice,setNotice]=useState('');
@@ -80,7 +84,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
    </div>
    <div className={styles.canvasStage}>
     <div className={styles.zoom} style={{transform:`scale(${zoom/100})`}}>
-     <ProductPatternPreview surfaceTreatment={inputs.surfaceTreatment} surfaceInkExposureStops={inputs.surfaceInkExposureStops} sourceWidth={inputs.width} sourceHeight={inputs.height} assetWidth={inputs.assetWidth??inputs.width} assetHeight={inputs.assetHeight??inputs.height} productSrc={inputs.source.url} designableMaskSrc={inputs.mask.url} brandingOverlaySrc={inputs.branding?.url} patternSrc={patternUrl} placementMode={mode} fillMask={fillMask} onArtworkMove={mode==='artwork'?(x,y)=>change('drag',{x,y}):undefined} patternTransform={patternTransform} bodyPlacementAdjustments={patternBodyAdjustments} curvatureStrength={curvatureStrength} alt={`${product.name}, ${active.color}, tasarımlı ürün önizlemesi`}>
+     <ProductPatternPreview onRendered={rendered} surfaceTreatment={inputs.surfaceTreatment} surfaceInkExposureStops={inputs.surfaceInkExposureStops} sourceWidth={inputs.width} sourceHeight={inputs.height} assetWidth={inputs.assetWidth??inputs.width} assetHeight={inputs.assetHeight??inputs.height} productSrc={inputs.source.url} designableMaskSrc={inputs.mask.url} brandingOverlaySrc={inputs.branding?.url} patternSrc={patternUrl} placementMode={mode} fillMask={fillMask} onArtworkMove={mode==='artwork'?(x,y)=>change('drag',{x,y}):undefined} patternTransform={patternTransform} bodyPlacementAdjustments={patternBodyAdjustments} curvatureStrength={curvatureStrength} alt={`${product.name}, ${active.color}, tasarımlı ürün önizlemesi`}>
       {/* eslint-disable-next-line @next/next/no-img-element -- generated data URL */}
       {showArea&&outline&&<img className={styles.printArea} src={outline} alt=""/>}
      </ProductPatternPreview>
@@ -97,8 +101,8 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
    <div className={styles.fileSummary}>
     {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
     <img src={patternUrl} alt={mode==='pattern'?'Yüklenen desen':'Yüklenen görsel'}/>
-    <div><p>{source.name}</p><p>{fileMeta(source)}</p></div>
-    <Link href={changeHref} onClick={event=>{event.preventDefault();onChange()}}>Değiştir</Link>
+    <div><p>{source.name}</p><p>{sourceDescription??(source.size?fileMeta(source):'Kayıtlı tasarım')}</p></div>
+    {file&&<Link href={changeHref} onClick={event=>{event.preventDefault();onChange()}}>Değiştir</Link>}
    </div>
    <section className={styles.placementPanel} aria-labelledby="pattern-controls-title">
     <div className={styles.placementPanelHead}><p id="pattern-controls-title">Yerleşim</p><button type="button" onClick={()=>change('',origin,DEFAULT_CURVATURE_STRENGTH)}>Sıfırla</button></div>
@@ -110,7 +114,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
    </section>
    <div className={styles.checkout}>
     <div><span className={styles.printCheck}><i aria-hidden="true"/>Baskı kontrolü: Bekliyor</span><span className={styles.price}>{money(price)}</span></div>
-    <SaveDesignButton key={patternUrl} stacked placement={placement} source={{file,productId:product.id,variantId:active.id}}/>
+    <fieldset className={styles.checkoutActions} disabled={!previewCanvas||switching}>{actions??(file&&<SaveDesignButton key={patternUrl} stacked previewCanvas={previewCanvas} placement={placement} source={{file,productId:product.id,variantId:active.id}}/>)}</fieldset>
    </div>
   </aside>
  </div>;

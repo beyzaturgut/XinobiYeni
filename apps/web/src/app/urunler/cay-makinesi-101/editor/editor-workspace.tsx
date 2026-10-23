@@ -15,7 +15,7 @@ const initialLayers: Layer[] = [
   { id: 2, type: "Şekil", name: "İnce çerçeve", locked: false, visible: true },
 ];
 
-export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", fillMask = false, patternSrc = "/assets/personalization/sample-pattern.png", artworkSrc, onUpload, uploadBusy = false, xinobiPreview = false, placementRef, onPlacementChange, initialPlacement }: { renderingInputs: RenderingInputs; patternSrc?: string; artworkSrc?: string; placementMode?: "pattern" | "artwork"; fillMask?: boolean; onUpload?: () => void; uploadBusy?: boolean; xinobiPreview?: boolean; placementRef?: Ref<PlacementTransferHandle>; onPlacementChange?:(value:DesignPlacement)=>void; initialPlacement?:DesignPlacement }) {
+export default function EditorWorkspace({ renderingInputs, placementMode = "pattern", fillMask = false, patternSrc = "/assets/personalization/sample-pattern.png", artworkSrc, onUpload, uploadBusy = false, xinobiPreview = false, placementRef, onPlacementChange, initialPlacement, onRendered }: { renderingInputs: RenderingInputs; patternSrc?: string; artworkSrc?: string; placementMode?: "pattern" | "artwork"; fillMask?: boolean; onUpload?: () => void; uploadBusy?: boolean; xinobiPreview?: boolean; placementRef?: Ref<PlacementTransferHandle>; onPlacementChange?:(value:DesignPlacement)=>void; initialPlacement?:DesignPlacement;onRendered?:(canvas:HTMLCanvasElement)=>void }) {
   const [face, setFace] = useState<"Ön yüz" | "Arka yüz">("Ön yüz");
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
@@ -56,6 +56,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
         <div className={styles.productStage}>
           <div className={styles.halo} />
           <ProductPatternPreview
+            onRendered={onRendered}
             surfaceTreatment={renderingInputs.surfaceTreatment}
             surfaceInkExposureStops={renderingInputs.surfaceInkExposureStops}
             sourceWidth={renderingInputs.width}

@@ -33,7 +33,6 @@ export default function MobilePreviewPage() {
         </div>
         <div className={styles.headerActions}>
           <Link href="/xinobi-u">XINOBI U&apos;ya dön</Link>
-          <button type="button" disabled>Sepete aktar</button>
         </div>
       </header>
       <main id="editor-workspace">

@@ -7,7 +7,6 @@ import '../features/account/addresses.dart';
 import '../features/account/notifications.dart';
 import '../features/assistant/nobi.dart';
 import '../features/designs/designs.dart';
-import '../features/personalization/editor_screen.dart';
 import '../features/quotes/quotes.dart';
 import '../features/account/orders.dart';
 import '../features/cart/checkout_screen.dart';
@@ -56,7 +55,8 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(path: '/kurumsal/teklif/takip', builder: (context, state) => QuoteTrackScreen(code: state.uri.queryParameters['kod'], email: state.uri.queryParameters['eposta'])),
         GoRoute(
           path: '/tasarim-editoru',
-          builder: (context, state) => EditorScreen(productId: state.uri.queryParameters['urun'], variantId: state.uri.queryParameters['renk'], designId: state.uri.queryParameters['tasarim']),
+          redirect: (context, state) => state.uri.queryParameters['tasarim'] == null ? '/xinobi-u' : null,
+          builder: (context, state) => XinobiMobilePreviewScreen(productId: state.uri.queryParameters['urun'], variantId: state.uri.queryParameters['renk'], designId: state.uri.queryParameters['tasarim'], configurationId: state.uri.queryParameters['configuration'], revision: int.tryParse(state.uri.queryParameters['revision'] ?? ''), cartLine: state.uri.queryParameters['line']),
         ),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
         GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),

@@ -27,6 +27,18 @@ public static class SavedDesignEndpoints
         me.MapPut("/design-configurations/{id}/favorite", async (string id, SetConfigurationFavorite request, ClaimsPrincipal user, SavedDesignStore designs) =>
         { await designs.SetFavorite(Id(user), id, request.Favorite); return TypedResults.NoContent(); }).WithName("SetMyDesignConfigurationFavorite");
 
+        me.MapPut("/design-configurations/{id}/revisions/{revision:int}/preview", async (string id, int revision, [FromForm] IFormFile file, ClaimsPrincipal user, SavedDesignStore designs) =>
+        {
+            if (file.Length is 0 or > 2 * 1024 * 1024) throw new ProblemException("invalid_preview", "Tasarım önizlemesi hazırlanamadı.");
+            using var buffer = new MemoryStream();
+            await file.CopyToAsync(buffer);
+            await designs.SavePreview(Id(user), id, revision, buffer.ToArray());
+            return TypedResults.NoContent();
+        }).DisableAntiforgery().WithName("SaveMyDesignConfigurationPreview");
+        me.MapGet("/design-configurations/{id}/revisions/{revision:int}/preview", async Task<Results<FileStreamHttpResult, NotFound>> (string id, int revision, ClaimsPrincipal user, SavedDesignStore designs) =>
+            await designs.Preview(Id(user), id, revision) is { } preview ? TypedResults.Stream(preview.Content, "image/jpeg") : TypedResults.NotFound())
+            .WithName("GetMyDesignConfigurationPreview");
+
         // The XINOBI U session store exists only where XINOBI U runs; it is resolved per request so the contract does not depend on it.
         me.MapPost("/designs", async Task<Results<Created<MyDesign>, ProblemHttpResult>> (SaveDesignFromSession request, ClaimsPrincipal user, HttpContext http, SavedDesignStore designs) =>
             {

@@ -48,7 +48,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     ..productId = item.line.productId
                     ..variantId = item.line.variantId
                     ..quantity = item.line.quantity
-                    ..designId = item.line.designId),
+                    ..designId = item.line.designId
+                    ..configurationId = item.line.configurationId
+                    ..configurationRevision = item.line.configurationRevision),
               ])),
           ));
       if (order == null) return;

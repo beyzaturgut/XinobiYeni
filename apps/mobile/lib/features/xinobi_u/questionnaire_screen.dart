@@ -375,7 +375,7 @@ class _ResultState extends ConsumerState<_Result> {
   Future<void> _addToCart() async {
     final design = await _save(announce: false);
     if (design == null || !mounted) return;
-    await addDesignToCart(context, ref, design, variantId: widget.session.variant.id);
+    await context.push(Uri(path: '/tasarim-editoru', queryParameters: {'tasarim': design.id, 'urun': design.productId, 'renk': widget.session.variant.id}).toString());
   }
 
   @override
@@ -399,7 +399,7 @@ class _ResultState extends ConsumerState<_Result> {
       OutlinedButton.icon(onPressed: () { ScaffoldMessenger.of(context).hideCurrentSnackBar(); widget.onOpenPreview(); }, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
       const SizedBox(height: 8),
       if (ref.watch(authProvider) is SignedIn) ...[
-        FilledButton.icon(onPressed: saving ? null : _addToCart, icon: const Icon(Icons.add_shopping_cart), label: Text(saving ? 'Hazırlanıyor…' : 'Sepete ekle')),
+        FilledButton.icon(onPressed: saving ? null : _addToCart, icon: const Icon(Icons.add_shopping_cart), label: Text(saving ? 'Hazırlanıyor…' : 'Üründe yerleştir ve sepete ekle')),
         const SizedBox(height: 8),
         OutlinedButton(onPressed: saving || saved != null ? null : _save, child: Text(saved != null ? 'Tasarımlarım’a kaydedildi' : 'Tasarımımı kaydet')),
       ] else

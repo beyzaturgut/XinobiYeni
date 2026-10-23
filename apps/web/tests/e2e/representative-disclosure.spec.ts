@@ -23,8 +23,8 @@ for(const flow of ['generated','own-image'])test(flow+' personalized preview has
   await openPlacement(page);
  }
  if(flow==='generated'){await expect(page.locator('canvas[role=img]')).toBeVisible();await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();}
- // The own-image placement step (design "Önizleme ve yerleşim") words the same disclosure for its own layout.
- const disclosure=flow==='generated'?'Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.':'Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.';
+ // Generated and uploaded designs share the same placement studio and disclosure.
+ const disclosure='Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.';
  for(const width of [1440,390]){
   await page.setViewportSize({width,height:900});const badge=page.getByText('Temsilidir',{exact:true});await badge.scrollIntoViewIfNeeded();await page.mouse.move(0,0);await expect(badge).toBeVisible();
   await expect(page.getByText(disclosure,{exact:true})).toBeVisible();

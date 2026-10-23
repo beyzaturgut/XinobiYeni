@@ -8,6 +8,7 @@ import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import 'favorite_button.dart';
 import 'favorites.dart';
+import '../designs/design_configurations.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
@@ -24,7 +25,7 @@ class FavoritesScreen extends ConsumerWidget {
         toolbarHeight: XinobiTokens.headerHeight,
         title: const Text('Favorilerim'),
       ),
-      body: ids.isEmpty
+      body: CustomScrollView(slivers: [const SliverToBoxAdapter(child: PersonalizedFavorites()), SliverFillRemaining(child: ids.isEmpty
           ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(24),
@@ -54,7 +55,7 @@ class FavoritesScreen extends ConsumerWidget {
                   for (final item in items) Padding(padding: const EdgeInsets.only(bottom: 12), child: _FavoriteRow(item: item)),
                 ]),
               ),
-            ),
+            )),]),
     );
   }
 }

@@ -108,3 +108,17 @@ Uri? xinobiPublishedSurfaceUri({
   if (base == null || !identifier.hasMatch(productId) || !identifier.hasMatch(variantId)) return null;
   return Uri(scheme: base.scheme, host: base.host, port: base.port, path: '/assets/product-previews/$productId/$variantId/inputs.json');
 }
+
+/// Reopens exactly the saved placement (and optionally one native cart row).
+Uri? xinobiSavedDesignUri({required String designId, String? variantId, String? configurationId, int? revision, String? line,
+  String override = const String.fromEnvironment('XINOBI_WEB_PREVIEW_URL')}) {
+  final base = xinobiMobilePreviewUri(override: override);
+  if (base == null || !RegExp(r'^[a-f0-9]{32}$').hasMatch(designId)) return null;
+  return base.replace(path: '/hesap/tasarimlarim/onizleme/', queryParameters: {
+    'id': designId, 'mobile': '1',
+    'variant': ?variantId,
+    'configuration': ?configurationId,
+    if (revision != null) 'revision': '$revision',
+    'line': ?line,
+  });
+}

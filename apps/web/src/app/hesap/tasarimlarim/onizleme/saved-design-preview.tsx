@@ -1,18 +1,22 @@
 'use client';
 import Link from 'next/link';
+import PlacementStudio from '../../../xinobi-u/kendi-gorselin/placement-studio';
+import DesignAccountAccess from '../../../../components/design-account-access';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useRouter,useSearchParams} from 'next/navigation';
-import {designImageUrl,myDesigns,myDesignConfigurations,getDesignConfiguration,saveDesignConfiguration,setDesignConfigurationFavorite,useDemoCommerce,type MyDesign,type MyDesignConfiguration} from '../../../../lib/demo-commerce';
+import {saveConfigurationPreview,designImageUrl,myDesigns,myDesignConfigurations,getDesignConfiguration,saveDesignConfiguration,setDesignConfigurationFavorite,useDemoCommerce,type MyDesign,type MyDesignConfiguration} from '../../../../lib/demo-commerce';
 import {useCommerce} from '../../../../lib/commerce';
 import {readDesignPlacement,saveDesignPlacement,type DesignPlacement} from '../../../../lib/design-placement';
-import {addToCart,updateCartDesign,useCart,cartLineKey} from '../../../../lib/cart';
+import {useCartReady,flushNativeCart,addToCart,updateCartDesign,useCart,cartLineKey} from '../../../../lib/cart';
 import AcceptedSurfaceEditor from '../../../urunler/cay-makinesi-101/editor/accepted-surface-editor';
 import styles from '../../../xinobi-u/studio.module.css';
+import flow from '../../../xinobi-u/flow.module.css';
+import buttons from '../../../../components/save-design.module.css';
 
 export default function SavedDesignPreview(){
- const params=useSearchParams(),{user,ready}=useDemoCommerce();
- if(!ready)return <main className={styles.main}><p role="status">Hesap yükleniyor…</p></main>;
- if(!user)return <main className={styles.main}><Link href="/hesap">Giriş yap →</Link></main>;
+ const params=useSearchParams(),{user,ready}=useDemoCommerce(),cartReady=useCartReady();
+ if(!ready||!cartReady)return <main className={styles.main}><p role="status">Hesap yükleniyor…</p></main>;
+ if(!user)return <main className={styles.main}><DesignAccountAccess/></main>;
  return <Loader key={user.id+':'+params.toString()} id={params.get('id')??''} variant={params.get('variant')??''} configuration={params.get('configuration')??''} revision={Number(params.get('revision'))||undefined} target={params.get('line')??''}/>;
 }
 function Loader({id,variant,configuration,revision,target}:{id:string;variant:string;configuration:string;revision?:number;target:string}){
@@ -32,6 +36,7 @@ function Editor({design,src,config:initial,variant:requested,target}:{design:MyD
  const router=useRouter(),{state}=useCommerce(),cart=useCart();
  const active=useRef(true),saving=useRef(false);
  useEffect(()=>{active.current=true;return()=>{active.current=false}},[]);
+ const [previewCanvas,setPreviewCanvas]=useState<HTMLCanvasElement|null>(null);
  const [original]=useState(()=>cart.find(row=>cartLineKey(row)===target));
  const [chosen,setChosen]=useState(requested||initial?.variantId||design.variantId||'');
  const [config,setConfig]=useState(initial),[draft,setDraft]=useState<DesignPlacement>(),[busy,setBusy]=useState(false),[notice,setNotice]=useState(''),[error,setError]=useState('');
@@ -43,24 +48,28 @@ function Editor({design,src,config:initial,variant:requested,target}:{design:MyD
   if(saving.current||!draft||!product?.personalizable||!color||missing)return;
   saving.current=true;setBusy(true);setError('');
   try{
-   const existing=config?.variantId===chosen?config:undefined;
+   const existing=target?undefined:config?.variantId===chosen?config:undefined;
    const saved=await saveDesignConfiguration(design.id,chosen,draft,existing,action==='favorite'||existing?.favorite||false);
    if(!active.current)return;
+   setConfig(saved);
+   if(previewCanvas)await saveConfigurationPreview(saved,previewCanvas);
    if(action==='favorite')await setDesignConfigurationFavorite(saved.id,true);
    if(!active.current)return;
    if(target)updateCartDesign(target,original?.configurationRevision,{id:design.id,name:design.name,placement:draft,configurationId:saved.id,configurationRevision:saved.revision});
    else if(action==='add')addToCart(product.id,color.id,color.stock,{id:design.id,name:design.name,placement:draft,configurationId:saved.id,configurationRevision:saved.revision});
-   saveDesignPlacement(design.id,design.productId,chosen,draft);setConfig(saved);setNotice(action==='favorite'?'Tasarım yerleşimi favorilerine kaydedildi.':'Yerleşim kaydedildi.');
+   await flushNativeCart();
+   saveDesignPlacement(design.id,design.productId,chosen,draft);setConfig(saved);setNotice(action==='favorite'?'Tasarım yerleşimi favorilerine kaydedildi.':action==='add'?'Tasarımlı ürün sepete eklendi.':'Yerleşim kaydedildi.');
    if(target)router.push('/sepet');
   }catch(e){if(active.current)setError(e instanceof Error?e.message:'Yerleşim kaydedilemedi.')}finally{saving.current=false;if(active.current)setBusy(false)}
  }
- return <><header className={styles.main}><section className={styles.intro}><p className={styles.kicker}>Tasarımlarım · Yerleşim düzenle</p><h1>{design.name}</h1><p>{design.productName}</p></section>
+ const actions=<div className={`${buttons.wrap} ${buttons.stacked}`}><div className={buttons.actions}><button className={`${buttons.button} ${target?buttons.primary:''}`} disabled={busy||!draft||!previewCanvas||missing||!product?.personalizable} onClick={()=>void save('save')}>{busy?'Kaydediliyor…':target?'Sepet satırını kaydet':'Yerleşimi kaydet'}</button>{!target&&<><button disabled={busy||!draft||!previewCanvas||!color||color.stock<=0||!product?.personalizable} className={`${buttons.button} ${buttons.primary}`} onClick={()=>void save('add')}>Bu tasarımla sepete ekle</button><button disabled={busy||!draft||!previewCanvas||!product?.personalizable} className={buttons.button} onClick={()=>void save('favorite')}>Yerleşimi favorilere kaydet</button></>}</div>{notice&&<p role="status" className={buttons.saved}>{notice} <Link href={notice.includes('favorilerine')?'/favoriler':'/sepet'}>{notice.includes('favorilerine')?'Favorilere git →':'Sepete git →'}</Link></p>}</div>;
+ return <main className={flow.page}><header><section><p className={styles.kicker}>Tasarımlarım · Yerleşim düzenle</p><h1 className={flow.title}>{design.name}</h1><p>{design.productName}</p></section>
   {product&&<label>Renk <select disabled={Boolean(target)||busy} value={chosen} onChange={e=>{if(draft&&!window.confirm('Kaydedilmemiş yerleşimi bırakıp renk değiştirmek istiyor musun?'))return;setChosen(e.target.value);setDraft(undefined);setNotice('')}}><option value="" disabled>Renk seç</option>{chosen&&!color&&<option value={chosen} disabled>Bu renk artık kullanılamıyor</option>}{product.variants.map(item=><option key={item.id} value={item.id}>{item.color}</option>)}</select></label>}
   {!product?.personalizable&&state&&<p role="alert">Ürün artık kişiselleştirme için kullanılamıyor.</p>}
   {product&&!color&&<p role="alert">Önizlemek için geçerli bir renk seç. Eski veya eksik renk başka renkle değiştirilmez.</p>}
   {missing&&<p role="alert">Düzenlediğin sepet satırı kaldırılmış. Satır yeniden oluşturulmaz.</p>}
   <p className={styles.note}>Temsilidir. Kaydetmeden çıkarsan sepet veya favori yerleşimi değişmez. Dijital önizleme fiziksel baskı onayı değildir.</p>
-  <div className={styles.entryActions}><button disabled={busy||!draft||missing||!product?.personalizable} onClick={()=>void save('save')}>{busy?'Kaydediliyor…':target?'Sepet satırını kaydet':'Yerleşimi kaydet'}</button>{!target&&<><button disabled={busy||!draft||!color||color.stock<=0||!product?.personalizable} onClick={()=>void save('add')}>Bu tasarımla sepete ekle</button><button disabled={busy||!draft||!product?.personalizable} onClick={()=>void save('favorite')}>Yerleşimi favorilere kaydet</button></>}<Link href={target?'/sepet':'/hesap/tasarimlarim'}>İptal</Link></div>
-  {error&&<p role="alert">{error}</p>}<p role="status">{notice}</p></header>
-  {color&&product?.personalizable&&<AcceptedSurfaceEditor key={chosen} commerceProduct={design.productId} commerceVariant={chosen} patternSrc={src} placementMode={base?.mode??(design.kind==='upload'?'artwork':'pattern')} initialPlacement={base} onPlacementChange={change}/>}</>;
+  <Link href={target?'/sepet':'/hesap/tasarimlarim'}>İptal</Link>
+  {error&&<p role="alert">{error}</p>}</header>
+  {color&&product?.personalizable&&<div><AcceptedSurfaceEditor key={chosen} commerceProduct={design.productId} commerceVariant={chosen} initialPlacement={base} renderEditor={(inputs,initial)=><PlacementStudio product={product} variants={[color]} surfaces={{[chosen]:inputs}} active={color} onActiveChange={()=>{}} mode={base?.mode??(design.kind==='upload'?'artwork':'pattern')} cover={base?.fillMask??false} initialPlacement={initial} patternUrl={src} source={{name:design.name,type:'',size:0}} changeHref="" onChange={()=>{}} price={state?.prices[chosen]} onDraftChange={change} onRendered={setPreviewCanvas} actions={actions}/>}/></div>}</main>;
 }

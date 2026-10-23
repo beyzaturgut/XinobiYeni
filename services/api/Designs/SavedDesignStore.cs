@@ -27,7 +27,12 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
     public static string CleanName(string? name, string fallback)
     {
         var text = name?.Trim() ?? "";
-        if (text.Length == 0) return fallback;
+        if (text.Length == 0)
+        {
+            text = new string(fallback.Where(character => !char.IsControl(character)).ToArray()).Trim();
+            if (text.Length > 60) text = text[..(char.IsHighSurrogate(text[59]) ? 59 : 60)];
+            return text.Length == 0 ? "Tasarım" : text;
+        }
         return text.Length <= 60 && !text.Any(char.IsControl) ? text : throw new ProblemException("invalid_name", "Tasarım adı en fazla 60 karakter olabilir.");
     }
 
@@ -127,6 +132,7 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
 
     public async Task<bool> Delete(string accountId, string id)
     {
+        await DeletePreviews(accountId, id);
         var design = await store.Update(state =>
         {
             var found = state.Designs.FirstOrDefault(item => item.Id == id && item.AccountId == accountId);
@@ -167,6 +173,7 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
 
     public async Task ForgetAccount(string accountId)
     {
+        await DeletePreviews(accountId);
         var removed = await store.Update(state =>
         {
             var mine = state.Designs.Where(item => item.AccountId == accountId).ToArray();

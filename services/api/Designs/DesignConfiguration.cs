@@ -149,6 +149,24 @@ public sealed partial class SavedDesignStore
             state.Configurations.Add(new(accountId, saved)); return saved;
         });
     }
+    private static string PreviewFile(MyDesignConfiguration value) => $"preview-{value.Id}-{value.Revision}.jpg";
+    public async Task SavePreview(string accountId, string id, int revision, byte[] bytes)
+    {
+        var value = await Configuration(accountId, id, revision);
+        if (bytes.Length is 0 or > 2 * 1024 * 1024 || DetectImage(bytes).Mime != "image/jpeg")
+            throw new ProblemException("invalid_preview", "Tasarım önizlemesi hazırlanamadı.");
+        await files.Save(FileAreas.Designs, PreviewFile(value), new MemoryStream(bytes), "image/jpeg");
+    }
+    public async Task<StoredFile?> Preview(string accountId, string id, int revision)
+    {
+        var value = await Configuration(accountId, id, revision);
+        return await files.Open(FileAreas.Designs, PreviewFile(value));
+    }
+    private async Task DeletePreviews(string accountId, string? designId = null)
+    {
+        foreach (var entry in (await store.Read()).Configurations.Where(item => item.AccountId == accountId && (designId is null || item.Value.DesignId == designId)))
+            await files.Delete(FileAreas.Designs, PreviewFile(entry.Value));
+    }
     public Task SetFavorite(string accountId, string id, bool favorite) => store.Update(state =>
     {
         var index = state.Configurations.FindLastIndex(item => item.AccountId == accountId && item.Value.Id == id);

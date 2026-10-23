@@ -23,6 +23,7 @@ Method | HTTP request | Description
 [**deleteMyFavorite**](AccountApi.md#deletemyfavorite) | **DELETE** /api/v1/me/favorites/{productId} |
 [**getMyAccount**](AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [**getMyDesignConfiguration**](AccountApi.md#getmydesignconfiguration) | **GET** /api/v1/me/design-configurations/{id}/revisions/{revision} |
+[**getMyDesignConfigurationPreview**](AccountApi.md#getmydesignconfigurationpreview) | **GET** /api/v1/me/design-configurations/{id}/revisions/{revision}/preview |
 [**getMyDesignImage**](AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [**getMyOrderLineDesign**](AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
@@ -54,6 +55,7 @@ Method | HTTP request | Description
 [**returnMyOrder**](AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [**saveMyDesign**](AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [**saveMyDesignConfiguration**](AccountApi.md#savemydesignconfiguration) | **POST** /api/v1/me/designs/{id}/configurations |
+[**saveMyDesignConfigurationPreview**](AccountApi.md#savemydesignconfigurationpreview) | **PUT** /api/v1/me/design-configurations/{id}/revisions/{revision}/preview |
 [**setMyDesignConfigurationFavorite**](AccountApi.md#setmydesignconfigurationfavorite) | **PUT** /api/v1/me/design-configurations/{id}/favorite |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [**startAdminPasswordReset**](AccountApi.md#startadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset |
@@ -630,6 +632,48 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMyDesignConfigurationPreview**
+> getMyDesignConfigurationPreview(id, revision)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final int revision = 56; // int |
+
+try {
+    api.getMyDesignConfigurationPreview(id, revision);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getMyDesignConfigurationPreview: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **revision** | **int**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -1851,6 +1895,50 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **saveMyDesignConfigurationPreview**
+> saveMyDesignConfigurationPreview(id, revision, file)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final int revision = 56; // int |
+final MultipartFile file = BINARY_DATA_HERE; // MultipartFile |
+
+try {
+    api.saveMyDesignConfigurationPreview(id, revision, file);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->saveMyDesignConfigurationPreview: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **revision** | **int**|  |
+ **file** | **MultipartFile**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: multipart/form-data
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

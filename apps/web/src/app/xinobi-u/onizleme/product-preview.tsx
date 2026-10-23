@@ -3,7 +3,6 @@ import Link from 'next/link';
 import {useEffect,useState} from 'react';
 import {designRequest,studioAsset,type DesignSession} from '../../../lib/design-studio';
 import AcceptedSurfaceEditor from '../../urunler/cay-makinesi-101/editor/accepted-surface-editor';
-import SaveDesignButton from '../../../components/save-design-button';
 import styles from '../studio.module.css';
 export default function ProductPreview(){
  const [session,setSession]=useState<DesignSession|null>(null),[error,setError]=useState('');
@@ -25,6 +24,5 @@ export default function ProductPreview(){
    <p className={styles.previewTitle}>{session.product.name}</p>
    <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p>
   </div>
-  <div className={styles.previewTopActions}><SaveDesignButton source={{sessionId:session.id}}/></div>
  </header><AcceptedSurfaceEditor xinobiPreview designId={session.id} commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={studioAsset(session.imageUrl!)}/></>;
 }

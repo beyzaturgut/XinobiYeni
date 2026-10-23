@@ -172,3 +172,5 @@
 @media (min-width:761px) and (max-height:620px){
   .fileSummary{display:none}
 }
+
+.checkoutActions{margin:0;padding:0;border:0;min-width:0}

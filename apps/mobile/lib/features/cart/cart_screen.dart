@@ -102,7 +102,14 @@ class _CartRow extends ConsumerWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: XinobiTokens.surface, border: Border.all(color: item.problem == CartProblem.none ? XinobiTokens.line : XinobiTokens.danger)),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        SizedBox(width: 72, height: 72, child: line.designId != null ? DesignOnProduct(designId: line.designId!, placement: line.designPlacement, productId: line.productId, variant: variant, label: '$label üzerinde ${line.designName} tasarımı') : RemoteImage(variant?.imageUrl ?? item.product?.imageUrl)),
+        InkWell(
+          onTap: line.designId == null ? null : () => context.push(Uri(path: '/tasarim-editoru', queryParameters: {
+            'tasarim': line.designId!, 'urun': line.productId, 'renk': line.variantId, 'line': line.key,
+            if (line.configurationId != null) 'configuration': line.configurationId!,
+            if (line.configurationRevision != null) 'revision': '${line.configurationRevision}',
+          }).toString()),
+          child: SizedBox(width: 72, height: 72, child: line.designId != null ? DesignOnProduct(designId: line.designId!, configurationId: line.configurationId, configurationRevision: line.configurationRevision, placement: line.designPlacement, productId: line.productId, variant: variant, label: '$label üzerinde ${line.designName} tasarımı, düzenlemek için aç') : RemoteImage(variant?.imageUrl ?? item.product?.imageUrl)),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -121,13 +128,13 @@ class _CartRow extends ConsumerWidget {
             Row(children: [
               IconButton(
                 tooltip: '$label adedini azalt',
-                onPressed: () => run(() => cart.setQuantity(line.productId, line.variantId, line.quantity - 1, designId: line.designId)),
+                onPressed: () => run(() => cart.setLineQuantity(line.key, line.quantity - 1)),
                 icon: const Icon(Icons.remove),
               ),
               Semantics(label: 'Adet ${line.quantity}', excludeSemantics: true, child: Text('${line.quantity}', style: text.titleMedium)),
               IconButton(
                 tooltip: '$label adedini artır',
-                onPressed: canIncrease ? () => run(() => cart.setQuantity(line.productId, line.variantId, line.quantity + 1, designId: line.designId)) : null,
+                onPressed: canIncrease ? () => run(() => cart.setLineQuantity(line.key, line.quantity + 1)) : null,
                 icon: const Icon(Icons.add),
               ),
               const Spacer(),
@@ -135,8 +142,8 @@ class _CartRow extends ConsumerWidget {
                 label: '$label sepetten kaldır',
                 button: true,
                 excludeSemantics: true,
-                onTap: () => run(() => cart.remove(line.productId, line.variantId, designId: line.designId)),
-                child: TextButton(onPressed: () => run(() => cart.remove(line.productId, line.variantId, designId: line.designId)), child: const Text('Kaldır')),
+                onTap: () => run(() => cart.setLineQuantity(line.key, 0)),
+                child: TextButton(onPressed: () => run(() => cart.setLineQuantity(line.key, 0)), child: const Text('Kaldır')),
               ),
             ]),
           ]),

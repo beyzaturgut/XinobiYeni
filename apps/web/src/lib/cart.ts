@@ -1,4 +1,5 @@
 'use client';
+import {isNativeCommerce,nativeCommerce} from './native-commerce';
 import {useMemo,useSyncExternalStore} from 'react';
 import {validDesignPlacement,readDesignPlacement,type DesignPlacement} from './design-placement';
 /** A cart row; [designId]/[designName] make it a personalised line with one of the customer's saved designs. */
@@ -8,20 +9,36 @@ const key='xinobi-cart-v1',changed='xinobi-cart-changed';
 function snapshot(){try{return localStorage.getItem(key)||'[]'}catch{return '[]'}}
 const text=(value:unknown,max:number)=>typeof value==='string'&&value.length>0&&value.length<=max;
 function parse(raw:string):CartLine[]{try{const rows=JSON.parse(raw);if(!Array.isArray(rows))return [];return rows.filter(row=>row&&typeof row.productId==='string'&&typeof row.variantId==='string'&&Number.isInteger(row.quantity)&&row.quantity>0&&row.quantity<=99&&(row.designId===undefined||text(row.designId,64)&&text(row.designName,60))&&(row.configurationId===undefined&&row.configurationRevision===undefined||row.designId&&typeof row.configurationId==='string'&&/^[a-f0-9]{32}$/.test(row.configurationId)&&Number.isInteger(row.configurationRevision)&&row.configurationRevision>0)).slice(0,100).map(row=>{const {designPlacement,...rest}=row;return {...rest,...(validDesignPlacement(designPlacement)?{designPlacement}:{})}})}catch{return []}}
-function write(rows:CartLine[]){localStorage.setItem(key,JSON.stringify(rows));window.dispatchEvent(new Event(changed))}
-function subscribe(callback:()=>void){window.addEventListener(changed,callback);window.addEventListener('storage',callback);return()=>{window.removeEventListener(changed,callback);window.removeEventListener('storage',callback)}}
+let nativeWrite:Promise<unknown>=Promise.resolve();
+export const flushNativeCart=()=>nativeWrite;
+function write(rows:CartLine[]){if(parse(JSON.stringify(rows)).length!==rows.length)throw new Error('Sepet satırı doğrulanamadı. Tasarımını yeniden açıp dene.');const previous=snapshot();localStorage.setItem(key,JSON.stringify(rows));window.dispatchEvent(new Event(changed));if(isNativeCommerce()){
+ nativeWrite=nativeWrite.catch(()=>{}).then(()=>nativeCommerce('cart.write',{rows,previous:JSON.parse(previous)})).catch(error=>{localStorage.setItem(key,previous);window.dispatchEvent(new Event(changed));throw error});
+ // Consumers await flushNativeCart before confirming success; quantity controls
+ // also receive a visible error if a native write cannot complete.
+ void nativeWrite.catch(()=>{});
+}}
+let nativeLoaded=false,nativeReady=false;
+export function useCartReady(){return useSyncExternalStore(subscribe,()=>!isNativeCommerce()||nativeReady,()=>true)}
+
+function subscribe(callback:()=>void){if(isNativeCommerce()&&!nativeLoaded){nativeLoaded=true;void nativeCommerce('cart.read').then(reply=>{nativeReady=true;localStorage.setItem(key,JSON.stringify(reply.body));window.dispatchEvent(new Event(changed))}).catch(()=>{nativeLoaded=false})}window.addEventListener(changed,callback);window.addEventListener('storage',callback);return()=>{window.removeEventListener(changed,callback);window.removeEventListener('storage',callback)}}
 /** The same colour with another design (or none) is a separate line. */
 export const sameLine=(row:CartLine,productId:string,variantId:string,designId?:string,configurationId?:string,configurationRevision?:number)=>row.productId===productId&&row.variantId===variantId&&(row.designId??'')===(designId??'')&&(row.configurationId??'')===(configurationId??'')&&row.configurationRevision===configurationRevision;
 export const cartLineKey=(row:CartLine)=>`${row.productId}:${row.variantId}:${row.designId??''}${row.configurationId?':'+row.configurationId+':'+row.configurationRevision:''}`;
 /** Units of one colour across all its lines; stock limits the colour, not each design. */
 export const variantUnits=(rows:CartLine[],variantId:string)=>rows.filter(row=>row.variantId===variantId).reduce((sum,row)=>sum+row.quantity,0);
 export function useCart(){const raw=useSyncExternalStore(subscribe,snapshot,()=>'[]');return useMemo(()=>parse(raw),[raw])}
-export function addToCart(productId:string,variantId:string,stock:number,design?:CartDesign,quantity=1){if(!Number.isInteger(quantity)||quantity<1||quantity>99)throw new Error('Geçerli adet girin.');if(design&&!design.placement)design={...design,placement:readDesignPlacement(design.id,productId,variantId)};const rows=parse(snapshot());const existing=rows.find(row=>sameLine(row,productId,variantId,design?.id,design?.configurationId,design?.configurationRevision));if(variantUnits(rows,variantId)+quantity>Math.min(stock,99)||(existing?.quantity||0)+quantity>99)throw new Error('Bu renk için sepetteki adet mevcut stok sınırına ulaştı.');write(existing?rows.map(row=>row===existing?{...row,quantity:row.quantity+quantity,...(design?.configurationId?{configurationRevision:design.configurationRevision}:{}),...(design?.placement?{designPlacement:design.placement}:{})}:row):[...rows,{productId,variantId,quantity,...(design?{designId:design.id,designName:design.name,...(design.configurationId?{configurationId:design.configurationId,configurationRevision:design.configurationRevision}:{}),...(design.placement?{designPlacement:design.placement}:{})}:{})}])}
+function cartDesign(design:CartDesign):CartDesign{
+ const name=design.name.trim()||'Tasarım';let shortened=name.slice(0,60);
+ if(/[\uD800-\uDBFF]$/.test(shortened))shortened=shortened.slice(0,-1);
+ return {...design,name:shortened};
+}
+export function addToCart(productId:string,variantId:string,stock:number,design?:CartDesign,quantity=1){if(design)design=cartDesign(design);if(!Number.isInteger(quantity)||quantity<1||quantity>99)throw new Error('Geçerli adet girin.');if(design&&!design.placement)design={...design,placement:readDesignPlacement(design.id,productId,variantId)};const rows=parse(snapshot());const existing=rows.find(row=>sameLine(row,productId,variantId,design?.id,design?.configurationId,design?.configurationRevision));if(variantUnits(rows,variantId)+quantity>Math.min(stock,99)||(existing?.quantity||0)+quantity>99)throw new Error('Bu renk için sepetteki adet mevcut stok sınırına ulaştı.');write(existing?rows.map(row=>row===existing?{...row,quantity:row.quantity+quantity,...(design?.configurationId?{configurationRevision:design.configurationRevision}:{}),...(design?.placement?{designPlacement:design.placement}:{})}:row):[...rows,{productId,variantId,quantity,...(design?{designId:design.id,designName:design.name,...(design.configurationId?{configurationId:design.configurationId,configurationRevision:design.configurationRevision}:{}),...(design.placement?{designPlacement:design.placement}:{})}:{})}])}
 export function setCartQuantity(productId:string,variantId:string,quantity:number,designId?:string,configurationId?:string,configurationRevision?:number){if(!Number.isInteger(quantity)||quantity<0||quantity>99)throw new Error('Geçerli adet girin.');const rows=parse(snapshot());write(quantity===0?rows.filter(row=>!sameLine(row,productId,variantId,designId,configurationId,configurationRevision)):rows.map(row=>sameLine(row,productId,variantId,designId,configurationId,configurationRevision)?{...row,quantity}:row))}
 export function clearCart(){write([])}
 
 /** Updates exactly one existing row; optimistic revision check prevents a stale editor from recreating/overwriting it. */
 export function updateCartDesign(target:string,expectedRevision:number|undefined,design:CartDesign){
+ design=cartDesign(design);
  const rows=parse(snapshot()),row=rows.find(item=>cartLineKey(item)===target);
  if(!row)throw new Error('Düzenlediğin sepet satırı kaldırılmış. Sepete dön.');
  if(row.configurationRevision!==expectedRevision)throw new Error('Sepet satırı başka bir işlemde değişti. Yeniden aç.');

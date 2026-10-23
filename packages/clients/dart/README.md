@@ -79,6 +79,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyFavorite**](doc/AccountApi.md#deletemyfavorite) | **DELETE** /api/v1/me/favorites/{productId} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
 [*AccountApi*](doc/AccountApi.md) | [**getMyDesignConfiguration**](doc/AccountApi.md#getmydesignconfiguration) | **GET** /api/v1/me/design-configurations/{id}/revisions/{revision} |
+[*AccountApi*](doc/AccountApi.md) | [**getMyDesignConfigurationPreview**](doc/AccountApi.md#getmydesignconfigurationpreview) | **GET** /api/v1/me/design-configurations/{id}/revisions/{revision}/preview |
 [*AccountApi*](doc/AccountApi.md) | [**getMyDesignImage**](doc/AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrderLineDesign**](doc/AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
@@ -110,6 +111,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**returnMyOrder**](doc/AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [*AccountApi*](doc/AccountApi.md) | [**saveMyDesign**](doc/AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**saveMyDesignConfiguration**](doc/AccountApi.md#savemydesignconfiguration) | **POST** /api/v1/me/designs/{id}/configurations |
+[*AccountApi*](doc/AccountApi.md) | [**saveMyDesignConfigurationPreview**](doc/AccountApi.md#savemydesignconfigurationpreview) | **PUT** /api/v1/me/design-configurations/{id}/revisions/{revision}/preview |
 [*AccountApi*](doc/AccountApi.md) | [**setMyDesignConfigurationFavorite**](doc/AccountApi.md#setmydesignconfigurationfavorite) | **PUT** /api/v1/me/design-configurations/{id}/favorite |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startAdminPasswordReset**](doc/AccountApi.md#startadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset |

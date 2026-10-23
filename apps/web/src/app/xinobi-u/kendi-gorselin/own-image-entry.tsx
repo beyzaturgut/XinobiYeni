@@ -4,7 +4,6 @@ import Link from "next/link";
 import {Suspense,useEffect,useState,type DragEvent} from "react";
 import {useSearchParams} from "next/navigation";
 import {useCommerce,mediaUrl,commerceApi} from "../../../lib/commerce";
-import {useDemoCommerce} from "../../../lib/demo-commerce";
 import {fileMeta,useLocalPatternFile} from "../../../features/product-personalization/use-local-pattern-file";
 import {startingVariant,useAcceptedVariants} from "../../../features/product-personalization/accepted-variants";
 import FlowSteps from "../flow-steps";
@@ -29,7 +28,6 @@ function Flow({product,variant,initialMode,embedded}:{product:string;variant:str
  useEffect(()=>{if(!embedded)return;document.documentElement.dataset.embedded='app';return()=>{delete document.documentElement.dataset.embedded}},[embedded]);
  useEffect(()=>{const sync=()=>setPreviewing(onPreview());window.addEventListener('popstate',sync);window.addEventListener('hashchange',sync);return()=>{window.removeEventListener('popstate',sync);window.removeEventListener('hashchange',sync)}},[]);
  const {state}=useCommerce();
- const {user,ready:accountReady}=useDemoCommerce();
  const selected=state?.products.find(item=>item.id===product&&item.active);
  const [retry,setRetry]=useState(0),[activeId,setActiveId]=useState(variant),[dragging,setDragging]=useState(false),[sampleError,setSampleError]=useState('');
  const accepted=useAcceptedVariants(selected?.personalizable===true?selected:undefined,retry);
@@ -42,14 +40,13 @@ function Flow({product,variant,initialMode,embedded}:{product:string;variant:str
  const switchMode=(next:Mode)=>{if(next===mode)return;setMode(next);window.history.replaceState(window.history.state,'',href(next).replace('/kendi-gorselin?','/kendi-gorselin/?'))};
  const methodHref='/xinobi-u/renk?'+new URLSearchParams({product,variant});
  const pattern=mode==='pattern';
- const pick=(file:File|undefined)=>{if(file){setSampleError('');void local.select(file)}};
+ const pick=async(file:File|undefined)=>{if(file){setSampleError('');await local.select(file)}};
  async function trySample(){setSampleError('');try{const response=await fetch(sampleSrc);if(!response.ok)throw new Error();const blob=await response.blob();void local.select(new File([blob],'ornek-desen.png',{type:blob.type||'image/png'}))}catch{setSampleError('Örnek görsel yüklenemedi.')}}
  const ready=selected?.personalizable===true&&Boolean(start);
  if(ready&&local.url&&local.file&&local.source&&active&&previewing)return <main className={flow.page} data-product-reference={product} data-variant-reference={active.id}>
   <FlowSteps current={3} backHref={href()} backLabel="Görseli değiştir" onBack={backToUpload}/>
   <div className={styles.placementHead}>
    <div><p className={flow.kicker}>XINOBI U · Adım 4 / 4</p><h1 className={`${flow.title} ${styles.placementTitle}`}>Tasarımını yerleştir</h1></div>
-   {accountReady&&!user&&<p><Link href="/hesap">Giriş yap</Link>, tasarımını kaydet ve sepete ekle.</p>}
   </div>
   <PlacementStudio product={selected!} variants={selected!.variants.filter(item=>accepted.surfaces[item.id])} surfaces={accepted.surfaces} active={active} onActiveChange={setActiveId} mode={mode} file={local.file} patternUrl={local.url} source={local.source} changeHref={href()} onChange={backToUpload} price={state?.prices[active.id]}/>
  </main>;
@@ -71,12 +68,12 @@ function Flow({product,variant,initialMode,embedded}:{product:string;variant:str
       {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
       <img src={local.url} alt={pattern?'Yüklenen desen':'Yüklenen görsel'}/>
       <div><p className={styles.fileReady}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{pattern?'Desen hazır':'Görsel hazır'}</p><p className={styles.fileName}>{local.source.name}</p><p className={styles.fileMeta}>{fileMeta(local.source)}</p></div>
-      <div className={styles.fileActions}><label className={styles.pickSmall}>Değiştir<input id="local-pattern" type="file" accept={accept} disabled={local.busy} onChange={event=>{const input=event.currentTarget,file=input.files?.[0];pick(file);input.value=''}}/></label><button type="button" aria-label={pattern?'Deseni kaldır':'Görseli kaldır'} onClick={local.remove}>Kaldır</button></div>
+      <div className={styles.fileActions}><label className={styles.pickSmall}>Değiştir<input id="local-pattern" type="file" accept={accept} disabled={local.busy} onChange={event=>{const input=event.currentTarget,file=input.files?.[0];void pick(file).finally(()=>{if(input.files?.[0]===file)input.value=''})}}/></label><button type="button" aria-label={pattern?'Deseni kaldır':'Görseli kaldır'} onClick={local.remove}>Kaldır</button></div>
      </div>:<div className={`${styles.drop} ${dragging?styles.dragging:''}`} onDragOver={(event:DragEvent)=>{event.preventDefault();setDragging(true)}} onDragLeave={()=>setDragging(false)} onDrop={(event:DragEvent)=>{event.preventDefault();setDragging(false);pick(event.dataTransfer.files?.[0])}}>
       <span className={styles.dropIcon} aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
       <p className={styles.dropTitle}>{pattern?'Desenini buraya sürükle':'Görselini buraya sürükle'}</p>
       <p>{embedded?'ya da cihazından bir dosya seç':'ya da bilgisayarından bir dosya seç'}</p>
-      <div className={styles.dropActions}><label className={styles.pick}>Dosya seç<input id="local-pattern" type="file" accept={accept} disabled={local.busy} aria-describedby="local-image-help" onChange={event=>{const input=event.currentTarget,file=input.files?.[0];pick(file);input.value=''}}/></label><button type="button" className={styles.sample} disabled={local.busy} onClick={()=>void trySample()}>Örnek görselle dene</button></div>
+      <div className={styles.dropActions}><label className={styles.pick}>Dosya seç<input id="local-pattern" type="file" accept={accept} disabled={local.busy} aria-describedby="local-image-help" onChange={event=>{const input=event.currentTarget,file=input.files?.[0];void pick(file).finally(()=>{if(input.files?.[0]===file)input.value=''})}}/></label><button type="button" className={styles.sample} disabled={local.busy} onClick={()=>void trySample()}>Örnek görselle dene</button></div>
      </div>}
      {local.busy&&<div className={styles.busy}><p role="status">Görsel hazırlanıyor…</p><button type="button" className={flow.secondary} onClick={local.cancel}>Hazırlamayı iptal et</button></div>}
      {(local.error||sampleError)&&<p role="alert" className={flow.error}>{local.error||sampleError}</p>}

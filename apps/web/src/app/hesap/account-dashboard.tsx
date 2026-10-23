@@ -1,9 +1,9 @@
 'use client';
 import Link from 'next/link';
-import {useEffect, useRef, useState, type FormEvent} from 'react';
+import {useState, type FormEvent} from 'react';
 import {changeAccountPassword,confirmEmailChange,deleteAccount,demoLogout,localPhone,startEmailChange,updateAccountProfile,useDemoCommerce,type CustomerAddress,type CustomerOrder,type DemoUser,type EmailChallenge} from '../../lib/demo-commerce';
 import {money} from '../../lib/commerce';
-import AccountAccess from '../../components/account-access/account-access';
+import AuthModal from '../../components/account-access/account-modal';
 import styles from './account.module.css';
 
 type IconName = 'person'|'package'|'heart'|'bag'|'lock'|'arrow'|'pin'|'bell'|'star';
@@ -20,16 +20,6 @@ function Icon({name}: {name: IconName}) {
     pin:'M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21ZM12 12a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
   };
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name]}/></svg>;
-}
-function AuthModal({mode,onClose}: {mode:'login'|'register';onClose:()=>void}) {
-  const ref=useRef<HTMLDialogElement>(null);
-  useEffect(()=>{ref.current?.showModal();},[]);
-  function close() {ref.current?.close();}
-  return <dialog ref={ref} className={styles.modal} aria-label={mode==='login'?'Giriş yap':'Hesap oluştur'} onClose={onClose} onClick={event=>{if(event.target===event.currentTarget){const box=event.currentTarget.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom)close();}}}>
-    <button className={styles.close} aria-label="Pencereyi kapat" onClick={close}>×</button>
-    <p className={styles.eyebrow}>XINOBI Üye Portalı</p>
-    <AccountAccess initialMode={mode} onAuthenticated={close}/>
-  </dialog>;
 }
 export default function AccountDashboard(){
   const {user,orders,addresses,ready}=useDemoCommerce();

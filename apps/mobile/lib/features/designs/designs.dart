@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,7 @@ import '../account/auth.dart';
 import '../cart/cart.dart';
 import '../catalog/catalog_repository.dart';
 import '../personalization/surface_preview.dart';
+import 'design_configurations.dart';
 import '../personalization/design_placement_store.dart';
 
 /// The account's saved designs (K-21), newest first; empty when signed out.
@@ -20,9 +23,19 @@ final myDesignsProvider = FutureProvider.autoDispose<List<MyDesign>>((ref) async
 
 /// Design images are private: the request carries the account's bearer token.
 final designImageProvider = FutureProvider.autoDispose.family<ImageProvider?, String>((ref, path) async {
-  final token = await ref.read(authProvider.notifier).accessToken();
-  if (token == null) return null;
-  return NetworkImage(ref.read(accountRepositoryProvider).designImageUrl(path), headers: {'Authorization': 'Bearer $token'});
+  if (ref.watch(authProvider) is! SignedIn) return null;
+  return ref.read(authProvider.notifier).withSession((repository, token) async {
+    try {
+      final dio = ref.read(apiClientProvider).dio;
+      final uri = Uri.parse(repository.designImageUrl(path));
+      if (!['http', 'https'].contains(uri.scheme) || uri.origin != Uri.parse(dio.options.baseUrl).origin) throw const AccountException('invalid_image', 'Tasarım görseli adresi doğrulanamadı.');
+      final response = await dio.get<List<int>>(uri.toString(), options: Options(responseType: ResponseType.bytes, headers: {'Authorization': 'Bearer $token'}));
+      return MemoryImage(Uint8List.fromList(response.data!));
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 401) throw const AccountException('unauthorized', 'Oturum sona erdi.');
+      throw const AccountException('image_unavailable', 'Tasarım görseli yüklenemedi.');
+    }
+  });
 });
 
 String designImagePath(String id) => '/api/v1/me/designs/${Uri.encodeComponent(id)}/image';
@@ -54,14 +67,20 @@ Future<void> addDesignToCart(BuildContext context, WidgetRef ref, MyDesign desig
 /// A saved design worn on its colour's approved surface, placed as the editor starts (an AI pattern covers it, an uploaded
 /// image sits at the default size); colours without an approved surface show the design itself. Labelled "Temsilidir".
 class DesignOnProduct extends ConsumerWidget {
-  const DesignOnProduct({super.key, required this.designId, required this.label, this.productId, this.variant, this.placement});
+  const DesignOnProduct({super.key, required this.designId, required this.label, this.productId, this.variant, this.placement, this.configurationId, this.configurationRevision});
   final String designId;
+  final String? configurationId;
+  final int? configurationRevision;
   final String? productId;
   final String label;
   final VariantDetail? variant;
   final DesignPlacement? placement;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (configurationId != null && configurationRevision != null) { return ConfigurationPreview(
+      configurationId: configurationId!, revision: configurationRevision!, label: label,
+      fallback: DesignOnProduct(designId: designId, productId: productId, variant: variant, placement: placement, label: label),
+    ); }
     final path = designImagePath(designId);
     final published = variant == null || variant!.surfaceMaskUrl != null || productId == null ? null : ref.watch(publishedSurfaceProvider((productId: productId!, variantId: variant!.id))).value;
     final product = variant?.surfaceMaskUrl != null ? variant?.imageUrl : published?.sourceUrl;
@@ -171,10 +190,10 @@ class DesignsScreen extends ConsumerWidget {
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       AspectRatio(
                         aspectRatio: 1,
-                        child: Stack(fit: StackFit.expand, children: [
+                        child: InkWell(onTap: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}'), child: Stack(fit: StackFit.expand, children: [
                           DesignImage(design: design),
                           Positioned(left: 6, bottom: 6, child: Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2), color: XinobiTokens.surface, child: Text('Temsilidir', style: text.labelSmall))),
-                        ]),
+                        ])),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(8, 8, 8, 0),
@@ -186,7 +205,7 @@ class DesignsScreen extends ConsumerWidget {
                       const Spacer(),
                       Row(children: [
                         IconButton(tooltip: '${design.name} ürün üzerinde dene', icon: const Icon(Icons.view_in_ar_outlined), onPressed: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}')),
-                        IconButton(tooltip: '${design.name} tasarımıyla sepete ekle', icon: const Icon(Icons.add_shopping_cart), onPressed: () => addDesignToCart(context, ref, design)),
+                        IconButton(tooltip: '${design.name} tasarımıyla sepete ekle', icon: const Icon(Icons.add_shopping_cart), onPressed: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}')),
                         IconButton(tooltip: '${design.name} yeniden adlandır', icon: const Icon(Icons.edit_outlined), onPressed: () => _rename(context, ref, design)),
                         IconButton(tooltip: '${design.name} sil', icon: const Icon(Icons.delete_outline), onPressed: () => _delete(context, ref, design)),
                       ]),

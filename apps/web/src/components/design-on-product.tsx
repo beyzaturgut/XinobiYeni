@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {privateImageUrl} from '../lib/demo-commerce';
+import {configurationPreviewPath,useDemoCommerce,privateImageUrl} from '../lib/demo-commerce';
 import {loadCachedAcceptedSurface,type RenderingInputs} from '../app/urunler/cay-makinesi-101/editor/accepted-surface-api';
 import ProductPatternPreview from '../app/urunler/cay-makinesi-101/editor/product-pattern-preview';
 import PrivateDesignImage from './private-design-image';
@@ -9,7 +9,15 @@ import styles from './design-on-product.module.css';
 
 /** A saved design worn on its product colour's approved surface, with the editor's starting placement; colours without
  *  an approved surface (or a failed render) show the design itself. Always labelled "Temsilidir" (K-12). */
-export default function DesignOnProduct({productId,variantId,designPath,kind,alt,className,placement}:{productId:string;variantId:string;designPath:string;kind?:'ai'|'upload';alt:string;className?:string;placement?:DesignPlacement}){
+type Props={productId:string;variantId:string;designPath:string;kind?:'ai'|'upload';alt:string;className?:string;placement?:DesignPlacement;configurationId?:string;configurationRevision?:number};
+export default function DesignOnProduct(props:Props){
+ const {user}=useDemoCommerce();
+ if(!user)return <span className={props.className}>Tasarımını görmek için giriş yap.</span>;
+ const key=[user.id,props.productId,props.variantId,props.designPath,props.configurationId,props.configurationRevision].join(':');
+ const fallback=<ComposedDesign key={key} {...props}/>;
+ return props.configurationId&&props.configurationRevision?<PrivateDesignImage key={key} path={configurationPreviewPath(props.configurationId,props.configurationRevision)} alt={props.alt} className={props.className} fit="contain" fallback={fallback}/>:fallback;
+}
+function ComposedDesign({productId,variantId,designPath,kind,alt,className,placement}:Props){
   const [inputs,setInputs]=useState<RenderingInputs|null|undefined>(undefined),[src,setSrc]=useState<string|null>(null);
   useEffect(()=>{let active=true;loadCachedAcceptedSurface(productId,variantId).then(value=>{if(active)setInputs(value)}).catch(()=>{if(active)setInputs(null)});return()=>{active=false}},[productId,variantId]);
   useEffect(()=>{let url:string|null=null;let active=true;privateImageUrl(designPath).then(value=>{url=value;if(active)setSrc(value);else URL.revokeObjectURL(value)}).catch(()=>{});return()=>{active=false;if(url)URL.revokeObjectURL(url)}},[designPath]);

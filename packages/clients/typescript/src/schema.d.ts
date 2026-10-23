@@ -1044,6 +1044,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/design-configurations/{id}/revisions/{revision}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetMyDesignConfigurationPreview"];
+        put: operations["SaveMyDesignConfigurationPreview"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/designs/upload": {
         parameters: {
             query?: never;
@@ -5114,6 +5130,72 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["SetConfigurationFavorite"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetMyDesignConfigurationPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revision: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SaveMyDesignConfigurationPreview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revision: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    file: components["schemas"]["IFormFile"];
+                };
             };
         };
         responses: {

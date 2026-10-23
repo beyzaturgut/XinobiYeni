@@ -18,6 +18,12 @@ export const metadata: Metadata = {
   description: "Xinobi ev teknolojilerini, kişisel seçimleri ve yalın tasarımı keşfedin.",
 };
 
+// Marks pages opened by the mobile app (?mobile=1 or the app's bridge) before first paint, so the site chrome and the
+// cookie panel never flash inside the WebView; client navigations keep the attribute. Links that leave the design
+// pages become real navigations there, so the app can open its own cart, favourites or account screen instead of
+// rendering the website inside the WebView.
+const embeddedScript = `try{if(/[?&]mobile=1(&|$)/.test(location.search)||window.XinobiCommerce){document.documentElement.dataset.embedded='app';document.addEventListener('click',function(e){var a=e.target&&e.target.closest&&e.target.closest('a[href]');if(!a||a.target||e.defaultPrevented)return;var u=new URL(a.href,location.href);if(u.origin!==location.origin||u.pathname.indexOf('/xinobi-u/')===0||u.pathname.indexOf('/hesap/tasarimlarim/onizleme')===0)return;e.preventDefault();e.stopPropagation();location.assign(u.href)},true)}}catch(e){}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
-  return <html lang="tr" className={`${inter.variable} ${interTight.variable} ${jost.variable}`}><body>{children}<CompareTray /><NobiLauncher /><LegalConsent /></body></html>;
+  return <html lang="tr" className={`${inter.variable} ${interTight.variable} ${jost.variable}`} suppressHydrationWarning><head><script dangerouslySetInnerHTML={{ __html: embeddedScript }} /></head><body>{children}<CompareTray /><NobiLauncher /><LegalConsent /></body></html>;
 }

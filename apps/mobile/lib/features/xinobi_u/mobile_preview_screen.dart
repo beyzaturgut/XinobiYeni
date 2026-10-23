@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
+import '../../app/design_tokens.g.dart';
 import '../../core/api_config.dart';
 
 class XinobiMobilePreviewScreen extends ConsumerStatefulWidget {
@@ -73,6 +74,9 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
     _trustedUri = uri;
     final controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      // The page is part of the app: no browser pinch zoom and no grey flash before the first paint.
+      ..enableZoom(false)
+      ..setBackgroundColor(XinobiTokens.surface)
       ..addJavaScriptChannel('XinobiCommerce', onMessageReceived: (message) async {
         final current = await _controller?.currentUrl();
         if (current == null || Uri.tryParse(current)?.origin != _trustedUri?.origin) return;
@@ -103,7 +107,7 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
             final target = Uri.tryParse(request.url);
             if (target == null || !['http', 'https'].contains(target.scheme) || target.origin != uri.origin) return NavigationDecision.prevent;
             final path = target.path.replaceAll(RegExp(r'/$'), '');
-            if (['/sepet', '/favoriler', '/hesap'].contains(path)) {
+            if (['/sepet', '/favoriler', '/hesap', '/hesap/tasarimlarim', '/xinobi-u'].contains(path)) {
               if (mounted) context.go(path);
               return NavigationDecision.prevent;
             }
@@ -218,15 +222,12 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
         if (!didPop) _handleBack();
       },
       child: Scaffold(
+        // Same app bar as the native XINOBI U steps; reloading is offered only on the error view, like other screens.
         appBar: AppBar(
-          title: Text(widget.productId != null ? 'XINOBI U' : 'Ürün önizlemesi'),
-          actions: [
-            IconButton(
-              tooltip: 'Yeniden yükle',
-              onPressed: _controller == null ? null : _retry,
-              icon: const Icon(Icons.refresh),
-            ),
-          ],
+          backgroundColor: XinobiTokens.header,
+          foregroundColor: XinobiTokens.onHeader,
+          toolbarHeight: XinobiTokens.headerHeight,
+          title: Text(widget.productId != null || widget.designId != null ? 'XINOBI U' : 'Ürün önizlemesi'),
         ),
         body: SafeArea(
           top: false,

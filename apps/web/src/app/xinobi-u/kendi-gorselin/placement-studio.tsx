@@ -9,6 +9,7 @@ import {usePrintAreaOutline} from "../../../features/product-personalization/pri
 import {fileMeta,type LocalPatternSource} from "../../../features/product-personalization/use-local-pattern-file";
 import SaveDesignButton from "../../../components/save-design-button";
 import {money} from "../../../lib/commerce";
+import {useEmbeddedApp} from "../../../lib/embedded-app";
 import type {DesignPlacement} from "../../../lib/design-placement";
 import type {Product,Variant} from "../../../../../../packages/commerce/client";
 import styles from "./own-image.module.css";
@@ -31,6 +32,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
  const [past,setPast]=useState<Snapshot[]>([]),[future,setFuture]=useState<Snapshot[]>([]);
  const [zoom,setZoom]=useState(100),[showArea,setShowArea]=useState(true);
  const [switching,setSwitching]=useState(false),[notice,setNotice]=useState('');
+ const app=useEmbeddedApp();
  const lastChange=useRef({key:'',at:0}),transferGeneration=useRef(0);
  const origin=defaultPatternTransform(inputs,mode,fillMask);
  const current:Snapshot={transform:patternTransform,curvature:curvatureStrength};
@@ -90,7 +92,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
      </ProductPatternPreview>
     </div>
    </div>
-   <div className={styles.canvasNotes}><span>Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.</span><span aria-live="polite">{notice||'Değişiklikler yalnızca bu tarayıcı oturumunda tutulur.'}</span></div>
+   <div className={styles.canvasNotes}><span>Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.</span><span aria-live="polite">{notice||(app?'Kaydedene kadar değişiklikler yalnızca bu ekranda tutulur.':'Değişiklikler yalnızca bu tarayıcı oturumunda tutulur.')}</span></div>
   </section>
   <aside className={styles.settings} aria-label="Tasarım ayarları">
    <fieldset className={styles.colours} aria-busy={switching}>

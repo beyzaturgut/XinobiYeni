@@ -23,7 +23,6 @@ const onPreview=()=>typeof window!=='undefined'&&window.location.hash===previewH
 function Flow({product,variant,initialMode,embedded}:{product:string;variant:string;initialMode:Mode;embedded:boolean}){
  const [mode,setMode]=useState(initialMode),[previewing,setPreviewing]=useState(onPreview);
  // In the mobile app the app bar leads back to its own method screen; the site's chrome and web back links stay hidden.
- useEffect(()=>{if(!embedded)return;document.documentElement.dataset.embedded='app';return()=>{delete document.documentElement.dataset.embedded}},[embedded]);
  useEffect(()=>{const sync=()=>setPreviewing(onPreview());window.addEventListener('popstate',sync);window.addEventListener('hashchange',sync);return()=>{window.removeEventListener('popstate',sync);window.removeEventListener('hashchange',sync)}},[]);
  const {state}=useCommerce();
  const selected=state?.products.find(item=>item.id===product&&item.active);

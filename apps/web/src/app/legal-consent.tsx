@@ -16,9 +16,9 @@ export default function LegalConsent() {
     setDetail(false);
   }
 
-  if (!open) return <button className={styles.reopen} type="button" onClick={() => setOpen(true)}>Çerez tercihleri</button>;
+  if (!open) return <button className={styles.reopen} type="button" data-app-chrome="" onClick={() => setOpen(true)}>Çerez tercihleri</button>;
 
-  return <aside className={styles.banner} aria-label="Çerez tercihleri" aria-live="polite">
+  return <aside className={styles.banner} data-app-chrome="" aria-label="Çerez tercihleri" aria-live="polite">
     <div className={styles.copy} style={{ minWidth: 0 }}><span>Gizlilik tercihleri · Taslak</span><h2>Kontrol sizde.</h2><p>Bu prototip zorunlu olmayan çerezleri veya analitik araçlarını çalıştırmaz. Tercih kaydı D10 hukuk ve saklama kararı sonrasında uygulanacaktır.</p><Link href="/yasal">Taslak yasal merkezi inceleyin →</Link></div>
     {detail && <fieldset className={styles.options}><legend>Tercih kategorileri</legend><label><span><strong>Zorunlu</strong><small>Güvenlik ve temel sayfa işlevleri</small></span><input type="checkbox" checked disabled /></label><label><span><strong>Analitik</strong><small>Kullanım ölçümü — şu anda yüklenmez</small></span><input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} /></label><label><span><strong>Pazarlama</strong><small>Kişiselleştirme — şu anda yüklenmez</small></span><input type="checkbox" checked={marketing} onChange={(event) => setMarketing(event.target.checked)} /></label></fieldset>}
     {notice && <p className={styles.notice}>{notice}</p>}

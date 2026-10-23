@@ -79,3 +79,16 @@ test('missing identity and ineligible products cannot upload',async({page})=>{
  await expect(page.getByRole('alert').filter({hasText:'Bu ürün kişiselleştirme programında değil.'})).toBeVisible();
  await expect(page.locator('input[type=file],canvas')).toHaveCount(0);
 });
+test('inside the mobile app the page shows no cookie panel or site chrome and leaves the site through real navigations',async({page})=>{
+ await mockStore(page);
+ await page.goto(entry+'?product=DEMO-P101&variant=DEMO-V101-B&mobile=1');
+ await expect(page.getByRole('button',{name:'Örnek görselle dene'})).toBeVisible();
+ await expect(page.locator('html')).toHaveAttribute('data-embedded','app');
+ await expect(page.getByRole('complementary',{name:'Çerez tercihleri'})).toBeHidden();
+ await expect(page.getByRole('button',{name:'Çerez tercihleri',exact:true})).toBeHidden();
+ await expect(page.locator('[data-app-chrome]').filter({visible:true})).toHaveCount(0);
+ expect(await page.evaluate(()=>getComputedStyle(document.body).userSelect)).toBe('none');
+ const navigation=page.waitForEvent('framenavigated');
+ await page.evaluate(()=>{const link=document.createElement('a');link.href='/sepet/';link.textContent='Sepete git';document.querySelector('main')!.append(link);link.click()});
+ expect(new URL((await navigation).url()).pathname).toBe('/sepet/');
+});

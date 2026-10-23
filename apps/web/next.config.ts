@@ -4,6 +4,8 @@ import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 const nextConfig: NextConfig = {
   output: "export",
   trailingSlash: true,
+  // The floating Next.js badge looks like a browser artefact inside the mobile app's WebView during local runs.
+  devIndicators: false,
   images: {
     unoptimized: true,
   },

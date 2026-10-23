@@ -65,10 +65,12 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
         error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(productProvider(widget.productId))),
         data: (detail) => _body(context, detail),
       ),
+      // The action stays pinned above the system navigation like other app steps; the app bar handles going back.
+      bottomNavigationBar: state.asData?.value == null ? null : _action(state.asData!.value),
     );
   }
 
-  Widget _body(BuildContext context, ProductDetail detail) {
+  ({List<VariantDetail> variants, VariantDetail? start, bool settled, bool failed}) _readiness(ProductDetail detail) {
     final variants = detail.variants.toList();
     // Each colour is ready with a catalogue mask or an accepted development surface.
     final checks = {
@@ -82,12 +84,40 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
     final settled = checks.values.every((check) => check.hasValue || check.hasError);
     final failed = checks.values.any((check) => check.hasError || (check.hasValue && check.asData?.value == null));
     final start = requested != null && ready(requested) ? requested : settled ? variants.where(ready).firstOrNull : null;
-    final shown = requested ?? (variants.isEmpty ? null : variants.first);
-    final image = shown?.imageUrl ?? detail.imageUrl;
+    return (variants: variants, start: start, settled: settled, failed: failed);
+  }
+
+  Widget _action(ProductDetail detail) {
+    final (:variants, :start, :settled, :failed) = _readiness(detail);
     final chosen = _methods.firstWhere((item) => item.method == _method);
+    return SafeArea(
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 10, XinobiTokens.gutterMobile, 10),
+        decoration: const BoxDecoration(color: XinobiTokens.surface, border: Border(top: BorderSide(color: flowLine))),
+        child: FilledButton(
+          style: flowPrimaryButton,
+          onPressed: start != null && !_opening
+              ? () => _open(detail, start)
+              : settled && failed
+                  ? () {
+                      for (final variant in variants) {
+                        ref.invalidate(acceptedSurfaceProvider((productId: detail.id, variantId: variant.id)));
+                      }
+                    }
+                  : null,
+          child: Text(start != null ? '${chosen.cta} →' : settled && failed ? 'Tekrar dene' : !settled ? 'Kontrol ediliyor…' : 'Kişiselleştirme kullanılamıyor'),
+        ),
+      ),
+    );
+  }
+
+  Widget _body(BuildContext context, ProductDetail detail) {
+    final (:variants, :start, :settled, :failed) = _readiness(detail);
+    final shown = variants.where((variant) => variant.id == widget.variantId).firstOrNull ?? (variants.isEmpty ? null : variants.first);
+    final image = shown?.imageUrl ?? detail.imageUrl;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 14, XinobiTokens.gutterMobile, 32),
+      padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 14, XinobiTokens.gutterMobile, 16),
       children: [
         const XinobiUSteps(current: 1),
         const SizedBox(height: 16),
@@ -121,30 +151,6 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
             ),
           ),
         ],
-        const SizedBox(height: 12),
-        Row(children: [
-          OutlinedButton(
-            style: flowSecondaryButton,
-            onPressed: () => context.pop(),
-            child: const Text('Geri'),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: FilledButton(
-              style: flowPrimaryButton,
-              onPressed: start != null && !_opening
-                  ? () => _open(detail, start)
-                  : settled && failed
-                      ? () {
-                          for (final variant in variants) {
-                            ref.invalidate(acceptedSurfaceProvider((productId: detail.id, variantId: variant.id)));
-                          }
-                        }
-                      : null,
-              child: Text(start != null ? '${chosen.cta} →' : settled && failed ? 'Tekrar dene' : !settled ? 'Kontrol ediliyor…' : 'Kişiselleştirme kullanılamıyor'),
-            ),
-          ),
-        ]),
       ],
     );
   }

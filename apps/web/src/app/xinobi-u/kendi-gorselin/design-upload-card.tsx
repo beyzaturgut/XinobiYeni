@@ -5,12 +5,15 @@ import {mediaUrl,commerceApi} from '../../../lib/commerce';
 import type {Product} from '../../../../../../packages/commerce/client';
 import {useState,type DragEvent} from 'react';
 import {fileMeta,useLocalPatternFile,type LocalPatternSource} from '../../../features/product-personalization/use-local-pattern-file';
+import {useEmbeddedApp} from '../../../lib/embedded-app';
 import flow from '../flow.module.css';
 import styles from './own-image.module.css';
 export type UploadMode='pattern'|'artwork';
 const accept='.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp';
 /** Shared upload step for a new design and for changing an existing cart/favorite design. */
 export default function DesignUploadCard({mode,onModeChange,local,existing,onRemove,embedded=false}:{mode:UploadMode;onModeChange:(mode:UploadMode)=>void;local:ReturnType<typeof useLocalPatternFile>;existing?:{url:string;source:LocalPatternSource};onRemove?:()=>void;embedded?:boolean}){
+ // Inside the app there is no drag and drop or browser: the picker opens the phone's gallery.
+ const app=useEmbeddedApp()||embedded;
  const [dragging,setDragging]=useState(false),[sampleError,setSampleError]=useState('');
  const pattern=mode==='pattern',url=local.url??existing?.url,source=local.source??existing?.source;
  const switchMode=onModeChange;
@@ -26,14 +29,14 @@ export default function DesignUploadCard({mode,onModeChange,local,existing,onRem
       <div className={styles.fileActions}><label className={styles.pickSmall}>Değiştir<input id="local-pattern" type="file" accept={accept} disabled={local.busy} onChange={event=>{const input=event.currentTarget,file=input.files?.[0];void pick(file).finally(()=>{if(input.files?.[0]===file)input.value=''})}}/></label><button type="button" aria-label={pattern?'Deseni kaldır':'Görseli kaldır'} onClick={remove}>Kaldır</button></div>
      </div>:<div className={`${styles.drop} ${dragging?styles.dragging:''}`} onDragOver={(event:DragEvent)=>{event.preventDefault();setDragging(true)}} onDragLeave={()=>setDragging(false)} onDrop={(event:DragEvent)=>{event.preventDefault();setDragging(false);pick(event.dataTransfer.files?.[0])}}>
       <span className={styles.dropIcon} aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></span>
-      <p className={styles.dropTitle}>{pattern?'Desenini buraya sürükle':'Görselini buraya sürükle'}</p>
-      <p>{embedded?'ya da cihazından bir dosya seç':'ya da bilgisayarından bir dosya seç'}</p>
-      <div className={styles.dropActions}><label className={styles.pick}>Dosya seç<input id="local-pattern" type="file" accept={accept} disabled={local.busy} aria-describedby="local-image-help" onChange={event=>{const input=event.currentTarget,file=input.files?.[0];void pick(file).finally(()=>{if(input.files?.[0]===file)input.value=''})}}/></label><button type="button" className={styles.sample} disabled={local.busy} onClick={()=>void trySample()}>Örnek görselle dene</button></div>
+      <p className={styles.dropTitle}>{app?(pattern?'Galeriden bir desen seç':'Galeriden bir görsel seç'):pattern?'Desenini buraya sürükle':'Görselini buraya sürükle'}</p>
+      <p>{app?'ya da örnek görselle hemen dene':'ya da bilgisayarından bir dosya seç'}</p>
+      <div className={styles.dropActions}><label className={styles.pick}>{app?'Galeriden seç':'Dosya seç'}<input id="local-pattern" type="file" accept={accept} disabled={local.busy} aria-describedby="local-image-help" onChange={event=>{const input=event.currentTarget,file=input.files?.[0];void pick(file).finally(()=>{if(input.files?.[0]===file)input.value=''})}}/></label><button type="button" className={styles.sample} disabled={local.busy} onClick={()=>void trySample()}>Örnek görselle dene</button></div>
      </div>}
      {local.busy&&<div className={styles.busy}><p role="status">Görsel hazırlanıyor…</p><button type="button" className={flow.secondary} onClick={local.cancel}>Hazırlamayı iptal et</button></div>}
      {(local.error||sampleError)&&<p role="alert" className={flow.error}>{local.error||sampleError}</p>}
      <ul className={styles.chips}><li>PNG, JPEG veya WebP</li><li>Boyut ve çözünürlük sınırı yok</li><li>Büyük görseller otomatik optimize edilir</li></ul>
-     <div className={styles.privacy}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p id="local-image-help">Görselin yalnızca bu tarayıcıda önizlenir. Kaydettiğinde, sepete veya favorilere eklediğinde hesabına yüklenir ve yalnızca sen görürsün.</p></div>
+     <div className={styles.privacy}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><p id="local-image-help">Görselin yalnızca {app?'bu cihazda':'bu tarayıcıda'} önizlenir. Kaydettiğinde, sepete veya favorilere eklediğinde hesabına yüklenir ve yalnızca sen görürsün.</p></div>
  </>;
 }
 

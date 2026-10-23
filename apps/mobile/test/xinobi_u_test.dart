@@ -137,6 +137,7 @@ void main() {
     final router = GoRouter(initialLocation: '/questions', routes: [
       GoRoute(path: '/questions', builder: (_, _) => const QuestionnaireScreen(productId: 'P1', variantId: 'V1', pollInterval: Duration(milliseconds: 10))),
       GoRoute(path: '/xinobi-u/mobil-onizleme', builder: (_, state) => Scaffold(body: Text('Advanced ${state.uri.queryParameters['session']}'))),
+      GoRoute(path: '/xinobi-u/kendi-gorselin', builder: (_, state) => Scaffold(body: Text('Own ${state.uri.queryParameters['urun']} ${state.uri.queryParameters['renk']}'))),
     ]);
     addTearDown(router.dispose);
     tester.view.physicalSize = const Size(1170, 2532);
@@ -153,12 +154,21 @@ void main() {
     expect(find.text('İşte sana özel yorum.'), findsOneWidget);
     expect(find.text('Advanced s1'), findsNothing);
     expect(fake.generateCalls, 1);
-    ScaffoldMessenger.of(tester.element(find.text('Üründe gelişmiş önizlemeyi aç'))).showSnackBar(
+    // The raw result has no shopping action: cart and favourites live on the product preview.
+    expect(find.textContaining('Sepete'), findsNothing);
+    expect(find.text('Kaydetmek için giriş yap'), findsOneWidget);
+    await tester.ensureVisible(find.text('Kendi görselimle dene'));
+    await tester.tap(find.text('Kendi görselimle dene'));
+    await tester.pumpAndSettle();
+    expect(find.text('Own P1 V1'), findsOneWidget, reason: 'The own-image flow continues with the same product and colour.');
+    router.pop();
+    await tester.pumpAndSettle();
+    ScaffoldMessenger.of(tester.element(find.text('Üründe önizle ve yerleştir →'))).showSnackBar(
       SnackBar(duration: const Duration(days: 1), content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () {})),
     );
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.text('Üründe gelişmiş önizlemeyi aç'));
-    await tester.tap(find.text('Üründe gelişmiş önizlemeyi aç'));
+    await tester.ensureVisible(find.text('Üründe önizle ve yerleştir →'));
+    await tester.tap(find.text('Üründe önizle ve yerleştir →'));
     await tester.pumpAndSettle();
     expect(find.text('Advanced s1'), findsOneWidget);
     expect(find.text('Tasarım hesabına kaydedildi.'), findsNothing);
@@ -179,8 +189,16 @@ void main() {
     expect(tester.widget<FilledButton>(find.widgetWithText(FilledButton, 'Devam et →')).onPressed, isNull, reason: 'An answer is required.');
     await answerAll(tester);
     expect(find.text('Birlikte şekillenen beş tercih.'), findsOneWidget);
-    expect(find.text('Seçenek 2-1'), findsOneWidget);
+    for (var i = 0; i < 5; i++) {
+      expect(find.text(_axes[i]), findsOneWidget);
+      expect(find.text('Seçenek $i-1'), findsOneWidget);
+    }
+    await tester.tap(find.text('Düzenle'));
+    await tester.pumpAndSettle();
+    expect(find.text('Soru 1 / 5'), findsOneWidget, reason: 'Editing returns to the first question.');
+    await answerAll(tester);
     await tester.tap(find.text('AI ile tasarımımı oluştur ✦'));
+    await tester.tap(find.text('AI ile tasarımımı oluştur ✦'), warnIfMissed: false);
     await tester.pumpAndSettle();
     expect(find.text('İşte sana özel yorum.'), findsOneWidget);
     expect(find.textContaining('Temsilidir.'), findsOneWidget);

@@ -6,10 +6,12 @@ import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../app/design_tokens.g.dart';
+import '../../app/theme.dart';
 import '../../widgets/common.dart';
 import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
 import '../designs/designs.dart';
+import 'flow_widgets.dart';
 import 'xinobi_u_repository.dart';
 
 enum _Phase { loading, questions, review, generating, ready, failed, error }
@@ -19,6 +21,7 @@ enum _Phase { loading, questions, review, generating, ready, failed, error }
 class QuestionnaireScreen extends ConsumerStatefulWidget {
   const QuestionnaireScreen({super.key, required this.productId, this.variantId, this.pollInterval = const Duration(seconds: 2)});
   final String productId;
+
   /// Optional: set when the user starts from a product page with a colour already shown; otherwise the server picks one.
   final String? variantId;
   final Duration pollInterval;
@@ -188,6 +191,9 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   }
 
   Future<void> _generate() async {
+    // A second tap in the same frame must not start a second provider call.
+    if (busy || phase != _Phase.review) return;
+    busy = true;
     setState(() {
       busy = true;
       message = null;
@@ -218,15 +224,66 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
         setState(() => phase == _Phase.review ? phase = _Phase.questions : step--);
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: XinobiTokens.header,
-          foregroundColor: XinobiTokens.onHeader,
-          toolbarHeight: XinobiTokens.headerHeight,
-          title: const Text('XINOBI U'),
-        ),
-        body: SafeArea(top: false, child: _body(context)),
+        appBar: AppBar(backgroundColor: XinobiTokens.header, foregroundColor: XinobiTokens.onHeader, toolbarHeight: XinobiTokens.headerHeight, title: const Text('XINOBI U')),
+        body: SafeArea(top: false, bottom: false, child: _body(context)),
+        // Actions sit in the scaffold's footer: above the system navigation, and snack bars appear above them.
+        bottomNavigationBar: _actions(context),
       ),
     );
+  }
+
+  Widget? _actions(BuildContext context) {
+    final current = session;
+    final Widget bar;
+    switch (phase) {
+      case _Phase.questions:
+        final selected = answers[current!.questions[step].id];
+        bar = _BottomBar(
+          children: [
+            if (step > 0) OutlinedButton(style: flowSecondaryButton, onPressed: () => setState(() => step--), child: const Text('← Geri')),
+            Expanded(
+              child: FilledButton(style: flowPrimaryButton, onPressed: selected == null ? null : _next, child: Text(step == current.questions.length - 1 ? 'Tercihlerimi gör →' : 'Devam et →')),
+            ),
+          ],
+        );
+      case _Phase.review:
+        bar = _BottomBar(
+          children: [
+            OutlinedButton(
+              style: flowSecondaryButton,
+              onPressed: busy
+                  ? null
+                  : () => setState(() {
+                      phase = _Phase.questions;
+                      step = 0;
+                    }),
+              child: const Text('Düzenle'),
+            ),
+            Expanded(
+              child: FilledButton(style: flowPrimaryButton, onPressed: busy ? null : _generate, child: Text(busy ? 'Gönderiliyor…' : 'AI ile tasarımımı oluştur ✦')),
+            ),
+          ],
+        );
+      case _Phase.ready:
+        // The one way forward from a raw design is to place it on the product.
+        bar = _BottomBar(
+          children: [
+            Expanded(
+              child: FilledButton(
+                style: flowPrimaryButton,
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  context.push(Uri(path: '/xinobi-u/mobil-onizleme', queryParameters: {'session': current!.id}).toString());
+                },
+                child: const Text('Üründe önizle ve yerleştir →'),
+              ),
+            ),
+          ],
+        );
+      default:
+        return null;
+    }
+    return SafeArea(top: false, child: bar);
   }
 
   Widget _body(BuildContext context) {
@@ -242,79 +299,68 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
       case _Phase.questions:
         final question = current!.questions[step];
         final selected = answers[question.id];
-        return Column(children: [
-          LinearProgressIndicator(value: (step + 1) / current.questions.length, color: XinobiTokens.ink, backgroundColor: XinobiTokens.line),
-          Expanded(
-            child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
-              Text('Soru ${step + 1} / ${current.questions.length}', style: text.bodySmall),
-              const SizedBox(height: 4),
-              Text(question.axisLabel.toUpperCase(), style: text.bodySmall?.copyWith(letterSpacing: 1.2)),
-              const SizedBox(height: 8),
-              Semantics(header: true, child: Text(question.text, style: text.titleLarge)),
-              const SizedBox(height: 16),
-              RadioGroup<String>(
-                groupValue: selected,
-                onChanged: (value) => value == null ? null : _choose(question.id, value),
-                child: Column(children: [
-                  for (final option in question.options)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      // Material (not a coloured box) so the tile's touch ripple stays visible.
-                      child: Material(
-                        color: XinobiTokens.surface,
-                        shape: Border.all(color: option.id == selected ? XinobiTokens.ink : XinobiTokens.line, width: option.id == selected ? 2 : 1),
-                        child: RadioListTile<String>(value: option.id, title: Text(option.label)),
-                      ),
-                    ),
-                ]),
-              ),
-            ]),
-          ),
-          _BottomBar(children: [
-            if (step > 0) OutlinedButton(onPressed: () => setState(() => step--), child: const Text('← Geri')),
+        return Column(
+          children: [
+            LinearProgressIndicator(value: (step + 1) / current.questions.length, color: XinobiTokens.ink, backgroundColor: XinobiTokens.line),
             Expanded(
-              child: FilledButton(
-                onPressed: selected == null ? null : _next,
-                child: Text(step == current.questions.length - 1 ? 'Tercihlerimi gör →' : 'Devam et →'),
+              child: ListView(
+                padding: const EdgeInsets.all(XinobiTokens.gutterMobile),
+                children: [
+                  Text('Soru ${step + 1} / ${current.questions.length}', style: text.bodySmall),
+                  const SizedBox(height: 4),
+                  Text(question.axisLabel.toUpperCase(), style: text.bodySmall?.copyWith(letterSpacing: 1.2)),
+                  const SizedBox(height: 8),
+                  Semantics(header: true, child: Text(question.text, style: text.titleLarge)),
+                  const SizedBox(height: 16),
+                  RadioGroup<String>(
+                    groupValue: selected,
+                    onChanged: (value) => value == null ? null : _choose(question.id, value),
+                    child: Column(
+                      children: [
+                        for (final option in question.options)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 10),
+                            // Material (not a coloured box) so the tile's touch ripple stays visible.
+                            child: Material(
+                              color: XinobiTokens.surface,
+                              shape: Border.all(color: option.id == selected ? XinobiTokens.ink : XinobiTokens.line, width: option.id == selected ? 2 : 1),
+                              child: RadioListTile<String>(value: option.id, title: Text(option.label)),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-          ]),
-        ]);
+          ],
+        );
       case _Phase.review:
-        return Column(children: [
-          Expanded(
-            child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
-              Semantics(header: true, child: Text('Birlikte şekillenen beş tercih.', style: text.headlineSmall)),
-              const SizedBox(height: 16),
-              for (final question in current!.questions)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(question.axisLabel, style: text.bodySmall),
-                    Text(question.options.firstWhere((option) => option.id == answers[question.id]).label, style: text.titleMedium),
-                  ]),
-                ),
-              const SizedBox(height: 8),
-              Text('Oluştur dediğinde yanıtlarına göre tek bir AI görseli üretilir; yanıtlar bu tasarım için kilitlenir.', style: text.bodySmall),
-              if (message != null) ...[
-                const SizedBox(height: 12),
-                Semantics(liveRegion: true, child: Text(message!, style: text.bodyMedium?.copyWith(color: XinobiTokens.danger))),
-              ],
-            ]),
-          ),
-          _BottomBar(children: [
-            OutlinedButton(
-              onPressed: busy
-                  ? null
-                  : () => setState(() {
-                        phase = _Phase.questions;
-                        step = 0;
-                      }),
-              child: const Text('Düzenle'),
+        return Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(XinobiTokens.gutterMobile),
+                children: [
+                  Semantics(header: true, child: Text('Birlikte şekillenen beş tercih.', style: flowTitle)),
+                  const SizedBox(height: 16),
+                  _AnswerSummary(
+                    rows: [for (final question in current!.questions) (label: question.axisLabel, answer: question.options.firstWhere((option) => option.id == answers[question.id]).label)],
+                  ),
+                  const SizedBox(height: 14),
+                  Text('Oluştur dediğinde yanıtlarına göre tek bir AI görseli üretilir; yanıtlar bu tasarım için kilitlenir.', style: inter(13, height: 1.45, color: flowMuted)),
+                  if (message != null) ...[
+                    const SizedBox(height: 12),
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(message!, style: text.bodyMedium?.copyWith(color: XinobiTokens.danger)),
+                    ),
+                  ],
+                ],
+              ),
             ),
-            Expanded(child: FilledButton(onPressed: busy ? null : _generate, child: Text(busy ? 'Gönderiliyor…' : 'AI ile tasarımımı oluştur ✦'))),
-          ]),
-        ]);
+          ],
+        );
       case _Phase.generating:
         return _Message(
           message: slow ? 'Üretim beklenenden uzun sürüyor. Durumu yenileyebilirsin; istek tekrar gönderilmez.' : 'Tasarımın hazırlanıyor. Bu genellikle birkaç saniye sürer.',
@@ -327,23 +373,15 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
           },
         );
       case _Phase.ready:
-        return _Result(
-          session: current!,
-          onRestart: () => _start(fresh: true),
-          onOpenPreview: () => context.push(Uri(
-            path: '/xinobi-u/mobil-onizleme',
-            queryParameters: {'session': current.id},
-          ).toString()),
-        );
+        return _Result(session: current!, onRestart: () => _start(fresh: true));
     }
   }
 }
 
 class _Result extends ConsumerStatefulWidget {
-  const _Result({required this.session, required this.onRestart, required this.onOpenPreview});
+  const _Result({required this.session, required this.onRestart});
   final XinobiUSession session;
   final VoidCallback onRestart;
-  final VoidCallback onOpenPreview;
   @override
   ConsumerState<_Result> createState() => _ResultState();
 }
@@ -352,63 +390,131 @@ class _ResultState extends ConsumerState<_Result> {
   bool saving = false;
   MyDesign? saved;
 
-  /// K-21: copies the design into the account so it outlives the session; saved once, reused by "Sepete ekle".
-  Future<MyDesign?> _save({bool announce = true}) async {
-    if (saved != null) return saved;
+  /// K-21: copies the raw design into the account so it outlives the session. Cart and favourites belong to the
+  /// product preview, where the design is placed on the chosen colour.
+  Future<void> _save() async {
+    if (saved != null || saving) return;
     final messenger = ScaffoldMessenger.of(context);
     setState(() => saving = true);
     try {
       final design = await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveDesign(token, widget.session.id));
       ref.invalidate(myDesignsProvider);
-      if (mounted) setState(() => saved = design);
-      if (announce && mounted) messenger.showSnackBar(SnackBar(showCloseIcon: true, content: const Text('Tasarım hesabına kaydedildi.'), action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim'))));
-      return design;
+      if (mounted) {
+        setState(() => saved = design);
+        messenger.showSnackBar(
+          SnackBar(
+            showCloseIcon: true,
+            content: const Text('Tasarım hesabına kaydedildi.'),
+            action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim')),
+          ),
+        );
+      }
     } on AccountException catch (error) {
       messenger.showSnackBar(SnackBar(content: Text(error.message)));
-      return null;
     } finally {
       if (mounted) setState(() => saving = false);
     }
   }
 
-  /// A cart line needs a saved design, so the result is saved to the account first.
-  Future<void> _addToCart() async {
-    final design = await _save(announce: false);
-    if (design == null || !mounted) return;
-    await context.push(Uri(path: '/tasarim-editoru', queryParameters: {'tasarim': design.id, 'urun': design.productId, 'renk': widget.session.variant.id}).toString());
+  /// Signs in above the result and returns to it, so the generated design is not left behind.
+  Future<void> _signIn() async {
+    final subscription = ref.listenManual(authProvider, (previous, next) {
+      if (next is SignedIn && mounted && context.canPop()) context.pop();
+    });
+    try {
+      await context.push('/hesap');
+    } finally {
+      subscription.close();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
     final session = widget.session;
-    return ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
-      Semantics(header: true, child: Text('İşte sana özel yorum.', style: text.headlineSmall)),
-      const SizedBox(height: 12),
-      AspectRatio(
-        aspectRatio: 1,
-        child: ColoredBox(
-          color: XinobiTokens.surface,
-          child: RemoteImage(session.imageUrl, label: 'AI tarafından üretilen desen', fit: BoxFit.cover),
+    final identity = 'urun=${Uri.encodeQueryComponent(session.product.id)}&renk=${Uri.encodeQueryComponent(session.variant.id)}';
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 14, XinobiTokens.gutterMobile, 16),
+      children: [
+        const FlowKicker('XINOBI U · AI TASARIMI'),
+        Semantics(header: true, child: Text('İşte sana özel yorum.', style: flowTitle)),
+        const SizedBox(height: 14),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: ColoredBox(
+              color: flowStage,
+              child: RemoteImage(session.imageUrl, label: 'AI tarafından üretilen desen', fit: BoxFit.cover),
+            ),
+          ),
         ),
-      ),
-      const SizedBox(height: 8),
-      // K-12: the "Temsilidir" notice is permanent, readable text.
-      Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: text.bodySmall),
-      const SizedBox(height: 20),
-      OutlinedButton.icon(onPressed: () { ScaffoldMessenger.of(context).hideCurrentSnackBar(); widget.onOpenPreview(); }, icon: const Icon(Icons.open_in_new), label: const Text('Üründe gelişmiş önizlemeyi aç')),
-      const SizedBox(height: 8),
-      if (ref.watch(authProvider) is SignedIn) ...[
-        FilledButton.icon(onPressed: saving ? null : _addToCart, icon: const Icon(Icons.add_shopping_cart), label: Text(saving ? 'Hazırlanıyor…' : 'Üründe yerleştir ve sepete ekle')),
         const SizedBox(height: 8),
-        OutlinedButton(onPressed: saving || saved != null ? null : _save, child: Text(saved != null ? 'Tasarımlarım’a kaydedildi' : 'Tasarımımı kaydet')),
-      ] else
-        OutlinedButton(onPressed: () => context.go('/hesap'), child: const Text('Sepete eklemek ve kaydetmek için giriş yap')),
-      const SizedBox(height: 8),
-      OutlinedButton(onPressed: () => context.push('/tasarim-editoru?urun=${Uri.encodeQueryComponent(session.product.id)}&renk=${Uri.encodeQueryComponent(session.variant.id)}'), child: const Text('Kendi görselimle dene')),
-      const SizedBox(height: 8),
-      OutlinedButton(onPressed: widget.onRestart, child: const Text('Yeni anket başlat')),
-    ]);
+        // K-12: the "Temsilidir" notice is permanent, readable text.
+        Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: inter(12, height: 1.4, color: flowMuted)),
+        const SizedBox(height: 10),
+        Text('Rengi ve yerleşimi üründe ayarla; sepete ve favorilere oradan ekleyebilirsin.', style: inter(14, height: 1.45, color: flowBody)),
+        const SizedBox(height: 16),
+        if (ref.watch(authProvider) is SignedIn)
+          OutlinedButton(
+            style: flowSecondaryButton,
+            onPressed: saving || saved != null ? null : _save,
+            child: Text(
+              saved != null
+                  ? 'Tasarımlarım’a kaydedildi'
+                  : saving
+                  ? 'Kaydediliyor…'
+                  : 'Tasarımımı kaydet',
+            ),
+          )
+        else
+          OutlinedButton(style: flowSecondaryButton, onPressed: _signIn, child: const Text('Kaydetmek için giriş yap')),
+        const SizedBox(height: 8),
+        OutlinedButton(style: flowSecondaryButton, onPressed: () => context.push('/xinobi-u/kendi-gorselin?$identity'), child: const Text('Kendi görselimle dene')),
+        const SizedBox(height: 4),
+        TextButton(
+          onPressed: widget.onRestart,
+          child: Text('Yeni anket başlat', style: inter(14, weight: 500, color: flowInk)),
+        ),
+      ],
+    );
+  }
+}
+
+/// The five chosen answers on one soft card: a small axis label above each answer, hairlines between rows.
+class _AnswerSummary extends StatelessWidget {
+  const _AnswerSummary({required this.rows});
+  final List<({String label, String answer})> rows;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(color: flowStage, borderRadius: BorderRadius.circular(16)),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var index = 0; index < rows.length; index++)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: index == rows.length - 1
+                  ? null
+                  : const BoxDecoration(
+                      border: Border(bottom: BorderSide(color: flowLine)),
+                    ),
+              child: MergeSemantics(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(rows[index].label, style: inter(12, color: flowMuted)),
+                    const SizedBox(height: 3),
+                    Text(rows[index].answer, style: inter(15, weight: 600, height: 1.3, color: flowInk)),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 
@@ -421,23 +527,33 @@ class _Message extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            if (busy) ...[const CircularProgressIndicator(semanticsLabel: 'Tasarım hazırlanıyor'), const SizedBox(height: 20)],
-            Semantics(liveRegion: true, child: Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium)),
-            if (action != null) ...[const SizedBox(height: 16), FilledButton(onPressed: onAction, child: Text(action!))],
-          ]),
-        ),
-      );
+    child: Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (busy) ...[const CircularProgressIndicator(semanticsLabel: 'Tasarım hazırlanıyor'), const SizedBox(height: 20)],
+          Semantics(
+            liveRegion: true,
+            child: Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
+          ),
+          if (action != null) ...[const SizedBox(height: 16), FilledButton(onPressed: onAction, child: Text(action!))],
+        ],
+      ),
+    ),
+  );
 }
 
 class _BottomBar extends StatelessWidget {
   const _BottomBar({required this.children});
   final List<Widget> children;
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 8, XinobiTokens.gutterMobile, 16),
-        child: Row(spacing: 12, children: children),
-      );
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 10, XinobiTokens.gutterMobile, 10),
+    decoration: const BoxDecoration(
+      color: XinobiTokens.surface,
+      border: Border(top: BorderSide(color: flowLine)),
+    ),
+    child: Row(spacing: 10, children: children),
+  );
 }

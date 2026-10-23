@@ -17,7 +17,8 @@ final flowPrimaryButton = FilledButton.styleFrom(
   backgroundColor: flowInk,
   foregroundColor: Colors.white,
   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-  textStyle: inter(15, weight: 600),
+  // Not inheriting, like Material's own label styles, so state changes animate between the two.
+  textStyle: inter(15, weight: 600).copyWith(inherit: false),
 );
 
 final flowSecondaryButton = OutlinedButton.styleFrom(
@@ -26,7 +27,7 @@ final flowSecondaryButton = OutlinedButton.styleFrom(
   foregroundColor: flowInk,
   side: const BorderSide(color: Color(0xFFD6D6D6)),
   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-  textStyle: inter(15, weight: 500),
+  textStyle: inter(15, weight: 500).copyWith(inherit: false),
 );
 
 /// Small upper-case label above a step or product title.

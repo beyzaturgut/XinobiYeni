@@ -2,8 +2,6 @@
 export const MAX_PATTERN_BYTES = 8 * 1024 * 1024;
 export const MAX_PATTERN_DIMENSION = 4096;
 export const MAX_PATTERN_PIXELS = 8 * 1024 * 1024;
-const MAX_INPUT_BYTES = 64 * 1024 * 1024;
-const MAX_INPUT_PIXELS = 100_000_000;
 const invalidImage = 'Görsel okunamadı. Geçerli bir PNG, JPEG veya WebP seçin.';
 
 function checkCancelled(signal?: AbortSignal) {
@@ -77,9 +75,7 @@ function orientation(bytes: Uint8Array): number {
 }
 
 async function imageSize(file: File, signal: AbortSignal) {
- if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Yalnız PNG, JPEG veya WebP görselleri seçebilirsiniz.');
  if (!file.size) throw new Error('Görsel dosyası boş olmamalıdır.');
- if (file.size > MAX_INPUT_BYTES) throw new Error('Bu görsel işlenemeyecek kadar büyük. Lütfen 64 MiB veya daha küçük bir dosya seçin.');
  checkCancelled(signal);
  const bytes = new Uint8Array(await waitFor(file.slice(0, 256 * 1024).arrayBuffer(), signal));
  const view = new DataView(bytes.buffer);
@@ -88,7 +84,13 @@ async function imageSize(file: File, signal: AbortSignal) {
  const png = [137, 80, 78, 71, 13, 10, 26, 10].every((v, i) => bytes[i] === v);
  const jpeg = bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255;
  const webp = tag(0) === 'RIFF' && tag(8) === 'WEBP';
- if (!(file.type === 'image/png' ? png : file.type === 'image/jpeg' ? jpeg : webp)) throw new Error('Dosyanın içeriği seçilen görsel biçimiyle eşleşmiyor.');
+ // File.type is supplied by the operating system and may be empty or use
+ // image/jpg, image/pjpeg or application/octet-stream for a valid JPEG.
+ const mime = png ? 'image/png' : jpeg ? 'image/jpeg' : webp ? 'image/webp' : null;
+ if (!mime) {
+  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Yalnız PNG, JPEG veya WebP görselleri seçebilirsiniz.');
+  throw new Error('Dosyanın içeriği seçilen görsel biçimiyle eşleşmiyor.');
+ }
  if (png && bytes.length >= 33 && tag(12) === 'IHDR' && view.getUint32(8) === 13) {
   width = view.getUint32(16); height = view.getUint32(20);
  } else if (jpeg) {
@@ -118,7 +120,6 @@ async function imageSize(file: File, signal: AbortSignal) {
   }
  }
  if (!width || !height) throw new Error(invalidImage);
- if (width > 32768 || height > 32768 || width * height > MAX_INPUT_PIXELS) throw new Error('Görselin çözünürlüğü güvenli işleme sınırını aşıyor. Lütfen daha küçük bir fotoğraf seçin.');
  // Read chunk headers/EXIF only, skipping compressed PNG/WebP pixels.
  if (png || webp) {
   let at = png ? 8 : 12;
@@ -134,7 +135,7 @@ async function imageSize(file: File, signal: AbortSignal) {
    at += 8 + length + (png ? 4 : length % 2);
   }
  }
- return exif >= 5 ? { width: height, height: width, swapped: true } : { width, height, swapped: false };
+ return exif >= 5 ? { width: height, height: width, mime } : { width, height, mime };
 }
 
 function fits(width: number, height: number, bytes: number) {
@@ -159,6 +160,7 @@ export async function prepareLocalPattern(file: File, signal?: AbortSignal): Pro
 
 async function prepare(file: File, signal: AbortSignal): Promise<File> {
  const size = await imageSize(file, signal);
+ if (file.type !== size.mime) file = new File([file], file.name, { type: size.mime, lastModified: file.lastModified });
  checkCancelled(signal);
  const unchanged = fits(size.width, size.height, file.size);
  const ratio = unchanged ? Math.min(1, 128 / Math.max(size.width, size.height)) : Math.min(1, MAX_PATTERN_DIMENSION / size.width, MAX_PATTERN_DIMENSION / size.height, Math.sqrt(MAX_PATTERN_PIXELS / (size.width * size.height)));

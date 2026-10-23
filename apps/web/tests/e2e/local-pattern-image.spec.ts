@@ -179,3 +179,19 @@ test('unresponsive decoders time out and release the upload input', async ({ pag
  await expect(page.locator('input[type=file]')).toBeEnabled();
  await expect(page.getByText('Görsel hazırlanıyor…', { exact: true })).toHaveCount(0);
 });
+
+for (const mimeType of ['', 'image/jpg', 'image/pjpeg', 'application/octet-stream']) test(`valid JPEG opens with operating system type ${mimeType || 'empty'}`, async ({ page }) => {
+ await setup(page);
+ const jpeg = await image(page, 'image/jpeg');
+ const buffer = Buffer.concat([jpeg, Buffer.alloc(119 * 1024 - jpeg.length)]);
+ await page.evaluate(({ bytes, type }) => {
+  const input = document.querySelector<HTMLInputElement>('input[type=file]')!;
+  const transfer = new DataTransfer();
+  transfer.items.add(new File([new Uint8Array(bytes)], 'download.jpeg', { type }));
+  input.files = transfer.files;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+ }, { bytes: [...buffer], type: mimeType });
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await expect(page.locator('main').getByRole('alert')).toHaveCount(0);
+ await expect(page.locator('#local-image-help')).toContainText('yükleme sınırı yoktur');
+});

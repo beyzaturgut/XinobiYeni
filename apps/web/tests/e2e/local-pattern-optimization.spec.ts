@@ -59,15 +59,17 @@ for (const entry of cases) test(entry.name, async ({ page }) => {
  if (entry.exif === 6) { expect(metrics.top[0]).toBeGreaterThan(200); expect(metrics.top[2]).toBeLessThan(50); expect(metrics.bottom[2]).toBeGreaterThan(200); }
 });
 
-test('input safety cap rejects before decoding', async ({ page }) => {
+test('an original larger than 64 MiB is accepted and optimized', async ({ page }) => {
  const result = await page.evaluate(async () => {
-  let decoded = 0; const original = window.createImageBitmap;
-  window.createImageBitmap = ((...args: Parameters<typeof createImageBitmap>) => { decoded++; return original(...args); }) as typeof createImageBitmap;
-  try { await window.preparePhoto(new File([new Uint8Array(64*1024*1024+1)], 'too-big.png', { type:'image/png' })); return { decoded, error:'' }; }
-  catch (error) { return { decoded, error:(error as Error).message }; }
-  finally { window.createImageBitmap = original; }
+  const canvas = document.createElement('canvas'); canvas.width = 32; canvas.height = 32;
+  const blob = await new Promise<Blob>(resolve => canvas.toBlob(value => resolve(value!), 'image/jpeg'));
+  const file = new File([blob, new Uint8Array(65 * 1024 * 1024)], 'large.jpeg', { type: 'image/jpeg' });
+  const output = await window.preparePhoto(file);
+  return { inputBytes: file.size, outputBytes: output.size, type: output.type };
  });
- expect(result.decoded).toBe(0); expect(result.error).toContain('64 MiB');
+ expect(result.inputBytes).toBeGreaterThan(64 * 1024 * 1024);
+ expect(result.outputBytes).toBeLessThanOrEqual(8 * 1024 * 1024);
+ expect(result.type).toBe('image/jpeg');
 });
 
 test('real oversized transparent PNG uses alpha-preserving compression',async({page})=>{
@@ -84,14 +86,14 @@ test('real oversized transparent PNG uses alpha-preserving compression',async({p
  expect(metrics.inputBytes).toBeGreaterThan(8*1024*1024);expect(metrics.outputBytes).toBeLessThanOrEqual(8*1024*1024);expect(metrics.width).toBe(1800);expect(metrics.height).toBe(1800);expect(metrics.type).toBe('image/webp');expect(metrics.cornerAlpha).toBe(0);expect(metrics.centerAlpha).toBe(102);
 });
 
-test('huge header dimensions are rejected before decoding',async({page})=>{
+test('malformed image dimensions are left to the decoder rather than a resolution gate',async({page})=>{
  const result=await page.evaluate(async()=>{
   const c=document.createElement('canvas');c.width=1;c.height=1;const blob=await new Promise<Blob>(r=>c.toBlob(b=>r(b!)));const bytes=await blob.arrayBuffer();c.width=0;c.height=0;
   const view=new DataView(bytes);view.setUint32(16,10001);view.setUint32(20,10001);
   let decoded=0;const decode=window.createImageBitmap;window.createImageBitmap=(()=>{decoded++;throw Error('unexpected decoder')}) as typeof createImageBitmap;
   try{await window.preparePhoto(new File([bytes],'huge.png',{type:'image/png'}));return{decoded,error:''}}catch(error){return{decoded,error:(error as Error).message}}finally{window.createImageBitmap=decode}
  });
- expect(result.decoded).toBe(0);expect(result.error).toContain('güvenli işleme sınırını');
+ expect(result.decoded).toBeGreaterThan(0);expect(result.error).toContain('Görsel okunamadı');
 });
 
 test('encoder failure returns Turkish error and releases bitmap/canvas',async({page})=>{

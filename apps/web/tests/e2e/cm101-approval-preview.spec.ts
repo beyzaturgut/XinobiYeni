@@ -2,6 +2,7 @@ import {test,expect} from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import {openPlacement} from './own-image-flow';
 type QuestionnaireAnswer={questionId:string;optionId:string};
 type QuestionnaireSession={id:string;status:string;product?:{id?:string};variant?:{id?:string};answers?:QuestionnaireAnswer[];createdAt:string;assetFile:string;assetMime:string};
 type PatternDebug={mask:Uint8Array|null;source:Uint8Array|null;missing:Array<{upper:number;lower:number}>};
@@ -38,7 +39,7 @@ test.setTimeout(180000);
 await page.route('**/api/v1/dev/cm101-approved/**',async route=>{const u=new URL(route.request().url());if(u.pathname.endsWith('rendering-inputs'))return route.fulfill({json:bundle});const role=u.pathname.split('/').pop()!;return route.fulfill({contentType:role==='source'?'image/webp':'image/png',body:files[role as keyof typeof files]});});
 await page.goto('/xinobi-u/kendi-gorselin/?product='+p+'&variant='+v);
 await page.locator('input[type=file]').setInputFiles(path.join(repo,'apps/web/public/assets/personalization/sample-pattern.png'));
-const canvas=page.locator('canvas[role=img]');const start=Date.now();await expect(canvas).toBeVisible({timeout:120000});expect(await canvas.evaluate((c:HTMLCanvasElement)=>[c.width,c.height])).toEqual([3543,5315]);
+const canvas=page.locator('canvas[role=img]');const start=Date.now();await openPlacement(page,120000);expect(await canvas.evaluate((c:HTMLCanvasElement)=>[c.width,c.height])).toEqual([3543,5315]);
 const result=await canvas.evaluate(async(c:HTMLCanvasElement)=>{
 const paths=['source','mask','branding'].map(role=>'/api/v1/dev/cm101-approved/media/00000000-0000-4000-8000-000000000001/'+role);
 const output=c.getContext('2d')!.getImageData(0,0,c.width,c.height).data;

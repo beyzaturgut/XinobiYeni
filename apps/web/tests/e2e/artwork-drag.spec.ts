@@ -1,10 +1,12 @@
 import {test,expect,type Page} from '@playwright/test';
 import { artworkReadOnly } from './artwork-read-only';
+import { openPlacement } from './own-image-flow';
 test.beforeEach(async ({page}) => artworkReadOnly(page));
 async function setup(page:Page,width=1440){
  await page.setViewportSize({width,height:1000});await page.goto('/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B');
- await page.getByLabel('Görsel seç',{exact:true}).setInputFiles('public/assets/personalization/sample-pattern.png');
- await expect(page.locator('canvas[role=img]')).toBeVisible();await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
+ await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
+ await page.getByLabel('Dosya seç',{exact:true}).setInputFiles('public/assets/personalization/sample-pattern.png');
+ await openPlacement(page);
  await page.locator('canvas[role=img]').scrollIntoViewIfNeeded();
 }
 async function geometry(page:Page){return (await page.locator('canvas[role=img]').boundingBox())!}

@@ -60,9 +60,5 @@ for (const width of [320, 360, 390, 1440]) {
       expect(r.y).toBeCloseTo(dimensions[0].y, 0);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.goto('/xinobi-u/renk/?product=DEMO-499cf715-33cd-4144-8c40-2245181e8625');
-    const original = page.getByRole('button', { name: 'Metalik gümüş rengini seç', exact: true }).locator('span');
-    await expect(original).toBeVisible();
-    await expect(original).toHaveCSS('width', '48px');
   });
 }

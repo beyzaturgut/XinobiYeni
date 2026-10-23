@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState, type Ref } from "react";
-import ProductPatternPreview, { type PatternTransform } from "./product-pattern-preview";
+import { useState, type Ref } from "react";
+import ProductPatternPreview from "./product-pattern-preview";
 import styles from "./editor.module.css";
-import { DEFAULT_CURVATURE_STRENGTH } from "./product-surface-warp";
 import type { RenderingInputs } from "./accepted-surface-api";
-import { loadPreviewGeometry, transferPreviewPlacements, type PlacementTransferHandle, type PreviewPlacements } from "../../../../features/product-personalization/preview-placement-transfer";
+import type { PlacementTransferHandle } from "../../../../features/product-personalization/preview-placement-transfer";
+import { usePatternPlacement } from "./use-pattern-placement";
 
 import type {DesignPlacement} from "../../../../lib/design-placement";
 
@@ -20,41 +20,7 @@ export default function EditorWorkspace({ renderingInputs, placementMode = "patt
   const [layers, setLayers] = useState(initialLayers);
   const [selected, setSelected] = useState(1);
   const [notice, setNotice] = useState("");
-  const restored = initialPlacement?.surfaceVersion===renderingInputs.surfaceVersion?initialPlacement:undefined;
-  const [patternTransform, setPatternTransform] = useState<PatternTransform>(restored ? {x:restored.x,y:restored.y,scale:restored.scale,rotation:restored.rotation} : { x: renderingInputs.width / 2, y: renderingInputs.height * (fillMask ? .5 : .65), scale: fillMask ? 1 : placementMode === "artwork" ? 1 : 1.2, rotation: 0 });
-  const [curvatureStrength, setCurvatureStrength] = useState(restored?.curvatureStrength ?? DEFAULT_CURVATURE_STRENGTH);
-  const [artworkTransform, setArtworkTransform] = useState<PatternTransform>({ x: renderingInputs.width / 2, y: renderingInputs.height * .65, scale: 1, rotation: 0 });
-  const [patternBodyAdjustments, setPatternBodyAdjustments] = useState<PreviewPlacements['bodyAdjustments']>(restored?.bodyAdjustments);
-  useEffect(() => {
-    onPlacementChange?.({sourceWidth:renderingInputs.width,sourceHeight:renderingInputs.height,surfaceVersion:renderingInputs.surfaceVersion,...patternTransform,curvatureStrength,bodyAdjustments:patternBodyAdjustments,mode:placementMode,fillMask});
-  }, [onPlacementChange,renderingInputs.width,renderingInputs.height,renderingInputs.surfaceVersion,patternTransform,curvatureStrength,patternBodyAdjustments,placementMode,fillMask]);
-  const snapshot = useRef({ inputs: renderingInputs, pattern: patternTransform, artwork: artworkTransform, artworkSrc, bodyAdjustments: patternBodyAdjustments });
-  useLayoutEffect(() => {
-    snapshot.current = { inputs: renderingInputs, pattern: patternTransform, artwork: artworkTransform, artworkSrc, bodyAdjustments: patternBodyAdjustments };
-  }, [renderingInputs, patternTransform, artworkTransform, artworkSrc, patternBodyAdjustments, curvatureStrength, patternSrc]);
-  useImperativeHandle(placementRef, () => ({
-    async prepare(next) {
-      const current = snapshot.current;
-      try {
-        // Sequential, bounded working-resolution analysis; cache only bounds.
-        const from = await loadPreviewGeometry(current.inputs), to = await loadPreviewGeometry(next);
-        let imageDimensions: {width: number; height: number} | undefined;
-        if (current.artworkSrc) {
-          const image = new Image(); image.src = current.artworkSrc;
-          try { await image.decode(); imageDimensions = {width: image.naturalWidth, height: image.naturalHeight}; }
-          finally { image.src = 'data:,'; }
-        }
-        const mapped = transferPreviewPlacements(from, to, current, imageDimensions);
-        if (snapshot.current !== current) return null;
-        // Caller commits the placements and target surface in one React batch.
-        return () => {
-          if (snapshot.current !== current) return false;
-          setPatternTransform(mapped.pattern); setArtworkTransform(mapped.artwork); setPatternBodyAdjustments(mapped.bodyAdjustments);
-          return true;
-        };
-      } catch { return null; }
-    },
-  }), []);
+  const { patternTransform, setPatternTransform, curvatureStrength, setCurvatureStrength, artworkTransform, setArtworkTransform, patternBodyAdjustments } = usePatternPlacement({ renderingInputs, placementMode, fillMask, artworkSrc, placementRef, onPlacementChange, initialPlacement });
 
   function toggleLayer(id: number, key: "locked" | "visible") {
     setLayers((current) => current.map((layer) => layer.id === id ? { ...layer, [key]: !layer[key] } : layer));

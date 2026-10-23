@@ -12,13 +12,14 @@ type Source={sessionId:string}|{file:Blob;productId:string;variantId:string|null
 
 /** "Sepete ekle" and "Tasarımımı kaydet" for an AI result (session) or an own image (file). A cart line needs a saved
  *  design, so adding saves it first, once. Signed-out shoppers are sent to sign in. */
-export default function SaveDesignButton({source,placement}:{source:Source;placement?:DesignPlacement}){
+export default function SaveDesignButton({source,placement,stacked=false}:{source:Source;placement?:DesignPlacement;stacked?:boolean}){
   const {user,ready}=useDemoCommerce();
   if(!ready)return null;
-  if(!user)return <p className={styles.note}><Link href="/hesap">Giriş yap</Link>, tasarımını sepete ekle ve hesabında sakla.</p>;
-  return <SaveForAccount key={user.id+':'+('sessionId' in source?source.sessionId:source.productId+':'+source.variantId)} source={source} placement={placement}/>;
+  // The stacked layout (XINOBI U placement step) already says why above; it keeps a full-width way to sign in.
+  if(!user)return stacked?<div className={`${styles.wrap} ${styles.stacked}`}><Link className={`${styles.button} ${styles.primary}`} href="/hesap">Sepete eklemek için giriş yap</Link></div>:<p className={styles.note}><Link href="/hesap">Giriş yap</Link>, tasarımını sepete ekle ve hesabında sakla.</p>;
+  return <SaveForAccount key={user.id+':'+('sessionId' in source?source.sessionId:source.productId+':'+source.variantId)} source={source} placement={placement} stacked={stacked}/>;
 }
-function SaveForAccount({source,placement}:{source:Source;placement?:DesignPlacement}){
+function SaveForAccount({source,placement,stacked}:{source:Source;placement?:DesignPlacement;stacked:boolean}){
   const active=useRef(true),running=useRef(false);
   useEffect(()=>{active.current=true;return()=>{active.current=false}},[]);
   const router=useRouter();
@@ -46,7 +47,7 @@ function SaveForAccount({source,placement}:{source:Source;placement?:DesignPlace
     addToCart(product.id,variant.id,variant.stock,{id:saved.id,name:saved.name,placement,configurationId:config.current?.id,configurationRevision:config.current?.revision});
     setAdded(`“${saved.name}” tasarımlı ${product.name} (${variant.color}) sepete eklendi.`);
   });
-  return <div className={styles.wrap}>
+  return <div className={`${styles.wrap} ${stacked?styles.stacked:''}`}>
     <div className={styles.actions}>
       <button type="button" className={`${styles.button} ${styles.primary}`} disabled={busy||!state} onClick={add}>{busy?'Hazırlanıyor…':placement?'Sepete ekle':'Üründe yerleştir ve sepete ekle'}</button>
       <button type="button" className={styles.button} disabled={busy} onClick={()=>run(async()=>{await save()})}>{design?'Yerleşimi kaydet':'Tasarımımı kaydet'}</button>

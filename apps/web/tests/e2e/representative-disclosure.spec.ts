@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test';
 import {readFileSync} from 'node:fs';
+import {openPlacement} from './own-image-flow';
 for(const flow of ['generated','own-image'])test(flow+' personalized preview has persistent shared disclosure',async({page})=>{
  // Test-only approved surface: never depend on or approve the owner's local records.
  const state=JSON.parse(readFileSync('../../tests/fixtures/demo-commerce.json','utf8'));
@@ -17,13 +18,16 @@ for(const flow of ['generated','own-image'])test(flow+' personalized preview has
    else await r.fulfill({json:{id,status:'ready',product,variant,imageUrl:'/api/v1/design-studio/sessions/'+id+'/image'}});
   });await page.goto('/xinobi-u/onizleme/');
  }else{
-  await page.goto('/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B');
-  await page.getByLabel('Görsel seç',{exact:true}).setInputFiles('public/assets/personalization/sample-pattern.png');
+  await page.goto('/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B');await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
+  await page.getByLabel('Dosya seç',{exact:true}).setInputFiles('public/assets/personalization/sample-pattern.png');
+  await openPlacement(page);
  }
- await expect(page.locator('canvas[role=img]')).toBeVisible();await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
+ if(flow==='generated'){await expect(page.locator('canvas[role=img]')).toBeVisible();await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();}
+ // The own-image placement step (design "Önizleme ve yerleşim") words the same disclosure for its own layout.
+ const disclosure=flow==='generated'?'Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.':'Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.';
  for(const width of [1440,390]){
   await page.setViewportSize({width,height:900});const badge=page.getByText('Temsilidir',{exact:true});await badge.scrollIntoViewIfNeeded();await page.mouse.move(0,0);await expect(badge).toBeVisible();
-  await expect(page.getByText('Temsili dijital çalışma alanı · Ürün üzerindeki fiziksel baskı konumu veya ölçüsü değildir.',{exact:true})).toBeVisible();
+  await expect(page.getByText(disclosure,{exact:true})).toBeVisible();
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  }
 });

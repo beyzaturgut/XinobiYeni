@@ -1,0 +1,133 @@
+/* Step 3 · upload (design "Görsel yükleme") */
+.uploadLayout{display:flex;flex-wrap:wrap;gap:48px 64px;align-items:flex-start}
+.upload{flex:1 1 600px;min-width:0;display:flex;flex-direction:column}
+.surfaceStatus:empty{display:none}
+.surfaceStatus p{margin:20px 0 0;font-size:15px;color:#3d3d3d}
+.surfaceStatus button{margin-top:16px}
+.kinds{margin-top:32px;align-self:flex-start;padding:4px;display:inline-flex;flex-wrap:wrap;gap:4px;border-radius:12px;background:#f3f3f1}
+.kinds button{min-height:44px;padding:0 20px;border:0;border-radius:9px;background:transparent;color:#4a4a4a;font-size:15px;font-weight:500;cursor:pointer}
+.kinds button[aria-pressed=true]{background:#fff;color:#111;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.drop{margin-top:24px;padding:56px 32px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;border:1.5px dashed #bdbdbd;border-radius:16px;background:#fafaf9}
+.drop.dragging{border-color:#111;background:#f3f3f1}
+.drop p{margin:0;font-size:15px;color:#4a4a4a}
+.drop .dropTitle{font-size:20px;font-weight:600;color:#111}
+.dropIcon{width:64px;height:64px;display:flex;align-items:center;justify-content:center;border:1px solid #e0e0e0;border-radius:999px;background:#fff}
+.dropIcon svg{width:26px;height:26px;fill:none;stroke:#111;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.dropActions{margin-top:8px;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.pick,.pickSmall{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+.pick{height:52px;padding:0 24px;border-radius:10px;background:#111;color:#fff;font-size:16px;font-weight:600}
+.pick:hover{background:#000}
+.pick input,.pickSmall input{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.pick:focus-within,.pickSmall:focus-within{outline:3px solid #efc34a;outline-offset:3px}
+.pick:has(input:disabled),.pickSmall:has(input:disabled){opacity:.5;cursor:wait}
+.sample{height:52px;padding:0 20px;border:1px solid #d6d6d6;border-radius:10px;background:#fff;color:#111;font-size:15px;font-weight:500;cursor:pointer}
+.sample:hover{border-color:#111}
+.sample:disabled{opacity:.5;cursor:wait}
+.fileCard{margin-top:24px;padding:20px;display:flex;flex-wrap:wrap;align-items:center;gap:20px;border:1px solid #e0e0e0;border-radius:16px}
+.fileCard>img{width:120px;height:120px;display:block;object-fit:cover;border-radius:10px;background:#f3f3f1}
+.fileCard>div:nth-of-type(1){flex:1 1 220px;min-width:0}
+.fileCard p{margin:0}
+.fileReady{margin-bottom:6px!important;display:flex;align-items:center;gap:8px;color:#1f7a3a;font-size:14px;font-weight:600}
+.fileReady svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.fileName{margin-bottom:4px!important;overflow:hidden;font-size:17px;font-weight:600;text-overflow:ellipsis;white-space:nowrap}
+.fileMeta{font-size:14px;color:#5f5f5f}
+.fileActions{display:flex;flex-wrap:wrap;gap:8px}
+.pickSmall,.fileActions button{height:44px;padding:0 18px;border:1px solid #d6d6d6;border-radius:10px;background:#fff;color:#111;font-size:15px;font-weight:500;cursor:pointer}
+.pickSmall:hover,.fileActions button:hover{border-color:#111}
+.busy{margin-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.busy p{margin:0;font-size:15px}
+.busy button{height:44px}
+.chips{list-style:none;margin:20px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips li{padding:8px 12px;border-radius:999px;background:#f3f3f1;font-size:13px}
+.privacy{margin-top:24px;padding:18px 20px;display:flex;align-items:flex-start;gap:14px;border:1px solid #e6e6e6;border-radius:12px}
+.privacy svg{flex:none;width:20px;height:20px;margin-top:1px;fill:none;stroke:#111;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.privacy p{margin:0;font-size:14px;line-height:1.55;color:#3d3d3d}
+.privacy strong{color:#111;font-weight:600}
+.uploadActions{margin-top:40px}
+.aside{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.productCard{overflow:hidden;border:1px solid #e6e6e6;border-radius:16px}
+.productImage{height:300px;display:flex;align-items:center;justify-content:center;background:#f3f3f1}
+.productImage img{width:auto;height:82%;display:block;object-fit:contain;mix-blend-mode:multiply}
+.productText{padding:22px 24px;display:flex;flex-direction:column;gap:6px}
+.productText p{margin:0;font-size:14px;line-height:1.5;color:#4a4a4a}
+.productText .productKicker{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5f5f5f}
+.productText .productName{font-family:var(--font-display);font-size:20px;font-weight:600;color:#111;overflow-wrap:anywhere}
+.productText a{align-self:flex-start;min-height:44px;display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:#111;text-decoration:underline;text-underline-offset:3px}
+.tips{padding:22px 24px;border-radius:16px;background:#f3f3f1}
+.tips p{margin:0 0 12px;font-size:15px;font-weight:600}
+.tips ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.5;color:#3d3d3d}
+
+/* Step 4 · placement (design "Önizleme ve yerleşim") */
+.placementHead{margin:-8px 0 28px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px 40px}
+.placementHead>div{min-width:0}
+.placementHead .placementTitle{font-size:clamp(28px,3.2vw,40px)!important}
+.placementHead>p{margin:0;font-size:15px;color:#3d3d3d}
+.placementHead>p a{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.studio{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.canvasPanel{flex:999 1 640px;min-width:0;overflow:hidden;border:1px solid #e6e6e6;border-radius:16px}
+.toolbar{padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #e6e6e6}
+.toolGroup{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.iconButton{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:1px solid #e0e0e0;border-radius:10px;background:#fff;color:#111;cursor:pointer}
+.iconButton svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.iconButton:disabled,.zoomButton:disabled{color:#bdbdbd;cursor:not-allowed}
+.toolDivider{width:1px;height:24px;margin:0 6px;background:#e0e0e0}
+.zoomButton{width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#111;font-size:20px;cursor:pointer}
+.zoomButton:hover:not(:disabled){background:#f3f3f1}
+.zoomLabel{min-width:48px;text-align:center;font-size:14px;font-weight:500}
+.areaToggle{min-height:44px;display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+.areaToggle input{width:18px;height:18px;margin:0;accent-color:#111}
+.representative{padding:6px 12px;display:inline-flex;align-items:center;gap:6px;border:1px solid #d6d6d6;border-radius:999px;font-size:13px}
+.representative svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.canvasStage{height:640px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f3f3f1}
+.zoom{height:88%;display:flex;justify-content:center;transition:transform .2s}
+/* The preview keeps the surface's own aspect ratio and takes its size from the stage height. */
+.zoom>div{width:auto;height:100%;background:#f3f3f1}
+/* The product photo sits on white; multiplying it onto the stage colour drops the white box. */
+.zoom canvas{mix-blend-mode:multiply}
+.printArea{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.canvasNotes{padding:14px 20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;border-top:1px solid #e6e6e6;font-size:13px;color:#5f5f5f}
+.settings{flex:1 1 360px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.colours{margin:0;padding:20px 22px;border:1px solid #e6e6e6;border-radius:16px;min-width:0}
+.colours legend{margin-left:-6px;padding:0 6px;font-size:15px}
+.colours legend strong{font-weight:600}
+.colours>div{margin-top:6px;display:flex;flex-wrap:wrap;gap:12px}
+.colours button{width:44px;height:44px;padding:0;border:0;border-radius:999px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.colours button[aria-pressed=true]{box-shadow:0 0 0 3px #fff,0 0 0 5px #111}
+.colours button:disabled{cursor:wait}
+.colours button.noHex{background:repeating-linear-gradient(45deg,#eee,#eee 4px,#fff 4px,#fff 8px)}
+.colours p{margin:12px 0 0;font-size:13px;color:#3d3d3d}
+.fileSummary{padding:16px;display:flex;align-items:center;gap:14px;border:1px solid #e6e6e6;border-radius:16px}
+.fileSummary img{flex:none;width:56px;height:56px;display:block;object-fit:cover;border-radius:8px;background:#f3f3f1}
+.fileSummary>div{flex:1 1 auto;min-width:0}
+.fileSummary p{margin:0;font-size:13px;color:#5f5f5f}
+.fileSummary p:first-child{margin-bottom:2px;overflow:hidden;font-size:15px;font-weight:600;color:#111;text-overflow:ellipsis;white-space:nowrap}
+.fileSummary a{height:44px;padding:0 14px;display:inline-flex;align-items:center;border:1px solid #d6d6d6;border-radius:10px;font-size:14px;font-weight:500}
+.fileSummary a:hover{border-color:#111}
+.placementPanel{padding:20px 22px;border:1px solid #e6e6e6;border-radius:16px}
+.placementPanelHead{margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.placementPanelHead p{margin:0;font-size:15px;font-weight:600}
+.placementPanelHead button{min-height:44px;padding:0 4px;border:0;background:transparent;color:#111;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.quick{margin-bottom:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.quick button{height:44px;border:1px solid #d6d6d6;border-radius:10px;background:#fff;color:#111;font-size:14px;font-weight:500;cursor:pointer}
+.quick button:hover{border-color:#111}
+.sliders{display:flex;flex-direction:column;gap:16px}
+.sliders>div{display:flex;flex-direction:column;gap:6px}
+.sliders label{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.sliders label span:last-child{font-variant-numeric:tabular-nums;color:#3d3d3d}
+.sliders input{width:100%;height:28px;margin:0;accent-color:#111}
+.checkout{padding:20px 22px;display:flex;flex-direction:column;gap:14px;border-radius:16px;background:#f3f3f1}
+.checkout>div:first-child{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.printCheck{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#7a4b00}
+.printCheck i{width:8px;height:8px;border-radius:4px;background:#c98a1b}
+.price{font-family:var(--font-display);font-size:22px;font-weight:600}
+
+@media (max-width:760px){
+  .uploadLayout{gap:32px}
+  .upload,.aside{flex-basis:100%}
+  .drop{padding:40px 20px}
+  .fileCard>img{width:88px;height:88px}
+  .productImage{height:220px}
+  .canvasPanel,.settings{flex-basis:100%}
+  .canvasStage{height:min(120vw,480px)}
+  .toolbar{padding:10px 12px}
+}

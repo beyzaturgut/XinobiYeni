@@ -9,28 +9,31 @@ for(const [product,variant,ready] of pairs)test("exact preview readiness "+varia
   expect(bundle.inputs).toBeNull();await expect(page.getByRole("status")).toContainText("Bu seçili ürün/varyant için geliştirme ürün önizlemesi kullanılamıyor.");await expect(page.locator("canvas[role=img]")).toHaveCount(0);expect(masks).toHaveLength(0);
  }expect(posts).toBe(0);
 });
-// Eligibility (the XINOBI U product list) and exact readiness (the colour step) are separate since the colour page (fe93107).
+// Eligibility (the XINOBI U product list) and exact readiness (the method step) stay separate.
 test("XINOBI U eligibility remains separate from exact preview readiness",async({page})=>{
  await page.goto("/xinobi-u/");await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
  for(const [name,product] of [["Çay Makinesi 101","DEMO-P101"],["Kahve Makinesi 101","DEMO-P102"]])
   await expect(page.locator("article").filter({has:page.getByRole("heading",{name,exact:true})}).getByRole("link").first()).toHaveAttribute("href",new RegExp("^/xinobi-u/renk/?\\?product="+product+"$"));
  await page.goto("/xinobi-u/renk/?product=DEMO-P102");await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
- await page.getByRole("button",{name:"Kırmızı rengini seç"}).click();
- await expect(page.locator('[data-variant-reference="DEMO-V102-R"]')).toHaveAttribute("data-preview-readiness","unavailable");
- await expect(page.getByRole("link",{name:"Sorulara başla →"})).toHaveCount(0);
+ await expect(page.locator('[data-product-reference="DEMO-P102"]')).toHaveAttribute("data-preview-readiness","unavailable");
+ await expect(page.getByRole("link",{name:/→$/}).filter({hasText:/Görsel yükle|Sorulara başla|Desen yükle/})).toHaveCount(0);
 });
-test("selected color preserves questionnaire identity and exact readiness",async({page})=>{
- await page.goto("/xinobi-u/renk/?product=DEMO-P101");await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
- for(const [variant,color,status] of [["DEMO-V101-B","Lacivert","ready"],["DEMO-V101-R","Kırmızı","unavailable"],["DEMO-V101-S","Gümüş gri","unavailable"],["DEMO-V101-G","Rose gold","unavailable"]]){
-  await page.getByRole("button",{name:color+" rengini seç"}).click();await expect(page.locator('[data-variant-reference="'+variant+'"]')).toHaveAttribute("data-preview-readiness",status);
-  const start=page.getByRole("link",{name:"Sorulara başla →"});
-  if(status==="ready")await expect(start).toHaveAttribute("href","/xinobi-u/sorular/?product=DEMO-P101&variant="+variant);else await expect(start).toHaveCount(0);
- }await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+test("method step keeps the questionnaire identity on a colour with an accepted surface",async({page})=>{
+ for(const requested of ["DEMO-V101-B","DEMO-V101-R","DEMO-V101-S","DEMO-V101-G"]){
+  await page.goto("/xinobi-u/renk/?product=DEMO-P101&variant="+requested);
+  await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-preview-readiness","ready");
+  await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-variant-reference","DEMO-V101-B");
+  await page.getByRole("radio",{name:/Sorularla tasarla/}).check({force:true});
+  await expect(page.getByRole("link",{name:"Sorulara başla →"})).toHaveAttribute("href","/xinobi-u/sorular/?product=DEMO-P101&variant=DEMO-V101-B");
+ }
+ await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
 });
-test("changed variant never retains ready state; network error offers a retry",async({page})=>{
+test("readiness network error offers a retry",async({page})=>{
+ let release!:()=>void;const wait=new Promise<void>(resolve=>{release=resolve});let failing=true;
+ await page.route("**/commerce/DEMO-P101/DEMO-V101-S/rendering-inputs",async r=>{if(!failing)return r.fallback();await wait;await r.fulfill({status:503})});
  await page.goto("/xinobi-u/renk/?product=DEMO-P101");await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
- await page.getByRole("button",{name:"Lacivert rengini seç"}).click();await expect(page.locator('[data-preview-readiness="ready"]')).toHaveCount(1);
- let release!:()=>void;const wait=new Promise<void>(resolve=>{release=resolve});await page.route("**/commerce/DEMO-P101/DEMO-V101-S/rendering-inputs",async r=>{await wait;await r.fulfill({status:503})});
- await page.getByRole("button",{name:"Gümüş gri rengini seç"}).click();await expect(page.locator('[data-preview-readiness="loading"]')).toBeVisible();await expect(page.locator('[data-preview-readiness="ready"]')).toHaveCount(0);
- release();await expect(page.locator('[data-preview-readiness="error"]')).toContainText("şu anda kullanılamıyor");await expect(page.getByRole("button",{name:"Tekrar dene"})).toBeVisible();await expect(page.getByRole("link",{name:"Sorulara başla →"})).toHaveCount(0);
+ await expect(page.locator('[data-preview-readiness="loading"]')).toBeAttached();await expect(page.getByRole("link",{name:"Görsel yükle →"})).toHaveCount(0);
+ release();await expect(page.locator('[data-preview-readiness="error"]')).toContainText("doğrulanamıyor");
+ failing=false;await page.getByRole("button",{name:"Tekrar dene"}).click();
+ await expect(page.getByRole("link",{name:"Görsel yükle →"})).toHaveAttribute("href","/xinobi-u/kendi-gorselin/?product=DEMO-P101&variant=DEMO-V101-B");
 });

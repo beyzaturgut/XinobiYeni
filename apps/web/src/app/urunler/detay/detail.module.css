@@ -1,0 +1,99 @@
+/* Product detail (design "Ürün detay"): gallery on a warm grey stage, purchase column, XINOBI U card and an accordion. */
+.page{max-width:1360px;margin:0 auto;padding:28px 40px 120px;color:#111;background:#fff}
+.breadcrumb{margin-bottom:32px;display:flex;flex-wrap:wrap;gap:8px;font-size:14px;color:#5f5f5f}
+.breadcrumb a:hover{color:#111}
+.breadcrumb [aria-current]{color:#111;overflow-wrap:anywhere}
+.layout{display:flex;flex-wrap:wrap;gap:48px 72px;align-items:flex-start}
+
+.gallery{flex:1 1 520px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.stage{position:relative;aspect-ratio:1/1;overflow:hidden;border-radius:16px;background:#f3f3f1}
+/* Stacked, preloaded photos: the previous one leaves at once and the new one fades in (120 ms), so it never shows through. */
+.stage img{position:absolute;inset:0;width:100%;height:100%;padding:8%;box-sizing:border-box;object-fit:contain;mix-blend-mode:multiply}
+.stageShown{transition:opacity .12s ease}
+.stageHidden{transition:none}
+.stage>p{position:absolute;inset:0;margin:0;display:grid;place-items:center;color:#5f5f5f}
+.stageBar{position:absolute;z-index:3;left:20px;right:20px;bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:12px;pointer-events:none}
+.stageBar>*{pointer-events:auto}
+.counter{margin:0;padding:8px 14px;border-radius:999px;background:#fff;font-size:13px;font-weight:500}
+.stageBar>div{display:flex;gap:8px}
+.stageBar button{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border:0;border-radius:999px;background:#fff;color:#111;cursor:pointer}
+.stageBar button:hover{background:#f7f7f7}
+.stageBar svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.thumbs{list-style:none;margin:0;padding:0 0 4px;display:flex;gap:12px;overflow-x:auto}
+.thumbs button{width:88px;height:88px;padding:0;display:block;overflow:hidden;border:1px solid #e0e0e0;border-radius:10px;background:#f3f3f1;cursor:pointer}
+.thumbs button:hover{border-color:#9e9e9e}
+.thumbs button[aria-current=true]{border:2px solid #111}
+.thumbs img{width:100%;height:100%;padding:8%;box-sizing:border-box;object-fit:contain;mix-blend-mode:multiply}
+
+.info{flex:1 1 440px;min-width:0;display:flex;flex-direction:column}
+.eyebrow{margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5f5f5f}
+/* Overrides the site-wide compact `main h1` rule: this design uses a large display title. */
+.title{margin:0;font-family:var(--font-display);font-weight:600;font-size:clamp(32px,4vw,48px)!important;line-height:1.05!important;letter-spacing:-.02em!important;overflow-wrap:anywhere}
+.meta{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px;color:#5f5f5f;overflow-wrap:anywhere}
+.meta>span{display:flex;align-items:center;gap:6px}
+.meta i{width:8px;height:8px;border-radius:4px}
+.inStock{background:#1f7a3a}
+.outOfStock{background:#9e9e9e}
+.price{margin:32px 0 0;font-family:var(--font-display);font-size:36px;font-weight:600;letter-spacing:-.01em}
+.divider{height:1px;margin:32px 0;background:#e6e6e6}
+.colors{margin:0;padding:0;border:0}
+.colors legend{margin-bottom:16px;padding:0;font-size:15px}
+.colors legend strong{font-weight:600}
+.colors>div{display:flex;flex-wrap:wrap;gap:14px}
+.colors button{width:52px;height:52px;padding:0;border:0;border-radius:999px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.colors button[aria-pressed=true]{box-shadow:0 0 0 3px #fff,0 0 0 5px #111}
+.colors button:hover:not([aria-pressed=true]){box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 3px #fff,0 0 0 4px #9e9e9e}
+.colors button.noHex{background:repeating-linear-gradient(45deg,#eee,#eee 4px,#fff 4px,#fff 8px)}
+
+.secondaryActions{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px 28px}
+.secondaryActions button{min-height:44px;padding:0;display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#111;font-size:15px;cursor:pointer}
+.secondaryActions button:hover{text-decoration:underline;text-underline-offset:4px}
+.secondaryActions button:disabled{color:#9e9e9e;cursor:not-allowed;text-decoration:none}
+.secondaryActions svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.secondaryActions button[aria-pressed=true]{font-weight:600}
+.secondaryActions button[aria-pressed=true]:first-child svg{fill:currentColor}
+.error{margin:8px 0 0;color:#8b2424;font-size:13px}
+
+.personalize{margin-top:36px;padding:28px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;border-radius:16px;background:#f3f3f1}
+.personalize>div{flex:1 1 260px;min-width:0}
+.personalize p{margin:0;font-size:15px;line-height:1.5;color:#3d3d3d}
+.personalize .personalizeKicker{margin-bottom:8px;font-size:12px;font-weight:600;letter-spacing:.14em;color:#5f5f5f}
+.personalize .personalizeTitle{margin-bottom:8px;font-family:var(--font-display);font-size:22px;font-weight:600;color:#111}
+.personalize a{height:52px;padding:0 22px;display:inline-flex;align-items:center;gap:10px;border:1px solid #111;border-radius:10px;background:#fff;color:#111;font-size:15px;font-weight:600}
+.personalize a:hover{background:#111;color:#fff}
+
+.accordion{margin-top:36px;border-top:1px solid #e6e6e6}
+.accordion>div{border-bottom:1px solid #e6e6e6}
+.accordion h2{margin:0;font:inherit}
+.accordion button{width:100%;min-height:64px;padding:0;display:flex;align-items:center;justify-content:space-between;border:0;background:transparent;color:#111;font-size:16px;font-weight:500;text-align:left;cursor:pointer}
+.accordion button span{font-size:22px;font-weight:400}
+.accordion [role=region]{padding-bottom:22px;font-size:15px;line-height:1.6;color:#3d3d3d}
+.accordion [role=region] p{margin:0}
+.accordion [role=region] a{color:#111;text-decoration:underline;text-underline-offset:3px}
+.specs{margin:0;display:grid;gap:0}
+.specs div{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid #f0f0f0}
+.specs div:last-child{border-bottom:0}
+.specs dt{color:#5f5f5f}
+.specs dd{margin:0;font-weight:500;color:#111;text-align:right}
+
+/* Reviews keep their own module; here they align with the page column instead of a narrower centred box. */
+.below{margin-top:72px}
+.below>section{max-width:none;padding-inline:0}
+
+.footer{padding:28px clamp(20px,4vw,58px);display:flex;justify-content:space-between;background:#111;color:#9e9e9e;font-size:.7rem}
+.footer a:hover{color:#fff}
+
+@media (max-width:760px){
+  .page{padding:20px 16px 72px}
+  .breadcrumb{margin-bottom:20px}
+  .layout{gap:32px}
+  .gallery,.info{flex-basis:100%}
+  .stageBar{left:12px;right:12px;bottom:12px}
+  .thumbs button{width:72px;height:72px}
+  .price{margin-top:24px;font-size:30px}
+  .divider{margin:24px 0}
+  .personalize{padding:22px}
+  .personalize a{width:100%;justify-content:center}
+  .footer{flex-direction:column;gap:10px}
+}
+@media (prefers-reduced-motion:reduce){.stageShown{transition:none}}

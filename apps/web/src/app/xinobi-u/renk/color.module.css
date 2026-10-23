@@ -1,0 +1,77 @@
+/* XINOBI U step 2 (design "Renk seçimi"): preview on the left, colour cards and design method cards on the right. */
+.page{max-width:1360px;margin:0 auto;padding:28px 40px 120px;color:#111;background:#fff}
+.top{margin-bottom:40px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px 40px}
+.back{min-height:44px;display:inline-flex;align-items:center;gap:8px;font-size:15px;color:#111}
+.back:hover{text-decoration:underline;text-underline-offset:4px}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 28px;font-size:14px;color:#5f5f5f}
+.steps li{display:flex;align-items:center;gap:10px}
+.steps li>span[aria-hidden]{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid #bdbdbd;border-radius:999px;box-sizing:border-box;font-size:12px}
+.steps .stepDone>span[aria-hidden]{border:0;background:#111;color:#fff}
+.steps .stepDone svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.steps .stepCurrent{color:#111;font-weight:600}
+.steps .stepCurrent>span[aria-hidden]{border:2px solid #111}
+.srOnly{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.layout{display:flex;flex-wrap:wrap;gap:48px 72px;align-items:flex-start}
+
+.preview{flex:1 1 480px;min-width:0;display:flex;flex-direction:column;gap:16px}
+.stage{position:relative;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:16px;background:#f3f3f1}
+.stage img{width:70%;height:82%;display:block;object-fit:contain;mix-blend-mode:multiply}
+.badge{position:absolute;left:20px;top:20px;padding:8px 14px 8px 10px;display:inline-flex;align-items:center;gap:8px;border-radius:999px;background:#fff;font-size:13px;font-weight:500}
+.badge i{width:14px;height:14px;border-radius:999px;background:#bdbdbd;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.productCard{padding:20px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;border:1px solid #e6e6e6;border-radius:16px}
+.productCard>div{min-width:0}
+.productCard p{margin:0 0 6px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5f5f5f}
+.productCard h2{margin:0;font-family:var(--font-display);font-size:20px;font-weight:600;overflow-wrap:anywhere}
+.productCard a{min-height:44px;display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:#111;text-decoration:underline;text-underline-offset:3px}
+
+.choices{flex:1 1 460px;min-width:0;display:flex;flex-direction:column}
+.kicker{margin:0 0 12px;font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#5f5f5f}
+/* Overrides the site-wide compact `main h1` rule: this design uses a large display title. */
+.title{margin:0;font-family:var(--font-display);font-weight:600;font-size:clamp(30px,3.6vw,44px)!important;line-height:1.08!important;letter-spacing:-.02em!important}
+.lead{margin:16px 0 0;font-size:17px;line-height:1.5;color:#3d3d3d}
+.divider{height:1px;margin:36px 0 32px;background:#e6e6e6}
+
+.colors,.methods{margin:0;padding:0;border:0;min-width:0}
+.colors legend,.methods legend{margin-bottom:18px;padding:0;font-size:15px}
+.colors legend strong{font-weight:600}
+.colors>div{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.colors button{margin:1px;padding:18px 8px 14px;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid #e0e0e0;border-radius:12px;background:#fff;color:#111;font-size:14px;cursor:pointer}
+.colors button:hover{border-color:#9e9e9e}
+.colors button[aria-pressed=true]{margin:0;border:2px solid #111}
+.colors button>span{width:48px;height:48px;border-radius:999px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.colors button>span.noHex{background:repeating-linear-gradient(45deg,#eee,#eee 4px,#fff 4px,#fff 8px)}
+.colors small{font-size:14px;line-height:1.3;text-align:center;overflow-wrap:anywhere}
+
+.methods{margin-top:40px}
+.methods>div{display:flex;flex-direction:column;gap:12px}
+.methods label{position:relative;margin:1px 0;padding:20px 22px;display:flex;align-items:center;gap:18px;border:1px solid #e0e0e0;border-radius:12px;background:#fff;color:#111;cursor:pointer}
+.methods label:hover{border-color:#9e9e9e}
+.methods label.methodSelected{margin:0;border:2px solid #111}
+.methods label:has(input:focus-visible){outline:3px solid #efc34a;outline-offset:3px}
+.methods input{position:absolute;opacity:0;width:1px;height:1px;margin:0}
+.methodIcon{flex:none;width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#f3f3f1}
+.methodIcon svg{width:22px;height:22px;fill:none;stroke:#111;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.methodText{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:4px}
+.methodText strong{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:16px;font-weight:600}
+.methodText em{padding:3px 8px;border-radius:999px;background:#111;color:#fff;font-size:12px;font-style:normal;font-weight:600}
+.methodText>span{font-size:14px;line-height:1.45;color:#4a4a4a}
+.radio{flex:none;width:22px;height:22px;border:1.5px solid #9e9e9e;border-radius:999px;box-sizing:border-box}
+.methodSelected .radio{border:7px solid #111}
+
+.status p{margin:24px 0 0;font-size:14px;color:#3d3d3d}
+.actions{margin-top:24px;display:flex;flex-wrap:wrap;gap:12px}
+.secondary{height:58px;padding:0 26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #d6d6d6;border-radius:10px;color:#111;font-size:16px;font-weight:500}
+.secondary:hover{border-color:#111}
+.primary{flex:1 1 260px;height:58px;padding:0 20px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:10px;background:#111;color:#fff;font-size:17px;font-weight:600;text-align:center;cursor:pointer}
+.primary:hover{background:#000}
+.primary:disabled,.primary[aria-disabled=true]{background:#eee;color:#6b6b6b;cursor:not-allowed}
+
+@media (max-width:760px){
+  .page{padding:20px 16px 72px}
+  .top{margin-bottom:24px}
+  .layout{gap:32px}
+  .preview,.choices{flex-basis:100%}
+  .colors>div{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .methods label{padding:16px;gap:14px}
+  .divider{margin:28px 0 24px}
+}

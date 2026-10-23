@@ -11,6 +11,7 @@
   --color-line: #dedede;
   --font-ui: var(--font-inter), Inter, Arial, sans-serif;
   --font-header: var(--font-jost), Jost, "Futura", Arial, sans-serif;
+  --font-display: var(--font-inter-tight), "Inter Tight", var(--font-inter), Inter, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }

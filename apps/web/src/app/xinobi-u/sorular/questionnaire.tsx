@@ -16,7 +16,11 @@ function questionnaireError(error: unknown, fallback: string): string {
   return message;
 }
 
-export default function Questionnaire() {
+export default function Questionnaire(){
+  const params=useSearchParams();
+  return <QuestionnaireSession key={(params.get('product')??'')+':'+(params.get('variant')??'')}/>;
+}
+function QuestionnaireSession() {
   const params = useSearchParams(); const router = useRouter();
   const product = params.get('product') || '', variant = params.get('variant') || '';
   const [session, setSession] = useState<DesignSession | null>(null);

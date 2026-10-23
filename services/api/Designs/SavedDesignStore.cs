@@ -14,11 +14,11 @@ public record MyDesign(string Id, string Kind, string Name, string ProductId, st
 public record SaveDesignFromSession(string SessionId, string? Name);
 public record RenameDesign(string Name);
 
-public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore files, TimeProvider clock)
+public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileStore files, TimeProvider clock)
 {
     public const int MaxPerAccount = 50;
     public const long MaxUploadBytes = 8 * 1024 * 1024;
-    private sealed record State(List<SavedDesign> Designs);
+    private sealed record State(List<SavedDesign> Designs) { public List<StoredConfiguration> Configurations { get; init; } = []; }
     private readonly DocumentStore<State> store = documents.Open<State>(Path.Combine("designs", "designs.json"), () => new([]), "Tasarımlarım");
 
     public static MyDesign View(SavedDesign design) => new(design.Id, design.Kind, design.Name, design.ProductId, design.ProductName, design.VariantId, design.Color, design.Profile,
@@ -130,7 +130,7 @@ public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore file
         var design = await store.Update(state =>
         {
             var found = state.Designs.FirstOrDefault(item => item.Id == id && item.AccountId == accountId);
-            if (found is not null) state.Designs.Remove(found);
+            if (found is not null) { state.Designs.Remove(found); state.Configurations.RemoveAll(item => item.AccountId == accountId && item.Value.DesignId == id); }
             return found;
         });
         if (design is null) return false;
@@ -171,6 +171,7 @@ public sealed class SavedDesignStore(FeatureDocuments documents, IFileStore file
         {
             var mine = state.Designs.Where(item => item.AccountId == accountId).ToArray();
             state.Designs.RemoveAll(item => item.AccountId == accountId);
+            state.Configurations.RemoveAll(item => item.AccountId == accountId);
             return mine;
         });
         foreach (var design in removed) await files.Delete(FileAreas.Designs, design.File);

@@ -21,7 +21,7 @@ export default function Checkout(){
     if(!address){setError('Bir teslimat adresi seç.');return}
     if(scenario==='failed'){setError('Ödeme reddedildi (demo). Sipariş oluşmadı; yeniden deneyebilirsin.');return}
     locked.current=true;setBusy(true);
-    try{requestId.current||='web-'+randomCommerceId();const order=await placeDemoOrder(address.id,rows.map(row=>({productId:row.productId,variantId:row.variantId,quantity:row.quantity,designId:row.designId??null})),requestId.current);clearCart();router.push(`/odeme/sonuc?siparis=${encodeURIComponent(order.id)}`)}
+    try{requestId.current||='web-'+randomCommerceId();const order=await placeDemoOrder(address.id,rows.map(row=>({productId:row.productId,variantId:row.variantId,quantity:row.quantity,designId:row.designId??null,configurationId:row.configurationId??null,configurationRevision:row.configurationRevision??null})),requestId.current);clearCart();router.push(`/odeme/sonuc?siparis=${encodeURIComponent(order.id)}`)}
     catch(problem){setError(problem instanceof Error?problem.message:'Sipariş kaydedilemedi.');locked.current=false;setBusy(false)}}
   return <div className={styles.layout}><section className={styles.formArea}><h1>Ödeme</h1>
     <div className={styles.notice}><strong>Para çekilmez</strong><p>Demo sipariş: kart bilgisi istenmez, ödeme alınmaz; kargo ve stok işlemi yapılmaz. Siparişin web ve mobilde görünür.</p></div>

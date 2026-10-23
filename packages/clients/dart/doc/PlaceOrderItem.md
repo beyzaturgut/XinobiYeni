@@ -12,5 +12,7 @@ Name | Type | Description | Notes
 **variantId** | **String** |  |
 **quantity** | **int** |  |
 **designId** | **String** |  | [optional]
+**configurationId** | **String** |  | [optional]
+**configurationRevision** | **int** |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

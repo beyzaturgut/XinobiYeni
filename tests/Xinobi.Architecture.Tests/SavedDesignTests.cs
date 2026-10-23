@@ -25,7 +25,7 @@ public sealed class SavedDesignTests : IDisposable
         builder.UseEnvironment("Development");
         builder.UseSetting("Notifications:WorkerEnabled", "false");
         builder.UseSetting("DesignStudio:WorkerEnabled", "true");
-        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:ExternalInferenceEnabled"] = "false" }));
+        builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:ExternalInferenceEnabled"] = "false", ["ProductSurfaces:PublishedRoot"] = Path.Combine(directory, "published") }));
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender>(new PreviewSender());
@@ -164,6 +164,73 @@ public sealed class SavedDesignTests : IDisposable
         (await staff.PutAsJsonAsync("/api/v1/local-commerce/products/DEMO-P101", tea with { Personalizable = false })).EnsureSuccessStatusCode();
         Assert.Equal("personalization_not_available", await Code(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token,
             JsonContent.Create(Order("request-0004", new PlaceOrderItem("DEMO-P101", "DEMO-V101-B", 1, again.Id))))));
+    }
+
+    [Fact]
+    public async Task ConfigurationRevisionsReachImmutableOrdersAndProtectedDownloads()
+    {
+        using var factory = Factory(); using var client = factory.CreateClient(); using var staff = await TestStaff.Client(factory);
+        var token = await Register(client, "configuration@example.com"); var other = await Register(client, "configuration-other@example.com");
+        var design = await Read<MyDesign>(await Send(client, HttpMethod.Post, "/api/v1/me/designs/upload", token, Upload(Png)));
+        var state = (await staff.GetFromJsonAsync<Xinobi.Api.LocalCommerce.CommerceState>("/api/v1/local-commerce/state"))!;
+        var product = state.Products.First(p => p.Id == design.ProductId);
+        (await staff.PutAsJsonAsync("/api/v1/local-commerce/products/" + product.Id, product with { Personalizable = true })).EnsureSuccessStatusCode();
+        var root = Path.Combine(directory, "published", product.Id, design.VariantId!); Directory.CreateDirectory(root);
+        var version = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Png)).ToLowerInvariant();
+        var mediaVersion = Guid.NewGuid().ToString("D");
+        Directory.CreateDirectory(Path.Combine(root, mediaVersion));
+        await File.WriteAllBytesAsync(Path.Combine(root, mediaVersion, "source.webp"), Png);
+        await File.WriteAllBytesAsync(Path.Combine(root, mediaVersion, "mask.png"), Png);
+        var prefix = $"/assets/product-previews/{product.Id}/{design.VariantId}/{mediaVersion}/";
+        await File.WriteAllTextAsync(Path.Combine(root, "inputs.json"), System.Text.Json.JsonSerializer.Serialize(new {
+            productReference = product.Id, variantReference = design.VariantId, sourceImage = product.Variants.First(v => v.Id == design.VariantId).Image,
+            inputs = new { width = 100, height = 100, surfaceVersion = version,
+                source = new { url = prefix + "source.webp?v=" + version, sha256 = version },
+                mask = new { url = prefix + "mask.png?v=" + version, sha256 = version }, branding = (object?)null }
+        }));
+        var placement = new DesignPlacement(100, 100, version, 25, 35, 1.2, 15, .4,
+            new() { ["upper-body"] = new(2, 3, .8, 4) }, "artwork", false);
+        var route = $"/api/v1/me/designs/{design.Id}/configurations";
+        Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Post, route, other, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement)))).StatusCode);
+        Assert.Equal("invalid_placement", await Code(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement with { Scale = -1 })))));
+        Assert.Equal("surface_changed", await Code(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement with { SurfaceVersion = new string('b',64) })))));
+        await File.WriteAllBytesAsync(Path.Combine(root, mediaVersion, "mask.png"), [0, 1, 2]);
+        Assert.Equal("surface_unavailable", await Code(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement)))));
+        await File.WriteAllBytesAsync(Path.Combine(root, mediaVersion, "mask.png"), Png);
+        var first = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, Favorite: true))));
+        Assert.Equal(1, first.Revision); Assert.Equal(64, first.SourceSha256.Length);
+        Assert.Single(await Read<MyDesignConfiguration[]>(await Send(client, HttpMethod.Get, "/api/v1/me/design-configurations", token)));
+        Assert.Empty(await Read<MyDesignConfiguration[]>(await Send(client, HttpMethod.Get, "/api/v1/me/design-configurations", other)));
+        var address = await Read<CustomerAddress>(await Send(client, HttpMethod.Post, "/api/v1/me/addresses", token,
+            JsonContent.Create(new SaveCustomerAddress("Ev", "Test Kullanıcı", "05321234567", "İstanbul", "Kadıköy", "Test sokak no 12", "34710", true))));
+        var request = new PlaceOrder(address.Id, [new(product.Id, design.VariantId!, 2, design.Id, first.Id, first.Revision)], "configuration-request-1");
+        var order = await Read<CustomerOrder>(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, JsonContent.Create(request)));
+        Assert.Equal(placement, order.Lines[0].Personalization!.Placement! with { BodyAdjustments = placement.BodyAdjustments });
+        var secondResponse = await Send(client, HttpMethod.Post, route, token,
+            JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement with { X = 60, BodyAdjustments = null, Mode = null, FillMask = null }, first.Id, 1, true)));
+        using(var json=System.Text.Json.JsonDocument.Parse(await secondResponse.Content.ReadAsStringAsync()))
+        {
+            var output=json.RootElement.GetProperty("placement");
+            Assert.False(output.TryGetProperty("bodyAdjustments",out _));
+            Assert.False(output.TryGetProperty("mode",out _));
+            Assert.False(output.TryGetProperty("fillMask",out _));
+        }
+        var second = await Read<MyDesignConfiguration>(secondResponse);
+        Assert.Equal(2, second.Revision);
+        Assert.Equal("configuration_changed", await Code(await Send(client, HttpMethod.Post, route, token,
+            JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, first.Id, 1)))));
+        var old = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Get, $"/api/v1/me/design-configurations/{first.Id}/revisions/1", token));
+        Assert.Equal(25, old.Placement.X);
+        var conflict = request with { Items = [request.Items[0] with { ConfigurationRevision = 2 }] };
+        Assert.Equal("idempotency_conflict", await Code(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, JsonContent.Create(conflict))));
+        Assert.Equal(order.Id, (await Read<CustomerOrder>(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, JsonContent.Create(request)))).Id);
+        var download = await staff.GetAsync($"/api/v1/local-commerce/orders/{order.Id}/lines/0/design?download=true");
+        Assert.Equal("attachment", download.Content.Headers.ContentDisposition?.DispositionType); Assert.Equal(Png, await download.Content.ReadAsByteArrayAsync());
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync($"/api/v1/local-commerce/orders/{order.Id}/lines/0/design?download=true")).StatusCode);
+        (await Send(client, HttpMethod.Delete, $"/api/v1/me/designs/{design.Id}", token)).EnsureSuccessStatusCode();
+        var retained = await Read<CustomerOrder>(await Send(client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}", token));
+        Assert.Equal(25, retained.Lines[0].Personalization!.Placement!.X);
+        Assert.Equal(Png, await (await Send(client, HttpMethod.Get, retained.Lines[0].Personalization!.ImageUrl!, token)).Content.ReadAsByteArrayAsync());
     }
 
     private static async Task<string?> Code(HttpResponseMessage response)

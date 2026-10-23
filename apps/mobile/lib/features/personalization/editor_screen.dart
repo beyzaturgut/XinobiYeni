@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:xinobi_api_client/xinobi_api_client.dart';
+import 'package:xinobi_api_client/xinobi_api_client.dart' hide DesignPlacement;
 
 import '../../app/design_tokens.g.dart';
 import '../../widgets/common.dart';

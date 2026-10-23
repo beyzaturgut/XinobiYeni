@@ -78,11 +78,13 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyDesign**](doc/AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**deleteMyFavorite**](doc/AccountApi.md#deletemyfavorite) | **DELETE** /api/v1/me/favorites/{productId} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyAccount**](doc/AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[*AccountApi*](doc/AccountApi.md) | [**getMyDesignConfiguration**](doc/AccountApi.md#getmydesignconfiguration) | **GET** /api/v1/me/design-configurations/{id}/revisions/{revision} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyDesignImage**](doc/AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrderLineDesign**](doc/AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
 [*AccountApi*](doc/AccountApi.md) | [**getOrderOptions**](doc/AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[*AccountApi*](doc/AccountApi.md) | [**listMyDesignConfigurations**](doc/AccountApi.md#listmydesignconfigurations) | **GET** /api/v1/me/design-configurations |
 [*AccountApi*](doc/AccountApi.md) | [**listMyDesigns**](doc/AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
 [*AccountApi*](doc/AccountApi.md) | [**listMyFavorites**](doc/AccountApi.md#listmyfavorites) | **GET** /api/v1/me/favorites |
 [*AccountApi*](doc/AccountApi.md) | [**listMyNotifications**](doc/AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
@@ -107,6 +109,8 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**renameMyDesign**](doc/AccountApi.md#renamemydesign) | **PATCH** /api/v1/me/designs/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**returnMyOrder**](doc/AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [*AccountApi*](doc/AccountApi.md) | [**saveMyDesign**](doc/AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
+[*AccountApi*](doc/AccountApi.md) | [**saveMyDesignConfiguration**](doc/AccountApi.md#savemydesignconfiguration) | **POST** /api/v1/me/designs/{id}/configurations |
+[*AccountApi*](doc/AccountApi.md) | [**setMyDesignConfigurationFavorite**](doc/AccountApi.md#setmydesignconfigurationfavorite) | **PUT** /api/v1/me/design-configurations/{id}/favorite |
 [*AccountApi*](doc/AccountApi.md) | [**startAccountEmailVerification**](doc/AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [*AccountApi*](doc/AccountApi.md) | [**startAdminPasswordReset**](doc/AccountApi.md#startadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset |
 [*AccountApi*](doc/AccountApi.md) | [**startMyEmailChange**](doc/AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
@@ -193,6 +197,7 @@ Class | Method | HTTP request | Description
  - [AuditPage](doc/AuditPage.md)
  - [AuthSession](doc/AuthSession.md)
  - [Availability](doc/Availability.md)
+ - [BodyPlacement](doc/BodyPlacement.md)
  - [CancelMyOrder](doc/CancelMyOrder.md)
  - [CategoryHighlight](doc/CategoryHighlight.md)
  - [CategoryItem](doc/CategoryItem.md)
@@ -209,6 +214,7 @@ Class | Method | HTTP request | Description
  - [CustomerOrderLine](doc/CustomerOrderLine.md)
  - [DeleteMyAccount](doc/DeleteMyAccount.md)
  - [DependencyHealth](doc/DependencyHealth.md)
+ - [DesignPlacement](doc/DesignPlacement.md)
  - [HealthResponse](doc/HealthResponse.md)
  - [HomeContent](doc/HomeContent.md)
  - [HomeSlide](doc/HomeSlide.md)
@@ -219,6 +225,7 @@ Class | Method | HTTP request | Description
  - [MarkNotificationsRead](doc/MarkNotificationsRead.md)
  - [Money](doc/Money.md)
  - [MyDesign](doc/MyDesign.md)
+ - [MyDesignConfiguration](doc/MyDesignConfiguration.md)
  - [MyReview](doc/MyReview.md)
  - [OrderEvent](doc/OrderEvent.md)
  - [OrderOptions](doc/OrderOptions.md)
@@ -255,7 +262,9 @@ Class | Method | HTTP request | Description
  - [ReviewSummary](doc/ReviewSummary.md)
  - [ReviewSummaryList](doc/ReviewSummaryList.md)
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
+ - [SaveDesignConfiguration](doc/SaveDesignConfiguration.md)
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
+ - [SetConfigurationFavorite](doc/SetConfigurationFavorite.md)
  - [StaffOrder](doc/StaffOrder.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartAdminPasswordReset](doc/StartAdminPasswordReset.md)

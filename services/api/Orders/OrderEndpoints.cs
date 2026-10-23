@@ -32,8 +32,8 @@ public static class OrderEndpoints
             .WithName("GetMyOrder")
             .ProducesProblem(StatusCodes.Status404NotFound);
 
-        me.MapGet("/orders/{id}/lines/{line:int}/design", async Task<IResult> (string id, int line, ClaimsPrincipal user, IAccountStore accounts, Designs.SavedDesignStore designs) =>
-                await DesignImage((await accounts.Orders(Id(user))).FirstOrDefault(order => order.Id == id), line, designs))
+        me.MapGet("/orders/{id}/lines/{line:int}/design", async Task<IResult> (string id, int line, bool? download, ClaimsPrincipal user, IAccountStore accounts, Designs.SavedDesignStore designs) =>
+                await DesignImage((await accounts.Orders(Id(user))).FirstOrDefault(order => order.Id == id), line, designs, download == true))
             .WithName("GetMyOrderLineDesign")
             .Produces(StatusCodes.Status200OK, contentType: "image/png")
             .Produces(StatusCodes.Status404NotFound);
@@ -68,10 +68,10 @@ public static class OrderEndpoints
     {
         panel.MapGet("/orders", async (HttpContext http, IAccountStore accounts, IConfiguration configuration, IWebHostEnvironment environment) =>
             TypedResults.Ok((await accounts.AllOrders()).Select(item => item with { Order = WithImages(item.Order, http, configuration, environment, "/api/v1/local-commerce/orders") }).ToArray()));
-        panel.MapGet("/orders/{id}/lines/{line:int}/design", async (string id, int line, IAccountStore accounts, Designs.SavedDesignStore designs) =>
+        panel.MapGet("/orders/{id}/lines/{line:int}/design", async (string id, int line, bool? download, IAccountStore accounts, Designs.SavedDesignStore designs) =>
             await DesignImage(accounts is SqlAccountStore sql
                 ? (await sql.StaffOrderById(Guid.TryParse(id, out var key) ? key : Guid.Empty))?.Order
-                : (await accounts.AllOrders()).FirstOrDefault(item => item.Order.Id == id)?.Order, line, designs));
+                : (await accounts.AllOrders()).FirstOrDefault(item => item.Order.Id == id)?.Order, line, designs, download == true));
         panel.MapGet("/order-options", (IConfiguration configuration) => TypedResults.Ok(Options(configuration)));
 
         panel.MapPost("/orders/{id}/status", async (string id, SetOrderStatus request, IAccountStore accounts, NotificationCenter notifications, TimeProvider clock) =>
@@ -113,10 +113,10 @@ public static class OrderEndpoints
         })],
     };
 
-    private static async Task<IResult> DesignImage(CustomerOrder? order, int line, Designs.SavedDesignStore designs) =>
+    private static async Task<IResult> DesignImage(CustomerOrder? order, int line, Designs.SavedDesignStore designs, bool download = false) =>
         order is not null && line >= 0 && line < order.Lines.Length && order.Lines[line].Personalization is { } design
             && await designs.OrderImage(order.Id, line, design.Mime) is { } file
-            ? Results.Stream(file.Content, file.ContentType)
+            ? Results.Stream(file.Content, file.ContentType, fileDownloadName: download ? $"xinobi-{order.Id}-{line}-source{(design.Mime == "image/png" ? ".png" : design.Mime == "image/jpeg" ? ".jpg" : ".webp")}" : null)
             : Results.NotFound();
 
     private static string Id(ClaimsPrincipal user) => user.FindFirstValue(ClaimTypes.NameIdentifier)!;

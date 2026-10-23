@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:xinobi_api_client/xinobi_api_client.dart';
+import 'package:xinobi_api_client/xinobi_api_client.dart' hide DesignPlacement;
 import 'package:xinobi_mobile/features/cart/cart.dart';
 import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/features/designs/designs.dart';

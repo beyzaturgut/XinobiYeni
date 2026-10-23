@@ -58,7 +58,7 @@ Ana sayfa, katalog, ürün detayları ve arama ortak katalog kaynağını kullan
 
 Fiyatlar kuruş olarak tutulur. Admin varyant fiyatı `2499,90` ve `2499.90` biçimlerini kabul eder; pozitif, en fazla iki ondalıklı değer gerekir. Kampanya taslağı ve fiyat önizlemesi, gerçek kupon tüketimi veya ödeme entegrasyonu değildir.
 
-Sepet `xinobi-cart-v1` anahtarıyla tarayıcıda tutulur; fiyat ve uygunluk katalogdan okunur. `/odeme` kayıtlı teslimat adresi seçtirir. Sipariş oluşturma isteği `/api/v1/me/orders` üzerinden sunucuya gider; sunucu adres sahipliğini, ürün/varyant uygunluğunu ve miktarı kontrol eder, fiyatı katalogdan hesaplar ve sipariş anlık görüntüsünü saklar. Aynı `clientRequestId` tekrarlandığında aynı sipariş döndürülür.
+Sepet `xinobi-cart-v1` anahtarıyla tarayıcıda tutulur; fiyat ve uygunluk katalogdan okunur. `/odeme` kayıtlı teslimat adresi seçtirir. Sipariş oluşturma isteği `/api/v1/me/orders` üzerinden sunucuya gider; sunucu adres sahipliğini, ürün/varyant uygunluğunu ve miktarı kontrol eder, fiyatı katalogdan hesaplar ve sipariş anlık görüntüsünü saklar. Aynı sepet ve `clientRequestId` tekrarlandığında aynı sipariş döndürülür; farklı içerikle tekrar kullanım reddedilir.
 
 **Alışveriş hâlâ demo ödeme sınırındadır.** Gerçek kart işleme, tahsilat, stok rezervasyonu veya siparişle atomik stok düşümü tamamlanmış kabul edilmemelidir. Stok uygunluğunun kontrol edilmesi rezervasyon değildir. İptal ve iade işlemleri para iadesi yapmaz.
 
@@ -73,6 +73,18 @@ Görsel üretimi `CloudflareImageProvider` üzerinden `@cf/black-forest-labs/flu
 Üretim işi oturum ve yanıtlarla idempotenttir; başarısız veya belirsiz sağlayıcı çağrısı otomatik tekrarlanmaz. Sonuçlar MIME/imza ve boyut kontrollerinden geçer. Development'ta worker ve dış inference `DesignStudio:WorkerEnabled` ve `DesignStudio:ExternalInferenceEnabled` ile kapatılabilir. Sunucudaki açılış koşulları yukarıdaki ortam tablosundadır; origin kısıtları, günlük üretim limiti ve oturum erişimi üretim yetkilendirmesi/moderasyonu için tamamlanmış bir çözüm kabul edilmemelidir.
 
 Desenin ürüne uygulanması tarayıcıda yapılır; bu adım ayrıca görsel düzenleme API'si çağırmaz. Güncel admin akışı kaynak fotoğrafı indirme, maske prompt'unu kopyalama, WebP maske yükleme, önizleme ve onaylamadır. Onaylı maskeler fotoğraf/renk bilgileriyle eşleştirilerek mağaza önizlemesinde kullanılır. Yeni fotoğraf için maske ve geometri uygunluğu ayrıca kontrol edilmelidir; otomatik kusursuz yüzey tespiti varsayılmaz.
+
+Web'de Desen yükle, Görsel yükle ve AI ile tasarla girişleri aynı ürün/renk bağlamını korur. Kişiselleştirilebilir ürünün tüm renklerinde giriş görünür; bu, her renk için onaylı maske bulunduğu anlamına gelmez. Yüzeyi olmayan renk açıkça belirtilir ve başka rengin maskesi kullanılmaz.
+
+Yerleşim konfigürasyonları `/api/v1/me/design-configurations` ile hesaba bağlı saklanır. Konfigürasyon kimliği ve revizyonu, maske sürümünden ayrı tutulur. Sepette aynı tasarımın farklı konfigürasyon/revizyonları ayrı satırlardır. Sepet görselinden açılan editörde Kaydet yalnız hedef satırın yerleşimini değiştirir; adet korunur, İptal değişiklik yapmaz. Tasarım favorileri sunucudaki konfigürasyona bağlıdır; normal ürün favorileri korunur.
+
+Yeni web kişiselleştirme akışında yerleşim kaydı checkout'a aktarılır. Sipariş, konfigürasyon revizyonunu, şema/yüzey sürümünü, konum/ölçek/döndürme ve gövde ayarlarını, ham dosya checksum'ını ve SKU'yu kendi snapshot'ında saklar. Tasarımın sonradan değiştirilmesi veya silinmesi sipariş kopyasını değiştirmez. Eski veya konfigürasyonsuz API siparişlerinde bu alanlar bilinmiyor olarak kalır. Aynı sipariş anahtarının farklı konfigürasyonla tekrar kullanılması reddedilir.
+
+Admin siparişleri kişiselleştirme türüne göre filtreleyebilir, kayıtlı ayarları okuyabilir ve mevcut yetkili görsel uçlarında `?download=true` ile ham tasarımı indirebilir. Birleşik mockup dosyası ayrıca saklanmaz; bu geliştirme ham dosyayı fiziksel üretim dosyasına dönüştürmez. Ayrıntılı kabul ve test kaydı [UX uygulama kaydı](docs/ux/2026-10-22-implementation.md) içindedir.
+
+Sunucuda onaylı katalog maskeleri varsa konfigürasyon doğrudan bu dosyalarla doğrulanır. Paketlenmiş önizleme kullanılacaksa API için `ProductSurfaces:PublishedRoot` gerçek `assets/product-previews` dizinine ayarlanmalıdır; kaynak ve maske dosyaları sürüm/checksum ile kontrol edilir. Klasör veya doğru yüzey yoksa konfigürasyon kaydı/siparişi 409 döner; tarayıcıdaki bir görselin açılması sunucu doğrulamasının hazır olduğunu kanıtlamaz. Yeni SQL migration gerekmez: konfigürasyon mevcut özellik belgesinde, sipariş ayarları mevcut `PersonalizationJson` alanında tutulur; `Features:StorageProvider=SqlServer` ve mevcut şema yine gereklidir.
+
+Titanyum seri bağlantısı admin İçerik > Titanyum kaplama bölümünde seçilen gerçek katalog kategorisini kullanır (`content.titaniumCategory`). Yapılandırılmamış veya kaldırılmış kategori için seri bağlantısı gösterilmez; ürün adına göre seri tahmini yapılmaz.
 
 AI veya yüklenen tasarım hesaba kaydedilebilir, ürün üzerinde önizlenebilir ve kişiselleştirilmiş sepet satırına bağlanabilir. Dijital ürün önizlemesi fiziksel baskı ölçüsü, DPI veya üretim onayı değildir. Akış ve maske ayrıntıları `docs/runbooks/webp-surface-mask-upload.md` ve `tools/local-mask-editor/README.md` içindedir.
 

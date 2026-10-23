@@ -14,6 +14,19 @@ public static class SavedDesignEndpoints
         me.MapGet("/designs", async (ClaimsPrincipal user, SavedDesignStore designs) => TypedResults.Ok(await designs.Mine(Id(user))))
             .WithName("ListMyDesigns");
 
+        me.MapGet("/design-configurations", async (ClaimsPrincipal user, SavedDesignStore designs) => TypedResults.Ok(await designs.Configurations(Id(user))))
+            .WithName("ListMyDesignConfigurations");
+        me.MapPost("/designs/{id}/configurations", async (string id, SaveDesignConfiguration request, ClaimsPrincipal user, SavedDesignStore designs, DesignSurfaceValidator surfaces) =>
+        {
+            var design = await designs.Find(Id(user), id) ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
+            await surfaces.Validate(design.ProductId, request.VariantId, request.Placement);
+            return TypedResults.Ok(await designs.SaveConfiguration(Id(user), id, request));
+        }).WithName("SaveMyDesignConfiguration");
+        me.MapGet("/design-configurations/{id}/revisions/{revision:int}", async (string id, int revision, ClaimsPrincipal user, SavedDesignStore designs) =>
+            TypedResults.Ok(await designs.Configuration(Id(user), id, revision))).WithName("GetMyDesignConfiguration");
+        me.MapPut("/design-configurations/{id}/favorite", async (string id, SetConfigurationFavorite request, ClaimsPrincipal user, SavedDesignStore designs) =>
+        { await designs.SetFavorite(Id(user), id, request.Favorite); return TypedResults.NoContent(); }).WithName("SetMyDesignConfigurationFavorite");
+
         // The XINOBI U session store exists only where XINOBI U runs; it is resolved per request so the contract does not depend on it.
         me.MapPost("/designs", async Task<Results<Created<MyDesign>, ProblemHttpResult>> (SaveDesignFromSession request, ClaimsPrincipal user, HttpContext http, SavedDesignStore designs) =>
             {

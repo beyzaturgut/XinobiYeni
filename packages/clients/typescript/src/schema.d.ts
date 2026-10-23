@@ -980,6 +980,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/design-configurations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListMyDesignConfigurations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/designs/{id}/configurations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["SaveMyDesignConfiguration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/design-configurations/{id}/revisions/{revision}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetMyDesignConfiguration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/design-configurations/{id}/favorite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["SetMyDesignConfigurationFavorite"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/designs/upload": {
         parameters: {
             query?: never;
@@ -1576,6 +1640,16 @@ export interface components {
             /** Format: int32 */
             remaining: null | number;
         };
+        BodyPlacement: {
+            /** Format: double */
+            x?: null | number;
+            /** Format: double */
+            y?: null | number;
+            /** Format: double */
+            scale?: null | number;
+            /** Format: double */
+            rotation?: null | number;
+        };
         CancelMyOrder: {
             reason: string;
             description: null | string;
@@ -1683,6 +1757,28 @@ export interface components {
             isReady: boolean;
             code: string;
         };
+        DesignPlacement: {
+            /** Format: int32 */
+            sourceWidth: number;
+            /** Format: int32 */
+            sourceHeight: number;
+            surfaceVersion: string;
+            /** Format: double */
+            x: number;
+            /** Format: double */
+            y: number;
+            /** Format: double */
+            scale: number;
+            /** Format: double */
+            rotation: number;
+            /** Format: double */
+            curvatureStrength: number;
+            bodyAdjustments?: null | {
+                [key: string]: components["schemas"]["BodyPlacement"];
+            };
+            mode?: null | string;
+            fillMask?: null | boolean;
+        };
         HealthResponse: {
             service: string;
             status: string;
@@ -1751,6 +1847,21 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        MyDesignConfiguration: {
+            id: string;
+            designId: string;
+            productId: string;
+            variantId: string;
+            /** Format: int32 */
+            revision: number;
+            /** Format: int32 */
+            schemaVersion: number;
+            placement: components["schemas"]["DesignPlacement"];
+            favorite: boolean;
+            sourceSha256: string;
+            /** Format: date-time */
+            createdAt: string;
+        };
         MyReview: {
             id: string;
             productId: string;
@@ -1783,6 +1894,14 @@ export interface components {
             name: string;
             mime: string;
             imageUrl?: null | string;
+            /** Format: int32 */
+            schemaVersion?: null | number;
+            placement?: null | components["schemas"]["DesignPlacement"];
+            configurationId?: null | string;
+            /** Format: int32 */
+            configurationRevision?: null | number;
+            sourceSha256?: null | string;
+            sku?: null | string;
         };
         OrderRequest: {
             id: string;
@@ -1831,6 +1950,9 @@ export interface components {
             /** Format: int32 */
             quantity: number;
             designId?: null | string;
+            configurationId?: null | string;
+            /** Format: int32 */
+            configurationRevision?: null | number;
         };
         ProblemDetails: {
             type?: null | string;
@@ -2024,9 +2146,21 @@ export interface components {
             postalCode: null | string;
             isDefault: boolean;
         };
+        SaveDesignConfiguration: {
+            variantId: string;
+            placement: components["schemas"]["DesignPlacement"];
+            configurationId?: null | string;
+            /** Format: int32 */
+            expectedRevision?: null | number;
+            /** @default false */
+            favorite: boolean;
+        };
         SaveDesignFromSession: {
             sessionId: string;
             name: null | string;
+        };
+        SetConfigurationFavorite: {
+            favorite: boolean;
         };
         StaffOrder: {
             order: components["schemas"]["CustomerOrder"];
@@ -4420,7 +4554,9 @@ export interface operations {
     };
     GetMyOrderLineDesign: {
         parameters: {
-            query?: never;
+            query?: {
+                download?: boolean;
+            };
             header?: never;
             path: {
                 id: string;
@@ -4858,6 +4994,135 @@ export interface operations {
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
                 };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListMyDesignConfigurations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyDesignConfiguration"][];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SaveMyDesignConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveDesignConfiguration"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyDesignConfiguration"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetMyDesignConfiguration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revision: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyDesignConfiguration"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SetMyDesignConfigurationFavorite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetConfigurationFavorite"];
+            };
+        };
+        responses: {
+            /** @description No Content */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Service Unavailable */
             503: {

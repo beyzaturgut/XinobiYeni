@@ -39,6 +39,7 @@ doc/AuditEntry.md
 doc/AuditPage.md
 doc/AuthSession.md
 doc/Availability.md
+doc/BodyPlacement.md
 doc/CancelMyOrder.md
 doc/CatalogApi.md
 doc/CategoryHighlight.md
@@ -57,6 +58,7 @@ doc/CustomerOrder.md
 doc/CustomerOrderLine.md
 doc/DeleteMyAccount.md
 doc/DependencyHealth.md
+doc/DesignPlacement.md
 doc/HealthResponse.md
 doc/HomeContent.md
 doc/HomeSlide.md
@@ -67,6 +69,7 @@ doc/LogoutSession.md
 doc/MarkNotificationsRead.md
 doc/Money.md
 doc/MyDesign.md
+doc/MyDesignConfiguration.md
 doc/MyReview.md
 doc/OrderEvent.md
 doc/OrderOptions.md
@@ -104,7 +107,9 @@ doc/ReviewPage.md
 doc/ReviewSummary.md
 doc/ReviewSummaryList.md
 doc/SaveCustomerAddress.md
+doc/SaveDesignConfiguration.md
 doc/SaveDesignFromSession.md
+doc/SetConfigurationFavorite.md
 doc/StaffOrder.md
 doc/StartAccountEmailVerification.md
 doc/StartAdminPasswordReset.md
@@ -176,6 +181,7 @@ lib/src/model/audit_entry.dart
 lib/src/model/audit_page.dart
 lib/src/model/auth_session.dart
 lib/src/model/availability.dart
+lib/src/model/body_placement.dart
 lib/src/model/cancel_my_order.dart
 lib/src/model/category_highlight.dart
 lib/src/model/category_item.dart
@@ -193,6 +199,7 @@ lib/src/model/customer_order_line.dart
 lib/src/model/date.dart
 lib/src/model/delete_my_account.dart
 lib/src/model/dependency_health.dart
+lib/src/model/design_placement.dart
 lib/src/model/health_response.dart
 lib/src/model/home_content.dart
 lib/src/model/home_slide.dart
@@ -203,6 +210,7 @@ lib/src/model/logout_session.dart
 lib/src/model/mark_notifications_read.dart
 lib/src/model/money.dart
 lib/src/model/my_design.dart
+lib/src/model/my_design_configuration.dart
 lib/src/model/my_review.dart
 lib/src/model/order_event.dart
 lib/src/model/order_options.dart
@@ -239,7 +247,9 @@ lib/src/model/review_page.dart
 lib/src/model/review_summary.dart
 lib/src/model/review_summary_list.dart
 lib/src/model/save_customer_address.dart
+lib/src/model/save_design_configuration.dart
 lib/src/model/save_design_from_session.dart
+lib/src/model/set_configuration_favorite.dart
 lib/src/model/staff_order.dart
 lib/src/model/start_account_email_verification.dart
 lib/src/model/start_admin_password_reset.dart

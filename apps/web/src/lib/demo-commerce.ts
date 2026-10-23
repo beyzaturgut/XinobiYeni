@@ -1,5 +1,6 @@
 'use client';
 import {useSyncExternalStore} from 'react';
+import type {DesignPlacement} from './design-placement';
 import {commerceApi} from './commerce';
 
 // Accounts are real: the shared /api/v1/auth and /api/v1/me contract (web: HttpOnly session cookies + CSRF header, ADR-004).
@@ -9,7 +10,7 @@ export type DemoUser={id:string;name:string;email:string;createdAt?:string;phone
 export type Money={amountMinor:number;currency:string};
 export type CustomerAddress={id:string;title:string;fullName:string;phone:string;city:string;district:string;line:string;postalCode?:string|null;isDefault:boolean};
 export type AddressInput=Omit<CustomerAddress,'id'>;
-export type OrderPersonalization={designId:string;kind:'ai'|'upload';name:string;mime:string;imageUrl?:string|null};
+export type OrderPersonalization={designId:string;kind:'ai'|'upload';name:string;mime:string;imageUrl?:string|null;schemaVersion?:number|null;placement?:DesignPlacement|null;configurationId?:string|null;configurationRevision?:number|null;sourceSha256?:string|null;sku?:string|null};
 export type OrderLine={productId:string;variantId:string;name:string;color:string;imageUrl?:string|null;unitPrice:Money;quantity:number;lineTotal:Money;personalization?:OrderPersonalization|null};
 export type OrderShipment={carrier:string;trackingNumber:string;trackingUrl?:string|null;shippedAt:string;deliveredAt?:string|null};
 export type OrderEvent={status:string;at:string;actor:string;note?:string|null};
@@ -175,7 +176,7 @@ export async function deleteAddress(id:string){
 }
 
 /** Demo order: the server prices the items from the catalogue. Reusing [requestId] returns the same order instead of a second one. */
-export async function placeDemoOrder(addressId:string,items:{productId:string;variantId:string;quantity:number;designId?:string|null}[],requestId:string){
+export async function placeDemoOrder(addressId:string,items:{productId:string;variantId:string;quantity:number;designId?:string|null;configurationId?:string|null;configurationRevision?:number|null}[],requestId:string){
   const order=(await signedIn<CustomerOrder>('/me/orders',{method:'POST',body:JSON.stringify({addressId,items,clientRequestId:requestId})}))!;
   publish({orders:[order,...session.orders.filter(existing=>existing.id!==order.id)]});
   return order;
@@ -244,3 +245,12 @@ export async function confirmPasswordReset(email:string,verificationId:string,co
   if(newPassword.length<8)throw new Error('Yeni parola en az 8 karakter olmalı.');
   await call('/auth/password-reset/confirm',{method:'POST',body:JSON.stringify({email:email.trim().toLowerCase(),verificationId,verificationCode:code.trim(),newPassword})});
 }
+
+export type MyDesignConfiguration={id:string;designId:string;productId:string;variantId:string;revision:number;schemaVersion:number;placement:DesignPlacement;favorite:boolean;sourceSha256:string;createdAt:string};
+export async function myDesignConfigurations(){return (await signedIn<MyDesignConfiguration[]>('/me/design-configurations'))??[]}
+export async function saveDesignConfiguration(designId:string,variantId:string,placement:DesignPlacement,existing?:MyDesignConfiguration,favorite=existing?.favorite??false){
+ return (await signedIn<MyDesignConfiguration>(`/me/designs/${encodeURIComponent(designId)}/configurations`,{method:'POST',body:JSON.stringify({variantId,placement,configurationId:existing?.id??null,expectedRevision:existing?.revision??null,favorite})}))!;
+}
+export async function setDesignConfigurationFavorite(id:string,favorite:boolean){await signedIn(`/me/design-configurations/${encodeURIComponent(id)}/favorite`,{method:'PUT',body:JSON.stringify({favorite})})}
+
+export async function getDesignConfiguration(id:string,revision:number){return (await signedIn<MyDesignConfiguration>(`/me/design-configurations/${encodeURIComponent(id)}/revisions/${revision}`))!}

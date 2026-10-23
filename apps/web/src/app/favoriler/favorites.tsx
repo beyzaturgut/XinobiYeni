@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
 import { useFavorites } from "../../lib/favorites";
+import DesignFavorites from "../../components/design-favorites";
 import styles from "./favorites.module.css";
 
 type Favorite = { id: string; name: string; family: string; color: string; image: StaticImageData | string; price?: number; stock?: number; tall?: boolean; href?: string };
@@ -22,6 +23,7 @@ export default function Favorites() {
   return <>
     {(error || favorites.error || actionError) && <p role="alert">{error || favorites.error || actionError}</p>}
     <section className={styles.hero}><p>Kişisel seçkiniz</p><h1>Favorilerim.</h1><div><span>Hesabınıza özel</span><p>Favorileriniz hesabınıza güvenle kaydedilir ve giriş yaptığınız cihazlarda görünür.</p></div></section>
+    <DesignFavorites/>
     <section className={styles.content} aria-live="polite">
       {favorites.loading ? <div className={styles.loading}>Favorileriniz hazırlanıyor…</div> : !favorites.signedIn ? <div className={styles.empty}><span aria-hidden="true">♡</span><h2>Favorilerinizi görmek için giriş yapın.</h2><p>Listeniz hesabınıza bağlı olarak güvenle saklanır.</p><Link href="/hesap">Giriş yap →</Link></div> : selected.length ? <><div className={styles.summary}><strong>{selected.length} favori ürün</strong><button type="button" onClick={() => void favorites.clear().catch(cause => setActionError(cause instanceof Error ? cause.message : "Favoriler temizlenemedi."))}>Tümünü temizle</button></div><div className={styles.grid}>{selected.map((product) => <article key={product.id}>
         <div className={styles.media}>{product.image ? <Image className={product.tall ? styles.tall : ""} src={product.image} width={600} height={600} alt={`${product.name}, ${product.color}`} sizes="(max-width: 680px) 90vw, 32vw" /> : <span>Görsel yok</span>}<button type="button" onClick={() => remove(product.id)} aria-label={`${product.name} ${product.color} ürününü favorilerden çıkar`}>♥</button></div>

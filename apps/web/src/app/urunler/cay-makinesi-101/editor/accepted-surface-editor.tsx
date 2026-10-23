@@ -23,6 +23,7 @@ function PreviewStatus({ error = false, children }: { error?: boolean; children:
 }
 type SavedPlacementProps={placementMode?:"pattern"|"artwork";initialPlacement?:DesignPlacement;onPlacementChange?:(value:DesignPlacement)=>void};
 function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailableMessage, xinobiPreview = false, ...saved }: { variant: string; commerceProduct?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean } & SavedPlacementProps) {
+  const [resetPlacement,setResetPlacement]=useState(false);
   const [state, setState] = useState<{ variant: string; inputs?: RenderingInputs | null; error?: boolean }>({ variant });
   useEffect(() => {
     const controller = new AbortController();
@@ -35,7 +36,8 @@ function AcceptedSurfaceLoader({ variant, commerceProduct, patternSrc, unavailab
     return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
   if (state.error) return <PreviewStatus error>Önizleme yüklenemedi. Ürün görselleri doğrulanamadı veya tarayıcıda işlenemedi. Sayfayı yenileyip yeniden deneyin.</PreviewStatus>;
   if (!state.inputs) return <PreviewStatus>{unavailableMessage ?? previewUnavailableMessage}</PreviewStatus>;
-  if(saved.onPlacementChange)return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} fillMask={saved.initialPlacement?.fillMask} {...saved}/>;
+  if(saved.initialPlacement&&saved.initialPlacement.surfaceVersion!==state.inputs.surfaceVersion&&!resetPlacement)return <section role="alert"><p>Ürün yüzeyi değişti. Eski yerleşim bu yüzeye otomatik uygulanmaz.</p><button onClick={()=>setResetPlacement(true)}>Güncel yüzeye yeniden yerleştir</button></section>;
+  if(saved.onPlacementChange)return <EditorWorkspace renderingInputs={state.inputs} patternSrc={patternSrc} fillMask={saved.initialPlacement?.fillMask} {...saved} initialPlacement={resetPlacement?undefined:saved.initialPlacement}/>;
   return <LocalPatternPreview inputs={state.inputs} initialPatternSrc={patternSrc ?? "/assets/personalization/sample-pattern.png"} xinobiPreview={xinobiPreview} />;
 }
 function AcceptedSurfaceRoute() {

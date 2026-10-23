@@ -20,6 +20,7 @@ export async function mockStore(page:Page,{signedIn=false,cart=false}:{signedIn?
   const now=new Date().toISOString();
   const order:CustomerOrder={id:'test-order',number:'TEST-ORDER-1',createdAt:now,status:'delivered',address,lines:[{productId:'DEMO-P101',variantId:blue.id,name:'Çay Makinesi 101',color:blue.color,quantity:2,unitPrice:{amountMinor:240000,currency:'TRY'},lineTotal:{amountMinor:480000,currency:'TRY'}}],total:{amountMinor:480000,currency:'TRY'},shipment:{carrier:'Test Kargo',trackingNumber:'TEST123',shippedAt:now,deliveredAt:now},history:['received','preparing','shipped','delivered'].map(status=>({status,at:now,actor:'store'})),requests:[]};
   let orders=[order];
+  const favorites=new Set<string>();
   let quote:Quote={id:'test-quote',code:'Q-TEST-1',company:'Test Firma',contactName:user.name,email:user.email,items:[{productId:'DEMO-P101',productName:'Çay Makinesi 101',quantity:20}],personalization:false,status:'offered',createdAt:now,offer:{total:{amountMinor:4800000,currency:'TRY'},validUntil:new Date(Date.now()+86400000).toISOString(),at:now},messages:[],history:[]};
   const requests:{path:string;method:string;body:Record<string,unknown>}[]=[];
   if(cart)await page.addInitScript(line=>{if(!localStorage.getItem('xinobi-cart-v1'))localStorage.setItem('xinobi-cart-v1',JSON.stringify([line]));},{productId:'DEMO-P101',variantId:blue.id,quantity:1});
@@ -42,6 +43,12 @@ export async function mockStore(page:Page,{signedIn=false,cart=false}:{signedIn?
       return json(addresses);
     }
     if(path.startsWith('/me/addresses/')&&method==='PUT'){addresses=addresses.map(a=>a.id===path.split('/').at(-1)?{...a,...body}:a);return json(addresses.find(a=>a.id===path.split('/').at(-1)));}
+    if(path==='/me/favorites'){
+      if(method==='POST'){favorites.add(String(body.productId));return route.fulfill({status:201});}
+      return json([...favorites]);
+    }
+    if(path.startsWith('/me/favorites/')&&method==='DELETE'){favorites.delete(decodeURIComponent(path.split('/').at(-1)!));return route.fulfill({status:204});}
+    if(path==='/me/designs'||path==='/me/design-configurations')return json([]);
     if(path==='/me/inbox')return json({items:[],unread:0});
     if(path==='/me/order-options')return json({cancelReasons:['Yanlış ürün seçtim'],returnReasons:['Ürün hasarlı'],carriers:['Test Kargo'],returnWindowDays:14});
     if(path==='/me/orders'){

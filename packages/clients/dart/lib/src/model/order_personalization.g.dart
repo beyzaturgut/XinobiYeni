@@ -17,6 +17,18 @@ class _$OrderPersonalization extends OrderPersonalization {
   final String mime;
   @override
   final String? imageUrl;
+  @override
+  final int? schemaVersion;
+  @override
+  final DesignPlacement? placement;
+  @override
+  final String? configurationId;
+  @override
+  final int? configurationRevision;
+  @override
+  final String? sourceSha256;
+  @override
+  final String? sku;
 
   factory _$OrderPersonalization(
           [void Function(OrderPersonalizationBuilder)? updates]) =>
@@ -27,7 +39,13 @@ class _$OrderPersonalization extends OrderPersonalization {
       required this.kind,
       required this.name,
       required this.mime,
-      this.imageUrl})
+      this.imageUrl,
+      this.schemaVersion,
+      this.placement,
+      this.configurationId,
+      this.configurationRevision,
+      this.sourceSha256,
+      this.sku})
       : super._();
   @override
   OrderPersonalization rebuild(
@@ -46,7 +64,13 @@ class _$OrderPersonalization extends OrderPersonalization {
         kind == other.kind &&
         name == other.name &&
         mime == other.mime &&
-        imageUrl == other.imageUrl;
+        imageUrl == other.imageUrl &&
+        schemaVersion == other.schemaVersion &&
+        placement == other.placement &&
+        configurationId == other.configurationId &&
+        configurationRevision == other.configurationRevision &&
+        sourceSha256 == other.sourceSha256 &&
+        sku == other.sku;
   }
 
   @override
@@ -57,6 +81,12 @@ class _$OrderPersonalization extends OrderPersonalization {
     _$hash = $jc(_$hash, name.hashCode);
     _$hash = $jc(_$hash, mime.hashCode);
     _$hash = $jc(_$hash, imageUrl.hashCode);
+    _$hash = $jc(_$hash, schemaVersion.hashCode);
+    _$hash = $jc(_$hash, placement.hashCode);
+    _$hash = $jc(_$hash, configurationId.hashCode);
+    _$hash = $jc(_$hash, configurationRevision.hashCode);
+    _$hash = $jc(_$hash, sourceSha256.hashCode);
+    _$hash = $jc(_$hash, sku.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -68,7 +98,13 @@ class _$OrderPersonalization extends OrderPersonalization {
           ..add('kind', kind)
           ..add('name', name)
           ..add('mime', mime)
-          ..add('imageUrl', imageUrl))
+          ..add('imageUrl', imageUrl)
+          ..add('schemaVersion', schemaVersion)
+          ..add('placement', placement)
+          ..add('configurationId', configurationId)
+          ..add('configurationRevision', configurationRevision)
+          ..add('sourceSha256', sourceSha256)
+          ..add('sku', sku))
         .toString();
   }
 }
@@ -97,6 +133,35 @@ class OrderPersonalizationBuilder
   String? get imageUrl => _$this._imageUrl;
   set imageUrl(String? imageUrl) => _$this._imageUrl = imageUrl;
 
+  int? _schemaVersion;
+  int? get schemaVersion => _$this._schemaVersion;
+  set schemaVersion(int? schemaVersion) =>
+      _$this._schemaVersion = schemaVersion;
+
+  DesignPlacementBuilder? _placement;
+  DesignPlacementBuilder get placement =>
+      _$this._placement ??= DesignPlacementBuilder();
+  set placement(DesignPlacementBuilder? placement) =>
+      _$this._placement = placement;
+
+  String? _configurationId;
+  String? get configurationId => _$this._configurationId;
+  set configurationId(String? configurationId) =>
+      _$this._configurationId = configurationId;
+
+  int? _configurationRevision;
+  int? get configurationRevision => _$this._configurationRevision;
+  set configurationRevision(int? configurationRevision) =>
+      _$this._configurationRevision = configurationRevision;
+
+  String? _sourceSha256;
+  String? get sourceSha256 => _$this._sourceSha256;
+  set sourceSha256(String? sourceSha256) => _$this._sourceSha256 = sourceSha256;
+
+  String? _sku;
+  String? get sku => _$this._sku;
+  set sku(String? sku) => _$this._sku = sku;
+
   OrderPersonalizationBuilder() {
     OrderPersonalization._defaults(this);
   }
@@ -109,6 +174,12 @@ class OrderPersonalizationBuilder
       _name = $v.name;
       _mime = $v.mime;
       _imageUrl = $v.imageUrl;
+      _schemaVersion = $v.schemaVersion;
+      _placement = $v.placement?.toBuilder();
+      _configurationId = $v.configurationId;
+      _configurationRevision = $v.configurationRevision;
+      _sourceSha256 = $v.sourceSha256;
+      _sku = $v.sku;
       _$v = null;
     }
     return this;
@@ -128,18 +199,37 @@ class OrderPersonalizationBuilder
   OrderPersonalization build() => _build();
 
   _$OrderPersonalization _build() {
-    final _$result = _$v ??
-        _$OrderPersonalization._(
-          designId: BuiltValueNullFieldError.checkNotNull(
-              designId, r'OrderPersonalization', 'designId'),
-          kind: BuiltValueNullFieldError.checkNotNull(
-              kind, r'OrderPersonalization', 'kind'),
-          name: BuiltValueNullFieldError.checkNotNull(
-              name, r'OrderPersonalization', 'name'),
-          mime: BuiltValueNullFieldError.checkNotNull(
-              mime, r'OrderPersonalization', 'mime'),
-          imageUrl: imageUrl,
-        );
+    _$OrderPersonalization _$result;
+    try {
+      _$result = _$v ??
+          _$OrderPersonalization._(
+            designId: BuiltValueNullFieldError.checkNotNull(
+                designId, r'OrderPersonalization', 'designId'),
+            kind: BuiltValueNullFieldError.checkNotNull(
+                kind, r'OrderPersonalization', 'kind'),
+            name: BuiltValueNullFieldError.checkNotNull(
+                name, r'OrderPersonalization', 'name'),
+            mime: BuiltValueNullFieldError.checkNotNull(
+                mime, r'OrderPersonalization', 'mime'),
+            imageUrl: imageUrl,
+            schemaVersion: schemaVersion,
+            placement: _placement?.build(),
+            configurationId: configurationId,
+            configurationRevision: configurationRevision,
+            sourceSha256: sourceSha256,
+            sku: sku,
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'placement';
+        _placement?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'OrderPersonalization', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

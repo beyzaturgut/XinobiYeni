@@ -34,6 +34,35 @@ public sealed class SqlFeatureDocumentTests
     }
 
     [EmptySqlAccountsFact]
+    public async Task DesignConfigurationRevisionsPersistAcrossSqlStoreInstances()
+    {
+        var services = new ServiceCollection(); services.AddXinobiPersistence(Environment.GetEnvironmentVariable("XINOBI_TEST_SQL")!);
+        await using var provider = services.BuildServiceProvider();
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string,string?> { ["Features:StorageProvider"]="SqlServer" }).Build();
+        var scopes = provider.GetRequiredService<IServiceScopeFactory>();
+        await using var scope = provider.CreateAsyncScope(); var db = scope.ServiceProvider.GetRequiredService<XinobiDbContext>();
+        Assert.False(await db.FeatureDocuments.AnyAsync(row => row.Name == "designs"));
+        var root = Path.Combine(Path.GetTempPath(), "xinobi-config-sql-" + Guid.NewGuid());
+        Xinobi.Api.Designs.SavedDesignStore Process() => new(new FeatureDocuments(new Production(), configuration, scopes), new LocalFileStore(root), TimeProvider.System);
+        try
+        {
+            var owner=Guid.NewGuid().ToString("N");
+            var design=await Process().Add(owner,"upload","Test","P","Product","V","Blue",[],Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg=="));
+            var placement=new Xinobi.Api.Designs.DesignPlacement(100,100,new string('a',64),20,30,1,0,.5);
+            var first=await Process().SaveConfiguration(owner,design.Id,new("V",placement,Favorite:true));
+            var next=await Process().SaveConfiguration(owner,design.Id,new("V",placement with { X=40 },first.Id,1,true));
+            Assert.Equal(2,next.Revision);
+            Assert.Equal(20,(await Process().Configuration(owner,first.Id,1)).Placement.X);
+            Assert.Equal(40,Assert.Single(await Process().Configurations(owner)).Placement.X);
+        }
+        finally
+        {
+            await db.FeatureDocuments.Where(row => row.Name == "designs").ExecuteDeleteAsync();
+            if(Directory.Exists(root))Directory.Delete(root,true);
+        }
+    }
+
+    [EmptySqlAccountsFact]
     public async Task AuditTrailWritesAndReadsOpsAuditLogs()
     {
         var services = new ServiceCollection();

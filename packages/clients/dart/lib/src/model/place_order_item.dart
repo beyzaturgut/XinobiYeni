@@ -15,6 +15,8 @@ part 'place_order_item.g.dart';
 /// * [variantId]
 /// * [quantity]
 /// * [designId]
+/// * [configurationId]
+/// * [configurationRevision]
 @BuiltValue()
 abstract class PlaceOrderItem implements Built<PlaceOrderItem, PlaceOrderItemBuilder> {
   @BuiltValueField(wireName: r'productId')
@@ -28,6 +30,12 @@ abstract class PlaceOrderItem implements Built<PlaceOrderItem, PlaceOrderItemBui
 
   @BuiltValueField(wireName: r'designId')
   String? get designId;
+
+  @BuiltValueField(wireName: r'configurationId')
+  String? get configurationId;
+
+  @BuiltValueField(wireName: r'configurationRevision')
+  int? get configurationRevision;
 
   PlaceOrderItem._();
 
@@ -72,6 +80,20 @@ class _$PlaceOrderItemSerializer implements PrimitiveSerializer<PlaceOrderItem> 
       yield serializers.serialize(
         object.designId,
         specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.configurationId != null) {
+      yield r'configurationId';
+      yield serializers.serialize(
+        object.configurationId,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.configurationRevision != null) {
+      yield r'configurationRevision';
+      yield serializers.serialize(
+        object.configurationRevision,
+        specifiedType: const FullType.nullable(int),
       );
     }
   }
@@ -125,6 +147,22 @@ class _$PlaceOrderItemSerializer implements PrimitiveSerializer<PlaceOrderItem> 
           ) as String?;
           if (valueDes == null) continue;
           result.designId = valueDes;
+          break;
+        case r'configurationId':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.configurationId = valueDes;
+          break;
+        case r'configurationRevision':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(int),
+          ) as int?;
+          if (valueDes == null) continue;
+          result.configurationRevision = valueDes;
           break;
         default:
           unhandled.add(key);

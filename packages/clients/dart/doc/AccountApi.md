@@ -22,11 +22,13 @@ Method | HTTP request | Description
 [**deleteMyDesign**](AccountApi.md#deletemydesign) | **DELETE** /api/v1/me/designs/{id} |
 [**deleteMyFavorite**](AccountApi.md#deletemyfavorite) | **DELETE** /api/v1/me/favorites/{productId} |
 [**getMyAccount**](AccountApi.md#getmyaccount) | **GET** /api/v1/me |
+[**getMyDesignConfiguration**](AccountApi.md#getmydesignconfiguration) | **GET** /api/v1/me/design-configurations/{id}/revisions/{revision} |
 [**getMyDesignImage**](AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [**getMyOrderLineDesign**](AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
 [**getOrderOptions**](AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
+[**listMyDesignConfigurations**](AccountApi.md#listmydesignconfigurations) | **GET** /api/v1/me/design-configurations |
 [**listMyDesigns**](AccountApi.md#listmydesigns) | **GET** /api/v1/me/designs |
 [**listMyFavorites**](AccountApi.md#listmyfavorites) | **GET** /api/v1/me/favorites |
 [**listMyNotifications**](AccountApi.md#listmynotifications) | **GET** /api/v1/me/notifications |
@@ -51,6 +53,8 @@ Method | HTTP request | Description
 [**renameMyDesign**](AccountApi.md#renamemydesign) | **PATCH** /api/v1/me/designs/{id} |
 [**returnMyOrder**](AccountApi.md#returnmyorder) | **POST** /api/v1/me/orders/{id}/returns |
 [**saveMyDesign**](AccountApi.md#savemydesign) | **POST** /api/v1/me/designs |
+[**saveMyDesignConfiguration**](AccountApi.md#savemydesignconfiguration) | **POST** /api/v1/me/designs/{id}/configurations |
+[**setMyDesignConfigurationFavorite**](AccountApi.md#setmydesignconfigurationfavorite) | **PUT** /api/v1/me/design-configurations/{id}/favorite |
 [**startAccountEmailVerification**](AccountApi.md#startaccountemailverification) | **POST** /api/v1/auth/email-verification |
 [**startAdminPasswordReset**](AccountApi.md#startadminpasswordreset) | **POST** /api/v1/auth/admin/password-reset |
 [**startMyEmailChange**](AccountApi.md#startmyemailchange) | **POST** /api/v1/me/email-verification |
@@ -586,6 +590,49 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getMyDesignConfiguration**
+> MyDesignConfiguration getMyDesignConfiguration(id, revision)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final int revision = 56; // int |
+
+try {
+    final response = api.getMyDesignConfiguration(id, revision);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getMyDesignConfiguration: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **revision** | **int**|  |
+
+### Return type
+
+[**MyDesignConfiguration**](MyDesignConfiguration.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getMyDesignImage**
 > getMyDesignImage(id)
 
@@ -668,7 +715,7 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getMyOrderLineDesign**
-> getMyOrderLineDesign(id, line)
+> getMyOrderLineDesign(id, line, download)
 
 
 
@@ -679,9 +726,10 @@ import 'package:xinobi_api_client/api.dart';
 final api = XinobiApiClient().getAccountApi();
 final String id = id_example; // String |
 final int line = 56; // int |
+final bool download = true; // bool |
 
 try {
-    api.getMyOrderLineDesign(id, line);
+    api.getMyOrderLineDesign(id, line, download);
 } on DioException catch (e) {
     print('Exception when calling AccountApi->getMyOrderLineDesign: $e\n');
 }
@@ -693,6 +741,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **String**|  |
  **line** | **int**|  |
+ **download** | **bool**|  | [optional]
 
 ### Return type
 
@@ -771,6 +820,43 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**BuiltList&lt;CustomerAddress&gt;**](CustomerAddress.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listMyDesignConfigurations**
+> BuiltList<MyDesignConfiguration> listMyDesignConfigurations()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+
+try {
+    final response = api.listMyDesignConfigurations();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->listMyDesignConfigurations: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BuiltList&lt;MyDesignConfiguration&gt;**](MyDesignConfiguration.md)
 
 ### Authorization
 
@@ -1722,6 +1808,91 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **saveMyDesignConfiguration**
+> MyDesignConfiguration saveMyDesignConfiguration(id, saveDesignConfiguration)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final SaveDesignConfiguration saveDesignConfiguration = ; // SaveDesignConfiguration |
+
+try {
+    final response = api.saveMyDesignConfiguration(id, saveDesignConfiguration);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->saveMyDesignConfiguration: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **saveDesignConfiguration** | [**SaveDesignConfiguration**](SaveDesignConfiguration.md)|  |
+
+### Return type
+
+[**MyDesignConfiguration**](MyDesignConfiguration.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **setMyDesignConfigurationFavorite**
+> setMyDesignConfigurationFavorite(id, setConfigurationFavorite)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+final SetConfigurationFavorite setConfigurationFavorite = ; // SetConfigurationFavorite |
+
+try {
+    api.setMyDesignConfigurationFavorite(id, setConfigurationFavorite);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->setMyDesignConfigurationFavorite: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **setConfigurationFavorite** | [**SetConfigurationFavorite**](SetConfigurationFavorite.md)|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

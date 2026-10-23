@@ -14,7 +14,7 @@ public record CustomerAddress(string Id, string Title, string FullName, string P
 public record SaveCustomerAddress(string Title, string FullName, string Phone, string City, string District, string Line, string? PostalCode, bool IsDefault);
 
 /// <summary><paramref name="DesignId"/> is one of the customer's saved designs, for a personalised product (XINOBI U or own image).</summary>
-public record PlaceOrderItem(string ProductId, string VariantId, int Quantity, string? DesignId = null);
+public record PlaceOrderItem(string ProductId, string VariantId, int Quantity, string? DesignId = null, string? ConfigurationId = null, int? ConfigurationRevision = null);
 /// <summary>Demo order: no payment is taken and stock is not reserved. <paramref name="ClientRequestId"/> makes retries return the same order.</summary>
 public record PlaceOrder(string AddressId, PlaceOrderItem[] Items, string ClientRequestId);
 public record CustomerOrderLine(string ProductId, string VariantId, string Name, string Color, string? ImageUrl, Money UnitPrice, int Quantity, Money LineTotal,
@@ -23,7 +23,7 @@ public record CustomerOrderLine(string ProductId, string VariantId, string Name,
 /// The design printed on a line, copied when the order was placed: deleting or renaming the saved design later does not change
 /// the order. <paramref name="ImageUrl"/> is filled per request (customer or panel address); the image is a representative preview.
 /// </summary>
-public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null);
+public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null, int? SchemaVersion = null, Designs.DesignPlacement? Placement = null, string? ConfigurationId = null, int? ConfigurationRevision = null, string? SourceSha256 = null, string? Sku = null);
 /// <summary>
 /// <paramref name="Shipment"/>, <paramref name="History"/> and <paramref name="Requests"/> were added with the order lifecycle;
 /// orders stored before have none.

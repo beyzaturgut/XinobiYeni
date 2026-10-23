@@ -19,7 +19,7 @@ test('arama Escape ile temizlenir ve karşılaştırma dört ürünle sınırlan
  for(const product of state.products.slice(0,4))await page.getByRole('article').filter({has:page.getByRole('heading',{name:product.name,exact:true})}).getByRole('button',{name:'Karşılaştır',exact:true}).click();
  await expect(page.getByRole('button',{name:'En fazla 4 ürün'})).toHaveCount(2);
  await expect(page.getByRole('button',{name:'En fazla 4 ürün'}).first()).toBeDisabled();
- await page.goto('/karsilastir/');await expect(page.getByRole('checkbox',{name:'Yalnız farkları göster'})).toBeVisible();
+ await page.goto('/karsilastir/');await page.getByRole('button',{name:'Seçilen ürünleri karşılaştır (4)'}).click();await expect(page.getByRole('checkbox',{name:'Yalnız farkları göster'})).toBeVisible();
 });
 
 test('ödeme sonucunda oturumsuz kullanıcıya sipariş gösterilmez',async({page})=>{
@@ -115,7 +115,7 @@ test('teklif takibinde mesaj ve kabul kararı güncellenir',async({page})=>{
  const {requests}=await mockStore(page);await page.goto('/kurumsal/teklif/takip/?kod=Q-TEST-1&eposta=test@example.com');await closeConsent(page);
  await page.getByLabel('Mesajınız').fill('Termin bilgisini paylaşır mısınız?');await page.getByRole('button',{name:'Mesaj gönder'}).click();
  await expect(page.getByText('Termin bilgisini paylaşır mısınız?',{exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Teklifi kabul et'}).click();await expect(page.getByText('Kabul edildi',{exact:true})).toBeVisible();
+ await page.getByRole('button',{name:'Teklifi kabul et'}).click();await expect(page.getByRole('heading',{name:'Kabul edildi',exact:true})).toBeVisible();
  expect(requests.find(r=>r.path.endsWith('/decision'))?.body.decision).toBe('accept');
 });
 
@@ -143,8 +143,8 @@ test('ürün detayında renk varyantı, görsel ve seçili durum değişir',asyn
  await expect(page.getByRole('link',{name:/XINOBI U ile kişiselleştir/})).toHaveAttribute('href',/product=DEMO-P101&variant=DEMO-V101-R/);
 });
 
-test('katalog favorisi tarayıcı listesine taşınır ve listeden kaldırılır',async({page})=>{
- await mockStore(page);await page.goto('/urunler/');await closeConsent(page);
+test('katalog favorisi hesap listesine taşınır ve listeden kaldırılır',async({page})=>{
+ await mockStore(page,{signedIn:true});await page.goto('/urunler/');await closeConsent(page);
  await page.getByRole('button',{name:/^Çay Makinesi 101 .*ürününü favorilere ekle$/}).click();await page.goto('/favoriler/');
  await expect(page.getByText('1 favori ürün',{exact:true})).toBeVisible();await page.getByRole('button',{name:/^Çay Makinesi 101 .*ürününü favorilerden çıkar$/}).click();
  await expect(page.getByRole('heading',{name:'Favori listeniz henüz boş.'})).toBeVisible();

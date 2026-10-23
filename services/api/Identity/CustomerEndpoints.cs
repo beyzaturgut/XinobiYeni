@@ -122,7 +122,7 @@ public static class CustomerEndpoints
             .WithName("ListMyOrders");
 
         me.MapPost("/orders", async Task<Results<Created<CustomerOrder>, ProblemHttpResult>> (PlaceOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
-                ICatalogSource source, NotificationCenter notifications, Designs.SavedDesignStore designs, IConfiguration configuration, IWebHostEnvironment environment) =>
+                ICatalogSource source, NotificationCenter notifications, Designs.SavedDesignStore designs, Designs.DesignSurfaceValidator surfaces, IConfiguration configuration, IWebHostEnvironment environment) =>
             {
                 var id = Id(user);
                 if (request.ClientRequestId is not { Length: >= 8 and <= 80 }) throw new AccountException("invalid_request", "Sipariş isteği tanımlanamadı. Tekrar dene.");
@@ -138,7 +138,7 @@ public static class CustomerEndpoints
                 {
                     var product = catalog.Detail(item.ProductId);
                     var variant = product?.Variants.FirstOrDefault(candidate => candidate.Id == item.VariantId);
-                    if (product is null || variant is null || !variant.Purchasable || variant.Price is null || item.Quantity > variant.MaxQuantity)
+                    if (product is null || variant is null || !variant.Purchasable || variant.Price is null || items.Where(row => row.VariantId == item.VariantId).Sum(row => row.Quantity) > variant.MaxQuantity)
                         throw new AccountException("cart_changed", $"{product?.Name ?? "Bir ürün"}{(variant is null ? "" : " · " + variant.Color)} bu adette satın alınamıyor. Sepetini kontrol et.", StatusCodes.Status409Conflict);
                     OrderPersonalization? personalization = null;
                     if (item.DesignId is { } designId)
@@ -151,7 +151,16 @@ public static class CustomerEndpoints
                         if (design.ProductId != product.Id)
                             throw new AccountException("design_product_mismatch", $"\"{design.Name}\" tasarımı başka bir ürün için hazırlandı.", StatusCodes.Status409Conflict);
                         personalized.Add((lines.Count, design));
-                        personalization = new OrderPersonalization(design.Id, design.Kind, design.Name, design.Mime);
+                        personalization = new OrderPersonalization(design.Id, design.Kind, design.Name, design.Mime, Sku: variant.Sku);
+                        if (item.ConfigurationId is not null)
+                        {
+                            var config = await designs.Configuration(id, item.ConfigurationId, item.ConfigurationRevision ?? 0);
+                            if (config.DesignId != design.Id || config.ProductId != product.Id || config.VariantId != variant.Id)
+                                throw new AccountException("configuration_variant_mismatch", "Sepetteki yerleşim bu tasarım ve renkle eşleşmiyor.", 409);
+                            await surfaces.Validate(product.Id, variant.Id, config.Placement);
+                            personalization = personalization with { SchemaVersion = config.SchemaVersion, Placement = config.Placement,
+                                ConfigurationId = config.Id, ConfigurationRevision = config.Revision, SourceSha256 = config.SourceSha256 };
+                        }
                     }
                     lines.Add(new CustomerOrderLine(product.Id, variant.Id, product.Name, variant.Color, variant.ImageUrl ?? product.ImageUrl, variant.Price,
                         item.Quantity, variant.Price with { AmountMinor = variant.Price.AmountMinor * item.Quantity }, personalization));
@@ -178,6 +187,12 @@ public static class CustomerEndpoints
                     // A retried request returned the earlier order (or placing failed): these copies belong to nothing.
                     if (!created) foreach (var (line, _) in personalized) await designs.ForgetOrderImage(orderId, line);
                 }
+                if (!created && (order.Address.Id != request.AddressId || order.Lines.Length != lines.Count || order.Lines.Where((line, index) =>
+                    line.ProductId != lines[index].ProductId || line.VariantId != lines[index].VariantId || line.Quantity != lines[index].Quantity
+                    || line.Personalization?.DesignId != lines[index].Personalization?.DesignId
+                    || line.Personalization?.ConfigurationId != lines[index].Personalization?.ConfigurationId
+                    || line.Personalization?.ConfigurationRevision != lines[index].Personalization?.ConfigurationRevision).Any()))
+                    throw new AccountException("idempotency_conflict", "Bu sipariş isteği farklı bir sepetle kullanıldı. Sepetini yeniden kontrol et.", 409);
                 // A retried request returns the stored order and must not notify twice.
                 if (created && await accounts.FindById(id) is { } account) await OrderNotifications.Send(notifications, account, order, "order_placed");
                 return TypedResults.Created($"/api/v1/me/orders/{order.Id}", OrderEndpoints.WithImages(order, http, configuration, environment));
@@ -203,9 +218,12 @@ public static class CustomerEndpoints
             throw new AccountException("invalid_items", "Sepetteki adetleri kontrol et.");
         if (items.Any(item => item.DesignId is { } design && (design.Length is 0 or > 64)))
             throw new AccountException("invalid_items", "Sepetteki tasarımı kontrol et.");
+        if (items.Any(item => item.ConfigurationId is not null && (item.DesignId is null || item.ConfigurationId.Length != 32 || item.ConfigurationRevision is not > 0)
+            || item.ConfigurationId is null && item.ConfigurationRevision is not null))
+            throw new AccountException("invalid_configuration", "Sepetteki yerleşim kaydını kontrol et.");
         // The same colour with two designs (or with none) stays as separate lines.
-        var merged = items.GroupBy(item => (item.ProductId, item.VariantId, item.DesignId))
-            .Select(group => new PlaceOrderItem(group.Key.ProductId, group.Key.VariantId, group.Sum(item => item.Quantity), group.Key.DesignId)).ToArray();
+        var merged = items.GroupBy(item => (item.ProductId, item.VariantId, item.DesignId, item.ConfigurationId, item.ConfigurationRevision))
+            .Select(group => new PlaceOrderItem(group.Key.ProductId, group.Key.VariantId, group.Sum(item => item.Quantity), group.Key.DesignId, group.Key.ConfigurationId, group.Key.ConfigurationRevision)).ToArray();
         return merged.Any(item => item.Quantity > 99) ? throw new AccountException("invalid_items", "Sepetteki adetleri kontrol et.") : merged;
     }
 

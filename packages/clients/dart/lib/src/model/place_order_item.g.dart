@@ -15,6 +15,10 @@ class _$PlaceOrderItem extends PlaceOrderItem {
   final int quantity;
   @override
   final String? designId;
+  @override
+  final String? configurationId;
+  @override
+  final int? configurationRevision;
 
   factory _$PlaceOrderItem([void Function(PlaceOrderItemBuilder)? updates]) =>
       (PlaceOrderItemBuilder()..update(updates))._build();
@@ -23,7 +27,9 @@ class _$PlaceOrderItem extends PlaceOrderItem {
       {required this.productId,
       required this.variantId,
       required this.quantity,
-      this.designId})
+      this.designId,
+      this.configurationId,
+      this.configurationRevision})
       : super._();
   @override
   PlaceOrderItem rebuild(void Function(PlaceOrderItemBuilder) updates) =>
@@ -39,7 +45,9 @@ class _$PlaceOrderItem extends PlaceOrderItem {
         productId == other.productId &&
         variantId == other.variantId &&
         quantity == other.quantity &&
-        designId == other.designId;
+        designId == other.designId &&
+        configurationId == other.configurationId &&
+        configurationRevision == other.configurationRevision;
   }
 
   @override
@@ -49,6 +57,8 @@ class _$PlaceOrderItem extends PlaceOrderItem {
     _$hash = $jc(_$hash, variantId.hashCode);
     _$hash = $jc(_$hash, quantity.hashCode);
     _$hash = $jc(_$hash, designId.hashCode);
+    _$hash = $jc(_$hash, configurationId.hashCode);
+    _$hash = $jc(_$hash, configurationRevision.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -59,7 +69,9 @@ class _$PlaceOrderItem extends PlaceOrderItem {
           ..add('productId', productId)
           ..add('variantId', variantId)
           ..add('quantity', quantity)
-          ..add('designId', designId))
+          ..add('designId', designId)
+          ..add('configurationId', configurationId)
+          ..add('configurationRevision', configurationRevision))
         .toString();
   }
 }
@@ -84,6 +96,16 @@ class PlaceOrderItemBuilder
   String? get designId => _$this._designId;
   set designId(String? designId) => _$this._designId = designId;
 
+  String? _configurationId;
+  String? get configurationId => _$this._configurationId;
+  set configurationId(String? configurationId) =>
+      _$this._configurationId = configurationId;
+
+  int? _configurationRevision;
+  int? get configurationRevision => _$this._configurationRevision;
+  set configurationRevision(int? configurationRevision) =>
+      _$this._configurationRevision = configurationRevision;
+
   PlaceOrderItemBuilder() {
     PlaceOrderItem._defaults(this);
   }
@@ -95,6 +117,8 @@ class PlaceOrderItemBuilder
       _variantId = $v.variantId;
       _quantity = $v.quantity;
       _designId = $v.designId;
+      _configurationId = $v.configurationId;
+      _configurationRevision = $v.configurationRevision;
       _$v = null;
     }
     return this;
@@ -123,6 +147,8 @@ class PlaceOrderItemBuilder
           quantity: BuiltValueNullFieldError.checkNotNull(
               quantity, r'PlaceOrderItem', 'quantity'),
           designId: designId,
+          configurationId: configurationId,
+          configurationRevision: configurationRevision,
         );
     replace(_$result);
     return _$result;

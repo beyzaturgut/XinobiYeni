@@ -2735,6 +2735,13 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "download",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -3234,6 +3241,181 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/me/design-configurations": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "ListMyDesignConfigurations",
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MyDesignConfiguration"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/designs/{id}/configurations": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "SaveMyDesignConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveDesignConfiguration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyDesignConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/design-configurations/{id}/revisions/{revision}": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "GetMyDesignConfiguration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyDesignConfiguration"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/me/design-configurations/{id}/favorite": {
+      "put": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "SetMyDesignConfigurationFavorite",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetConfigurationFavorite"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
           }
         }
       }
@@ -5619,6 +5801,39 @@
           }
         }
       },
+      "BodyPlacement": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "y": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "scale": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "rotation": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          }
+        }
+      },
       "CancelMyOrder": {
         "required": [
           "reason",
@@ -6083,6 +6298,73 @@
           }
         }
       },
+      "DesignPlacement": {
+        "required": [
+          "sourceWidth",
+          "sourceHeight",
+          "surfaceVersion",
+          "x",
+          "y",
+          "scale",
+          "rotation",
+          "curvatureStrength"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceWidth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sourceHeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "surfaceVersion": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number",
+            "format": "double"
+          },
+          "y": {
+            "type": "number",
+            "format": "double"
+          },
+          "scale": {
+            "type": "number",
+            "format": "double"
+          },
+          "rotation": {
+            "type": "number",
+            "format": "double"
+          },
+          "curvatureStrength": {
+            "type": "number",
+            "format": "double"
+          },
+          "bodyAdjustments": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "additionalProperties": {
+              "$ref": "#/components/schemas/BodyPlacement"
+            }
+          },
+          "mode": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fillMask": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          }
+        }
+      },
       "HealthResponse": {
         "required": [
           "service",
@@ -6353,6 +6635,56 @@
           }
         }
       },
+      "MyDesignConfiguration": {
+        "required": [
+          "id",
+          "designId",
+          "productId",
+          "variantId",
+          "revision",
+          "schemaVersion",
+          "placement",
+          "favorite",
+          "sourceSha256",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "designId": {
+            "type": "string"
+          },
+          "productId": {
+            "type": "string"
+          },
+          "variantId": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "placement": {
+            "$ref": "#/components/schemas/DesignPlacement"
+          },
+          "favorite": {
+            "type": "boolean"
+          },
+          "sourceSha256": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "MyReview": {
         "required": [
           "id",
@@ -6482,6 +6814,48 @@
             "type": "string"
           },
           "imageUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "schemaVersion": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "placement": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DesignPlacement"
+              }
+            ]
+          },
+          "configurationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "configurationRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "sourceSha256": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sku": {
             "type": [
               "null",
               "string"
@@ -6677,6 +7051,19 @@
               "null",
               "string"
             ]
+          },
+          "configurationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "configurationRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -7485,6 +7872,38 @@
           }
         }
       },
+      "SaveDesignConfiguration": {
+        "required": [
+          "variantId",
+          "placement"
+        ],
+        "type": "object",
+        "properties": {
+          "variantId": {
+            "type": "string"
+          },
+          "placement": {
+            "$ref": "#/components/schemas/DesignPlacement"
+          },
+          "configurationId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expectedRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "favorite": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
       "SaveDesignFromSession": {
         "required": [
           "sessionId",
@@ -7500,6 +7919,17 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "SetConfigurationFavorite": {
+        "required": [
+          "favorite"
+        ],
+        "type": "object",
+        "properties": {
+          "favorite": {
+            "type": "boolean"
           }
         }
       },

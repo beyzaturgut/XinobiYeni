@@ -49,6 +49,7 @@ import 'package:xinobi_api_client/src/model/audit_entry.dart';
 import 'package:xinobi_api_client/src/model/audit_page.dart';
 import 'package:xinobi_api_client/src/model/auth_session.dart';
 import 'package:xinobi_api_client/src/model/availability.dart';
+import 'package:xinobi_api_client/src/model/body_placement.dart';
 import 'package:xinobi_api_client/src/model/cancel_my_order.dart';
 import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
@@ -65,6 +66,7 @@ import 'package:xinobi_api_client/src/model/customer_order.dart';
 import 'package:xinobi_api_client/src/model/customer_order_line.dart';
 import 'package:xinobi_api_client/src/model/delete_my_account.dart';
 import 'package:xinobi_api_client/src/model/dependency_health.dart';
+import 'package:xinobi_api_client/src/model/design_placement.dart';
 import 'package:xinobi_api_client/src/model/health_response.dart';
 import 'package:xinobi_api_client/src/model/home_content.dart';
 import 'package:xinobi_api_client/src/model/home_slide.dart';
@@ -75,6 +77,7 @@ import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/mark_notifications_read.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:xinobi_api_client/src/model/my_design.dart';
+import 'package:xinobi_api_client/src/model/my_design_configuration.dart';
 import 'package:xinobi_api_client/src/model/my_review.dart';
 import 'package:xinobi_api_client/src/model/order_event.dart';
 import 'package:xinobi_api_client/src/model/order_options.dart';
@@ -111,7 +114,9 @@ import 'package:xinobi_api_client/src/model/review_page.dart';
 import 'package:xinobi_api_client/src/model/review_summary.dart';
 import 'package:xinobi_api_client/src/model/review_summary_list.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
+import 'package:xinobi_api_client/src/model/save_design_configuration.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
+import 'package:xinobi_api_client/src/model/set_configuration_favorite.dart';
 import 'package:xinobi_api_client/src/model/staff_order.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
@@ -169,6 +174,7 @@ part 'serializers.g.dart';
   AuditPage,
   AuthSession,
   Availability,
+  BodyPlacement,
   CancelMyOrder,
   CategoryHighlight,
   CategoryItem,
@@ -185,6 +191,7 @@ part 'serializers.g.dart';
   CustomerOrderLine,
   DeleteMyAccount,
   DependencyHealth,
+  DesignPlacement,
   HealthResponse,
   HomeContent,
   HomeSlide,
@@ -195,6 +202,7 @@ part 'serializers.g.dart';
   MarkNotificationsRead,
   Money,
   MyDesign,
+  MyDesignConfiguration,
   MyReview,
   OrderEvent,
   OrderOptions,
@@ -231,7 +239,9 @@ part 'serializers.g.dart';
   ReviewSummary,
   ReviewSummaryList,
   SaveCustomerAddress,
+  SaveDesignConfiguration,
   SaveDesignFromSession,
+  SetConfigurationFavorite,
   StaffOrder,
   StartAccountEmailVerification,
   StartAdminPasswordReset,
@@ -309,6 +319,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<OrderEvent>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(MyDesignConfiguration)]),
+        () => ListBuilder<MyDesignConfiguration>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(DependencyHealth)]),
         () => ListBuilder<DependencyHealth>(),
       )
@@ -323,6 +337,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(Quote)]),
         () => ListBuilder<Quote>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltMap, [FullType(String), FullType(BodyPlacement)]),
+        () => MapBuilder<String, BodyPlacement>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(ProductSummary)]),

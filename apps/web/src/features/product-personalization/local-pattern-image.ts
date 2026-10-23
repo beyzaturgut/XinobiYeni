@@ -105,9 +105,9 @@ export async function prepareLocalPattern(file: File, signal?: AbortSignal): Pro
  let bitmap: ImageBitmap;
  // Default decoding applies EXIF. Some Chromium versions reject the historical
  // explicit "from-image" enum value; do not override the browser default.
- // Resize dimensions refer to encoded axes; EXIF orientation is applied by
- // the decoder afterwards. The retained bitmap uses the oriented dimensions.
- try { bitmap = await createImageBitmap(file, { resizeWidth: size.swapped ? height : width, resizeHeight: size.swapped ? width : height, resizeQuality: 'high' }); }
+ // Resize dimensions refer to the oriented bitmap; imageSize already swaps
+ // the axes for EXIF rotations. Swapping again distorts portrait photographs.
+ try { bitmap = await createImageBitmap(file, { resizeWidth: width, resizeHeight: height, resizeQuality: 'high' }); }
  catch { throw new Error(invalidImage); }
  let canvas: HTMLCanvasElement | undefined;
  try {

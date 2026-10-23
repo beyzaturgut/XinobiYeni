@@ -9,6 +9,51 @@ const invalidImage = 'Görsel okunamadı. Geçerli bir PNG, JPEG veya WebP seçi
 function checkCancelled(signal?: AbortSignal) {
  if (signal?.aborted) throw new DOMException('İşlem iptal edildi.', 'AbortError');
 }
+const preparationTimeout = 'Görsel hazırlama zaman aşımına uğradı. Yeniden deneyin veya başka bir görsel seçin.';
+
+// Browser decoders and encoders do not accept AbortSignal. Stop awaiting them
+// when cancelled and dispose of a bitmap even if it finishes after cancellation.
+function waitFor<T>(task: Promise<T>, signal: AbortSignal, discard?: (value: T) => void): Promise<T> {
+ return new Promise((resolve, reject) => {
+  const abort = () => reject(signal.reason ?? new DOMException('İşlem iptal edildi.', 'AbortError'));
+  signal.addEventListener('abort', abort, { once: true });
+  if (signal.aborted) abort();
+  task.then(value => {
+   if (signal.aborted) discard?.(value);
+   else resolve(value);
+  }, reject).finally(() => signal.removeEventListener('abort', abort));
+ });
+}
+
+async function decodeImage(file: File, width: number, height: number, signal: AbortSignal) {
+ const decoder = new AbortController();
+ const abort = () => decoder.abort(signal.reason);
+ signal.addEventListener('abort', abort, { once: true });
+ const timer = setTimeout(() => decoder.abort(new Error('Bitmap decoder timed out')), 5000);
+ try {
+  checkCancelled(signal);
+  const bitmap = await waitFor(createImageBitmap(file, { resizeWidth: width, resizeHeight: height, resizeQuality: 'high' }), decoder.signal, bitmap => bitmap.close());
+  if (bitmap.width !== width || bitmap.height !== height) { bitmap.close(); throw new Error(invalidImage); }
+  return { source: bitmap as CanvasImageSource, close: () => bitmap.close() };
+ } catch {
+  checkCancelled(signal);
+  // Some devices stall or reject createImageBitmap. The native image element
+  // provides an independent decoder, while the outer deadline bounds both.
+  const image = new Image();
+  const url = URL.createObjectURL(file);
+  try {
+   image.src = url;
+   await waitFor(image.decode(), signal);
+   return { source: image as CanvasImageSource, close: () => { image.src = ''; URL.revokeObjectURL(url); } };
+  } catch {
+   image.src = ''; URL.revokeObjectURL(url); throw new Error(invalidImage);
+  }
+ } finally {
+  clearTimeout(timer);
+  signal.removeEventListener('abort', abort);
+ }
+}
+
 function orientation(bytes: Uint8Array): number {
  let start = 0;
  if (String.fromCharCode(...bytes.subarray(0, 6)) === 'Exif\0\0') start = 6;
@@ -31,12 +76,12 @@ function orientation(bytes: Uint8Array): number {
  return 1;
 }
 
-async function imageSize(file: File, signal?: AbortSignal) {
+async function imageSize(file: File, signal: AbortSignal) {
  if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) throw new Error('Yalnız PNG, JPEG veya WebP görselleri seçebilirsiniz.');
  if (!file.size) throw new Error('Görsel dosyası boş olmamalıdır.');
  if (file.size > MAX_INPUT_BYTES) throw new Error('Bu görsel işlenemeyecek kadar büyük. Lütfen 64 MiB veya daha küçük bir dosya seçin.');
  checkCancelled(signal);
- const bytes = new Uint8Array(await file.slice(0, 256 * 1024).arrayBuffer());
+ const bytes = new Uint8Array(await waitFor(file.slice(0, 256 * 1024).arrayBuffer(), signal));
  const view = new DataView(bytes.buffer);
  const tag = (at: number) => String.fromCharCode(...bytes.subarray(at, at + 4));
  let width = 0, height = 0, exif = 1;
@@ -79,12 +124,12 @@ async function imageSize(file: File, signal?: AbortSignal) {
   let at = png ? 8 : 12;
   for (let n = 0; n < 128 && at + 8 <= file.size; n++) {
    checkCancelled(signal);
-   const chunk = new Uint8Array(await file.slice(at, at + 8).arrayBuffer());
+   const chunk = new Uint8Array(await waitFor(file.slice(at, at + 8).arrayBuffer(), signal));
    const data = new DataView(chunk.buffer);
    const length = data.getUint32(png ? 0 : 4, webp);
    const name = String.fromCharCode(...chunk.subarray(png ? 4 : 0, png ? 8 : 4));
    if (at + 8 + length > file.size) throw new Error(invalidImage);
-   if (name === 'eXIf' || name === 'EXIF') { exif = orientation(new Uint8Array(await file.slice(at + 8, at + 8 + Math.min(length, 65536)).arrayBuffer())); break; }
+   if (name === 'eXIf' || name === 'EXIF') { exif = orientation(new Uint8Array(await waitFor(file.slice(at + 8, at + 8 + Math.min(length, 65536)).arrayBuffer(), signal))); break; }
    if (name === 'IEND') break;
    at += 8 + length + (png ? 4 : length % 2);
   }
@@ -97,22 +142,32 @@ function fits(width: number, height: number, bytes: number) {
 }
 
 export async function prepareLocalPattern(file: File, signal?: AbortSignal): Promise<File> {
+ const controller = new AbortController();
+ const abort = () => controller.abort(signal?.reason);
+ signal?.addEventListener('abort', abort, { once: true });
+ if (signal?.aborted) abort();
+ const timer = setTimeout(() => controller.abort(new Error(preparationTimeout)), 30000);
+ try { return await prepare(file, controller.signal); }
+ catch (error) {
+  if (controller.signal.aborted) throw controller.signal.reason;
+  throw error;
+ } finally {
+  clearTimeout(timer);
+  signal?.removeEventListener('abort', abort);
+ }
+}
+
+async function prepare(file: File, signal: AbortSignal): Promise<File> {
  const size = await imageSize(file, signal);
  checkCancelled(signal);
  const unchanged = fits(size.width, size.height, file.size);
  const ratio = unchanged ? Math.min(1, 128 / Math.max(size.width, size.height)) : Math.min(1, MAX_PATTERN_DIMENSION / size.width, MAX_PATTERN_DIMENSION / size.height, Math.sqrt(MAX_PATTERN_PIXELS / (size.width * size.height)));
  let width = Math.max(1, Math.floor(size.width * ratio)), height = Math.max(1, Math.floor(size.height * ratio));
- let bitmap: ImageBitmap;
- // Default decoding applies EXIF. Some Chromium versions reject the historical
- // explicit "from-image" enum value; do not override the browser default.
- // Resize dimensions refer to the oriented bitmap; imageSize already swaps
- // the axes for EXIF rotations. Swapping again distorts portrait photographs.
- try { bitmap = await createImageBitmap(file, { resizeWidth: width, resizeHeight: height, resizeQuality: 'high' }); }
- catch { throw new Error(invalidImage); }
+ // Resize dimensions are oriented; imageSize already accounts for EXIF.
+ const decoded = await decodeImage(file, width, height, signal);
  let canvas: HTMLCanvasElement | undefined;
  try {
   checkCancelled(signal);
-  if (bitmap.width !== width || bitmap.height !== height) throw new Error(invalidImage);
   if (unchanged) return file;
   canvas = document.createElement('canvas');
   const context = canvas.getContext('2d');
@@ -121,13 +176,13 @@ export async function prepareLocalPattern(file: File, signal?: AbortSignal): Pro
    checkCancelled(signal);
    canvas.width = width; canvas.height = height;
    context.imageSmoothingEnabled = true; context.imageSmoothingQuality = 'high';
-   context.drawImage(bitmap, 0, 0, width, height);
+   context.drawImage(decoded.source, 0, 0, width, height);
    // Never encode transparent PNG/WebP as JPEG. Prefer lossless PNG, then
    // alpha-preserving WebP; limit quality reduction before reducing dimensions.
    const encodings: [string, number | undefined][] = file.type === 'image/png' ? [['image/png', undefined], ['image/webp', .92], ['image/webp', .86], ['image/webp', .8]] : [[file.type, .92], [file.type, .86], [file.type, .8]];
    for (const [type, quality] of encodings) {
     checkCancelled(signal);
-    const blob = await new Promise<Blob | null>(resolve => canvas!.toBlob(resolve, type, quality));
+    const blob = await waitFor(new Promise<Blob | null>(resolve => canvas!.toBlob(resolve, type, quality)), signal);
     checkCancelled(signal);
     if (blob && blob.size > 0 && fits(width, height, blob.size)) {
      const extension = blob.type === 'image/jpeg' ? 'jpg' : blob.type === 'image/webp' ? 'webp' : 'png';
@@ -142,7 +197,7 @@ export async function prepareLocalPattern(file: File, signal?: AbortSignal): Pro
   if (error instanceof DOMException && error.name === 'AbortError') throw error;
   throw new Error('Görsel bu cihazda hazırlanamadı. Lütfen daha küçük veya başka bir fotoğraf deneyin.');
  } finally {
-  bitmap.close();
+  decoded.close();
   if (canvas) { canvas.width = 0; canvas.height = 0; }
  }
 }

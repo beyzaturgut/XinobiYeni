@@ -104,7 +104,7 @@ test('removing an uploaded photo restores the original pattern preview byte for 
  await expect.poll(()=>canvas.evaluate((c:HTMLCanvasElement)=>c.toDataURL())).toBe(original);
 });
 
-test('rapid selections serialize decoding and only retain the latest photo',async({page})=>{
+test('rapid selections discard cancelled decoding and only retain the latest photo',async({page})=>{
  await setup(page);
  const result=await page.evaluate(async()=>{
   const canvas=document.createElement('canvas');canvas.width=32;canvas.height=32;const ctx=canvas.getContext('2d')!;
@@ -124,6 +124,58 @@ test('rapid selections serialize decoding and only retain the latest photo',asyn
   window.createImageBitmap=decode;
   return{busy,maxActive,closed,retainedName,created:window.localPatternUrls.created.length};
  });
- expect(result.busy).toBe(true);expect(result.maxActive).toBe(1);expect(result.closed).toBeGreaterThanOrEqual(2);expect(result.retainedName).toBe('#0000ff.png');expect(result.created).toBe(1);
+ expect(result.busy).toBe(true);expect(result.maxActive).toBeLessThanOrEqual(2);expect(result.closed).toBeGreaterThanOrEqual(2);expect(result.retainedName).toBe('#0000ff.png');expect(result.created).toBe(1);
  await expect(page.locator('canvas[role=img]')).toBeVisible();
+});
+
+for (const mode of ['artwork', 'pattern']) test(`${mode} recovers when the bitmap decoder never finishes`, async ({ page }) => {
+ await setup(page);
+ if (mode === 'pattern') {
+  await page.goto(route + '&mode=pattern');
+  await expect(page.locator('input[type=file]')).toBeVisible();
+ }
+ const buffer = await image(page, 'image/png', mode === 'pattern' ? 4097 : 32, 32);
+ await page.clock.install();
+ await page.evaluate(() => { window.createImageBitmap = () => new Promise<ImageBitmap>(() => {}); });
+ await page.locator('input[type=file]').setInputFiles({ name: 'fallback.png', mimeType: 'image/png', buffer });
+ await expect(page.getByText('Görsel hazırlanıyor…', { exact: true })).toBeVisible();
+ await page.clock.runFor(5100);
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await expect(page.locator('input[type=file]')).toBeEnabled();
+ await expect(page.getByText('Görsel hazırlanıyor…', { exact: true })).toHaveCount(0);
+});
+
+test('a stalled file read can be cancelled and the next file still opens', async ({ page }) => {
+ await setup(page);
+ const buffer = await image(page, 'image/png');
+ await page.evaluate(() => {
+  const read = Blob.prototype.arrayBuffer;
+  let first = true;
+  Blob.prototype.arrayBuffer = function () {
+   if (first) { first = false; return new Promise<ArrayBuffer>(() => {}); }
+   return read.call(this);
+  };
+ });
+ const input = page.locator('input[type=file]');
+ await input.setInputFiles({ name: 'stalled.png', mimeType: 'image/png', buffer });
+ await page.getByRole('button', { name: 'Hazırlamayı iptal et' }).click();
+ await expect(input).toBeEnabled();
+ await input.setInputFiles({ name: 'retry.png', mimeType: 'image/png', buffer });
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+});
+
+test('unresponsive decoders time out and release the upload input', async ({ page }) => {
+ await setup(page);
+ const buffer = await image(page, 'image/png');
+ await page.clock.install();
+ await page.evaluate(() => {
+  window.createImageBitmap = () => new Promise<ImageBitmap>(() => {});
+  HTMLImageElement.prototype.decode = () => new Promise<void>(() => {});
+ });
+ await page.locator('input[type=file]').setInputFiles({ name: 'stalled.png', mimeType: 'image/png', buffer });
+ await expect(page.getByText('Görsel hazırlanıyor…', { exact: true })).toBeVisible();
+ await page.clock.runFor(30100);
+ await expect(page.locator('main').getByRole('alert')).toContainText('zaman aşımına');
+ await expect(page.locator('input[type=file]')).toBeEnabled();
+ await expect(page.getByText('Görsel hazırlanıyor…', { exact: true })).toHaveCount(0);
 });

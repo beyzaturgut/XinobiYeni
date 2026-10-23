@@ -18,7 +18,7 @@ export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPrev
   processing.current?.abort();const controller=new AbortController();processing.current=controller;
   const ticket=++generation.current;setBusy(true);setError('');
   try{
-   // Serialize decoders; a cancelled old selection cannot overwrite the new one.
+   // Queue preparation; cancelled native decoders are disposed when they settle.
    const task=pending.current.then(()=>prepareLocalPattern(file,controller.signal));pending.current=task.then(()=>{},()=>{});
    const prepared=await task;
    if(ticket!==generation.current)return;
@@ -38,7 +38,7 @@ export default function LocalPatternPreview({inputs,initialPatternSrc,xinobiPrev
    <input ref={fileInput} id="local-pattern" type="file" accept="image/png,image/jpeg,image/webp" disabled={busy} aria-describedby="local-image-help" onChange={event=>{const file=event.currentTarget.files?.[0];event.currentTarget.value='';if(file)void select(file)}}/>
    {pattern&&<button type="button" className={styles.secondary} onClick={remove}>{uploadMode==='pattern'?'Deseni kaldır':'Görseli kaldır'}</button>}
    <p id="local-image-help">PNG, JPEG veya WebP · Büyük görseller önizleme için otomatik optimize edilir. İşlenmiş görsel en fazla 4096 piksel/kenar, 8 megapiksel ve 8 MiB olur. Görsel bu tarayıcıda önizlenir; yalnız “Tasarımımı kaydet” dersen hesabına yüklenir ve yalnız sen görürsün.</p>
-   {busy&&<p role="status">Görsel hazırlanıyor…</p>}{error&&<p role="alert" className={styles.error}>{error}</p>}
+   {busy&&<><p role="status">Görsel hazırlanıyor…</p><button type="button" className={styles.secondary} onClick={()=>{generation.current++;processing.current?.abort();setBusy(false);setError('');}}>Hazırlamayı iptal et</button></>}{error&&<p role="alert" className={styles.error}>{error}</p>}
   </div>
   {previewPattern&&<EditorWorkspace key={composeArtwork?'composed':pattern?'artwork':'pattern'} renderingInputs={inputs} onPlacementChange={setSavedPlacement} patternSrc={previewPattern} placementMode={!composeArtwork&&pattern?uploadMode:'pattern'} fillMask={!composeArtwork&&Boolean(pattern)&&uploadMode==='pattern'} artworkSrc={composeArtwork?pattern??undefined:undefined} onUpload={()=>fileInput.current?.click()} uploadBusy={busy} xinobiPreview={xinobiPreview} placementRef={placementRef}/>}
   {file&&product&&!composeArtwork&&<SaveDesignButton key={pattern} placement={savedPlacement} source={{file,productId:product,variantId:variant??null}}/>}

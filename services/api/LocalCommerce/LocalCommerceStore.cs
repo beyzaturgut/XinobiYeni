@@ -16,7 +16,7 @@ public record CommerceProduct(string Id, string Name, string Category, bool Acti
 /// <summary>One technical property, e.g. Güç = 1650 W.</summary>
 public record ProductSpec(string Name, string Value);
 public record CommerceSlide(long Id, string Name, string Type, string Src, string Alt, int Duration, bool Active);
-public record CommerceContent(CommerceSlide[] Slides, string XinobiBanner, string ButtonColor, Dictionary<string, string>? CategoryProducts = null, string? TitaniumBanner = null, string[]? FeaturedProducts = null, Dictionary<string, string>? CategoryImages = null, string? TitaniumImage = null);
+public record CommerceContent(CommerceSlide[] Slides, string XinobiBanner, string ButtonColor, Dictionary<string, string>? CategoryProducts = null, string? TitaniumBanner = null, string[]? FeaturedProducts = null, Dictionary<string, string>? CategoryImages = null, string? TitaniumImage = null, string? TitaniumCategory = null);
 public record CommerceState(CommerceProduct[] Products, Dictionary<string, long> Prices, CommerceContent Content, string[]? Categories = null, CommerceAnnouncement[]? Announcements = null);
 public record CommerceAnnouncement(string Id, string Title, string Body, string Kind, DateTimeOffset PublishedAt);
 public record AnnouncementCreate(string Title, string Body, string Kind);

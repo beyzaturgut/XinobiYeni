@@ -107,7 +107,7 @@ public static class LocalCommerceEndpoints
                     {
                         Categories = state.Categories!.Where(category => category != name).ToArray(),
                         Products = state.Products.Select(product => product.Category == name ? product with { Category = moveTo! } : product).ToArray(),
-                        Content = state.Content with { CategoryProducts = state.Content.CategoryProducts?.Where(pair => pair.Key != name).ToDictionary(), CategoryImages = state.Content.CategoryImages?.Where(pair => pair.Key != name).ToDictionary() }
+                        Content = state.Content with { TitaniumCategory = state.Content.TitaniumCategory == name ? null : state.Content.TitaniumCategory, CategoryProducts = state.Content.CategoryProducts?.Where(pair => pair.Key != name).ToDictionary(), CategoryImages = state.Content.CategoryImages?.Where(pair => pair.Key != name).ToDictionary() }
                     };
                 }));
             }
@@ -172,6 +172,8 @@ public static class LocalCommerceEndpoints
             {
                 return Results.Ok(await store.Update(state =>
                 {
+                    if (!string.IsNullOrEmpty(content.TitaniumCategory) && !state.Categories!.Contains(content.TitaniumCategory))
+                        throw new ArgumentException("Titanyum serisi için mevcut katalog kategorilerinden birini seçin.");
                     if (content.CategoryImages is { } images && (images.Count > 100 || images.Any(pair => !state.Categories!.Contains(pair.Key) || !ValidMedia(pair.Value) || (!string.IsNullOrEmpty(pair.Value) && !Regex.IsMatch(pair.Value, @"\.(png|jpg|webp)$")))))
                         throw new ArgumentException("Kategori için geçerli PNG, JPEG veya WebP görseli yükleyin.");
                     if (content.FeaturedProducts is { } featured && (featured.Length > 4 || featured.Distinct().Count() != featured.Length || featured.Any(id => !state.Products.Any(product => product.Id == id && product.Active) && !(state.Content.FeaturedProducts?.Contains(id) ?? false))))

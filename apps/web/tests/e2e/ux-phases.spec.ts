@@ -42,3 +42,13 @@ test('review service error remains visible and can be retried',async({page})=>{
  await expect(page.getByRole('link',{name:'Sepetim →',exact:true})).toHaveCount(0);
  await expect(page.getByRole('link',{name:'Karşılaştırmayı aç →',exact:true})).toHaveCount(0);
 });
+
+
+test('titanium CTA uses only the configured real category',async({page})=>{
+ const {state}=await mockStore(page);state.categories=[...new Set(state.products.map(product=>product.category))];state.content.titaniumCategory=null;
+ await page.goto('/');await closeConsent(page);
+ await expect(page.getByRole('link',{name:'Titanyum Serisini Keşfet'})).toHaveCount(0);
+ state.content.titaniumCategory=state.categories![0];
+ await page.reload();
+ await expect(page.getByRole('link',{name:'Titanyum Serisini Keşfet'})).toHaveAttribute('href',new RegExp('category='+encodeURIComponent(state.categories![0])));
+});

@@ -12,6 +12,7 @@ function ContentEditor({ content, products, categories, announcements, onPublish
   const [selectedId, setSelectedId] = useState(content.slides[0]?.id ?? 0)
   const [notice, setNotice] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const [titaniumCategory,setTitaniumCategory]=useState(content.titaniumCategory??'')
   const [titaniumImage, setTitaniumImage] = useState(content.titaniumImage ?? '/assets/products/titanium-bronze-gold.png')
   const buttonColor = content.buttonColor
   const selected = slides.find((slide) => slide.id === selectedId) ?? slides[0]
@@ -48,7 +49,7 @@ function ContentEditor({ content, products, categories, announcements, onPublish
   }
 
   async function saveContent() {
-    try { await onSave({ ...content, slides, buttonColor, categoryProducts, categoryImages, titaniumImage, featuredProducts: featuredProducts.filter(Boolean) }); setNotice('İçerik kaydedildi.') }
+    try { await onSave({ ...content, slides, buttonColor, categoryProducts, categoryImages, titaniumImage, titaniumCategory: titaniumCategory||null, featuredProducts: featuredProducts.filter(Boolean) }); setNotice('İçerik kaydedildi.') }
     catch (error) { setNotice(error instanceof Error ? error.message : 'İçerik kaydedilemedi.') }
   }
   const source = (src: string) => mediaUrl(src, commerceApi, 'http://127.0.0.1:3000')
@@ -61,7 +62,7 @@ function ContentEditor({ content, products, categories, announcements, onPublish
         const id=featuredProducts[index] || ''
         const product=products.find(product=>product.id===id)
         return <section key={index}><h3>{index+1}. ürün</h3><label>Gösterilecek ürün<select aria-label={`${index+1}. öne çıkan ürün`} value={id} onChange={event=>setFeaturedProducts(current=>Array.from({length:4},(_,slot)=>slot===index?event.target.value:(current[slot]||'')))}><option value="">Ürün seçilmedi</option>{products.filter(product=>product.active).map(product=><option key={product.id} value={product.id} disabled={featuredProducts.some((selected,slot)=>slot!==index&&selected===product.id)}>{product.name}</option>)}{id&&!product?.active&&<option value={id}>Ürün artık aktif değil</option>}</select></label>{product&&(product.originalImage||product.variants[0]?.image)&&<img src={source(product.originalImage||product.variants[0].image)} alt={`${product.name} kapak önizlemesi`} />}</section>
-      })}</div><div className="save-row"><p aria-live="polite">{notice}</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div></section> : section === 'titanium' ? <section className="xinobi-editor" aria-label="Titanyum kaplama görseli yönetimi"><h2>Titanyum kaplamalı ürünler</h2><p>Bu sabit alan kategorilerin altında gösterilir. Yüklediğiniz tek fotoğraf sağdaki ürün alanında ve koyu gölgenin arkasında birlikte kullanılır.</p><div className="titanium-preview">{titaniumImage ? <img src={source(titaniumImage)} alt="Titanyum kaplama ürün görseli önizlemesi" /> : <p>Görsel kaldırıldı.</p>}</div><label>Titanyum kaplama görseli yükle<input type="file" accept="image/jpeg,image/png,image/webp" onChange={async event => {
+      })}</div><div className="save-row"><p aria-live="polite">{notice}</p><button onClick={saveContent}>Kaydet ve web’i güncelle</button></div></section> : section === 'titanium' ? <section className="xinobi-editor" aria-label="Titanyum kaplama görseli yönetimi"><h2>Titanyum kaplamalı ürünler</h2><label>Titanyum serisi katalog kategorisi<select value={titaniumCategory} onChange={e=>setTitaniumCategory(e.target.value)}><option value="">Seri kategorisi henüz belirlenmedi</option>{categories.map(name=><option key={name}>{name}</option>)}</select></label><p>Mağazadaki seri bağlantısı bu gerçek kategoriye gider. Kategori seçilmezse yanıltıcı seri bağlantısı gösterilmez.</p><p>Bu sabit alan kategorilerin altında gösterilir. Yüklediğiniz tek fotoğraf sağdaki ürün alanında ve koyu gölgenin arkasında birlikte kullanılır.</p><div className="titanium-preview">{titaniumImage ? <img src={source(titaniumImage)} alt="Titanyum kaplama ürün görseli önizlemesi" /> : <p>Görsel kaldırıldı.</p>}</div><label>Titanyum kaplama görseli yükle<input type="file" accept="image/jpeg,image/png,image/webp" onChange={async event => {
         const file = event.target.files?.[0]; if(!file) return
         try { setTitaniumImage(await uploadMedia(commerceApi, file));setNotice('Titanyum kaplama görseli eklendi; değişikliği kaydedin.');event.target.value='' }
         catch(error) {setNotice(error instanceof Error ? error.message : 'Görsel yüklenemedi.')}

@@ -54,6 +54,22 @@ public sealed class LocalCommerceTests : IDisposable
     }
 
     [Fact]
+    public async Task TitaniumCategoryMustExistAndSurvivesRestart()
+    {
+        string category;
+        using(var factory=CreateFactory())
+        using(var client=await TestStaff.Client(factory))
+        {
+            var state=(await client.GetFromJsonAsync<CommerceState>(Root+"/state"))!;
+            category=state.Categories![0];
+            Assert.Equal(HttpStatusCode.BadRequest,(await client.PutAsJsonAsync(Root+"/content",state.Content with { TitaniumCategory="Missing series" })).StatusCode);
+            (await client.PutAsJsonAsync(Root+"/content",state.Content with { TitaniumCategory=category })).EnsureSuccessStatusCode();
+        }
+        using var restarted=CreateFactory();using var second=await TestStaff.Client(restarted);
+        Assert.Equal(category,(await second.GetFromJsonAsync<CommerceState>(Root+"/state"))!.Content.TitaniumCategory);
+    }
+
+    [Fact]
     public async Task FeaturedProductsKeepOrderAndRejectDuplicatesAndUnknownProducts()
     {
         string[] selected;
@@ -83,7 +99,7 @@ public sealed class LocalCommerceTests : IDisposable
             category = state.Products[0].Category; target = state.Products[1].Category;
             expected = state.Products.Select(product => product.Category == category ? product with { Category = target } : product).ToArray();
             prices = state.Prices;
-            (await client.PutAsJsonAsync(Root + "/content", state.Content with { CategoryProducts = new() { [category] = state.Products[0].Variants[0].Id } })).EnsureSuccessStatusCode();
+            (await client.PutAsJsonAsync(Root + "/content", state.Content with { TitaniumCategory=category, CategoryProducts = new() { [category] = state.Products[0].Variants[0].Id } })).EnsureSuccessStatusCode();
             foreach(var destination in new[] { "", "?moveTo=" + Uri.EscapeDataString(category), "?moveTo=Unknown" })
                 Assert.Equal(HttpStatusCode.Conflict, (await client.DeleteAsync(Root + "/categories/" + Uri.EscapeDataString(category) + destination)).StatusCode);
             Assert.Contains(category, (await client.GetFromJsonAsync<CommerceState>(Root + "/state"))!.Categories!);
@@ -98,6 +114,7 @@ public sealed class LocalCommerceTests : IDisposable
         Assert.DoesNotContain(category, saved.Categories!);
         Assert.DoesNotContain("Boş kategori", saved.Categories!);
         Assert.False(saved.Content.CategoryProducts!.ContainsKey(category));
+        Assert.Null(saved.Content.TitaniumCategory);
         Assert.Equal(System.Text.Json.JsonSerializer.Serialize(expected), System.Text.Json.JsonSerializer.Serialize(saved.Products));
         Assert.Equal(prices, saved.Prices);
     }

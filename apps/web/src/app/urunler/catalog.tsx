@@ -21,7 +21,7 @@ export default function Catalog() {
   const categories = state ? ["Tümü", ...new Set((state.categories ?? state.products.map(product => product.category)).map(categoryLabel))] : fallbackCategories;
   const params=useSearchParams();
   const category=categoryLabel(params.get("category")||"Tümü");
-  function setCategory(value:string){const next=new URLSearchParams(params.toString());if(value==="Tümü")next.delete("category");else next.set("category",value);router.push("/urunler"+(next.size?"?"+next.toString():""),{scroll:false})}
+  function setCategory(value:string){const next=new URLSearchParams(params.toString());if(value==="Tümü")next.delete("category");else next.set("category",value);window.history.pushState(null,"",window.location.pathname+(next.size?"?"+next.toString():""))}
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState("featured");
   const router = useRouter();

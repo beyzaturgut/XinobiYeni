@@ -2,7 +2,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import {useEffect,useMemo,useState,type ReactNode} from 'react';
-import {useRouter,useSearchParams} from 'next/navigation';
+import {useSearchParams} from 'next/navigation';
 import {commerceApi,mediaUrl,money,stockText,useCommerce} from '../../lib/commerce';
 import {clearCompare,maxCompare,removeCompare,setCompare,toggleCompare,useCompare} from '../../lib/compare';
 import {stars,useReviewSummaries} from '../../lib/reviews';
@@ -16,11 +16,11 @@ const personalizable=(product:Product)=>product.personalizable===true;
 export default function Comparison(){
   const {state,error}=useCommerce();
   const ids=useCompare();
-  const params=useSearchParams(),router=useRouter();
+  const params=useSearchParams();
   const shared=params.get('urunler');
   const table=params.get('view')==='table'||Boolean(shared)&&params.get('view')!=='select';
   const [query,setQuery]=useState(''),[category,setCategory]=useState(''),[notice,setNotice]=useState('');
-  const show=(view:string)=>{const next=new URLSearchParams(params.toString());next.set('view',view);router.push('/karsilastir?'+next,{scroll:false})};
+  const show=(view:string)=>{const next=new URLSearchParams(params.toString());next.set('view',view);window.history.pushState(null,'',window.location.pathname+'?'+next)};
   // A shared link (?urunler=a,b) replaces the list once.
   useEffect(()=>{if(shared)setCompare(shared.split(',').filter(Boolean).slice(0,maxCompare))},[shared]);
   const [onlyDifferences,setOnlyDifferences]=useState(false);

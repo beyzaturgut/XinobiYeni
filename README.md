@@ -38,6 +38,14 @@ SQL sağlayıcı seçimi bağlantının, migration'ların veya servis erişimini
 
 Sunucuya özel yapılandırma `XINOBI_SERVER_SETTINGS` ile gösterilen dosyadan; Windows'ta varsayılan olarak `C:\XinobiData\config\appsettings.Server.json` üzerinden yüklenir. Bu dosya deploy edilen API klasörünün dışında tutulur. Ortam değişkenleriyle geçersiz kılınabilir. Gerçek ayar dosyaları, bağlantı parolaları, tokenlar, ticaret kayıtları ve yüklemeler Git'e eklenmez.
 
+Yerel katalog SQL'den okunurken yüklenmiş görseller yalnız canlı medya deposunda bulunabilir. Katalogdaki yolun dönmesi dosyanın yerelde bulunduğunu göstermez; medya GET isteği 404 döner. Aynı katalogdaki eksik herkese açık dosyaları mevcut dosyaların üzerine yazmadan indirmek için:
+
+```sh
+node tools/restore-local-media.mjs --origin http://109.104.120.91:8014 --state-url http://127.0.0.1:5003/api/v1/local-commerce/state
+```
+
+`--origin` erişilebilir gerçek yayın adresi olmalıdır. API yerine dosya kataloğu kullanılacaksa `--state` ile JSON yolu verilebilir; varsayılan `services/api/App_Data/local-commerce/state.json` dosyasıdır. Araç yalnız katalogda referans verilen medya dosyalarını yerel `media/` dizinine ekler; katalog/SQL kayıtlarını değiştirmez, kimlik bilgisi göndermez. Farklı dosya deposu kullanılıyorsa `--media` ile doğru dizin seçilmelidir. Medya Git'e eklenmez. Kontrol: `node --test tools/restore-local-media.test.mjs`.
+
 ## Hesaplar, yetkilendirme ve e-posta
 
 Web ve mobil ortak `/api/v1/auth` ve `/api/v1/me` sözleşmesini kullanır. Kayıt, e-posta kodu, giriş, yenileme, çıkış, profil, parola ve e-posta değiştirme, parola sıfırlama ve hesap silme uçları mevcuttur. Web oturumu HttpOnly cookie ve `X-Xinobi-Csrf` başlığıyla; mobil oturum dönen yenileme jetonuyla taşınır. Ayrıntılar [ADR-004](docs/decisions/ADR-004-oturum-barindirma-depolama.md) içindedir.

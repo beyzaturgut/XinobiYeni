@@ -91,7 +91,7 @@ function Editor({design,src,config:initial,variant:requested,target,feedback}:{d
  }
  const returnTo=target?'/sepet':initial?.favorite?'/favoriler':'/hesap/tasarimlarim';
  const actions=<div className={`${buttons.wrap} ${buttons.stacked}`}><div className={buttons.actions}>
-  <button className={`${buttons.button} ${target?buttons.primary:''}`} disabled={busy||!draft||!previewCanvas||missing||!product?.personalizable} onClick={()=>void save('save')}>{busy?'Kaydediliyor…':target?'Sepet satırını kaydet':'Yerleşimi kaydet'}</button>
+  <button className={`${buttons.button} ${target?buttons.primary:''}`} disabled={busy||!draft||!previewCanvas||missing||!product?.personalizable} onClick={()=>void save('save')}>{busy?'Kaydediliyor…':target?'Sepet satırını kaydet':'Tasarımımı kaydet'}</button>
   {!target&&<><button disabled={busy||!draft||!previewCanvas||!color||color.stock<=0||!product?.personalizable} className={`${buttons.button} ${buttons.primary}`} onClick={()=>void save('add')}>Bu tasarımla sepete ekle</button><button disabled={busy||!draft||!previewCanvas||!product?.personalizable} className={buttons.button} onClick={()=>void save('favorite')}>Yerleşimi favorilere kaydet</button></>}
  </div>{notice&&<p role="status" className={buttons.saved}>{notice} <Link href={feedback==='favorite'?'/favoriler':'/sepet'}>{feedback==='favorite'?'Favorilere git →':'Sepete git →'}</Link></p>}</div>;
  return <main className={flow.page} data-product-reference={design.productId} data-variant-reference={chosen}>

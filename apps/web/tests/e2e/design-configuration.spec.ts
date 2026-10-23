@@ -124,7 +124,7 @@ test('AI placement is saved directly from its chosen preview colour and can be f
  await page.getByRole('link',{name:'Favorilere git →'}).click();
  await page.getByRole('region',{name:'Kişisel tasarım favorileri'}).getByRole('link').click();
  await expect(page.locator('#pattern-x')).toHaveValue('63');
- await page.locator('#pattern-x').fill('77');await page.getByRole('button',{name:'Yerleşimi kaydet',exact:true}).click();
+ await page.locator('#pattern-x').fill('77');await page.getByRole('button',{name:'Tasarımımı kaydet',exact:true}).click();
  await expect(page.getByRole('status').filter({hasText:'Tasarım değişiklikleri kaydedildi.'})).toBeVisible();
  expect(f.current().placement.x).toBe(77);
  const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!));expect(rows[0].designPlacement.x).toBe(63);
@@ -234,7 +234,7 @@ test('favorite source and colour edits update the same favorite and survive a re
  await expect(page.locator('canvas[role=img]')).toBeVisible();
  await page.getByRole('button',{name:f.product.variants[1].color+' rengini seç',exact:true}).click();
  await replaceArtwork(page,'artwork');await page.locator('#pattern-x').fill('68');
- await page.getByRole('button',{name:'Yerleşimi kaydet',exact:true}).click();
+ await page.getByRole('button',{name:'Tasarımımı kaydet',exact:true}).click();
  await expect(page).toHaveURL(new RegExp('id='+'1'.repeat(32)));await expect(page.locator('#pattern-x')).toHaveValue('68');
  expect(f.current()).toMatchObject({id:configuration,designId:'1'.repeat(32),variantId:f.product.variants[1].id,favorite:true});expect(f.lastRequest().configurationId).toBe(configuration);
  await page.reload();await expect(page.locator('#pattern-x')).toHaveValue('68');

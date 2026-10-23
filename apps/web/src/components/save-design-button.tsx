@@ -56,7 +56,7 @@ function SaveForAccount({source,placement,stacked,previewCanvas}:{source:Source;
     <div className={styles.actions}>
       <button type="button" className={`${styles.button} ${styles.primary}`} disabled={busy||!state||Boolean(placement&&previewCanvas===null)} onClick={add}>{busy?'Hazırlanıyor…':placement?'Sepete ekle':'Üründe yerleştir ve sepete ekle'}</button>
       {placement&&<button type="button" className={styles.button} disabled={busy||previewCanvas===null} onClick={()=>run(async()=>{await save();if(!config.current)throw new Error('Yerleşim henüz hazır değil.');await setDesignConfigurationFavorite(config.current.id,true);config.current={...config.current,favorite:true};setAdded('Tasarım favorilerine kaydedildi.')})}>Favorilere ekle</button>}
-      <button type="button" className={styles.button} disabled={busy||Boolean(placement&&previewCanvas===null)} onClick={()=>run(async()=>{await save()})}>{design?'Yerleşimi kaydet':'Tasarımımı kaydet'}</button>
+      <button type="button" className={styles.button} disabled={busy||Boolean(placement&&previewCanvas===null)} onClick={()=>run(async()=>{await save()})}>Tasarımımı kaydet</button>
     </div>
     {added&&<p className={styles.saved} role="status">{added} <Link href={added.includes("favorilerine")?"/favoriler":"/sepet"}>{added.includes("favorilerine")?"Favorilere git →":"Sepete git →"}</Link></p>}
     {design&&!added&&<p className={styles.saved} role="status">Tasarım hesabına kaydedildi. <Link href="/hesap/tasarimlarim">Tasarımlarım →</Link></p>}

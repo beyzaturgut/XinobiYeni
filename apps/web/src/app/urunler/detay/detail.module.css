@@ -95,4 +95,18 @@
   .personalize a{width:100%;justify-content:center}
   .footer{flex-direction:column;gap:10px}
 }
+/* Short windows: the purchase column tightens so name, price, colours and buttons stay on one screen. */
+@media (min-width:761px) and (max-height:820px){
+  .page{padding-top:12px}
+  .breadcrumb{margin-bottom:10px}
+  .title{font-size:clamp(20px,2vw,26px)!important}
+  .price{margin-top:10px;font-size:22px}
+  .divider{margin:12px 0}
+  .colors legend{margin-bottom:6px}
+  .colors button{width:34px;height:34px}
+  .personalize{margin-top:10px;padding:12px 14px}
+  .personalize a{height:38px}
+  .accordion{margin-top:10px}
+  .accordion button{min-height:42px}
+}
 @media (prefers-reduced-motion:reduce){.stageShown{transition:none}}

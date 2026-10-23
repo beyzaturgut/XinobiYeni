@@ -9,3 +9,4 @@
 .stacked .button{height:42px;border-color:#111;border-radius:10px;font-size:15px;display:flex;align-items:center;justify-content:center;text-align:center}
 .stacked .primary{height:46px;font-size:15px}
 .stacked .saved,.stacked .note{margin:0}
+@media (min-width:761px) and (max-height:820px){.stacked .actions{grid-template-columns:1fr 1fr}.stacked .button,.stacked .primary{height:38px;padding:0 10px;font-size:14px}}

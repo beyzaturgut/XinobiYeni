@@ -131,3 +131,44 @@
   .canvasStage{height:min(110vw,440px)}
   .toolbar{padding:10px 12px}
 }
+
+/* Short windows: the upload and placement steps tighten like the method step. */
+@media (min-width:761px) and (max-height:820px){
+  .kinds{margin-top:10px}
+  .kinds button{min-height:32px}
+  .drop{margin-top:10px;padding:16px;gap:6px}
+  .dropIcon{width:38px;height:38px}
+  .dropIcon svg{width:18px;height:18px}
+  .drop .dropTitle{font-size:15px}
+  .drop p{font-size:13px}
+  .pick,.sample{height:38px}
+  .fileCard{margin-top:10px;padding:10px}
+  .fileCard>img{width:64px;height:64px}
+  .chips{margin-top:8px}
+  .privacy{margin-top:8px;padding:8px 12px}
+  .uploadActions{margin-top:12px}
+  .productImage{height:140px}
+  .productText{padding:10px 14px;gap:2px}
+  .tips{padding:10px 14px}
+  .tips ul{gap:2px;font-size:12px}
+  .placementHead{margin:-6px 0 8px}
+  .placementHead .placementTitle{font-size:clamp(20px,2vw,24px)!important}
+  .toolbar{padding:4px 10px}
+  .canvasStage{height:clamp(300px,calc(100svh - 250px),560px)}
+  .canvasNotes{padding:6px 12px}
+  .settings{gap:8px}
+  .colours{padding:6px 12px 10px}
+  .colours button{width:30px;height:30px}
+  .fileSummary{padding:8px 10px}
+  .placementPanel{padding:8px 12px}
+  .quick{margin-bottom:6px}
+  .quick button{height:30px}
+  .sliders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 14px}
+  .sliders input{height:18px}
+  .sliders label{font-size:12px}
+  .checkout{padding:10px 12px;gap:6px}
+}
+/* Very short windows: "Görseli değiştir" above already reaches the file, so its summary card gives way to the cart. */
+@media (min-width:761px) and (max-height:620px){
+  .fileSummary{display:none}
+}

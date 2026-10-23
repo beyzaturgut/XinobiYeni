@@ -51,8 +51,8 @@ export default function PersonalizableProducts() {
     <section className={styles.intro}>
       <p className={styles.kicker}>XINOBI U · Sana özel</p>
       <h1>Bir ürün.<br />Binlerce olasılık.</h1>
-      <p>Önce ürününü seç. Sonra rengini seçip Tarzını Keşfet sorularıyla tasarımını bul veya kendi görselini kullan.</p>
-      <div className={styles.steps}><span>01 · Ürününüzü seçin</span><span>02 · Rengini seçin</span><span>03 · Tarzınızı keşfedin</span></div>
+      <p>Önce ürününü seç. Sonra tasarım yöntemini seç; rengini ve yerleşimi önizleme üzerinde ayarla.</p>
+      <div className={styles.steps}><span>01 · Ürününü seç</span><span>02 · Yöntemini seç</span><span>03 · Yükle</span><span>04 · Önizle ve yerleştir</span></div>
     </section>
     {(error || favorites.error || favoriteError) && <p className={styles.error} role="alert">{error || favorites.error || favoriteError}</p>}
     {!state ? <p role="status">Ürünler hazırlanıyor…</p> : products.length === 0 ? <p>Şu anda kişiselleştirmeye açık bir ürün bulunmuyor.</p> : <section className={catalogStyles.grid} aria-label="Kişiselleştirilebilir ürünler">

@@ -23,7 +23,7 @@ test("method step keeps the questionnaire identity on a colour with an accepted 
   await page.goto("/xinobi-u/renk/?product=DEMO-P101&variant="+requested);
   await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-preview-readiness","ready");
   await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-variant-reference","DEMO-V101-B");
-  await page.getByRole("radio",{name:/Sorularla tasarla/}).check({force:true});
+  const ask=page.getByRole("radio",{name:/Sorularla tasarla/});await ask.dispatchEvent("click");await expect(ask).toBeChecked();
   await expect(page.getByRole("link",{name:"Sorulara başla →"})).toHaveAttribute("href","/xinobi-u/sorular/?product=DEMO-P101&variant=DEMO-V101-B");
  }
  await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);

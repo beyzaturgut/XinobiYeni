@@ -4,7 +4,7 @@ import {mockStore} from './fixtures';
 import type {MyDesignConfiguration} from '../../src/lib/demo-commerce';
 const image=readFileSync('public/assets/personalization/sample-pattern.png');
 const sha='a'.repeat(64),sourceSha='b'.repeat(64),id='d'.repeat(32),configuration='c'.repeat(32);
-async function fixture(page:import('@playwright/test').Page,{empty=false,kind='upload',signedIn=true,storedPreview=false,name='Test placement'}:{name?:string;empty?:boolean;kind?:'ai'|'upload';signedIn?:boolean;storedPreview?:boolean}={}){
+async function fixture(page:import('@playwright/test').Page,{empty=false,kind='upload',signedIn=true,storedPreview=false,name='Test placement',colours=false}:{colours?:boolean;name?:string;empty?:boolean;kind?:'ai'|'upload';signedIn?:boolean;storedPreview?:boolean}={}){
  const {state}=await mockStore(page,{signedIn});
  // Consent is a non-persistent prototype. Dismiss it on every route, as a shopper can,
  // rather than letting the bottom banner intercept placement/cart actions.
@@ -13,18 +13,32 @@ async function fixture(page:import('@playwright/test').Page,{empty=false,kind='u
  await page.route('**/assets/personalization/sample-pattern.png*',route=>route.fulfill({body:flat,contentType:'image/png'}));const product=state.products[0],variant=product.variants[0];product.personalizable=true;
  const mask=Buffer.from(await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=100;const context=canvas.getContext('2d')!;context.fillRect(10,10,80,80);return canvas.toDataURL().split(',')[1]}),'base64');
  const original:MyDesignConfiguration={id:configuration,designId:id,productId:product.id,variantId:variant.id,revision:1,schemaVersion:1,placement:{sourceWidth:100,sourceHeight:100,surfaceVersion:sha,x:25,y:35,scale:1,rotation:0,curvatureStrength:.5,mode:'artwork'},favorite:true,sourceSha256:sourceSha,createdAt:new Date().toISOString()};
- let current={...original};let saves=0,previews=0;let lastRequest:Record<string,unknown>={};const thumbnails=new Map<string,Buffer>();
+ let current={...original};let saves=0,previews=0,uploads=0;let lastRequest:Record<string,unknown>={};const thumbnails=new Map<string,Buffer>();
  const design={id,kind,name,productId:product.id,productName:product.name,variantId:variant.id,color:variant.color,profile:[],imageUrl:'/api/v1/me/designs/'+id+'/image',createdAt:original.createdAt};
- await page.route(/\/api\/v1\/me\/designs(?:\/|$)/,async route=>{const url=new URL(route.request().url());if(url.pathname.endsWith('/image'))return route.fulfill({body:image,contentType:'image/png'});if(url.pathname.endsWith('/configurations')){const body=route.request().postDataJSON();lastRequest=body;saves++;current={...current,placement:body.placement,revision:current.revision+1,favorite:body.favorite};return route.fulfill({json:current})}return route.fulfill({json:route.request().method()==='POST'?design:[design]})});
- await page.route(/\/api\/v1\/me\/design-configurations(?:\/|$)/,route=>{const path=new URL(route.request().url()).pathname;if(path.endsWith('/preview')){if(route.request().method()==='PUT'){previews++;const bytes=route.request().postDataBuffer()!;thumbnails.set(path,bytes.subarray(bytes.indexOf('\r\n\r\n')+4,bytes.lastIndexOf('\r\n--')));return route.fulfill({status:204})}const thumbnail=thumbnails.get(path);return storedPreview&&thumbnail?route.fulfill({body:thumbnail,contentType:'image/jpeg'}):route.fulfill({status:204})}if(path.endsWith('/favorite')){current={...current,favorite:route.request().postDataJSON().favorite};return route.fulfill({status:204})}return route.fulfill({json:path.includes('/revisions/1')?original:path.includes('/revisions/')?current:[current]})});
- await page.route('**/api/v1/dev/product-surfaces/commerce-mask/**/rendering-inputs',route=>route.fulfill({json:{scope:'development-preview',productReference:product.id,variantReference:variant.id,previewAvailable:true,inputs:{width:100,height:100,surfaceVersion:sha,sourceMediaVersion:sourceSha,brandingRequired:false,branding:null,source:{url:'/assets/personalization/sample-pattern.png?v='+sourceSha,sha256:sourceSha},mask:{url:'/api/v1/local-commerce/media/'+'f'.repeat(32)+'.png?v='+sha,sha256:sha}}}}));
+ const designs=[design],assets=new Map<string,Buffer>([[id,image]]),revisions=[original];
+ await page.route(/\/api\/v1\/me\/designs(?:\/|$)/,async route=>{
+  const request=route.request(),path=new URL(request.url()).pathname;
+  if(path.endsWith('/image'))return route.fulfill({body:assets.get(path.split('/').at(-2)!)??image,contentType:'image/png'});
+  if(path.endsWith('/upload')){
+   uploads++;const bytes=request.postDataBuffer()!,source=bytes.subarray(bytes.indexOf('\r\n\r\n')+4,bytes.indexOf('\r\n--',bytes.indexOf('\r\n\r\n')+4));
+   const value={...design,id:String(uploads).repeat(32),imageUrl:'/api/v1/me/designs/'+String(uploads).repeat(32)+'/image'};designs.push(value);assets.set(value.id,source);return route.fulfill({json:value,status:201});
+  }
+  if(path.endsWith('/configurations')){const body=request.postDataJSON();lastRequest=body;saves++;current={...current,designId:path.split('/').at(-2)!,variantId:body.variantId,placement:body.placement,revision:current.revision+1,favorite:body.favorite};revisions.push(current);return route.fulfill({json:current})}
+  return route.fulfill({json:request.method()==='POST'?design:designs});
+ });
+ await page.route(/\/api\/v1\/me\/design-configurations(?:\/|$)/,route=>{const path=new URL(route.request().url()).pathname;if(path.endsWith('/preview')){if(route.request().method()==='PUT'){previews++;const bytes=route.request().postDataBuffer()!;thumbnails.set(path,bytes.subarray(bytes.indexOf('\r\n\r\n')+4,bytes.lastIndexOf('\r\n--')));return route.fulfill({status:204})}const thumbnail=thumbnails.get(path);return storedPreview&&thumbnail?route.fulfill({body:thumbnail,contentType:'image/jpeg'}):route.fulfill({status:204})}if(path.endsWith('/favorite')){current={...current,favorite:route.request().postDataJSON().favorite};return route.fulfill({status:204})}return route.fulfill({json:path.includes('/revisions/')?revisions.find(value=>value.revision===Number(path.split('/').at(-1))):[current]})});
+ await page.route('**/api/v1/dev/product-surfaces/commerce-mask/**/rendering-inputs',route=>{
+  const requested=new URL(route.request().url()).pathname.split('/').at(-2)!;
+  const available=requested===variant.id||colours&&requested===product.variants[1].id;
+  return route.fulfill({json:{scope:'development-preview',productReference:product.id,variantReference:requested,previewAvailable:available,inputs:available?{width:100,height:100,surfaceVersion:sha,sourceMediaVersion:sourceSha,brandingRequired:false,branding:null,source:{url:'/assets/personalization/sample-pattern.png?v='+sourceSha,sha256:sourceSha},mask:{url:'/api/v1/local-commerce/media/'+'f'.repeat(32)+'.png?v='+sha,sha256:sha}}:null}});
+ });
  await page.route('**/api/v1/local-commerce/media/**',route=>route.fulfill({body:mask,contentType:'image/png'}));
  const row={productId:product.id,variantId:variant.id,quantity:2,designId:id,designName:design.name,designPlacement:original.placement,configurationId:configuration,configurationRevision:1};
  const other={...row,configurationId:'e'.repeat(32),quantity:1};
  await page.addInitScript(rows=>{if(!localStorage.getItem('xinobi-cart-v1'))localStorage.setItem('xinobi-cart-v1',JSON.stringify(rows))},empty?[]:[row,other]);
  const target=[row.productId,row.variantId,id,configuration,'1'].join(':');
  const url='/hesap/tasarimlarim/onizleme?'+new URLSearchParams({id,variant:variant.id,configuration,revision:'1',line:target});
- return {url,product,variant,design,current:()=>current,saves:()=>saves,previews:()=>previews,thumbnails,lastRequest:()=>lastRequest};
+ return {url,product,variant,design,current:()=>current,saves:()=>saves,previews:()=>previews,uploads:()=>uploads,thumbnails,lastRequest:()=>lastRequest};
 }
 
 test('editing one personalized cart line preserves quantity, other rows and server revision',async({page})=>{
@@ -45,11 +59,11 @@ test('cancel and removed target never silently rewrite the cart',async({page})=>
  await expect(page.getByRole('button',{name:'Sepet satırını kaydet',exact:true})).toBeDisabled();expect(f.saves()).toBe(0);
 });
 test('personalized favorites reopen the saved variant and placement',async({page})=>{
- await fixture(page);await page.goto('/favoriler');
+ const f=await fixture(page);await page.goto('/favoriler');
  const favorite=page.getByRole('region',{name:'Kişisel tasarım favorileri'});
  await favorite.getByRole('link',{name:/Test placement/}).click();
  await expect(page.locator('#pattern-x')).toHaveValue('25');
- await expect(page.getByRole('combobox',{name:'Renk',exact:true})).toHaveValue('DEMO-V101-B');
+ await expect(page.getByRole('button',{name:f.variant.color+' rengini seç',exact:true})).toHaveAttribute('aria-pressed','true');
 });
 
 
@@ -111,7 +125,7 @@ test('AI placement is saved directly from its chosen preview colour and can be f
  await page.getByRole('region',{name:'Kişisel tasarım favorileri'}).getByRole('link').click();
  await expect(page.locator('#pattern-x')).toHaveValue('63');
  await page.locator('#pattern-x').fill('77');await page.getByRole('button',{name:'Yerleşimi kaydet',exact:true}).click();
- await expect(page.getByRole('status').filter({hasText:'Yerleşim kaydedildi.'})).toBeVisible();
+ await expect(page.getByRole('status').filter({hasText:'Tasarım değişiklikleri kaydedildi.'})).toBeVisible();
  expect(f.current().placement.x).toBe(77);
  const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!));expect(rows[0].designPlacement.x).toBe(63);
 });
@@ -187,4 +201,55 @@ test('expired private cart images refresh the cookie session once and retry both
  await expect(page.locator('article img')).toHaveCount(2);
  await expect(page.locator('article img').first()).toBeVisible();await expect(page.locator('article img').last()).toBeVisible();
  expect(seen.size).toBe(2);expect(refreshes).toBe(1);
+});
+
+async function replaceArtwork(page:import('@playwright/test').Page,mode:'artwork'|'pattern'){
+ await page.getByRole('link',{name:'Değiştir',exact:true}).click();
+ await expect(page.getByRole('group',{name:'Yükleme türü'})).toBeVisible();
+ await page.getByRole('button',{name:mode==='pattern'?'Desen':'Görsel',exact:true}).click();
+ const buffer=Buffer.from(await page.evaluate(()=>{const canvas=document.createElement('canvas');canvas.width=canvas.height=80;const context=canvas.getContext('2d')!;context.fillStyle='#20ce67';context.fillRect(0,0,80,80);return canvas.toDataURL().split(',')[1]}),'base64');
+ await page.locator('input[type=file]').setInputFiles({name:'replacement.png',mimeType:'image/png',buffer});
+ await page.getByRole('button',{name:'Önizlemeye geç →',exact:true}).click();
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+}
+
+test('cart reediting changes colour and replaces the image with a pattern while preserving other rows and quantity',async({page})=>{
+ const f=await fixture(page,{colours:true});await page.goto(f.url);
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await page.getByRole('button',{name:f.product.variants[1].color+' rengini seç',exact:true}).click();
+ await replaceArtwork(page,'pattern');
+ await page.locator('#pattern-x').fill('62');
+ await page.getByRole('button',{name:'Sepet satırını kaydet',exact:true}).click();await expect(page).toHaveURL(/\/sepet\/?$/);
+ const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!));
+ expect(rows[0]).toMatchObject({quantity:2,variantId:f.product.variants[1].id,designId:'1'.repeat(32),designPlacement:{x:62,mode:'pattern',fillMask:true}});
+ expect(rows[1]).toMatchObject({quantity:1,variantId:f.variant.id,designId:id,configurationRevision:1});expect(f.uploads()).toBe(1);
+ await page.locator('article').first().getByRole('link').click();await expect(page.locator('#pattern-x')).toHaveValue('62');
+ await expect(page.getByRole('button',{name:f.product.variants[1].color+' rengini seç',exact:true})).toHaveAttribute('aria-pressed','true');
+ await expect(page.getByRole('link',{name:'Değiştir',exact:true})).toBeVisible();
+});
+
+test('favorite source and colour edits update the same favorite and survive a refresh',async({page})=>{
+ const f=await fixture(page,{colours:true});await page.goto('/favoriler');
+ await page.getByRole('region',{name:'Kişisel tasarım favorileri'}).getByRole('link').click();
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await page.getByRole('button',{name:f.product.variants[1].color+' rengini seç',exact:true}).click();
+ await replaceArtwork(page,'artwork');await page.locator('#pattern-x').fill('68');
+ await page.getByRole('button',{name:'Yerleşimi kaydet',exact:true}).click();
+ await expect(page).toHaveURL(new RegExp('id='+'1'.repeat(32)));await expect(page.locator('#pattern-x')).toHaveValue('68');
+ expect(f.current()).toMatchObject({id:configuration,designId:'1'.repeat(32),variantId:f.product.variants[1].id,favorite:true});expect(f.lastRequest().configurationId).toBe(configuration);
+ await page.reload();await expect(page.locator('#pattern-x')).toHaveValue('68');
+ await expect(page.getByRole('button',{name:f.product.variants[1].color+' rengini seç',exact:true})).toHaveAttribute('aria-pressed','true');
+ const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!));expect(rows[0].designId).toBe(id);expect(rows[0].variantId).toBe(f.variant.id);
+});
+
+test('cancelling a replacement leaves the cart unchanged and new-colour stock checks preserve the old line',async({page})=>{
+ const f=await fixture(page,{colours:true});f.product.variants[1].stock=1;
+ await page.goto(f.url);await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await replaceArtwork(page,'pattern');await page.getByRole('link',{name:'İptal',exact:true}).click();await expect(page).toHaveURL(/\/sepet\/?$/);
+ expect(f.uploads()).toBe(0);expect(f.saves()).toBe(0);
+ await page.goto(f.url);await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await page.getByRole('button',{name:f.product.variants[1].color+' rengini seç',exact:true}).click();
+ await page.getByRole('button',{name:'Sepet satırını kaydet',exact:true}).click();
+ await expect(page.getByRole('alert').filter({hasText:'stok yok'})).toBeVisible();
+ const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!));expect(rows[0].variantId).toBe(f.variant.id);expect(rows[0].quantity).toBe(2);
 });

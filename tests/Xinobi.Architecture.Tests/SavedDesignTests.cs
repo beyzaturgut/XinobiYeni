@@ -72,6 +72,44 @@ public sealed class SavedDesignTests : IDisposable
     }
 
     [Fact]
+    public async Task ConfigurationCanReplaceColourAndSourceWithoutRewritingOldRevisions()
+    {
+        using var factory = Factory();
+        var store = factory.Services.GetRequiredService<SavedDesignStore>();
+        var original = await store.Add("owner", "upload", "Original", "P1", "Product", "blue", "Blue", [], Png);
+        var replacement = await store.Add("owner", "upload", "Replacement", "P1", "Product", "red", "Red", [], [.. Png, 0]);
+        var placement = new DesignPlacement(100, 100, new string('a', 64), 50, 50, 1, 0, .5, Mode: "artwork");
+        var first = await store.SaveConfiguration("owner", original.Id, new("blue", placement, Favorite: true));
+        var next = await store.SaveConfiguration("owner", replacement.Id, new("red", placement with { X = 65 }, first.Id, 1, true));
+        Assert.Equal((first.Id, 2, replacement.Id, "red", true), (next.Id, next.Revision, next.DesignId, next.VariantId, next.Favorite));
+        Assert.NotEqual(first.SourceSha256, next.SourceSha256);
+        Assert.Equal(first, await store.Configuration("owner", first.Id, 1));
+        var otherProduct = await store.Add("owner", "upload", "Other", "P2", "Other product", "red", "Red", [], Png);
+        Assert.Equal("configuration_changed", (await Assert.ThrowsAsync<ProblemException>(() => store.SaveConfiguration("owner", otherProduct.Id, new("red", placement, first.Id, 2)))).Code);
+        Assert.Equal("configuration_changed", (await Assert.ThrowsAsync<ProblemException>(() => store.SaveConfiguration("owner", original.Id, new("blue", placement, first.Id, 1)))).Code);
+        Assert.Equal("design_not_found", (await Assert.ThrowsAsync<ProblemException>(() => store.SaveConfiguration("other", replacement.Id, new("red", placement, first.Id, 2)))).Code);
+        await store.SavePreview("owner", first.Id, 1, [255, 216, 255, 217]);
+        await store.SavePreview("owner", next.Id, 2, [255, 216, 255, 217]);
+        // Removing the old upload leaves the replacement and its current favorite intact.
+        Assert.True(await store.Delete("owner", original.Id));
+        Assert.Equal(next, Assert.Single(await store.Configurations("owner")));
+        Assert.NotNull(await store.Find("owner", replacement.Id));
+        // Removing the current source retires its lineage, so an older favorite cannot reappear.
+        Assert.True(await store.Delete("owner", replacement.Id));
+        Assert.Empty(await store.Configurations("owner"));
+        Assert.Empty(Directory.GetFiles(directory, "preview-*.jpg", SearchOption.AllDirectories));
+
+        var remaining = await store.Add("owner", "upload", "Remaining", "P1", "Product", "blue", "Blue", [], Png);
+        var latest = await store.SaveConfiguration("owner", remaining.Id, new("blue", placement, Favorite: true));
+        var final = await store.Add("owner", "upload", "Final", "P1", "Product", "red", "Red", [], Png);
+        await store.SaveConfiguration("owner", final.Id, new("red", placement, latest.Id, 1, true));
+        await store.Delete("owner", final.Id);
+        Assert.Empty(await store.Configurations("owner"));
+        await Assert.ThrowsAsync<ProblemException>(() => store.Configuration("owner", latest.Id, 1));
+        Assert.NotNull(await store.Find("owner", remaining.Id));
+    }
+
+    [Fact]
     public void GeneratedDesignNamesFitTheCartWithoutRejectingTheDesign()
     {
         Assert.Equal(60, SavedDesignStore.CleanName(null, new string('a', 90)).Length);

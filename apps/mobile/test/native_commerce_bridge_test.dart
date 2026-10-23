@@ -57,6 +57,20 @@ void main(){
   final stored=parseCart((await SharedPreferences.getInstance()).getString(cartStorageKey));
   expect(stored.single.configurationRevision,2);expect(stored.single.configurationPlacement!['rotation'],30);
  });
+ test('editing a source and colour from the shared preview preserves native cart quantities and other designs',() async {
+  final container=ProviderContainer();addTearDown(container.dispose);
+  await container.read(cartProvider.notifier).ready;
+  final configuration=List.filled(32,'c').join(),design=List.filled(32,'d').join();
+  final row={'productId':'P1','variantId':'blue','quantity':2,'designId':design,'designName':'Desen','configurationId':configuration,'configurationRevision':1,'designPlacement':{'sourceWidth':100,'sourceHeight':100,'surfaceVersion':List.filled(64,'a').join(),'x':60,'y':50,'scale':1,'rotation':0,'curvatureStrength':.5,'mode':'pattern','fillMask':true}};
+  final other={...row,'configurationId':List.filled(32,'e').join(),'quantity':1};
+  final bridge=container.read(nativeCommerceBridgeProvider);
+  await bridge.handle(jsonEncode({'id':'add','action':'cart.write','payload':{'previous':[],'rows':[row,other]}}));
+  final changed={...row,'variantId':'red','designId':List.filled(32,'f').join(),'configurationRevision':2};
+  final result=await bridge.handle(jsonEncode({'id':'edit','action':'cart.write','payload':{'previous':[row,other],'rows':[changed,other]}}));
+  expect(result['status'],204);
+  final stored=parseCart((await SharedPreferences.getInstance()).getString(cartStorageKey));
+  expect(stored.map((line)=>line.toJson()).toList(),[changed,other]);
+ });
  test('saved design links encode the exact cart row and revision on the configured preview origin',(){
   final uri=xinobiSavedDesignUri(designId:List.filled(32,'d').join(),configurationId:List.filled(32,'c').join(),revision:3,variantId:'V1',line:'P1:V1:design:config:3',override:'https://shop.example.test/untrusted?token=never');
   expect(uri!.origin,'https://shop.example.test');expect(uri.path,'/hesap/tasarimlarim/onizleme/');expect(uri.queryParameters['line'],'P1:V1:design:config:3');expect(uri.queryParameters['revision'],'3');expect(uri.queryParameters.containsKey('token'),false);

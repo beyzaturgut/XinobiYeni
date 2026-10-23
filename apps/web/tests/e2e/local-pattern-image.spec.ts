@@ -83,7 +83,7 @@ test('changing the artwork replaces it; removal releases the URL and does not im
  await expect(page.getByText('replacement.jpg',{exact:true})).toBeVisible();
  // T17 removes the nonfunctional properties/save panel only from XINOBI U.
  await expect(page.getByRole('button',{name:'Kalıcı kaydetme henüz kullanılamıyor'})).toHaveCount(0);
- await expect(page.locator('#local-image-help')).toContainText('Tasarımımı kaydet dersen hesabına yüklenir');
+ await expect(page.locator('#local-image-help')).toContainText('Kaydettiğinde, sepete veya favorilere eklediğinde hesabına yüklenir');
  await page.getByRole('button',{name:'Görseli kaldır',exact:true}).click();
  await expect(page.locator('main img[alt^="Yüklenen"]')).toHaveCount(0);
  expect(await page.evaluate(()=>window.localPatternUrls.revoked.length)).toBe(2);

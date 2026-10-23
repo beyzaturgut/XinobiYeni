@@ -18,7 +18,7 @@ const validHex=(hex?:string|null)=>Boolean(hex&&/^#[a-fA-F0-9]{6}$/.test(hex));
 const signed=(value:number,unit:string)=>(value>0?'+':'')+value+' '+unit;
 
 /** Step 4: the uploaded image on the selected colour's accepted surface, with the placement controls of the design. */
-export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription}:{product:Product;variants:Variant[];surfaces:Record<string,RenderingInputs>;active:Variant;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
+export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription,canChange=false}:{product:Product;variants:Variant[];surfaces:Record<string,RenderingInputs>;active:Variant;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;canChange?:boolean;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
  const inputs=surfaces[active.id];
  const fillMask=initialPlacement?.fillMask??cover??mode==='pattern';
  const renderKey=JSON.stringify([inputs.source.url,inputs.mask.url,patternUrl,mode,fillMask]);
@@ -102,7 +102,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
     {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
     <img src={patternUrl} alt={mode==='pattern'?'Yüklenen desen':'Yüklenen görsel'}/>
     <div><p>{source.name}</p><p>{sourceDescription??(source.size?fileMeta(source):'Kayıtlı tasarım')}</p></div>
-    {file&&<Link href={changeHref} onClick={event=>{event.preventDefault();onChange()}}>Değiştir</Link>}
+    {(file||canChange)&&<Link href={changeHref} onClick={event=>{event.preventDefault();onChange()}}>Değiştir</Link>}
    </div>
    <section className={styles.placementPanel} aria-labelledby="pattern-controls-title">
     <div className={styles.placementPanelHead}><p id="pattern-controls-title">Yerleşim</p><button type="button" onClick={()=>change('',origin,DEFAULT_CURVATURE_STRENGTH)}>Sıfırla</button></div>

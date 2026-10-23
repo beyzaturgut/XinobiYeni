@@ -9,6 +9,8 @@ Görsel, desen ve AI sonuçları aynı hesap tasarımı + sürümlü ürün/renk
 - Sepet/favori görseli ham desen yerine ürünle birleşik JPEG önizlemesidir. Her yerleşim revizyonunun hesabına özel, ayrı bir küçük önizleme dosyası vardır. Eski kayıtlarda dosya yoksa mevcut renderer/ham tasarım yedeği kullanılır. Bu görseller üretim veya baskı onayı değildir.
 - Sepet görseli tam satır anahtarı ve kayıtlı revizyonla editöre gider. Düzenlemeyi kaydetmek yalnız seçili satırı değiştirir, adet ve diğer satırlar korunur. Sepet düzenlemesi yeni yerleşim kimliği üretir; daha sonra değişmiş bir favori revizyonuyla çatışmaz. İptal veya kaldırılmış satır eski sepeti yeniden oluşturmaz.
 - Favori görseli aynı ürün, renk ve kayıtlı yerleşimi editörde açar. Favoriyi düzenlemek sepete daha önce eklenmiş ayrı revizyonu değiştirmez.
+- Yeniden açılan editörde onaylı renkler değiştirilebilir. “Değiştir” aynı görsel/desen yükleme adımını açar; yeni dosya, tür seçimi ve önizleme kontrolleri ilk tasarımla ortaktır. Yeni dosya yalnız kaydederken yüklenir. Favori düzenlemesi aynı yerleşim kimliğinin yeni sürümünü oluşturur; renk ve kaynak değişse de yenileme son kaydı açar. Sepet düzenlemesi yalnız seçili satırın rengini ve tasarımını değiştirir; yeni rengin toplam stok kontrolünde hata olursa eski satır korunur.
+- Eski kaynak silindiğinde yeni kaynağı kullanan güncel favori korunur. Güncel kaynak silindiğinde yerleşimin bütün eski sürümleri kaldırılır; eski favori yeniden görünmez. Sipariş snapshot’ları bağımsızdır.
 
 ## Mobil bağlantısı
 
@@ -28,8 +30,12 @@ Güncel API ve web birlikte yayınlanmalı; mobil uygulama da yeni köprü koduy
 
 ## Kontroller
 
-- Tam web uçtan uca koşusu: 174 başarılı, ortam verisine bağlı 1 atlama. Görsel/desen/AI ekleme, ürünle birleşik önizleme, sepet/favoriden yeniden açma, revizyonlar, adet/diğer satırların korunması, girişte dosyanın kalması, uzun tasarım adı, tek cookie yenilemesi, gömülü uygulama sepeti ve 390/1440 px düzenleme ekranları kapsanır.
-- Tam API testleri: 476 başarılı, SQL/özel ortam gerektiren 29 atlama. Yeni küçük önizleme için sahiplik, oturumsuz erişim, revizyon ayrımı, silme temizliği ve eski sipariş snapshot'ının korunması doğrulanır. Uzun varsayılan ad ve Unicode sınırı testlidir.
-- Flutter: 66 test başarılı; `flutter analyze --no-pub` temiz. Native oturum yenilemesi, WebView'e token verilmemesi, izin verilmeyen proxy yolu, sepet revizyon/yerleşim/adet round-trip'i, eşzamanlı değişiklik reddi ve editör bağlantısı kapsanır.
+- Web uçtan uca kontrolleri: tam koşuda 176 başarılı, ortam verisine bağlı 1 atlama; güncellenen yükleme açıklamasının eski metin beklentisi düzeltildikten sonra ilgili 26 test yeniden başarılı. Böylece 177 farklı senaryo doğrulandı. Görsel/desen/AI ekleme, ürünle birleşik önizleme, sepet/favoriden yeniden açma, revizyonlar, adet/diğer satırların korunması, girişte dosyanın kalması, uzun tasarım adı, tek cookie yenilemesi, gömülü uygulama sepeti ve 390/1440 px düzenleme ekranları kapsanır.
+- Tam API testleri: 477 başarılı, SQL/özel ortam gerektiren 29 atlama. Yeni küçük önizleme için sahiplik, oturumsuz erişim, revizyon ayrımı, silme temizliği ve eski sipariş snapshot'ının korunması doğrulanır. Uzun varsayılan ad ve Unicode sınırı testlidir.
+- Flutter: 67 test başarılı; `flutter analyze --no-pub` temiz. Native oturum yenilemesi, WebView'e token verilmemesi, izin verilmeyen proxy yolu, sepet revizyon/yerleşim/adet round-trip'i, eşzamanlı değişiklik reddi ve editör bağlantısı kapsanır.
 - `pnpm lint` ve web `tsc --noEmit` başarılı; mevcut admin uyarıları hata değildir. Üretilen sözleşmeler 95 operasyon / 122 Dart part dosyası kontrolünden geçti.
 - Yerel standart başlatıcıyla web (3000), admin (5173), API (5003) yenilendi. Canlı API/web yayını veya cihazda yeni APK/iOS kurulumu yapılmadı. Fiziksel cihaz testi bu oturumda yapılmadı.
+
+## Yeniden düzenleme doğrulaması
+
+Renk + görsel/desen değiştirme, iptal, yeni rengin yetersiz stoku, aynı favorinin yeni kaynakla güncellenmesi ve sayfa yenilemesi tarayıcı testleriyle doğrulanır. API testi kaynak/renk sürümlerini, eski revizyonun değişmezliğini, sahipliği ve kaynak silme temizliğini; Flutter köprü testi yeni kaynak/rengin adet ve diğer satırlarla birlikte kalıcı yazılmasını kapsar.

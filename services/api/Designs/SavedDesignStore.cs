@@ -132,15 +132,24 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
 
     public async Task<bool> Delete(string accountId, string id)
     {
-        await DeletePreviews(accountId, id);
-        var design = await store.Update(state =>
+        var removed = await store.Update(state =>
         {
-            var found = state.Designs.FirstOrDefault(item => item.Id == id && item.AccountId == accountId);
-            if (found is not null) { state.Designs.Remove(found); state.Configurations.RemoveAll(item => item.AccountId == accountId && item.Value.DesignId == id); }
-            return found;
+            var design = state.Designs.FirstOrDefault(item => item.Id == id && item.AccountId == accountId);
+            // Deleting the latest source retires its whole configuration, so an
+            // older favorite cannot reappear and revision numbers are not reused.
+            var retired = state.Configurations.Where(item => item.AccountId == accountId).GroupBy(item => item.Value.Id)
+                .Where(group => group.MaxBy(item => item.Value.Revision)!.Value.DesignId == id).Select(group => group.Key).ToHashSet();
+            var configurations = state.Configurations.Where(item => item.AccountId == accountId && (item.Value.DesignId == id || retired.Contains(item.Value.Id))).ToArray();
+            if (design is not null)
+            {
+                state.Designs.Remove(design);
+                foreach (var configuration in configurations) state.Configurations.Remove(configuration);
+            }
+            return (Design: design, Previews: configurations.Select(item => item.Value).ToArray());
         });
-        if (design is null) return false;
-        await files.Delete(FileAreas.Designs, design.File);
+        if (removed.Design is null) return false;
+        await DeletePreviews(removed.Previews);
+        await files.Delete(FileAreas.Designs, removed.Design.File);
         return true;
     }
 
@@ -173,14 +182,15 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
 
     public async Task ForgetAccount(string accountId)
     {
-        await DeletePreviews(accountId);
         var removed = await store.Update(state =>
         {
             var mine = state.Designs.Where(item => item.AccountId == accountId).ToArray();
+            var previews = state.Configurations.Where(item => item.AccountId == accountId).Select(item => item.Value).ToArray();
             state.Designs.RemoveAll(item => item.AccountId == accountId);
             state.Configurations.RemoveAll(item => item.AccountId == accountId);
-            return mine;
+            return (Designs: mine, Previews: previews);
         });
-        foreach (var design in removed) await files.Delete(FileAreas.Designs, design.File);
+        await DeletePreviews(removed.Previews);
+        foreach (var design in removed.Designs) await files.Delete(FileAreas.Designs, design.File);
     }
 }

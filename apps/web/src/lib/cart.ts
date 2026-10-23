@@ -27,21 +27,24 @@ export const cartLineKey=(row:CartLine)=>`${row.productId}:${row.variantId}:${ro
 /** Units of one colour across all its lines; stock limits the colour, not each design. */
 export const variantUnits=(rows:CartLine[],variantId:string)=>rows.filter(row=>row.variantId===variantId).reduce((sum,row)=>sum+row.quantity,0);
 export function useCart(){const raw=useSyncExternalStore(subscribe,snapshot,()=>'[]');return useMemo(()=>parse(raw),[raw])}
-function cartDesign(design:CartDesign):CartDesign{
- const name=design.name.trim()||'Tasarım';let shortened=name.slice(0,60);
+export function designDisplayName(value:string){
+ const name=value.trim()||'Tasarım';let shortened=name.slice(0,60);
  if(/[\uD800-\uDBFF]$/.test(shortened))shortened=shortened.slice(0,-1);
- return {...design,name:shortened};
+ return shortened;
 }
+function cartDesign(design:CartDesign):CartDesign{return {...design,name:designDisplayName(design.name)}}
 export function addToCart(productId:string,variantId:string,stock:number,design?:CartDesign,quantity=1){if(design)design=cartDesign(design);if(!Number.isInteger(quantity)||quantity<1||quantity>99)throw new Error('Geçerli adet girin.');if(design&&!design.placement)design={...design,placement:readDesignPlacement(design.id,productId,variantId)};const rows=parse(snapshot());const existing=rows.find(row=>sameLine(row,productId,variantId,design?.id,design?.configurationId,design?.configurationRevision));if(variantUnits(rows,variantId)+quantity>Math.min(stock,99)||(existing?.quantity||0)+quantity>99)throw new Error('Bu renk için sepetteki adet mevcut stok sınırına ulaştı.');write(existing?rows.map(row=>row===existing?{...row,quantity:row.quantity+quantity,...(design?.configurationId?{configurationRevision:design.configurationRevision}:{}),...(design?.placement?{designPlacement:design.placement}:{})}:row):[...rows,{productId,variantId,quantity,...(design?{designId:design.id,designName:design.name,...(design.configurationId?{configurationId:design.configurationId,configurationRevision:design.configurationRevision}:{}),...(design.placement?{designPlacement:design.placement}:{})}:{})}])}
 export function setCartQuantity(productId:string,variantId:string,quantity:number,designId?:string,configurationId?:string,configurationRevision?:number){if(!Number.isInteger(quantity)||quantity<0||quantity>99)throw new Error('Geçerli adet girin.');const rows=parse(snapshot());write(quantity===0?rows.filter(row=>!sameLine(row,productId,variantId,designId,configurationId,configurationRevision)):rows.map(row=>sameLine(row,productId,variantId,designId,configurationId,configurationRevision)?{...row,quantity}:row))}
 export function clearCart(){write([])}
 
 /** Updates exactly one existing row; optimistic revision check prevents a stale editor from recreating/overwriting it. */
-export function updateCartDesign(target:string,expectedRevision:number|undefined,design:CartDesign){
+export function updateCartDesign(target:string,expectedRevision:number|undefined,design:CartDesign,selection?:{variantId:string;stock:number;expectedDesignId:string}){
  design=cartDesign(design);
  const rows=parse(snapshot()),row=rows.find(item=>cartLineKey(item)===target);
  if(!row)throw new Error('Düzenlediğin sepet satırı kaldırılmış. Sepete dön.');
  if(row.configurationRevision!==expectedRevision)throw new Error('Sepet satırı başka bir işlemde değişti. Yeniden aç.');
- if(row.designId!==design.id)throw new Error('Tasarım sepet satırıyla eşleşmiyor.');
- write(rows.map(item=>item===row?{...item,designName:design.name,designPlacement:design.placement,configurationId:design.configurationId,configurationRevision:design.configurationRevision}:item));
+ if(row.designId!==(selection?.expectedDesignId??design.id))throw new Error('Tasarım sepet satırıyla eşleşmiyor.');
+ const variantId=selection?.variantId??row.variantId;
+ if(selection&&variantId!==row.variantId&&variantUnits(rows.filter(item=>item!==row),variantId)+row.quantity>Math.min(selection.stock,99))throw new Error('Seçtiğin renk için sepetteki adedi karşılayacak stok yok.');
+ write(rows.map(item=>item===row?{...item,variantId,designId:design.id,designName:design.name,designPlacement:design.placement,configurationId:design.configurationId,configurationRevision:design.configurationRevision}:item));
 }

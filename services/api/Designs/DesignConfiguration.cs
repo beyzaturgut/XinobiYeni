@@ -141,7 +141,7 @@ public sealed partial class SavedDesignStore
             if (!state.Designs.Any(d => d.Id == designId && d.AccountId == accountId)) throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
             var existing = request.ConfigurationId is null ? null : state.Configurations.Where(c => c.AccountId == accountId && c.Value.Id == request.ConfigurationId).MaxBy(c => c.Value.Revision)?.Value;
             if (request.ConfigurationId is not null && existing is null) throw ProblemException.NotFound("configuration_not_found", "Tasarım yerleşimi bulunamadı.");
-            if (existing is not null && (existing.DesignId != designId || existing.VariantId != request.VariantId || existing.Revision != request.ExpectedRevision))
+            if (existing is not null && (existing.ProductId != design.ProductId || existing.Revision != request.ExpectedRevision))
                 throw new ProblemException("configuration_changed", "Yerleşim başka bir işlemde değişti. Yeniden aç.", 409);
             if (state.Configurations.Count(c => c.AccountId == accountId) >= 1000) throw new ProblemException("configuration_limit", "Yerleşim kayıt sınırına ulaşıldı.", 409);
             var saved = new MyDesignConfiguration(existing?.Id ?? Guid.NewGuid().ToString("N"), designId, design.ProductId, request.VariantId,
@@ -156,16 +156,18 @@ public sealed partial class SavedDesignStore
         if (bytes.Length is 0 or > 2 * 1024 * 1024 || DetectImage(bytes).Mime != "image/jpeg")
             throw new ProblemException("invalid_preview", "Tasarım önizlemesi hazırlanamadı.");
         await files.Save(FileAreas.Designs, PreviewFile(value), new MemoryStream(bytes), "image/jpeg");
+        // A design can be deleted while its thumbnail is being uploaded.
+        try { await Configuration(accountId, id, revision); }
+        catch { await files.Delete(FileAreas.Designs, PreviewFile(value)); throw; }
     }
     public async Task<StoredFile?> Preview(string accountId, string id, int revision)
     {
         var value = await Configuration(accountId, id, revision);
         return await files.Open(FileAreas.Designs, PreviewFile(value));
     }
-    private async Task DeletePreviews(string accountId, string? designId = null)
+    private async Task DeletePreviews(IEnumerable<MyDesignConfiguration> values)
     {
-        foreach (var entry in (await store.Read()).Configurations.Where(item => item.AccountId == accountId && (designId is null || item.Value.DesignId == designId)))
-            await files.Delete(FileAreas.Designs, PreviewFile(entry.Value));
+        foreach (var value in values) await files.Delete(FileAreas.Designs, PreviewFile(value));
     }
     public Task SetFavorite(string accountId, string id, bool favorite) => store.Update(state =>
     {

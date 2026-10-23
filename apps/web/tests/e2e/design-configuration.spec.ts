@@ -253,3 +253,39 @@ test('cancelling a replacement leaves the cart unchanged and new-colour stock ch
  await expect(page.getByRole('alert').filter({hasText:'stok yok'})).toBeVisible();
  const rows=await page.evaluate(()=>JSON.parse(localStorage.getItem('xinobi-cart-v1')!));expect(rows[0].variantId).toBe(f.variant.id);expect(rows[0].quantity).toBe(2);
 });
+
+test('the AI preview has one upload control and it keeps the product and the shown colour',async({page})=>{
+ const f=await fixture(page,{empty:true,kind:'ai'});
+ await page.addInitScript(()=>sessionStorage.setItem('xinobi-u-selected-session','abcdef'));
+ await page.route('**/api/v1/design-studio/sessions/abcdef',route=>route.fulfill({json:{id:'abcdef',status:'ready',product:{id:f.product.id,name:f.product.name},variant:{id:f.variant.id,color:f.variant.color},questions:[],answers:[],imageUrl:'/api/v1/design-studio/sessions/abcdef/image'}}));
+ await page.route('**/api/v1/design-studio/sessions/abcdef/image',route=>route.fulfill({body:image,contentType:'image/png'}));
+ await page.goto('/xinobi-u/onizleme');
+ await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await expect(page.locator('input[type=file]')).toHaveCount(0);
+ await expect(page.getByText(/Görsel seç|Dosya seç/)).toHaveCount(0);
+ const upload=page.getByRole('link',{name:'Görsel yükle',exact:true});await expect(upload).toHaveCount(1);
+ await upload.click();
+ await expect(page).toHaveURL(new RegExp(`/xinobi-u/kendi-gorselin/?\\?product=${f.product.id}&variant=${f.variant.id}`));
+ await expect(page.getByLabel('Dosya seç',{exact:true})).toBeVisible();
+});
+
+test('a signed-in shopper can start from a saved design of the same product only',async({page})=>{
+ const f=await fixture(page,{empty:true});
+ await page.route(/\/api\/v1\/me\/designs\/?$/,route=>route.request().method()==='GET'?route.fulfill({json:[f.design,{...f.design,id:'9'.repeat(32),name:'Başka ürünün tasarımı',productId:'OTHER-PRODUCT',imageUrl:'/api/v1/me/designs/'+'9'.repeat(32)+'/image'}]}):route.fallback());
+ await page.goto(`/xinobi-u/kendi-gorselin/?product=${f.product.id}&variant=${f.variant.id}`);
+ await page.getByRole('button',{name:'Tasarımlarımdan seç',exact:true}).click();
+ const library=page.getByRole('region',{name:'Tasarımlarım'});
+ await expect(library.getByRole('button',{name:'Test placement'})).toBeVisible();
+ await expect(library.getByText('Başka ürünün tasarımı')).toHaveCount(0);
+ await library.getByRole('button',{name:'Test placement'}).click();
+ await expect(page.getByText('Görsel hazır')).toBeVisible();await expect(library).toHaveCount(0);
+ await page.getByRole('button',{name:'Önizlemeye geç →'}).click();await expect(page.locator('canvas[role=img]')).toBeVisible();
+ await expect(page).toHaveURL(new RegExp(`variant=${f.variant.id}`));
+});
+
+test('guests pick from the gallery without being asked to sign in',async({page})=>{
+ const f=await fixture(page,{empty:true,signedIn:false});
+ await page.goto(`/xinobi-u/kendi-gorselin/?product=${f.product.id}&variant=${f.variant.id}`);
+ await expect(page.getByLabel('Dosya seç',{exact:true})).toBeVisible();
+ await expect(page.getByRole('button',{name:'Tasarımlarımdan seç'})).toHaveCount(0);
+});

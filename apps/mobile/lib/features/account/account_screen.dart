@@ -28,6 +28,28 @@ class AccountScreen extends ConsumerWidget {
   }
 }
 
+/// Sign-in above the current screen (outside the tabs), for flows that must continue where they were: the caller
+/// pops it once the session exists, and back or cancel returns with nothing lost.
+class SignInScreen extends ConsumerWidget {
+  const SignInScreen({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: XinobiTokens.header,
+        foregroundColor: XinobiTokens.onHeader,
+        toolbarHeight: XinobiTokens.headerHeight,
+        title: const Text('Giriş yap'),
+      ),
+      body: switch (ref.watch(authProvider)) {
+        SignedOut() => const _AccessForms(),
+        _ => const LoadingView(),
+      },
+    );
+  }
+}
+
 String _date(DateTime value) {
   final local = value.toLocal();
   return '${local.day.toString().padLeft(2, '0')}.${local.month.toString().padLeft(2, '0')}.${local.year}';

@@ -65,6 +65,7 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
           },
           builder: (context, state) => XinobiMobilePreviewScreen(productId: state.uri.queryParameters['urun'], variantId: state.uri.queryParameters['renk'], designId: state.uri.queryParameters['tasarim'], configurationId: state.uri.queryParameters['configuration'], revision: int.tryParse(state.uri.queryParameters['revision'] ?? ''), cartLine: state.uri.queryParameters['line']),
         ),
+        GoRoute(path: '/giris', builder: (context, state) => const SignInScreen()),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),
         GoRoute(path: '/hesap/parola', builder: (context, state) => const ChangePasswordScreen()),
         GoRoute(path: '/hesap/parola-sifirla', builder: (context, state) => const PasswordResetScreen()),

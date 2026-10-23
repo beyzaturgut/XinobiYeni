@@ -422,7 +422,7 @@ class _ResultState extends ConsumerState<_Result> {
       if (next is SignedIn && mounted && context.canPop()) context.pop();
     });
     try {
-      await context.push('/hesap');
+      await context.push('/giris');
     } finally {
       subscription.close();
     }

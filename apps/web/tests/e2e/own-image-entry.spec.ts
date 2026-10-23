@@ -92,3 +92,10 @@ test('inside the mobile app the page shows no cookie panel or site chrome and le
  await page.evaluate(()=>{const link=document.createElement('a');link.href='/sepet/';link.textContent='Sepete git';document.querySelector('main')!.append(link);link.click()});
  expect(new URL((await navigation).url()).pathname).toBe('/sepet/');
 });
+test('the AI preview page shows no website header inside the mobile app',async({page})=>{
+ await mockStore(page);
+ await page.goto('/xinobi-u/mobil-onizleme/?mobile=1');
+ await expect(page.locator('html')).toHaveAttribute('data-embedded','app');
+ await expect(page.getByRole('link',{name:'XINOBI U ana sayfa'})).toBeHidden();
+ await expect(page.getByRole('link',{name:"XINOBI U'ya dön"})).toBeHidden();
+});

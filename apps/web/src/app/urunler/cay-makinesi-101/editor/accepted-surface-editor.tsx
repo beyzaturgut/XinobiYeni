@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import EditorWorkspace from "./editor-workspace";
 import type {DesignPlacement} from "../../../../lib/design-placement";
@@ -13,6 +13,7 @@ import styles from "./editor.module.css";
 import { previewUnavailableMessage } from "../../../../features/product-personalization/variant-preview-readiness";
 import type { Product, Variant } from "../../../../../../../packages/commerce/client";
 import { loadCommerceState } from "../../../../lib/commerce";
+import { useEmbeddedApp } from "../../../../lib/embedded-app";
 import detailStyles from "../product.module.css";
 import type { PlacementTransferHandle } from "../../../../features/product-personalization/preview-placement-transfer";
 
@@ -77,6 +78,8 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
   const [switching, setSwitching] = useState(false);
   const placementRef = useRef<PlacementTransferHandle>(null);
   const transferGeneration = useRef(0);
+  const router = useRouter();
+  const embedded = useEmbeddedApp();
   useEffect(() => () => { transferGeneration.current++; }, []);
   useEffect(() => {
     let active = true;
@@ -133,7 +136,10 @@ function XinobiVariantPreview({ productId, sessionVariantId, patternSrc, unavail
     }
     setSwitching(false);
   }
-  if(designId&&product&&selected&&inputs)return <PlacementStudio product={product} variants={variants} surfaces={surfaces} active={selected} onActiveChange={id=>{setActiveVariantId(id);try{localStorage.setItem(activeVariantKey,id)}catch{}}} mode="pattern" cover={false} patternUrl={patternSrc??"/assets/personalization/sample-pattern.png"} source={{name:'AI tasarımı',type:'',size:0}} sourceDescription="AI ile oluşturuldu" changeHref="" onChange={()=>{}} price={prices[selected.id]} onDraftChange={setPlacement} onRendered={setPreviewCanvas} actions={<SaveDesignButton stacked previewCanvas={previewCanvas} placement={placement?.surfaceVersion===inputs.surfaceVersion?placement:undefined} source={{sessionId:designId,productId,variantId:activeVariantId}}/>}/>;
+  // The AI design's one upload control leaves for the own-image upload with the same product and the colour shown now;
+  // the AI design itself stays reachable through history.
+  const ownImageHref = '/xinobi-u/kendi-gorselin/?'+new URLSearchParams({product:productId,variant:activeVariantId,...(embedded?{mobile:'1'}:{})});
+  if(designId&&product&&selected&&inputs)return <PlacementStudio product={product} variants={variants} surfaces={surfaces} active={selected} onActiveChange={id=>{setActiveVariantId(id);try{localStorage.setItem(activeVariantKey,id)}catch{}}} mode="pattern" cover={false} patternUrl={patternSrc??"/assets/personalization/sample-pattern.png"} source={{name:'AI tasarımı',type:'',size:0}} sourceDescription="AI ile oluşturuldu" canChange changeLabel="Görsel yükle" changeHref={ownImageHref} onChange={()=>router.push(ownImageHref)} price={prices[selected.id]} onDraftChange={setPlacement} onRendered={setPreviewCanvas} actions={<SaveDesignButton stacked previewCanvas={previewCanvas} placement={placement?.surfaceVersion===inputs.surfaceVersion?placement:undefined} source={{sessionId:designId,productId,variantId:activeVariantId}}/>}/>;
   return <div className={styles.xinobiLayout}>
     <section className={styles.previewVariants} aria-label="Önizleme rengi" data-session-variant={sessionVariantId} data-preview-variant={activeVariantId} data-active-variant={activeVariantId}>
       <fieldset className={detailStyles.variants}>

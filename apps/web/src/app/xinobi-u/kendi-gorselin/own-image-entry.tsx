@@ -58,7 +58,7 @@ function Flow({product,variant,initialMode,embedded}:{product:string;variant:str
     </section>
     {selected&&selected.personalizable!==true&&<p role="alert" className={flow.error}>Bu ürün kişiselleştirme programında değil.</p>}
     {ready&&<>
-     <DesignUploadCard mode={mode} onModeChange={switchMode} local={local} embedded={embedded}/>
+     <DesignUploadCard mode={mode} onModeChange={switchMode} local={local} embedded={embedded} productId={selected?.id}/>
     </>}
     <div className={`${flow.actions} ${styles.uploadActions}`}>
      {!embedded&&<Link className={flow.secondary} href={methodHref}>Geri</Link>}

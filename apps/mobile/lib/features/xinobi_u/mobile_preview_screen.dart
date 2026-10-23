@@ -91,7 +91,7 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
             final subscription = ref.listenManual(authProvider, (previous, next) {
               if (next is SignedIn && mounted && context.canPop()) context.pop();
             });
-            try { await context.push('/hesap'); } finally { subscription.close(); }
+            try { await context.push('/giris'); } finally { subscription.close(); }
           }
           reply = {'id': request['id'], 'status': 204};
         } else {
@@ -227,7 +227,7 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
           backgroundColor: XinobiTokens.header,
           foregroundColor: XinobiTokens.onHeader,
           toolbarHeight: XinobiTokens.headerHeight,
-          title: Text(widget.productId != null || widget.designId != null ? 'XINOBI U' : 'Ürün önizlemesi'),
+          title: const Text('XINOBI U'),
         ),
         body: SafeArea(
           top: false,

@@ -6,6 +6,8 @@ import { commerceApi } from '../../../lib/commerce';
 import type { DesignSession } from '../../../lib/design-studio';
 import AcceptedSurfaceEditor from '../../urunler/cay-makinesi-101/editor/accepted-surface-editor';
 import styles from '../../urunler/cay-makinesi-101/editor/editor.module.css';
+import flow from '../flow.module.css';
+import placement from '../kendi-gorselin/own-image.module.css';
 
 const SESSION_ID = /^[A-Za-z0-9_-]{1,128}$/;
 const SESSION_IMAGE = /^\/api\/v1\/xinobi-u\/sessions\/[A-Za-z0-9_-]{1,128}\/image$/;
@@ -107,13 +109,17 @@ export default function MobilePreviewContent({ demoProductId, demoVariantId, dem
   }
 
   if (state === 'ready' && resolved?.sessionId === sessionId) {
+    // Same frame and heading as the own-image placement step, so both XINOBI U methods end on one screen.
     return (
+      <div className={flow.page}>
+      <div className={placement.placementHead}><div><p className={flow.kicker}>XINOBI U · AI tasarımı</p><h1 className={`${flow.title} ${placement.placementTitle}`}>Tasarımını yerleştir</h1></div></div>
       <AcceptedSurfaceEditor xinobiPreview designId={resolved.sessionId}
         commerceProduct={resolved.productId}
         commerceVariant={resolved.variantId}
         patternSrc={resolved.patternSrc}
         unavailableMessage="Bu ürün/varyant için onaylı mobil önizleme desteği bulunmuyor. Başka bir ürünün maskesi kullanılmaz."
       />
+      </div>
     );
   }
 

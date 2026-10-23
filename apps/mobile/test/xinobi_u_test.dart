@@ -5,10 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/app/theme.dart';
+import 'package:xinobi_mobile/features/account/account_screen.dart';
+import 'package:xinobi_mobile/features/account/auth.dart';
 import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/features/xinobi_u/questionnaire_screen.dart';
 import 'package:xinobi_mobile/features/xinobi_u/xinobi_u_repository.dart';
 import 'package:xinobi_mobile/main.dart';
+
+import 'account_test.dart' show FakeAccounts, MemoryTokens;
 
 const _axes = ['Doğa', 'Ruh hâli', 'Renk', 'Yoğunluk', 'Tarz'];
 
@@ -257,5 +261,44 @@ void main() {
     await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
     expect(find.text('Soru 1 / 5'), findsOneWidget);
+  });
+
+  testWidgets('signing in from the result returns to the same result; cancelling keeps it too', (tester) async {
+    final fake = FakeXinobiU();
+    final router = GoRouter(initialLocation: '/questions', routes: [
+      GoRoute(path: '/questions', builder: (_, _) => const QuestionnaireScreen(productId: 'P1', variantId: 'V1', pollInterval: Duration(milliseconds: 10))),
+      GoRoute(path: '/giris', builder: (_, _) => const SignInScreen()),
+    ]);
+    addTearDown(router.dispose);
+    tester.view.physicalSize = const Size(1170, 2532);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(ProviderScope(retry: noAutomaticRetry, overrides: [
+      xinobiURepositoryProvider.overrideWithValue(fake),
+      productProvider('P1').overrideWith((ref) async => _product()),
+      accountRepositoryProvider.overrideWithValue(FakeAccounts()),
+      tokenStoreProvider.overrideWithValue(MemoryTokens()),
+    ], child: MaterialApp.router(theme: buildTheme(), routerConfig: router)));
+    await tester.pumpAndSettle();
+    await answerAll(tester);
+    await tester.tap(find.text('AI ile tasarımımı oluştur ✦'));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 10));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Kaydetmek için giriş yap'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hesabına giriş yap'), findsOneWidget);
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(find.text('İşte sana özel yorum.'), findsOneWidget, reason: 'Cancelling returns to the result.');
+    await tester.tap(find.text('Kaydetmek için giriş yap'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.widgetWithText(TextField, 'E-posta'), 'ayse@example.com');
+    await tester.enterText(find.widgetWithText(TextField, 'Parola'), 'guclu-parola-1');
+    await tester.tap(find.widgetWithText(FilledButton, 'Giriş yap'));
+    await tester.pumpAndSettle();
+    expect(find.text('İşte sana özel yorum.'), findsOneWidget, reason: 'A successful sign-in returns to the same result.');
+    expect(find.text('Tasarımımı kaydet'), findsOneWidget);
+    expect(fake.generateCalls, 1);
   });
 }

@@ -19,10 +19,11 @@ const CM121_VARIANT = "DEMO-V-5a46bb98-c95c-42b9-9f12-e4286f628cca";
 export default function MobilePreviewPage() {
   return (
     <div className={`${styles.page} ${styles.mobilePreviewPage}`}>
-      <a className={styles.skipLink} href="#editor-workspace">
+      <a className={styles.skipLink} data-app-chrome="" href="#editor-workspace">
         Editör çalışma alanına geç
       </a>
-      <header className={styles.header}>
+      {/* The mobile app shows its own app bar instead. */}
+      <header className={styles.header} data-app-chrome="">
         <Link className={styles.brand} href="/xinobi-u" aria-label="XINOBI U ana sayfa">
           <Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority />
         </Link>

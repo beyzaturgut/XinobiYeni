@@ -168,9 +168,21 @@ public static class CustomerEndpoints
                 var now = DateTimeOffset.UtcNow;
                 var orderId = Guid.NewGuid().ToString("N");
                 // Design images are copied before the order exists so a stored order never points to a missing file.
-                foreach (var (line, design) in personalized)
-                    if (!await designs.CopyToOrder(design, orderId, line))
-                        throw new AccountException("design_not_found", $"\"{design.Name}\" tasarımının görseli bulunamadı.", StatusCodes.Status409Conflict);
+                try
+                {
+                    foreach (var (line, design) in personalized)
+                    {
+                        if (!await designs.CopyToOrder(design, orderId, line))
+                            throw new AccountException("design_not_found", $"{design.Name} tasarımının görseli bulunamadı.", StatusCodes.Status409Conflict);
+                        if (lines[line].Personalization is { ConfigurationId: { } configurationId, ConfigurationRevision: { } revision })
+                            await designs.CopyPreviewToOrder(id, configurationId, revision, orderId, line);
+                    }
+                }
+                catch
+                {
+                    foreach (var (line, _) in personalized) await designs.ForgetOrderImage(orderId, line);
+                    throw;
+                }
                 var created = false;
                 CustomerOrder order;
                 try

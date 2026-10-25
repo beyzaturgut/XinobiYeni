@@ -262,6 +262,16 @@ public sealed class SavedDesignTests : IDisposable
         var request = new PlaceOrder(address.Id, [new(product.Id, design.VariantId!, 2, design.Id, first.Id, first.Revision)], "configuration-request-1");
         var order = await Read<CustomerOrder>(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, JsonContent.Create(request)));
         Assert.Equal(placement, order.Lines[0].Personalization!.Placement! with { BodyAdjustments = placement.BodyAdjustments });
+        var orderPreview = $"/api/v1/me/orders/{order.Id}/lines/0/preview";
+        Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, orderPreview, token)).Content.ReadAsByteArrayAsync());
+        Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, orderPreview, other)).StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(orderPreview)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, orderPreview.Replace("/0/", "/99/"), token)).StatusCode);
+        // Even replacing the editable thumbnail cannot change the composition copied into an order.
+        using var replacementPreview = new MultipartFormDataContent { { new ByteArrayContent(new byte[] {255, 216, 255, 0, 217}), "file", "preview.jpg" } };
+        (await Send(client, HttpMethod.Put, previewRoute, token, replacementPreview)).EnsureSuccessStatusCode();
+        Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, orderPreview, token)).Content.ReadAsByteArrayAsync());
+
         var secondResponse = await Send(client, HttpMethod.Post, route, token,
             JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement with { X = 60, BodyAdjustments = null, Mode = null, FillMask = null }, first.Id, 1, true)));
         using(var json=System.Text.Json.JsonDocument.Parse(await secondResponse.Content.ReadAsStringAsync()))
@@ -274,7 +284,7 @@ public sealed class SavedDesignTests : IDisposable
         var second = await Read<MyDesignConfiguration>(secondResponse);
         Assert.Equal(2, second.Revision);
         Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, previewRoute.Replace("/1/", "/2/"), token)).StatusCode);
-        Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
+        Assert.Equal(new byte[] {255, 216, 255, 0, 217}, await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
         Assert.Equal("configuration_changed", await Code(await Send(client, HttpMethod.Post, route, token,
             JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, first.Id, 1)))));
         var old = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Get, $"/api/v1/me/design-configurations/{first.Id}/revisions/1", token));
@@ -290,6 +300,7 @@ public sealed class SavedDesignTests : IDisposable
         var retained = await Read<CustomerOrder>(await Send(client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}", token));
         Assert.Equal(25, retained.Lines[0].Personalization!.Placement!.X);
         Assert.Equal(Png, await (await Send(client, HttpMethod.Get, retained.Lines[0].Personalization!.ImageUrl!, token)).Content.ReadAsByteArrayAsync());
+        Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, orderPreview, token)).Content.ReadAsByteArrayAsync());
     }
 
     private static async Task<string?> Code(HttpResponseMessage response)

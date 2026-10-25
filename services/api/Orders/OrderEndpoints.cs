@@ -38,6 +38,16 @@ public static class OrderEndpoints
             .Produces(StatusCodes.Status200OK, contentType: "image/png")
             .Produces(StatusCodes.Status404NotFound);
 
+        // Binary order preview follows the same ownership check as the retained artwork.
+        me.MapGet("/orders/{id}/lines/{line:int}/preview", async Task<IResult> (string id, int line, ClaimsPrincipal user, IAccountStore accounts, Designs.SavedDesignStore designs) =>
+        {
+            var order = (await accounts.Orders(Id(user))).FirstOrDefault(item => item.Id == id);
+            if (order is null || line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is null)
+                return Results.NotFound();
+            var preview = await designs.OrderPreview(id, line);
+            return preview is null ? Results.NotFound() : Results.Stream(preview.Content, "image/jpeg");
+        }).ExcludeFromDescription();
+
         me.MapPost("/orders/{id}/cancellation", async Task<Ok<CustomerOrder>> (string id, CancelMyOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
                 NotificationCenter notifications, TimeProvider clock, IConfiguration configuration, IWebHostEnvironment environment) =>
             {

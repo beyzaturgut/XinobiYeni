@@ -178,7 +178,24 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
     public async Task<StoredFile?> OrderImage(string orderId, int line, string mime) =>
         await files.Open(FileAreas.Designs, OrderFile(orderId, line)) is { } file ? file with { ContentType = mime } : null;
 
-    public Task ForgetOrderImage(string orderId, int line) => files.Delete(FileAreas.Designs, OrderFile(orderId, line));
+    /// <summary>The composed product preview is retained independently of editable designs.</summary>
+    public async Task CopyPreviewToOrder(string accountId, string configurationId, int revision, string orderId, int line)
+    {
+        await using var preview = await Preview(accountId, configurationId, revision);
+        // Legacy/native clients may not have uploaded a composition. Do not substitute the raw artwork.
+        if (preview is not null)
+            await files.Save(FileAreas.Designs, OrderFile(orderId, line) + "-preview", preview.Content, "image/jpeg");
+    }
+
+    public async Task<StoredFile?> OrderPreview(string orderId, int line) =>
+        await files.Open(FileAreas.Designs, OrderFile(orderId, line) + "-preview") is { } file
+            ? file with { ContentType = "image/jpeg" } : null;
+
+    public async Task ForgetOrderImage(string orderId, int line)
+    {
+        await files.Delete(FileAreas.Designs, OrderFile(orderId, line));
+        await files.Delete(FileAreas.Designs, OrderFile(orderId, line) + "-preview");
+    }
 
     public async Task ForgetAccount(string accountId)
     {

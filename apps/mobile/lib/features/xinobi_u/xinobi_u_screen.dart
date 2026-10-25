@@ -9,7 +9,9 @@ import '../catalog/catalog_repository.dart';
 
 /// XINOBI U first selects a product family; the method follows, and the colour is chosen on the placement preview.
 class XinobiUScreen extends ConsumerWidget {
-  const XinobiUScreen({super.key});
+  const XinobiUScreen({super.key, this.editorEntry = false});
+
+  final bool editorEntry;
 
   static const query = ProductQuery(personalizable: true);
 
@@ -18,7 +20,9 @@ class XinobiUScreen extends ConsumerWidget {
     final products = ref.watch(productsProvider(query));
     final text = Theme.of(context).textTheme;
     return Scaffold(
-      appBar: const XinobiHeader(),
+      appBar: editorEntry
+          ? AppBar(title: const Text('Tasarım editörü'))
+          : const XinobiHeader(),
       body: CustomScrollView(
         slivers: [
           SliverPadding(
@@ -34,7 +38,10 @@ class XinobiUScreen extends ConsumerWidget {
                 children: [
                   Semantics(
                     header: true,
-                    child: Text('XINOBI U', style: text.headlineSmall),
+                    child: Text(
+                      editorEntry ? 'Tasarlamak için ürün seç' : 'XINOBI U',
+                      style: text.headlineSmall,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -86,7 +93,8 @@ class XinobiUScreen extends ConsumerWidget {
                         showFavorite: true,
                         footerBuilder: (context, product) => Text(
                           'XINOBI U ile kişiselleştir →',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         semanticsLabelBuilder: (product) =>
                             '${product.name}, XINOBI U ile kişiselleştir',

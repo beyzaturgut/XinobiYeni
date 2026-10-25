@@ -55,15 +55,16 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(path: '/kurumsal/teklif/takip', builder: (context, state) => QuoteTrackScreen(code: state.uri.queryParameters['kod'], email: state.uri.queryParameters['eposta'])),
         GoRoute(
           path: '/tasarim-editoru',
-          // Without a saved design this opens the own-image upload for the given product and colour; nothing to edit
-          // without a product.
-          redirect: (context, state) {
+          // Keep a product-less editor entry above the tab shell: redirecting a pushed route
+          // into a StatefulShellRoute branch can leave an empty nested navigation stack.
+          builder: (context, state) {
             final query = state.uri.queryParameters;
-            if (query['tasarim'] != null) return null;
-            if (query['urun'] == null || query['renk'] == null) return '/xinobi-u';
-            return Uri(path: '/xinobi-u/kendi-gorselin', queryParameters: {'urun': query['urun']!, 'renk': query['renk']!}).toString();
+            if (query['tasarim'] == null) {
+              if (query['urun'] == null) { return const XinobiUScreen(editorEntry: true); }
+              return XinobiUMethodScreen(productId: query['urun']!, variantId: query['renk']);
+            }
+            return XinobiMobilePreviewScreen(productId: query['urun'], variantId: query['renk'], designId: query['tasarim'], configurationId: query['configuration'], revision: int.tryParse(query['revision'] ?? ''), cartLine: query['line']);
           },
-          builder: (context, state) => XinobiMobilePreviewScreen(productId: state.uri.queryParameters['urun'], variantId: state.uri.queryParameters['renk'], designId: state.uri.queryParameters['tasarim'], configurationId: state.uri.queryParameters['configuration'], revision: int.tryParse(state.uri.queryParameters['revision'] ?? ''), cartLine: state.uri.queryParameters['line']),
         ),
         GoRoute(path: '/giris', builder: (context, state) => const SignInScreen()),
         GoRoute(path: '/hesap/profil', builder: (context, state) => const ProfileDetailsScreen()),

@@ -9,7 +9,7 @@ import '../../app/design_tokens.g.dart';
 import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import 'account_widgets.dart';
-import '../designs/designs.dart';
+import 'order_product_image.dart';
 import 'addresses.dart';
 import 'auth.dart';
 import 'notifications.dart';
@@ -238,17 +238,11 @@ class OrderDetailScreen extends ConsumerWidget {
                 ),
               ],
               const SizedBox(height: 20),
-              for (final line in order.lines)
+              for (final (index, line) in order.lines.indexed)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
                   child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    SizedBox(
-                      width: 64,
-                      height: 64,
-                      child: line.personalization?.imageUrl != null
-                          ? PrivateDesignImage(path: line.personalization!.imageUrl!, label: '${line.personalization!.name} tasarımı')
-                          : ColoredBox(color: XinobiTokens.surface, child: RemoteImage(line.imageUrl, label: '${line.name}, ${line.color}')),
-                    ),
+                    OrderProductThumbnail(orderId: order.id, index: index, line: line),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

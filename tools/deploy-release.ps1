@@ -6,7 +6,7 @@ param(
     [string]$ApiSite = 'XinobiYeniApi',
     [string]$ServerSettings = 'C:\XinobiData\config\appsettings.Server.json',
     [string]$WorkRoot = 'C:\XinobiDeploy',
-    [string]$HealthUrl = 'http://127.0.0.1:8024/api/v1/health/ready',
+    [string]$HealthUrl = 'http://localhost:8024/api/v1/health/ready',
     [string]$WebUrl = 'http://127.0.0.1:8014'
 )
 $ErrorActionPreference = 'Stop'
@@ -51,10 +51,55 @@ function Download-Asset($asset, $destination) {
     $h = @{} + $headers; $h.Accept = 'application/octet-stream'
     Invoke-WebRequest -UseBasicParsing -Uri $asset.url -Headers $h -OutFile $destination | Out-Null
 }
+# Recovery helpers also run after a partially completed directory swap.
+function Stop-DeploymentPools {
+    param([string[]]$Names)
+    foreach ($name in $Names) {
+        if ((Get-WebAppPoolState -Name $name).Value -notin @('Stopped','Stopping')) {
+            Stop-WebAppPool -Name $name
+        }
+    }
+    foreach ($name in $Names) {
+        $deadline = (Get-Date).AddSeconds(60)
+        while ((Get-WebAppPoolState -Name $name).Value -ne 'Stopped') {
+            if ((Get-Date) -gt $deadline) { throw "Pool $name did not stop within 60 seconds." }
+            Start-Sleep -Seconds 1
+        }
+    }
+}
+function Move-DeploymentDirectory {
+    param([string]$Source, [string]$Destination)
+    # Pool state can become Stopped before the worker releases every file handle.
+    for ($attempt = 0; $attempt -lt 30; $attempt++) {
+        if (Test-Path -LiteralPath $Destination) { throw "Destination already exists: $Destination. Refusing to merge directories." }
+        try {
+            Move-Item -LiteralPath $Source -Destination $Destination -ErrorAction Stop
+            return
+        } catch [System.IO.IOException] {
+            if ($attempt -eq 29) { throw }
+        } catch [System.UnauthorizedAccessException] {
+            if ($attempt -eq 29) { throw }
+        }
+        Start-Sleep -Seconds 2
+    }
+}
+function Start-DeploymentPools {
+    param([string[]]$Names)
+    foreach ($name in $Names) {
+        if ((Get-WebAppPoolState -Name $name).Value -ne 'Started') { Start-WebAppPool -Name $name }
+    }
+}
 $pools = @($webPool,$apiPool) | Select-Object -Unique
 foreach ($pool in $pools) { if ((Get-WebAppPoolState -Name $pool).Value -ne 'Started') { throw "Pool $pool must be running before deployment." } }
 $swaps = @()
 try {
+    # Detect a wrong health URL before changing any running application.
+    foreach ($url in @($HealthUrl, ($WebUrl.TrimEnd('/')+'/api/v1/health/ready'))) {
+        try {
+            if ((Invoke-WebRequest -UseBasicParsing -Uri $url -TimeoutSec 15).StatusCode -ne 200) { throw 'Non-200 response' }
+        } catch { throw "Pre-deploy health check failed at $url. No application files were changed. Check the URL and current service first." }
+    }
+
     $releaseInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/beyzaturgut/XinobiYeni/releases/tags/$Release" -Headers $headers
     foreach ($name in @('xinobi.zip','xinobi.zip.sha256')) {
         $asset = @($releaseInfo.assets | Where-Object { $_.name -eq $name })
@@ -80,19 +125,12 @@ try {
         $swaps += [pscustomobject]@{target=$target;next=$next;backup="$target-previous-$stamp";moved=$false;installed=$false}
     }
     $record.status = 'PREPARED'; Save-Record
-    foreach ($pool in $pools) { Stop-WebAppPool -Name $pool }
-    foreach ($pool in $pools) {
-        $deadline = (Get-Date).AddSeconds(60)
-        while ((Get-WebAppPoolState -Name $pool).Value -ne 'Stopped') {
-            if ((Get-Date) -gt $deadline) { throw "Pool $pool did not stop." }
-            Start-Sleep -Seconds 1
-        }
-    }
+    Stop-DeploymentPools -Names $pools
     foreach ($swap in $swaps) {
-        Move-Item -LiteralPath $swap.target -Destination $swap.backup; $swap.moved=$true
-        Move-Item -LiteralPath $swap.next -Destination $swap.target; $swap.installed=$true
+        Move-DeploymentDirectory -Source $swap.target -Destination $swap.backup; $swap.moved=$true
+        Move-DeploymentDirectory -Source $swap.next -Destination $swap.target; $swap.installed=$true
     }
-    foreach ($pool in $pools) { Start-WebAppPool -Name $pool }
+    Start-DeploymentPools -Names $pools
     $ready=$false
     for ($i=0; $i -lt 20; $i++) {
         try { if ((Invoke-WebRequest -UseBasicParsing -Uri $HealthUrl -TimeoutSec 10).StatusCode -eq 200) { $ready=$true; break } } catch {}
@@ -107,18 +145,36 @@ try {
 } catch {
     $failure = $_
     $record.status='FAILED'
-    try {
-        if (@($swaps | Where-Object { $_.moved }).Count -gt 0) {
-            foreach ($pool in $pools) { if ((Get-WebAppPoolState -Name $pool).Value -ne 'Stopped') { Stop-WebAppPool -Name $pool } }
-            Start-Sleep -Seconds 5
+    $recoveryErrors = @()
+    if (@($swaps | Where-Object { $_.moved }).Count -gt 0) {
+        $stopped = $false
+        try { Stop-DeploymentPools -Names $pools; $stopped = $true }
+        catch { $recoveryErrors += "Could not stop pools: $($_.Exception.Message)" }
+        if ($stopped) {
             foreach ($swap in $swaps) {
-                if ($swap.installed) { Move-Item -LiteralPath $swap.target -Destination "$($swap.target)-failed-$stamp" }
-                if ($swap.moved) { Move-Item -LiteralPath $swap.backup -Destination $swap.target }
+                if (!$swap.moved) { continue }
+                try {
+                    if ($swap.installed) {
+                        Move-DeploymentDirectory -Source $swap.target -Destination "$($swap.target)-failed-$stamp"
+                        $swap.installed = $false
+                    }
+                    Move-DeploymentDirectory -Source $swap.backup -Destination $swap.target
+                    $swap.moved = $false
+                } catch { $recoveryErrors += "Recovery of $($swap.target) failed: $($_.Exception.Message)" }
             }
-            $record.status='ROLLED_BACK'
         }
-        foreach ($pool in $pools) { if ((Get-WebAppPoolState -Name $pool).Value -ne 'Started') { Start-WebAppPool -Name $pool } }
-    } catch { $record.status='ROLLBACK_FAILED'; Write-Warning 'Automatic recovery failed. Restore previous directories and check IIS pools manually.' }
+        $record.status = if ($recoveryErrors.Count -eq 0) { 'ROLLED_BACK' } else { 'ROLLBACK_FAILED' }
+    }
+    # Attempt every pool even if recovery of another target/pool failed.
+    foreach ($pool in $pools) {
+        try { Start-DeploymentPools -Names @($pool) }
+        catch { $recoveryErrors += "Could not start pool ${pool}: $($_.Exception.Message)"; $record.status='ROLLBACK_FAILED' }
+    }
+    foreach ($message in $recoveryErrors) { Write-Warning $message }
+    if ($record.status -eq 'ROLLBACK_FAILED') {
+        Write-Warning "Automatic recovery incomplete. Inspect retained directories. Deployment record: $log"
+    }
+    if ($record.status -eq 'ROLLED_BACK') { Write-Warning 'Previous directories restored. Verify their HTTP health before another deployment.' }
     Save-Record
     throw $failure
 }

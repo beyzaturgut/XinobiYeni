@@ -108,3 +108,22 @@ dosya geri dönüşünü belirtir; eski sürümün HTTP kontrollerini tekrar yap
 `-previous-<tarih>` klasörlerini asıl adlarına geri getir, pool'ları başlat ve kontrol et.
 Başarılı bir yayından sonra manuel geri dönüş de aynı klasörlerle yapılır. SQL şemasını
 bu işlem geri almaz; eski sürümün şemayla uyumluluğunu ayrıca kontrol et.
+
+## 25.10.2026: saglik adresi ve geri alma duzeltmesi
+
+Bu IIS kurulumunda `http://127.0.0.1:8024/api/v1/health/ready` 400,
+`http://localhost:8024/api/v1/health/ready` 200 doner. API kontrolunun varsayilani
+`localhost` olarak duzeltildi. Script dosyalari degistirmeden once mevcut API ve web
+proxy readiness adreslerini kontrol eder.
+
+Ilk `xinobi-4333eda` release asset'indeki deploy araci eski surumdur. Repo `tools/deploy-release.ps1`
+dosyasinin guncel halini sunucudaki `C:\XinobiDeploy\tools\deploy-release.ps1` uzerine kopyala.
+Ayni uygulama paketini yeniden olusturmadan bu yeni aracla kurabilirsin; ZIP icindeki eski
+script otomatik calistirilmaz ve sunucudaki aracin uzerine yazilmaz.
+
+Yeni geri alma kodu havuzlarin durmasini bekler, dosya kilitleri icin sinirli yeniden
+deneme yapar, mevcut hedef klasore birlestirmeyi reddeder ve hedefleri bagimsiz geri alir.
+Kurtarma hatasinda diger havuzlarin baslatilmasi da denenir; asil hata ekrana yazilir.
+`ROLLED_BACK` sonrasi HTTP kontrollerini tekrar yap. Bu davranislar IIS ve ag cagrilari
+mock edilerek `pwsh -NoProfile -File tools/deploy-release.test.ps1` ile test edilir;
+gercek Windows/IIS dogrulamasi ayrica gereklidir.

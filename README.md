@@ -124,3 +124,5 @@ Web tarayıcı testleri `apps/web/tests/e2e` altında; `pnpm --filter web test:e
 `.github/workflows/ci.yml` .NET build/test, üretilen API sözleşme kontrolü, web/admin lint ve build, Dart istemci ve Flutter analyze/test adımlarını çalıştırır. **Mevcut CI'da Playwright/tarayıcı uçtan uca testlerini çalıştıran adım yoktur.** Tarayıcı testlerinin repoda bulunması CI kapsamında çalıştıkları anlamına gelmez.
 
 Deploy istendiğinde `node tools/package-deploy.mjs` web ve admin'i tek birleşik ZIP olarak paketler. Yayın koşulları ve sunucu yapılandırması için `deployments/README.md` ve `docs/runbooks/` incelenmelidir; GitHub'a push yapılması deploy değildir.
+
+API, web ve admin birlikte indirerek tek komutta IIS yayını: [adım adım deploy rehberi](docs/runbooks/one-command-deploy.md).

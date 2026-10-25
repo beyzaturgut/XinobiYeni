@@ -10,13 +10,14 @@ const commit=spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).stdout.trim
 const dirty=spawnSync('git',['status','--porcelain','--','apps/mobile'],{encoding:'utf8'}).stdout.trim()!=='';
 const name=`XinobiYeni-mobile-${commit.slice(0,7)}${dirty?'-dirty':''}.apk`;
 const api=process.env.XINOBI_API_BASE_URL||'http://109.104.120.91:8024';
-const webPreview=process.env.XINOBI_WEB_PREVIEW_URL||'';
-const defines=[`--dart-define=API_BASE_URL=${api}`];
-if(webPreview)defines.push(`--dart-define=XINOBI_WEB_PREVIEW_URL=${webPreview}`);
+const webPreview=process.env.XINOBI_WEB_PREVIEW_URL??'http://109.104.120.91:8014';
+const previewUrl=new URL(webPreview);
+if(!['http:','https:'].includes(previewUrl.protocol))throw new Error('XINOBI_WEB_PREVIEW_URL must be an HTTP(S) web origin.');
+const defines=[`--dart-define=API_BASE_URL=${api}`,`--dart-define=XINOBI_WEB_PREVIEW_URL=${webPreview}`];
 const build=spawnSync('flutter',['build','apk','--release',...defines],{cwd:path.join(root,'apps/mobile'),stdio:'inherit'});
 if(build.status!==0)process.exit(build.status||1);
 await mkdir(path.join(root,'paketler','apk'),{recursive:true});
 const artifact=path.join(root,'paketler','apk',name);
 await cp(path.join(root,'apps/mobile/build/app/outputs/flutter-apk/app-release.apk'),artifact);
 const bytes=await readFile(artifact);
-console.log(JSON.stringify({artifact,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),source:commit,dirty,api},null,2));
+console.log(JSON.stringify({artifact,bytes:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex'),source:commit,dirty,api,webPreview},null,2));

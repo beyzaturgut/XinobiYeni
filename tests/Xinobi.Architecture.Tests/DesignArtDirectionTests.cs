@@ -9,17 +9,17 @@ public sealed class DesignArtDirectionTests
         new() { ["style"] = style, ["nature"] = nature, ["visual"] = visual, ["color"] = color, ["mood"] = mood };
 
     [Theory]
-    [InlineData("minimal", "ocean", "Simple Geometry")]
-    [InlineData("geometry", "mountain", "Simple Geometry")]
-    [InlineData("watercolor", "garden", "Elegant Botanical")]
-    [InlineData("engraving", "forest", "Elegant Botanical")]
-    [InlineData("ink", "ocean", "Japanese Inspired")]
+    [InlineData("minimal", "ocean", "Minimal Graphic")]
+    [InlineData("geometry", "mountain", "Geometric Graphic")]
+    [InlineData("watercolor", "garden", "Botanical Watercolor")]
+    [InlineData("engraving", "forest", "Botanical Engraving")]
+    [InlineData("ink", "ocean", "Ink Illustration")]
     [InlineData("abstract", "river", "Fluid Abstract")]
-    [InlineData("watercolor", "ocean", "Fluid Abstract")]
+    [InlineData("watercolor", "ocean", "Flowing Watercolor")]
     public void StylesRespectTheSelectedNatureInsteadOfAddingUnrelatedMotifs(string style, string nature, string expected)
     {
         var prompt = DesignArtDirection.Build(Choices(style, nature));
-        Assert.Contains("Art direction: Xinobi " + expected, prompt);
+        Assert.Contains("Art direction: " + expected, prompt);
         if (nature == "ocean")
         {
             Assert.Contains("wave contours", prompt);
@@ -34,7 +34,7 @@ public sealed class DesignArtDirectionTests
     public void RichOrLayeredAnswersCannotCancelMinimalStyling(string style, string visual)
     {
         var prompt = DesignArtDirection.Build(Choices(style, visual: visual, color: "jewel", mood: "energetic"));
-        Assert.Contains("at most 3 ink colors", prompt);
+        Assert.Contains("at most 3 base colors", prompt);
         Assert.Contains("45-55% quiet background", prompt);
         Assert.Contains("at most one shape layer", prompt);
         Assert.DoesNotContain("gold-colored", prompt);
@@ -48,10 +48,36 @@ public sealed class DesignArtDirectionTests
         Assert.Contains("one dominant motif", prompt);
         Assert.Contains("no repeated focal motifs or forced seamless tiling", prompt);
         Assert.Contains("60-70% quiet background", prompt);
-        Assert.Contains("at most 2 ink colors", prompt);
+        Assert.Contains("at most 2 base colors", prompt);
         Assert.Contains("no colored accents", prompt);
         Assert.DoesNotContain("Seamless repeating decorative pattern", prompt);
         Assert.DoesNotContain("entire image is filled", prompt);
+    }
+
+    [Theory]
+    [InlineData("engraving")]
+    [InlineData("ink")]
+    [InlineData("watercolor")]
+    [InlineData("abstract")]
+    public void RichIllustrationsAllowDetailWithoutMinimalOnlyRestrictions(string style)
+    {
+        var prompt = DesignArtDirection.Build(Choices(style, "ocean", "rich"));
+        Assert.Contains("Rich illustration", prompt);
+        Assert.Contains("foam crests", prompt);
+        Assert.Contains("tonal variations", prompt);
+        Assert.DoesNotContain("Minimal styling takes priority", prompt);
+        Assert.DoesNotContain("no intricate detail", prompt);
+        Assert.DoesNotContain("no texture", prompt);
+    }
+
+    [Fact]
+    public void WatercolorAndEngravingKeepTheirDistinctTechniquesForBotanicalMotifs()
+    {
+        var watercolor = DesignArtDirection.Build(Choices("watercolor", "garden", "layer"));
+        var engraving = DesignArtDirection.Build(Choices("engraving", "garden", "layer"));
+        Assert.Contains("pigment blooms", watercolor);
+        Assert.Contains("fine hatching", engraving);
+        Assert.DoesNotContain("at most two overlapping shape layers", watercolor);
     }
 
     [Fact]
@@ -69,6 +95,11 @@ public sealed class DesignArtDirectionTests
             var prompt = DesignArtDirection.Build(Choices(style.Id, nature.Id, visual.Id, color.Id, mood.Id));
             Assert.InRange(prompt.Length, 1, 2048);
             Assert.Contains("No text, letters, numbers, logos", prompt);
+            Assert.Contains("No products, appliances, kitchenware", prompt);
+            Assert.Contains("watermarks", prompt);
+            Assert.DoesNotContain("Xinobi", prompt);
+            Assert.DoesNotContain("home appliance collection", prompt);
+            Assert.DoesNotContain("for the kitchen", prompt);
         }
     }
 

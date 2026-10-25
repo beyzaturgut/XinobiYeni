@@ -87,7 +87,9 @@ public sealed class DesignStudioTests : IDisposable
         Assert.Equal(session.Variant.Id, ready.Variant.Id);
         var bank = factory.Services.GetRequiredService<QuestionBank>();
         Assert.Equal(bank.BuildPrompt(session.Questions, Answers(session).Answers), provider.LastPrompt);
-        Assert.Contains("Art direction: Xinobi", provider.LastPrompt!);
+        Assert.Contains("Art direction:", provider.LastPrompt!);
+        Assert.DoesNotContain("Xinobi", provider.LastPrompt!);
+        Assert.Contains("No products, appliances, kitchenware", provider.LastPrompt!);
         Assert.Contains("Composition:", provider.LastPrompt!);
         using var stored = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "design-studio", "sessions.json")));
         var savedSession = stored.RootElement.GetProperty("sessions").GetProperty(session.Id);

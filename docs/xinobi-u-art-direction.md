@@ -1,36 +1,52 @@
 # XINOBI U tasarım yönü ve cevap kuralları
 
-13.10.2026 tarihinde proje sahibinin istediği iki iyileştirme uygulandı: Xinobi görsel stilleri ve cevaplardan somut tasarım kuralları üretimi. İstem sürümü `xinobi-art-direction-1`.
+25.10.2026: istem sürümü `xinobi-art-direction-2`. Amaç ürün fotoğrafı değil,
+ürün üzerine daha sonra uygulanacak bağımsız iki boyutlu desen üretmektir.
+Modelin kullanım bağlamından eşya veya marka yazısı türetmesini azaltmak için
+olumlu tarifte marka, ev aleti koleksiyonu ve mutfak kullanım bağlamı bulunmaz.
 
-## Dört görsel stil
+## Cevapların tasarıma dönüşmesi
 
-| Yön | Mevcut cevaplardan seçim | Tasarım dili |
-| --- | --- | --- |
-| Sade geometrik | Minimal, geometrik, retro; botanik olmayan İskandinav | Kontrollü çizgi, temiz şekiller, ölçülü boşluk. Retro ve İskandinav seçimlerinin kendi çizgi karakteri korunur. |
-| Zarif botanik | Orman/bahçe ilhamıyla suluboya, gravür veya İskandinav | Sade yaprak/taç yaprak, ince dal, kontrollü organik yerleşim. |
-| Japon esintili | Mürekkep; botanik olmayan gravür | Az sayıda okunabilir mürekkep çizgisi, kontrollü fırça ritmi, boşluk. Seçilen doğa teması korunur. |
-| Akışkan soyut | Soyut; botanik olmayan suluboya | Geniş organik kıvrımlar, ölçülü katmanlar, okunabilir konturlar. |
+Mevcut beş soru ve seçenek kimlikleri korunur. Doğa motifleri, renk paleti,
+kompozisyon, ruh hâli ve çizim tekniği ayrı tarif edilir.
 
-Bu stiller mevcut beş sorudan türetilir; yeni ekran veya ek soru yoktur. Doğa seçimi bir manzara fotoğrafı yerine motif sözlüğünü belirler: dalga çizgisi, yaprak, dağ konturu, kum kıvrımı gibi. Kullanıcının suluboya, gravür veya retro tercihi ayrıca çizgi/doku kurallarıyla korunur.
+- Minimal/İskandinav: sade şekiller, bir motif ailesi, en fazla iki motif ölçeği ve
+  üç ana renk. Zengin/katmanlı yoğunlukta basit motiflerin ritmi artar; %45–55 sakin
+  zemin ve en fazla tek şekil katmanı korunur.
+- Suluboya: görünür pigment ve saydam boya geçişleri; botanik seçiminde yaprak ve
+  çiçek resimleme, diğer doğa temalarında akışkan boyama.
+- Gravür: ince oyma çizgileri ve tarama; zengin/katmanlı seçimde ayrıntılı konturlar.
+- Mürekkep: el çizgisi ve değişken çizgi kalınlığı; ayrıntı yoğunluk seçimine bağlıdır.
+- Geometri, retro ve soyut kendi şekil, doku ve kompozisyon karakterlerini korur.
+- Minimal olmayan zengin/katmanlı tasarımlar ayrıntılı motiflere izin verir; tüm
+  stillere zorunlu sadelik, düz dolgu veya iki katman sınırı uygulanmaz.
+- Diğer stillerde en fazla dört ana renk; aynı palet içinde ton geçişleri mümkündür.
+  Monokrom her durumda beyaz ve kömür grisi olarak kalır.
+- Seyrek, dengeli, zengin, tek odak, akış, tekrar, asimetri ve katman kompozisyonları
+  ayrı kurallara sahiptir. Yalnız tekrar seçiminde kesintisiz döşeme istenir.
 
-## Çelişmeyen kurallar
+## İstenmeyen içerik
 
-- Minimal ve İskandinav: en fazla üç renk, bir motif ailesi, en fazla iki motif ölçeği. Zengin/katmanlı yoğunluk seçilirse küçük karmaşık detaylar yerine basit motiflerin ritmi artar; %45–55 sakin zemin ve en fazla tek şekil katmanı istenir.
-- Diğer stiller: seçilen paletten en fazla dört renk. Palet sırası sabittir; minimal seçiminde dördüncü renk eklenmez. Monokrom: beyaz zemin ve kömür grisi, renkli vurgu yoktur.
-- Seyrek: %65–75 sakin zemin. Dengeli: %40–50. Zengin: %20–30 ve düzenli motif grupları.
-- Tek odak: merkez bölgesinde tek ana motif ve %60–70 sakin zemin; zorunlu tekrar/döşeme yoktur.
-- Akış: iki veya üç geniş diyagonal yol. Tekrar: karşı kenarları eşleşen düzenli desen. Asimetri: boşlukla dengelenmiş kaydırılmış gruplar. Katman: en fazla iki okunabilir katman.
-- Ruh hâli çizginin ritmini, formu ve kontrastı değiştirir; renk sınırını veya yoğunluk kararını aşamaz.
-- Tüm yönler düz iki boyutlu tasarım ister. Ürün maketi, perspektif, sahte metal yansıması, yazı ve logo istenmez. Mevcut içerik sınırları korunur.
+Tüm istemlerde ürünler, ev aletleri, mutfak eşyaları, fincanlar, çaydanlıklar,
+mobilya, iç mekân, ürün maketi ve 3D nesneler açıkça yasaklanır. Yazı, harf, rakam,
+logo, tipografi, etiket, açıklama, imza, filigran ve çerçeve de yasaklanır.
+Olumlu tarif yalnız seçilen doğa motiflerini çizmesini ister.
 
-Yüzdeler ve renk sınırları modele verilen tasarım talimatlarıdır; üretilmiş pikselleri ölçen veya düzelten bir kalite filtresi değildir. Güzel sonuç garantisi verilmez. Gerçek kalite, aynı cevaplarla üretilmiş örnekler ürün üzerinde karşılaştırılarak değerlendirilmeli.
+Bunlar modele verilen talimatlardır. OCR veya nesne denetimi eklenmedi; çıktıda
+istenmeyen içerik bulunmayacağı ya da estetik kalitenin artacağı garanti edilmez.
+Kalite yeni üretilen görseller ve ürün üzerindeki önizlemelerle değerlendirilmelidir.
 
-## Uygulama ve doğrulama
+## Kapsam ve doğrulama
 
-`DesignArtDirection` sunucuda sabit seçenek kimliklerini kurallara çevirir. Soru sırası ve rastgele görünen seçenek ifadeleri sonucu değiştirmez. `QuestionBank.BuildPrompt` her eksenin tam bir kez bulunmasını ve cevabın o oturuma ait olmasını doğrular.
+`DesignArtDirection` sabit seçenek kimliklerini kurallara çevirir. `QuestionBank`
+soru/cevap eşleşmelerini doğrular. Yeni üretimlerin tamamlanan istemi ve istem sürümü
+kaydedilir. Eski görseller ve kuyrukta kayıtlı eski istemler değiştirilmez; yeni
+kurallar için deploy sonrasında yeni bir üretim başlatılmalıdır.
 
-Yeni üretim kuyruğa alınırken tamamlanan istemle birlikte `GenerationPromptVersion` saklanır. Mevcut üretilmiş görseller yeniden üretilmez; kayıtlı eski istemler korunur. Banka sürümü, model, dört adımlı üretim, tek görsel sonucu, kota ve aynı isteğin tekrar üretim yapmaması davranışı değişmedi. SQL katalog ve ürün görsellerinde değişiklik yoktur.
+Model (FLUX.1 schnell), dört adımlı üretim, kota ve tek sonuç davranışı değişmedi.
+Referans görseller sağlayıcıya gönderilmez. Testler minimal/yoğunluk çakışmasını,
+çizim tekniklerini, konu/yazı yasaklarını, kayıtlı istemi ve 32.768 cevap birleşiminin
+2.048 karakter sınırına uymasını kapsar. Üretim testleri sahte sağlayıcı kullanır;
+ücretli görsel üretimi veya görsel kalite değerlendirmesi yapılmaz.
 
-19 izole test geçti. Testler dört yönü, minimal/yoğunluk çakışmasını, tek odak/monokrom kurallarını, sıra bağımsızlığını ve geçersiz cevapları kapsar. Bankanın 32.768 cevap kombinasyonunun tümünde kurallar çözümlenebildi ve istemler sağlayıcının 2.048 karakter sınırına sığdı. Üretim testleri sahte görsel sağlayıcısıyla çalıştı; ücretli AI çağrısı veya görsel kalite değerlendirmesi yapılmadı.
-
-Bu değişiklik kaynak koddadır; canlıya uygulanması için sonraki API dağıtımı gerekir. Bu çalışma kapsamında ZIP oluşturulmadı.
+Bu değişiklik kaynak koddadır; canlıya uygulanması için API deploy'u gerekir.

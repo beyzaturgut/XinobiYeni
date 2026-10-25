@@ -3,18 +3,18 @@ namespace Xinobi.Api.DesignStudio;
 /// <summary>Server-owned art direction. The questionnaire's stable option IDs, not random labels or question order, select the rules.</summary>
 public static class DesignArtDirection
 {
-    public const string Version = "xinobi-art-direction-1";
+    public const string Version = "xinobi-art-direction-2";
 
     private static readonly Dictionary<string, string> Motifs = new()
     {
-        ["forest"] = "stylized leaf silhouettes and slender branching lines; no forest landscape",
-        ["ocean"] = "simplified wave contours and flowing current arcs; no horizon or seascape",
-        ["mountain"] = "abstract angular ridge outlines; no photographic mountain scene",
-        ["desert"] = "smooth dune ribbons and clean contour bands; no granular sand noise",
-        ["garden"] = "restrained petal silhouettes and fine botanical stems; no crowded bouquet",
-        ["sky"] = "open airy arcs and simplified cloud curves; no realistic sky scene",
-        ["river"] = "meandering ribbons and rounded pebble forms; no river landscape",
-        ["cosmos"] = "sparse orbital arcs and clean star-like points; no galaxy photograph"
+        ["forest"] = "leaves, branching stems and woodland foliage",
+        ["ocean"] = "curling wave contours, flowing currents and foam crests",
+        ["mountain"] = "mountain ridgelines and layered rocky contours",
+        ["desert"] = "rolling dune ribbons and wind-shaped sand contours",
+        ["garden"] = "petals, blossoms and fine botanical stems",
+        ["sky"] = "airy cloud curves and sweeping sky currents",
+        ["river"] = "meandering river ribbons and rounded pebble forms",
+        ["cosmos"] = "orbital arcs and star-like points"
     };
 
     // Ordered palette: the color limit takes precedence over the remaining optional colors.
@@ -51,7 +51,7 @@ public static class DesignArtDirection
         ["flow"] = "Flow layout: 40-50% quiet background, two or three broad diagonal paths, consistent gaps between curves",
         ["repeat"] = "Repeat layout: 40-50% quiet background, a regular seamless tile with matching opposite edges, consistent motif spacing",
         ["asymmetric"] = "Asymmetric layout: 45-55% quiet background, offset motif clusters balanced by open space; no forced symmetry",
-        ["layer"] = "Layered layout: 30-40% quiet background, at most two overlapping shape layers, readable boundaries; no muddy overlap"
+        ["layer"] = "Layered layout: 30-40% quiet background, translucent overlapping shapes with readable boundaries and depth through color"
     };
 
     public static string Build(IReadOnlyDictionary<string, string> answers)
@@ -63,24 +63,31 @@ public static class DesignArtDirection
         var botanical = nature is "forest" or "garden";
         var direction = style switch
         {
-            "minimal" or "geometry" or "retro" => "Xinobi Simple Geometry: precise silhouettes, consistent medium-weight lines, deliberate spacing and clean matte graphic shapes",
-            "scandi" when botanical => "Xinobi Elegant Botanical: simplified leaves or petals, slender stems, restrained linework and carefully spaced organic forms",
-            "scandi" => "Xinobi Simple Geometry: soft geometric forms, clean contours, deliberate spacing and an organic Scandinavian character",
-            "watercolor" or "engraving" when botanical => "Xinobi Elegant Botanical: simplified leaves or petals, slender stems, restrained linework and carefully spaced organic forms",
-            "ink" or "engraving" => "Xinobi Japanese Inspired: economical ink gestures, controlled brush rhythm and deliberate open space; no calligraphy or borrowed artist signatures",
-            "watercolor" or "abstract" => "Xinobi Fluid Abstract: broad organic ribbons, calm overlapping forms and controlled flowing contours",
+            "minimal" => "Minimal Graphic: precise silhouettes, deliberate spacing and clean matte shapes",
+            "geometry" => "Geometric Graphic: precise shapes and rhythmic interlocking contours",
+            "scandi" when botanical => "Elegant Botanical: slender stems, simplified leaves and carefully spaced organic forms",
+            "scandi" => "Scandinavian Graphic: softly rounded organic shapes and quiet spacing",
+            "watercolor" when botanical => "Botanical Watercolor: expressive petals and foliage with delicate pigment washes",
+            "watercolor" => "Flowing Watercolor: fluid natural forms and luminous layered washes",
+            "engraving" when botanical => "Botanical Engraving: detailed leaves, veins and finely drawn stems",
+            "engraving" => "Illustrative Engraving: intricate flowing contours and rhythmic fine linework",
+            "ink" => "Ink Illustration: graceful hand-drawn contours and expressive brushwork",
+            "retro" => "Mid-century Graphic: rounded silhouettes, rhythmic shapes and confident color blocks",
+            "abstract" => "Fluid Abstract: expressive natural shapes and layered sweeping contours",
             _ => throw new ArgumentException("Bu tarz için tasarım kuralları tanımlı değil.")
         };
+        // Detail follows both style and density; rich illustration must not inherit minimal-only rules.
+        var detailed = !minimal && (visual is "rich" or "layer");
         var treatment = style switch
         {
-            "minimal" => "Flat solid fills and uniform medium-weight outlines; no texture or tiny ornament",
-            "geometry" => "Precise geometric reduction of the chosen nature motifs; crisp edges and consistent line weight",
-            "scandi" => "Softly rounded organic shapes, matte fills and simple contours; no tiny ornament",
-            "retro" => "Refined mid-century proportions and rounded graphic shapes; retain the user's palette",
-            "watercolor" => "Soft pigment transitions confined within clean motif shapes; no speckles or washed-out edges",
-            "ink" => "Fine but clearly readable ink contours with one controlled brush accent",
-            "engraving" => "Sparse parallel engraving strokes inside the motifs only; no dense crosshatching",
-            "abstract" => "Broad expressive shapes and restrained contour variation; no random paint splatter",
+            "minimal" => "Flat fills, uniform outlines and simple shapes",
+            "geometry" => "Crisp geometric edges and consistent line weight",
+            "scandi" => "Matte fills, fine stems and simple organic contours",
+            "retro" => "Refined mid-century proportions and subtle printed pigment texture",
+            "watercolor" => "Visible pigment blooms, translucent washes and soft painted edges",
+            "ink" => detailed ? "Intricate ink contours, varied line weight and flowing brush accents" : "Economical fine ink contours and one expressive brush accent",
+            "engraving" => detailed ? "Detailed engraved linework, fine hatching and layered contours" : "Fine engraved contours and selective interior hatching",
+            "abstract" => "Expressive painted shapes, layered color and controlled textural variation",
             _ => throw new ArgumentException("Bu tarz için tasarım kuralları tanımlı değil.")
         };
         var palette = Palettes[answers["color"]].Take(minimal ? 3 : 4).ToArray();
@@ -88,15 +95,18 @@ public static class DesignArtDirection
         var composition = minimal && (visual is "rich" or "layer")
             ? "Structured minimal layout: 45-55% quiet background, a richer rhythm of simple motifs, one motif family and at most one shape layer; no intricate detail"
             : Compositions[visual];
-        return $"Original flat two-dimensional decorative artwork for the Xinobi home appliance collection. "
-            + $"Art direction: {direction}. Motif vocabulary: {Motifs[nature]}. Finish: {treatment}. "
-            + $"Palette: use only {string.Join(", ", palette)}, at most {palette.Length} ink colors including the background; no additional hues. "
-            + (answers["color"] == "mono" ? "Monochrome only: charcoal marks on white, no colored accents. " : "")
-            + $"Composition: {composition}. Mood expressed through {Moods[answers["mood"]]}. "
-            + (minimal ? "Minimal styling takes priority: one motif family, at most two motif sizes, generous spacing and no ornamental micro-details. " : "")
-            + "One coherent visual language, readable shapes, intentional negative space and a flat background across the full canvas. "
-            + "The requested color limit and composition take priority over mood and texture. Quiet background is part of the finished artwork; do not fill every gap. "
-            + "Standalone artwork swatch, straight-on view, no product mockup, perspective, lighting effects, simulated metallic reflections or 3D objects. "
-            + "No text, letters, numbers, logos, signatures, brands, people, faces, copyrighted characters, violent, sexual or hateful imagery.";
+        return "Create only a standalone two-dimensional decorative artwork, viewed straight-on. "
+            + $"Art direction: {direction}. Motifs: {Motifs[nature]}. Technique: {treatment}. "
+            + $"Palette: {string.Join(", ", palette)}; at most {palette.Length} base colors including the background. "
+            + (answers["color"] == "mono" ? "Monochrome only: charcoal marks on white, no colored accents. "
+                : minimal ? "Use flat solid colors. " : "Allow tonal variations and shading within the selected palette. ")
+            + $"Composition: {composition}. Mood: {Moods[answers["mood"]]}. "
+            + (minimal ? "Minimal styling takes priority: one motif family, at most two motif sizes, generous spacing and no ornamental micro-details. "
+                : detailed ? "Rich illustration: layered motifs, fine internal detail and varied linework; preserve a clear visual hierarchy. "
+                : "Keep detail selective and follow the requested motif spacing. ")
+            + "The artwork itself fills the canvas, including intentional background space. All depicted forms belong to the selected nature motifs. "
+            + "No products, appliances, kitchenware, utensils, cups, teapots, furniture, interiors, product mockups or 3D objects. "
+            + "No text, letters, numbers, logos, typography, labels, captions, signatures, watermarks or borders. "
+            + "No people, faces, copyrighted characters, violent, sexual or hateful imagery.";
     }
 }

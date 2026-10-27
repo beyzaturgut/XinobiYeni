@@ -1,5 +1,7 @@
 # XINOBI U tasarım yönü ve cevap kuralları
 
+**27.10 yerel OCR güncellemesi:** Yeni AI adayları yayımlanmadan Tesseract ile tam görsel/köşe taramasından geçer. Şüpheli yazı/imza izinde en fazla bir ek aday; OCR hatasında kontrolsüz görsel yayımlanmaz. Eşya denetimi eklenmedi. Eski v2/v3/v4 metinlerindeki OCR yok ifadeleri tarihsel kalır. [İşletim ve kurulum](runbooks/tesseract-artwork-gate.md).
+
 ## Güncel estetik yön — 27.10.2026 / xinobi-art-direction-4
 
 V3 renk rolleri ve motif hiyerarşisi korunur. V4 rafine motif konturları, kontrollü çizgi kalınlığı, dengeli görsel ağırlık ve ana konturdan ince yardımcı çizgiler ister. Minimal/geometri/İskandinav teknik tarifleri tutarlı ince konturlarla güncellendi. Model ve steps=4 aynı. Bu estetik değişiklik OCR/nesne denetimi değildir; yazı/imza/eşya bulunmaması garanti edilmez. Görselin Cloudflare görsel anlama modeline gönderilmesi kullanıcı tarafından reddedildi. Yerel denetim seçenekleri değerlendirildi; üretim sonrası kontrol henüz uygulanmadı.

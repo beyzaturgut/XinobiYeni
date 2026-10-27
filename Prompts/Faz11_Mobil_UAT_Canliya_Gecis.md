@@ -1,5 +1,7 @@
 # Faz11 — iOS/Android, çapraz kanal kabulü ve canlıya geçiş
 
+**27.10 yerel OCR kapısı:** Yeni AI üretimlerine Tesseract tam görsel + köşe taraması bağlandı; şüpheli yazı/imza izleri yayımlanmıyor, en fazla bir ek üretim; OCR yok/hatalıysa kapalı kalır. Yeni dış görsel gönderimi yok. Eşya kontrolü hâlâ açık. Windows sunucuda executable/eng kurulumu ve IIS izinleri deploy öncesi gerekli; bu çalışma canlı kurulum değildir. [Kurulum ve sınırlar](../docs/runbooks/tesseract-artwork-gate.md).
+
 ## Güncel uygulama durumu — 27.10.2026
 
 **Durum:** Devam — birleşik yayın var; UAT/mağaza kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.

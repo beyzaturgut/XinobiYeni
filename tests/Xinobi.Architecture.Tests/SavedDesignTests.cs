@@ -26,8 +26,10 @@ public sealed class SavedDesignTests : IDisposable
         builder.UseSetting("Notifications:WorkerEnabled", "false");
         builder.UseSetting("DesignStudio:WorkerEnabled", "true");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:ExternalInferenceEnabled"] = "false", ["ProductSurfaces:PublishedRoot"] = Path.Combine(directory, "published") }));
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices((context, services) =>
         {
+            // Keep file assertions and the isolated stores on the same test-owned directory.
+            context.Configuration["LocalCommerce:DataDirectory"] = directory;
             services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender>(new PreviewSender());
             services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(new FakeProvider());
         });

@@ -18,7 +18,7 @@ public static class DesignStudioEndpoints
             catch (KeyNotFoundException) { return Results.NotFound(new { code = "session_expired", message = "Tasarım oturumu bulunamadı veya süresi doldu." }); }
             catch (DesignProviderException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Code == "answers_locked" ? 409 : error.Code.Contains("limit") ? 429 : 503); }
         });
-        group.MapGet("/status", (IImageGenerationProvider provider, QuestionBank bank) => Results.Ok(new { configured = provider.IsConfigured, questionCount = bank.Data.Questions.Length, version = bank.Data.Version }));
+        group.MapGet("/status", (IImageGenerationProvider provider, IArtworkInspector inspector, QuestionBank bank) => Results.Ok(new { configured = provider.IsConfigured && inspector.IsConfigured, questionCount = bank.Data.Questions.Length, version = bank.Data.Version }));
         group.MapPost("/sessions", async (CreateDesignSession request, DesignSessionStore store) => Results.Ok(await store.Create(request)));
         group.MapGet("/sessions/{id}", async (string id, DesignSessionStore store) => await store.Get(id) is { } session ? Results.Ok(session) : Results.NotFound(new { code = "session_expired", message = "Oturum bulunamadı veya süresi doldu." }));
         group.MapPost("/sessions/{id}/generation", async (string id, GenerateDesignRequest request, DesignSessionStore store) => Results.Ok(await store.Generate(id, request)));

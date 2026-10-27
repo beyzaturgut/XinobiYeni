@@ -1,5 +1,7 @@
 # Yerel desen denetimi değerlendirmesi — 27.10.2026
 
+> Sonraki uygulama: yerel Tesseract yazı/iz kapısı bağlandı; güncel kapsam ve Windows kurulumu [Tesseract runbook](tesseract-artwork-gate.md) içinde. Aşağıdaki değerlendirmedeki henüz entegrasyon yok ifadeleri değerlendirme anının tarihsel durumudur. Eşya/görsel model denetimi hâlâ uygulanmadı.
+
 ## Karar ve mevcut durum
 
 Proje sahibi, üretilen ham desenin dahi Cloudflare görsel-anlama modeline gönderilmesini reddetti; yalnız yerel denetim seçeneklerinin değerlendirilmesini istedi. Dış görsel denetim entegrasyonu uygulanmadı. Mevcut Cloudflare desen üretimi aynı kalır; yeni veri gönderimi eklenmedi. Prompt v4 rafine motif, tutarlı ince çizgi, ana/yardımcı çizgi ayrımı ve dengeli görsel ağırlık yönünü uygular. Bu prompt değişikliği otomatik görsel denetimi değildir.

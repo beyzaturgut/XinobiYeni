@@ -230,3 +230,5 @@
 
 
 - 27.10.2026 · [Prompt v5 / tek aday üretim](2026-10-27/TST-art-direction-v5.md) — Açık yazı/imza/eşya yasakları; ek denetim kaldırıldı, 25 hedefli test geçti.
+
+- 27.10.2026 · [Release dda85b6 doğrulaması](2026-10-27/TST-release-dda85b6.md) — Web/admin/API üretim derlemesi, ZIP ve yayımlanmış üç asset/hash doğrulandı; IIS kurulumu bekliyor.

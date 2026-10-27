@@ -228,6 +228,5 @@
 
 - 27.10.2026 · [Baskı alanı varsayılan kapalı](2026-10-27/TST-print-area-default.md) — Ortak web/mobil önizleme; yeniden açılışta checkbox işaretsiz, dosya lint temiz.
 
-- 27.10.2026 · [Prompt v4 / yerel OCR değerlendirmesi](2026-10-27/TST-art-direction-v4-local-review.md) — 25 test geçti; örnek imza yerel OCR ile düşük güvenle bulundu. Dış görsel denetim reddedildi; yerel üretim kapısı henüz kurulmadı.
 
-- 27.10.2026 · [Otomatik yerel Tesseract kapısı](2026-10-27/TST-tesseract-artwork-gate.md) — 54 hedefli API testi; gerçek yerel OCR temiz/örnek imza kontrolü, web tip/lint kontrolü. Eşya tespiti ve Windows kurulumu açık.
+- 27.10.2026 · [Prompt v5 / tek aday üretim](2026-10-27/TST-art-direction-v5.md) — Açık yazı/imza/eşya yasakları; ek denetim kaldırıldı, 25 hedefli test geçti.

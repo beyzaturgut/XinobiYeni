@@ -40,8 +40,6 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IAccountStore>();
                 services.AddSingleton<IAccountStore>(provider => provider.GetRequiredService<DevFileAccountStore>());
             }
-            services.RemoveAll<Xinobi.Api.DesignStudio.IArtworkInspector>();
-            services.AddSingleton<Xinobi.Api.DesignStudio.IArtworkInspector, TestArtworkInspector>();
             foreach (var service in services.Where(x => x.ServiceType == typeof(IHostedService) && x.ImplementationType == typeof(NotificationWorker)).ToArray())
                 services.Remove(service);
         });
@@ -52,10 +50,4 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
         base.Dispose(disposing);
         if (disposing && Directory.Exists(directory)) Directory.Delete(directory, true);
     }
-}
-
-internal sealed class TestArtworkInspector : Xinobi.Api.DesignStudio.IArtworkInspector
-{
-    public bool IsConfigured => true;
-    public Task<Xinobi.Api.DesignStudio.ArtworkInspection> InspectAsync(Xinobi.Api.DesignStudio.GeneratedImage image, CancellationToken cancellationToken) => Task.FromResult(new Xinobi.Api.DesignStudio.ArtworkInspection(false, 0));
 }

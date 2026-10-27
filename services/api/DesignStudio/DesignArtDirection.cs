@@ -3,7 +3,7 @@ namespace Xinobi.Api.DesignStudio;
 /// <summary>Server-owned art direction. The questionnaire's stable option IDs, not random labels or question order, select the rules.</summary>
 public static class DesignArtDirection
 {
-    public const string Version = "xinobi-art-direction-4";
+    public const string Version = "xinobi-art-direction-5";
 
     private static readonly Dictionary<string, string> Motifs = new()
     {
@@ -117,6 +117,8 @@ public static class DesignArtDirection
             + "Refined motif contours, controlled line weight and balanced visual weight; supporting strokes stay finer than the main contours. Readable shapes remain clear at reduced size. "
             + "The complete canvas is a flat illustrated surface composed exclusively of the selected nature motifs and intentional background space. "
             + "Text-free, unlettered, unbranded, unsigned, watermark-free and borderless artwork. "
-            + "Original nature illustration with family-friendly imagery.";
+            + "No text, letters, numbers, typography, captions, labels, signatures, initials, dates, logos, watermarks or borders. "
+            + "No products, appliances, kitchenware, utensils, cups, teapots, furniture, interiors, product mockups or 3D objects. "
+            + "No people, faces, copyrighted characters, violent, sexual or hateful imagery.";
     }
 }

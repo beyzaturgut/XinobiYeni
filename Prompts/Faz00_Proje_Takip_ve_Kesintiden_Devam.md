@@ -1,6 +1,6 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
-**27.10 yerel OCR kapısı:** Yeni AI üretimlerine Tesseract tam görsel + köşe taraması bağlandı; şüpheli yazı/imza izleri yayımlanmıyor, en fazla bir ek üretim; OCR yok/hatalıysa kapalı kalır. Yeni dış görsel gönderimi yok. Eşya kontrolü hâlâ açık. Windows sunucuda executable/eng kurulumu ve IIS izinleri deploy öncesi gerekli; bu çalışma canlı kurulum değildir. [Kurulum ve sınırlar](../docs/runbooks/tesseract-artwork-gate.md).
+**27.10 son üretim tercihi:** Ek yerel denetim ve bağlı kurulum kullanıcı isteğiyle kaldırıldı; tek aday üretimi geri geldi. Prompt v5 her isteme açık yazı/imza/logo/ürün/eşya yasakları ekler, rafine çizim kuralları korunur. [Test kaydı](../test/2026-10-27/TST-art-direction-v5.md).
 
 > **Bu dosyanın ilk hali bir plan ve doldurulabilir çalışma kaydıdır.** Bu ifade başlangıç planının durumunu anlatır; güncel uygulama, test ve yayın durumu §5’te, tarihli kabul kayıtları §7’dedir. Her çalışma oturumu başında okunur, anlamlı her değişiklikten sonra ve oturum kapanışında güncellenir.
 

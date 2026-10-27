@@ -13,11 +13,11 @@ public sealed class DesignStudioTests : IDisposable
 {
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-design-test-" + Guid.NewGuid());
     private readonly FakeImageProvider provider = new();
-    private WebApplicationFactory<Program> Factory(int limit = 30, bool disableLimit = false, IArtworkInspector? inspector = null) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory(int limit = 30, bool disableLimit = false) => new IsolatedApiFactory().WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["DesignStudio:WorkerEnabled"] = "true", ["DesignStudio:ExternalInferenceEnabled"] = "false", ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:DailyGenerationLimit"] = limit.ToString(), ["DesignStudio:DisableGenerationLimit"] = disableLimit.ToString() }));
-        builder.ConfigureServices((context, services) => { context.Configuration["DesignStudio:DataDirectory"] = Path.Combine(directory, "design-studio"); services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); if (inspector is not null) { services.RemoveAll<IArtworkInspector>(); services.AddSingleton<IArtworkInspector>(inspector); } services.AddHostedService<DesignGenerationWorker>(); });
+        builder.ConfigureServices((context, services) => { context.Configuration["DesignStudio:DataDirectory"] = Path.Combine(directory, "design-studio"); services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); services.AddHostedService<DesignGenerationWorker>(); });
     });
     private const string Root = "/api/v1/design-studio";
     private async Task<SessionView> Create(HttpClient client, string? browser = null)
@@ -142,81 +142,6 @@ public sealed class DesignStudioTests : IDisposable
         Assert.Equal(HttpStatusCode.BadRequest, (await client.PostAsJsonAsync(Root + "/sessions", new CreateDesignSession("DEMO-P101", "DEMO-V102-R", Guid.NewGuid().ToString()))).StatusCode);
     }
     public void Dispose() { if (Directory.Exists(directory)) Directory.Delete(directory, true); }
-    [Theory]
-    [InlineData(false, false, 1, "ready")]
-    [InlineData(true, false, 2, "ready")]
-    [InlineData(true, true, 2, "failed")]
-    public async Task OnlyInspectedCleanOutputCanBePublishedAndRetryIsBounded(bool first, bool second, int expectedCalls, string expectedStatus)
-    {
-        var inspector = new SequenceInspector(first, second);
-        using var factory = Factory(inspector: inspector); using var client = factory.CreateClient();
-        var session = await Create(client);
-        (await client.PostAsJsonAsync(Root + "/sessions/" + session.Id + "/generation", Answers(session))).EnsureSuccessStatusCode();
-        SessionView current = session;
-        for (var attempt = 0; attempt < 100; attempt++)
-        {
-            current = (await client.GetFromJsonAsync<SessionView>(Root + "/sessions/" + session.Id))!;
-            if (current.Status is "ready" or "failed") break;
-            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync(Root + "/sessions/" + session.Id + "/image")).StatusCode);
-            await Task.Delay(30);
-        }
-        Assert.Equal(expectedStatus, current.Status); Assert.Equal(expectedCalls, provider.Calls);
-        Assert.Equal(expectedCalls, inspector.Calls);
-        if (expectedStatus == "failed")
-        {
-            Assert.Equal("artwork_rejected", current.ErrorCode); Assert.Null(current.ImageUrl);
-            Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync(Root + "/sessions/" + session.Id + "/image")).StatusCode);
-            Assert.False(Directory.Exists(Path.Combine(directory, "design-studio", "assets")));
-        }
-        (await client.PostAsJsonAsync(Root + "/sessions/" + session.Id + "/generation", Answers(session))).EnsureSuccessStatusCode();
-        Assert.Equal(expectedCalls, provider.Calls);
-    }
-    [Fact]
-    public async Task UnavailableOcrBlocksGenerationBeforeSpendingAProviderCall()
-    {
-        using var factory = Factory(inspector: new MissingInspector()); using var client = factory.CreateClient();
-        var session = await Create(client);
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.PostAsJsonAsync(Root + "/sessions/" + session.Id + "/generation", Answers(session))).StatusCode);
-        Assert.Equal(0, provider.Calls);
-    }
-    [Fact]
-    public async Task RuntimeOcrFailurePublishesNothingAndDoesNotRegenerate()
-    {
-        using var factory = Factory(inspector: new FailingInspector()); using var client = factory.CreateClient();
-        var session = await Create(client);
-        (await client.PostAsJsonAsync(Root + "/sessions/" + session.Id + "/generation", Answers(session))).EnsureSuccessStatusCode();
-        SessionView current = session;
-        for (var attempt = 0; attempt < 100; attempt++)
-        {
-            current = (await client.GetFromJsonAsync<SessionView>(Root + "/sessions/" + session.Id))!;
-            if (current.Status == "failed") break;
-            await Task.Delay(30);
-        }
-        Assert.Equal("failed", current.Status); Assert.Equal("artwork_review_unavailable", current.ErrorCode);
-        Assert.Equal(1, provider.Calls); Assert.Null(current.ImageUrl);
-        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync(Root + "/sessions/" + session.Id + "/image")).StatusCode);
-        Assert.False(Directory.Exists(Path.Combine(directory, "design-studio", "assets")));
-    }
-    private sealed class FailingInspector : IArtworkInspector
-    {
-        public bool IsConfigured => true;
-        public Task<ArtworkInspection> InspectAsync(GeneratedImage image, CancellationToken token) => throw new DesignProviderException("artwork_review_unavailable", "Yerel OCR kullanılamıyor.");
-    }
-    private sealed class MissingInspector : IArtworkInspector
-    {
-        public bool IsConfigured => false;
-        public Task<ArtworkInspection> InspectAsync(GeneratedImage image, CancellationToken token) => throw new InvalidOperationException();
-    }
-    private sealed class SequenceInspector(bool first, bool second) : IArtworkInspector
-    {
-        public int Calls;
-        public bool IsConfigured => true;
-        public Task<ArtworkInspection> InspectAsync(GeneratedImage image, CancellationToken token)
-        {
-            var rejected = ++Calls == 1 ? first : second;
-            return Task.FromResult(new ArtworkInspection(rejected, rejected ? 1 : 0));
-        }
-    }
     private sealed class FakeImageProvider : IImageGenerationProvider
     {
         public static byte[] Png => Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");

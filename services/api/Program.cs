@@ -75,7 +75,6 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceWorkspace>();
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
-    builder.Services.AddSingleton<IArtworkInspector, LocalArtworkInspector>();
     builder.Services.AddSingleton<DesignSessionStore>();
     if (builder.Configuration.GetValue("DesignStudio:WorkerEnabled", true)) builder.Services.AddHostedService<DesignGenerationWorker>();
     builder.Services.AddRateLimiter(options => {
@@ -95,7 +94,6 @@ if (xinobiUOnTestServer)
 {
     builder.Services.AddSingleton<QuestionBank>();
     builder.Services.AddHttpClient<IImageGenerationProvider, CloudflareImageProvider>(client => client.Timeout = TimeSpan.FromSeconds(120));
-    builder.Services.AddSingleton<IArtworkInspector, LocalArtworkInspector>();
     builder.Services.AddSingleton<DesignSessionStore>();
     builder.Services.AddHostedService<DesignGenerationWorker>();
     builder.Services.AddRateLimiter(options => {

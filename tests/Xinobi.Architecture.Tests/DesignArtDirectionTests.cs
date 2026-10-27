@@ -114,8 +114,10 @@ public sealed class DesignArtDirectionTests
             Assert.InRange(prompt.Length, 1, 2048);
             Assert.Contains("Text-free, unlettered, unbranded", prompt);
             Assert.Contains("composed exclusively of the selected nature motifs", prompt);
-            foreach (var unwanted in new[] { "kitchen", "appliance", "teapot", "cup", "mockup", "furniture", "typography" })
-                Assert.DoesNotContain(unwanted, prompt, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("No text, letters, numbers, typography", prompt);
+            Assert.Contains("signatures, initials, dates, logos, watermarks", prompt);
+            Assert.Contains("No products, appliances, kitchenware", prompt);
+            Assert.Contains("cups, teapots, furniture, interiors, product mockups", prompt);
             Assert.Contains("watermark-free", prompt);
             Assert.DoesNotContain("Xinobi", prompt);
             Assert.DoesNotContain("home appliance collection", prompt);

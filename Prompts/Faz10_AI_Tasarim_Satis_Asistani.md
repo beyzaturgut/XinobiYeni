@@ -1,8 +1,7 @@
 # Faz10 — AI tasarım üretimi, satış asistanı ve AI yönetim paneli
 
-**27.10 yerel OCR kapısı:** Yeni AI üretimlerine Tesseract tam görsel + köşe taraması bağlandı; şüpheli yazı/imza izleri yayımlanmıyor, en fazla bir ek üretim; OCR yok/hatalıysa kapalı kalır. Yeni dış görsel gönderimi yok. Eşya kontrolü hâlâ açık. Windows sunucuda executable/eng kurulumu ve IIS izinleri deploy öncesi gerekli; bu çalışma canlı kurulum değildir. [Kurulum ve sınırlar](../docs/runbooks/tesseract-artwork-gate.md).
+**27.10 son üretim tercihi:** Ek yerel denetim ve bağlı kurulum kullanıcı isteğiyle kaldırıldı; tek aday üretimi geri geldi. Prompt v5 her isteme açık yazı/imza/logo/ürün/eşya yasakları ekler, rafine çizim kuralları korunur. [Test kaydı](../test/2026-10-27/TST-art-direction-v5.md).
 
-**27.10 v4 estetik ek kaydı:** Rafine motif/çizgi kalınlığı/görsel denge kuralları eklendi. Dış görsel denetim gönderimi kullanıcı tarafından reddedildi. Yerel OCR/görsel model seçenekleri değerlendirildi; otomatik denetim kurulmuş veya görsel kalite kabul edilmiş sayılmaz.
 
 **27.10 prompt v3 ek kaydı:** AI desen üretimine olumlu motif tarifi, ana/yardımcı motif hiyerarşisi, zemin/ana/destek/vurgu renk rolleri ve kısa yazısızlık kuralları eklendi (`xinobi-art-direction-3`). Model ve dört adım korunur. Yeni ücretli üretim/estetik kabul veya canlı deploy yapılmadı; görsel sonuçlar kullanıcıyla iteratif değerlendirilecek. [Kurallar](../docs/xinobi-u-art-direction.md), [test kaydı](../test/2026-10-27/TST-art-direction-v3.md).
 
@@ -122,5 +121,3 @@ Faz00'a son doğrulanmış commit/test, aktif iş ID/job status, kota rezervasyo
 | **Proje Yöneticisi — zorunlu son kapı** | **Altı inceleme, gerçek servis kanıtı, D05/D08/D10, Creative handoff, müşteri UAT ve Faz00; eksikte RED** | **BEKLİYOR** |
 
 Belge incelemesi gerçek uygulama onayı değildir; bu kutular şimdiden işaretlenmez.
-
-Yerel seçeneklerin kanıt ve sınırları: [yerel denetim değerlendirmesi](../docs/runbooks/local-artwork-review.md).

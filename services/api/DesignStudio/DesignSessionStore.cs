@@ -16,8 +16,6 @@ public record DesignSession(string Id, string BrowserId, DateTimeOffset CreatedA
     public DesignAnswer[] Answers { get; set; } = [];
     public string? GenerationPrompt { get; set; }
     public string? GenerationPromptVersion { get; set; }
-    public int GenerationAttempts { get; set; }
-    public ArtworkInspection[] Inspections { get; set; } = [];
     public string? RequestHash { get; set; }
     public string? ErrorCode { get; set; }
     public string? ErrorMessage { get; set; }
@@ -37,7 +35,7 @@ public record SessionView(string Id, string Status, DateTimeOffset ExpiresAt, Co
 /// Products come from the active catalogue source (the local store in Development, the published snapshot on the test server).
 /// Sessions and images live in <c>DesignStudio:DataDirectory</c>, by default <c>design-studio</c> under the local commerce data directory.
 /// </summary>
-public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank, IImageGenerationProvider provider, IArtworkInspector inspector, IConfiguration configuration, IWebHostEnvironment environment)
+public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank, IImageGenerationProvider provider, IConfiguration configuration, IWebHostEnvironment environment)
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
@@ -134,7 +132,6 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
                 return View(session); // Network retries never trigger another provider request.
             }
             if (session.BankVersion != bank.Data.Version) throw new DesignProviderException("questionnaire_updated", "Soru havuzu güncellendi. Yeni bir anket başlatın.");
-            if (!inspector.IsConfigured) throw new DesignProviderException("artwork_review_unavailable", "Yerel yazı denetimi hazır değil. Tesseract kurulumu kontrol edilmeli; üretim başlatılmadı.");
             if (!provider.IsConfigured) throw new DesignProviderException("provider_not_configured", "Cloudflare bağlantısı henüz yapılandırılmadı. Yanıtlarınız korunuyor.");
             if (!current.Products.Any(p => p.Id == session.Product.Id && Eligible(p) && p.Variants.Any(v => v.Id == session.Variant.Id))) throw new ArgumentException("Seçilen ürün artık kişiselleştirmeye açık değil.");
             var limit = Math.Clamp(configuration.GetValue("DesignStudio:DailyGenerationLimit", 30), 1, 100);
@@ -175,21 +172,7 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
         }
         finally { gate.Release(); }
         GeneratedImage? image = null; string? errorCode = null, errorMessage = null;
-        var inspections = new List<ArtworkInspection>(); var attempts = 0;
-        try
-        {
-            if (!inspector.IsConfigured) throw new DesignProviderException("artwork_review_unavailable", "Yerel yazı denetimi hazır değil; görsel üretimi başlatılmadı.");
-            var prompt = session.GenerationPrompt ?? bank.BuildPrompt(session.Questions, session.Answers);
-            for (var attempt = 0; attempt < 2; attempt++)
-            {
-                token.ThrowIfCancellationRequested(); attempts++;
-                var candidate = await provider.GenerateAsync(prompt, token);
-                var inspection = await inspector.InspectAsync(candidate, token);
-                inspections.Add(inspection);
-                if (!inspection.HasText) { image = candidate; break; }
-            }
-            if (image is null) throw new DesignProviderException("artwork_rejected", "Görselde yazı veya imza benzeri iz algılandı. İki denemede de denetim geçilemedi; görsel gösterilmedi. Yeni bir anket başlatabilirsiniz.");
-        }
+        try { image = await provider.GenerateAsync(session.GenerationPrompt ?? bank.BuildPrompt(session.Questions, session.Answers), token); }
         catch (DesignProviderException error) { errorCode = error.Code; errorMessage = error.Message; }
         catch (OperationCanceledException) { errorCode = "provider_timeout"; errorMessage = "Üretim süresi doldu. İstek otomatik tekrarlanmadı."; }
         catch (Exception) { errorCode = "provider_unavailable"; errorMessage = "Görsel üretimi tamamlanamadı. Yanıtlarınız korunuyor."; }
@@ -197,7 +180,6 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
         try
         {
             var state = await ReadCore(); var saved = state.Sessions[id];
-            saved.GenerationAttempts = attempts; saved.Inspections = inspections.ToArray();
             if (image is not null)
             {
                 Directory.CreateDirectory(AssetDirectory);
@@ -220,7 +202,7 @@ public sealed class DesignGenerationWorker(DesignSessionStore sessions, ILogger<
         await sessions.Recover();
         await foreach (var id in sessions.Queue.Reader.ReadAllAsync(stoppingToken))
         {
-            try { using var timeout = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken); timeout.CancelAfter(TimeSpan.FromSeconds(360)); await sessions.Run(id, timeout.Token); }
+            try { using var timeout = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken); timeout.CancelAfter(TimeSpan.FromSeconds(120)); await sessions.Run(id, timeout.Token); }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested) { break; }
             catch (Exception error) { logger.LogError("Design job persistence failed ({ExceptionType}).", error.GetType().Name); }
         }

@@ -84,8 +84,10 @@ public static class OrderEndpoints
                 : (await accounts.AllOrders()).FirstOrDefault(item => item.Order.Id == id)?.Order, line, designs, download == true));
         panel.MapGet("/order-options", (IConfiguration configuration) => TypedResults.Ok(Options(configuration)));
 
-        panel.MapPost("/orders/{id}/status", async (string id, SetOrderStatus request, IAccountStore accounts, NotificationCenter notifications, TimeProvider clock) =>
+        panel.MapPost("/orders/{id}/status", async (string id, SetOrderStatus request, HttpContext http, IAccountStore accounts, NotificationCenter notifications, TimeProvider clock) =>
         {
+            if (request.Status == OrderStatuses.Cancelled && !http.User.HasClaim(PermissionAuthorization.PermissionClaim, "orders.cancel"))
+                throw new ProblemException("forbidden", "Sipariş iptali için orders.cancel yetkisi gerekli.", StatusCodes.Status403Forbidden);
             var (order, account) = await accounts.ChangeOrder(null, id, order => OrderLifecycle.SetStatus(order, request.Status, request.Note, clock.GetUtcNow()));
             await OrderNotifications.Send(notifications, account, order, "order_" + order.Status);
             return TypedResults.Ok(order);

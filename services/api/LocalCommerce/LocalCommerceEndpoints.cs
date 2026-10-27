@@ -5,6 +5,16 @@ namespace Xinobi.Api.LocalCommerce;
 
 public static class LocalCommerceEndpoints
 {
+    public record StockUpdate(int Stock);
+
+    private static void RequireStockPermission(HttpContext http, CommerceVariant[] before, CommerceVariant[] after)
+    {
+        var oldStocks = before.ToDictionary(v => v.Id, v => v.Stock);
+        var newStocks = after.ToDictionary(v => v.Id, v => v.Stock);
+        if (oldStocks.Keys.Union(newStocks.Keys).Any(id => oldStocks.GetValueOrDefault(id) != newStocks.GetValueOrDefault(id))
+            && !http.User.HasClaim(Xinobi.Api.Identity.PermissionAuthorization.PermissionClaim, "inventory.write"))
+            throw new Xinobi.Api.Infrastructure.ProblemException("forbidden", "Stok değişikliği için inventory.write yetkisi gerekli.", StatusCodes.Status403Forbidden);
+    }
     public const int MaxGalleryImages = 12;
     public const int MaxSpecs = 30;
 
@@ -114,7 +124,7 @@ public static class LocalCommerceEndpoints
             catch (KeyNotFoundException error) { return Results.NotFound(new { message = error.Message }); }
             catch (ArgumentException error) { return Results.Conflict(new { message = error.Message }); }
         });
-        group.MapPut("/products/{id}", async (string id, CommerceProduct product, LocalCommerceStore store) =>
+        group.MapPut("/products/{id}", async (string id, CommerceProduct product, HttpContext http, LocalCommerceStore store) =>
         {
             if (!ValidSpecs(product.Specs))
                 return Results.BadRequest(new { message = $"Teknik özellikler: en fazla {MaxSpecs} satır, ad 1–60 ve değer 1–200 karakter, aynı ad iki kez kullanılamaz." });
@@ -128,6 +138,7 @@ public static class LocalCommerceEndpoints
             {
                 var state = await store.Update(state =>
                 {
+                    RequireStockPermission(http, state.Products.FirstOrDefault(p => p.Id == id)?.Variants ?? [], product.Variants);
                     if (!state.Categories!.Contains(product.Category)) throw new ArgumentException("Geçerli kategori seçin.");
                     if (state.Products.Where(p => p.Id != id).SelectMany(p => p.Variants).Any(other => product.Variants.Any(v => v.Id == other.Id || string.Equals(v.Sku, other.Sku, StringComparison.OrdinalIgnoreCase))))
                         throw new ArgumentException("SKU veya varyant kimliği başka bir üründe kullanılıyor.");
@@ -142,11 +153,28 @@ public static class LocalCommerceEndpoints
             }
             catch (ArgumentException error) { return Results.BadRequest(new { message = error.Message }); }
         });
-        group.MapDelete("/products/{id}", async (string id, LocalCommerceStore store) => Results.Ok(await store.Update(state => state with
+        group.MapDelete("/products/{id}", async (string id, HttpContext http, LocalCommerceStore store) => Results.Ok(await store.Update(state =>
         {
-            Products = state.Products.Where(p => p.Id != id).ToArray(),
-            Prices = state.Prices.Where(pair => !state.Products.Where(p => p.Id == id).SelectMany(p => p.Variants).Any(v => v.Id == pair.Key)).ToDictionary()
+            RequireStockPermission(http, state.Products.FirstOrDefault(p => p.Id == id)?.Variants ?? [], []);
+            return state with
+            {
+                Products = state.Products.Where(p => p.Id != id).ToArray(),
+                Prices = state.Prices.Where(pair => !state.Products.Where(p => p.Id == id).SelectMany(p => p.Variants).Any(v => v.Id == pair.Key)).ToDictionary()
+            };
         })));
+        group.MapPut("/inventory/{id}", async (string id, StockUpdate request, LocalCommerceStore store) =>
+        {
+            if (request.Stock < 0) return Results.BadRequest(new { message = "Stok sıfır veya pozitif tam sayı olmalı." });
+            return Results.Ok(await store.Update(state =>
+            {
+                if (!state.Products.SelectMany(p => p.Variants).Any(v => v.Id == id))
+                    throw new Xinobi.Api.Infrastructure.ProblemException("variant_not_found", "Varyant bulunamadı.", StatusCodes.Status404NotFound);
+                return state with { Products = state.Products.Select(p => p with
+                {
+                    Variants = p.Variants.Select(v => v.Id == id ? v with { Stock = request.Stock } : v).ToArray()
+                }).ToArray() };
+            }));
+        });
         group.MapPut("/prices/{id}", async (string id, PriceUpdate price, LocalCommerceStore store) =>
         {
             if (price.Cents <= 0 || price.Cents > 999999999) return Results.BadRequest(new { message = "Geçerli pozitif fiyat girin." });

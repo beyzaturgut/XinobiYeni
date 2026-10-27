@@ -54,19 +54,21 @@ try{
   assert.deepEqual(errors,[])
   await page.close();console.log(`${width}px PASS: no fabricated KPI/depot/provider records, stock search/clear, disabled nonpersistent settings, real invite retained, zero writes and no overflow`)
  }
- // Existing catalog stock save contract: failure keeps input, success requires
+ // Inventory-only save contract: failure keeps input, success requires
  // the returned server state. Double-click protection is UI-only, not a claim
  // of server idempotency. All writes below are intercepted fixtures.
  const page=await browser.newPage();let writes=0,fail=true
  await page.route('**/api/**',async route=>{
   const path=new URL(route.request().url()).pathname
-  if(path.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Synthetic'},permissions:['inventory.read','catalog.write']}})
+  if(path.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Synthetic'},permissions:['inventory.read','inventory.write']}})
   if(route.request().method()!=='GET'){
    writes++;await new Promise(resolve=>setTimeout(resolve,80))
+   assert.equal(route.request().method(),'PUT')
+   assert.equal(path,'/api/v1/local-commerce/inventory/V-P1')
    if(fail)return route.fulfill({status:503,json:{title:'Synthetic stock failure'}})
    const saved=route.request().postDataJSON()
-   assert.equal(saved.variants[0].stock,9)
-   return route.fulfill({json:{...state,products:[saved,state.products[1]]}})
+   assert.deepEqual(saved,{stock:9})
+   return route.fulfill({json:{...state,products:[{...state.products[0],variants:[{...state.products[0].variants[0],stock:9}]},state.products[1]]}})
   }
   return route.fulfill({json:state})
  })
@@ -80,4 +82,16 @@ try{
  await page.getByText('SKU-A stoğu kaydedildi.',{exact:true}).waitFor()
  assert.equal(writes,2);assert.equal(await stock.inputValue(),'9')
  await page.close();console.log('PASS: existing stock save retains failed input, confirmed state updates value, duplicate click sends one fixture request')
+ const denied=await browser.newPage();let deniedWrites=0
+ await denied.route('**/api/**',route=>{
+  if(route.request().method()!=='GET'){deniedWrites++;return route.fulfill({status:403,json:{title:'Forbidden'}})}
+  if(new URL(route.request().url()).pathname.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Catalog editor'},permissions:['inventory.read','catalog.write']}})
+  return route.fulfill({json:state})
+ })
+ await denied.goto(base+'?view=inventory')
+ await denied.getByRole('spinbutton',{name:'SKU-A web stoğu'}).waitFor()
+ assert.equal(await denied.getByRole('spinbutton',{name:'SKU-A web stoğu'}).isDisabled(),true)
+ assert.equal(await denied.getByRole('button',{name:'Stoğu kaydet'}).first().isDisabled(),true)
+ assert.equal(deniedWrites,0)
+ await denied.close();console.log('PASS: catalog.write alone cannot edit inventory')
 }finally{await browser.close()}

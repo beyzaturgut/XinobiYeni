@@ -3,8 +3,8 @@ import type {Product} from './catalog-data'
 import {useAdminSession} from './AdminAccess'
 
 const tabs=['Web stokları','Depo stokları','Hareket geçmişi','Mutabakat','Sayım önizlemesi']
-export default function Inventory({products,onSave}:{products:Product[];onSave:(product:Product)=>Promise<void>}){
-  const canWrite=useAdminSession()?.permissions.includes('catalog.write')??false
+export default function Inventory({products,onStock}:{products:Product[];onStock:(variantId:string,stock:number)=>Promise<void>}){
+  const canWrite=useAdminSession()?.permissions.includes('inventory.write')??false
   const [tab,setTab]=useState(tabs[0]),[query,setQuery]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false)
   const writing=useRef(false)
   const matches=(product:Product,variant:Product['variants'][number])=>`${product.name} ${variant.sku} ${variant.color}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR'))
@@ -20,7 +20,7 @@ export default function Inventory({products,onSave}:{products:Product[];onSave:(
         const stock=Number((event.currentTarget.elements.namedItem('stock') as HTMLInputElement).value)
         if(!Number.isSafeInteger(stock)||stock<0){setError('Stok sıfır veya pozitif tam sayı olmalı.');return}
         writing.current=true;setBusy(true);setNotice('');setError('')
-        try{await onSave({...product,variants:product.variants.map(item=>item.id===variant.id?{...item,stock}:item)});setNotice(`${variant.sku} stoğu kaydedildi.`)}catch(problem){setError(problem instanceof Error?problem.message:'Stok kaydedilemedi.')}finally{writing.current=false;setBusy(false)}
+        try{await onStock(variant.id,stock);setNotice(`${variant.sku} stoğu kaydedildi.`)}catch(problem){setError(problem instanceof Error?problem.message:'Stok kaydedilemedi.')}finally{writing.current=false;setBusy(false)}
       }}><label>{variant.color} · {variant.sku}<input key={`${variant.id}-${variant.stock}`} aria-label={`${variant.sku} web stoğu`} name="stock" type="number" min="0" step="1" defaultValue={variant.stock} required/></label><button>Stoğu kaydet</button></form>)}</fieldset>)}
       {count===0&&<div className="empty-widget"><strong>{products.length?'Filtreye uygun varyant yok':'Katalogda varyant yok'}</strong><p>Depo stoğu veya örnek ürün üretilmez.</p></div>}
       {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}

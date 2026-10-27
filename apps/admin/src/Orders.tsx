@@ -142,7 +142,7 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
         <div className="dialog-actions">
           {order.status === 'received' && <button disabled={actionsDisabled||!canWrite} onClick={() => void act('/status', { status: 'preparing', note: note || null }, 'Sipariş hazırlanıyor.')}>Hazırlanmaya başla</button>}
           {order.status === 'shipped' && <button disabled={actionsDisabled||!canWrite} onClick={() => void act('/status', { status: 'delivered', note: note || null }, 'Sipariş teslim edildi.')}>Teslim edildi</button>}
-          {(order.status === 'received' || order.status === 'preparing') && <button disabled={actionsDisabled||!canWrite} onClick={() => { if (window.confirm(`${order.number} iptal edilsin mi?`)) void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.') }}>Siparişi iptal et</button>}
+          {(order.status === 'received' || order.status === 'preparing') && <button disabled={actionsDisabled||!canWrite||!canCancel} onClick={() => { if (window.confirm(`${order.number} iptal edilsin mi?`)) void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.') }}>Siparişi iptal et</button>}
         </div>
         {notice && <p role="status">{notice}</p>}
         <h3>Geçmiş</h3>

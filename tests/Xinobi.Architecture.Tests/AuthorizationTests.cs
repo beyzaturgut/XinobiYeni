@@ -2,6 +2,11 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Xinobi.Api.LocalCommerce;
+using Xinobi.Api.Orders;
+using Xinobi.Api.Catalog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -399,6 +404,83 @@ public sealed class AuthorizationTests : IDisposable
         var builder = WebApplication.CreateBuilder();
         var app = builder.Build();
         Assert.Throws<ArgumentException>(() => app.MapGet("/x", () => "x").RequirePermission("catalog.delete-everything"));
+    }
+
+    private sealed class RemovePermissions(string[] permissions) : IClaimsTransformation
+    {
+        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        {
+            foreach (var identity in principal.Identities)
+                foreach (var claim in identity.FindAll(PermissionAuthorization.PermissionClaim).Where(c => permissions.Contains(c.Value)).ToArray())
+                    identity.RemoveClaim(claim);
+            return Task.FromResult(principal);
+        }
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task DirectAndRequestedCancellationRequireCancelPermission(bool allowed)
+    {
+        using var isolated = Factory();
+        using var factory = isolated.WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+            services.AddSingleton<IClaimsTransformation>(new RemovePermissions(allowed ? [] : ["orders.cancel"]))));
+        Assert.IsType<DevFileAccountStore>(factory.Services.GetRequiredService<IAccountStore>());
+        Assert.Equal("", factory.Services.GetRequiredService<IConfiguration>()["ConnectionStrings:Xinobi"]);
+        using var client = await TestStaff.Client(factory);
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var customer = await accounts.Register("Synthetic", "cancel@example.invalid", "synthetic-password-1");
+        var now = DateTimeOffset.UtcNow;
+        var order = await accounts.PlaceOrder(customer.Id, "permission-test", () => new CustomerOrder("cancel-order", "XN-TEST", now, OrderStatuses.Received,
+            new CustomerAddress("a", "Ev", "Synthetic", "+905321234567", "İstanbul", "Kadıköy", "Test adresi", null, true),
+            [new CustomerOrderLine("p", "v", "Synthetic", "Mavi", null, new Money(100, "TRY"), 1, new Money(100, "TRY"))], new Money(100, "TRY")));
+        var status = await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Cancelled, null));
+        Assert.Equal(allowed ? HttpStatusCode.OK : HttpStatusCode.Forbidden, status.StatusCode);
+        Assert.Equal(allowed ? OrderStatuses.Cancelled : OrderStatuses.Received, (await accounts.Orders(customer.Id)).Single().Status);
+        if (!allowed)
+        {
+            Assert.Equal(HttpStatusCode.Forbidden, (await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/requests/request", new DecideOrderRequest("approve", null))).StatusCode);
+            Assert.Equal(HttpStatusCode.OK, (await client.PostAsJsonAsync($"/api/v1/local-commerce/orders/{order.Id}/status", new SetOrderStatus(OrderStatuses.Preparing, null))).StatusCode);
+        }
+    }
+
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    [InlineData(false, false)]
+    public async Task InventoryPermissionProtectsStockAcrossDedicatedAndCatalogWrites(bool inventory, bool catalog)
+    {
+        using var isolated = Factory();
+        using var factory = isolated.WithWebHostBuilder(builder => builder.ConfigureServices(services =>
+            services.AddSingleton<IClaimsTransformation>(new RemovePermissions(new[] { inventory ? "" : "inventory.write", catalog ? "" : "catalog.write" }))));
+        Assert.IsType<DevFileAccountStore>(factory.Services.GetRequiredService<IAccountStore>());
+        Assert.Equal("", factory.Services.GetRequiredService<IConfiguration>()["ConnectionStrings:Xinobi"]);
+        using var client = await TestStaff.Client(factory);
+        var store = factory.Services.GetRequiredService<LocalCommerceStore>();
+        var product = (await store.Read()).Products.First();
+        var variant = product.Variants.First();
+        var original = variant.Stock;
+        var changed = product with { Variants = product.Variants.Select(v => v.Id == variant.Id ? v with { Stock = original + 1 } : v).ToArray() };
+        Assert.Equal(inventory && catalog ? HttpStatusCode.OK : HttpStatusCode.Forbidden,
+            (await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", changed)).StatusCode);
+        Assert.Equal(inventory && catalog ? original + 1 : original, (await store.Read()).Products.First().Variants.First().Stock);
+        Assert.Equal(inventory ? HttpStatusCode.OK : HttpStatusCode.Forbidden,
+            (await client.PutAsJsonAsync($"/api/v1/local-commerce/inventory/{variant.Id}", new { stock = original + 2 })).StatusCode);
+        var current = (await store.Read()).Products.First();
+        Assert.Equal(inventory ? original + 2 : original, current.Variants.First().Stock);
+        Assert.Equal(catalog ? HttpStatusCode.OK : HttpStatusCode.Forbidden,
+            (await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", current with { Name = "Updated name" })).StatusCode);
+        var withoutStockedVariant = current with { Active = false, Variants = current.Variants.Where(v => v.Id != variant.Id).ToArray() };
+        Assert.Equal(inventory && catalog ? HttpStatusCode.OK : HttpStatusCode.Forbidden,
+            (await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", withoutStockedVariant)).StatusCode);
+        if (inventory && catalog) Assert.Equal(HttpStatusCode.OK,
+            (await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{product.Id}", current)).StatusCode);
+        var created = product with { Id = "permission-product", Variants = [variant with { Id = "permission-variant", Sku = "PERMISSION-SKU", Stock = 1 }] };
+        Assert.Equal(inventory && catalog ? HttpStatusCode.OK : HttpStatusCode.Forbidden,
+            (await client.PutAsJsonAsync($"/api/v1/local-commerce/products/{created.Id}", created)).StatusCode);
+        Assert.Equal(inventory && catalog ? HttpStatusCode.OK : HttpStatusCode.Forbidden,
+            (await client.DeleteAsync($"/api/v1/local-commerce/products/{product.Id}")).StatusCode);
     }
 
     public void Dispose()

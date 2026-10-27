@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Xinobi.Api.Notifications;
+using Xinobi.Api.Identity;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Xinobi.Architecture.Tests;
 
@@ -23,8 +25,21 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
             ["Catalog:StorageProvider"] = "File",
             ["LocalCommerce:SeedFile"] = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"))
         }));
-        builder.ConfigureServices(services =>
+        builder.ConfigureServices((context, services) =>
         {
+            // Program loads appsettings.Local.json after ConfigureAppConfiguration.
+            // Reassert isolation after that load, before any stores/workers resolve.
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                context.Configuration["LocalCommerce:DataDirectory"] = directory;
+                context.Configuration["LocalCommerce:SeedFile"] = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"));
+                context.Configuration["ConnectionStrings:Xinobi"] = "";
+                context.Configuration["Catalog:StorageProvider"] = "File";
+                context.Configuration["Accounts:StorageProvider"] = "File";
+                context.Configuration["Features:StorageProvider"] = "File";
+                services.RemoveAll<IAccountStore>();
+                services.AddSingleton<IAccountStore>(provider => provider.GetRequiredService<DevFileAccountStore>());
+            }
             foreach (var service in services.Where(x => x.ServiceType == typeof(IHostedService) && x.ImplementationType == typeof(NotificationWorker)).ToArray())
                 services.Remove(service);
         });

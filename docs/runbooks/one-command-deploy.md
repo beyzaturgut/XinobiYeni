@@ -77,6 +77,24 @@ Ardından yönetici PowerShell'de gerçek komut:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\XinobiDeploy\tools\deploy-release.ps1 -Release xinobi-<commit>
 ```
 
+### Bu repoda token'ı panodan alma
+
+Repo özeldir. Windows oturumunda token yoksa GitHub release sorgusu 404 döner. Bu kullanıcının PowerShell'inde maskeli girişe yapıştırmak kontrol karakteri üretebildiği için aşağıdaki yöntemi kullan. Kodu çalıştır, bekleme mesajı geldiğinde repo için Contents: read yetkili token'ı kopyala, PowerShell'e dönüp yapıştırmadan Enter'a bas. `<commit>` yerine seçilen gerçek sürümü yaz.
+
+```powershell
+$null = Read-Host "GitHub token'ını şimdi kopyala; sonra buraya dönüp Enter'a bas"
+try {
+    $token = (Get-Clipboard -Raw).Trim()
+    if ($token -notmatch '\A[A-Za-z0-9_]+\z') { throw "Panoda geçerli token bulunamadı." }
+    $env:GITHUB_TOKEN = $token
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\XinobiDeploy\tools\deploy-release.ps1 -Release xinobi-<commit>
+}
+finally {
+    Remove-Item Env:\GITHUB_TOKEN -ErrorAction SilentlyContinue
+    Remove-Variable token -ErrorAction SilentlyContinue
+}
+```
+
 Script belirtilen release'i indirir, SHA256 ve commit'i kontrol eder, iki paketi hazırlar,
 IIS pool'larını durdurur, mevcut klasörleri `-previous-<tarih>` adıyla saklar, yeni
 klasörleri yerleştirir ve pool'ları başlatır. API readiness ile web, admin, proxy readiness

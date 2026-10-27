@@ -3,6 +3,7 @@
 - When the owner says "deploy alalım", follow the existing GitHub Releases flow in `docs/runbooks/one-command-deploy.md`.
 - Review the recent GitHub releases, ensure source changes are committed and pushed, then run `node tools/package-release.mjs`. The release contains web, admin and API together; `package-deploy.mjs` is an internal step, not the final deliverable.
 - Publish the prepared version with `node tools/publish-release.mjs xinobi-<7-character-commit>` using an existing authorized credential without exposing it. Verify the published release and its three assets: `xinobi.zip`, `xinobi.zip.sha256`, `deploy-release.ps1`.
+- This repository is private. The owner's Windows PowerShell cannot reliably paste into masked prompts: provide a `Read-Host` pause, then read a newly copied token with `Get-Clipboard -Raw`, validate it, set the server session's `GITHUB_TOKEN`, and remove the environment variable in `finally`. Never display the token or transfer the Mac's write credential to the server; the server token needs repository Contents: read.
 - Return the GitHub release link and the server's version-specific PowerShell command. Creating/publishing a release is not a completed IIS deployment; record the actual status honestly. Do not change hosting or add a new workflow.
 - Build an APK only when explicitly requested. Record release preparation/publication under `deployments/` without secrets.
 

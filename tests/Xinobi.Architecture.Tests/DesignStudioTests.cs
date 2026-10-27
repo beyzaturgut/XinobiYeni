@@ -17,7 +17,7 @@ public sealed class DesignStudioTests : IDisposable
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["DesignStudio:WorkerEnabled"] = "true", ["DesignStudio:ExternalInferenceEnabled"] = "false", ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:DailyGenerationLimit"] = limit.ToString(), ["DesignStudio:DisableGenerationLimit"] = disableLimit.ToString() }));
-        builder.ConfigureServices(services => { services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); services.AddHostedService<DesignGenerationWorker>(); });
+        builder.ConfigureServices((context, services) => { context.Configuration["DesignStudio:DataDirectory"] = Path.Combine(directory, "design-studio"); services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); services.AddHostedService<DesignGenerationWorker>(); });
     });
     private const string Root = "/api/v1/design-studio";
     private async Task<SessionView> Create(HttpClient client, string? browser = null)
@@ -89,7 +89,7 @@ public sealed class DesignStudioTests : IDisposable
         Assert.Equal(bank.BuildPrompt(session.Questions, Answers(session).Answers), provider.LastPrompt);
         Assert.Contains("Art direction:", provider.LastPrompt!);
         Assert.DoesNotContain("Xinobi", provider.LastPrompt!);
-        Assert.Contains("No products, appliances, kitchenware", provider.LastPrompt!);
+        Assert.Contains("composed exclusively of the selected nature motifs", provider.LastPrompt!);
         Assert.Contains("Composition:", provider.LastPrompt!);
         using var stored = JsonDocument.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "design-studio", "sessions.json")));
         var savedSession = stored.RootElement.GetProperty("sessions").GetProperty(session.Id);
@@ -146,6 +146,6 @@ public sealed class DesignStudioTests : IDisposable
     {
         public static byte[] Png => Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");
         public string? LastPrompt; public int Calls; public bool Configured = true; public bool IsConfigured => Configured;
-        public async Task<GeneratedImage> GenerateAsync(string prompt, CancellationToken token) { LastPrompt = prompt; Interlocked.Increment(ref Calls); Assert.Contains("No text", prompt); await Task.Delay(50, token); return new(Png, "image/png", "test-provider", "test-request"); }
+        public async Task<GeneratedImage> GenerateAsync(string prompt, CancellationToken token) { LastPrompt = prompt; Interlocked.Increment(ref Calls); Assert.Contains("Text-free, unlettered, unbranded", prompt); await Task.Delay(50, token); return new(Png, "image/png", "test-provider", "test-request"); }
     }
 }

@@ -118,6 +118,8 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 
 Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek entegrasyon/iş kabulü** alınmaz. Bu kararlar Xinobi iş sahibine aittir; geliştirici tahminini `varsayım` yazabilir, gerçek onay diye işaretleyemez.
 
+**27.10 prompt v3 ek kaydı:** AI desen üretimine olumlu motif tarifi, ana/yardımcı motif hiyerarşisi, zemin/ana/destek/vurgu renk rolleri ve kısa yazısızlık kuralları eklendi (`xinobi-art-direction-3`). Model ve dört adım korunur. Yeni ücretli üretim/estetik kabul veya canlı deploy yapılmadı; görsel sonuçlar kullanıcıyla iteratif değerlendirilecek. [Kurallar](../docs/xinobi-u-art-direction.md), [test kaydı](../test/2026-10-27/TST-art-direction-v3.md).
+
 ## 5. Anlık durum — her oturum başında güncelle
 
 | Alan | Şu anki kayıt |

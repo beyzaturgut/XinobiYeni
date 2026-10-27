@@ -223,3 +223,5 @@
 - 20.10.2026 · [TST-135 canlıda ürün yüzey maskelemesi](2026-10-20/TST-135-production-surface-masking.md) — Admin maskeleme ve onaylı maske önizlemesi SQL admin kataloğuyla canlıda; .NET 434/25/0, önizleme e2e 34/34
 
 - 27.10.2026 · [Faz dokümanları denetimi](2026-10-27/TST-phase-audit.md) — 12 faz dosyası, 64 commit–faz eşlemesi, yeni yerel bağlantılar, rol/PM hücreleri ve Markdown diff kontrolü; uygulama testleri yeniden çalıştırılmadı.
+
+- 27.10.2026 · [AI prompt v3](2026-10-27/TST-art-direction-v3.md) — 25 hedefli test, 32.768 kombinasyonda prompt sınırı; motif hiyerarşisi/renk rolleri ve yerel readiness başarılı. Görsel kalite ve canlı deploy bekliyor.

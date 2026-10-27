@@ -46,10 +46,12 @@ public sealed class DesignArtDirectionTests
     {
         var prompt = DesignArtDirection.Build(Choices("abstract", visual: "focal", color: "mono", mood: "bold"));
         Assert.Contains("one dominant motif", prompt);
-        Assert.Contains("no repeated focal motifs or forced seamless tiling", prompt);
+        Assert.Contains("single focal motif", prompt);
+        Assert.DoesNotContain("matching opposite edges", prompt);
         Assert.Contains("60-70% quiet background", prompt);
         Assert.Contains("at most 2 base colors", prompt);
-        Assert.Contains("no colored accents", prompt);
+        Assert.Contains("Background: white. Main motifs: charcoal.", prompt);
+        Assert.DoesNotContain("Sparse accents:", prompt);
         Assert.DoesNotContain("Seamless repeating decorative pattern", prompt);
         Assert.DoesNotContain("entire image is filled", prompt);
     }
@@ -81,6 +83,22 @@ public sealed class DesignArtDirectionTests
     }
 
     [Fact]
+    public void PaletteRolesAndRepeatRulesFollowTheAnswers()
+    {
+        var blue = DesignArtDirection.Build(Choices("watercolor", "ocean", "repeat"));
+        Assert.Contains("Background: warm white. Main motifs: navy.", blue);
+        Assert.Contains("Supporting forms: ocean blue. Sparse accents: pale blue.", blue);
+        Assert.Contains("matching opposite edges", blue);
+        Assert.Contains("larger forms set the rhythm", blue);
+        var minimal = DesignArtDirection.Build(Choices("scandi", "forest", "asymmetric", "green"));
+        Assert.Contains("Background: cream. Main motifs: sage green.", minimal);
+        Assert.Contains("Supporting forms: olive.", minimal);
+        Assert.DoesNotContain("Sparse accents:", minimal);
+        Assert.DoesNotContain("matching opposite edges", minimal);
+        Assert.Contains("controlled asymmetry", minimal);
+    }
+
+    [Fact]
     public void EveryQuestionnaireCombinationHasRulesAndFitsTheProviderPromptLimit()
     {
         using var factory = new IsolatedApiFactory();
@@ -94,9 +112,11 @@ public sealed class DesignArtDirectionTests
         {
             var prompt = DesignArtDirection.Build(Choices(style.Id, nature.Id, visual.Id, color.Id, mood.Id));
             Assert.InRange(prompt.Length, 1, 2048);
-            Assert.Contains("No text, letters, numbers, logos", prompt);
-            Assert.Contains("No products, appliances, kitchenware", prompt);
-            Assert.Contains("watermarks", prompt);
+            Assert.Contains("Text-free, unlettered, unbranded", prompt);
+            Assert.Contains("composed exclusively of the selected nature motifs", prompt);
+            foreach (var unwanted in new[] { "kitchen", "appliance", "teapot", "cup", "mockup", "furniture", "typography" })
+                Assert.DoesNotContain(unwanted, prompt, StringComparison.OrdinalIgnoreCase);
+            Assert.Contains("watermark-free", prompt);
             Assert.DoesNotContain("Xinobi", prompt);
             Assert.DoesNotContain("home appliance collection", prompt);
             Assert.DoesNotContain("for the kitchen", prompt);

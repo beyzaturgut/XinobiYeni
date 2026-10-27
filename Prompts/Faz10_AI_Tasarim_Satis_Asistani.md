@@ -1,5 +1,7 @@
 # Faz10 — AI tasarım üretimi, satış asistanı ve AI yönetim paneli
 
+**27.10 prompt v3 ek kaydı:** AI desen üretimine olumlu motif tarifi, ana/yardımcı motif hiyerarşisi, zemin/ana/destek/vurgu renk rolleri ve kısa yazısızlık kuralları eklendi (`xinobi-art-direction-3`). Model ve dört adım korunur. Yeni ücretli üretim/estetik kabul veya canlı deploy yapılmadı; görsel sonuçlar kullanıcıyla iteratif değerlendirilecek. [Kurallar](../docs/xinobi-u-art-direction.md), [test kaydı](../test/2026-10-27/TST-art-direction-v3.md).
+
 ## Güncel uygulama durumu — 27.10.2026
 
 **Durum:** Devam — AI üretim ve UI iyileşti; kalite kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.

@@ -1,5 +1,19 @@
 # Faz08 — Mikro muhasebe entegrasyonu ve mutabakat
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — D02/D06/D11. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| 08.01–08.10 değişiklik denetimi | Yeni entegrasyon yok | 20–27 Ekim commitleri içinde gerçek Mikro istemcisi/adaptörü, stok/fiyat/cari/sipariş/fatura senkronu veya mutabakat teslimi bulunmadı. Panel prototip temizliği ve ortak izin altyapısı Mikro entegrasyonunun çalıştığı anlamına gelmez. |
+| Açık kapılar | Bloke | Mikro sürümü/API erişimi, alan sahipliği/yönler, gerçek örnek veri, fatura sorumluluğu, idempotent işleyici ve sandbox uçtan uca doğrulama gerekiyor. Önceki çekirdek tablo/prototip kanıtları kısmi kalır. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 > **Durum (16.10.2026):** Bloke (D02/D06) · geliştirme ~5 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Plan / uygulanmadı. Yedi rolün onayı uygulama kanıtından sonra ayrı ayrı kaydedilir; bu metin gerçek insan onayı veya 20 yıllık gerçek iş geçmişi iddiası değildir. Son kapı her durumda PM'dedir.
 
 ## 1. Kaynak, kapsam ve giriş koşulu

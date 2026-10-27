@@ -1,5 +1,19 @@
 # Faz09 — Trendyol, Hepsiburada ve N11 ile merkezi sipariş
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — D02/D03/D06. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| 1–6 entegrasyon denetimi | Yeni entegrasyon yok | Trendyol/Hepsiburada/N11 adaptörü, kanal ürün eşleme, merkezi sipariş, stok/fiyat senkronu, webhook ve mutabakat için yeni çalışan teslim bulunmadı. Kendi web/mobil siparişindeki iyileştirmeler pazaryeri siparişi kabulü değildir. |
+| Erişim ve işletim | Bloke | Mağaza/sandbox, alan sahipliği, ödeme/sipariş/rezervasyon kararları ve gerçek kanal örnekleri gerekiyor. Ortak outbox/inbox şeması kanal işleyicilerinin uygulandığını göstermez. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1 çok kanallı operasyon, §4 D02/D03/D06, §6.2–6.3, §7 K4 ve §8. **İlerleme ve yarım kalan işin tek kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Pazaryerinin güncel API sözleşmesi, mağaza yetkileri ve oran/kota koşulları D06 incelemesinde doğrulanır; bu belge sağlayıcıya ait doğrulanmamış endpoint/alan iddia etmez.
 
 ## 1. Kapsam, veri sahipliği ve başlangıç

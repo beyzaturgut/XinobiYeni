@@ -1,5 +1,22 @@
 # Faz04 — Ürün kataloğu, içerik ve yayın
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — katalog iyileştirildi, ticari altyapı eksikleri açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| Katalog medya / maske araçları | Uygulandı | 9925f10 katalog rengi/HEX kullanımı; 561b90b kod tabanlı renklendirme, temiz kenar ve kayıpsız WebP promptu; 0ec407d/1c40a4a HTTP sitede prompt kopyalama ve kaynak fotoğraf indirme. 9e69a74/cdd8ed3 maskeleme panelini production derlemede açar; her canlı renk için kabul kanıtı değildir. |
+| Katalog keşfi / kişiselleştirme | Uygulandı | 2f05625 yalnız panelde kişiselleştirilebilir işaretli ürünler; 50c6080 yönetilebilir gerçek kategoriye bağlı titanyum keşfi (kategori seçimi veri işidir); abdc87a/c9b1e28 filtre/karşılaştırma ve statik export geçişleri. |
+| Web stok kaydı | Kısmi | aa6069f web stok değişimini inventory.write ile sınırlar ve ürünün tamamını yeniden yazmaz. Depo bazlı stok hareketi, rezervasyon veya Mikro senkronu eklenmedi. |
+| Yerel medya / rapor sınırları | Kısmi | 503de15 yalnız eksik yerel medyayı üzerine yazmadan kurtarır; c49e706 sunucuda bulunan medyanın paketlemeyi durdurmasını önler. Bunlar canlı medya tamlığı kanıtı değildir. SQL sipariş/müşteri özetleri mevcut; ödeme/net ciro ve ziyaret/dönüşüm verisi hâlâ koşulludur. |
+| Kalan kapsam | Açık / bloke | Kampanya/kupon, CMS/blog/SSS/iletişim, marka/doküman, medya kütüphanesi, CSV/301, ürün sitemap ve analitik; D02/D03/D13 sınırları değişmedi. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Durum (20.10.2026):** Devam · geliştirme ~52 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4, §5, §6.2–6.3, §8 ve `Xinobi_Proje_Kapsami(4).md`. **Yürütme kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu dokümandaki onay kutuları, gerçek kişilerin henüz vermediği onayı temsil etmez.
 
 ## 1. Amaç, bağımlılık, sınır

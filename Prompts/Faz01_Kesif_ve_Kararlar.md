@@ -1,5 +1,20 @@
 # Faz01 — Keşif, kararlar ve uygulanabilir teslim temeli
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — müşteri kararları. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| D01 / 01.03, 01.11 | Güncellendi | Mevcut main, SQL/API, Flutter ve ortak WebView editörü uygulanmış durumdadır. 20.10 tarihindeki feature dalı/PR bekliyor ifadesi güncel değildir. Çalışan kod, gerçek as-is görüşme veya müşteri kapsam kabulü yerine geçmez. |
+| 01.09 / D08–D09 | Kısmi | AI prompt v2, ortak mobil editör ve sipariş önizlemesi uygulandı. Alternatif sayısı, kota/maliyet, cihaz kabulü, push ve mağaza kararı kapanmadı. |
+| 01.04–10, 01.15–19 | Bloke / açık | D02–D14 sahip/tarih/onayları, gerçek operasyon ve geçiş envanteri, fiziksel baskı girdileri, hukuk, takvim ve SLA/RPO/RTO kanıtı hâlâ gereklidir. Teknik uygulamadan iş kararı türetilmedi. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Durum (16.10.2026):** Bloke (müşteri kararları) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–4, 6–8, ek kaynak `Proje Yönetimi/Xinobi_Kavramsal_ve_Teknik_Analiz2.md` K-01–K-21 ve müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`. Bu faz, Faz00'daki ilerleme kaydından yönetilir. Bu belgede iş kararı verilmiş gibi gösterilen hiçbir boşluk yoktur.
 
 ## Amaç ve sınır

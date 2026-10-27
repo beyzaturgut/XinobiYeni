@@ -1,5 +1,21 @@
 # Faz02 — Xinobi yaratıcı yön, UI/UX ve tasarım teslimi
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — tasarım ve erişilebilirlik kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| Akışlar / ürün detayı / navigasyon | Uygulandı | abdc87a, c9b1e28, 94aa425, ec1638c, 27fed34, 350cd08: kategori URL/geri-ileri, menü odağı, 2–4 ürün karşılaştırma seçimi; ürün/renk → yöntem → yükleme/AI → yerleşim. Kısa ekran ve 390 px düzenleri iyileştirildi. |
+| Mobil ve AI ekranları | Uygulandı | 62d4daf, b5518a4, 6f2fc13, 72808e9: ürün önce, sonuç özeti ve native görünümlü gömülü adımlar; aynı ürün/renk ve giriş sonrası dosya/yerleşim korunur. 2806527 kayıt düğmesi metnini tutarlı kılar. |
+| Sipariş önizlemesi / Nobi | Uygulandı | 451581b, 17904ce, 6c56cdc, e2131e7: birleşik ürün görseli, body portalında tam ekran, 1–5x pinch/pan, klavye ve odak dönüşü; Nobi altında kaybolan eylemler için kaydırma alanı. |
+| Eski ekranlar / tasarım teslimi | Kısmi | 179c46b ve 078a42e kullanılmayan prototipleri/eski editör arayüzünü kaldırdı. Kod ekranı, hi-fi kaynak/handoff veya Creative/Web Designer onayı değildir. Ekran okuyucu, gerçek cihaz ve erişilebilirlik denetimi açık. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Durum (16.10.2026):** Devam · geliştirme ~60 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Faz sahibi:** Sr. Creative Designer (temsili 20+ yıl uzman rolü) · **Nihai kapı sahibi:** Proje Yöneticisi (PM)
 **Kaynak ve öncelik:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2–5, §6.4, D04/D08/D09/D10 ve `Xinobi_Proje_Kapsami(4).md` UI/UX, web, panel, kişiselleştirme, mobil, AI kapsamı. Çelişkide müşteri kapsamı ile doğrulanmış karar kaydı esastır.  
 **Kapsam:** Yalnız belirtilen web, yönetim paneli, iOS/Android, basit/gelişmiş editör, AI üretim ve asistan arayüzü; özellik ekleme yetkisi vermez.

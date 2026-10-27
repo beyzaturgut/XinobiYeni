@@ -221,3 +221,5 @@
 - 20.10.2026 · [TST-133 admin maskelemede yalnız PNG](2026-10-20/TST-133-png-only-admin-masking.md) — Eğri/fırça/Roboflow/hizalama ve eski katalog incelemesi admin+API'den kaldırıldı
 - 20.10.2026 · [TST-134 XINOBI önizleme e2e kök nedeni](2026-10-20/TST-134-xinobi-preview-e2e-regression.md) — CM121 yayın paketi orijinal boyutta yayımlanıyordu; test kataloğu/proxy eksikti. 11 önizleme testi geçiyor
 - 20.10.2026 · [TST-135 canlıda ürün yüzey maskelemesi](2026-10-20/TST-135-production-surface-masking.md) — Admin maskeleme ve onaylı maske önizlemesi SQL admin kataloğuyla canlıda; .NET 434/25/0, önizleme e2e 34/34
+
+- 27.10.2026 · [Faz dokümanları denetimi](2026-10-27/TST-phase-audit.md) — 12 faz dosyası, 64 commit–faz eşlemesi, yeni yerel bağlantılar, rol/PM hücreleri ve Markdown diff kontrolü; uygulama testleri yeniden çalıştırılmadı.

@@ -1,5 +1,19 @@
 # Faz07 — Kurumsal teklif ve toplu sipariş
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — D07; panel akışı iyileştirildi. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| 5 Panel teklif listesi/detayı | Uygulandı | 2df83fe yükleniyor/boş/hata/tekrar ayrımı; 88e99f9 status eylemlerinde quotes.write; 72aff5d kayıtlı teklif özetini düzenleme izninden bağımsız salt okunur sunum; a544fde arama/sayfalama. Arama yalnız yüklenmiş kayıtları kapsar, sunucu tarafı eksiksiz arama değildir. |
+| 3 API / 7 dönüşüm / 9–11 | Kısmi / bloke | Mevcut talep/mesaj/teklif/kabul-ret korunur. Teklif → sipariş, firma başvurusu, teklifsiz toplu sipariş, ek dosya, onaylı e-posta şablonu ve rapor bu commitlerle tamamlanmadı. D07 ve gerçek UAT açık. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Durum (16.10.2026):** Bloke (D07) · geliştirme ~45 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Planlandı · **Sorumlu:** Proje yöneticisi (PM) · **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §§2–5, 6.2–6.3, 7–8; müşteri kapsamı `Xinobi_Proje_Kapsami(4).md`; Faz01 D07 kararı. Durum ve kanıtlar Faz00'da tutulur.
 
 ## Amaç ve sınır

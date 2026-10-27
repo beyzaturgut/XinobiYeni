@@ -1,6 +1,6 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
-> **Bu dosyanın ilk hali bir plan ve doldurulabilir çalışma kaydıdır.** Henüz geliştirme, test, müşteri kararı veya canlı yayın tamamlanmış değildir. Her çalışma oturumu başında okunur, anlamlı her değişiklikten sonra ve oturum kapanışında güncellenir.
+> **Bu dosyanın ilk hali bir plan ve doldurulabilir çalışma kaydıdır.** Bu ifade başlangıç planının durumunu anlatır; güncel uygulama, test ve yayın durumu §5’te, tarihli kabul kayıtları §7’dedir. Her çalışma oturumu başında okunur, anlamlı her değişiklikten sonra ve oturum kapanışında güncellenir.
 
 ## 0. Önce bunu oku
 
@@ -122,18 +122,39 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 2026-10-20 · Claude; `cd96d5c..42553c3` (30 commit) fazlara işlendi, ayrıntı [faz denetimi 20.10](../docs/tasks/phase-audit-2026-10-20.md); .NET, admin tarayıcı ve web e2e alt kümesi koşuldu |
-| Aktif faz/görev ID | **Faz06/10 ürün yüzeyi ve XINOBI U önizleme**: resim (kayıpsız WebP) yüklemeli maskeleme, aynı konumlu renklerde tek ortak maske, yeniden tasarlanmış önizleme. **Faz03/04 panel**: veri dürüstlüğü, oturum/yetki ve SQL özet raporu düzeltmeleri (PR #1–#14). Faz02 web onayı ertelendi (F02-A17) |
-| Repo/branch/HEAD | `feature/surface-masking-preview-20261020` · `42553c3` (push edildi, `origin/main` `7152979` birleştirildi; `main`’e PR bekliyor) · origin `https://github.com/beyzaturgut/XinobiYeni.git` (private) |
-| Geliştirme/test/canlı ortamları | macOS + Docker’sız CI; uzak SQL Server 2022 Express `XinobiYeniDB` üzerinde 0001–0005 migration’ları uygulandı, yerel API SQL’den okuyor (TST-113/114); canlı önizleme IIS `109.104.120.91` HTTPS 443 (web/admin) + loopback ARR ile API 8024 |
-| Son çalışan uygulama komutu/URL | `pnpm dev:local:background` (API 5003, web 3000, admin 5173; log `/tmp/xinobi-local.log`); mobil `flutter run -d emulator-5554` (Pixel_8). Son hazırlanan paketler DEPLOY-008 (`d1639f6` web+API), DEPLOY-009 (`42dc4d8`), DEPLOY-010 (`dfbc972`); **uzak IIS uygulaması ve canlı smoke kaydı yok** |
-| Son test komutu ve sonucu | 20.10: .NET **433/25/1** (`OnlyListedAreasArePublic`, TST-130’dan beri); admin maske tarayıcı testi 4 mod başarılı; [TST-134](../test/2026-10-20/TST-134-xinobi-preview-e2e-regression.md): 11 XINOBI önizleme testi düzeltildi, tam web e2e 145/5/1 → kalan açık 3 test önizlemeyle ilgisiz (favori girişi, 2 EXIF JPEG). 19.10 izole panel kabulü .NET 429/24/0 |
-| Değişen dosyalar / migration | Migration’lar 0001 InitialCore, 0002 CatalogCommerce, 0003 CustomerIdentityOrders, 0004 FeatureDocuments, 0005 OrderLinePersonalization — **hepsi XinobiYeniDB’ye uygulandı**. Ek olarak 0006–0009 migration dosyaları hazır; hedef SQL uygulaması doğrulanmadı |
-| Aktif hata/yarım iş | Canlı maskeleme dağıtım sonrası doğrulanmadı (TST-135); web e2e: favori testi giriş gerektiren yeni davranışa güncellenmeli, 2 EXIF JPEG testi incelenmeli; maskeleme/önizleme değişiklikleri `main`’de ve canlıda değil; DEPLOY-008–011 uzak smoke kanıtı eksik; yedek VERIFYONLY/restore provası yok; kalıcı panel ayarları, ödeme (D03/D05), baskı alanı/çıktısı (D04/T-04), Mikro ve pazaryerleri yok; `design/a11y-audit.md` yok; §7 rol/PM onayları boş |
-| Sonraki en küçük güvenli adım | rendering-inputs public listesi kararını verip `OnlyListedAreasArePublic`’i yeşile almak; favori ve EXIF e2e testlerini düzeltmek; ardından `feature/surface-masking-preview-20261020` için PR ve yeni paketle canlı CM121 önizleme kontrolü. Karar tarafında D03 ve D04 sahipleri/hedef tarihleri |
-| Geri alma / devam noktası | `b1573d0` (TST-115 ile doğrulanmış HEAD); SQL’de 5 migration, geri alma script’leri `infra/db/migrations`; Cloudflare’a yeni çağrı yapılmadı |
+| Son güncelleme ve sorumlu | 27.10.2026 · Codex; kaynak main / 5791181. [Tam commit–faz eşlemesi](../docs/tasks/phase-audit-2026-10-27.md); Faz00–11 güncellendi. |
+| Aktif görev | Tamamlanmış geliştirmelerin fazlara kaydı; Faz02/04/05/06/10/11 ortak ürün tasarımı, mobil, sipariş önizlemesi; Faz03/07 panel yetki ve veri durumları. |
+| Repo/branch/HEAD | Desktop/Xinobi · main · denetlenen kaynak 5791181; private origin beyzaturgut/XinobiYeni. Önceki feature dalı birleştirildi; PR bekliyor ifadesi tarihsel. |
+| Ortam / migration | SQL Server XinobiYeniDB için 0001–0005 uygulanmış eski kanıt mevcut; 0006–0009 hedef uygulaması bu oturumda doğrulanmadı. Yeni revizyon/sipariş görseli mevcut FeatureDocuments/PersonalizationJson kullanır, yeni fiziksel migration yok. |
+| Yerel başlatma | pnpm dev:local:background; API 5003, web 3000, admin 5173. Bu denetimde servis başlatılmadı. |
+| Gerçek IIS durumu | Kullanıcı 25.10’da xinobi-4333eda ve xinobi-902066f için başarılı kurulum çıktısı paylaştı; 4333eda sonrası sayfa kontrolünü bildirdi. Sonraki d54c13c/e2131e7 IIS kurulumu doğrulanmış değil. |
+| Son release | DEPLOY-014: xinobi-e2131e7, kaynak e2131e7, 27.10 GitHub yayını ve üç asset doğrulanmış. Web/admin/API birlikte; bu release için APK yok. GitHub yayını kurulum değildir. |
+| Test kanıtları | TST-135 434/25/0 ve 34 web e2e; 23.10 alışveriş kaydı API 477/29, Flutter 67 ve tarihli web koşuları; 27.10 temizlik 26 WebKit; tam ekran 4 WebKit; DEPLOY-014 26 AuthorizationTests. Bunlar farklı kaynak/ortamlara aittir; tek güncel tam regresyon sayısı değildir. |
+| Kapanan eski hatalar | OnlyListedAreasArePublic: TST-135; EXIF eksenleri: b926844; ürün seçilmeden mobil editör beyaz ekranı: 902066f; sipariş ürün görseli/tam ekran: 902066f/451581b/e2131e7. Fiziksel cihaz ve son IIS kabulü ayrıca gerekir. |
+| Aktif risk ve açık işler | Gerçek ödeme/sunucu sepeti/rezervasyon, üretim baskısı, Mikro/pazaryerleri, restore provası, D kararları ve rol/PM onayları açık. WebKit temizlik raporunda önceki HEAD’de de oluşan test/fixture sınırlamaları korunur. |
+| Sonraki en küçük güvenli adım | DEPLOY-014 sürümünün gerçek IIS kurulum durumunu kanıtlayıp web/admin/API ve telefon smoke kaydını eklemek; fiziksel cihazda editör ve yeni sipariş ürün önizlemesini doğrulamak. İş kararı tarafında D03/D04 sahip ve tarihleri. |
+| Güvenli geri dönüş | Birleşik deploy previous dizinlerini ve deployment.json kaydını tutar. Aktif web out, API api; XinobiData, API data ve C:\XinobiData\config korunur. Kullanıcının ayrı eski Xinobi projesi bu proje değildir. Yedek doğrulama/restore kabulü bekliyor. |
 
-### 5.1 Faz ilerleme ve eksik özeti — 20.10.2026
+### 5.0 Güncel faz özeti — 27.10.2026
+
+| Faz | Güncel durum | Ayrıntı |
+|---|---|---|
+| 00 | Devam; kayıtlar güncellendi, takvim ve onaylar açık | Bu kayıt ve commit envanteri |
+| 01 | Bloke — müşteri kararları | [Faz01_Kesif_ve_Kararlar](./Faz01_Kesif_ve_Kararlar.md) güncel uygulama bölümü |
+| 02 | Devam — tasarım ve erişilebilirlik kabulü açık | [Faz02_Tasarim_ve_UIUX](./Faz02_Tasarim_ve_UIUX.md) güncel uygulama bölümü |
+| 03 | Devam — güvenlik ve işletim doğrulamaları kısmi | [Faz03_Teknik_Altyapi_Kimlik_Veritabani](./Faz03_Teknik_Altyapi_Kimlik_Veritabani.md) güncel uygulama bölümü |
+| 04 | Devam — katalog iyileştirildi, ticari altyapı eksikleri açık | [Faz04_Katalog_Stok_Fiyat_Icerik_SEO](./Faz04_Katalog_Stok_Fiyat_Icerik_SEO.md) güncel uygulama bölümü |
+| 05 | Bloke — gerçek ödeme ve ticari kabul açık | [Faz05_ETicaret_Odeme_Siparis](./Faz05_ETicaret_Odeme_Siparis.md) güncel uygulama bölümü |
+| 06 | Devam; üretim baskısı D04/T-04 ile bloke | [Faz06_Kisisellestirme_Editor_Baski](./Faz06_Kisisellestirme_Editor_Baski.md) güncel uygulama bölümü |
+| 07 | Bloke — D07; panel akışı iyileştirildi | [Faz07_Kurumsal_Teklif_Toplu_Siparis](./Faz07_Kurumsal_Teklif_Toplu_Siparis.md) güncel uygulama bölümü |
+| 08 | Bloke — D02/D06/D11 | [Faz08_Mikro_Muhasebe_Entegrasyonu](./Faz08_Mikro_Muhasebe_Entegrasyonu.md) güncel uygulama bölümü |
+| 09 | Bloke — D02/D03/D06 | [Faz09_Pazaryerleri_Merkezi_Siparis](./Faz09_Pazaryerleri_Merkezi_Siparis.md) güncel uygulama bölümü |
+| 10 | Devam — AI üretim ve UI iyileşti; kalite kabulü açık | [Faz10_AI_Tasarim_Satis_Asistani](./Faz10_AI_Tasarim_Satis_Asistani.md) güncel uygulama bölümü |
+| 11 | Devam — birleşik yayın var; UAT/mağaza kabulü açık | [Faz11_Mobil_UAT_Canliya_Gecis](./Faz11_Mobil_UAT_Canliya_Gecis.md) güncel uygulama bölümü |
+
+**Kabul ve ölçüm:** Hiçbir faza yeni rol/PM onayı verilmedi. Aşağıdaki 20.10 yüzdeleri tarihsel tahmindir; bu denetimde yeni yüzde veya ağırlıksız genel tamamlanma oranı üretilmedi. Güncel kapsam, her fazın 27.10 tablosudur.
+
+### 5.1 Tarihsel faz ilerleme ve eksik özeti — 20.10.2026
 
 **Ölçüm kuralı:** "Geliştirme %" her faz dosyasındaki görev listesinin kod/belge/test kanıtına göre tahminidir (tamam = 1, kısmi = 0,5 civarı, yok/bloke = 0). "Kabul" §7’deki rol + PM kapısıdır. **Hiçbir faz kabul edilmedi; bu nedenle resmi olarak tamamen biten faz yoktur.** Ayrıntılı görev tabloları ilgili faz dosyasının "Uygulama durumu — 16.10.2026" bölümünde ve altındaki 20.10 güncellemelerindedir.
 
@@ -173,6 +194,10 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 **16.10 kaynak tabanlı maske promptu — PUSH YOK:** Seçili ürün/renk ve fotoğraf boyutu/SHA ile otomatik prompt; (0,0), ölçek1, RGBA alpha ve crop/trim kuralları, düzenlenebilir yüzey hedefi, kopyala ve pano reddinde seçim. [TST-128](../test/2026-10-16/TST-128-source-bound-mask-prompt.md), admin build/lint ve browser başarılı. Gerçek AI çağrısı yok; hizalama garantisi verilmedi. Geri dönüş `adac37a` korunuyor.
 
 **20.10 faz denetimi:** `cd96d5c..42553c3` 30 commit fazlara eşlendi → [phase-audit-2026-10-20](../docs/tasks/phase-audit-2026-10-20.md). Faz04 %50→%52 (SQL özet raporu, müşteri dizini), Faz06 %45→%47 (resim yüklemeli ortak maske, önizleme yeniden tasarımı). 16.10’daki “PUSH YOK” yerel denemeleri (TST-126–131) kullanıcı talimatıyla `feature/surface-masking-preview-20261020` branch’ine alındı; eğri/fırça/Roboflow/hizalama TST-133 ile kaldırıldı. Yeni açıklar: 11 XINOBI önizleme e2e gerilemesi (TST-134 ile kök neden bulundu ve düzeltildi: CM121 yayın paketi orijinal boyutta yayımlanıyordu), `OnlyListedAreasArePublic`. Faz kabulü değişmedi.
+
+### 27.10.2026 — kümülatif faz denetimi
+
+20.10 denetim sınırı `42553c3` ile `5791181` arasındaki tüm merge olmayan commitler tek tek fazlara eşlendi; merge commitleri ayrıca raporlandı. Daha önce kaydedilmiş yan dal commitleri yeni teslim olarak iki kez sayılmadı. [Denetim raporu](../docs/tasks/phase-audit-2026-10-27.md), [doküman doğrulaması](../test/2026-10-27/TST-phase-audit.md). Uygulama kodu/ortamı, müşteri kararları ve onay imzaları değiştirilmedi.
 
 ### Oturum kaydı şablonu — yeni satır üste
 
@@ -343,22 +368,23 @@ Her önemli karar `docs/decisions/ADR-###.md` ile şu alanları taşısın: prob
 
 | Faz | Kod/teslim kanıtı | BA | Creative | FE | BE | DBA | Full Stack | Web Des. | CTO | PM nihai | Statü |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| 00 | Defter, ADR-001–004, test/INDEX, task dökümleri; TST-115 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Devam |
-| 01 | `docs/discovery/*` (368 satır izlenebilirlik, karar defteri, as-is/to-be, sözleşme taslağı); D kararları açık | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Bloke |
-| 02 | `design/*` (tokens, components, flows, editor/ai-spec, handoff, WEB-001 hi-fi); TST-053–086 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Devam |
-| 03 | Persistence + 5 migration uygulandı; kimlik/izin/panel girişi; IFileStore; TST-091–114 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Devam |
-| 04 | SQL katalog/varyant/fiyat/stok, panel katalog, galeri; TST-111/113 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Devam |
-| 05 | Hesap, adres, ödemesiz sipariş, iptal/iade talebi, değerlendirme, bildirim; TST-098/099/114 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
-| 06 | Ürün yüzey maskeleri, XINOBI U önizleme, editör, kayıtlı tasarım → sepet/sipariş; TST-106/114 | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bloke |
-| 07 | Teklif talep/takip/mesaj/kabul-ret, panel teklifleri; tasks-2026-10-09-addendum | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
-| 08 | Yalnız panel prototip (TST-084) | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
-| 09 | Yalnız panel prototip (TST-084) | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
-| 10 | XINOBI U (Cloudflare, ADR-002 Ek A/B), Nobi + AI yönetimi (Ek C); TST-XINOBI-U-live | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Devam |
-| 11 | Flutter Android uygulaması (TST-095–107, TST-115 55/55); iOS/UAT/yayın yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Devam |
+| 00 | Defter, ADR-001–004, test/INDEX, task dökümleri; TST-115; 27.10 faz denetimi ve commit envanteri | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Devam |
+| 01 | `docs/discovery/*` (368 satır izlenebilirlik, karar defteri, as-is/to-be, sözleşme taslağı); D kararları açık; güncel main/runtime envanteri; D kararları açık | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Bloke |
+| 02 | `design/*` (tokens, components, flows, editor/ai-spec, handoff, WEB-001 hi-fi); TST-053–086; 23.10 UX; 27.10 tam ekran/Nobi kontrolleri | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Devam |
+| 03 | Persistence + 5 migration uygulandı; kimlik/izin/panel girişi; IFileStore; TST-091–114; TST-135; aa6069f yetki düzeltmesi | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Devam |
+| 04 | SQL katalog/varyant/fiyat/stok, panel katalog, galeri; TST-111/113; titanyum kategori bağı, HTTP medya araçları ve inventory.write | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Devam |
+| 05 | Hesap, adres, ödemesiz sipariş, iptal/iade talebi, değerlendirme, bildirim; TST-098/099/114; web/mobil ortak favori, revizyonlu sepet ve sipariş ürün snapshot | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 06 | Ürün yüzey maskeleri, XINOBI U önizleme, editör, kayıtlı tasarım → sepet/sipariş; TST-106/114; PlacementStudio, revizyonlu yerleşim, korumalı önizleme; baskı kapısı açık | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bloke |
+| 07 | Teklif talep/takip/mesaj/kabul-ret, panel teklifleri; tasks-2026-10-09-addendum; yükleme/hata, yazma yetkisi, salt okunur özet, yerel arama/sayfalama | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 08 | Yalnız panel prototip (TST-084); 27.10: yeni Mikro adaptörü yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 09 | Yalnız panel prototip (TST-084); 27.10: yeni kanal adaptörü yok | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | — | Bekliyor | Bloke |
+| 10 | XINOBI U (Cloudflare, ADR-002 Ek A/B), Nobi + AI yönetimi (Ek C); TST-XINOBI-U-live; prompt v2; ürün bağlamı, AI panel izin/tarih filtreleri | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | — | Bekliyor | Bekliyor | Devam |
+| 11 | Flutter Android; iOS/UAT/mağaza kabulü yok; DEPLOY-012–014; kullanıcı 25.10 kurulum bildirimi, son release IIS bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Bekliyor | Devam |
 
-`—` o fazda ek rolün zorunlu kaydı olmadığını gösterir. **14.10.2026:** "Kod/teslim kanıtı" ve statü sütunları güncellendi; rol ve PM hücreleri gerçek inceleme yapılmadığı için `Bekliyor` bırakıldı. Bu nedenle hiçbir faz `Tamamlandı` değildir.
+`—` o fazda ek rolün zorunlu kaydı olmadığını gösterir. **14.10.2026:** "Kod/teslim kanıtı" ve statü sütunları güncellendi; rol ve PM hücreleri gerçek inceleme yapılmadığı için `Bekliyor` bırakıldı. Bu nedenle hiçbir faz `Tamamlandı` değildir. **27.10.2026:** teslim kanıtları güncellendi; rol, PM ve faz kabul statüsü hücreleri değiştirilmedi.
 
 PM her fazda kontrol eder: ① kaynak kapsamı ve Creative/UIUX handoff ② D kararlarının gerçek sahibi ③ kod/şema/API kanıtı ④ otomatik ve manuel test sonucu ⑤ yedi rol incelemesi ⑥ güvenlik, veri, rollback ⑦ Faz00 güncelliği. PM kendi rol incelemesini `PM-İNCELEME: ONAY/RED`, ardından ayrı nihai kararı `PM-KAPI: KABUL/RED` ve iki ayrı kanıt/tarihle aynı hücreye veya bağlantılı tutanağa yazar. Herhangi biri yoksa gerekçe yazıp `RED`; koşullu kabul ile sonraki bağımlı fazı başlatma. Plan dosyaları için ayrı temsili doküman inceleme sonucu aşağıya yazılır; uygulama tablosunu değiştirmez.
+
 
 ## 8. Plan dokümanı inceleme kaydı
 

@@ -1,5 +1,21 @@
 # Faz05 — B2C satış, müşteri hesabı ve sipariş sonrası işlemler
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — gerçek ödeme ve ticari kabul açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| Favoriler / sepet | Uygulandı; sepet kısmi | 9933fef, 47d8016, d2d8f8d: hesapta ortak web/mobil tasarım favorisi, tam ürün/renk/konfigürasyon/revizyon anahtarı, hedefli Kaydet/İptal, adet ve diğer satırların korunması; renk/kaynak değişimi. Sepet cihazda tutulur, cihazlar arası otomatik sunucu eşitlemesi yok. |
+| Sipariş snapshot ve görseller | Uygulandı | 9933fef, 902066f, 451581b, e2131e7: sipariş yerleşimi ve kaynak/checksum/SKU korunur; yeni siparişe bağımsız birleşik JPEG kopyası alınır. Web/mobil küçük görsel ve büyütme aynı ürün kompozisyonunu kullanır; eski kayıtta tam satın alınan revizyonla fallback, kaynak yoksa açık temsilî/erişilemiyor durumu. Ham desen ürün önizlemesi gibi gösterilmez. |
+| Panel sipariş / iptal | Uygulandı | 6fd16c0, c425c4a, 681daeb, c34c250: tasarımdan bağlı siparişe geçiş, sayfalı referanslar, tek siparişi bağımsız okuma. aa6069f iptal yetkisini UI ve API üzerinde ayırır. |
+| Ödeme ve operasyon | Bloke / kısmi | Demo sipariş tahsilatsızdır. Kart/3DS/havale, webhook/iade ödemesi, sunucu sepeti, rezervasyon, kargo sağlayıcısı/ücreti, yasal onay/İYS ve push için D03/D05/D10/D11 ve gerçek entegrasyon kanıtları gerekir. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md`, özellikle §3.1 B2C, §4 D02–D03/D05/D10, §5, §6.2–6.3 ve §8. **Kayıt:** İlerleme, karar ve yarım kalan iş `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` içine işlenir. Bu dosya uygulanacak plan ve kabul kapısıdır. 20+ yıl deneyimli yedi rol birer *temsili uzman bakışıdır*; aşağıdaki imza kutuları gerçek kişilerin onayıyla doldurulur, otomatik olarak onaylanmış sayılmaz.
 
 ## 1. Kapsam ve ön koşullar

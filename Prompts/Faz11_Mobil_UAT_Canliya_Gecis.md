@@ -1,5 +1,22 @@
 # Faz11 — iOS/Android, çapraz kanal kabulü ve canlıya geçiş
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — birleşik yayın var; UAT/mağaza kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| 11.01–11.06 mobil eşlik | Uygulandı; kabul kısmi | 62d4daf, b5518a4, 47d8016, 6f2fc13, 72808e9: ortak web editörü ve native hesap/sepet köprüsü. Bearer/refresh token WebView JS/URL/storage içine verilmez; köprü origin ve izinli yollarla sınırlı. 95ad560 APK yapılandırmasında web preview origin; 902066f boş editör ekranı ve büyütülebilir sipariş ürün önizlemesi düzeltmesi. |
+| 11.09–11.11 dağıtım altyapısı | Kısmi | 4333eda birleşik web/admin/API indirilebilir GitHub Release; SHA256, yedek, sağlık kontrolü, geri dönüş ve deployment.json. 94c9e26 localhost readiness, IIS bekleme/yeniden deneme ve kurtarma. 096b267 dış ayarlar korunur; deployment doğrudan veri migration çalıştırmaz. |
+| Gerçek sunucu kanıtı | Kullanıcı bildirimi | 25.10 görüşmesinde xinobi-4333eda ve xinobi-902066f için Deployment successful çıktıları alındı; 4333eda sonrası sayfalar kullanıcı tarafından kontrol edildi. Önceki rollback başarısızlığı/manüel kurtarma tarihi korunur. Bu, tüm modüllerin UAT onayı değildir. |
+| En son yayımlanan sürüm | IIS kurulumu doğrulanmadı | DEPLOY-013 xinobi-d54c13c, DEPLOY-014 xinobi-e2131e7 GitHub üzerinde yayımlandı. Son kaynak e2131e7; üç asset ve build kayıtlı. Yeni IIS kurulumu/sonrası smoke kaydı yok. APK bu son web release için üretilmedi; release yayını fiziksel telefon güncellemesi değildir. |
+| 11.07–11.16 kalan işler | Açık / bloke | Gerçek Android/iOS cihaz regresyonu, push/deep link, mağaza yayını, ödeme, güvenlik/yük testi, restore provası, eğitim/devir, cutover ve D09/D10/D14 kabulü bekliyor. Runbook ve paketleme varlığı bu işlerin tamamını kapatmaz. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Bağlayıcı kaynak:** `Xinobi_Proje_Kapsami(4).md` iOS, Android, teslim ve yayın maddeleri; `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4/D03–D10, §5, §6.5, §7/K5–K6, §8. Yürütmenin tek kaydı `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`; bu dosya final fazın çalışma talimatı ve kontrol listesidir. İlk on faz bitmiş görünüyor diye platformlar, gerçek erişimler ve müşteri UAT'si atlanmaz.
 
 ## 1. Başlama ve erken mobil hazırlık

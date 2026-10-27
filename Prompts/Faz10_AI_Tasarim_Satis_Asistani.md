@@ -1,5 +1,22 @@
 # Faz10 — AI tasarım üretimi, satış asistanı ve AI yönetim paneli
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — AI üretim ve UI iyileşti; kalite kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| 10.02 / 10.05 prompt v2 | Uygulandı | 2ba81dd: ürüne uygulanacak bağımsız düz desen/görsel üretimi; mutfak eşyası/ürün mockupı, yazı/harf/logo/filigran istemeyen kurallar ve stile göre sanat yönü. Ürün kompozisyonu sonradan renderer ile yapılır. Prompt yasağı tek başına sonuçta nesne/yazı bulunmayacağını garanti etmez; çıktı moderasyonu/kalite elemesi yok. |
+| 10.05–10.06 ürün bağlamı / mobil | Uygulandı | 2f05625 yalnız kişiselleştirilebilir katalog; b4dac85 analiz notları; 6f2fc13/72808e9 sonuç özeti, tek ürün/renk bağlamı, girişten sonra aynı yerleşim; kaydet/sepet/favori ortak konfigürasyon revizyonuna bağlı. 078a42e aynı renderer kullanımı. |
+| 10.09 panel AI yönetimi | Uygulandı; kapsam kısmi | ef949b1 yükleme/hata ve taslak koruma; b9b63f3 ai.write ile mutasyon; 61aaade yüklenmiş kullanım kayıtlarında tarih filtresi. Filtre tüm geçmiş için sunucu sorgusu veya maliyet ölçümü değildir. |
+| 10.07 Nobi | Kısmi | 17904ce/6c56cdc Nobi yanında önizleme eylemlerini erişilebilir kılar. 16.10 canlı 503 kaydı tarihsel kalır; bu denetimde güncel Nobi AI cevabı veya insana devri sınanmadı. |
+| Açık AI kapıları | Kısmi / bloke | D05/D08/D10; moderasyon, transaction kota/maliyet, dört aday/alternatif kararı, arka plan kaldırma/genişletme, soru havuzu, resmi özellik bayrağı, WhatsApp devri ve CTO PoC/kalite onayı kapanmadı. Yeni ücretli üretim denemesi yapılmadı. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Bağlayıcı kaynak:** `Xinobi_Proje_Kapsami(4).md` AI maddeleri ve `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §2, §3.1, §4/D05–D08/D10, §5–6, §8. **Tek yürütme ve kesinti kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Bu fazdaki örnek yollar ve uçlar gerçek repo keşfine göre Faz00'da eşlenir. Model/sağlayıcı, fiyat, seçenek sayısı veya sabit kapasite ürün sahibinin D05/D08 kararı olmadan kesin kabul edilmez.
 
 ## 1. Başlama kapısı ve akış

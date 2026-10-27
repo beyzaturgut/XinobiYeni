@@ -1,5 +1,23 @@
 # Faz03 — Teknik temel, kimlik ve veritabanı iskeleti
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — güvenlik ve işletim doğrulamaları kısmi. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| 03.02 / 03.04 kamuya açık önizleme | Düzeltildi | 9e69a74 ve TST-135: rendering-inputs salt okunur anonim listeye alındı; OnlyListedAreasArePublic geçti (434 geçti/25 atlandı/0 hata). Önceki 20.10 test hatası güncel açık değildir. |
+| 03.04 personel / nesne yetkisi | Uygulandı | 34556fa, 503fe50, 6fd16c0, 681daeb: salt okunur tasarım metadata ve korumalı görsel, tasarıma bağlı sayfalı sipariş referansları, liste limiti dışındaki tek siparişi okuma. 88e99f9/b9b63f3 teklif/AI yazma kontrollerini yetkiye bağlar. |
+| 03.04 iptal ve stok ayrımı | Düzeltildi | aa6069f: sipariş status üzerinden iptal için orders.cancel sunucuda da zorunlu; stok yazımı inventory.write ve yalnız stok güncelleme yoluyla yapılır. Katalog yazma yetkisi stok yetkisi yerine geçmez. DEPLOY-014: 26 AuthorizationTests geçti. |
+| 03.08 / 03.11 revizyon ve medya | Kısmi | 9933fef, 47d8016, 902066f: sahiplik kontrollü konfigürasyon revizyonu, özel JPEG ve siparişe bağımsız kompozisyon kopyası. Mevcut FeatureDocuments/PersonalizationJson kullanılır; yeni fiziksel SQL migration yok. İzole SQL kalıcılık doğrulaması atlandı; malware taraması ve genel upload/finalize sözleşmesi açık. |
+| 03.10 sırlar / kurulum | Kısmi | 096b267, 982436b, 4333eda, 94c9e26: harici sunucu ayarları, aynı dizine kurulum reddi, checksum ile birleşik paket, IIS durdurma/bekleme/yeniden deneme ve geri dönüş. localhost:8024 readiness kullanılır. VERIFYONLY/restore provası, RPO/RTO ve güvenlik taramaları kapanmadı. |
+| 03.07 / 03.12 sınırlar | Açık | Inbox/dead-letter, ayrı worker, kalıcı genel panel ayarları ve teknik kararların açık bölümleri sürer. Cihaz sepeti sunucu sepetine dönüşmedi; XINOBI U oturumları tümüyle SQL olarak doğrulanmadı. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 > **Durum (16.10.2026):** Devam · geliştirme ~75 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Plan / uygulanmadı. Bu dosyadaki yedi rol değerlendirmesi bir kontrol listesidir; gerçek kişilerin onayı değildir. Uygulama tamamlanınca kanıt yollarını ve ayrı ayrı kararları doldurun. Son geçişi her koşulda PM verir.
 
 ## 1. Bağlayıcı kaynak, sınır ve ön koşullar

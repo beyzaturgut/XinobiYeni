@@ -1,5 +1,23 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
+## Güncel uygulama durumu — 27.10.2026
+
+**Durum:** Devam; üretim baskısı D04/T-04 ile bloke. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+
+| İş / kapsam | Güncel durum | Uygulama ve sınır |
+|---|---|---|
+| Onaylı maske / production önizleme | Uygulandı | 9e69a74, cdd8ed3 ve TST-135: SQL admin kataloğunda maske araçları ve onaylı yüzey renderer yolu production için açıldı. a96d3d9 çalışma kopyası kaynaklarını yayımlar, preview e2e fixture/proxy bağımlılığını giderir. Tüm gerçek renklerde maske/piksel kalitesi ayrıca kabul edilmelidir. |
+| Yükleme / yerleşim | Uygulandı | b926844 EXIF eksenlerini düzeltir; 32d92f2 iptal/takılma kurtarma; 6abc71e içeriğe göre görüntü algılama. Güncel PlacementStudio görsel/desen, konum/ölçek/dönüş/kavis, yakınlaştırma ve geri alma/yineleme kontrollerini paylaşır. Bu, tam katmanlı üretim editörü kabulü değildir. |
+| Sürümlü kaydet / yeniden düzenle | Uygulandı | 9933fef, 47d8016, d2d8f8d, 72808e9: hesap tasarımı + konfigürasyon revizyonu, renk/kaynak değişimi, sepet ve favoriden aynı yerleşime dönüş; girişte tasarım kaybolmaz. 902066f ürün seçilmemiş mobil editör bağlantısını beyaz ekran yerine native seçiciye yönlendirir. |
+| Sipariş / panel tasarım kayıtları | Uygulandı; baskı kısmi | 34556fa, 469d9bd, 503fe50: gerçek tasarım metadata ve yetkili görsel; 068e976 kaynak yokken sahte baskı eylemlerini kapatır. 902066f sipariş kompozisyonunu tasarım silinmesinden bağımsız korur. JPEG önizleme üretim baskı dosyası değildir. |
+| Eski editörün kaldırılması | Uygulandı | 179c46b/078a42e eski prototipleri, EditorWorkspace ve sahte metin/şekil/ön-arka kontrollerini kaldırır; AI ve referans önizlemesi ortak rendering/PlacementStudio kullanır. Eski URL ürün seçimine gider. Yerel referans sayfası gerçek ticari kimlik veya kaydetme hakkı üretmez. |
+| Üretim kapısı | Bloke / açık | Konfigürasyon revizyonu üretim DesignVersion kabulünü kapatmaz. Fiziksel PrintArea mm, DPI/taşma/renk/format, üretim onayı, baskı render worker ve indirme, şablon/metin/katman/çoklu yüz ve fiyat farkı eksikleri sürer. Eski Roboflow/Tea Maker yerel araçlarının tamamı silindi varsayılmadı. |
+
+**Doğrulama:** Tarihli test raporları ve çalıştırıldığı commit/ortam denetim dosyasında listelenmiştir. Bu dokümantasyon oturumunda uygulama testleri yeniden çalıştırılmadı.
+
+---
+
+
 **Durum (20.10.2026):** Bloke (D04) · geliştirme ~47 %; ayrıntı "Uygulama durumu — 16.10.2026" bölümünde, faz kabulü yok. **İlk plan durumu:** Uygulanmayı bekliyor. **Kaynak:** `Xinobi_Kavramsal_ve_Teknik_Analiz.md` §3.1, §4, §5, §6.3–6.5, §8 ve `Xinobi_Proje_Kapsami(4).md` kişiselleştirme/editör maddeleri. **Yürütme ve karar kaydı:** `Faz00_Proje_Takip_ve_Kesintiden_Devam.md`. Onay kutuları gerçek onay verilince işaretlenir.
 
 ## 1. Amaç, bağımlılık, karar kapısı

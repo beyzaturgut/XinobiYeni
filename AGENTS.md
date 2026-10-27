@@ -1,6 +1,10 @@
 # Repository workflow
 
-- When the owner says "deploy alalım", prepare one combined ZIP containing the web storefront and admin panel. Use `node tools/package-deploy.mjs`; do not deliver separate web/admin ZIPs as the requested deployment artifact.
+- When the owner says "deploy alalım", follow the existing GitHub Releases flow in `docs/runbooks/one-command-deploy.md`.
+- Review the recent GitHub releases, ensure source changes are committed and pushed, then run `node tools/package-release.mjs`. The release contains web, admin and API together; `package-deploy.mjs` is an internal step, not the final deliverable.
+- Publish the prepared version with `node tools/publish-release.mjs xinobi-<7-character-commit>` using an existing authorized credential without exposing it. Verify the published release and its three assets: `xinobi.zip`, `xinobi.zip.sha256`, `deploy-release.ps1`.
+- Return the GitHub release link and the server's version-specific PowerShell command. Creating/publishing a release is not a completed IIS deployment; record the actual status honestly. Do not change hosting or add a new workflow.
+- Build an APK only when explicitly requested. Record release preparation/publication under `deployments/` without secrets.
 
 The project owner wants completed changes committed and pushed regularly.
 

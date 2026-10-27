@@ -359,8 +359,7 @@
 
 /* XINOBI U preview: the stage and the colour / image / placement cards share one grid.
    Phones and tablets stack them with the product first; desktop moves the cards into a right column beside a sticky stage. */
-/* Leave scroll room below checkout actions so the fixed Nobi launcher can be cleared. */
-.xinobiLayout { box-sizing: border-box; max-width: 1440px; margin: 0 auto; padding: 0 16px calc(120px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: minmax(0,1fr);
+.xinobiLayout { box-sizing: border-box; max-width: 1440px; margin: 0 auto; padding: 0 16px 32px; display: grid; grid-template-columns: minmax(0,1fr);
   grid-template-areas: "stage" "variants" "tools" "upload" "placement" "rest"; gap: 12px; align-items: start; }
 .xinobiLayout .xinobiPreview { display: contents; }
 .xinobiLayout > .previewStatus { grid-column: 1 / -1; }
@@ -410,7 +409,7 @@
 .xinobiLayout .properties > section + section { margin-top: 18px; padding-top: 14px; border-top: 1px solid #ebebeb; }
 
 @media (min-width: 1051px) {
-  .xinobiLayout { padding: 8px clamp(20px,3vw,40px) calc(180px + env(safe-area-inset-bottom, 0px)); grid-template-columns: minmax(0,1fr) 380px;
+  .xinobiLayout { padding: 8px clamp(20px,3vw,40px) 48px; grid-template-columns: minmax(0,1fr) 380px;
     grid-template-areas: "stage variants" "stage tools" "stage upload" "stage placement" "stage rest"; grid-template-rows: auto auto auto auto 1fr; column-gap: 32px; }
   .xinobiLayout .xinobiPreview .canvasSection { position: sticky; top: 16px; height: min(calc(100vh - 32px), 920px); min-height: 600px; }
   .xinobiLayout .canvas { padding: 24px; overflow: auto; }

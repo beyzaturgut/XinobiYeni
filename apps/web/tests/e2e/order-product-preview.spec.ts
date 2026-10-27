@@ -1,0 +1,23 @@
+import {readFileSync} from 'node:fs';
+import {test,expect} from '@playwright/test';
+import {mockStore} from './fixtures';
+const image=readFileSync('public/assets/personalization/sample-pattern.png');
+for(const fallback of [false,true])test(`order composition and zoom, saved revision fallback=${fallback}`,async({page})=>{
+ const {order}=await mockStore(page,{signedIn:true});
+ await page.addLocatorHandler(page.getByRole('button',{name:'Çerez tercih panelini kapat'}),async button=>{await button.click()});
+ order.lines[0].personalization={designId:'design',kind:'upload',name:'Desen',mime:'image/png',imageUrl:'/api/v1/me/orders/test-order/lines/0/design',configurationId:'saved',configurationRevision:3};
+ const requested:string[]=[];
+ await page.route('**/api/v1/me/orders/*/lines/*/preview',route=>{requested.push('order');return fallback?route.fulfill({status:404}):route.fulfill({body:image,contentType:'image/png'})});
+ await page.route('**/api/v1/me/design-configurations/saved/revisions/3/preview',route=>{requested.push('revision');return route.fulfill({body:image,contentType:'image/png'})});
+ let raw=false;await page.route('**/api/v1/me/orders/*/lines/*/design',route=>{raw=true;return route.abort()});
+ await page.goto('/hesap/siparisler');
+ const thumbnail=page.getByRole('button',{name:/ürün önizlemesini büyüt/}).first();
+ await expect(thumbnail.locator('img')).toHaveAttribute('alt',/tasarladığın ürün/);
+ const src=await thumbnail.locator('img').getAttribute('src');
+ await thumbnail.click();const viewer=page.getByRole('dialog');await expect(viewer).toBeVisible();
+ await expect(viewer.locator('img')).toHaveAttribute('src',src!);
+ await viewer.getByRole('button',{name:'Yakınlaştır',exact:true}).click();await expect(viewer.locator('output')).toHaveText('%150');
+ await viewer.getByRole('button',{name:'Uzaklaştır',exact:true}).click();await expect(viewer.locator('output')).toHaveText('%100');
+ await page.keyboard.press('Escape');await expect(viewer).toHaveCount(0);
+ expect(requested).toEqual(fallback?['order','revision']:['order']);expect(raw).toBe(false);
+});

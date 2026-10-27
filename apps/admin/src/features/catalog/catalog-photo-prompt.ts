@@ -1,83 +1,47 @@
 import type { Product } from '../../commerce'
 
-export const defaultCoating = 'Kaynak fotoğraftaki kişiselleştirilebilir ana dış gövdenin tamamı; varsa bu gövdeye ait dışa uzanan dökme ağzı, ağız ucunun görünen yüzeyleri, yanları, kenarları ve gövdeyle birleşim bölgesi. Kaplama gövde ile ağız arasında kesintisiz devam etsin; yanlışlıkla eski renkte alan bırakma. Yalnız fotoğrafta bulunan parçaları değerlendir.'
-export const defaultProtectedParts = 'Cam ve şeffaf parçalar, süzgeç, kapak, kapak düğmesi, kulplar, düğmeler, kablo, taban ve ayrı metal bağlantı halkaları (yalnız kaynakta varsa). Logo ve yazıların gerçek çizgileri her durumda korunmalı.'
+export const defaultFinish = 'fine-textured soft satin metallic'
 
 function slug(value: string) {
-  return value.toLocaleLowerCase('tr-TR').replaceAll('ı', 'i').replaceAll('ş', 's').replaceAll('ğ', 'g').replaceAll('ü', 'u').replaceAll('ö', 'o').replaceAll('ç', 'c').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'urun'
+  return value.toLocaleLowerCase('tr-TR').replaceAll('ı', 'i').replaceAll('ş', 's').replaceAll('ğ', 'g').replaceAll('ü', 'u').replaceAll('ö', 'o').replaceAll('ç', 'c').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'urun'
 }
 
-export function buildCatalogPhotoPrompt(product: Product, referenceId: string, coating: string, protectedParts: string) {
-  const reference = product.variants.find(v => v.id === referenceId) ?? product.variants[0]
-  const variants = reference ? [reference, ...product.variants.filter(v => v.id !== reference.id)] : []
-  return `Eklediğim ana görseldeki ${JSON.stringify(product.name || '[ÜRÜN ADI EKSİK]')} ürününden aşağıdaki kurallara uygun ${variants.length} ayrı katalog görseli hazırla. Amaç aynı ürünün dış kaplamasını katalogdaki renklerde göstermektir. Görseller tek desen maskesiyle kullanılacağı için piksel düzeyinde aynı hizada olmalıdır.
+// Colours come from the product's catalogue variants in their saved order; the first one becomes the MASTER.
+export function buildCatalogPhotoPrompt(product: Product) {
+  const colours = product.variants.map((v, i) => `${i + 1}. ${v.color.trim() || '[RENK EKSİK]'} - ${/^#[0-9a-f]{6}$/i.test(v.hex?.trim() ?? '') ? v.hex!.trim().toUpperCase() : '[GEÇERLİ HEX EKSİK]'}`)
+  return `Edit the provided product photo and produce ONE output image for EACH color listed in COLORS. Number of outputs = number of colors.
 
-ÇIKTI ÖZETİ (her dosya için zorunlu)
-- Format: KAYIPSIZ WebP (.webp). PNG, JPEG veya kayıplı WebP teslim etme.
-- Boyut: tam 1333 × 2000 piksel; opak saf beyaz #FFFFFF fon.
-- Yöntem: Ürünü görsel üretim modeliyle yeniden çizme. İşlemi kodla yap (Python + Pillow/OpenCV/NumPy): kaynak pikselleri koru, yalnız arka planı ayır ve kaplama maskesinde rengi dönüştür. Yeniden çizim kenarları bozar ve rengi tutturamaz. Kod çalıştıramıyorsan bunu en başta söyle ve üretme.
+WORKFLOW (mandatory)
+1. Create a single MASTER image from the first color: background removed, canvas and placement finalized.
+2. Generate every other color ONLY by recoloring this same MASTER. Never re-generate, redraw or re-place the product for each color.
+3. All outputs must share identical canvas, product position, scale, outline, edges, lighting, highlights and shadows. Overlaid at (0,0), they must match exactly; only the body color differs.
 
-ÜRÜNE AİT GÜNCEL BİLGİLER
-Ürün kimliği: ${product.id}
-Kategori: ${JSON.stringify(product.category)}
-Açıklama (geometriyi fotoğraftan belirle): ${JSON.stringify(product.description)}
-Referans varyant: ${reference ? JSON.stringify(reference.color) + ' / ' + reference.sku : '[VARYANT EKSİK]'}
-Ana görseli bu metne dosya olarak ekliyorum. Katalogdaki görsel adreslerini eklenmiş kaynak dosya sayma. Ürün adı, varyant, renk veya geçerli #RRGGBB kodu eksikse tahmin etme; eksik bilgiyi iste ve üretimi durdur.
+SOURCE FIDELITY
+Do NOT redraw, redesign, mirror, rotate or change the camera angle. Keep the exact shape, proportions, perspective, all parts, logos and text exactly as in the source.
 
-KAYNAĞA SADAKAT
-- Şekli, oranları, kamera açısını, perspektifi ve bütün parçaları yalnız ana görselden al. Aynalama, döndürme veya yeniden tasarlama.
-- Dekoru, diğer nesneleri ve ortamı kaldır. Cam parçalar ve kulp boşluklarından görünen ortamı da temizle; arkalarında beyaz fon görünsün. Camın kendi çizgilerini ve yansımalarını koru.
-- Logo ve yazıların kaynak şekli, konumu, boyutu ve rengini koru. Okunamayan ayrıntıları uydurma. Basılı logonun yalnız gerçek çizgilerini koru; çevresindeki kaplanabilir gövdeyi dikdörtgen olarak hariç tutma. Gerçek fiziksel etiket varsa kendi sınırını koru.
+BACKGROUND
+Remove all background, props and environment, including anything visible through transparent parts and inside openings or gaps. Replace with pure solid white (#FFFFFF). Keep the transparent parts' own edges and reflections.
+Clean product edges with 1–2 px natural anti-aliasing blending into white. No halo, no fringe, no grey or colored outline, no leftover background color. No shadow, no floor line, no reflection surface.
 
-KENAR KALİTESİ VE ARKA PLAN AYIRMA
-- Ürünü fondan temiz ayır: kenarlarda eski fondan kalan açık/koyu saçak, hale, çift kontur, basamaklı (pikselli) kenar veya yarı saydam kalıntı olmasın.
-- Kenar geçişi 1–2 piksel yumuşak (anti-aliasing) olsun ve saf beyaza karışsın. Kenar piksellerindeki eski fon rengini temizle (renk arındırma / decontamination); kulp ve gövde kenarı beyaz fonda gri veya renkli çizgi bırakmasın.
-- Kulp içi boşluklar, kulp ile gövde arası, ağız altı ve taban çevresi gibi kapalı/yarı kapalı boşlukları ayrıca kontrol et: buralarda eski fon veya yansıma kalmasın, saf beyaz olsun.
-- Kenarları kalınlaştırma, inceltme veya yeniden çizme; ürün sınırı kaynakla aynı kalsın.
+CANVAS
+Exact output size: 1333 × 2000 pixels (width × height), portrait. Exactly 1333 × 2000, not approximately.
+Product centered horizontally, total height about 1600 px, about 200 px empty space at top and bottom. If the product is too wide, reduce its height to fit and keep the aspect ratio. Do not crop, stretch or distort any part.
 
-ORTAK TUVAL VE YERLEŞİM
-- Her dosyanın gerçek boyutu tam 1333 × 2000 piksel; opak saf beyaz #FFFFFF arka plan.
-- Zemin çizgisi, yansıma yüzeyi, dekor veya gölge ekleme.
-- Ürün bütün parçalarıyla yaklaşık 1600 piksel yüksekliğinde; üst ve altta yaklaşık 200'er piksel boşluk. Dış sınırları yatayda ortala; hiçbir parçayı kırpma.
-- Geniş ürünlerde bütün parçaları kırpmadan sığdırmak önceliklidir: en-boy oranını koru, yüksekliği gerekirse azalt ve gerçek yerleşimi raporla. Ürünü esnetme.
+COLOR
+Recolor ONLY the main customizable outer body, including any protruding parts that belong to it (spout, tip, edges, seams), so no area keeps the old color. Use the exact same recolor area in every output.
+Finish: ${defaultFinish}.
+Keep luminance, lighting direction, highlight and shadow placement from the source; change only hue and saturation. Do not shift the tone toward another hue, do not oversaturate, no chrome or mirror effect, no blown-out white areas, no flat paint look.
 
-KAPLAMA ALANI
-${coating.trim() || defaultCoating}
+COLORS
+${colours.join('\n') || '[RENK VARYANTI EKSİK]'}
 
-KORUNACAK PARÇALAR
-${protectedParts.trim() || defaultProtectedParts}
-Fotoğrafta olmayan parça ekleme. Kaplanacak ve korunacak alanlar çelişiyorsa veya sınır belirsizse tahmin etmeden sor.
+DO NOT CHANGE
+Transparent/glass parts, lids, knobs, handles, buttons, cables, bases, separate metal parts, logos and text. Do not add, remove, move or scale anything.
 
-YÜZEY VE PARLAKLIK
-- İnce dokulu, hafif metalik saten kaplama. Ana görselin ışık yönünü ve hacmi anlatan yumuşak gölgeleri koru.
-- Aşırı krom, ayna etkisi, patlayan beyaz alan veya keskin beyaz ışık şeritleri oluşturma. Düz, gölgesiz boyama yapma.
-- Parlama ve gölgelerin konumu, şekli ve dağılımı bütün renklerde aynı olsun. HEX ana tondur; ışık ve gölgede doğal açık/koyu karşılıklarını kullan.
-
-RENK DÖNÜŞÜMÜ VE DOĞRULUĞU
-- Dönüşümü parlaklığı koruyan bir renk uzayında yap (ör. LAB: L kanalı kaynaktan, renk kanalları hedef HEX'ten); düz boya veya renk katmanı bindirme yapma.
-- Kaplama alanının orta tonlarının (parlama ve koyu gölge hariç) ortalaması hedef HEX'e yakın olsun: LAB'de ΔE ≤ 5. Tonu pembeye, turuncuya veya griye kaydırma; doygunluğu hedef HEX'ten fazla artırma.
-- Kaplama alanının hiçbir yerinde eski renk kalmasın: dökme ağzı ve ucu, alt kenar şeridi, iki gövdenin birleşim çizgisi, gövde kenarlarındaki yansımalar dahil.
-- Her dosya için ölçtüğün ortalama orta ton HEX değerini ve ΔE'yi raporla.
-
-RENKLER VE DOSYA ADLARI (ilk satır ortak kalıp)
-${variants.map((v, i) => `${i + 1}. ${JSON.stringify(v.color || '[RENK EKSİK]')} — ${/^#[0-9a-f]{6}$/i.test(v.hex || '') ? v.hex : '[GEÇERLİ HEX EKSİK]'}; SKU: ${JSON.stringify(v.sku)}; varyant: ${v.id}\n   ${slug(v.sku || product.name)}-${slug(v.color)}-${i + 1}-1333x2000.webp`).join('\n')}
-
-ZORUNLU İŞLEM SIRASI
-1. Önce yalnız ilk listedeki referans rengin katalog görselini hazırla. Gümüş varyant varsa operatör bunu referans seçebilir; listede olmayan renk üretme.
-2. Tuvali, ürün boyutunu, konumunu ve beyaz fonu son haline getir. Bu görsel ortak KALIP olsun.
-3. Kalıpta belirtilen kaplama alanının tamamını kapsayan tek maske oluştur. Logo çizgilerini ve korunacak parçaları çıkar. Bu renk dönüşümü maskesini bütün varyantlarda aynen kullan.
-4. Diğer renkleri ayrı ayrı yeniden üretme. Aynı kalıp ve aynı maske üzerinde piksel tabanlı renk dönüşümü uygula.
-5. Bütün renklerde aynı ışıklılık haritasını kullan; doğal ve ölçülü metalik görünümü koru.
-6. Varyantlar oluşturulduktan sonra ayrı kırpma, ölçekleme, döndürme veya konum düzeltmesi yapma.
-7. Maskenin dışındaki çözülmüş RGB pikselleri bütün dosyalarda birebir aynı tut.
-
-TESLİM VE DOĞRULAMA
-- Her görseli ayrı KAYIPSIZ WebP (.webp) olarak ve bütün dosyaları tek ZIP içinde teslim et. PNG/JPEG veya kayıplı WebP'ye sessizce geçme.
-- Kenarları %200–400 yakınlaştırarak kontrol et: kulplar, kulp içleri, ağız ve taban çevresinde saçak, hale veya eski fon kalmadığını doğrula.
-- Kaydedilen dosyaları tekrar aç; formatı, kayıpsız kodlamayı ve her birinin 1333 × 2000 piksel olduğunu doğrula.
-- (0,0) konumu, ölçek 1 ve dönüş 0 ile üst üste koy; dış sınırlar ve bütün parçalar tam çakışmalı.
-- Çözülmüş piksel karşılaştırmasında farkların yalnız kaplama maskesinde kaldığını doğrula; maske dışı farklı piksel sayısını ve dosya boyutlarını raporla.
-- Varsa gövdenin ağız ve uç kısmının da renklendirildiğini görsel olarak kontrol et. Fonun saf beyaz olduğunu kontrol et.
-- Boyut, hizalama, kayıpsız format veya piksel eşitliğini kontrol edemiyorsan açıkça belirt. Doğrulanmayan sonucu kontrol edilmiş veya tamamlanmış olarak sunma.
-- Bu katalog fotoğrafı hazırlama işlemidir. Desen giydirme için alfa maskesi, son kalıp fotoğrafa bağlı olarak ayrıca hazırlanıp panelde kontrol edilmelidir.`
+OUTPUT
+One separate file per color, in the order listed.
+Format: WebP (.webp), lossless. Not PNG, not JPEG, not lossy WebP.
+Opaque white background, no transparency. Each file exactly 1333 × 2000 px.
+File names:
+${product.variants.map((v, i) => `${slug(product.name)}-${slug(v.color)}-${i + 1}-1333x2000.webp`).join('\n') || `${slug(product.name)}-[renk-adı]-[sıra]-1333x2000.webp`}`
 }

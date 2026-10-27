@@ -3,7 +3,7 @@ namespace Xinobi.Api.DesignStudio;
 /// <summary>Server-owned art direction. The questionnaire's stable option IDs, not random labels or question order, select the rules.</summary>
 public static class DesignArtDirection
 {
-    public const string Version = "xinobi-art-direction-3";
+    public const string Version = "xinobi-art-direction-4";
 
     private static readonly Dictionary<string, string> Motifs = new()
     {
@@ -80,9 +80,9 @@ public static class DesignArtDirection
         var detailed = !minimal && (visual is "rich" or "layer");
         var treatment = style switch
         {
-            "minimal" => "Flat fills, uniform outlines and simple shapes",
-            "geometry" => "Crisp geometric edges and consistent line weight",
-            "scandi" => "Matte fills, fine stems and simple organic contours",
+            "minimal" => "Flat fills, consistent fine outlines and refined simple shapes",
+            "geometry" => "Crisp geometric edges, balanced proportions and consistent fine line weight",
+            "scandi" => "Matte fills, slender stems, controlled fine line weight and refined organic contours",
             "retro" => "Refined mid-century proportions and subtle printed pigment texture",
             "watercolor" => "Visible pigment blooms, translucent washes and soft painted edges",
             "ink" => detailed ? "Intricate ink contours, varied line weight and flowing brush accents" : "Economical fine ink contours and one expressive brush accent",
@@ -114,7 +114,7 @@ public static class DesignArtDirection
             + (minimal ? "Minimal styling takes priority: one motif family, at most two motif sizes, generous spacing and selective detail. "
                 : detailed ? "Rich illustration: layered motifs, fine internal detail and varied linework; preserve a clear visual hierarchy. "
                 : "Keep detail selective and follow the requested motif spacing. ")
-            + "Readable silhouettes and intentional spacing remain clear when the artwork is reduced in size. "
+            + "Refined motif contours, controlled line weight and balanced visual weight; supporting strokes stay finer than the main contours. Readable shapes remain clear at reduced size. "
             + "The complete canvas is a flat illustrated surface composed exclusively of the selected nature motifs and intentional background space. "
             + "Text-free, unlettered, unbranded, unsigned, watermark-free and borderless artwork. "
             + "Original nature illustration with family-friendly imagery.";

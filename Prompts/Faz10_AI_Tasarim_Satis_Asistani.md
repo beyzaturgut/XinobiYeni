@@ -1,5 +1,7 @@
 # Faz10 — AI tasarım üretimi, satış asistanı ve AI yönetim paneli
 
+**27.10 v4 estetik ek kaydı:** Rafine motif/çizgi kalınlığı/görsel denge kuralları eklendi. Dış görsel denetim gönderimi kullanıcı tarafından reddedildi. Yerel OCR/görsel model seçenekleri değerlendirildi; otomatik denetim kurulmuş veya görsel kalite kabul edilmiş sayılmaz.
+
 **27.10 prompt v3 ek kaydı:** AI desen üretimine olumlu motif tarifi, ana/yardımcı motif hiyerarşisi, zemin/ana/destek/vurgu renk rolleri ve kısa yazısızlık kuralları eklendi (`xinobi-art-direction-3`). Model ve dört adım korunur. Yeni ücretli üretim/estetik kabul veya canlı deploy yapılmadı; görsel sonuçlar kullanıcıyla iteratif değerlendirilecek. [Kurallar](../docs/xinobi-u-art-direction.md), [test kaydı](../test/2026-10-27/TST-art-direction-v3.md).
 
 ## Güncel uygulama durumu — 27.10.2026
@@ -118,3 +120,5 @@ Faz00'a son doğrulanmış commit/test, aktif iş ID/job status, kota rezervasyo
 | **Proje Yöneticisi — zorunlu son kapı** | **Altı inceleme, gerçek servis kanıtı, D05/D08/D10, Creative handoff, müşteri UAT ve Faz00; eksikte RED** | **BEKLİYOR** |
 
 Belge incelemesi gerçek uygulama onayı değildir; bu kutular şimdiden işaretlenmez.
+
+Yerel seçeneklerin kanıt ve sınırları: [yerel denetim değerlendirmesi](../docs/runbooks/local-artwork-review.md).

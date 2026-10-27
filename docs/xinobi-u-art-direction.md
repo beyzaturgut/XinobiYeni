@@ -1,5 +1,10 @@
 # XINOBI U tasarım yönü ve cevap kuralları
 
+## Güncel estetik yön — 27.10.2026 / xinobi-art-direction-4
+
+V3 renk rolleri ve motif hiyerarşisi korunur. V4 rafine motif konturları, kontrollü çizgi kalınlığı, dengeli görsel ağırlık ve ana konturdan ince yardımcı çizgiler ister. Minimal/geometri/İskandinav teknik tarifleri tutarlı ince konturlarla güncellendi. Model ve steps=4 aynı. Bu estetik değişiklik OCR/nesne denetimi değildir; yazı/imza/eşya bulunmaması garanti edilmez. Görselin Cloudflare görsel anlama modeline gönderilmesi kullanıcı tarafından reddedildi. Yerel denetim seçenekleri değerlendirildi; üretim sonrası kontrol henüz uygulanmadı.
+
+
 ## Güncel sürüm — 27.10.2026 / xinobi-art-direction-3
 
 İlk kalite denemesi için mevcut beş soru ve seçenek kimlikleri korunur. Prompt motif → sanat yönü/teknik → renk rolleri → kompozisyon/ruh hâli → görsel hiyerarşi sırasıyla kurulur.
@@ -70,3 +75,5 @@ Referans görseller sağlayıcıya gönderilmez. Testler minimal/yoğunluk çak�
 ücretli görsel üretimi veya görsel kalite değerlendirmesi yapılmaz.
 
 Bu değişiklik kaynak koddadır; canlıya uygulanması için API deploy'u gerekir.
+
+Yerel seçeneklerin kanıt ve sınırları: [yerel denetim değerlendirmesi](runbooks/local-artwork-review.md).

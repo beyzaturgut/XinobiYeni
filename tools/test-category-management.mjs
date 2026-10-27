@@ -18,7 +18,7 @@ try{
   return route.fulfill({json:state});
  });
  await admin.goto('http://127.0.0.1:5173');await admin.getByRole('button',{name:'Katalog',exact:true}).click();
- await admin.getByLabel('Yeni kategori adı',{exact:true}).fill('Blenderlar');await admin.getByRole('button',{name:'Kategori ekle',exact:true}).click();
+ await admin.getByRole('button',{name:'Yeni kategori',exact:true}).click();await admin.getByLabel('Yeni kategori adı',{exact:true}).fill('Blenderlar');await admin.getByRole('button',{name:'Kategori ekle',exact:true}).click();
  await admin.getByRole('status').getByText('Blenderlar kategorisi eklendi.',{exact:true}).waitFor();
  await admin.getByRole('button',{name:'Yeni ürün',exact:true}).click();await admin.getByLabel('Ürün kategorisi',{exact:true}).selectOption('Blenderlar');
  assert.equal(await admin.getByLabel('Ürün kategorisi',{exact:true}).inputValue(),'Blenderlar');
@@ -33,6 +33,7 @@ try{
  assert.ok(await page.getByRole('heading',{name:state.products[0].name,exact:true}).first().isVisible());await page.close();
  }
  await admin.reload();await admin.getByRole('button',{name:'Katalog',exact:true}).click();
+ await admin.getByRole('button',{name:'Yeni kategori',exact:true}).click();await admin.getByText(/^Mevcut kategoriler/).click();
  assert.ok(await admin.getByRole('button',{name:'Blenderlar kategorisini sil',exact:true}).isDisabled());
  await admin.getByLabel('Blenderlar ürünlerini taşı',{exact:true}).selectOption('Kahve makineleri');
  admin.once('dialog',dialog=>dialog.accept());await admin.getByRole('button',{name:'Blenderlar kategorisini sil',exact:true}).click();

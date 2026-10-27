@@ -10,13 +10,16 @@ export default function Catalog({ products, prices, onPrice, categories = [], on
   const canWrite=useAdminSession()?.permissions.includes('catalog.write')??false
   const [priceDrafts,setPriceDrafts]=useState<Record<string,string>>({}),[saving,setSaving]=useState(false)
   const [categoryTargets, setCategoryTargets] = useState<Record<string, string>>({})
-  const [categoryName, setCategoryName] = useState(''), [categoryBusy, setCategoryBusy] = useState(false), [categoryError, setCategoryError] = useState('')
+  const [categoryName, setCategoryName] = useState(''), [categoryBusy, setCategoryBusy] = useState(false), [categoryError, setCategoryError] = useState(''), [categoryNotice, setCategoryNotice] = useState('')
+  const categoryDialog = useRef<HTMLDialogElement>(null), categoryTrigger = useRef<HTMLButtonElement | null>(null)
   const [promptProductId, setPromptProductId] = useState('')
   const [query, setQuery] = useState(''), [category, setCategory] = useState('Tümü'), [status, setStatus] = useState('Tümü')
   const [draft, setDraft] = useState<Product | null>(null), [tab, setTab] = useState('Genel bilgiler'), [error, setError] = useState(''), [notice, setNotice] = useState('')
   const dialog = useRef<HTMLDialogElement>(null), trigger = useRef<HTMLButtonElement | null>(null), dirty = useRef(false)
   const filtered = products.filter(product => (category === 'Tümü' || product.category === category) && (status === 'Tümü' || (status === 'Aktif' ? product.active : status === 'Pasif' ? !product.active : product.variants.every(variant => variant.stock === 0))) && `${product.name} ${product.id} ${product.variants.map(variant => variant.sku).join(' ')}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
   function open(product: Product, button: HTMLButtonElement) { trigger.current = button; setDraft(structuredClone(product)); setPriceDrafts(Object.fromEntries(product.variants.map(variant=>[variant.id,prices[variant.id]===undefined?'':(prices[variant.id]/100).toFixed(2)]))); setTab('Genel bilgiler'); setError(''); dirty.current = false; dialog.current?.showModal() }
+  function openCategories(button: HTMLButtonElement) { categoryTrigger.current = button; setCategoryError(''); setCategoryNotice(''); categoryDialog.current?.showModal() }
+  function closeCategories() { categoryDialog.current?.close() }
   // Colours already used in the catalogue (other products included) suggest names and fill their HEX code.
   const palette = useMemo(() => knownColours(products), [products])
   function update(patch: Partial<Product>) { dirty.current = true; setDraft(current => current && { ...current, ...patch }) }
@@ -51,27 +54,9 @@ export default function Catalog({ products, prices, onPrice, categories = [], on
     } catch (error) { setError((productSaved?'Ürün kaydedildi; bazı fiyatlar kaydedilemedi. Yeniden kaydetmeyi dene. ':'')+(error instanceof Error ? error.message : 'Kayıt başarısız.')) } finally {setSaving(false)}
   }
   return <section aria-label="Katalog yönetimi">
-    <form className="category-create" aria-label="Yeni kategori ekle" onSubmit={async event => {
-      event.preventDefault(); if (categoryBusy || !canWrite) return
-      setCategoryBusy(true); setCategoryError('');setNotice('')
-      try { await onCategory(categoryName.trim()); setNotice(`${categoryName.trim()} kategorisi eklendi.`); setCategoryName('') }
-      catch (error) { setCategoryError(error instanceof Error ? error.message : 'Kategori eklenemedi.') }
-      finally { setCategoryBusy(false) }
-    }}><label>Yeni kategori adı<input required maxLength={80} value={categoryName} placeholder="Örn. Blenderlar" onChange={event => setCategoryName(event.target.value)} /></label><button type="submit" disabled={!canWrite || categoryBusy || !categoryName.trim()}>{categoryBusy ? 'Ekleniyor…' : 'Kategori ekle'}</button>{categoryError && <p role="alert">{categoryError}</p>}</form>
-    <section className="category-management" aria-label="Kategori yönetimi"><h2>Kategoriler</h2><p>Ürün içeren bir kategoriyi silerken ürünlerin taşınacağı kategoriyi seçin.</p>{categories.map(name => {
-      const count = products.filter(product => product.category === name).length
-      const target = categoryTargets[name] || ''
-      return <div className="category-management-row" key={name}><span><strong>{name}</strong><small>{count} ürün</small></span>{count > 0 && <label>Ürünleri taşı<select aria-label={`${name} ürünlerini taşı`} value={target} onChange={event => setCategoryTargets(current => ({...current, [name]: event.target.value}))}><option value="">Hedef kategori seçin</option>{categories.filter(other => other !== name).map(other => <option key={other}>{other}</option>)}</select></label>}<button disabled={!canWrite || categoryBusy || (count > 0 && (!target || !categories.includes(target)))} aria-label={`${name} kategorisini sil`} onClick={async () => {
-        if (!window.confirm(count > 0 ? `${name} kategorisi silinsin ve ${count} ürün ${target} kategorisine taşınsın mı?` : `${name} kategorisi silinsin mi?`)) return
-        setCategoryBusy(true); setCategoryError('');setNotice('')
-        try { await onDeleteCategory(name, count > 0 ? target : undefined); if(category === name) setCategory('Tümü'); setNotice(`${name} kategorisi silindi${count > 0 ? `; ürünler ${target} kategorisine taşındı` : ''}.`); setCategoryTargets(current => {const next={...current};delete next[name];return next}) }
-        catch(error) {setCategoryError(error instanceof Error ? error.message : 'Kategori silinemedi.')}
-        finally {setCategoryBusy(false)}
-      }}>Kategoriyi sil</button></div>
-    })}</section>
     {filtered.length===0&&<p role="status">{products.length?'Filtrelere uygun ürün yok.':'Katalogda ürün yok.'}</p>}
     <div className="catalog-summary">{[['Toplam ürün', products.length], ['Aktif', products.filter(product => product.active).length], ['Pasif', products.filter(product => !product.active).length], ['Stoksuz ürün', products.filter(product => product.variants.every(variant => variant.stock === 0)).length]].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
-    <div className="order-filters"><label>Ürün veya SKU ara<input value={query} onChange={event => setQuery(event.target.value)} /></label><label>Kategori<select aria-label="Kategori filtresi" value={category} onChange={event => setCategory(event.target.value)}>{['Tümü', ...categories].map(item => <option key={item}>{item}</option>)}</select></label><label>Durum<select aria-label="Ürün durum filtresi" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Aktif', 'Pasif', 'Stoksuz'].map(item => <option key={item}>{item}</option>)}</select></label><button onClick={() => { setQuery(''); setCategory('Tümü'); setStatus('Tümü') }}>Filtreleri temizle</button><button disabled={!canWrite} onClick={event => open({ id: `DEMO-${randomCommerceId()}`, name: '', category: categories[0] ?? '', active: false, description: '', seoTitle: '', variants: [] }, event.currentTarget)}>Yeni ürün</button></div>
+    <div className="order-filters"><label>Ürün veya SKU ara<input value={query} onChange={event => setQuery(event.target.value)} /></label><label>Kategori<select aria-label="Kategori filtresi" value={category} onChange={event => setCategory(event.target.value)}>{['Tümü', ...categories].map(item => <option key={item}>{item}</option>)}</select></label><label>Durum<select aria-label="Ürün durum filtresi" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Aktif', 'Pasif', 'Stoksuz'].map(item => <option key={item}>{item}</option>)}</select></label><button onClick={() => { setQuery(''); setCategory('Tümü'); setStatus('Tümü') }}>Filtreleri temizle</button><button disabled={!canWrite} onClick={event => openCategories(event.currentTarget)}>Yeni kategori</button><button disabled={!canWrite} onClick={event => open({ id: `DEMO-${randomCommerceId()}`, name: '', category: categories[0] ?? '', active: false, description: '', seoTitle: '', variants: [] }, event.currentTarget)}>Yeni ürün</button></div>
     <details className="catalog-photo-prompt-launcher"><summary>XINOBI U · Katalog görseli promptu</summary>
       <label>Prompt hazırlanacak ürün<select value={products.some(product => product.id === promptProductId) ? promptProductId : products[0]?.id ?? ''} onChange={event => setPromptProductId(event.target.value)}>{products.map(product => <option key={product.id} value={product.id}>{product.name}</option>)}</select></label>
       {(() => { const product = products.find(item => item.id === promptProductId) ?? products[0]; return product ? <CatalogPhotoPrompt key={product.id} product={product} /> : <p>Yeni ürün ekleyip Medya bölümünden promptu hazırlayabilirsin.</p> })()}
@@ -104,5 +89,25 @@ export default function Catalog({ products, prices, onPrice, categories = [], on
         {(products.flatMap(item => item.specs ?? []).length > 0) && <p>Diğer ürünlerde kullanılan adlar: {[...new Set(products.flatMap(item => (item.specs ?? []).map(spec => spec.name)))].join(', ')}</p>}</>}
       {tab === 'SEO' && <><label>SEO başlığı<input maxLength={120} value={draft.seoTitle} onChange={event => update({ seoTitle: event.target.value })} /></label><p>Örnek arama başlığı: {draft.seoTitle || draft.name || 'Başlık girin'}</p><p>Slug, canonical ve gerçek yayın sunucu sözleşmesiyle tanımlanacak.</p></>}
       {error && <p className="catalog-error" role="alert">{error}</p>}</div><footer className="catalog-footer"><button type="button" onClick={close}>Vazgeç</button><button type="submit" disabled={saving||!canWrite}>{saving?'Kaydediliyor…':'Kaydet ve web’i güncelle'}</button></footer></fieldset></form>}</dialog>
+    <dialog className="category-dialog" ref={categoryDialog} aria-labelledby="category-title" onClose={() => categoryTrigger.current?.focus()}><header className="dialog-heading"><h2 id="category-title">Kategoriler</h2><button aria-label="Kategori penceresini kapat" onClick={closeCategories}>×</button></header><div className="dialog-body">
+      <form className="category-create" aria-label="Yeni kategori ekle" onSubmit={async event => {
+        event.preventDefault(); if (categoryBusy || !canWrite) return
+        setCategoryBusy(true); setCategoryError('');setCategoryNotice('')
+        try { await onCategory(categoryName.trim()); setNotice(`${categoryName.trim()} kategorisi eklendi.`); setCategoryName(''); closeCategories() }
+        catch (error) { setCategoryError(error instanceof Error ? error.message : 'Kategori eklenemedi.') }
+        finally { setCategoryBusy(false) }
+      }}><label>Yeni kategori adı<input required maxLength={80} value={categoryName} placeholder="Örn. Blenderlar" onChange={event => setCategoryName(event.target.value)} /></label><button type="submit" disabled={!canWrite || categoryBusy || !categoryName.trim()}>{categoryBusy ? 'Ekleniyor…' : 'Kategori ekle'}</button></form>{categoryError && <p className="catalog-error" role="alert">{categoryError}</p>}
+      <details className="category-management"><summary>Mevcut kategoriler ({categories.length})</summary><p>Ürün içeren bir kategoriyi silerken ürünlerin taşınacağı kategoriyi seçin.</p>{categories.map(name => {
+        const count = products.filter(product => product.category === name).length
+        const target = categoryTargets[name] || ''
+        return <div className="category-management-row" key={name}><span><strong>{name}</strong><small>{count} ürün</small></span>{count > 0 && <label>Ürünleri taşı<select aria-label={`${name} ürünlerini taşı`} value={target} onChange={event => setCategoryTargets(current => ({...current, [name]: event.target.value}))}><option value="">Hedef kategori seçin</option>{categories.filter(other => other !== name).map(other => <option key={other}>{other}</option>)}</select></label>}<button disabled={!canWrite || categoryBusy || (count > 0 && (!target || !categories.includes(target)))} aria-label={`${name} kategorisini sil`} onClick={async () => {
+          if (!window.confirm(count > 0 ? `${name} kategorisi silinsin ve ${count} ürün ${target} kategorisine taşınsın mı?` : `${name} kategorisi silinsin mi?`)) return
+          setCategoryBusy(true); setCategoryError('');setCategoryNotice('')
+          try { await onDeleteCategory(name, count > 0 ? target : undefined); if(category === name) setCategory('Tümü'); setCategoryNotice(`${name} kategorisi silindi${count > 0 ? `; ürünler ${target} kategorisine taşındı` : ''}.`); setCategoryTargets(current => {const next={...current};delete next[name];return next}) }
+          catch(error) {setCategoryError(error instanceof Error ? error.message : 'Kategori silinemedi.')}
+          finally {setCategoryBusy(false)}
+        }}>Kategoriyi sil</button></div>
+      })}</details>{categoryNotice && <p role="status">{categoryNotice}</p>}
+    </div></dialog>
   </section>
 }

@@ -1,5 +1,5 @@
 // Temporary provider-unaware development rendering seam.
-import {commerceApi} from '../../../../lib/commerce';
+import {commerceApi} from '../../../lib/commerce';
 export type RenderingMedia={url:string;sha256:string;originalSha256?:string};
 export type RenderingInputs={surfaceVersion:string;sourceMediaVersion:string;width:number;height:number;assetWidth?:number;assetHeight?:number;source:RenderingMedia;mask:RenderingMedia;brandingRequired:boolean;branding:RenderingMedia|null;displayName?:string;surfaceTreatment?:"metallic-ink";surfaceInkExposureStops?:number};
 export const MAX_CATALOG_PREVIEW_PIXELS=20_000_000;

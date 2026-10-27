@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { clearCachedAcceptedSurface, loadCachedAcceptedSurface } from "../../app/urunler/cay-makinesi-101/editor/accepted-surface-api";
+import { clearCachedAcceptedSurface, loadCachedAcceptedSurface } from "./rendering/accepted-surface-api";
 
 export const previewUnavailableMessage = "Bu seçili ürün/varyant için geliştirme ürün önizlemesi kullanılamıyor.";
 export type PreviewReadinessStatus = "loading" | "ready" | "unavailable" | "error";

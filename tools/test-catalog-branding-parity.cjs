@@ -3,7 +3,7 @@
 const fs=require('fs'),path=require('path'),crypto=require('crypto'),assert=require('node:assert/strict'),ts=require('../apps/web/node_modules/typescript'),sharp=require('../node_modules/.pnpm/sharp@0.35.5_@types+node@20.19.43/node_modules/sharp'),{chromium}=require('../apps/web/node_modules/@playwright/test');
 const root=path.resolve(__dirname,'..'),{createRegistry,hash}=require('./local-mask-editor/catalog-registry.cjs');
 const image=async b=>{const raw=await sharp(b).ensureAlpha().raw().toBuffer({resolveWithObject:true});return{width:raw.info.width,height:raw.info.height,data:new Uint8ClampedArray(raw.data)}};
-const moduleFor=name=>{const module={exports:{}};new Function('module','exports',ts.transpileModule(fs.readFileSync(path.join(root,'apps/web/src/app/urunler/cay-makinesi-101/editor',name+'.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(module,module.exports);return module.exports;};
+const moduleFor=name=>{const module={exports:{}};new Function('module','exports',ts.transpileModule(fs.readFileSync(path.join(root,'apps/web/src/features/product-personalization/rendering',name+'.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(module,module.exports);return module.exports;};
 (async()=>{
 const r=createRegistry({root,sharp}),ep='DEMO-97db48f3-afb3-4026-aa26-03deb087cd9d',ev='DEMO-V-459a05ef-1a88-490b-95a6-810f95e70bd5',cp='DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6',cv='DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1';
 const old=await r.read(ep,ev,'de3174cb-5406-4b7f-b8b0-c8026e4332fd'),ec=await r.read(ep,ev),draft=await r.candidate(ec.record.candidateId,ep,ev);assert.ok(draft.editedMask&&draft.editedBranding);await r.validate(draft.editedMask,draft.editedBranding,draft.mask,draft.s);

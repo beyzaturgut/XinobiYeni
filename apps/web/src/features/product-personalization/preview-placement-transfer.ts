@@ -1,6 +1,6 @@
-import type { RenderingInputs } from '../../app/urunler/cay-makinesi-101/editor/accepted-surface-api';
-import type { PatternTransform } from '../../app/urunler/cay-makinesi-101/editor/product-pattern-preview';
-import { separatedBodyPlacements, type BodyPlacementAdjustment, type BodySurfaceId } from '../../app/urunler/cay-makinesi-101/editor/separated-body-placement';
+import type { RenderingInputs } from './rendering/accepted-surface-api';
+import type { PatternTransform } from './rendering/product-pattern-preview';
+import { separatedBodyPlacements, type BodyPlacementAdjustment, type BodySurfaceId } from './rendering/separated-body-placement';
 
 type BodyId = 'upper-body' | 'lower-body';
 export type PreviewBody = { id: BodyId; left: number; top: number; width: number; height: number };

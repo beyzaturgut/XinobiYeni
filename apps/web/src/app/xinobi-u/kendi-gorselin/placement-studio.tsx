@@ -1,10 +1,10 @@
 "use client";
 import Link from "next/link";
 import {useCallback,useRef,useState,type ReactNode} from "react";
-import ProductPatternPreview,{type PatternTransform} from "../../urunler/cay-makinesi-101/editor/product-pattern-preview";
-import {defaultPatternTransform,usePatternPlacement} from "../../urunler/cay-makinesi-101/editor/use-pattern-placement";
-import {DEFAULT_CURVATURE_STRENGTH} from "../../urunler/cay-makinesi-101/editor/product-surface-warp";
-import type {RenderingInputs} from "../../urunler/cay-makinesi-101/editor/accepted-surface-api";
+import ProductPatternPreview,{type PatternTransform} from "../../../features/product-personalization/rendering/product-pattern-preview";
+import {defaultPatternTransform,usePatternPlacement} from "../../../features/product-personalization/rendering/use-pattern-placement";
+import {DEFAULT_CURVATURE_STRENGTH} from "../../../features/product-personalization/rendering/product-surface-warp";
+import type {RenderingInputs} from "../../../features/product-personalization/rendering/accepted-surface-api";
 import {usePrintAreaOutline} from "../../../features/product-personalization/print-area-outline";
 import {fileMeta,type LocalPatternSource} from "../../../features/product-personalization/use-local-pattern-file";
 import SaveDesignButton from "../../../components/save-design-button";
@@ -19,7 +19,7 @@ const validHex=(hex?:string|null)=>Boolean(hex&&/^#[a-fA-F0-9]{6}$/.test(hex));
 const signed=(value:number,unit:string)=>(value>0?'+':'')+value+' '+unit;
 
 /** Step 4: the uploaded image on the selected colour's accepted surface, with the placement controls of the design. */
-export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription,canChange=false,changeLabel='Değiştir'}:{product:Product;variants:Variant[];surfaces:Record<string,RenderingInputs>;active:Variant;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;canChange?:boolean;changeLabel?:string;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
+export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription,canChange=false,changeLabel='Değiştir'}:{product:Pick<Product,'id'|'name'>;variants:Pick<Variant,'id'|'color'|'hex'>[];surfaces:Record<string,RenderingInputs>;active:Pick<Variant,'id'|'color'|'hex'>;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;canChange?:boolean;changeLabel?:string;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
  const inputs=surfaces[active.id];
  const fillMask=initialPlacement?.fillMask??cover??mode==='pattern';
  const renderKey=JSON.stringify([inputs.source.url,inputs.mask.url,patternUrl,mode,fillMask]);
@@ -95,11 +95,11 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
    <div className={styles.canvasNotes}><span>Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.</span><span aria-live="polite">{notice||(app?'Kaydedene kadar değişiklikler yalnızca bu ekranda tutulur.':'Değişiklikler yalnızca bu tarayıcı oturumunda tutulur.')}</span></div>
   </section>
   <aside className={styles.settings} aria-label="Tasarım ayarları">
-   <fieldset className={styles.colours} aria-busy={switching}>
+   {variants.length>0&&<fieldset className={styles.colours} aria-busy={switching}>
     <legend>Ürün rengi: <strong>{active.color}</strong></legend>
     <div>{variants.map(variant=><button type="button" key={variant.id} title={variant.color} aria-label={`${variant.color} rengini seç`} aria-pressed={variant.id===active.id} disabled={switching} className={validHex(variant.hex)?undefined:styles.noHex} style={validHex(variant.hex)?{background:variant.hex!}:undefined} onClick={()=>void selectColour(variant.id)}/>)}</div>
     {switching&&<p role="status">Renk hazırlanıyor…</p>}
-   </fieldset>
+   </fieldset>}
    <div className={styles.fileSummary}>
     {/* eslint-disable-next-line @next/next/no-img-element -- local object URL */}
     <img src={patternUrl} alt={mode==='pattern'?'Yüklenen desen':'Yüklenen görsel'}/>

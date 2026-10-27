@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
-import { cylindricalCoordinate, DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "../../src/app/urunler/cay-makinesi-101/editor/product-surface-warp";
-import { separatedBodyPlacements } from "../../src/app/urunler/cay-makinesi-101/editor/separated-body-placement";
-import { applySurfaceInk } from "../../src/app/urunler/cay-makinesi-101/editor/surface-ink";
+import { cylindricalCoordinate, DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "../../src/features/product-personalization/rendering/product-surface-warp";
+import { separatedBodyPlacements } from "../../src/features/product-personalization/rendering/separated-body-placement";
+import { applySurfaceInk } from "../../src/features/product-personalization/rendering/surface-ink";
 
 function fixture() {
   const width = 200, height = 120;

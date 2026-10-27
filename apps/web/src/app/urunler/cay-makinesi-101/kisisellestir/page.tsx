@@ -1,22 +1,11 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import PersonalizationStudio from "./personalization-studio";
-import styles from "./studio.module.css";
+import SiteHeader from "../../../../components/site-header";
+import styles from "../../../xinobi-u/flow.module.css";
 
-export const metadata: Metadata = {
-  title: "Ürün seçimi | Xinobi Studio",
-  description: "Xinobi Studio basit kişiselleştirme deneyimini keşfedin.",
-};
+export const metadata:Metadata={title:"Ürün seçimi | Xinobi",description:"Güncel kişiselleştirilebilir Xinobi ürünlerini keşfedin."};
 
-export default function PersonalizeTeaMakerPage() {
-  return <div className={styles.page}>
-    <a className={styles.skipLink} href="#studio">Kişiselleştirme aracına geç</a>
-    <header className={styles.header}>
-      <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
-      <div className={styles.headerTitle}><span>Xinobi Studio</span><strong>Basit kişiselleştirme</strong></div>
-      <Link className={styles.closeLink} href="/urunler/cay-makinesi-101">Ürüne dön <span aria-hidden="true">×</span></Link>
-    </header>
-    <main id="studio"><PersonalizationStudio /></main>
-  </div>;
+/** Retain old bookmarks without reintroducing the retired simple-mode screen. */
+export default function PersonalizeTeaMakerPage(){
+ return <><SiteHeader/><main className={styles.page}><p role="status">Bu örnek ürün artık katalogda yer almıyor.</p><Link href="/xinobi-u">Güncel ürünlerden birini seç →</Link></main></>;
 }

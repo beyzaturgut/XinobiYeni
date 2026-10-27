@@ -119,12 +119,13 @@ test('teklif takibinde mesaj ve kabul kararı güncellenir',async({page})=>{
  expect(requests.find(r=>r.path.endsWith('/decision'))?.body.decision).toBe('accept');
 });
 
-test('gelişmiş editör katman, görünürlük, kilit ve yüz seçimlerini yönetir',async({page})=>{
+test('reference preview keeps placement but removes retired demo controls',async({page})=>{
  await mockStore(page);await page.goto('/urunler/cay-makinesi-101/editor/');await closeConsent(page);
- await page.locator("aside[aria-label='Tasarım araçları'] button").filter({hasText:'Metin'}).click();await expect(page.getByText('3 öğe')).toBeVisible();
- await page.getByRole('button',{name:'Yeni metin katmanını gizle'}).click();await expect(page.getByRole('button',{name:'Yeni metin katmanını göster'})).toBeVisible();
- await page.getByRole('button',{name:'Bana özel katmanının kilidini kapat'}).click();await expect(page.getByRole('button',{name:'Bana özel katmanının kilidini aç'})).toBeVisible();
- await page.getByRole('button',{name:'Arka yüz',exact:true}).click();await expect(page.getByRole('heading',{name:'Arka yüz'})).toBeVisible();
+ const canvas=page.locator('canvas[role=img]');await expect(canvas).toBeVisible();
+ await expect(page.getByRole('button',{name:'Metin',exact:true})).toHaveCount(0);
+ await expect(page.getByRole('button',{name:'Arka yüz',exact:true})).toHaveCount(0);
+ const original=await canvas.evaluate((node:HTMLCanvasElement)=>node.toDataURL());
+ await page.locator('#pattern-scale').fill('1.5');await expect.poll(()=>canvas.evaluate((node:HTMLCanvasElement)=>node.toDataURL())).not.toBe(original);
 });
 
 test('katalog kategori, arama, sıralama ve filtre temizleme akışını çalıştırır',async({page})=>{

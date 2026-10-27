@@ -1,0 +1,6 @@
+.productPreview { width: min(82%, calc(min(67vh, 610px) * var(--source-aspect, .66625))); aspect-ratio: 1066 / 1600; position: relative; z-index: 1; }
+.productPreview > canvas { display: block; width: 100%; height: 100%; }
+.productPreview > canvas[hidden] { display: none; }
+.previewMessage { position: absolute; inset: 0; display: grid; place-items: center; padding: 18px; border: 1px solid var(--color-line); background: var(--color-surface); color: var(--color-muted); text-align: center; }
+.previewMessage p { margin: 0; font-size: .69rem; line-height: 1.5; }
+@media(max-width:680px){.productPreview{width:min(96%,calc(500px * 1066 / 1600))}}

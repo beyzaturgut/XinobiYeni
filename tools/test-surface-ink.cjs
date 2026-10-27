@@ -1,5 +1,5 @@
 const fs=require('fs'),path=require('path'),assert=require('node:assert/strict'),ts=require('../apps/web/node_modules/typescript'),sharp=require('../node_modules/.pnpm/sharp@0.35.5_@types+node@20.19.43/node_modules/sharp');
-const root=path.resolve(__dirname,'..'),base=path.join(root,'apps/web/src/app/urunler/cay-makinesi-101/editor');
+const root=path.resolve(__dirname,'..'),base=path.join(root,'apps/web/src/features/product-personalization/rendering');
 function load(name){const module={exports:{}};new Function('exports','module',ts.transpileModule(fs.readFileSync(path.join(base,name+'.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(module.exports,module);return module.exports;}
 const {applySurfaceInk}=load('surface-ink'),{deriveBodySurface,warpPattern}=load('product-surface-warp'),{deriveProductLighting,shadePattern}=load('product-lighting'),{containArtwork}=load('artwork-placement');
 const image=(data,w,h)=>({data:new Uint8ClampedArray(data),width:w,height:h});

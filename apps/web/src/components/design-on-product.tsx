@@ -1,8 +1,8 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {configurationPreviewPath,useDemoCommerce,privateImageUrl} from '../lib/demo-commerce';
-import {loadCachedAcceptedSurface,type RenderingInputs} from '../app/urunler/cay-makinesi-101/editor/accepted-surface-api';
-import ProductPatternPreview from '../app/urunler/cay-makinesi-101/editor/product-pattern-preview';
+import {loadCachedAcceptedSurface,type RenderingInputs} from '../features/product-personalization/rendering/accepted-surface-api';
+import ProductPatternPreview from '../features/product-personalization/rendering/product-pattern-preview';
 import PrivateDesignImage from './private-design-image';
 import type {DesignPlacement} from '../lib/design-placement';
 import styles from './design-on-product.module.css';

@@ -1,5 +1,5 @@
 ﻿const fs=require('fs'),path=require('path'),assert=require('node:assert/strict'),ts=require('../apps/web/node_modules/typescript');
-const base=path.resolve(__dirname,'../apps/web/src/app/urunler/cay-makinesi-101/editor');
+const base=path.resolve(__dirname,'../apps/web/src/features/product-personalization/rendering');
 function load(name){const module={exports:{}};new Function('exports','module','require',ts.transpileModule(fs.readFileSync(path.join(base,name+'.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS}}).outputText)(module.exports,module,n=>load(n.replace('./','')));return module.exports;}
 const {separatedBodyPlacements}=load('separated-body-placement');
 for(const [w,h] of [[120,200],[240,360]]){

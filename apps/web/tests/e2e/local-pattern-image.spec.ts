@@ -1,5 +1,5 @@
 import {test,expect,type Page} from '@playwright/test';
-import {containArtwork} from '../../src/app/urunler/cay-makinesi-101/editor/artwork-placement';
+import {containArtwork} from '../../src/features/product-personalization/rendering/artwork-placement';
 import { artworkReadOnly } from './artwork-read-only';
 import { expectPrepared, openPlacement } from './own-image-flow';
 test.beforeEach(async ({page}) => artworkReadOnly(page));
@@ -98,7 +98,7 @@ test('removing an uploaded photo restores the original pattern preview byte for 
  await page.getByRole('button',{name:'Çerez tercih panelini kapat'}).click();
  const original=await canvas.evaluate((c:HTMLCanvasElement)=>c.toDataURL());
  const chooser=page.waitForEvent('filechooser');
- await page.getByRole('button',{name:/Görsel yükle/}).click();
+ await page.getByRole('link',{name:'Görsel yükle',exact:true}).click();
  await (await chooser).setFiles({name:'photo.png',mimeType:'image/png',buffer:await image(page,'image/png',100,150)});
  await expect(page.getByRole('button',{name:'Görseli kaldır',exact:true})).toBeVisible();
  await expect(canvas).toBeVisible();

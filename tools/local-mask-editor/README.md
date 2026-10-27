@@ -61,7 +61,7 @@ Admin embedding allows only http://127.0.0.1:5176 by default.
 
 Customer preview (after explicit approval):
 http://127.0.0.1:3032/xinobi-u/kendi-gorselin/?product=DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6&variant=DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1
-The same canonical EditorWorkspace also consumes completed DesignStudio
+The shared PlacementStudio also consumes completed DesignStudio
 patterns at /xinobi-u/onizleme/. No paid generation is enabled by this tool.
 
 From apps/web, start the isolated development preview:

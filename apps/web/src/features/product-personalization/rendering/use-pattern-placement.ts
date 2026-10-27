@@ -4,8 +4,8 @@ import { useEffect, useImperativeHandle, useLayoutEffect, useRef, useState, type
 import type { PatternTransform } from "./product-pattern-preview";
 import { DEFAULT_CURVATURE_STRENGTH } from "./product-surface-warp";
 import type { RenderingInputs } from "./accepted-surface-api";
-import { loadPreviewGeometry, transferPreviewPlacements, type PlacementTransferHandle, type PreviewPlacements } from "../../../../features/product-personalization/preview-placement-transfer";
-import type { DesignPlacement } from "../../../../lib/design-placement";
+import { loadPreviewGeometry, transferPreviewPlacements, type PlacementTransferHandle, type PreviewPlacements } from "../preview-placement-transfer";
+import type { DesignPlacement } from "../../../lib/design-placement";
 
 /** Starting placement of the uploaded image or pattern on a surface. */
 export function defaultPatternTransform(inputs: Pick<RenderingInputs, "width" | "height">, placementMode: "pattern" | "artwork", fillMask: boolean): PatternTransform {

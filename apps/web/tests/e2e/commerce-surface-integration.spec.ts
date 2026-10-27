@@ -13,7 +13,7 @@ test("commerce blue uses exact accepted surface; unsupported never renders",asyn
  await page.goto(editor+"?product=DEMO-P101&variant=DEMO-V101-B");
  await expect(page.locator("canvas[role=img]")).toBeVisible();
  await expect(page.locator("canvas[role=img]")).toHaveAttribute("width","1066");
- await expect(page.getByRole("link",{name:"Basit moda dön"})).toHaveAttribute("href",/variant=DEMO-V101-B&product=DEMO-P101/);
+ await expect(page.getByRole("link",{name:"Ürün seçimine dön"})).toHaveAttribute("href",/product=DEMO-P101&variant=DEMO-V101-B/);
  for(const variant of ["DEMO-V101-S","DEMO-V101-R","DEMO-V101-G","blue"]){
   await page.goto(editor+"?product=DEMO-P101&variant="+variant);
   await expect(page.getByRole("status")).toContainText("kullanılamıyor");

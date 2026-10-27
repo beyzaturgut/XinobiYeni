@@ -7,7 +7,7 @@ import { commerceApi, mediaUrl } from '../../../lib/commerce';
 import { browserId, designRequest, rememberSession, sessionKey, studioAsset, type DesignSession } from '../../../lib/design-studio';
 import PersonalizationMethods from '../../../components/personalization-methods';
 import SaveDesignButton from '../../../components/save-design-button';
-import { loadCachedAcceptedSurface } from '../../urunler/cay-makinesi-101/editor/accepted-surface-api';
+import { loadCachedAcceptedSurface } from '../../../features/product-personalization/rendering/accepted-surface-api';
 import styles from '../studio.module.css';
 
 function questionnaireError(error: unknown, fallback: string): string {

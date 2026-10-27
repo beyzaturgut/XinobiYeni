@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { deriveProductLighting, shadePattern } from "../../src/app/urunler/cay-makinesi-101/editor/product-lighting";
+import { deriveProductLighting, shadePattern } from "../../src/features/product-personalization/rendering/product-lighting";
 
 function image(width: number, height: number, color: (x: number, y: number) => number[]) {
   const data = new Uint8ClampedArray(width * height * 4);

@@ -36,7 +36,7 @@ for (const variant of ["silver", "red", "rose", "unknown"]) {
     await page.goto(editor + `?variant=${variant}`);
     await expect(page.getByRole("status")).toContainText("kullanılamıyor");
     expect(await page.locator("canvas[role='img']").count()).toBe(0);
-    await expect(page.getByRole("link", { name: "Basit moda dön" })).toHaveAttribute("href", new RegExp(`variant=${variant}$`));
+    await expect(page.getByRole("link", { name: "Ürün seçimine dön" })).toHaveAttribute("href", /\/xinobi-u\/?$/);
   });
 }
 test("API failure and malformed/required-branding bundles never render", async ({ page, request }) => {

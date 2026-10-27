@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
-import { catalogPreviewDimensions } from "../../src/app/urunler/cay-makinesi-101/editor/accepted-surface-api";
+import { catalogPreviewDimensions } from "../../src/features/product-personalization/rendering/accepted-surface-api";
 
 const product = "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6";
 const version = "00000000-0000-4000-8000-000000000105";

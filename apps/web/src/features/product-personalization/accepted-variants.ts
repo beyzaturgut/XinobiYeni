@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { clearCachedAcceptedSurface, loadCachedAcceptedSurface, type RenderingInputs } from "../../app/urunler/cay-makinesi-101/editor/accepted-surface-api";
+import { clearCachedAcceptedSurface, loadCachedAcceptedSurface, type RenderingInputs } from "./rendering/accepted-surface-api";
 import type { Product } from "../../../../../packages/commerce/client";
 
 export type AcceptedVariants = { status: "loading" | "ready" | "error"; surfaces: Record<string, RenderingInputs> };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import styles from "./editor.module.css";
+import styles from "./product-pattern-preview.module.css";
 import { deriveProductLighting, shadePattern } from "./product-lighting";
 import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./product-surface-warp";
 

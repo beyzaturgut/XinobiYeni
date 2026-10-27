@@ -1,5 +1,7 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
+**27.10 görünürlük güncellemesi:** Web ve mobil WebView ortak PlacementStudio önizlemesinde “Baskı alanını göster” başlangıçta kapalıdır; kullanıcı isteğe bağlı açar. Maske ve kayıtlı yerleşim değişmedi. [Kontrol kaydı](../test/2026-10-27/TST-print-area-default.md).
+
 ## Güncel uygulama durumu — 27.10.2026
 
 **Durum:** Devam; üretim baskısı D04/T-04 ile bloke. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.

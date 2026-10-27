@@ -30,7 +30,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
  const {patternTransform,setPatternTransform,curvatureStrength,setCurvatureStrength,patternBodyAdjustments,transfer}=usePatternPlacement({renderingInputs:inputs,placementMode:mode,fillMask,onPlacementChange,initialPlacement});
  const rendered=useCallback((canvas:HTMLCanvasElement)=>{setPreview({key:renderKey,canvas});onRendered?.(canvas)},[onRendered,renderKey]);
  const [past,setPast]=useState<Snapshot[]>([]),[future,setFuture]=useState<Snapshot[]>([]);
- const [zoom,setZoom]=useState(100),[showArea,setShowArea]=useState(true);
+ const [zoom,setZoom]=useState(100),[showArea,setShowArea]=useState(false);
  const [switching,setSwitching]=useState(false),[notice,setNotice]=useState('');
  const app=useEmbeddedApp();
  const lastChange=useRef({key:'',at:0}),transferGeneration=useRef(0);

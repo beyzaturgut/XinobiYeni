@@ -225,3 +225,5 @@
 - 27.10.2026 · [Faz dokümanları denetimi](2026-10-27/TST-phase-audit.md) — 12 faz dosyası, 64 commit–faz eşlemesi, yeni yerel bağlantılar, rol/PM hücreleri ve Markdown diff kontrolü; uygulama testleri yeniden çalıştırılmadı.
 
 - 27.10.2026 · [AI prompt v3](2026-10-27/TST-art-direction-v3.md) — 25 hedefli test, 32.768 kombinasyonda prompt sınırı; motif hiyerarşisi/renk rolleri ve yerel readiness başarılı. Görsel kalite ve canlı deploy bekliyor.
+
+- 27.10.2026 · [Baskı alanı varsayılan kapalı](2026-10-27/TST-print-area-default.md) — Ortak web/mobil önizleme; yeniden açılışta checkbox işaretsiz, dosya lint temiz.

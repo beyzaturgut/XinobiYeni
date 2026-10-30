@@ -603,3 +603,7 @@ Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST
 Ürün/renk/yüz bazlı eksik ölçülü taslak, sürümlü kalibrasyon onayı/kaldırma, geçmiş okuma, mm/DPI/taşma/renk/format/korunan bölgeler ve fiziksel SVG referansı uygulandı. Yeni yerleşim ve siparişler değişmez profil kopyası/SHA alır. Pixel → mm ölçümü yalnız kalibre edilmiş düzlemsel referans içindir; manuel/kavisli üretim şablonuna otomatik baskı çıktısı iddiası yok. `productionReady=false`. Gerçek ürün verisine onay yazılmadı.
 
 [Uygulama ve kullanım](../docs/tasks/kis-01-print-profiles-2026-10-30.md), [test TST-157–166](../test/2026-10-30/TST-157-kis01-print-profiles.md). KAR-05 gerçek ölçüler ve üretim sahibi numune/konum kabulü açık; SQL fiziksel profil kabulü yapılmadı. KIS-05/06/07 üretim onayı/render/indirme ayrı kapsamdır. Web02 için kullanıcıdan beklenen 23 ürün içeriği açık kalır. Faz/PM/üretim kabulü tamamlandı sayılmaz.
+
+## 30.10.2026 - Canlı admin giriş ekranı kontrolü
+
+Kullanıcının doğruladığı canlı /admin/ adresinde yeni Chrome ve uygulama içi tarayıcıda giriş formu görünür; girişsiz oturum/katalog/tasarım okumaları 401. Yeni auth uygulaması veya deploy gerekmedi; hesap/izin değişmedi, parola/MFA denenmedi. Kullanıcının önceki tarayıcısında görünmeme nedeni doğrulanmadı; geçerli oturumun paneli açması mevcut davranış. [TST-167-169](../test/2026-10-30/TST-167-live-admin-login-diagnosis.md).

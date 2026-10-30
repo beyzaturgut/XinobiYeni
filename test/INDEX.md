@@ -2,6 +2,9 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-167 | 30.10.2026 | Mevcut staff request/refresh regresyonu | PASS; kapsam sınırları raporda | ISOLATED FETCH | `2026-10-30/TST-167-live-admin-login-diagnosis.md` |
+| TST-168 | 30.10.2026 | Canlı admin anonim erişim teşhisi | PASS; kapsam sınırları raporda | READ-ONLY LIVE | `2026-10-30/TST-167-live-admin-login-diagnosis.md` |
+| TST-169 | 30.10.2026 | Canlı admin Chrome ve IAB giriş ekranı | PASS; kapsam sınırları raporda | LIVE UI / NO LOGIN | `2026-10-30/TST-167-live-admin-login-diagnosis.md` |
 | TST-157 | 30.10.2026 | KIS-01 48 hedefli API/ölçü/snapshot testi | PASS; sınırlar ve ilk hatalar raporda | ISOLATED / UNIT | `2026-10-30/TST-157-kis01-print-profiles.md` |
 | TST-158 | 30.10.2026 | KIS-01 tam API regresyonu | PASS; sınırlar ve ilk hatalar raporda | ISOLATED / SQL SKIP | `2026-10-30/TST-157-kis01-print-profiles.md` |
 | TST-159 | 30.10.2026 | KIS-01 sözleşme ve tekrar üretim | PASS; sınırlar ve ilk hatalar raporda | BUILD / CONTRACT | `2026-10-30/TST-157-kis01-print-profiles.md` |

@@ -2,6 +2,12 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-136 | 30.10.2026 | WEB-01 gerçek katalog 24 ürün/8 kategori, üç boyut ve kenar durumları | PASS; ilk çerez paneli test engeli düzeltilip tekrarlandı | READ-ONLY LOCAL / E2E / GET FIXTURE | `2026-10-30/TST-136-web01-catalog-navigation.md` |
+| TST-137 | 30.10.2026 | Mevcut katalog/arama/karşılaştırma 3 regresyon | PASS | CHROME FIXTURE / E2E | `2026-10-30/TST-136-web01-catalog-navigation.md` |
+| TST-138 | 30.10.2026 | WEB-01 TypeScript | PASS | STATIC | `2026-10-30/TST-136-web01-catalog-navigation.md` |
+| TST-139 | 30.10.2026 | WEB-01 tam web ESLint | PASS | STATIC | `2026-10-30/TST-136-web01-catalog-navigation.md` |
+| TST-140 | 30.10.2026 | WEB-01 statik production build, 38 sayfa | PASS | BUILD | `2026-10-30/TST-136-web01-catalog-navigation.md` |
+| TST-141 | 30.10.2026 | WEB-01 diff bütünlüğü | PASS | STATIC | `2026-10-30/TST-136-web01-catalog-navigation.md` |
 | ADMIN-ACCEPT-20261019 | 19.10.2026 | Full isolated API/admin acceptance, price result and actual session permission display | 429 PASS / 24 SKIP; local SELECT test 1 PASS; signed-in browser SKIP | ISOLATED / CHROME FIXTURE / REAL SELECT | `2026-10-19/admin-technical-acceptance.md` |
 | ADMIN-SQL-20261019 | 19.10.2026 | SQL recorded-row Dashboard summary, UTC ranges, privilege/fallback and generated contracts | PASS: 44 existing + 3 summary API; Dart 9; Chrome four widths; real authenticated browser acceptance not run | READ-ONLY LOCAL SQL / FIXTURE / CONTRACT | `2026-10-19/admin-sql-summary.md` |
 | ADMIN-DATA-20261019 | 19.10.2026 | Dashboard/stok/ayar/entegrasyon doğrulanmış veri sınırları | PASS; API 44/44; real SQL writes/authenticated acceptance not run | CHROME FIXTURES / UNIT / READ-ONLY SQL | `2026-10-19/admin-data-honesty.md` |

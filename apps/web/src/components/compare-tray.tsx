@@ -2,16 +2,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
-import {clearCompare,maxCompare,removeCompare,useCompare} from '../lib/compare';
+import {clearCompare,maxCompare,removeCompare,useCatalogCompare} from '../lib/compare';
 import {commerceApi,mediaUrl,useCommerce} from '../lib/commerce';
 import styles from './compare.module.css';
 
 /** Floating bar on every page while products are picked for comparison. */
 export default function CompareTray(){
-  const ids=useCompare();
   const path=usePathname();
-  const {state}=useCommerce();
-  if(!ids.length||path?.startsWith('/karsilastir'))return null;
+  const {state,error}=useCommerce();
+  const ids=useCatalogCompare(state,error);
+  if(!state||error||!ids.length||path?.startsWith('/karsilastir'))return null;
   const products=ids.map(id=>state?.products.find(product=>product.id===id)).filter(product=>product!==undefined);
   return <aside className={styles.tray} data-app-chrome="" aria-label="Karşılaştırma listesi">
     <ul>{products.map(product=><li key={product.id}>{(product.originalImage||product.variants[0]?.image)?<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={44} height={44}/>:<span/>}<span>{product.name}</span><button type="button" aria-label={`${product.name} ürününü karşılaştırmadan çıkar`} onClick={()=>removeCompare(product.id)}>×</button></li>)}

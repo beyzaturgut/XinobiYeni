@@ -16,6 +16,7 @@ export function loadCommerceState() {
 export function useCommerce() {
   const [state, setState] = useState<CommerceState | null>(null);
   const [error, setError] = useState('');
+  const [refreshVersion, setRefreshVersion] = useState(0);
   useEffect(() => {
     if (!catalogUrl && !commerceApi && !snapshotUrl) return;
     let active = true;
@@ -29,8 +30,8 @@ export function useCommerce() {
     const timer = window.setInterval(refresh, 2000);
     window.addEventListener('focus', refresh);
     return () => { active = false; window.clearInterval(timer); window.removeEventListener('focus', refresh); };
-  }, []);
-  return { state, error, connected: Boolean(state), enabled: Boolean(catalogUrl || commerceApi || snapshotUrl) };
+  }, [refreshVersion]);
+  return { state, error, retry: () => setRefreshVersion(version => version + 1), connected: Boolean(state), enabled: Boolean(catalogUrl || commerceApi || snapshotUrl) };
 }
 
 export function stockText(stock?: number) {

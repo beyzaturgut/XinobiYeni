@@ -2,27 +2,36 @@
 
 import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { useCommerce, commerceApi, mediaUrl, money, stockText } from "../../lib/commerce";
-import { clearCompare, maxCompare, toggleCompare, useCompare } from "../../lib/compare";
+import { clearCompare, maxCompare, toggleCompare, useCatalogCompare } from "../../lib/compare";
 import styles from "./search.module.css";
 
 type Item = { id: string; name: string; family: string; description: string; image: StaticImageData | string; price?: number; stock?: number; tall?: boolean; features: [string, string, string]; href?: string };
 
 export default function SearchCompare() {
-  const { state, error } = useCommerce();
+  const { state, error, retry } = useCommerce();
   const items: Item[] = useMemo(() => state ? state.products.filter(product => product.active).map(product => ({ id: product.id, name: product.name, family: product.category, description: product.description, image: mediaUrl(product.originalImage || product.variants[0]?.image || '', commerceApi), price: state.prices[product.variants[0]?.id], stock: product.variants.reduce((sum, variant) => sum + variant.stock, 0), features: [product.category, `${product.variants.length} renk`, product.description], href: `/urunler/detay?id=${encodeURIComponent(product.id)}` })) : [], [state]);
-  const [query, setQuery] = useState("");
+  const params=useSearchParams();
+  const query=params.get("q")||"";
+  const setQuery=(value:string)=>{
+    const next=new URLSearchParams(params.toString());if(value)next.set("q",value);else next.delete("q");
+    window.history.replaceState(null,"",window.location.pathname+(next.size?"?"+next.toString():"")+window.location.hash);
+  };
   // The comparison list is shared with product cards, the tray and /karsilastir.
-  const selected = useCompare();
+  const selected = useCatalogCompare(state,error);
   const normalized = query.trim().toLocaleLowerCase("tr-TR");
   const results = useMemo(() => items.filter((item) => `${item.name} ${item.family} ${item.description}`.toLocaleLowerCase("tr-TR").includes(normalized)), [normalized, items]);
   const compared = selected.map((id) => items.find((item) => item.id === id)).filter((item): item is Item => Boolean(item));
 
   const toggle = (id: string) => { toggleCompare(id); };
 
+  if(error||!state)return <section className={styles.results}>
+    {error?<div role="alert"><h1>Ürünler şu anda yüklenemiyor.</h1><p>{error}</p><button type="button" onClick={retry}>Aramayı yeniden yükle</button></div>:<p role="status">Ürünler yükleniyor…</p>}
+  </section>;
+
   return <>
-    {error && <p role="alert">{error}</p>}
     <section className={styles.searchHero} aria-labelledby="search-title">
       <p>Ürün keşfi</p><h1 id="search-title">Aradığınızı daha sakin bulun.</h1>
       <label htmlFor="global-product-search">Ürün, kategori veya özellik ara</label>

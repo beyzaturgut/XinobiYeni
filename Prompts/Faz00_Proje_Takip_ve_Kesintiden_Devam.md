@@ -582,3 +582,8 @@ Sonraki tek güvenli canlı adım: DBA'nın `tools/sql/verify-catalog-backup.sql
 Yerel logo promptu düzeltmesi (16.10.2026): [TST-129](../test/2026-10-16/TST-129-photo-specific-logo-mask-prompt.md). Basılı logo çizgisi/fiziksel etiket ayrımı ve renderer alfa sözleşmesi eklendi; marka/renk/konum fotoğraftan incelenir. Build/lint ve browser başarılı; push yok, faz yüzdeleri değişmedi.
 
 Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST-130-anonymous-approved-mask-preview.md). Commerce-mask GET default-deny 401 sorunu AllowAnonymous ile çözüldü; yönetim korunuyor. 13/13, gerçek ürün önizlemesi hazır/PNG 200; push yok, faz yüzdeleri değişmedi.
+
+
+### WEB-01 - Gerçek katalog gezinme kabulü / 30.10.2026
+
+[Task kapanışı](../docs/tasks/web-01-catalog-navigation-2026-10-30.md), [TST-136...141](../test/2026-10-30/TST-136-web01-catalog-navigation.md): 24 aktif ürün/8 kategoriyle 390/768/1440 px gezinme kabulü başarılı. URL arama/sıralama ve geri dönüş koruması, kategori kimliği/çakışması, gerçek hata-boş-yükleniyor ayrımı, retry ve silinen/pasif karşılaştırma seçimi düzeltildi. 3 mevcut fixture regresyonu, TypeScript, tam web lint ve statik production build başarılı. İlk çerez paneli kaynaklı test tıklama engeli korunarak raporlandı ve test navigasyon yardımcısı düzeltilerek tekrarlandı. WEB-01 yerel teknik kabul tamamlandı; CAT-01 veri/medya tamlığı, canlı deploy ve resmi UAT kapanmadı. Faz yüzdeleri değiştirilmedi; veri yazımı/migration/APK/sağlayıcı işlemi yok.

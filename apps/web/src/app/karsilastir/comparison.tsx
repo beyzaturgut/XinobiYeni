@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {useEffect,useMemo,useState,type ReactNode} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {commerceApi,mediaUrl,money,stockText,useCommerce} from '../../lib/commerce';
-import {clearCompare,maxCompare,removeCompare,setCompare,toggleCompare,useCompare} from '../../lib/compare';
+import {maxCompare,setCompare,useCatalogCompare} from '../../lib/compare';
 import {stars,useReviewSummaries} from '../../lib/reviews';
 import type {Product} from '../../../../../packages/commerce/client';
 import styles from './compare.module.css';
@@ -14,15 +14,25 @@ const personalizable=(product:Product)=>product.personalizable===true;
 
 /** Side-by-side comparison of up to four products: price, colours, stock, rating, XINOBI U and every technical spec. */
 export default function Comparison(){
-  const {state,error}=useCommerce();
-  const ids=useCompare();
+  const {state,error,retry}=useCommerce();
+  const ids=useCatalogCompare(state,error);
   const params=useSearchParams();
   const shared=params.get('urunler');
   const table=params.get('view')==='table'||Boolean(shared)&&params.get('view')!=='select';
   const [query,setQuery]=useState(''),[category,setCategory]=useState(''),[notice,setNotice]=useState('');
   const show=(view:string)=>{const next=new URLSearchParams(params.toString());next.set('view',view);window.history.pushState(null,'',window.location.pathname+'?'+next)};
   // A shared link (?urunler=a,b) replaces the list once.
-  useEffect(()=>{if(shared)setCompare(shared.split(',').filter(Boolean).slice(0,maxCompare))},[shared]);
+  useEffect(()=>{if(shared)setCompare(shared.split(','))},[shared]);
+  const select=(nextIds:string[])=>{
+    setCompare(nextIds);
+    if(shared){const next=new URLSearchParams(params.toString());if(nextIds.length)next.set('urunler',nextIds.join(','));else next.delete('urunler');window.history.replaceState(null,'',window.location.pathname+(next.size?'?'+next:''))}
+  };
+  const remove=(id:string)=>select(ids.filter(item=>item!==id));
+  const toggle=(id:string)=>{
+    if(ids.includes(id)){remove(id);return true}
+    if(ids.length>=maxCompare)return false;
+    select([...ids,id]);return true;
+  };
   const [onlyDifferences,setOnlyDifferences]=useState(false);
   const [copied,setCopied]=useState(false);
   const active=useMemo(()=>state?.products.filter(product=>product.active)??[],[state]);
@@ -32,7 +42,7 @@ export default function Comparison(){
   const available=active.filter(product=>(!category||product.category===category)&&(!query.trim()||`${product.name} ${product.category}`.toLocaleLowerCase('tr-TR').includes(query.trim().toLocaleLowerCase('tr-TR'))));
   const priceOf=(product:Product)=>{const prices=product.variants.map(variant=>state?.prices[variant.id]).filter((value):value is number=>Boolean(value));return prices.length?Math.min(...prices):undefined};
 
-  if(!state)return <div className={styles.shell}><p role="status">{error||'Ürünler yükleniyor…'}</p></div>;
+  if(error||!state)return <div className={styles.shell}>{error?<div role="alert"><h1>Ürünler şu anda yüklenemiyor.</h1><p>{error}</p><button type="button" onClick={retry}>Karşılaştırmayı yeniden yükle</button></div>:<p role="status">Ürünler yükleniyor…</p>}</div>;
   const specNames=[...new Set(products.flatMap(product=>(product.specs??[]).map(spec=>spec.name)))];
   const rows:Row[]=[
     {label:'Fiyat',values:products.map(product=>String(priceOf(product)??'')),cells:products.map(product=>{const price=priceOf(product);const varies=new Set(product.variants.map(v=>state.prices[v.id])).size>1;return <strong key={product.id}>{price===undefined?'Fiyat tanımlanmadı':varies?`${money(price)}'den başlayan`:money(price)}</strong>})},
@@ -52,23 +62,22 @@ export default function Comparison(){
       {table&&products.length>=2&&<div className={styles.headActions}>
         <label className={styles.switch}><input type="checkbox" checked={onlyDifferences} onChange={event=>setOnlyDifferences(event.target.checked)}/>Yalnız farkları göster</label>
         <button type="button" onClick={async()=>{try{await navigator.clipboard.writeText(`${location.origin}/karsilastir?urunler=${ids.join(',')}`);setCopied(true);window.setTimeout(()=>setCopied(false),2000)}catch{}}}>{copied?'Bağlantı kopyalandı':'Bağlantıyı paylaş'}</button>
-        <button type="button" onClick={clearCompare}>Listeyi temizle</button>
+        <button type="button" onClick={()=>select([])}>Listeyi temizle</button>
       </div>}
     </header>
     {!table||products.length<2?<section aria-label="Karşılaştırılacak ürünleri seç">
       <h2>Ürünlerini seç, sonra karşılaştır.</h2>
       <div className={styles.filters}><label>Ürün ara<input type="search" value={query} onChange={event=>setQuery(event.target.value)}/></label><label>Kategori<select value={category} onChange={event=>setCategory(event.target.value)}><option value="">Tüm kategoriler</option>{[...new Set(active.map(product=>product.category))].map(name=><option key={name}>{name}</option>)}</select></label></div>
       <p role="status">{notice||`${products.length} / ${maxCompare} ürün seçildi. Karşılaştırmak için en az 2 ürün seç.`}</p>
-      {ids.some(id=>!active.some(product=>product.id===id))&&<p role="alert">Bazı seçimler artık yayında değil. <button onClick={()=>setCompare(products.map(product=>product.id))}>Kullanılamayan seçimleri kaldır</button></p>}
       <button type="button" className={styles.continue} disabled={products.length<2} onClick={()=>show('table')}>Seçilen ürünleri karşılaştır ({products.length})</button>
-      <div className={styles.quickPick}>{available.map(product=><button type="button" key={product.id} aria-pressed={ids.includes(product.id)} onClick={()=>{const ok=toggleCompare(product.id);setNotice(ok?'Seçimin güncellendi.':`En fazla ${maxCompare} ürün seçebilirsin. Yeni ürün için bir seçimi kaldır.`)}}>{(product.originalImage||product.variants[0]?.image)&&<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={96} height={96}/>}<span>{product.name}</span><small>{product.category}</small><strong>{ids.includes(product.id)?'✓ Seçildi':'+ Seç'}</strong></button>)}</div>
+      <div className={styles.quickPick}>{available.map(product=><button type="button" key={product.id} aria-pressed={ids.includes(product.id)} onClick={()=>{const ok=toggle(product.id);setNotice(ok?'Seçimin güncellendi.':`En fazla ${maxCompare} ürün seçebilirsin. Yeni ürün için bir seçimi kaldır.`)}}>{(product.originalImage||product.variants[0]?.image)&&<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={96} height={96}/>}<span>{product.name}</span><small>{product.category}</small><strong>{ids.includes(product.id)?'✓ Seçildi':'+ Seç'}</strong></button>)}</div>
       {!available.length&&<p>Aramana uygun ürün bulunamadı.</p>}
     </section>:<>
       <button type="button" className={styles.continue} onClick={()=>show('select')}>Seçimleri düzenle / Bir ürün daha ekle</button>
       <div className={styles.tableWrap} role="region" aria-label="Seçilen ürünlerin karşılaştırma tablosu" tabIndex={0}>
         <table className={styles.table} style={{['--columns' as string]:products.length}}>
           <thead><tr><th scope="col"><span className={styles.srOnly}>Özellik</span>{products.length===1&&<p className={styles.hint}>Karşılaştırmak için en az bir ürün daha ekle.</p>}</th>{products.map(product=><th scope="col" key={product.id}>
-            <button type="button" className={styles.remove} aria-label={`${product.name} ürününü karşılaştırmadan çıkar`} onClick={()=>removeCompare(product.id)}>×</button>
+            <button type="button" className={styles.remove} aria-label={`${product.name} ürününü karşılaştırmadan çıkar`} onClick={()=>remove(product.id)}>×</button>
             <div className={styles.productImage}>{(product.originalImage||product.variants[0]?.image)?<Image src={mediaUrl(product.originalImage||product.variants[0].image,commerceApi)} alt="" width={220} height={220}/>:<span>Görsel yok</span>}</div>
             <Link href={`/urunler/detay?id=${encodeURIComponent(product.id)}`}>{product.name}</Link>
             <Link className={styles.inspect} href={`/urunler/detay?id=${encodeURIComponent(product.id)}`}>İncele ve sepete ekle →</Link>

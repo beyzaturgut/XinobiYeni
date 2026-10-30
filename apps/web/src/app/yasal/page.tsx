@@ -15,7 +15,7 @@ const documents = [
 
 export default function LegalPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#legal-content">İçeriğe geç</a>
+    <a data-skip-link className={styles.skipLink} href="#legal-content">İçeriğe geç</a>
     <SiteHeader />
     <main id="legal-content">
       <section className={styles.hero}><p>Yasal merkez · Taslak</p><h1>Bilginiz.<br />Tercihiniz.<br />Kontrolünüz.</h1><span>Bu sayfa yasal bilgi mimarisi prototipidir. Yayınlanmış hukuki metin veya açık rıza kaydı değildir.</span></section>

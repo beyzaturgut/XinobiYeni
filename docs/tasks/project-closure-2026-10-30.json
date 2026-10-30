@@ -319,7 +319,7 @@
       "work": "Klavye, ekran okuyucu, odak dönüşü, modal, hata duyurusu, kontrast, büyük metin ve küçük ekran kontrollerini tamamla.",
       "accept": "Manuel cihaz/ekran okuyucu kayıtları var; kritik akışlarda taşma, erişilemeyen CTA veya odak tuzağı kalmamış.",
       "deps": "QA-03",
-      "done": "Klavye/odak/dialog, mobil menü, Nobi canlı günlük, kontrast ve %200 metin düzeltildi. 52 rota/boyut kontrolü, 27 benzersiz test ve 15 ek axe taraması geçti.",
+      "done": "Klavye/odak/dialog, mobil menü, Nobi canlı günlük, kontrast ve %200 metin düzeltildi. 52 rota/boyut kontrolü, 27 benzersiz test ve 15 ek axe taraması geçti. 30.10 web görsel/durum çalışması: 33 rota × 4 genişlik × 2 metin ölçeği; hesap/katalog/iade/Nobi hata ayrımı, taslak ve modal odak düzeltmeleri. Kanıt: design/web-consistency-audit-2026-10-30.md ve test/2026-10-30/TST-179-web-consistency.md. Gerçek kabul açık.",
       "remaining": "Gerçek Safari/VoiceOver, iOS/Android VoiceOver/TalkBack, tarayıcı zoom/OS ölçeği ve Creative/UX-handoff kabulü açık.",
       "status": "Kısmen yapıldı",
       "phase": "Faz02",
@@ -1495,7 +1495,7 @@
       "work": "Web/admin/Android/iOS ekran matrisi, hi-fi/handoff, klavye ve VoiceOver/TalkBack tutanaklarını tamamla.",
       "accept": "Creative/UX/Frontend onayı var; otomatik tarama yanında manuel cihaz kanıtı bulunuyor; kritik erişilebilirlik kusuru kalmamış.",
       "deps": "KAR-01",
-      "done": "WEB-07 otomatik tarama, klavye/odak ve %200 metin düzeltmeleri; tarihli test/audit kaydı var. de99958 native Flutter ana sayfa yerleşimi 7 odaklı testle doğrulandı; fiziksel cihaz değil.",
+      "done": "WEB-07 otomatik tarama, klavye/odak ve %200 metin düzeltmeleri; tarihli test/audit kaydı var. de99958 native Flutter ana sayfa yerleşimi 7 odaklı testle doğrulandı; fiziksel cihaz değil. 30.10 web görsel/durum çalışması: 33 rota × 4 genişlik × 2 metin ölçeği; hesap/katalog/iade/Nobi hata ayrımı, taslak ve modal odak düzeltmeleri. Kanıt: design/web-consistency-audit-2026-10-30.md ve test/2026-10-30/TST-179-web-consistency.md. Gerçek kabul açık.",
       "remaining": "Web/admin/Android/iOS tam matris, gerçek VoiceOver/TalkBack ve Creative/UX/handoff imzaları eksik.",
       "status": "Kısmen yapıldı",
       "phase": "Faz02",
@@ -1761,5 +1761,6 @@
         "remaining": "Yetkili paket/dağıtım adımında güncel uygulamayı telefona kur ve görsel kabulü kaydet. Bu dokümantasyon oturumunda APK/kurulum yapılmaz."
       }
     ]
-  }
+  },
+  "web_consistency_evidence": "design/web-consistency-audit-2026-10-30.md"
 }

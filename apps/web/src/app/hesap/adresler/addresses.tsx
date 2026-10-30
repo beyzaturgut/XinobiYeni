@@ -11,24 +11,29 @@ const blank=(name='',phone=''):AddressInput=>({title:'',fullName:name,phone,city
 export default function Addresses(){
   const {user,addresses,ready}=useDemoCommerce();
   const [editing,setEditing]=useState<CustomerAddress|'new'|null>(null);
+  const [busy,setBusy]=useState(''),[error,setError]=useState(''),[notice,setNotice]=useState('');
+  const lock=useRef(false);
+  async function makeDefault(address:CustomerAddress){if(lock.current)return;lock.current=true;setBusy(address.id);setError('');setNotice('');try{await saveAddress({...address,isDefault:true},address.id);setNotice('Varsayılan adres güncellendi.')}catch(e){setError(e instanceof Error?e.message:'Adres güncellenemedi.')}finally{lock.current=false;setBusy('')}}
   if(!ready)return <div className={styles.shell}><p role="status">Adresler yükleniyor…</p></div>;
   if(!user)return <div className={styles.shell}><h1>Adreslerim</h1><p><Link href="/hesap">Adreslerini görmek için giriş yap →</Link></p></div>;
   return <div className={styles.shell}>
     <div className={styles.titleRow}><div><p className={styles.eyebrow}><Link href="/hesap">← Hesabım</Link></p><h1>Adreslerim</h1></div>
       {editing===null&&<button className={styles.primary} onClick={()=>setEditing('new')}>Adres ekle</button>}</div>
-    {editing!==null?<AddressForm key={editing==='new'?'new':editing.id} address={editing==='new'?undefined:editing} initial={editing==='new'?blank(user.name,localPhone(user.phone)):undefined} onDone={()=>setEditing(null)}/>:
+    {error&&<p role="alert" className={styles.error}>{error}</p>}{notice&&<p role="status" className={styles.ok}>{notice}</p>}
+    {editing!==null?<AddressForm key={editing==='new'?'new':editing.id} address={editing==='new'?undefined:editing} initial={editing==='new'?blank(user.name,localPhone(user.phone)):undefined} onDone={message=>{setEditing(null);setNotice(message)}}/>:
       addresses.length===0?<p className={styles.note}>Henüz kayıtlı adresin yok. Sipariş verirken kullanacağın bir teslimat adresi ekle.</p>:
       <ul className={styles.addressList}>{addresses.map(address=><li key={address.id}><div><strong>{address.title}{address.isDefault&&<em>Varsayılan</em>}</strong><small>{address.fullName} · {localPhone(address.phone)}</small><small>{address.line}, {address.district}/{address.city}{address.postalCode?` ${address.postalCode}`:''}</small></div>
-        <div className={styles.addressActions}>{!address.isDefault&&<button className={styles.secondary} onClick={()=>saveAddress({...address,isDefault:true},address.id)}>Varsayılan yap</button>}<button className={styles.secondary} onClick={()=>setEditing(address)}>Düzenle</button></div></li>)}</ul>}
+        <div className={styles.addressActions}>{!address.isDefault&&<button className={styles.secondary} disabled={!!busy} onClick={()=>void makeDefault(address)}>{busy===address.id?'Kaydediliyor…':'Varsayılan yap'}</button>}<button className={styles.secondary} onClick={()=>setEditing(address)}>Düzenle</button></div></li>)}</ul>}
   </div>;
 }
 
-function AddressForm({address,initial,onDone}:{address?:CustomerAddress;initial?:AddressInput;onDone:()=>void}){
+function AddressForm({address,initial,onDone}:{address?:CustomerAddress;initial?:AddressInput;onDone:(message:string)=>void}){
   const [form,setForm]=useState<AddressInput>(address?{...address,phone:localPhone(address.phone),postalCode:address.postalCode??''}:initial!);
   const [busy,setBusy]=useState(false),[error,setError]=useState('');
   const [confirmDelete,setConfirmDelete]=useState(false);
   const set=(field:keyof AddressInput)=>(event:React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>)=>setForm(current=>({...current,[field]:field==='isDefault'?(event.target as HTMLInputElement).checked:event.target.value}));
-  async function run(action:()=>Promise<unknown>){setBusy(true);setError('');try{await action();onDone()}catch(problem){setError(problem instanceof Error?problem.message:'İşlem tamamlanamadı.');setBusy(false)}}
+  const saving=useRef(false);
+  async function run(action:()=>Promise<unknown>,message='Adres kaydedildi.'){if(saving.current)return;saving.current=true;setBusy(true);setError('');try{await action();onDone(message)}catch(problem){setError(problem instanceof Error?problem.message:'İşlem tamamlanamadı.');setBusy(false);saving.current=false}}
   function submit(event:FormEvent){event.preventDefault();run(()=>saveAddress({...form,postalCode:form.postalCode?.trim()||null},address?.id))}
   return <form className={`${styles.form} ${styles.addressForm}`} onSubmit={submit} noValidate><h3>{address?'Adresi düzenle':'Yeni adres'}</h3>
     <label>Adres başlığı<input value={form.title} maxLength={40} placeholder="Ev, İş" onChange={set('title')}/></label>
@@ -39,9 +44,9 @@ function AddressForm({address,initial,onDone}:{address?:CustomerAddress;initial?
     <label>Posta kodu (isteğe bağlı)<input value={form.postalCode??''} inputMode="numeric" maxLength={5} autoComplete="postal-code" onChange={set('postalCode')}/></label>
     <label className={styles.check}><input type="checkbox" checked={form.isDefault} disabled={address?.isDefault} onChange={set('isDefault')}/>Varsayılan adresim olsun</label>
     {error&&!confirmDelete&&<p role="alert" className={styles.error}>{error}</p>}
-    <div className={styles.addressActions}><button className={styles.primary} disabled={busy}>{busy?'Kaydediliyor…':'Kaydet'}</button><button type="button" className={styles.secondary} onClick={onDone} disabled={busy}>Vazgeç</button>
+    <div className={styles.addressActions}><button className={styles.primary} disabled={busy}>{busy?'Kaydediliyor…':'Kaydet'}</button><button type="button" className={styles.secondary} onClick={()=>onDone('')} disabled={busy}>Vazgeç</button>
       {address&&<button type="button" className={styles.logout} disabled={busy} onClick={()=>setConfirmDelete(true)}>Adresi sil</button>}</div>
-    {address&&confirmDelete&&<DeleteConfirmation title={address.title} busy={busy} error={error} onCancel={()=>setConfirmDelete(false)} onConfirm={()=>{if(!busy)void run(()=>deleteAddress(address.id))}}/>}
+    {address&&confirmDelete&&<DeleteConfirmation title={address.title} busy={busy} error={error} onCancel={()=>setConfirmDelete(false)} onConfirm={()=>{if(!busy)void run(()=>deleteAddress(address.id),'Adres silindi.')}}/>}
   </form>;
 }
 

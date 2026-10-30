@@ -50,5 +50,5 @@ export function useFavorites(productIds: string[]) {
     setIds([]);
   }, [ids, user]);
 
-  return { ids, loading: loading || !accountReady, error, signedIn: Boolean(user), toggle, clear };
+  return { ids, loading: loading || !accountReady, error, signedIn: Boolean(user), reload, toggle, clear };
 }

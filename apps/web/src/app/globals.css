@@ -44,3 +44,8 @@ main h1 { font-size: clamp(24px, 2.6vw, 34px) !important; line-height: 1.2 !impo
 
 /* Keep focused controls clear of fixed page chrome when the browser scrolls them into view. */
 a,button,input,textarea,select,summary{scroll-margin-block:7rem}
+
+/* Long Turkish titles and off-screen skip links must also fit enlarged text. */
+main h1{overflow-wrap:anywhere}
+[data-skip-link]{top:0!important;max-width:calc(100vw - 32px);transform:translateY(calc(-100% - 16px));white-space:normal;overflow-wrap:anywhere}
+[data-skip-link]:focus{transform:translateY(16px)}

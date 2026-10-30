@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Teklif Takibi | Xinobi", description
 
 export default function QuoteTrackingPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#quote-tracking">Teklif takibine geç</a>
+    <a data-skip-link className={styles.skipLink} href="#quote-tracking">Teklif takibine geç</a>
     <header className={styles.header}><Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link><nav aria-label="Kurumsal menü"><Link href="/kurumsal/teklif">Yeni talep</Link><Link href="/kurumsal/teklif/takip" aria-current="page">Teklif takibi</Link></nav><Link href="/">Ana sayfaya dön ↗</Link></header>
     <main id="quote-tracking"><Suspense fallback={<p role="status">Yükleniyor…</p>}><QuoteTracking /></Suspense></main>
   </div>;

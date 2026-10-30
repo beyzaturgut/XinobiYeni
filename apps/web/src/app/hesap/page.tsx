@@ -1,3 +1,4 @@
+import AccountRequestState from "../../components/account-request-state";
 import SiteHeader from "../../components/site-header";
 import CommerceFooter from "../../components/commerce-footer";
 import type { Metadata } from "next";
@@ -8,9 +9,9 @@ export const metadata: Metadata = { title: "Hesabım | Xinobi", description: "Xi
 
 export default function AccountPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#account">Hesap içeriğine geç</a>
+    <a data-skip-link className={styles.skipLink} href="#account">Hesap içeriğine geç</a>
     <SiteHeader />
-    <main id="account"><AccountDashboard /></main>
+    <main id="account"><AccountRequestState><AccountDashboard /></AccountRequestState></main>
     <CommerceFooter />
   </div>;
 }

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function AdvancedEditorPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#editor-workspace">Editör çalışma alanına geç</a>
+    <a data-skip-link className={styles.skipLink} href="#editor-workspace">Editör çalışma alanına geç</a>
     <header className={styles.header}>
       <Link className={styles.brand} href="/" aria-label="Xinobi ana sayfa"><Image src="/assets/brand/xinobi-logo-white.png" alt="Xinobi" width={385} height={333} priority /></Link>
       <div className={styles.documentTitle}><span>Xinobi Studio</span><strong>Ürün önizlemesi</strong></div>

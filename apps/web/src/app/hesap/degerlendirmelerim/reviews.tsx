@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { myReviews, submitReview, useDemoCommerce, type MyReview } from "../../../lib/demo-commerce";
 import styles from "./reviews.module.css";
 
@@ -20,22 +20,30 @@ function ReviewForm({ product, review, onSaved, onCancel }: { product: Product; 
   const [body, setBody] = useState(review?.body ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const dialog = useRef<HTMLDialogElement>(null), saving = useRef(false);
+  useEffect(() => { const element = dialog.current!,previous=document.activeElement; element.showModal(); return () => {element.close();if(previous instanceof HTMLElement&&previous.isConnected)previous.focus({preventScroll:true})}; }, []);
   async function save(event: FormEvent) {
-    event.preventDefault(); setBusy(true); setError("");
+    event.preventDefault(); if(saving.current)return; saving.current=true; setBusy(true); setError("");
     try { onSaved(await submitReview(product.id, rating, title, body)); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Değerlendirme gönderilemedi."); }
-    finally { setBusy(false); }
+    finally { saving.current=false; setBusy(false); }
   }
-  return <form className={styles.form} onSubmit={save}>
-    <h2>{review ? "Değerlendirmeyi düzenle" : "Ürünü değerlendir"}</h2>
+  return <dialog ref={dialog} className={styles.form} aria-labelledby="review-form-title" onKeyDown={event=>{
+      if(event.key!=='Tab')return;
+      const controls=[...event.currentTarget.querySelectorAll<HTMLElement>('button,input,select,textarea,a[href],[tabindex]')].filter(element=>element.tabIndex>=0&&!element.matches(':disabled')&&element.getClientRects().length>0);
+      const first=controls[0],last=controls.at(-1);
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}
+    }} onCancel={event=>{event.preventDefault();if(!busy)onCancel()}}><form onSubmit={save} style={{display:"contents"}}>
+    <h2 id="review-form-title">{review ? "Değerlendirmeyi düzenle" : "Ürünü değerlendir"}</h2>
     <p><strong>{product.name}</strong>{product.color ? ` · ${product.color}` : ""}</p>
     <fieldset><legend>Puanın</legend><div className={styles.stars}>{[1, 2, 3, 4, 5].map(value => <label key={value}><input type="radio" name="rating" value={value} checked={rating === value} onChange={() => setRating(value)} /><span aria-hidden="true">★</span><span className={styles.srOnly}>{value} yıldız</span></label>)}</div></fieldset>
     <label>Başlık (isteğe bağlı)<input value={title} maxLength={80} onChange={event => setTitle(event.target.value)} /></label>
     <label>Yorumun<textarea value={body} minLength={10} maxLength={2000} rows={5} required onChange={event => setBody(event.target.value)} /><small>{body.trim().length}/2000 · en az 10 karakter</small></label>
     {review && <p className={styles.warning}>Değişiklik kaydedildiğinde değerlendirme yeniden incelemeye alınır.</p>}
     {error && <p role="alert" className={styles.error}>{error}</p>}
-    <div className={styles.actions}><button type="button" onClick={onCancel}>Vazgeç</button><button className={styles.primary} disabled={busy || rating === 0 || body.trim().length < 10}>{busy ? "Gönderiliyor…" : "İncelemeye gönder"}</button></div>
-  </form>;
+    <div className={styles.actions}><button type="button" disabled={busy} onClick={onCancel}>Vazgeç</button><button className={styles.primary} disabled={busy || rating === 0 || body.trim().length < 10}>{busy ? "Gönderiliyor…" : "İncelemeye gönder"}</button></div>
+  </form></dialog>;
 }
 
 export default function MyReviews() {
@@ -44,6 +52,7 @@ export default function MyReviews() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [editing, setEditing] = useState<string>();
+  const [reload,setReload] = useState(0);
   const products = useMemo(() => {
     const result = new Map<string, Product>();
     orders.filter(order => order.status === "delivered").forEach(order => order.lines.forEach(line => result.set(line.productId, { id: line.productId, name: line.name, color: line.color })));
@@ -57,15 +66,15 @@ export default function MyReviews() {
     let active = true;
     myReviews().then(items => { if (active) setReviews(items); }).catch(cause => { if (active) setError(cause instanceof Error ? cause.message : "Değerlendirmeler yüklenemedi."); }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [ready, user]);
+  }, [ready, user,reload]);
 
   const eligible = [...products.values()].filter(product => !reviews.some(review => review.productId === product.id));
   function saved(next: MyReview) { setReviews(current => [next, ...current.filter(review => review.id !== next.id)]); setEditing(undefined); }
 
   return <div className={styles.shell}>
     <header><p>Market hesabım</p><h1>Değerlendirmelerim</h1><span>Yalnız teslim aldığın ürünleri değerlendirebilirsin.</span></header>
-    {error && <p role="alert" className={styles.error}>{error}</p>}
-    {!ready || loading ? <p role="status">Değerlendirmelerin yükleniyor…</p> : !user ? <div className={styles.empty}><h2>Hesabına giriş yap</h2><p>Kendi değerlendirmelerini görmek ve teslim aldığın ürünlere puan vermek için giriş yap.</p><Link href="/hesap">Giriş yap →</Link></div> : <>
+    {error && <p role="alert" className={styles.error}>{error} <button type="button" onClick={()=>{setError("");setLoading(true);setReload(value=>value+1)}}>Tekrar dene</button></p>}
+    {!ready || loading ? <p role="status">Değerlendirmelerin yükleniyor…</p> : !user ? <div className={styles.empty}><h2>Hesabına giriş yap</h2><p>Kendi değerlendirmelerini görmek ve teslim aldığın ürünlere puan vermek için giriş yap.</p><Link href="/hesap">Giriş yap →</Link></div> : error ? null : <>
       {eligible.length > 0 && <section aria-labelledby="eligible-title"><h2 id="eligible-title" className={styles.sectionTitle}>Değerlendirebileceğin ürünler</h2><div className={styles.eligible}>{eligible.map(product => <button key={product.id} onClick={() => setEditing(product.id)}><span><strong>{product.name}</strong><small>{product.color}</small></span><b>Değerlendir →</b></button>)}</div></section>}
       <section aria-labelledby="reviews-title"><h2 id="reviews-title" className={styles.sectionTitle}>Gönderdiklerin</h2>
         {reviews.length === 0 ? <div className={styles.empty}><h2>Henüz değerlendirmen yok.</h2><p>Teslim edilen siparişlerindeki ürünler burada değerlendirmeye açılır.</p><Link href="/hesap/siparisler">Siparişlerime git →</Link></div> : <div className={styles.list}>{reviews.map(review => {

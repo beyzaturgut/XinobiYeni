@@ -92,7 +92,7 @@ function QuestionnaireSession() {
     finally { setBusy(false); }
   }
   if (!product) return <main className={styles.main}><p role="status">Önce güncel katalogdan bir ürün seçin.</p><Link href="/xinobi-u">Ürün seçimine dön</Link></main>;
-  if (!session) return <main className={styles.main}><PersonalizationMethods product={product} variant={variant} mode="ai"/><p role="status">{error || 'Sana özel sorular hazırlanıyor…'}</p>{error && <><button className={styles.primary} onClick={restart}>Tekrar dene</button><Link href="/xinobi-u">Ürün seçimine dön</Link></>}</main>;
+  if (!session) return <main className={styles.main}><PersonalizationMethods product={product} variant={variant} mode="ai"/><p role={error?'alert':'status'}>{error || 'Sana özel sorular hazırlanıyor…'}</p>{error && <><button className={styles.primary} onClick={restart}>Tekrar dene</button><Link href="/xinobi-u">Ürün seçimine dön</Link></>}</main>;
   const question = session.questions[step];
   const complete = session.questions.every(q => Boolean(answers[q.id]));
   const generating = status === 'queued' || status === 'running';

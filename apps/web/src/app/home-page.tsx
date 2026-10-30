@@ -61,7 +61,7 @@ export default function Home() {
 
   return <div id="top" className={styles.page}>
     {error && <p role="alert">{error}</p>}
-    <a className={styles.skipLink} href="#main-content">İçeriğe geç</a><SiteHeader categories={state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).map(name => ({name})) : []} />
+    <a data-skip-link className={styles.skipLink} href="#main-content">İçeriğe geç</a><SiteHeader categories={state ? (state.categories ?? [...new Set(state.products.map(product => product.category))]).map(name => ({name})) : []} />
     <main id="main-content">
       <h1 className={styles.srOnly}>Xinobi ev teknolojileri</h1>
       {slides.length > 0 && <section className={styles.hero} aria-label="Xinobi ürün tanıtımları">{slides[slide % slides.length].type === 'Video' ? <video className={styles.heroImage} style={{ width: '100%', height: '100%' }} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} autoPlay muted loop playsInline /> : <Image className={styles.heroImage} src={mediaUrl(slides[slide % slides.length].src, commerceApi)} alt={slides[slide % slides.length].alt} fill priority sizes="100vw" />}<div className={styles.sliderDots} aria-label="Slider sayfaları">{slides.map((item, index) => <button type="button" key={item.src} className={index === slide % slides.length ? styles.activeDot : ""} onClick={() => setSlide(index)} aria-label={`${index + 1}. görsel`} aria-current={index === slide % slides.length ? "true" : undefined} />)}</div></section>}

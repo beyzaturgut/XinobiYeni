@@ -1,5 +1,7 @@
 # Faz02 geliştirmeye teslim paketi
 
+**30.10.2026 web uygulama kontrolü:** [33 rota ekran/durum matrisi](web-consistency-audit-2026-10-30.md) ve [test kanıtı](../test/2026-10-30/TST-179-web-consistency.md). Otomasyon kanıtı resmi Creative/UX handoff veya gerçek cihaz kabulü değildir.
+
 Sürüm: 0.1.0 · 02.10.2026 · F02-A06
 
 Durum: Mevcut web kaynakları ve davranış belgeleri teslim incelemesine hazır. FE/Creative/BE/DBA/Full Stack kabulü bekliyor; Faz02 kapanışı değildir. Yayın kullanıcı tarafından daha sonra yapılacak.

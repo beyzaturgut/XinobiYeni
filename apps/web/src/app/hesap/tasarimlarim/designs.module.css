@@ -12,3 +12,5 @@
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.actions a{font-size:13px;font-weight:600;border-bottom:1px solid #222}
 
 .title{flex-wrap:wrap}.title>*{min-width:0;overflow-wrap:anywhere}.title a{max-width:100%}
+
+.grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr))}.grid>li{min-width:0;overflow-wrap:anywhere}.grid form{flex-wrap:wrap}.grid form input{max-width:100%}.media>span[role=status]{padding:16px;font-size:13px;line-height:1.5}.media button{min-height:44px;padding:8px;border:1px solid #777;border-radius:4px;background:#fff;cursor:pointer}

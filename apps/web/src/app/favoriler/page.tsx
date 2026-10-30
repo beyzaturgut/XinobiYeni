@@ -1,3 +1,4 @@
+import AccountRequestState from "../../components/account-request-state";
 import SiteHeader from "../../components/site-header";
 import type { Metadata } from "next";
 import Favorites from "./favorites";
@@ -7,8 +8,8 @@ export const metadata: Metadata = { title: "Favorilerim | Xinobi", description: 
 
 export default function FavoritesPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#favorites">Favorilere geç</a>
+    <a data-skip-link className={styles.skipLink} href="#favorites">Favorilere geç</a>
     <SiteHeader />
-    <main id="favorites"><Favorites /></main>
+    <main id="favorites"><AccountRequestState><Favorites /></AccountRequestState></main>
   </div>;
 }

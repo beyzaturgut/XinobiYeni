@@ -20,10 +20,12 @@ export default function ReturnRequest() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [sent, setSent] = useState(false);
-  useEffect(() => { if (user) orderOptions().then(setOptions).catch(() => setError("İade seçenekleri yüklenemedi.")); }, [user]);
+  const [optionsError,setOptionsError]=useState(""),[reload,setReload]=useState(0);
+  useEffect(() => { if (user) orderOptions().then(setOptions).catch(() => setOptionsError("İade seçenekleri yüklenemedi.")); }, [user,reload]);
 
-  if (!ready || (user && !options && !error)) return <p className={styles.layout} role="status">Yükleniyor…</p>;
+  if (!ready || (user && !options && !optionsError)) return <p className={styles.layout} role="status">Yükleniyor…</p>;
   if (!user) return <div className={styles.layout}><Link href="/hesap">İade talebi için giriş yap →</Link></div>;
+  if (!options) return <div className={styles.layout}><section className={styles.formArea}><h1>İade talebi</h1><p role="alert" className={styles.error}>{optionsError} <button type="button" onClick={()=>{setOptionsError("");setReload(value=>value+1)}}>Tekrar dene</button></p><Link href="/hesap/siparisler">Siparişlerime dön →</Link></section></div>;
   if (!order) {
     // Reached without an order (e.g. the footer link): list the orders that can still be returned or cancelled.
     const eligible = options ? orders.filter((item) => Object.keys(returnable(item, options.returnWindowDays)).length > 0 || item.status === "received" || item.status === "preparing") : [];

@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {expect, type Page} from '@playwright/test';
 import type {CommerceState} from '../../../../packages/commerce/client';
@@ -74,4 +75,19 @@ export async function mockStore(page:Page,{signedIn=false,cart=false}:{signedIn?
 
 export async function checkCartTotal(page:Page,count:number) {
   await expect(page.getByText(`${count} ürün`,{exact:true})).toBeVisible();
+}
+
+/** Fixed public reference bytes only: no real API acceptance, account or provider call. */
+export async function mockReferenceSurface(page:Page){
+ const sourcePath='/assets/products/tea-maker-101-blue.webp',maskPath='/assets/personalization/tea-maker-101-blue-designable.png',brandPath='/assets/personalization/tea-maker-101-blue-branding-overlay.png';
+ const bytes=(url:string)=>readFileSync('public'+url),hash=(url:string)=>createHash('sha256').update(bytes(url)).digest('hex');
+ const media=(url:string)=>({url:url+'?v='+hash(url),sha256:hash(url)});
+ await page.route('**/api/v1/dev/product-surfaces/**',route=>{
+  const p=new URL(route.request().url()).pathname;
+  if(p.endsWith('/cay-makinesi-101/blue/rendering-inputs'))return route.fulfill({json:{scope:'development-preview',productReference:'cay-makinesi-101',variantReference:'blue',previewAvailable:true,inputs:{width:1066,height:1600,surfaceVersion:hash(maskPath),sourceMediaVersion:hash(sourcePath),source:media(sourcePath),mask:media(maskPath),brandingRequired:true,branding:media(brandPath)}}});
+  if(p.endsWith('/commerce-mask/DEMO-P101/DEMO-V101-B/rendering-inputs'))return route.fulfill({json:{scope:'development-preview',productReference:'DEMO-P101',variantReference:'DEMO-V101-B',previewAvailable:true,inputs:{width:1066,height:1600,surfaceVersion:hash(maskPath),sourceMediaVersion:hash(sourcePath),source:{url:'/api/v1/local-commerce/media/'+'a'.repeat(32)+'.webp?v='+hash(sourcePath),sha256:hash(sourcePath)},mask:{url:'/api/v1/local-commerce/media/'+ 'b'.repeat(32)+'.png?v='+hash(maskPath),sha256:hash(maskPath)},brandingRequired:false,branding:null}}});
+  return route.fulfill({status:404});
+ });
+ await page.route('**/api/v1/local-commerce/media/'+ 'a'.repeat(32)+'.webp*',route=>route.fulfill({contentType:'image/webp',headers:{'Access-Control-Allow-Origin':'*'},body:bytes(sourcePath)}));
+ await page.route('**/api/v1/local-commerce/media/'+ 'b'.repeat(32)+'.png*',route=>route.fulfill({contentType:'image/png',headers:{'Access-Control-Allow-Origin':'*'},body:bytes(maskPath)}));
 }

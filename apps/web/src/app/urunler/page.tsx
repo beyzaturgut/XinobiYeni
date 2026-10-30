@@ -13,7 +13,7 @@ export const metadata: Metadata = pageMetadata("/urunler/", {
 
 export default function ProductsPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#catalog">Ürünlere geç</a>
+    <a data-skip-link className={styles.skipLink} href="#catalog">Ürünlere geç</a>
     <SiteHeader />
     <main>
       <section className={styles.intro} aria-labelledby="catalog-title">

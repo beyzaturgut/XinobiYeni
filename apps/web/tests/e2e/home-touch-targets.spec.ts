@@ -1,9 +1,11 @@
+import {mockStore} from './fixtures';
 import { expect, test } from "@playwright/test";
 
 for (const width of [320, 390, 768, 1024, 1440]) {
   test(`${width}px: slider dokunma alanı ve klavye seçimi`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: "reduce" });
+    await mockStore(page);
     await page.goto("/");
     await page.getByRole("button", { name: "Çerez tercih panelini kapat" }).click();
     const hero = page.getByRole("region", { name: "Xinobi ürün tanıtımları" });

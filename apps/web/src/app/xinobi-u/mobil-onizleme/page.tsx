@@ -19,7 +19,7 @@ const CM121_VARIANT = "DEMO-V-5a46bb98-c95c-42b9-9f12-e4286f628cca";
 export default function MobilePreviewPage() {
   return (
     <div className={`${styles.page} ${styles.mobilePreviewPage}`}>
-      <a className={styles.skipLink} data-app-chrome="" href="#editor-workspace">
+      <a data-skip-link className={styles.skipLink} data-app-chrome="" href="#editor-workspace">
         Editör çalışma alanına geç
       </a>
       {/* The mobile app shows its own app bar instead. */}

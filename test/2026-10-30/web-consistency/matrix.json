@@ -1,0 +1,690 @@
+{
+  "date": "2026-10-30",
+  "environment": "Chrome / isolated fixtures; computed 200% text, not browser zoom",
+  "widths": {
+    "320": {
+      "pageErrors": [],
+      "seriousCriticalAxe": "not run at this width",
+      "routes": [
+        {
+          "route": "/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/arama/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/asistan/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/favoriler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/adresler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/bildirimler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/degerlendirmelerim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/iade/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/karsilastir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/takip/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/sonuc/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/sepet/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/studio/ai/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/editor/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/kisisellestir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/detay/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/kendi-gorselin/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/maske-kontrolu/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/mobil-onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/renk/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/sorular/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/yasal/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        }
+      ]
+    },
+    "390": {
+      "pageErrors": [],
+      "seriousCriticalAxe": [],
+      "routes": [
+        {
+          "route": "/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/arama/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/asistan/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/favoriler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/adresler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/bildirimler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/degerlendirmelerim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/iade/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/karsilastir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/takip/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/sonuc/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/sepet/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/studio/ai/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/editor/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/kisisellestir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/detay/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/kendi-gorselin/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/maske-kontrolu/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/mobil-onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/renk/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/sorular/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/yasal/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        }
+      ]
+    },
+    "768": {
+      "pageErrors": [],
+      "seriousCriticalAxe": "not run at this width",
+      "routes": [
+        {
+          "route": "/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/arama/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/asistan/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/favoriler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/adresler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/bildirimler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/degerlendirmelerim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/iade/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/karsilastir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/takip/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/sonuc/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/sepet/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/studio/ai/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/editor/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/kisisellestir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/detay/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/kendi-gorselin/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/maske-kontrolu/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/mobil-onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/renk/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/sorular/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/yasal/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        }
+      ]
+    },
+    "1440": {
+      "pageErrors": [],
+      "seriousCriticalAxe": "not run at this width",
+      "routes": [
+        {
+          "route": "/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/arama/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/asistan/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/favoriler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/adresler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/bildirimler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/degerlendirmelerim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/siparisler/iade/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/hesap/tasarimlarim/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/karsilastir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/kurumsal/teklif/takip/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/odeme/sonuc/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/sepet/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/studio/ai/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/editor/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/cay-makinesi-101/kisisellestir/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/urunler/detay/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/kendi-gorselin/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/maske-kontrolu/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/mobil-onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/onizleme/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/renk/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi-u/sorular/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/xinobi/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        },
+        {
+          "route": "/yasal/",
+          "normalOverflow": false,
+          "text200Overflow": false
+        }
+      ]
+    }
+  }
+}

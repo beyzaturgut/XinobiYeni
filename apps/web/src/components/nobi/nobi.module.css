@@ -36,3 +36,5 @@
 .error{margin:0 14px 8px;font-size:13px;color:#8b2424}
 .srOnly{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media(max-width:767px){.launcher{right:14px;bottom:max(14px,env(safe-area-inset-bottom));width:64px}.mark{width:62px;height:60px}.launcher b{display:none}.panel{right:12px;bottom:84px;width:calc(100vw - 24px);height:calc(100svh - 110px)}}
+
+.retry{min-height:44px;padding:8px 12px;border:1px solid currentColor;border-radius:5px;color:inherit;background:#fff;cursor:pointer}

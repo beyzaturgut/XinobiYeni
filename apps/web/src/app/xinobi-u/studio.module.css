@@ -45,3 +45,10 @@
 .previewTopActions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;max-width:100%}.previewTopActions>*{margin:0}
 @media(min-width:1051px){.previewTop{padding:24px clamp(20px,3vw,40px) 16px}}
 
+
+/* Active questions must also reflow at enlarged text, not only the entry screen. */
+.questionLayout>*{min-width:0;overflow-wrap:anywhere}
+.options label{grid-template-columns:34px minmax(0,1fr) 24px}.options strong{min-width:0;overflow-wrap:anywhere}
+.navigation,.progress,.summary dl>div{flex-wrap:wrap}
+.summary dt,.summary dd{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.primary,.secondary{max-width:100%;white-space:normal;overflow-wrap:anywhere}

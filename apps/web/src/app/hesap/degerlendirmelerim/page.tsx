@@ -1,3 +1,4 @@
+import AccountRequestState from "../../../components/account-request-state";
 import type { Metadata } from "next";
 import CommerceFooter from "../../../components/commerce-footer";
 import SiteHeader from "../../../components/site-header";
@@ -8,9 +9,9 @@ export const metadata: Metadata = { title: "Değerlendirmelerim | Xinobi", descr
 
 export default function MyReviewsPage() {
   return <div className={accountStyles.page}>
-    <a className={accountStyles.skipLink} href="#reviews">Değerlendirmelere geç</a>
+    <a data-skip-link className={accountStyles.skipLink} href="#reviews">Değerlendirmelere geç</a>
     <SiteHeader />
-    <main id="reviews"><MyReviews /></main>
+    <main id="reviews"><AccountRequestState resource="orders"><MyReviews /></AccountRequestState></main>
     <CommerceFooter />
   </div>;
 }

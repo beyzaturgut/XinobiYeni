@@ -9,14 +9,15 @@ import styles from './checkout.module.css';
 
 /** Demo checkout: pick a saved address; the server prices the cart from the catalogue. No card, no payment, no stock reservation. */
 export default function Checkout(){
-  const router=useRouter();const cart=useCart();const {state}=useCommerce();const {user,addresses,ready}=useDemoCommerce();
+  const router=useRouter();const cart=useCart();const {state,error:catalogError,retry}=useCommerce();const {user,addresses,ready,addressesLoading,addressesError}=useDemoCommerce();
   const [scenario,setScenario]=useState('success');const [chosen,setChosen]=useState('');const [error,setError]=useState('');const [busy,setBusy]=useState(false);
   const requestId=useRef('');const locked=useRef(false);
   const rows=cart.map(row=>{const product=state?.products.find(item=>item.id===row.productId&&item.active);const variant=product?.variants.find(item=>item.id===row.variantId);return {...row,product,variant,price:state?.prices[row.variantId]}});
-  const valid=rows.length>0&&rows.every(row=>row.product&&row.variant&&row.variant.stock>=variantUnits(cart,row.variantId)&&row.price!==undefined&&row.price>0);
+  const valid=!catalogError&&rows.length>0&&rows.every(row=>row.product&&row.variant&&row.variant.stock>=variantUnits(cart,row.variantId)&&row.price!==undefined&&row.price>0);
   const total=rows.reduce((sum,row)=>sum+(row.price||0)*row.quantity,0);
   const address=addresses.find(item=>item.id===chosen)??addresses.find(item=>item.isDefault)??addresses[0];
   async function submit(event:React.FormEvent){event.preventDefault();if(locked.current)return;setError('');
+    if(addressesLoading||addressesError){setError('Teslimat adresleri doğrulanamadı. Yeniden yüklemeyi bekle.');return}
     if(!valid){setError('Fiyat veya stok değişti. Sepetini kontrol et.');return}
     if(!address){setError('Bir teslimat adresi seç.');return}
     if(scenario==='failed'){setError('Ödeme reddedildi (demo). Sipariş oluşmadı; yeniden deneyebilirsin.');return}
@@ -25,7 +26,7 @@ export default function Checkout(){
     catch(problem){setError(problem instanceof Error?problem.message:'Sipariş kaydedilemedi.');locked.current=false;setBusy(false)}}
   return <div className={styles.layout}><section className={styles.formArea}><h1>Ödeme</h1>
     <div className={styles.notice}><strong>Para çekilmez</strong><p>Demo sipariş: kart bilgisi istenmez, ödeme alınmaz; kargo ve stok işlemi yapılmaz. Siparişin web ve mobilde görünür.</p></div>
-    {!ready?<p role="status">Hesap kontrol ediliyor…</p>:!user?<p><Link href="/hesap">Önce hesabına giriş yap →</Link></p>:<form id="demo-checkout" onSubmit={submit}>
+    {catalogError?<p role="alert">{catalogError} <button type="button" onClick={retry}>Tekrar dene</button></p>:!state?<p role="status">Ürün ve fiyat bilgileri yükleniyor…</p>:!ready?<p role="status">Hesap kontrol ediliyor…</p>:!user?<p><Link href="/hesap">Önce hesabına giriş yap →</Link></p>:<form id="demo-checkout" onSubmit={submit}>
       <p>{user.name} · {user.email}</p>
       <fieldset><legend>Teslimat adresi</legend>
         {addresses.length===0?<p>Sipariş için bir teslimat adresi ekle. <Link href="/hesap/adresler">Adres ekle →</Link></p>:<div className={styles.addresses}>{addresses.map(item=><label key={item.id} className={item.id===address?.id?styles.addressChosen:styles.address}><input type="radio" name="address" checked={item.id===address?.id} onChange={()=>setChosen(item.id)}/><span><strong>{item.title}{item.isDefault&&<em>Varsayılan</em>}</strong><small>{item.fullName} · {localPhone(item.phone)}</small><small>{item.line}, {item.district}/{item.city}</small></span></label>)}<Link href="/hesap/adresler">Adresleri yönet →</Link></div>}
@@ -34,5 +35,5 @@ export default function Checkout(){
     </form>}
     {error&&<p role="alert">{error}</p>}
   </section>
-  <aside className={styles.summary}><h2>Sipariş özeti</h2>{rows.map(row=><p key={cartLineKey(row)}>{row.product?.name||'Ürün bulunamadı'} · {row.variant?.color}{row.designName?` · Tasarım: ${row.designName}`:''} × {row.quantity}</p>)}<p>Toplam: {valid?money(total):'Sepeti kontrol et'}</p><button form="demo-checkout" type="submit" disabled={!user||!valid||!address||busy}>{busy?'Kaydediliyor…':'Ödemeyi tamamla'}</button><p><Link href="/sepet">Sepete dön →</Link></p></aside></div>;
+  <aside className={styles.summary}><h2>Sipariş özeti</h2>{state&&!catalogError&&rows.map(row=><p key={cartLineKey(row)}>{row.product?.name||'Ürün bulunamadı'} · {row.variant?.color}{row.designName?` · Tasarım: ${row.designName}`:''} × {row.quantity}</p>)}<p>Toplam: {valid?money(total):'Sepeti kontrol et'}</p><button form="demo-checkout" type="submit" disabled={!user||!valid||!address||busy||addressesLoading||!!addressesError}>{busy?'Kaydediliyor…':'Ödemeyi tamamla'}</button><p><Link href="/sepet">Sepete dön →</Link></p></aside></div>;
 }

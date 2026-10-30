@@ -2,6 +2,15 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-179 | 30.10.2026 | Web rota/envanter ve kaynak inceleme | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-180 | 30.10.2026 | Web 264 rota/boyut/metin ve 33 axe | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-181 | 30.10.2026 | Web 19 izole durum/akış testi | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-182 | 30.10.2026 | Web tam regresyon paketi | PASS 97/97; sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-183 | 30.10.2026 | Web TypeScript/lint | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-184 | 30.10.2026 | Web production build 38 çıktı | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-185 | 30.10.2026 | Web görsel inceleme | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-186 | 30.10.2026 | 24 ürün/8 kategori gerçek readonly katalog | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
+| TST-187 | 30.10.2026 | Web belge/diff/upstream | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
 | TST-175 | 30.10.2026 | Faz task eşleme: 120 task / 11 ana faz / 16 commit | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |
 | TST-176 | 30.10.2026 | Faz task eşleme: yerel link ve anchor | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |
 | TST-177 | 30.10.2026 | Faz task eşleme: tarihsel kayıt ve kabul koruması | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |

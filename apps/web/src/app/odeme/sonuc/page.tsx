@@ -1,3 +1,4 @@
+import AccountRequestState from "../../../components/account-request-state";
 import SiteHeader from "../../../components/site-header";
 import type { Metadata } from "next";
 import { Suspense } from "react";
@@ -8,8 +9,8 @@ export const metadata: Metadata = { title: "Ödeme Durumu | Xinobi", description
 
 export default function PaymentResultPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#payment-result">Ödeme durumuna geç</a>
+    <a data-skip-link className={styles.skipLink} href="#payment-result">Ödeme durumuna geç</a>
     <SiteHeader />
-    <main id="payment-result"><Suspense><PaymentResult /></Suspense></main>
+    <main id="payment-result"><AccountRequestState resource="orders"><Suspense><PaymentResult /></Suspense></AccountRequestState></main>
   </div>;
 }

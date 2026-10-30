@@ -1,5 +1,7 @@
 # Faz02 ekran envanteri
 
+**30.10.2026 web uygulama kontrolü:** [33 rota ekran/durum matrisi](web-consistency-audit-2026-10-30.md) ve [test kanıtı](../test/2026-10-30/TST-179-web-consistency.md). Otomasyon kanıtı resmi Creative/UX handoff veya gerçek cihaz kabulü değildir.
+
 Sürüm: `0.1.0` · Durum: Envanter hazır, tasarım teslimleri aşamalı
 
 | ID | Yüzey / ekran | Rol ve giriş | Ana eylem | Temel veri | Sonraki faz | Tasarım durumu |

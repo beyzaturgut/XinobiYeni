@@ -19,7 +19,7 @@
   .mobilePreviewPage {
     min-height: 100dvh;
     padding-bottom: env(safe-area-inset-bottom, 0px);
-    overflow-x: hidden;
+
   }
 
   .mobilePreviewPage .header {
@@ -59,3 +59,11 @@
 
 }
 @media(max-width:680px){.header{min-height:70px;padding:0 14px;grid-template-columns:48px 1fr auto;gap:10px}.brand{width:45px;height:56px}.brand img{width:44px}.documentTitle span,.documentTitle small{display:none}.headerActions a{padding:9px;font-size:.55rem}}
+
+@media(max-width:680px){
+ .header,.mobilePreviewPage .header{grid-template-columns:48px minmax(0,1fr);padding-block:10px}
+ .documentTitle,.mobilePreviewPage .documentTitle{min-width:0;overflow-wrap:anywhere}
+ .headerActions{grid-column:1/-1;justify-content:flex-end;flex-wrap:wrap;min-width:0}
+ .headerActions a,.mobilePreviewPage .headerActions a{max-width:100%;white-space:normal;overflow:visible;overflow-wrap:anywhere}
+ .documentTitle strong,.mobilePreviewPage .documentTitle strong{white-space:normal;overflow:visible}
+}

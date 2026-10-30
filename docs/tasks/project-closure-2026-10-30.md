@@ -175,6 +175,8 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### WEB-07
 
+**30.10 ek teknik kanıt:** [Web görsel/durum matrisi](../../design/web-consistency-audit-2026-10-30.md), [TST-179](../../test/2026-10-30/TST-179-web-consistency.md). 264 rota/boyut/metin kontrolü; gerçek cihaz/handoff kabulü açık.
+
 **Duyarlı tasarım ve erişilebilirlik kusurlarını kapat** — P1 / Doğrulama / **Kısmen yapıldı**
 
 **Önerilen sorumlu:** Web geliştirici + UX + QA. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
@@ -206,6 +208,8 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 **Bağımlılıklar:** QA-04.
 
 ### QA-03
+
+**30.10 ek teknik kanıt:** [33 ekran görsel/durum denetimi](../../design/web-consistency-audit-2026-10-30.md); Chrome/fixture kanıtı manuel ekran okuyucu kabulü değildir.
 
 **Erişilebilirlik ve tasarım teslimini kabul et** — P1 / Doğrulama / **Kısmen yapıldı**
 

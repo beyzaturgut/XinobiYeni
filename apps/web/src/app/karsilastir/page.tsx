@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Ürün Karşılaştırma | Xinobi", 
 
 export default function ComparePage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#compare">Karşılaştırmaya geç</a>
+    <a data-skip-link className={styles.skipLink} href="#compare">Karşılaştırmaya geç</a>
     <SiteHeader />
     <main id="compare"><Suspense fallback={<p role="status">Karşılaştırma yükleniyor…</p>}><Comparison /></Suspense></main>
     <SiteFooter />

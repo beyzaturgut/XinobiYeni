@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata("/xinobi/", {
 
 export default function XinobiPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#content">İçeriğe geç</a>
+    <a data-skip-link className={styles.skipLink} href="#content">İçeriğe geç</a>
     <SiteHeader />
     {/* Text from Proje Yönetimi/Hakkımızda.docx, laid out as a plain reading page (title, then paragraphs). */}
     <main id="content" className={styles.article}>

@@ -39,12 +39,12 @@ export default function AccountDashboard(){
             <h2>Hesabına giriş yap</h2><p className={styles.description}>Kayıt ol veya giriş yap; siparişlerini, favorilerini ve sepetini tek bir yerden yönet.</p>
             <div className={styles.actions}><button className={styles.primary} onClick={()=>setMode('login')}>Giriş yap <Icon name="arrow"/></button><button className={styles.secondary} onClick={()=>setMode('register')}>Hesap oluştur</button></div>
           </>
-          <div className={styles.storage}><p><Icon name="lock"/><strong>Geliştirme ortamı hesabı</strong></p><p>Hesabın Xinobi sunucusunda tutulur; web ve mobil uygulamada aynı hesapla giriş yaparsın. Başka hizmetlerde kullandığın parolayı kullanma.</p><p>Deneme siparişlerin şimdilik yalnızca bu tarayıcıda saklanır.</p></div>
+          <div className={styles.storage}><p><Icon name="lock"/><strong>Geliştirme ortamı hesabı</strong></p><p>Hesabın Xinobi sunucusunda tutulur; web ve mobil uygulamada aynı hesapla giriş yaparsın. Başka hizmetlerde kullandığın parolayı kullanma.</p><p>Deneme siparişlerin hesabına bağlı olarak sunucuda saklanır; ödeme alınmaz.</p></div>
         </div>
       </section>
     </div>
     <div className={styles.features}>
-      {[{icon:'package',title:'Siparişlerin',text:'Bu tarayıcıda oluşturduğun deneme siparişlerini görüntüle.',href:'/hesap/siparisler'},{icon:'heart',title:'Favorilerin',text:'Beğendiğin ürünleri bir arada tut, dilediğinde yeniden keşfet.',href:'/favoriler'},{icon:'bag',title:'Sepetin',text:'Seçtiğin ürünleri ve adetlerini kontrol edip deneme ödeme akışına devam et.',href:'/sepet'}].map(feature=><Link href={feature.href} className={styles.feature} key={feature.title}><span className={styles.featureIcon}><Icon name={feature.icon as IconName}/></span><div><h3>{feature.title}</h3><p>{feature.text}</p></div></Link>)}
+      {[{icon:'package',title:'Siparişlerin',text:'Hesabına bağlı deneme siparişlerini web ve mobilde görüntüle.',href:'/hesap/siparisler'},{icon:'heart',title:'Favorilerin',text:'Beğendiğin ürünleri bir arada tut, dilediğinde yeniden keşfet.',href:'/favoriler'},{icon:'bag',title:'Sepetin',text:'Seçtiğin ürünleri ve adetlerini kontrol edip deneme ödeme akışına devam et.',href:'/sepet'}].map(feature=><Link href={feature.href} className={styles.feature} key={feature.title}><span className={styles.featureIcon}><Icon name={feature.icon as IconName}/></span><div><h3>{feature.title}</h3><p>{feature.text}</p></div></Link>)}
     </div>
     </>}
     {mode&&<AuthModal key={mode} mode={mode} onClose={()=>setMode(null)}/>}
@@ -56,6 +56,7 @@ const initials=(name:string)=>{const parts=name.trim().split(/\s+/).filter(part=
 
 /** Signed in: profile summary beside the real settings (name, password); orders are the browser demo, addresses come with checkout. */
 function SignedInAccount({user,orders,addresses}:{user:DemoUser;orders:CustomerOrder[];addresses:CustomerAddress[]}){
+  const {addressesLoading,ordersLoading,addressesLoaded,ordersLoaded,addressesError,ordersError}=useDemoCommerce();
   return <div className={styles.settings}>
     <aside className={styles.profileCard} aria-label="Hesap özeti">
       <div className={styles.initials} aria-hidden="true">{initials(user.name)}</div>
@@ -69,13 +70,13 @@ function SignedInAccount({user,orders,addresses}:{user:DemoUser;orders:CustomerO
       </section>
       <section aria-labelledby="account-shopping"><h2 id="account-shopping" className={styles.sectionTitle}>Alışveriş</h2>
         <nav className={styles.menu} aria-label="Alışveriş">
-          <Link href="/hesap/siparisler"><Icon name="package"/><span><strong>Siparişlerim</strong><small>{orders.length?`${orders.length} demo sipariş · son: ${orders[0].number} · ${money(orders[0].total.amountMinor)}`:'Henüz siparişin yok'}</small></span><Icon name="arrow"/></Link>
+          <Link href="/hesap/siparisler"><Icon name="package"/><span><strong>Siparişlerim</strong><small>{ordersError?'Sipariş bilgileri yüklenemedi; listeyi açıp yeniden deneyebilirsin.':ordersLoading&&!ordersLoaded?'Siparişler yükleniyor…':orders.length?`${orders.length} demo sipariş · son: ${orders[0].number} · ${money(orders[0].total.amountMinor)}`:'Henüz siparişin yok'}</small></span><Icon name="arrow"/></Link>
           <Link href="/favoriler"><Icon name="heart"/><span><strong>Favorilerim</strong><small>Beğendiğin ürünler</small></span><Icon name="arrow"/></Link>
           <Link href="/sepet"><Icon name="bag"/><span><strong>Sepetim</strong><small>Seçtiğin ürünler ve adetleri</small></span><Icon name="arrow"/></Link>
           <Link href="/hesap/tasarimlarim"><Icon name="heart"/><span><strong>Tasarımlarım</strong><small>XINOBI U tasarımların ve yüklediğin görseller</small></span><Icon name="arrow"/></Link>
           <Link href="/hesap/bildirimler"><Icon name="bell"/><span><strong>Bildirimlerim</strong><small>Sipariş, kargo, iptal ve iade gelişmeleri</small></span><Icon name="arrow"/></Link>
           <Link href="/hesap/degerlendirmelerim"><Icon name="star"/><span><strong>Değerlendirmelerim</strong><small>Puanların, yorumların ve yayın durumları</small></span><Icon name="arrow"/></Link>
-          <Link href="/hesap/adresler"><Icon name="pin"/><span><strong>Adreslerim</strong><small>{addresses.length?`${addresses.length} kayıtlı adres${addresses[0]?.isDefault?` · varsayılan: ${addresses[0].title}`:''}`:'Henüz adres eklemedin'}</small></span><Icon name="arrow"/></Link>
+          <Link href="/hesap/adresler"><Icon name="pin"/><span><strong>Adreslerim</strong><small>{addressesError?'Adres bilgileri yüklenemedi; listeyi açıp yeniden deneyebilirsin.':addressesLoading&&!addressesLoaded?'Adresler yükleniyor…':addresses.length?`${addresses.length} kayıtlı adres${addresses[0]?.isDefault?` · varsayılan: ${addresses[0].title}`:''}`:'Henüz adres eklemedin'}</small></span><Icon name="arrow"/></Link>
         </nav>
       </section>
       <section aria-labelledby="account-help"><h2 id="account-help" className={styles.sectionTitle}>Yardım ve yasal</h2>

@@ -28,7 +28,7 @@ function LeadForm({conversationId,onDone}:{conversationId:string;onDone:()=>void
 /** Nobi chat (K-09): product cards from the live catalogue, actions, quick replies, handoff and lead form. Used in the panel and on /asistan. */
 export default function NobiChat({onNavigate,full=false}:{onNavigate?:()=>void;full?:boolean}){
   const router=useRouter();
-  const [config,setConfig]=useState<AssistantConfig|null>(null);
+  const [config,setConfig]=useState<AssistantConfig|null>(null),[configReload,setConfigReload]=useState(0);
   const [conversationId,setConversationId]=useState<string|null>(null);
   const [messages,setMessages]=useState<AssistantMessage[]>([]);
   const [text,setText]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[remaining,setRemaining]=useState<number|null>(null);
@@ -40,10 +40,10 @@ export default function NobiChat({onNavigate,full=false}:{onNavigate?:()=>void;f
     const stored=storedConversation();
     if(stored)conversation(stored).then(value=>{if(active){setConversationId(value.id);setMessages(value.messages);setLeadSent(value.leadSent)}}).catch(()=>rememberConversation(null));
     return()=>{active=false};
-  },[]);
+  },[configReload]);
   useEffect(()=>{list.current?.scrollTo({top:list.current.scrollHeight,behavior:'smooth'})},[messages,busy,leadOpen]);
   async function send(message:string){
-    const value=message.trim();if(!value||busy)return;
+    const value=message.trim();if(!value||busy||!config?.enabled)return;
     setBusy(true);setError('');setNotice('');setText('');
     setMessages(current=>[...current,{id:'pending',role:'user',text:value,products:[],actions:[],at:new Date().toISOString()}]);
     try{
@@ -86,11 +86,13 @@ export default function NobiChat({onNavigate,full=false}:{onNavigate?:()=>void;f
       {notice&&<p className={styles.notice} role="status">{notice}</p>}
     </div>
     {messages.length===0&&config&&<div className={styles.quick}>{config.quickReplies.map(reply=><button type="button" key={reply} onClick={()=>void send(reply)}>{reply}</button>)}</div>}
-    {error&&<p role="alert" className={styles.error}>{error}</p>}
+    {!config&&!error&&<p role="status">Nobi hazırlanıyor…</p>}
+    {config&&!config.enabled&&<p role="status">Nobi şu anda kullanıma açık değil.</p>}
+    {error&&<p role="alert" className={styles.error}>{error} {!config&&<button type="button" className={styles.retry} onClick={()=>{setError('');setConfigReload(value=>value+1)}}>Nobi’yi tekrar yükle</button>}</p>}
     <form className={styles.composer} onSubmit={event=>{event.preventDefault();void send(text)}}>
       <label htmlFor={full?'nobi-message-full':'nobi-message'} className={styles.srOnly}>Nobi’ye mesajın</label>
       <textarea id={full?'nobi-message-full':'nobi-message'} ref={input} rows={2} maxLength={500} value={text} placeholder="Ne aradığını yaz…" onChange={e=>setText(e.target.value)} onKeyDown={event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();void send(text)}}}/>
-      <button disabled={busy||!text.trim()} aria-label="Mesajı gönder">↑</button>
+      <button disabled={busy||!config?.enabled||!text.trim()} aria-label="Mesajı gönder">↑</button>
     </form>
     <div className={styles.footer}><small>{config?.disclaimer}{remaining!==null&&remaining<=5?` · Bu konuşmada ${remaining} mesaj hakkın kaldı.`:''}</small>{messages.length>0&&<button type="button" onClick={reset}>Yeni konuşma</button>}</div>
   </div>;

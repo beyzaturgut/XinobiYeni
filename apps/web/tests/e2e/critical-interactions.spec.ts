@@ -1,5 +1,5 @@
 import {expect,test} from '@playwright/test';
-import {closeConsent,mockStore,checkCartTotal} from './fixtures';
+import {closeConsent,mockStore,checkCartTotal,mockReferenceSurface} from './fixtures';
 
 test('çerez tercih paneli kapatılır, yeniden açılır ve kategoriler gösterilir',async({page})=>{
  await mockStore(page);await page.goto('/');await closeConsent(page);
@@ -120,7 +120,7 @@ test('teklif takibinde mesaj ve kabul kararı güncellenir',async({page})=>{
 });
 
 test('reference preview keeps placement but removes retired demo controls',async({page})=>{
- await mockStore(page);await page.goto('/urunler/cay-makinesi-101/editor/');await closeConsent(page);
+ await mockStore(page);await mockReferenceSurface(page);await page.goto('/urunler/cay-makinesi-101/editor/');await closeConsent(page);
  const canvas=page.locator('canvas[role=img]');await expect(canvas).toBeVisible();
  await expect(page.getByRole('button',{name:'Metin',exact:true})).toHaveCount(0);
  await expect(page.getByRole('button',{name:'Arka yüz',exact:true})).toHaveCount(0);

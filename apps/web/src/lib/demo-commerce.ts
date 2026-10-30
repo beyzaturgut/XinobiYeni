@@ -23,13 +23,13 @@ export type InboxItem={id:string;kind:string;title:string;body:string;link?:stri
 export type EmailChallenge={verificationId:string;email:string;expiresAt:string;previewCode?:string|null};
 
 const api=commerceApi?commerceApi.replace(/\/local-commerce\/?$/,''):'';
-type Snapshot={user?:DemoUser;ready:boolean;addresses:CustomerAddress[];orders:CustomerOrder[];inbox:InboxItem[];unread:number};
-const empty:Snapshot={ready:false,addresses:[],orders:[],inbox:[],unread:0};
+type Snapshot={user?:DemoUser;ready:boolean;sessionError?:string;addressesLoading:boolean;ordersLoading:boolean;addressesLoaded:boolean;ordersLoaded:boolean;addressesError?:string;ordersError?:string;addresses:CustomerAddress[];orders:CustomerOrder[];inbox:InboxItem[];unread:number};
+const empty:Snapshot={ready:false,addressesLoading:false,ordersLoading:false,addressesLoaded:false,ordersLoaded:false,addresses:[],orders:[],inbox:[],unread:0};
 let session:Snapshot=empty;
 let loading:Promise<void>|null=null;
 const listeners=new Set<()=>void>();
 function publish(next:Partial<Snapshot>){session={...session,...next};listeners.forEach(listener=>listener())}
-function signedOut(){publish({user:undefined,ready:true,addresses:[],orders:[],inbox:[],unread:0})}
+function signedOut(){publish({...empty,ready:true,sessionError:undefined,addressesError:undefined,ordersError:undefined})}
 
 async function call<T>(path:string,init:RequestInit={}):Promise<T|null>{
   if(!api)throw new Error('Hesap servisi henüz kullanıma açılmadı.');
@@ -61,14 +61,24 @@ async function signedIn<T>(path:string,init:RequestInit={}):Promise<T|null>{
   }
 }
 
+const accountMessage=(error:unknown)=>error instanceof Error?error.message:'Hesap verileri yüklenemedi.';
 async function loadAccountData(){
-  const [addresses,orders]=await Promise.all([signedIn<CustomerAddress[]>('/me/addresses'),signedIn<CustomerOrder[]>('/me/orders')]);
-  publish({addresses:addresses??[],orders:orders??[]});
-  await refreshInbox().catch(()=>{});
+  await Promise.allSettled([refreshAddresses(),refreshOrders(),refreshInbox()]);
 }
 
-/** Reloads orders, e.g. after the panel changed a status. */
-export async function refreshOrders(){publish({orders:(await signedIn<CustomerOrder[]>('/me/orders'))??[]})}
+/** Independent requests keep a failed address read from hiding valid orders (and vice versa). */
+export async function refreshAddresses(){
+  const owner=session.user?.id;publish({addressesLoading:true,addressesError:undefined});
+  try{const addresses=await signedIn<CustomerAddress[]>('/me/addresses');if(owner===session.user?.id)publish({addresses:addresses??[],addressesLoaded:true})}
+  catch(error){if(owner===session.user?.id)publish({addressesError:accountMessage(error)});throw error}
+  finally{if(owner===session.user?.id)publish({addressesLoading:false})}
+}
+export async function refreshOrders(){
+  const owner=session.user?.id;publish({ordersLoading:true,ordersError:undefined});
+  try{const orders=await signedIn<CustomerOrder[]>('/me/orders');if(owner===session.user?.id)publish({orders:orders??[],ordersLoaded:true})}
+  catch(error){if(owner===session.user?.id)publish({ordersError:accountMessage(error)});throw error}
+  finally{if(owner===session.user?.id)publish({ordersLoading:false})}
+}
 
 export async function refreshInbox(){
   const inbox=await signedIn<{items:InboxItem[];unread:number}>('/me/notifications');
@@ -96,12 +106,13 @@ export async function requestReturn(id:string,reason:string,description:string,l
 
 /** Reads the cookie session; an expired access cookie is refreshed once. */
 async function loadSession(){
-  try{publish({user:(await call<DemoUser>('/me'))??undefined,ready:true})}
+  publish({ready:false,sessionError:undefined});
+  try{publish({user:(await call<DemoUser>('/me'))??undefined,ready:true,addressesLoading:true,ordersLoading:true})}
   catch(error){
-    if((error as {status?:number}).status!==401){publish({ready:true});return}
+    if((error as {status?:number}).status!==401){publish({ready:true,sessionError:accountMessage(error)});return}
     if(isNativeCommerce()){signedOut();return}
     try{publish({user:(await refreshWebSession())??undefined,ready:true})}
-    catch{signedOut();return}
+    catch(error){if((error as {status?:number}).status===401)signedOut();else publish({ready:true,sessionError:accountMessage(error)});return}
   }
   if(session.user&&!isNativeCommerce())await loadAccountData().catch(()=>{});
 }
@@ -125,10 +136,10 @@ export async function demoAccess(mode:'login'|'register',name:string,email:strin
     if(!name.trim())throw new Error('Ad soyad gir.');
     if(!verification)throw new Error('Önce e-posta adresini doğrula.');
     const user=await call<DemoUser>('/auth/web/register',{method:'POST',body:JSON.stringify({name:name.trim(),email,password,verificationId:verification.id,verificationCode:verification.code})});
-    publish({user:user??undefined,ready:true});
+    publish({user:user??undefined,ready:true,sessionError:undefined,addressesLoading:true,ordersLoading:true});
   }else{
     const user=await call<DemoUser>('/auth/web/login',{method:'POST',body:JSON.stringify({email,password})});
-    publish({user:user??undefined,ready:true});
+    publish({user:user??undefined,ready:true,sessionError:undefined,addressesLoading:true,ordersLoading:true});
   }
   await loadAccountData().catch(()=>{});
 }
@@ -170,7 +181,8 @@ export async function deleteAccount(currentPassword:string){
 
 export async function saveAddress(address:AddressInput,id?:string){
   const saved=await signedIn<CustomerAddress>(id?`/me/addresses/${encodeURIComponent(id)}`:'/me/addresses',{method:id?'PUT':'POST',body:JSON.stringify(address)});
-  publish({addresses:(await signedIn<CustomerAddress[]>('/me/addresses'))??[]});
+  publish({addresses:id?session.addresses.map(item=>item.id===id?saved!:item):[...session.addresses,saved!]});
+  void refreshAddresses().catch(()=>{});
   return saved!;
 }
 
@@ -180,7 +192,8 @@ export async function deleteFavorite(productId:string){await signedIn(`/me/favor
 
 export async function deleteAddress(id:string){
   await signedIn(`/me/addresses/${encodeURIComponent(id)}`,{method:'DELETE'});
-  publish({addresses:(await signedIn<CustomerAddress[]>('/me/addresses'))??[]});
+  publish({addresses:session.addresses.filter(item=>item.id!==id)});
+  void refreshAddresses().catch(()=>{});
 }
 
 /** Demo order: the server prices the items from the catalogue. Reusing [requestId] returns the same order instead of a second one. */

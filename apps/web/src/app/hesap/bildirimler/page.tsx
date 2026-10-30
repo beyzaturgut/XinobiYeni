@@ -1,3 +1,4 @@
+import AccountRequestState from "../../../components/account-request-state";
 import SiteHeader from "../../../components/site-header";
 import CommerceFooter from "../../../components/commerce-footer";
 import type { Metadata } from "next";
@@ -8,9 +9,9 @@ export const metadata: Metadata = { title: "Bildirimlerim | Xinobi", description
 
 export default function NotificationsPage() {
   return <div className={styles.page}>
-    <a className={styles.skipLink} href="#notifications">Bildirimlere geç</a>
+    <a data-skip-link className={styles.skipLink} href="#notifications">Bildirimlere geç</a>
     <SiteHeader />
-    <main id="notifications"><NotificationInbox /></main>
+    <main id="notifications"><AccountRequestState><NotificationInbox /></AccountRequestState></main>
     <CommerceFooter />
   </div>;
 }

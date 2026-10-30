@@ -607,3 +607,7 @@ Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST
 ## 30.10.2026 - Canlı admin giriş ekranı kontrolü
 
 Kullanıcının doğruladığı canlı /admin/ adresinde yeni Chrome ve uygulama içi tarayıcıda giriş formu görünür; girişsiz oturum/katalog/tasarım okumaları 401. Yeni auth uygulaması veya deploy gerekmedi; hesap/izin değişmedi, parola/MFA denenmedi. Kullanıcının önceki tarayıcısında görünmeme nedeni doğrulanmadı; geçerli oturumun paneli açması mevcut davranış. [TST-167-169](../test/2026-10-30/TST-167-live-admin-login-diagnosis.md).
+
+## 30.10.2026 - Flutter ana sayfa XINOBI U web yerleşim eşliği
+
+Kullanıcının ekran görüntüsündeki eski üst üste kart düzeni, mobil webdeki label/ürün/alt kart satırlarıyla eşlendi. Ürün 300px kendi satırında; soru kartı altta, desen kartı sağ alt hizalı, Temsilidir görünür. İçerik doğal yükseklikte; 320/390/700px ve 2x metinde örtüşme yok. Analiz temiz, 7 odaklı ve 79 tam Flutter testi geçti. [TST-170-174](../test/2026-10-30/TST-170-flutter-home-web-parity.md). Fiziksel cihaz, APK/kurulum veya yayın yapılmadı. KIS fiziksel üretim ve resmi mobil UAT açık kalır.

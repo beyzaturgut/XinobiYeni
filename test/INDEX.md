@@ -2,6 +2,11 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-170 | 30.10.2026 | Flutter ana sayfa analiz | PASS; sınırlar raporda | STATIC | `2026-10-30/TST-170-flutter-home-web-parity.md` |
+| TST-171 | 30.10.2026 | Flutter ana sayfa 7 yerleşim/CTA kontrolü | PASS; sınırlar raporda | WIDGET | `2026-10-30/TST-170-flutter-home-web-parity.md` |
+| TST-172 | 30.10.2026 | Flutter ana sayfa 79 test regresyon | PASS; sınırlar raporda | FLUTTER FIXTURE | `2026-10-30/TST-170-flutter-home-web-parity.md` |
+| TST-173 | 30.10.2026 | Flutter ana sayfa 390px görsel kontrol | PASS; sınırlar raporda | WIDGET RENDER | `2026-10-30/TST-170-flutter-home-web-parity.md` |
+| TST-174 | 30.10.2026 | Flutter ana sayfa diff/upstream | PASS; sınırlar raporda | STATIC / GIT | `2026-10-30/TST-170-flutter-home-web-parity.md` |
 | TST-167 | 30.10.2026 | Mevcut staff request/refresh regresyonu | PASS; kapsam sınırları raporda | ISOLATED FETCH | `2026-10-30/TST-167-live-admin-login-diagnosis.md` |
 | TST-168 | 30.10.2026 | Canlı admin anonim erişim teşhisi | PASS; kapsam sınırları raporda | READ-ONLY LIVE | `2026-10-30/TST-167-live-admin-login-diagnosis.md` |
 | TST-169 | 30.10.2026 | Canlı admin Chrome ve IAB giriş ekranı | PASS; kapsam sınırları raporda | LIVE UI / NO LOGIN | `2026-10-30/TST-167-live-admin-login-diagnosis.md` |

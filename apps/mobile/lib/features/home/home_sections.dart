@@ -85,7 +85,7 @@ class _Steps extends StatelessWidget {
   }
 }
 
-/// Product with the sample design, a sample question card and the generated artwork, as on the web.
+/// Matches the web's small-screen rows: label, unobstructed product, then sample cards.
 class _Visual extends StatelessWidget {
   const _Visual();
   @override
@@ -94,76 +94,94 @@ class _Visual extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          height: 370,
+          key: const ValueKey('home-personalization-preview'),
+          padding: const EdgeInsets.all(14),
           decoration: const BoxDecoration(
             gradient: RadialGradient(center: Alignment(-.3, .7), radius: 1.1, colors: [Color(0xFFFAFAFA), Color(0xFFE7E8EA), Color(0xFFD7D9DD)], stops: [0, .45, 1]),
           ),
-          child: Stack(children: [
-            Positioned.fill(
-              left: 64,
-              top: 38,
-              child: Image.asset('assets/home/japanese-wave-product.png', fit: BoxFit.contain, semanticLabel: 'Japon dalga deseni uygulanmış Xinobi çay makinesi'),
-            ),
-            Positioned(
-              top: 16,
-              right: 16,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Align(
+              alignment: Alignment.centerRight,
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
                 decoration: BoxDecoration(color: XinobiTokens.surface, borderRadius: BorderRadius.circular(24)),
                 child: Text('Ürün üzerinde önizleme', style: inter(10, weight: 600)),
               ),
             ),
-            Positioned(
-              left: 10,
-              top: 85,
-              width: 145,
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: const Color(0xF2FFFFFF), borderRadius: BorderRadius.circular(12)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Sana nasıl bir tasarım yakışır?', style: inter(13, weight: 650, height: 1.2)),
-                  const SizedBox(height: 10),
-                  Text('Hangi tarz sana daha yakın?', style: inter(10)),
-                  const SizedBox(height: 6),
-                  for (final (symbol, label, chosen) in const [('◌', 'Minimal', false), ('♧', 'Doğadan ilham', false), ('∿', 'Soyut', true)])
-                    Container(
-                      margin: const EdgeInsets.only(top: 7),
-                      padding: const EdgeInsets.all(7),
-                      decoration: BoxDecoration(
-                        color: chosen ? const Color(0xFFFFEDF0) : null,
-                        border: Border.all(color: chosen ? XinobiTokens.cta : const Color(0xFFD6D6DA)),
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                      child: Row(children: [
-                        SizedBox(width: 22, child: Text(symbol, style: inter(18, height: 1))),
-                        const SizedBox(width: 6),
-                        Flexible(child: Text(label, style: inter(10, weight: 500))),
-                      ]),
-                    ),
-                ]),
-              ),
-            ),
-            Positioned(
-              right: 10,
-              bottom: 14,
-              width: 90,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: XinobiTokens.surface, borderRadius: BorderRadius.circular(12)),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('AI tasarımın', style: inter(11, weight: 700)),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    // Share the full-bleed artwork with the web marketing card.
-                    child: AspectRatio(aspectRatio: 1, child: Image.asset('assets/home/japanese-wave-artwork.png', fit: BoxFit.cover)),
+            const SizedBox(height: 14),
+            SizedBox(
+              key: const ValueKey('home-personalization-product'),
+              height: 300,
+              child: Stack(fit: StackFit.expand, children: [
+                Image.asset('assets/home/japanese-wave-product.png', fit: BoxFit.contain, semanticLabel: 'Japon dalga deseni uygulanmış Xinobi çay makinesi'),
+                Positioned(
+                  left: 8,
+                  bottom: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                    decoration: BoxDecoration(color: const Color(0xEBFFFFFF), border: Border.all(color: const Color(0xFFB0B0B0)), borderRadius: BorderRadius.circular(6)),
+                    child: Text('Temsilidir', style: inter(12, weight: 500, height: 1.4)),
                   ),
-                ]),
-              ),
+                ),
+              ]),
             ),
+            const SizedBox(height: 14),
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              const Expanded(child: _SampleQuestions()),
+              const SizedBox(width: 14),
+              SizedBox(
+                key: const ValueKey('home-personalization-artwork'),
+                width: 90,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(color: XinobiTokens.surface, borderRadius: BorderRadius.circular(12)),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('AI tasarımın', style: inter(11, weight: 700)),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: AspectRatio(aspectRatio: 1, child: Image.asset('assets/home/japanese-wave-artwork.png', fit: BoxFit.cover)),
+                    ),
+                  ]),
+                ),
+              ),
+            ]),
           ]),
         ),
       ),
+    );
+  }
+}
+
+class _SampleQuestions extends StatelessWidget {
+  const _SampleQuestions();
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      key: const ValueKey('home-personalization-questions'),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: const Color(0xF2FFFFFF), borderRadius: BorderRadius.circular(12)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('Sana nasıl bir tasarım yakışır?', style: inter(13, weight: 650, height: 1.2)),
+        const SizedBox(height: 10),
+        Text('Hangi tarz sana daha yakın?', style: inter(10)),
+        const SizedBox(height: 3),
+        for (final (symbol, label, chosen) in const [('◌', 'Minimal', false), ('♧', 'Doğadan ilham', false), ('∿', 'Soyut', true)])
+          Container(
+            margin: const EdgeInsets.only(top: 7),
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: chosen ? const Color(0xFFFFEDF0) : null,
+              border: Border.all(color: chosen ? XinobiTokens.cta : const Color(0xFFD6D6DA)),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: Row(children: [
+              SizedBox(width: 22, child: Text(symbol, style: inter(20, height: 1))),
+              const SizedBox(width: 8),
+              Flexible(child: Text(label, style: inter(10, weight: 500))),
+            ]),
+          ),
+      ]),
     );
   }
 }

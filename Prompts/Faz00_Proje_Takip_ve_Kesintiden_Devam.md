@@ -597,3 +597,9 @@ Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST
 ### WEB-07 - Web erişilebilirlik teknik düzenlemeleri / 30.10.2026
 
 [Task](../docs/tasks/web-07-accessibility-2026-10-30.md), [denetim matrisi](../design/a11y-audit.md), [TST-150...156](../test/2026-10-30/TST-150-web07-accessibility.md): görünür odak, mobil menü/Nobi/duyuru odak yönetimi, dialog klavye döngüsü, etkin ödeme düğmesi kontrastı ve büyük metin yerleşimleri düzeltildi. 320/390/768/1440 px'de 13 kritik sayfa (52 birleşim), toplam 27 benzersiz test son odaklı tekrarlarla başarılı; gerçek public katalogda 15 axe taraması başarılı. İlk başarısızlıklar ve son tekrarlar raporda korunur. Teknik bölüm tamamlandı; gerçek VoiceOver/TalkBack/fiziksel cihaz/zoom ve QA-03 tasarım/handoff kabulü açık. Faz yüzdeleri, ürün içeriği, ticari veri, API/mobil veya canlı kurulum değişmedi.
+
+## 30.10.2026 — KIS-01 fiziksel baskı profilleri
+
+Ürün/renk/yüz bazlı eksik ölçülü taslak, sürümlü kalibrasyon onayı/kaldırma, geçmiş okuma, mm/DPI/taşma/renk/format/korunan bölgeler ve fiziksel SVG referansı uygulandı. Yeni yerleşim ve siparişler değişmez profil kopyası/SHA alır. Pixel → mm ölçümü yalnız kalibre edilmiş düzlemsel referans içindir; manuel/kavisli üretim şablonuna otomatik baskı çıktısı iddiası yok. `productionReady=false`. Gerçek ürün verisine onay yazılmadı.
+
+[Uygulama ve kullanım](../docs/tasks/kis-01-print-profiles-2026-10-30.md), [test TST-157–166](../test/2026-10-30/TST-157-kis01-print-profiles.md). KAR-05 gerçek ölçüler ve üretim sahibi numune/konum kabulü açık; SQL fiziksel profil kabulü yapılmadı. KIS-05/06/07 üretim onayı/render/indirme ayrı kapsamdır. Web02 için kullanıcıdan beklenen 23 ürün içeriği açık kalır. Faz/PM/üretim kabulü tamamlandı sayılmaz.

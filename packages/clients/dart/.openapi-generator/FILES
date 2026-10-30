@@ -5,6 +5,7 @@ doc/AcceptAdminInvitation.md
 doc/AccountApi.md
 doc/AccountEmailVerification.md
 doc/AccountProfile.md
+doc/ActOnPrintProfile.md
 doc/AddFavorite.md
 doc/AdminApi.md
 doc/AdminCustomerDetails.md
@@ -67,6 +68,7 @@ doc/InboxItem.md
 doc/LoginAccount.md
 doc/LogoutSession.md
 doc/MarkNotificationsRead.md
+doc/MeasurePrintPlacement.md
 doc/Money.md
 doc/MyDesign.md
 doc/MyDesignConfiguration.md
@@ -81,6 +83,12 @@ doc/OrderStatusCount.md
 doc/PermissionCatalogResponse.md
 doc/PlaceOrder.md
 doc/PlaceOrderItem.md
+doc/PrintMeasurement.md
+doc/PrintProfileDefinition.md
+doc/PrintProfileRevision.md
+doc/PrintProfileSnapshot.md
+doc/PrintRect.md
+doc/PrintSetupSnapshot.md
 doc/ProblemDetails.md
 doc/ProductDetail.md
 doc/ProductPage.md
@@ -109,6 +117,7 @@ doc/ReviewSummaryList.md
 doc/SaveCustomerAddress.md
 doc/SaveDesignConfiguration.md
 doc/SaveDesignFromSession.md
+doc/SavePrintProfile.md
 doc/SetConfigurationFavorite.md
 doc/StaffOrder.md
 doc/StartAccountEmailVerification.md
@@ -149,6 +158,7 @@ lib/src/date_serializer.dart
 lib/src/model/accept_admin_invitation.dart
 lib/src/model/account_email_verification.dart
 lib/src/model/account_profile.dart
+lib/src/model/act_on_print_profile.dart
 lib/src/model/add_favorite.dart
 lib/src/model/admin_customer_details.dart
 lib/src/model/admin_customer_page.dart
@@ -208,6 +218,7 @@ lib/src/model/inbox_item.dart
 lib/src/model/login_account.dart
 lib/src/model/logout_session.dart
 lib/src/model/mark_notifications_read.dart
+lib/src/model/measure_print_placement.dart
 lib/src/model/money.dart
 lib/src/model/my_design.dart
 lib/src/model/my_design_configuration.dart
@@ -222,6 +233,12 @@ lib/src/model/order_status_count.dart
 lib/src/model/permission_catalog_response.dart
 lib/src/model/place_order.dart
 lib/src/model/place_order_item.dart
+lib/src/model/print_measurement.dart
+lib/src/model/print_profile_definition.dart
+lib/src/model/print_profile_revision.dart
+lib/src/model/print_profile_snapshot.dart
+lib/src/model/print_rect.dart
+lib/src/model/print_setup_snapshot.dart
 lib/src/model/problem_details.dart
 lib/src/model/product_detail.dart
 lib/src/model/product_page.dart
@@ -249,6 +266,7 @@ lib/src/model/review_summary_list.dart
 lib/src/model/save_customer_address.dart
 lib/src/model/save_design_configuration.dart
 lib/src/model/save_design_from_session.dart
+lib/src/model/save_print_profile.dart
 lib/src/model/set_configuration_favorite.dart
 lib/src/model/staff_order.dart
 lib/src/model/start_account_email_verification.dart

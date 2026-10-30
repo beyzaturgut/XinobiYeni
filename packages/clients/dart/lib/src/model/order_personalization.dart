@@ -4,6 +4,7 @@
 
 // ignore_for_file: unused_element
 import 'package:xinobi_api_client/src/model/design_placement.dart';
+import 'package:xinobi_api_client/src/model/print_setup_snapshot.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -23,6 +24,7 @@ part 'order_personalization.g.dart';
 /// * [configurationRevision]
 /// * [sourceSha256]
 /// * [sku]
+/// * [printSetup]
 @BuiltValue()
 abstract class OrderPersonalization implements Built<OrderPersonalization, OrderPersonalizationBuilder> {
   @BuiltValueField(wireName: r'designId')
@@ -57,6 +59,9 @@ abstract class OrderPersonalization implements Built<OrderPersonalization, Order
 
   @BuiltValueField(wireName: r'sku')
   String? get sku;
+
+  @BuiltValueField(wireName: r'printSetup')
+  PrintSetupSnapshot? get printSetup;
 
   OrderPersonalization._();
 
@@ -148,6 +153,13 @@ class _$OrderPersonalizationSerializer implements PrimitiveSerializer<OrderPerso
       yield serializers.serialize(
         object.sku,
         specifiedType: const FullType.nullable(String),
+      );
+    }
+    if (object.printSetup != null) {
+      yield r'printSetup';
+      yield serializers.serialize(
+        object.printSetup,
+        specifiedType: const FullType.nullable(PrintSetupSnapshot),
       );
     }
   }
@@ -256,6 +268,14 @@ class _$OrderPersonalizationSerializer implements PrimitiveSerializer<OrderPerso
           ) as String?;
           if (valueDes == null) continue;
           result.sku = valueDes;
+          break;
+        case r'printSetup':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(PrintSetupSnapshot),
+          ) as PrintSetupSnapshot?;
+          if (valueDes == null) continue;
+          result.printSetup.replace(valueDes);
           break;
         default:
           unhandled.add(key);

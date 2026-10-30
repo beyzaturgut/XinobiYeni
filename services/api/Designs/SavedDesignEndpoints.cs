@@ -16,11 +16,12 @@ public static class SavedDesignEndpoints
 
         me.MapGet("/design-configurations", async (ClaimsPrincipal user, SavedDesignStore designs) => TypedResults.Ok(await designs.Configurations(Id(user))))
             .WithName("ListMyDesignConfigurations");
-        me.MapPost("/designs/{id}/configurations", async (string id, SaveDesignConfiguration request, ClaimsPrincipal user, SavedDesignStore designs, DesignSurfaceValidator surfaces) =>
+        me.MapPost("/designs/{id}/configurations", async (string id, SaveDesignConfiguration request, ClaimsPrincipal user, SavedDesignStore designs, DesignSurfaceValidator surfaces, Print.PrintProfileStore profiles) =>
         {
             var design = await designs.Find(Id(user), id) ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
             await surfaces.Validate(design.ProductId, request.VariantId, request.Placement);
-            return TypedResults.Ok(await designs.SaveConfiguration(Id(user), id, request));
+            var printSetup = await profiles.Setup(design.ProductId, request.VariantId, request.Placement);
+            return TypedResults.Ok(await designs.SaveConfiguration(Id(user), id, request, printSetup));
         }).WithName("SaveMyDesignConfiguration");
         me.MapGet("/design-configurations/{id}/revisions/{revision:int}", async (string id, int revision, ClaimsPrincipal user, SavedDesignStore designs) =>
             TypedResults.Ok(await designs.Configuration(Id(user), id, revision))).WithName("GetMyDesignConfiguration");

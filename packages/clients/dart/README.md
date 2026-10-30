@@ -122,8 +122,10 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**updateMyAddress**](doc/AccountApi.md#updatemyaddress) | **PUT** /api/v1/me/addresses/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**uploadMyDesign**](doc/AccountApi.md#uploadmydesign) | **POST** /api/v1/me/designs/upload |
 [*AccountApi*](doc/AccountApi.md) | [**verifyAdminMfa**](doc/AccountApi.md#verifyadminmfa) | **POST** /api/v1/auth/admin/mfa/verify |
+[*AdminApi*](doc/AdminApi.md) | [**approvePrintProfile**](doc/AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[*AdminApi*](doc/AdminApi.md) | [**downloadPrintCalibration**](doc/AdminApi.md#downloadprintcalibration) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision}/calibration.svg |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminCustomer**](doc/AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminDesign**](doc/AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminDesignImage**](doc/AdminApi.md#getadmindesignimage) | **GET** /api/v1/admin/designs/{id}/image |
@@ -131,10 +133,15 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**getAdminReportSummary**](doc/AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
+[*AdminApi*](doc/AdminApi.md) | [**getPrintProfileRevision**](doc/AdminApi.md#getprintprofilerevision) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision} |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminCustomers**](doc/AdminApi.md#listadmincustomers) | **GET** /api/v1/admin/customers |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminDesignOrders**](doc/AdminApi.md#listadmindesignorders) | **GET** /api/v1/admin/designs/{id}/orders | Tasarım kimliğine bağlı sipariş referansları; müşteri bilgisi içermez.
 [*AdminApi*](doc/AdminApi.md) | [**listAdminDesigns**](doc/AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
+[*AdminApi*](doc/AdminApi.md) | [**listPrintProfiles**](doc/AdminApi.md#listprintprofiles) | **GET** /api/v1/admin/print-profiles |
+[*AdminApi*](doc/AdminApi.md) | [**measurePrintPlacement**](doc/AdminApi.md#measureprintplacement) | **POST** /api/v1/admin/print-profiles/{id}/revisions/{revision}/measure |
+[*AdminApi*](doc/AdminApi.md) | [**retirePrintProfile**](doc/AdminApi.md#retireprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/retire |
+[*AdminApi*](doc/AdminApi.md) | [**savePrintProfileDraft**](doc/AdminApi.md#saveprintprofiledraft) | **POST** /api/v1/admin/print-profiles |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConfig**](doc/AssistantApi.md#getassistantconfig) | **GET** /api/v1/assistant/config |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConversation**](doc/AssistantApi.md#getassistantconversation) | **GET** /api/v1/assistant/conversations/{id} |
 [*AssistantApi*](doc/AssistantApi.md) | [**requestAssistantHandoff**](doc/AssistantApi.md#requestassistanthandoff) | **POST** /api/v1/assistant/conversations/{id}/handoff |
@@ -167,6 +174,7 @@ Class | Method | HTTP request | Description
  - [AcceptAdminInvitation](doc/AcceptAdminInvitation.md)
  - [AccountEmailVerification](doc/AccountEmailVerification.md)
  - [AccountProfile](doc/AccountProfile.md)
+ - [ActOnPrintProfile](doc/ActOnPrintProfile.md)
  - [AddFavorite](doc/AddFavorite.md)
  - [AdminCustomerDetails](doc/AdminCustomerDetails.md)
  - [AdminCustomerPage](doc/AdminCustomerPage.md)
@@ -225,6 +233,7 @@ Class | Method | HTTP request | Description
  - [LoginAccount](doc/LoginAccount.md)
  - [LogoutSession](doc/LogoutSession.md)
  - [MarkNotificationsRead](doc/MarkNotificationsRead.md)
+ - [MeasurePrintPlacement](doc/MeasurePrintPlacement.md)
  - [Money](doc/Money.md)
  - [MyDesign](doc/MyDesign.md)
  - [MyDesignConfiguration](doc/MyDesignConfiguration.md)
@@ -239,6 +248,12 @@ Class | Method | HTTP request | Description
  - [PermissionCatalogResponse](doc/PermissionCatalogResponse.md)
  - [PlaceOrder](doc/PlaceOrder.md)
  - [PlaceOrderItem](doc/PlaceOrderItem.md)
+ - [PrintMeasurement](doc/PrintMeasurement.md)
+ - [PrintProfileDefinition](doc/PrintProfileDefinition.md)
+ - [PrintProfileRevision](doc/PrintProfileRevision.md)
+ - [PrintProfileSnapshot](doc/PrintProfileSnapshot.md)
+ - [PrintRect](doc/PrintRect.md)
+ - [PrintSetupSnapshot](doc/PrintSetupSnapshot.md)
  - [ProblemDetails](doc/ProblemDetails.md)
  - [ProductDetail](doc/ProductDetail.md)
  - [ProductPage](doc/ProductPage.md)
@@ -266,6 +281,7 @@ Class | Method | HTTP request | Description
  - [SaveCustomerAddress](doc/SaveCustomerAddress.md)
  - [SaveDesignConfiguration](doc/SaveDesignConfiguration.md)
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
+ - [SavePrintProfile](doc/SavePrintProfile.md)
  - [SetConfigurationFavorite](doc/SetConfigurationFavorite.md)
  - [StaffOrder](doc/StaffOrder.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)

@@ -20,7 +20,7 @@ public record DesignPlacement(int SourceWidth, int SourceHeight, string SurfaceV
 public record SaveDesignConfiguration(string VariantId, DesignPlacement Placement, string? ConfigurationId = null, int? ExpectedRevision = null, bool Favorite = false);
 /// <summary>Immutable revision of a customer's product/variant placement. SchemaVersion describes placement, not the mask.</summary>
 public record MyDesignConfiguration(string Id, string DesignId, string ProductId, string VariantId, int Revision, int SchemaVersion,
-    DesignPlacement Placement, bool Favorite, string SourceSha256, DateTimeOffset CreatedAt);
+    DesignPlacement Placement, bool Favorite, string SourceSha256, DateTimeOffset CreatedAt, Print.PrintSetupSnapshot? PrintSetup = null);
 public record SetConfigurationFavorite(bool Favorite);
 
 public static class PlacementRules
@@ -130,7 +130,7 @@ public sealed partial class SavedDesignStore
     public async Task<MyDesignConfiguration> Configuration(string accountId, string id, int revision) =>
         (await store.Read()).Configurations.FirstOrDefault(item => item.AccountId == accountId && item.Value.Id == id && item.Value.Revision == revision)?.Value
             ?? throw ProblemException.NotFound("configuration_not_found", "Tasarım yerleşimi bulunamadı.");
-    public async Task<MyDesignConfiguration> SaveConfiguration(string accountId, string designId, SaveDesignConfiguration request)
+    public async Task<MyDesignConfiguration> SaveConfiguration(string accountId, string designId, SaveDesignConfiguration request, Print.PrintSetupSnapshot? printSetup = null)
     {
         PlacementRules.Validate(request.Placement);
         var design = await Find(accountId, designId) ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
@@ -145,7 +145,7 @@ public sealed partial class SavedDesignStore
                 throw new ProblemException("configuration_changed", "Yerleşim başka bir işlemde değişti. Yeniden aç.", 409);
             if (state.Configurations.Count(c => c.AccountId == accountId) >= 1000) throw new ProblemException("configuration_limit", "Yerleşim kayıt sınırına ulaşıldı.", 409);
             var saved = new MyDesignConfiguration(existing?.Id ?? Guid.NewGuid().ToString("N"), designId, design.ProductId, request.VariantId,
-                (existing?.Revision ?? 0) + 1, 1, request.Placement, request.Favorite, sha, clock.GetUtcNow());
+                (existing?.Revision ?? 0) + 1, 1, request.Placement, request.Favorite, sha, clock.GetUtcNow(), printSetup);
             state.Configurations.Add(new(accountId, saved)); return saved;
         });
     }

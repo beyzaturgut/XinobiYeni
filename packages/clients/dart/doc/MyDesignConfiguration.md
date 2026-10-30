@@ -18,5 +18,6 @@ Name | Type | Description | Notes
 **favorite** | **bool** |  |
 **sourceSha256** | **String** |  |
 **createdAt** | [**DateTime**](DateTime.md) |  |
+**printSetup** | [**PrintSetupSnapshot**](PrintSetupSnapshot.md) |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

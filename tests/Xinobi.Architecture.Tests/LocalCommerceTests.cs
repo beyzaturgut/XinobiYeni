@@ -10,7 +10,7 @@ namespace Xinobi.Architecture.Tests;
 public sealed class LocalCommerceTests : IDisposable
 {
     private readonly string dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-commerce-test-" + Guid.NewGuid());
-    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new IsolatedApiFactory().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new IsolatedApiFactory(dataDirectory).WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = dataDirectory }));

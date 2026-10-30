@@ -17,6 +17,7 @@ import 'package:xinobi_api_client/src/model/date.dart';
 import 'package:xinobi_api_client/src/model/accept_admin_invitation.dart';
 import 'package:xinobi_api_client/src/model/account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/account_profile.dart';
+import 'package:xinobi_api_client/src/model/act_on_print_profile.dart';
 import 'package:xinobi_api_client/src/model/add_favorite.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_details.dart';
 import 'package:xinobi_api_client/src/model/admin_customer_page.dart';
@@ -75,6 +76,7 @@ import 'package:xinobi_api_client/src/model/inbox_item.dart';
 import 'package:xinobi_api_client/src/model/login_account.dart';
 import 'package:xinobi_api_client/src/model/logout_session.dart';
 import 'package:xinobi_api_client/src/model/mark_notifications_read.dart';
+import 'package:xinobi_api_client/src/model/measure_print_placement.dart';
 import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:xinobi_api_client/src/model/my_design.dart';
 import 'package:xinobi_api_client/src/model/my_design_configuration.dart';
@@ -89,6 +91,12 @@ import 'package:xinobi_api_client/src/model/order_status_count.dart';
 import 'package:xinobi_api_client/src/model/permission_catalog_response.dart';
 import 'package:xinobi_api_client/src/model/place_order.dart';
 import 'package:xinobi_api_client/src/model/place_order_item.dart';
+import 'package:xinobi_api_client/src/model/print_measurement.dart';
+import 'package:xinobi_api_client/src/model/print_profile_definition.dart';
+import 'package:xinobi_api_client/src/model/print_profile_revision.dart';
+import 'package:xinobi_api_client/src/model/print_profile_snapshot.dart';
+import 'package:xinobi_api_client/src/model/print_rect.dart';
+import 'package:xinobi_api_client/src/model/print_setup_snapshot.dart';
 import 'package:xinobi_api_client/src/model/problem_details.dart';
 import 'package:xinobi_api_client/src/model/product_detail.dart';
 import 'package:xinobi_api_client/src/model/product_page.dart';
@@ -116,6 +124,7 @@ import 'package:xinobi_api_client/src/model/review_summary_list.dart';
 import 'package:xinobi_api_client/src/model/save_customer_address.dart';
 import 'package:xinobi_api_client/src/model/save_design_configuration.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
+import 'package:xinobi_api_client/src/model/save_print_profile.dart';
 import 'package:xinobi_api_client/src/model/set_configuration_favorite.dart';
 import 'package:xinobi_api_client/src/model/staff_order.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
@@ -142,6 +151,7 @@ part 'serializers.g.dart';
   AcceptAdminInvitation,
   AccountEmailVerification,
   AccountProfile,
+  ActOnPrintProfile,
   AddFavorite,
   AdminCustomerDetails,
   AdminCustomerPage,
@@ -200,6 +210,7 @@ part 'serializers.g.dart';
   LoginAccount,
   LogoutSession,
   MarkNotificationsRead,
+  MeasurePrintPlacement,
   Money,
   MyDesign,
   MyDesignConfiguration,
@@ -214,6 +225,12 @@ part 'serializers.g.dart';
   PermissionCatalogResponse,
   PlaceOrder,
   PlaceOrderItem,
+  PrintMeasurement,
+  PrintProfileDefinition,
+  PrintProfileRevision,
+  PrintProfileSnapshot,
+  PrintRect,
+  PrintSetupSnapshot,
   ProblemDetails,
   ProductDetail,
   ProductPage,
@@ -241,6 +258,7 @@ part 'serializers.g.dart';
   SaveCustomerAddress,
   SaveDesignConfiguration,
   SaveDesignFromSession,
+  SavePrintProfile,
   SetConfigurationFavorite,
   StaffOrder,
   StartAccountEmailVerification,
@@ -379,6 +397,10 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<AuditEntry>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PrintProfileRevision)]),
+        () => ListBuilder<PrintProfileRevision>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OrderRequestLine)]),
         () => ListBuilder<OrderRequestLine>(),
       )
@@ -391,12 +413,20 @@ Serializers serializers = (_$serializers.toBuilder()
         () => ListBuilder<VariantDetail>(),
       )
       ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PrintRect)]),
+        () => ListBuilder<PrintRect>(),
+      )
+      ..addBuilderFactory(
         const FullType(BuiltList, [FullType(AdminDesignOrderReference)]),
         () => ListBuilder<AdminDesignOrderReference>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(CustomerOrderLine)]),
         () => ListBuilder<CustomerOrderLine>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(PrintProfileSnapshot)]),
+        () => ListBuilder<PrintProfileSnapshot>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(XinobiUAnswer)]),

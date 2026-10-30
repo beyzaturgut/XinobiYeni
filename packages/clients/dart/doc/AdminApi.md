@@ -9,8 +9,10 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**approvePrintProfile**](AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [**assignAdminRole**](AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [**createAdminInvitation**](AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[**downloadPrintCalibration**](AdminApi.md#downloadprintcalibration) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision}/calibration.svg |
 [**getAdminCustomer**](AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [**getAdminDesign**](AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |
 [**getAdminDesignImage**](AdminApi.md#getadmindesignimage) | **GET** /api/v1/admin/designs/{id}/image |
@@ -18,11 +20,59 @@ Method | HTTP request | Description
 [**getAdminReportSummary**](AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [**getAdminSession**](AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
+[**getPrintProfileRevision**](AdminApi.md#getprintprofilerevision) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision} |
 [**listAdminAudit**](AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
 [**listAdminCustomers**](AdminApi.md#listadmincustomers) | **GET** /api/v1/admin/customers |
 [**listAdminDesignOrders**](AdminApi.md#listadmindesignorders) | **GET** /api/v1/admin/designs/{id}/orders | Tasarım kimliğine bağlı sipariş referansları; müşteri bilgisi içermez.
 [**listAdminDesigns**](AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
+[**listPrintProfiles**](AdminApi.md#listprintprofiles) | **GET** /api/v1/admin/print-profiles |
+[**measurePrintPlacement**](AdminApi.md#measureprintplacement) | **POST** /api/v1/admin/print-profiles/{id}/revisions/{revision}/measure |
+[**retirePrintProfile**](AdminApi.md#retireprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/retire |
+[**savePrintProfileDraft**](AdminApi.md#saveprintprofiledraft) | **POST** /api/v1/admin/print-profiles |
 
+
+# **approvePrintProfile**
+> PrintProfileRevision approvePrintProfile(id, actOnPrintProfile)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final ActOnPrintProfile actOnPrintProfile = ; // ActOnPrintProfile |
+
+try {
+    final response = api.approvePrintProfile(id, actOnPrintProfile);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->approvePrintProfile: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **actOnPrintProfile** | [**ActOnPrintProfile**](ActOnPrintProfile.md)|  |
+
+### Return type
+
+[**PrintProfileRevision**](PrintProfileRevision.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **assignAdminRole**
 > AdminSession assignAdminRole(assignAdminRole)
@@ -103,6 +153,49 @@ No authorization required
 
  - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **downloadPrintCalibration**
+> Uint8List downloadPrintCalibration(id, revision)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final int revision = 56; // int |
+
+try {
+    final response = api.downloadPrintCalibration(id, revision);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->downloadPrintCalibration: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **revision** | **int**|  |
+
+### Return type
+
+[**Uint8List**](Uint8List.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, image/svg+xml
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
@@ -389,6 +482,49 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getPrintProfileRevision**
+> PrintProfileRevision getPrintProfileRevision(id, revision)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final int revision = 56; // int |
+
+try {
+    final response = api.getPrintProfileRevision(id, revision);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getPrintProfileRevision: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **revision** | **int**|  |
+
+### Return type
+
+[**PrintProfileRevision**](PrintProfileRevision.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **listAdminAudit**
 > AuditPage listAdminAudit(action, actorId, from, to, page, pageSize)
 
@@ -569,6 +705,172 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **listPrintProfiles**
+> BuiltList<PrintProfileRevision> listPrintProfiles()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+
+try {
+    final response = api.listPrintProfiles();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->listPrintProfiles: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**BuiltList&lt;PrintProfileRevision&gt;**](PrintProfileRevision.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **measurePrintPlacement**
+> PrintMeasurement measurePrintPlacement(id, revision, measurePrintPlacement)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final int revision = 56; // int |
+final MeasurePrintPlacement measurePrintPlacement = ; // MeasurePrintPlacement |
+
+try {
+    final response = api.measurePrintPlacement(id, revision, measurePrintPlacement);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->measurePrintPlacement: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **revision** | **int**|  |
+ **measurePrintPlacement** | [**MeasurePrintPlacement**](MeasurePrintPlacement.md)|  |
+
+### Return type
+
+[**PrintMeasurement**](PrintMeasurement.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **retirePrintProfile**
+> PrintProfileRevision retirePrintProfile(id, actOnPrintProfile)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final ActOnPrintProfile actOnPrintProfile = ; // ActOnPrintProfile |
+
+try {
+    final response = api.retirePrintProfile(id, actOnPrintProfile);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->retirePrintProfile: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **actOnPrintProfile** | [**ActOnPrintProfile**](ActOnPrintProfile.md)|  |
+
+### Return type
+
+[**PrintProfileRevision**](PrintProfileRevision.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **savePrintProfileDraft**
+> PrintProfileRevision savePrintProfileDraft(savePrintProfile)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final SavePrintProfile savePrintProfile = ; // SavePrintProfile |
+
+try {
+    final response = api.savePrintProfileDraft(savePrintProfile);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->savePrintProfileDraft: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **savePrintProfile** | [**SavePrintProfile**](SavePrintProfile.md)|  |
+
+### Return type
+
+[**PrintProfileRevision**](PrintProfileRevision.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

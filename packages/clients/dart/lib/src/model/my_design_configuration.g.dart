@@ -27,6 +27,8 @@ class _$MyDesignConfiguration extends MyDesignConfiguration {
   final String sourceSha256;
   @override
   final DateTime createdAt;
+  @override
+  final PrintSetupSnapshot? printSetup;
 
   factory _$MyDesignConfiguration(
           [void Function(MyDesignConfigurationBuilder)? updates]) =>
@@ -42,7 +44,8 @@ class _$MyDesignConfiguration extends MyDesignConfiguration {
       required this.placement,
       required this.favorite,
       required this.sourceSha256,
-      required this.createdAt})
+      required this.createdAt,
+      this.printSetup})
       : super._();
   @override
   MyDesignConfiguration rebuild(
@@ -66,7 +69,8 @@ class _$MyDesignConfiguration extends MyDesignConfiguration {
         placement == other.placement &&
         favorite == other.favorite &&
         sourceSha256 == other.sourceSha256 &&
-        createdAt == other.createdAt;
+        createdAt == other.createdAt &&
+        printSetup == other.printSetup;
   }
 
   @override
@@ -82,6 +86,7 @@ class _$MyDesignConfiguration extends MyDesignConfiguration {
     _$hash = $jc(_$hash, favorite.hashCode);
     _$hash = $jc(_$hash, sourceSha256.hashCode);
     _$hash = $jc(_$hash, createdAt.hashCode);
+    _$hash = $jc(_$hash, printSetup.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -98,7 +103,8 @@ class _$MyDesignConfiguration extends MyDesignConfiguration {
           ..add('placement', placement)
           ..add('favorite', favorite)
           ..add('sourceSha256', sourceSha256)
-          ..add('createdAt', createdAt))
+          ..add('createdAt', createdAt)
+          ..add('printSetup', printSetup))
         .toString();
   }
 }
@@ -150,6 +156,12 @@ class MyDesignConfigurationBuilder
   DateTime? get createdAt => _$this._createdAt;
   set createdAt(DateTime? createdAt) => _$this._createdAt = createdAt;
 
+  PrintSetupSnapshotBuilder? _printSetup;
+  PrintSetupSnapshotBuilder get printSetup =>
+      _$this._printSetup ??= PrintSetupSnapshotBuilder();
+  set printSetup(PrintSetupSnapshotBuilder? printSetup) =>
+      _$this._printSetup = printSetup;
+
   MyDesignConfigurationBuilder() {
     MyDesignConfiguration._defaults(this);
   }
@@ -167,6 +179,7 @@ class MyDesignConfigurationBuilder
       _favorite = $v.favorite;
       _sourceSha256 = $v.sourceSha256;
       _createdAt = $v.createdAt;
+      _printSetup = $v.printSetup?.toBuilder();
       _$v = null;
     }
     return this;
@@ -209,12 +222,16 @@ class MyDesignConfigurationBuilder
                 sourceSha256, r'MyDesignConfiguration', 'sourceSha256'),
             createdAt: BuiltValueNullFieldError.checkNotNull(
                 createdAt, r'MyDesignConfiguration', 'createdAt'),
+            printSetup: _printSetup?.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'placement';
         placement.build();
+
+        _$failedField = 'printSetup';
+        _printSetup?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'MyDesignConfiguration', _$failedField, e.toString());

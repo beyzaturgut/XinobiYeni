@@ -17,7 +17,7 @@ public sealed class AuditTrailTests : IDisposable
     private readonly string dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-audit-test-" + Guid.NewGuid());
     private const string Root = "/api/v1/local-commerce";
 
-    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory(dataDirectory).WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = dataDirectory }));

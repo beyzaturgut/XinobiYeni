@@ -13,7 +13,16 @@ namespace Xinobi.Architecture.Tests;
 /// <summary>Keeps API tests on isolated files; no owner's catalog marker, accounts, notification worker or SQL queries.</summary>
 public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
 {
-    private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-isolated-api-" + Guid.NewGuid());
+    private readonly string? sharedDirectory;
+    private readonly string directory;
+    private readonly bool seedDemo;
+    public IsolatedApiFactory() : this(null) { }
+    internal IsolatedApiFactory(string? sharedDirectory, bool seedDemo = true)
+    {
+        this.sharedDirectory = sharedDirectory;
+        this.seedDemo = seedDemo;
+        directory = sharedDirectory ?? Path.Combine(Path.GetTempPath(), "xinobi-isolated-api-" + Guid.NewGuid());
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -23,7 +32,7 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
             ["LocalCommerce:DataDirectory"] = directory,
             ["ConnectionStrings:Xinobi"] = "",
             ["Catalog:StorageProvider"] = "File",
-            ["LocalCommerce:SeedFile"] = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"))
+            ["LocalCommerce:SeedFile"] = seedDemo ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json")) : null
         }));
         builder.ConfigureServices((context, services) =>
         {
@@ -32,7 +41,7 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
             if (context.HostingEnvironment.IsDevelopment())
             {
                 context.Configuration["LocalCommerce:DataDirectory"] = directory;
-                context.Configuration["LocalCommerce:SeedFile"] = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json"));
+                context.Configuration["LocalCommerce:SeedFile"] = seedDemo ? Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../../tests/fixtures/demo-commerce.json")) : null;
                 context.Configuration["ConnectionStrings:Xinobi"] = "";
                 context.Configuration["Catalog:StorageProvider"] = "File";
                 context.Configuration["Accounts:StorageProvider"] = "File";
@@ -48,6 +57,6 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
     protected override void Dispose(bool disposing)
     {
         base.Dispose(disposing);
-        if (disposing && Directory.Exists(directory)) Directory.Delete(directory, true);
+        if (disposing && sharedDirectory is null && Directory.Exists(directory)) Directory.Delete(directory, true);
     }
 }

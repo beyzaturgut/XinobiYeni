@@ -4,6 +4,7 @@
 
 // ignore_for_file: unused_element
 import 'package:xinobi_api_client/src/model/design_placement.dart';
+import 'package:xinobi_api_client/src/model/print_setup_snapshot.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -22,6 +23,7 @@ part 'my_design_configuration.g.dart';
 /// * [favorite]
 /// * [sourceSha256]
 /// * [createdAt]
+/// * [printSetup]
 @BuiltValue()
 abstract class MyDesignConfiguration implements Built<MyDesignConfiguration, MyDesignConfigurationBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -53,6 +55,9 @@ abstract class MyDesignConfiguration implements Built<MyDesignConfiguration, MyD
 
   @BuiltValueField(wireName: r'createdAt')
   DateTime get createdAt;
+
+  @BuiltValueField(wireName: r'printSetup')
+  PrintSetupSnapshot? get printSetup;
 
   MyDesignConfiguration._();
 
@@ -127,6 +132,13 @@ class _$MyDesignConfigurationSerializer implements PrimitiveSerializer<MyDesignC
       object.createdAt,
       specifiedType: const FullType(DateTime),
     );
+    if (object.printSetup != null) {
+      yield r'printSetup';
+      yield serializers.serialize(
+        object.printSetup,
+        specifiedType: const FullType.nullable(PrintSetupSnapshot),
+      );
+    }
   }
 
   @override
@@ -219,6 +231,14 @@ class _$MyDesignConfigurationSerializer implements PrimitiveSerializer<MyDesignC
             specifiedType: const FullType(DateTime),
           ) as DateTime;
           result.createdAt = valueDes;
+          break;
+        case r'printSetup':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(PrintSetupSnapshot),
+          ) as PrintSetupSnapshot?;
+          if (valueDes == null) continue;
+          result.printSetup.replace(valueDes);
           break;
         default:
           unhandled.add(key);

@@ -4182,6 +4182,335 @@
         }
       }
     },
+    "/api/v1/admin/print-profiles": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "ListPrintProfiles",
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PrintProfileRevision"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "SavePrintProfileDraft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SavePrintProfile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintProfileRevision"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/print-profiles/{id}/revisions/{revision}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "GetPrintProfileRevision",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintProfileRevision"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/print-profiles/{id}/approve": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "ApprovePrintProfile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActOnPrintProfile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintProfileRevision"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/print-profiles/{id}/retire": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "RetirePrintProfile",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ActOnPrintProfile"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintProfileRevision"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/print-profiles/{id}/revisions/{revision}/measure": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "MeasurePrintPlacement",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeasurePrintPlacement"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrintMeasurement"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/print-profiles/{id}/revisions/{revision}/calibration.svg": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "DownloadPrintCalibration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "revision",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Physical calibration reference only; not production artwork",
+            "content": {
+              "image/svg+xml": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/designs/{id}/orders": {
       "get": {
         "tags": [
@@ -4941,6 +5270,26 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "ActOnPrintProfile": {
+        "required": [
+          "expectedRevision",
+          "evidenceReference",
+          "note"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "evidenceReference": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
           }
         }
       },
@@ -6662,6 +7011,62 @@
           }
         }
       },
+      "MeasurePrintPlacement": {
+        "required": [
+          "sourceWidth",
+          "sourceHeight",
+          "surfaceVersion",
+          "x",
+          "y",
+          "artworkWidthPx",
+          "artworkHeightPx",
+          "rotation",
+          "artworkPixelWidth",
+          "artworkPixelHeight"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceWidth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sourceHeight": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "surfaceVersion": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number",
+            "format": "double"
+          },
+          "y": {
+            "type": "number",
+            "format": "double"
+          },
+          "artworkWidthPx": {
+            "type": "number",
+            "format": "double"
+          },
+          "artworkHeightPx": {
+            "type": "number",
+            "format": "double"
+          },
+          "rotation": {
+            "type": "number",
+            "format": "double"
+          },
+          "artworkPixelWidth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "artworkPixelHeight": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "Money": {
         "required": [
           "amountMinor",
@@ -6782,6 +7187,16 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "printSetup": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PrintSetupSnapshot"
+              }
+            ]
           }
         }
       },
@@ -6959,6 +7374,16 @@
             "type": [
               "null",
               "string"
+            ]
+          },
+          "printSetup": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PrintSetupSnapshot"
+              }
             ]
           }
         }
@@ -7164,6 +7589,340 @@
               "integer"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "PrintMeasurement": {
+        "required": [
+          "centerXmm",
+          "centerYmm",
+          "widthMm",
+          "heightMm",
+          "dpiX",
+          "dpiY",
+          "requiredWidthPx",
+          "requiredHeightPx",
+          "fitsSafeArea",
+          "meetsDpi",
+          "intersectsExclusion"
+        ],
+        "type": "object",
+        "properties": {
+          "centerXmm": {
+            "type": "number",
+            "format": "double"
+          },
+          "centerYmm": {
+            "type": "number",
+            "format": "double"
+          },
+          "widthMm": {
+            "type": "number",
+            "format": "double"
+          },
+          "heightMm": {
+            "type": "number",
+            "format": "double"
+          },
+          "dpiX": {
+            "type": "number",
+            "format": "double"
+          },
+          "dpiY": {
+            "type": "number",
+            "format": "double"
+          },
+          "requiredWidthPx": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "requiredHeightPx": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fitsSafeArea": {
+            "type": "boolean"
+          },
+          "meetsDpi": {
+            "type": "boolean"
+          },
+          "intersectsExclusion": {
+            "type": "boolean"
+          },
+          "productionReady": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "PrintProfileDefinition": {
+        "required": [
+          "productId",
+          "variantId",
+          "face",
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "variantId": {
+            "type": "string"
+          },
+          "face": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "widthMm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "heightMm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "dpi": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "bleedMm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "safeInsetMm": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
+          },
+          "process": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "colorSpace": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "colorProfile": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "outputFormat": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "allowTransparency": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "sourceWidth": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "sourceHeight": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "surfaceVersion": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "referenceRectPx": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PrintRect"
+              }
+            ]
+          },
+          "mappingKind": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "templateReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "exclusionsMm": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/PrintRect"
+            }
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PrintProfileRevision": {
+        "required": [
+          "id",
+          "revision",
+          "status",
+          "sku",
+          "definition",
+          "actorId",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/PrintProfileDefinition"
+          },
+          "actorId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "evidenceReference": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "decisionNote": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PrintProfileSnapshot": {
+        "required": [
+          "id",
+          "revision",
+          "sku",
+          "definition",
+          "sha256"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sku": {
+            "type": "string"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/PrintProfileDefinition"
+          },
+          "sha256": {
+            "type": "string"
+          }
+        }
+      },
+      "PrintRect": {
+        "required": [
+          "x",
+          "y",
+          "width",
+          "height"
+        ],
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "format": "double"
+          },
+          "y": {
+            "type": "number",
+            "format": "double"
+          },
+          "width": {
+            "type": "number",
+            "format": "double"
+          },
+          "height": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "PrintSetupSnapshot": {
+        "required": [
+          "status",
+          "profiles"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrintProfileSnapshot"
+            }
+          },
+          "productionReady": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -8019,6 +8778,32 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "SavePrintProfile": {
+        "required": [
+          "id",
+          "expectedRevision",
+          "definition"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expectedRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "definition": {
+            "$ref": "#/components/schemas/PrintProfileDefinition"
           }
         }
       },

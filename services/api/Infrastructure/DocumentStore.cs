@@ -43,7 +43,7 @@ public sealed class FeatureDocuments(IWebHostEnvironment environment, IConfigura
 {
     public const string Marker = "features-sql.enabled";
     /// <summary>Every feature document, by its file under the data directory. The SQL name is the file name without extension.</summary>
-    public static readonly string[] Files = ["notifications/notifications.json", "reviews/reviews.json", "quotes/quotes.json", "designs/designs.json", "assistant/assistant.json"];
+    public static readonly string[] Files = ["notifications/notifications.json", "reviews/reviews.json", "quotes/quotes.json", "designs/designs.json", "assistant/assistant.json", "print/print-profiles.json"];
 
     public string? DataDirectory { get; } = environment.IsDevelopment()
         ? configuration["LocalCommerce:DataDirectory"] ?? Path.Combine(environment.ContentRootPath, "App_Data", "local-commerce")

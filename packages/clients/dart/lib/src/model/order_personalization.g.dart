@@ -29,6 +29,8 @@ class _$OrderPersonalization extends OrderPersonalization {
   final String? sourceSha256;
   @override
   final String? sku;
+  @override
+  final PrintSetupSnapshot? printSetup;
 
   factory _$OrderPersonalization(
           [void Function(OrderPersonalizationBuilder)? updates]) =>
@@ -45,7 +47,8 @@ class _$OrderPersonalization extends OrderPersonalization {
       this.configurationId,
       this.configurationRevision,
       this.sourceSha256,
-      this.sku})
+      this.sku,
+      this.printSetup})
       : super._();
   @override
   OrderPersonalization rebuild(
@@ -70,7 +73,8 @@ class _$OrderPersonalization extends OrderPersonalization {
         configurationId == other.configurationId &&
         configurationRevision == other.configurationRevision &&
         sourceSha256 == other.sourceSha256 &&
-        sku == other.sku;
+        sku == other.sku &&
+        printSetup == other.printSetup;
   }
 
   @override
@@ -87,6 +91,7 @@ class _$OrderPersonalization extends OrderPersonalization {
     _$hash = $jc(_$hash, configurationRevision.hashCode);
     _$hash = $jc(_$hash, sourceSha256.hashCode);
     _$hash = $jc(_$hash, sku.hashCode);
+    _$hash = $jc(_$hash, printSetup.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -104,7 +109,8 @@ class _$OrderPersonalization extends OrderPersonalization {
           ..add('configurationId', configurationId)
           ..add('configurationRevision', configurationRevision)
           ..add('sourceSha256', sourceSha256)
-          ..add('sku', sku))
+          ..add('sku', sku)
+          ..add('printSetup', printSetup))
         .toString();
   }
 }
@@ -162,6 +168,12 @@ class OrderPersonalizationBuilder
   String? get sku => _$this._sku;
   set sku(String? sku) => _$this._sku = sku;
 
+  PrintSetupSnapshotBuilder? _printSetup;
+  PrintSetupSnapshotBuilder get printSetup =>
+      _$this._printSetup ??= PrintSetupSnapshotBuilder();
+  set printSetup(PrintSetupSnapshotBuilder? printSetup) =>
+      _$this._printSetup = printSetup;
+
   OrderPersonalizationBuilder() {
     OrderPersonalization._defaults(this);
   }
@@ -180,6 +192,7 @@ class OrderPersonalizationBuilder
       _configurationRevision = $v.configurationRevision;
       _sourceSha256 = $v.sourceSha256;
       _sku = $v.sku;
+      _printSetup = $v.printSetup?.toBuilder();
       _$v = null;
     }
     return this;
@@ -218,12 +231,16 @@ class OrderPersonalizationBuilder
             configurationRevision: configurationRevision,
             sourceSha256: sourceSha256,
             sku: sku,
+            printSetup: _printSetup?.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'placement';
         _placement?.build();
+
+        _$failedField = 'printSetup';
+        _printSetup?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'OrderPersonalization', _$failedField, e.toString());

@@ -15,7 +15,7 @@ public sealed class CatalogTests : IDisposable
 {
     private readonly string dataDirectory = Path.Combine(Path.GetTempPath(), "xinobi-catalog-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> CreateFactory(string environment = "Development") => new IsolatedApiFactory().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> CreateFactory(string environment = "Development", bool seedDemo = true) => new IsolatedApiFactory(dataDirectory, seedDemo).WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = dataDirectory }));
@@ -24,8 +24,7 @@ public sealed class CatalogTests : IDisposable
     [Fact]
     public async Task DefaultSeedHasNoDemoProductsAndExistingStateIsPreserved()
     {
-        using var factory = CreateFactory().WithWebHostBuilder(builder =>
-            builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:SeedFile"] = null })));
+        using var factory = CreateFactory(seedDemo: false);
         using var client = factory.CreateClient();
         var empty = (await client.GetFromJsonAsync<CommerceState>("/api/v1/catalog/storefront"))!;
         Assert.Empty(empty.Products);

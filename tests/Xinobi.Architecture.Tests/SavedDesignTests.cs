@@ -20,7 +20,7 @@ public sealed class SavedDesignTests : IDisposable
     private static readonly byte[] Png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-saved-design-test-" + Guid.NewGuid());
 
-    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory().WithWebHostBuilder(builder =>
+    private WebApplicationFactory<Program> Factory() => new IsolatedApiFactory(directory).WithWebHostBuilder(builder =>
     {
         builder.UseEnvironment("Development");
         builder.UseSetting("Notifications:WorkerEnabled", "false");
@@ -28,6 +28,8 @@ public sealed class SavedDesignTests : IDisposable
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory, ["DesignStudio:ExternalInferenceEnabled"] = "false", ["ProductSurfaces:PublishedRoot"] = Path.Combine(directory, "published") }));
         builder.ConfigureServices(services =>
         {
+            // Keep the fixture's explicit directory authoritative for image/preview cleanup assertions.
+            services.RemoveAll<IFileStore>(); services.AddSingleton<IFileStore>(new LocalFileStore(directory));
             services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender>(new PreviewSender());
             services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(new FakeProvider());
         });
@@ -238,6 +240,9 @@ public sealed class SavedDesignTests : IDisposable
         }));
         var placement = new DesignPlacement(100, 100, version, 25, 35, 1.2, 15, .4,
             new() { ["upper-body"] = new(2, 3, .8, 4) }, "artwork", false);
+        var printProfiles=factory.Services.GetRequiredService<Xinobi.Api.Print.PrintProfileStore>();
+        var printDraft=await printProfiles.Save(new(null,null,new Xinobi.Api.Print.PrintProfileDefinition(product.Id,design.VariantId!,"front","Synthetic calibration only",100,100,100,0,0,"test","RGB","test profile","PNG",false,100,100,version,new(0,0,100,100),"manual-template","SYNTHETIC-TEMPLATE",[])),"fixture");
+        var printApproved=await printProfiles.Decide(printDraft.Id,new(1,"SYNTHETIC-TEST-EVIDENCE","not a real production approval"),"fixture",true,factory.Services.GetRequiredService<DesignSurfaceValidator>());
         var route = $"/api/v1/me/designs/{design.Id}/configurations";
         Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Post, route, other, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement)))).StatusCode);
         Assert.Equal("invalid_placement", await Code(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement with { Scale = -1 })))));
@@ -247,6 +252,7 @@ public sealed class SavedDesignTests : IDisposable
         await File.WriteAllBytesAsync(Path.Combine(root, mediaVersion, "mask.png"), Png);
         var first = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Post, route, token, JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, Favorite: true))));
         Assert.Equal(1, first.Revision); Assert.Equal(64, first.SourceSha256.Length);
+        Assert.Equal("reference-ready",first.PrintSetup!.Status);Assert.Equal(printApproved.Revision,first.PrintSetup.Profiles.Single().Revision);Assert.False(first.PrintSetup.ProductionReady);
         var previewRoute = $"/api/v1/me/design-configurations/{first.Id}/revisions/1/preview";
         byte[] jpegPreview = [255, 216, 255, 217];
         using var previewUpload = new MultipartFormDataContent { { new ByteArrayContent(jpegPreview), "file", "preview.jpg" } };
@@ -262,6 +268,8 @@ public sealed class SavedDesignTests : IDisposable
         var request = new PlaceOrder(address.Id, [new(product.Id, design.VariantId!, 2, design.Id, first.Id, first.Revision)], "configuration-request-1");
         var order = await Read<CustomerOrder>(await Send(client, HttpMethod.Post, "/api/v1/me/orders", token, JsonContent.Create(request)));
         Assert.Equal(placement, order.Lines[0].Personalization!.Placement! with { BodyAdjustments = placement.BodyAdjustments });
+        Assert.Equal(first.PrintSetup!.Profiles.Single().Sha256,order.Lines[0].Personalization!.PrintSetup!.Profiles.Single().Sha256);
+        await printProfiles.Decide(printDraft.Id,new(2,"SYNTHETIC-RETIRE","test-only retirement after order"),"fixture",false,factory.Services.GetRequiredService<DesignSurfaceValidator>());
         var orderPreview = $"/api/v1/me/orders/{order.Id}/lines/0/preview";
         Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, orderPreview, token)).Content.ReadAsByteArrayAsync());
         Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, orderPreview, other)).StatusCode);
@@ -299,6 +307,8 @@ public sealed class SavedDesignTests : IDisposable
         Assert.Null(await factory.Services.GetRequiredService<IFileStore>().Open(FileAreas.Designs, $"preview-{first.Id}-1.jpg"));
         var retained = await Read<CustomerOrder>(await Send(client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}", token));
         Assert.Equal(25, retained.Lines[0].Personalization!.Placement!.X);
+        Assert.Equal(printApproved.Revision,retained.Lines[0].Personalization!.PrintSetup!.Profiles.Single().Revision);
+        Assert.Equal(first.PrintSetup!.Profiles.Single().Sha256,retained.Lines[0].Personalization!.PrintSetup!.Profiles.Single().Sha256);
         Assert.Equal(Png, await (await Send(client, HttpMethod.Get, retained.Lines[0].Personalization!.ImageUrl!, token)).Content.ReadAsByteArrayAsync());
         Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, orderPreview, token)).Content.ReadAsByteArrayAsync());
     }

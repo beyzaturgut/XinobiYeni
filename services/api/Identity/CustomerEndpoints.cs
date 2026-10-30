@@ -159,7 +159,7 @@ public static class CustomerEndpoints
                                 throw new AccountException("configuration_variant_mismatch", "Sepetteki yerleşim bu tasarım ve renkle eşleşmiyor.", 409);
                             await surfaces.Validate(product.Id, variant.Id, config.Placement);
                             personalization = personalization with { SchemaVersion = config.SchemaVersion, Placement = config.Placement,
-                                ConfigurationId = config.Id, ConfigurationRevision = config.Revision, SourceSha256 = config.SourceSha256 };
+                                ConfigurationId = config.Id, ConfigurationRevision = config.Revision, SourceSha256 = config.SourceSha256, PrintSetup = config.PrintSetup };
                         }
                     }
                     lines.Add(new CustomerOrderLine(product.Id, variant.Id, product.Name, variant.Color, variant.ImageUrl ?? product.ImageUrl, variant.Price,

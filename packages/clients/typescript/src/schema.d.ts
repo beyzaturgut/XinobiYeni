@@ -1204,6 +1204,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/print-profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ListPrintProfiles"];
+        put?: never;
+        post: operations["SavePrintProfileDraft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/print-profiles/{id}/revisions/{revision}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetPrintProfileRevision"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/print-profiles/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ApprovePrintProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/print-profiles/{id}/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["RetirePrintProfile"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/print-profiles/{id}/revisions/{revision}/measure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["MeasurePrintPlacement"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/print-profiles/{id}/revisions/{revision}/calibration.svg": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["DownloadPrintCalibration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/designs/{id}/orders": {
         parameters: {
             query?: never;
@@ -1405,6 +1501,12 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             phone?: null | string;
+        };
+        ActOnPrintProfile: {
+            /** Format: int32 */
+            expectedRevision: number;
+            evidenceReference: string;
+            note: string;
         };
         AddFavorite: {
             productId: string;
@@ -1845,6 +1947,27 @@ export interface components {
         MarkNotificationsRead: {
             ids: null | string[];
         };
+        MeasurePrintPlacement: {
+            /** Format: int32 */
+            sourceWidth: number;
+            /** Format: int32 */
+            sourceHeight: number;
+            surfaceVersion: string;
+            /** Format: double */
+            x: number;
+            /** Format: double */
+            y: number;
+            /** Format: double */
+            artworkWidthPx: number;
+            /** Format: double */
+            artworkHeightPx: number;
+            /** Format: double */
+            rotation: number;
+            /** Format: int32 */
+            artworkPixelWidth: number;
+            /** Format: int32 */
+            artworkPixelHeight: number;
+        };
         Money: {
             /** Format: int64 */
             amountMinor: number;
@@ -1877,6 +2000,7 @@ export interface components {
             sourceSha256: string;
             /** Format: date-time */
             createdAt: string;
+            printSetup?: null | components["schemas"]["PrintSetupSnapshot"];
         };
         MyReview: {
             id: string;
@@ -1918,6 +2042,7 @@ export interface components {
             configurationRevision?: null | number;
             sourceSha256?: null | string;
             sku?: null | string;
+            printSetup?: null | components["schemas"]["PrintSetupSnapshot"];
         };
         OrderRequest: {
             id: string;
@@ -1969,6 +2094,97 @@ export interface components {
             configurationId?: null | string;
             /** Format: int32 */
             configurationRevision?: null | number;
+        };
+        PrintMeasurement: {
+            /** Format: double */
+            centerXmm: number;
+            /** Format: double */
+            centerYmm: number;
+            /** Format: double */
+            widthMm: number;
+            /** Format: double */
+            heightMm: number;
+            /** Format: double */
+            dpiX: number;
+            /** Format: double */
+            dpiY: number;
+            /** Format: int32 */
+            requiredWidthPx: number;
+            /** Format: int32 */
+            requiredHeightPx: number;
+            fitsSafeArea: boolean;
+            meetsDpi: boolean;
+            intersectsExclusion: boolean;
+            /** @default false */
+            productionReady: boolean;
+        };
+        PrintProfileDefinition: {
+            productId: string;
+            variantId: string;
+            face: string;
+            title: string;
+            /** Format: double */
+            widthMm?: null | number;
+            /** Format: double */
+            heightMm?: null | number;
+            /** Format: int32 */
+            dpi?: null | number;
+            /** Format: double */
+            bleedMm?: null | number;
+            /** Format: double */
+            safeInsetMm?: null | number;
+            process?: null | string;
+            colorSpace?: null | string;
+            colorProfile?: null | string;
+            outputFormat?: null | string;
+            allowTransparency?: null | boolean;
+            /** Format: int32 */
+            sourceWidth?: null | number;
+            /** Format: int32 */
+            sourceHeight?: null | number;
+            surfaceVersion?: null | string;
+            referenceRectPx?: null | components["schemas"]["PrintRect"];
+            mappingKind?: null | string;
+            templateReference?: null | string;
+            exclusionsMm?: null | components["schemas"]["PrintRect"][];
+            notes?: null | string;
+        };
+        PrintProfileRevision: {
+            id: string;
+            /** Format: int32 */
+            revision: number;
+            status: string;
+            sku: string;
+            definition: components["schemas"]["PrintProfileDefinition"];
+            actorId: string;
+            /** Format: date-time */
+            createdAt: string;
+            evidenceReference?: null | string;
+            decisionNote?: null | string;
+        };
+        PrintProfileSnapshot: {
+            id: string;
+            /** Format: int32 */
+            revision: number;
+            sku: string;
+            definition: components["schemas"]["PrintProfileDefinition"];
+            sha256: string;
+        };
+        PrintRect: {
+            /** Format: double */
+            x: number;
+            /** Format: double */
+            y: number;
+            /** Format: double */
+            width: number;
+            /** Format: double */
+            height: number;
+        };
+        PrintSetupSnapshot: {
+            status: string;
+            profiles: components["schemas"]["PrintProfileSnapshot"][];
+            /** @default false */
+            productionReady: boolean;
         };
         ProblemDetails: {
             type?: null | string;
@@ -2174,6 +2390,12 @@ export interface components {
         SaveDesignFromSession: {
             sessionId: string;
             name: null | string;
+        };
+        SavePrintProfile: {
+            id: null | string;
+            /** Format: int32 */
+            expectedRevision: null | number;
+            definition: components["schemas"]["PrintProfileDefinition"];
         };
         SetConfigurationFavorite: {
             favorite: boolean;
@@ -5707,6 +5929,238 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ListPrintProfiles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrintProfileRevision"][];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    SavePrintProfileDraft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavePrintProfile"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrintProfileRevision"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetPrintProfileRevision: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revision: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrintProfileRevision"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ApprovePrintProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActOnPrintProfile"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrintProfileRevision"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    RetirePrintProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActOnPrintProfile"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrintProfileRevision"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    MeasurePrintPlacement: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revision: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeasurePrintPlacement"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PrintMeasurement"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    DownloadPrintCalibration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                revision: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Physical calibration reference only; not production artwork */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/svg+xml": string;
                 };
             };
             /** @description Service Unavailable */

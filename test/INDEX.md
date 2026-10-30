@@ -2,6 +2,16 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-157 | 30.10.2026 | KIS-01 48 hedefli API/ölçü/snapshot testi | PASS; sınırlar ve ilk hatalar raporda | ISOLATED / UNIT | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-158 | 30.10.2026 | KIS-01 tam API regresyonu | PASS; sınırlar ve ilk hatalar raporda | ISOLATED / SQL SKIP | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-159 | 30.10.2026 | KIS-01 sözleşme ve tekrar üretim | PASS; sınırlar ve ilk hatalar raporda | BUILD / CONTRACT | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-160 | 30.10.2026 | KIS-01 admin Chrome üç boyut ve readonly | PASS; sınırlar ve ilk hatalar raporda | CHROME MOCK | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-161 | 30.10.2026 | KIS-01 admin tip/lint/build | PASS; sınırlar ve ilk hatalar raporda | STATIC / BUILD | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-162 | 30.10.2026 | KIS-01 web lint/build | PASS; sınırlar ve ilk hatalar raporda | STATIC / BUILD | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-163 | 30.10.2026 | KIS-01 Dart analiz ve 9 test | PASS; sınırlar ve ilk hatalar raporda | STATIC / UNIT | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-164 | 30.10.2026 | KIS-01 Flutter analiz ve 72 test | PASS; sınırlar ve ilk hatalar raporda | STATIC / FIXTURE | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-165 | 30.10.2026 | KIS-01 yenilenen local web/admin/API | PASS; sınırlar ve ilk hatalar raporda | READ-ONLY LOCAL | `2026-10-30/TST-157-kis01-print-profiles.md` |
+| TST-166 | 30.10.2026 | KIS-01 diff ve upstream | PASS; sınırlar ve ilk hatalar raporda | STATIC / GIT | `2026-10-30/TST-157-kis01-print-profiles.md` |
 | TST-150 | 30.10.2026 | WEB-07 mevcut 21 erişilebilirlik testi | PASS (ilk hatalar ve tekrarlar raporda) | CHROME FIXTURE / E2E | `2026-10-30/TST-150-web07-accessibility.md` |
 | TST-151 | 30.10.2026 | WEB-07 52 rota/boyut, 27 benzersiz test; son odaklı tekrarlar | PASS (ilk hatalar ve tekrarlar raporda) | CHROME FIXTURE / AXE / KEYBOARD / 200% TEXT | `2026-10-30/TST-150-web07-accessibility.md` |
 | TST-152 | 30.10.2026 | WEB-07 gerçek public katalog 15 axe taraması | PASS (ilk hatalar ve tekrarlar raporda) | READ-ONLY LOCAL / AXE | `2026-10-30/TST-150-web07-accessibility.md` |

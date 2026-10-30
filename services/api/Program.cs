@@ -169,6 +169,7 @@ builder.Services.AddSingleton<NotificationCenter>();
 builder.Services.AddSingleton<Xinobi.Api.Reviews.ReviewStore>();
 builder.Services.AddSingleton<Xinobi.Api.Designs.SavedDesignStore>();
 builder.Services.AddSingleton<Xinobi.Api.Designs.DesignSurfaceValidator>();
+builder.Services.AddSingleton<Xinobi.Api.Print.PrintProfileStore>();
 builder.Services.AddSingleton<Xinobi.Api.Quotes.QuoteStore>();
 // Nobi, the sales assistant: Cloudflare text model when configured (Assistant:ExternalInferenceEnabled), rules answers otherwise.
 builder.Services.AddHttpClient<Xinobi.Api.Assistant.ITextModelProvider, Xinobi.Api.Assistant.CloudflareTextModelProvider>(client => client.Timeout = TimeSpan.FromSeconds(30));

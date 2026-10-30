@@ -1,8 +1,43 @@
 # Faz05 — B2C satış, müşteri hesabı ve sipariş sonrası işlemler
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Bloke — gerçek ödeme ve ticari kabul açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Bloke - gerçek ödeme, rezervasyon, kargo ve ticari kabul açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** Mevcut sunucu fiyatlı demo sipariş, sahiplik/revizyon ve bağımsız sipariş görseli korunur. 42bee88 siparişe tam profil kopyası/SHA ekler; gerçek tahsilat, rezervasyon veya para iadesi eklemez.
+
+**Müşteriden / iş sahibinden beklenenler:** D03 ticaret/iptal-iade/kişiselleştirme fiyatı, vergi-fatura-kargo-havale; seçilen ödeme/kargo test erişimleri ve yasal onaylı metinler.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [TIC-01](../docs/tasks/project-closure-2026-10-30.md#tic-01) - Sunucu sepeti ve hesap birleştirmesini kur | Yapılmadı - kapanış açık | Ortak sunucu sepeti, misafir-hesap birleştirme ve iki cihaz arasındaki eşzamanlı sepet senkronu yapılmadı. |
+| [TIC-02](../docs/tasks/project-closure-2026-10-30.md#tic-02) - Checkout fiyat teklifini sunucuda üret | Yapılmadı - kapanış açık | Kupon, kişiselleştirme, vergi, kargo ve geçerlilik süresini kapsayan tek sunucu checkout/quote motoru eksik. |
+| [TIC-03](../docs/tasks/project-closure-2026-10-30.md#tic-03) - Stok rezervasyonu ve kesinleşmeyi atomik yap | Yapılmadı - kapanış açık | Atomik rezervasyon, süre sonu bırakma, tahsilatla kesinleştirme ve son stok yarışı iş kuralı tamamlanmadı. |
+| [TIC-04](../docs/tasks/project-closure-2026-10-30.md#tic-04) - Kart ve 3DS ödeme akışını bağla | Yapılmadı - kapanış açık | Gerçek kart/3DS/taksit sağlayıcı akışı ve başarı/red/iptal/dönüş için işlem kimlikli kabul yok. |
+| [TIC-05](../docs/tasks/project-closure-2026-10-30.md#tic-05) - Ödeme webhook ve mutabakatını kur | Yapılmadı - kapanış açık | Ödeme webhook imzası, olay tekilleştirme, sıra dışı bildirim ve tahsilat-sipariş mutabakatı uçtan uca eksik. |
+| [TIC-06](../docs/tasks/project-closure-2026-10-30.md#tic-06) - Havale ve ödeme bekleyen siparişi tamamla | Yapılmadı - kapanış açık | Havale referansı, son tarih, finans yetkisi, tutar kontrolü ve süresi dolan rezervasyonu bırakma uygulanmalı. |
+| [TIC-07](../docs/tasks/project-closure-2026-10-30.md#tic-07) - İptal ve iadeyi gerçek geri ödemeye bağla | Yapılmadı - kapanış açık | Tam/kısmi gerçek para iadesi, sağlayıcı işlem kimliği, fazla iade önleme ve stokla uzlaştırma tamamlanmadı. |
+| [TIC-08](../docs/tasks/project-closure-2026-10-30.md#tic-08) - Kargo fiyatı ve gönderiyi entegre et | Yapılmadı - kapanış açık | Gerçek taşıyıcı fiyatı, desi/bölge kuralları, etiket/gönderi, takip ve yinelenen gönderi kontrolü kabul edilmedi. |
+| [WEB-03](../docs/tasks/project-closure-2026-10-30.md#web-03) - Gerçek checkout ve sonuç ekranını tamamla | Yapılmadı - kapanış açık | Gerçek ödeme durumları, fatura/ücret özeti ve sağlayıcı dönüşlerinin checkout/quote üzerinden tamamlanması bekliyor. |
+| [WEB-04](../docs/tasks/project-closure-2026-10-30.md#web-04) - Hesap yaşam döngüsünü gerçek e-postayla kabul et | Yapılmadı - kapanış açık | İzinli gerçek alıcıyla e-posta teslimi, çoklu sekme ve gerçek ortam uçtan uca hesap kabulü bu task için kapanmadı. |
+| [WEB-05](../docs/tasks/project-closure-2026-10-30.md#web-05) - Satış sonrası ve tasarım ekranlarını doğrula | Yapılmadı - kapanış açık | Gerçek hesap ve SQL ile satış sonrası uçtan uca kabul; gerçek geri ödeme durumunun doğru gösterimi açık. |
+| [ADM-04](../docs/tasks/project-closure-2026-10-30.md#adm-04) - Müşteri ve firma operasyon ekranını tamamla | Yapılmadı - kapanış açık | Firma/kurumsal profil, destek geçmişi ve tüm sunucu filtre/sayfalama alanlarının kabul matrisi kapanmadı. |
+| [ADM-05](../docs/tasks/project-closure-2026-10-30.md#adm-05) - Sipariş finans ve kargo eylemlerini tamamla | Yapılmadı - kapanış açık | Gerçek tahsilat/geri ödeme/kargo sağlayıcısı sonuçları ve yinelenmeyen operasyon eylemleri eksik. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [ADM-01](../docs/tasks/project-closure-2026-10-30.md#adm-01), [CAT-02](../docs/tasks/project-closure-2026-10-30.md#cat-02), [CAT-03](../docs/tasks/project-closure-2026-10-30.md#cat-03), [SEC-01](../docs/tasks/project-closure-2026-10-30.md#sec-01), [SEC-02](../docs/tasks/project-closure-2026-10-30.md#sec-02), [KIS-03](../docs/tasks/project-closure-2026-10-30.md#kis-03), [OPS-04](../docs/tasks/project-closure-2026-10-30.md#ops-04).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — gerçek ödeme ve ticari kabul açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

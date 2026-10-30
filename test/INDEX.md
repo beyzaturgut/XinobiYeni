@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-175 | 30.10.2026 | Faz task eşleme: 120 task / 11 ana faz / 16 commit | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |
+| TST-176 | 30.10.2026 | Faz task eşleme: yerel link ve anchor | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |
+| TST-177 | 30.10.2026 | Faz task eşleme: tarihsel kayıt ve kabul koruması | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |
+| TST-178 | 30.10.2026 | Faz task eşleme: diff ve upstream | PASS | DOCUMENTATION / STATIC | `2026-10-30/TST-175-phase-closure-sync.md` |
 | TST-170 | 30.10.2026 | Flutter ana sayfa analiz | PASS; sınırlar raporda | STATIC | `2026-10-30/TST-170-flutter-home-web-parity.md` |
 | TST-171 | 30.10.2026 | Flutter ana sayfa 7 yerleşim/CTA kontrolü | PASS; sınırlar raporda | WIDGET | `2026-10-30/TST-170-flutter-home-web-parity.md` |
 | TST-172 | 30.10.2026 | Flutter ana sayfa 79 test regresyon | PASS; sınırlar raporda | FLUTTER FIXTURE | `2026-10-30/TST-170-flutter-home-web-parity.md` |

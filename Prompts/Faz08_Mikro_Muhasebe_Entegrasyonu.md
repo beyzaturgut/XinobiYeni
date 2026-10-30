@@ -1,8 +1,38 @@
 # Faz08 — Mikro muhasebe entegrasyonu ve mutabakat
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Bloke — D02/D06/D11. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Bloke - Mikro erişim/alan sözleşmesi ve gerçek adaptörler açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** Son commitlerde Mikro adaptörü veya gerçek senkron/mutabakat teslimi yok. Panel prototipi ve ortak veritabanı yapısı, Mikro bağlantı kabulü sayılmaz.
+
+**Müşteriden / iş sahibinden beklenenler:** Mikro sürümü/API/ara katman, test şirketi, örnek stok/cari/depo/vergi/birim/döviz ve fatura sorumlusu; veri yönü/çatışma önceliği.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [ERP-01](../docs/tasks/project-closure-2026-10-30.md#erp-01) - Mikro sürüm ve alan sözleşmesini kesinleştir | Yapılmadı - kapanış açık | Mikro sürümü, API/ara katman, test şirketi, depo/vergi/birim/döviz/cari kodları için alan sözleşmesi bekleniyor. |
+| [ERP-02](../docs/tasks/project-closure-2026-10-30.md#erp-02) - Mikro istemcisi ve bağlantı sağlık kontrolünü yaz | Yapılmadı - kapanış açık | Kimlik doğrulamalı Mikro istemcisi, timeout/limit/hata sınıflaması ve gerçek sağlık kontrolü eksik. |
+| [ERP-03](../docs/tasks/project-closure-2026-10-30.md#erp-03) - Ürün ve varyant kod eşlemesini uygula | Yapılmadı - kapanış açık | Mikro stok kodu/birim/vergi/kategoriyle sürümlü eşleme ve ilk senkron dry-run yapılmadı. |
+| [ERP-04](../docs/tasks/project-closure-2026-10-30.md#erp-04) - Depo stok ve fiyat senkronunu tamamla | Yapılmadı - kapanış açık | Mikro depo stok/fiyat okuma-yazma yönü, senkron periyodu ve rezervasyon/kanal uzlaştırması eksik. |
+| [ERP-05](../docs/tasks/project-closure-2026-10-30.md#erp-05) - Cari ve adres aktarımını uygula | Yapılmadı - kapanış açık | Mikro cari bulma/oluşturma, vergi ve fatura/teslimat adres eşlemesi eksik. |
+| [ERP-06](../docs/tasks/project-closure-2026-10-30.md#erp-06) - Sipariş ve fatura bağlantısını tamamla | Yapılmadı - kapanış açık | Kesinleşmiş siparişi Mikro belgesine dönüştürme ve fatura/belge numarası geri okuma tamamlanmadı. |
+| [ERP-07](../docs/tasks/project-closure-2026-10-30.md#erp-07) - İptal, iade ve entegrasyon izleme akışını kur | Yapılmadı - kapanış açık | Gerçek muhasebe iptal/iadesi, retry/dead-letter, manuel eşleme ve fark yönetimi eksik. |
+| [ERP-08](../docs/tasks/project-closure-2026-10-30.md#erp-08) - Mikro uçtan uca mutabakat ve işletim kabulü yap | Yapılmadı - kapanış açık | Test şirketinde ürün-stok-fiyat-cari-sipariş-fatura-iade mutabakatı ve işletim kabulü yapılmadı. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [KAR-02](../docs/tasks/project-closure-2026-10-30.md#kar-02), [KAR-04](../docs/tasks/project-closure-2026-10-30.md#kar-04), [CAT-02](../docs/tasks/project-closure-2026-10-30.md#cat-02), [TIC-03](../docs/tasks/project-closure-2026-10-30.md#tic-03), [SEC-06](../docs/tasks/project-closure-2026-10-30.md#sec-06), [OPS-07](../docs/tasks/project-closure-2026-10-30.md#ops-07).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — D02/D06/D11. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

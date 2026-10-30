@@ -1,10 +1,60 @@
 # Faz11 — iOS/Android, çapraz kanal kabulü ve canlıya geçiş
 
+## Güncel durum ve tüm açık işler - 30.10.2026
+
+**Durum:** Devam - Flutter eşliği düzeltildi; kurulum, cihaz, push, mağaza ve final UAT açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** de99958 Flutter önizleme satır düzeni ve Temsilidir: 320/390/700px, 1x/2x metin, CTA testi; 79/79 Flutter ve analiz temiz. Yeni APK veya telefon kurulumu yok. Son kayıtlı release xinobi-799e1af (DEPLOY-016); güncel HEAD için IIS kurulumu kanıtlanmadı.
+
+**Müşteriden / iş sahibinden beklenenler:** Firebase/APNs, mağaza/signing hesap sahipleri, hedef cihazlar; platform/işletim/UAT sahipleri, yayın takvimi, SLA/devir ve GO/NO-GO onayları.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [MOB-01](../docs/tasks/project-closure-2026-10-30.md#mob-01) - Üretim ortamı ve HTTPS yapılandırmasını hazırla | Yapılmadı - kapanış açık | Release HTTPS/origin matrisi ve localhost/debug istisnalarının kapatılması üretim ortamında doğrulanmalı. |
+| [MOB-02](../docs/tasks/project-closure-2026-10-30.md#mob-02) - Native ödeme ve 3DS dönüşünü tamamla | Yapılmadı - kapanış açık | Gerçek mobil ödeme/3DS, dış tarayıcı dönüşü, uygulama yeniden açılışı ve sunucudan ödeme doğrulama eksik. |
+| [MOB-03](../docs/tasks/project-closure-2026-10-30.md#mob-03) - Firebase SDK ve cihaz token kaydını bağla | Yapılmadı - kapanış açık | Firebase SDK/APNs, izin isteme, token kayıt/yenileme ve hesap çıkışında cihaz bağını kaldırma mobilde tamamlanmadı. |
+| [MOB-04](../docs/tasks/project-closure-2026-10-30.md#mob-04) - Push teslimini ve derin bağlantıyı tamamla | Yapılmadı - kapanış açık | Gerçek push teslimi ve ön/arka plan/kapalı uygulama deep link kabulü Android ve iOS için yapılmadı. |
+| [MOB-05](../docs/tasks/project-closure-2026-10-30.md#mob-05) - Native-WebView editör köprüsünü cihazda kabul et | Yapılmadı - kapanış açık | Her iki platformda gerçek cihaz oturum/yenileme/dosya/geri tuşu ve kesinti matrisiyle güncel kabul açık. |
+| [MOB-06](../docs/tasks/project-closure-2026-10-30.md#mob-06) - Mobil katalog ve hesap eşliğini kabul et | Yapılmadı - kapanış açık | Web ile aynı gerçek hesap/favori/teklif ve ticari akış eşliği Android/iOS cihazlarında ayrıca kabul edilmeli. |
+| [MOB-07](../docs/tasks/project-closure-2026-10-30.md#mob-07) - Cihaz performansı ve kesinti deneyimini düzelt | Yapılmadı - kapanış açık | Hedef düşük bellekli cihaz, yavaş ağ/uçak modu, büyük görsel, izin/döndürme ve uygulama öldürme matrisi eksik. |
+| [MOB-08](../docs/tasks/project-closure-2026-10-30.md#mob-08) - İmzalı Android ve iOS dağıtımını hazırla | Yapılmadı - kapanış açık | İmzalı üretim AAB, iOS archive, TestFlight/kapalı test ve güvenli signing kabulü tamamlanmadı; yeni APK üretilmedi. Son ana sayfa düzeltmesinin telefona kurulumu da bekliyor (MOB-HOME-02). |
+| [OPS-05](../docs/tasks/project-closure-2026-10-30.md#ops-05) - Sürüm uyumu ve son release kurulumunu doğrula | Yapılmadı - kapanış açık | Son kodun yeni release paketlemesi/IIS kurulumu ve deployment.json + mobil bridge sürüm eşliği doğrulanmadı. |
+| [OPS-06](../docs/tasks/project-closure-2026-10-30.md#ops-06) - Deploy ve rollback provasını tamamla | Yapılmadı - kapanış açık | Güncel staging sürümünde gerçek deploy/rollback/readiness provasıyla uçtan uca kabul eksik. |
+| [OPS-08](../docs/tasks/project-closure-2026-10-30.md#ops-08) - İşletim runbook ve erişim devrini tamamla | Yapılmadı - kapanış açık | Runtime/migration hesap ayrımı, sır yenileme, olay/ikame/SLA/maliyet ve yetkili erişim devri tamamlanmadı. |
+| [QA-05](../docs/tasks/project-closure-2026-10-30.md#qa-05) - Android ve iOS cihaz regresyonunu otomatikleştir | Yapılmadı - kapanış açık | Android+iOS fiziksel cihaz/simülatörde ödeme/push/deep link ve köprü kabulünün otomasyon kapsamı açık. |
+| [QA-06](../docs/tasks/project-closure-2026-10-30.md#qa-06) - Sağlayıcı sandbox uçtan uca paketini çalıştır | Yapılmadı - kapanış açık | Ödeme/kargo/e-posta/SMS/push/AI/Mikro/üç kanalın izinli sandbox uçtan uca ve mutabakat paketi kapanmadı. |
+| [UAT-01](../docs/tasks/project-closure-2026-10-30.md#uat-01) - Takvim, sorumlu ve kapasiteyi kesinleştir | Yapılmadı - kapanış açık | Kişi bazlı kapasite/tahmin/hedef tarih, dış bekleme süreleri ve imzalı sprint/milestone planı yok. |
+| [UAT-02](../docs/tasks/project-closure-2026-10-30.md#uat-02) - Web ve admin iş sahibi UAT'sini tamamla | Yapılmadı - kapanış açık | Gerçek ödeme-kargo-iade ve panel finans/rol/destek akışlarının ürün/operasyon sahibi imzalı UAT’si eksik. |
+| [UAT-03](../docs/tasks/project-closure-2026-10-30.md#uat-03) - Mobil iş sahibi UAT'sini tamamla | Yapılmadı - kapanış açık | Her iki gerçek platformda ödeme/editör/push/deep link/erişilebilirlik için iş sahibi imzalı UAT yok. |
+| [UAT-04](../docs/tasks/project-closure-2026-10-30.md#uat-04) - Üretim ve entegrasyon operasyonunu kabul ettir | Yapılmadı - kapanış açık | Fiziksel numune, teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarının üretim/muhasebe/kanal kabulü yok. |
+| [UAT-05](../docs/tasks/project-closure-2026-10-30.md#uat-05) - GO/NO-GO ve veri geçiş planını imzala | Yapılmadı - kapanış açık | Final katalog, açık kusurlar, güvenlik/yük/restore, sağlayıcılar ve rollback eşikleriyle imzalı GO/NO-GO eksik. |
+| [UAT-06](../docs/tasks/project-closure-2026-10-30.md#uat-06) - Mağaza başvurularını ve yayınını tamamla | Yapılmadı - kapanış açık | Google Play/App Store hesap-beyan-inceleme ve onaylı erişilebilir mağaza sürümleri tamamlanmadı. |
+| [UAT-07](../docs/tasks/project-closure-2026-10-30.md#uat-07) - Canlı cutover ve yayın sonrası smoke yap | Yapılmadı - kapanış açık | Güncel sürüm için onaylı canlı cutover, deployment.json/health smoke ve yayın sonrası izleme kabulü eksik. |
+| [UAT-08](../docs/tasks/project-closure-2026-10-30.md#uat-08) - Eğitim, bakım ve nihai teslimi kapat | Yapılmadı - kapanış açık | Panel/üretim/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı. |
+
+### Açık alt işler ve özel kabul kayıtları
+
+| Alt iş | Ana task | Durum | Kalan / kanıt |
+|---|---|---|---|
+| MOB-HOME-01 | MOB-06, QA-03 | Yapıldı - teknik | de99958 web düzenine native Flutter eşlik, ürün-kart örtüşmesi giderildi; 7 odaklı/79 tam test. |
+| MOB-HOME-02 | MOB-08, QA-05, OPS-05 | Açık | Yetkili paket/dağıtım adımında güncel uygulamayı telefona kur ve görsel kabulü kaydet. Bu dokümantasyon oturumunda APK/kurulum yapılmaz. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [WEB-07](../docs/tasks/project-closure-2026-10-30.md#web-07), [KIS-01](../docs/tasks/project-closure-2026-10-30.md#kis-01), [KIS-03](../docs/tasks/project-closure-2026-10-30.md#kis-03), [TIC-04](../docs/tasks/project-closure-2026-10-30.md#tic-04), [TIC-05](../docs/tasks/project-closure-2026-10-30.md#tic-05), [SEC-01](../docs/tasks/project-closure-2026-10-30.md#sec-01), [OPS-01](../docs/tasks/project-closure-2026-10-30.md#ops-01), [OPS-02](../docs/tasks/project-closure-2026-10-30.md#ops-02), [OPS-04](../docs/tasks/project-closure-2026-10-30.md#ops-04), [QA-03](../docs/tasks/project-closure-2026-10-30.md#qa-03), [QA-04](../docs/tasks/project-closure-2026-10-30.md#qa-04).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
 **27.10 son üretim tercihi:** Ek yerel denetim ve bağlı kurulum kullanıcı isteğiyle kaldırıldı; tek aday üretimi geri geldi. Prompt v5 her isteme açık yazı/imza/logo/ürün/eşya yasakları ekler, rafine çizim kuralları korunur. [Test kaydı](../test/2026-10-27/TST-art-direction-v5.md).
 
-## Güncel uygulama durumu — 27.10.2026
+## Tarihsel uygulama durumu — 27.10.2026
 
-**Durum:** Devam — birleşik yayın var; UAT/mağaza kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Devam — birleşik yayın var; UAT/mağaza kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

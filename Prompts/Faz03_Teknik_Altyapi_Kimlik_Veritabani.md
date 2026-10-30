@@ -1,8 +1,57 @@
 # Faz03 — Teknik temel, kimlik ve veritabanı iskeleti
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Devam — güvenlik ve işletim doğrulamaları kısmi. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Devam - temel regresyon kayıtlı; SQL/güvenlik/posta/işletim kabulü açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** 42bee88: profil sürüm/CAS/yetki/sipariş snapshot testleri; API 496 başarılı, 29 opt-in test atlandı. f4f9046: canlı /admin/ giriş formu ve girişsiz oturum/katalog/tasarım 401 doğrulandı; yeni auth kodu eklenmedi, gerçek parola/MFA/e-posta teslimi denenmedi.
+
+**Müşteriden / iş sahibinden beklenenler:** İzinli gerçek posta test alıcısı ve SMTP/Resend yapılandırması; domain/sertifika ve DBA restore yetkisi; hukuk onaylı saklama/izin metinleri. Parola/anahtar rapora yazılmaz.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [ADM-01](../docs/tasks/project-closure-2026-10-30.md#adm-01) - Kalıcı rol ve yetki yönetimini tamamla | Yapılmadı - kapanış açık | Kalıcı rol CRUD, atama/geri alma, son yönetici koruması ve bütün izin değişimlerinin audit kabulü eksik. |
+| [ADM-06](../docs/tasks/project-closure-2026-10-30.md#adm-06) - Tüm kayıtlar için sunucu aramasını tamamla | Yapılmadı - kapanış açık | Teklif/tasarım/AI ve gerekli sipariş aramalarında tüm geçmişi kapsayan sunucu sorgusu tamamlanmadı. |
+| [ADM-07](../docs/tasks/project-closure-2026-10-30.md#adm-07) - Bildirim ve hata işi operasyonunu bağla | Yapılmadı - kapanış açık | Gerçek teslim/red sağlayıcı kimlikleri, dead-letter, sınırlandırılmış retry ve operatör alarm kabulü açık. |
+| [SEC-01](../docs/tasks/project-closure-2026-10-30.md#sec-01) - Gerçek SQL oturum ve admin MFA kabulü yap | Yapılmadı - kapanış açık | Güncel izole SQL + gerçek kod teslimli oturum/eşzamanlı refresh/yetki geri alımı kabul paketi açık. |
+| [SEC-02](../docs/tasks/project-closure-2026-10-30.md#sec-02) - Sürümlü yasal onay ve ileti iznini kur | Yapılmadı - kapanış açık | Hukuk onaylı metin sürümü, ödeme onay kaydı, ileti izin/geri alma ve İYS bağlantısı tamamlanmadı. |
+| [SEC-03](../docs/tasks/project-closure-2026-10-30.md#sec-03) - Saklama, dışa aktarma ve silmeyi uçtan uca tamamla | Yapılmadı - kapanış açık | AI konuşmaları, loglar, önizlemeler, dosyalar ve yedekler dahil politika tabanlı tam saklama/silme/dışa aktarma açık. |
+| [SEC-04](../docs/tasks/project-closure-2026-10-30.md#sec-04) - Nesne ve rol yetkilerini tüm uçlarda tara | Yapılmadı - kapanış açık | Tüm müşteri/firma/admin/dosya/bridge uçları için eksiksiz farklı hesap/rol matrisi kapanmadı. |
+| [SEC-05](../docs/tasks/project-closure-2026-10-30.md#sec-05) - Audit kapsamı ve transaction bağını doğrula | Yapılmadı - kapanış açık | Tüm fiyat/stok/rol/ayar/sipariş/teklif/iade/entegrasyon işlemlerinin güvenli farkı ve transaction bağı kabul edilmeli. |
+| [SEC-06](../docs/tasks/project-closure-2026-10-30.md#sec-06) - Inbox, outbox ve hata kuyruğunu tamamla | Yapılmadı - kapanış açık | Genel atomik iş+olay outbox/inbox, lease/backoff, dead-letter ve worker mimari kararı eksik. |
+| [SEC-07](../docs/tasks/project-closure-2026-10-30.md#sec-07) - Güvenli upload ve dosya erişim sözleşmesini tamamla | Yapılmadı - kapanış açık | Genel finalize ve zararlı içerik taraması; özel indirme/süreli erişim/sahipsiz dosya sözleşmesi tamamlanmadı. |
+| [SEC-08](../docs/tasks/project-closure-2026-10-30.md#sec-08) - Güvenlik taraması ve bağımlılık incelemesini kapat | Yapılmadı - kapanış açık | Güncel staging’de sır/bağımlılık/SAST/DAST ve HTTPS/cookie/CORS/CSP/rate-limit bütünsel kabulü eksik. |
+| [OPS-01](../docs/tasks/project-closure-2026-10-30.md#ops-01) - Alan adı, HTTPS ve ortam ayrımını kapat | Yapılmadı - kapanış açık | Domain/TLS, reverse proxy, origin/CORS, ortam ayrımı ve minimum runtime yetkileri son ortamda kabul edilmeli. |
+| [OPS-02](../docs/tasks/project-closure-2026-10-30.md#ops-02) - SQL ve medya yedeğini geri yükleyerek doğrula | Yapılmadı - kapanış açık | SQL CHECKSUM/VERIFYONLY ve ayrı hedefe gerçek restore; DB-medya tutarlı geri dönüş provası açık. |
+| [OPS-03](../docs/tasks/project-closure-2026-10-30.md#ops-03) - Dosya deposu ve kapasite işletimini tamamla | Yapılmadı - kapanış açık | İzin/kapasite/yedek/saklama işletim kabulü tamamlanmadı; R2/S3 yalnız onaylı ihtiyaçla ayrı planlanır. |
+| [OPS-04](../docs/tasks/project-closure-2026-10-30.md#ops-04) - Gerçek bildirim kanallarını kabul et | Yapılmadı - kapanış açık | İzinli alıcılarda gerçek teslim/red/retry kanıtı ve kanal şablon kabulü tüm kanallar için kapanmadı. Yönetici davet/MFA/sıfırlama gerçek mail kabulü ADM-MAIL-01 altında açık. |
+| [OPS-07](../docs/tasks/project-closure-2026-10-30.md#ops-07) - Log, alarm ve servis gözlemini tamamla | Yapılmadı - kapanış açık | API p95/hata, ödeme/webhook, kuyruk, maliyet, disk ve yedek için sahipli/eşikli gerçek alarm kabulü eksik. |
+| [QA-01](../docs/tasks/project-closure-2026-10-30.md#qa-01) - Güncel HEAD için temel regresyonu çalıştır | Yapıldı - teknik | Temel teknik regresyon kapandı. 29 opt-in SQL/dış test atlandı; sağlayıcı, fiziksel numune ve resmi kabul bu taskın sonucu değildir. |
+| [QA-02](../docs/tasks/project-closure-2026-10-30.md#qa-02) - İzole SQL entegrasyon test ortamını kur | Yapılmadı - kapanış açık | Ayrı silinebilir SQL test DB’sinde tüm gerekli transaction/rezervasyon/idempotency/kalıcılık kapıları çalıştırılmadı. |
+| [QA-04](../docs/tasks/project-closure-2026-10-30.md#qa-04) - Web ve admin E2E'yi CI'ya ekle | Yapılmadı - kapanış açık | Deterministik E2E sunucu yaşam döngüsü, CI adımı ve kalıcı screenshot/artifact saklama pipeline’a tamamlanmadı. |
+| [QA-07](../docs/tasks/project-closure-2026-10-30.md#qa-07) - Yük ve arıza dayanıklılığını ölç | Yapılmadı - kapanış açık | Onaylı p95/yük hedefi, son stok/webhook/worker crash ve DB/sağlayıcı kesinti test matrisi eksik. |
+| [QA-08](../docs/tasks/project-closure-2026-10-30.md#qa-08) - Tek kabul matrisi ve kusur triage'ı oluştur | Kısmen yapıldı | Atanmış kişi/hedef tarih, tüm gereksinim-test-sürüm bağları ve sahipli kusur triage kapanışı eksik. |
+
+### Açık alt işler ve özel kabul kayıtları
+
+| Alt iş | Ana task | Durum | Kalan / kanıt |
+|---|---|---|---|
+| ADM-MAIL-01 | OPS-04, SEC-01 | Açık | İzinli gerçek alıcıda yönetici daveti, kabul, parola sonrası MFA, parola sıfırlama ve çıkış/yenileme akışını canlıya uygun ortamda doğrula; gönderim/teslim sonucunu kaydet. Formun açılması mail teslimi değildir. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [TIC-03](../docs/tasks/project-closure-2026-10-30.md#tic-03), [KIS-03](../docs/tasks/project-closure-2026-10-30.md#kis-03), [AI-01](../docs/tasks/project-closure-2026-10-30.md#ai-01), [ADM-02](../docs/tasks/project-closure-2026-10-30.md#adm-02), [UAT-05](../docs/tasks/project-closure-2026-10-30.md#uat-05).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — güvenlik ve işletim doğrulamaları kısmi. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

@@ -1,5 +1,7 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+**30.10 güncel kayıt:** Tüm 120 kapanış taskı Faz01-11 ile eşlendi; müşteri girdileri, teknik geliştirme ve gerçek kabul açıkları ayrıldı. [Ana liste](../docs/tasks/project-closure-2026-10-30.md), [faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Son uygulama kaynağı `de99958`; faz onayı/yüzde güncellemesi yok.
+
 **27.10 son üretim tercihi:** Ek yerel denetim ve bağlı kurulum kullanıcı isteğiyle kaldırıldı; tek aday üretimi geri geldi. Prompt v5 her isteme açık yazı/imza/logo/ürün/eşya yasakları ekler, rafine çizim kuralları korunur. [Test kaydı](../test/2026-10-27/TST-art-direction-v5.md).
 
 > **Bu dosyanın ilk hali bir plan ve doldurulabilir çalışma kaydıdır.** Bu ifade başlangıç planının durumunu anlatır; güncel uygulama, test ve yayın durumu §5’te, tarihli kabul kayıtları §7’dedir. Her çalışma oturumu başında okunur, anlamlı her değişiklikten sonra ve oturum kapanışında güncellenir.
@@ -126,20 +128,40 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 
 | Alan | Şu anki kayıt |
 |---|---|
-| Son güncelleme ve sorumlu | 27.10.2026 · Codex; kaynak main / 5791181. [Tam commit–faz eşlemesi](../docs/tasks/phase-audit-2026-10-27.md); Faz00–11 güncellendi. |
-| Aktif görev | Tamamlanmış geliştirmelerin fazlara kaydı; Faz02/04/05/06/10/11 ortak ürün tasarımı, mobil, sipariş önizlemesi; Faz03/07 panel yetki ve veri durumları. |
-| Repo/branch/HEAD | Desktop/Xinobi · main · denetlenen kaynak 5791181; private origin beyzaturgut/XinobiYeni. Önceki feature dalı birleştirildi; PR bekliyor ifadesi tarihsel. |
-| Ortam / migration | SQL Server XinobiYeniDB için 0001–0005 uygulanmış eski kanıt mevcut; 0006–0009 hedef uygulaması bu oturumda doğrulanmadı. Yeni revizyon/sipariş görseli mevcut FeatureDocuments/PersonalizationJson kullanır, yeni fiziksel migration yok. |
-| Yerel başlatma | pnpm dev:local:background; API 5003, web 3000, admin 5173. Bu denetimde servis başlatılmadı. |
-| Gerçek IIS durumu | Kullanıcı 25.10’da xinobi-4333eda ve xinobi-902066f için başarılı kurulum çıktısı paylaştı; 4333eda sonrası sayfa kontrolünü bildirdi. Sonraki d54c13c/e2131e7 IIS kurulumu doğrulanmış değil. |
-| Son release | DEPLOY-014: xinobi-e2131e7, kaynak e2131e7, 27.10 GitHub yayını ve üç asset doğrulanmış. Web/admin/API birlikte; bu release için APK yok. GitHub yayını kurulum değildir. |
-| Test kanıtları | TST-135 434/25/0 ve 34 web e2e; 23.10 alışveriş kaydı API 477/29, Flutter 67 ve tarihli web koşuları; 27.10 temizlik 26 WebKit; tam ekran 4 WebKit; DEPLOY-014 26 AuthorizationTests. Bunlar farklı kaynak/ortamlara aittir; tek güncel tam regresyon sayısı değildir. |
-| Kapanan eski hatalar | OnlyListedAreasArePublic: TST-135; EXIF eksenleri: b926844; ürün seçilmeden mobil editör beyaz ekranı: 902066f; sipariş ürün görseli/tam ekran: 902066f/451581b/e2131e7. Fiziksel cihaz ve son IIS kabulü ayrıca gerekir. |
-| Aktif risk ve açık işler | Gerçek ödeme/sunucu sepeti/rezervasyon, üretim baskısı, Mikro/pazaryerleri, restore provası, D kararları ve rol/PM onayları açık. WebKit temizlik raporunda önceki HEAD’de de oluşan test/fixture sınırlamaları korunur. |
-| Sonraki en küçük güvenli adım | DEPLOY-014 sürümünün gerçek IIS kurulum durumunu kanıtlayıp web/admin/API ve telefon smoke kaydını eklemek; fiziksel cihazda editör ve yeni sipariş ürün önizlemesini doğrulamak. İş kararı tarafında D03/D04 sahip ve tarihleri. |
-| Güvenli geri dönüş | Birleşik deploy previous dizinlerini ve deployment.json kaydını tutar. Aktif web out, API api; XinobiData, API data ve C:\XinobiData\config korunur. Kullanıcının ayrı eski Xinobi projesi bu proje değildir. Yedek doğrulama/restore kabulü bekliyor. |
+| Son güncelleme ve sorumlu | 30.10.2026 / Codex; kaynak main / de99958. [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md); Faz00-11 güncellendi. |
+| Aktif görev | Şimdiye kadarki tüm eksik/karar/kabul işlerini fazlara işleme; teknik kapanış ile müşteri/üretim/UAT girdilerini ayırma. |
+| Repo/branch/HEAD | Desktop/Xinobi / main / de99958 denetlenen uygulama kaynağı. Bu güncelleme dokümantasyondur. |
+| Ortam / migration | Önceki SQL 0001-0005 uygulama kanıtı korunur; sonraki migration hedefleri bu oturumda doğrulanmadı. KIS-01 mevcut FeatureDocuments/PersonalizationJson kullanır; yeni SQL migration yok. |
+| Yerel başlatma | pnpm dev:local:background; API 5003, web 3000, admin 5173. Bu dokümantasyon oturumunda servis değiştirilmedi. |
+| Gerçek IIS durumu | Canlı /admin/ giriş formu/anonim 401 30.10 kontrolünde doğrulandı; deployment.json 404 nedeniyle canlı kaynak sürümü bu kontrolden bilinmiyor. Önceki kullanıcı kurulum bildirimleri tarihsel. |
+| Son kayıtlı release | DEPLOY-016 / xinobi-799e1af GitHub yayını; güncel de99958 için paket/IIS/telefon kurulumu yapılmadı. Yayın, kurulum ve UAT ayrı. |
+| Son test kanıtları | 42bee88: API 496 PASS/29 SKIP, Dart 9, contracts/lint/build. de99958: Flutter analiz ve 79/79. WEB-01/02/07 testleri ayrı kaynak/ortam kayıtları. Bu oturumda uygulama regresyonu koşulmadı. |
+| Tamamlanan teknik alt işler | WEB-01 yerel teknik kabul; WEB-02 ve WEB-07 teknik düzeltmeleri; KIS-01 profil altyapısı; Flutter ana sayfa yerleşimi. Gerçek admin giriş sistemi var, e-posta teslimi ayrı açık. |
+| Müşteri/veri bekleyenler | 23 ürün açıklama/özellik dosyası ve SKU 117 fiyatı; üretim ölçü/şablon/şartname ve numune sahibi; KAR-01-08 karar/erişim/hukuk/mağaza/işletim girdileri. |
+| Teknik ekipte kalanlar | Gerçek ödeme/sepet/rezervasyon/kargo, üretim onayı/render/indirme, editör, panel/rol/ayar, CMS/kupon/depo/medya, AI SQL/kota/denetim, B2B, Mikro/kanallar; SQL/cihaz/posta/restore/güvenlik/yük/CI/UAT/mağaza/devir. Ayrıntı ana listede. |
+| Sonraki güvenli adımlar | UAT-01 kişi/takvim; izinli gerçek yönetici posta testi ADM-MAIL-01; izole SQL ve gerçek cihaz kabulü. İçerik/üretim bilgisi gelmeden veri veya fiziksel onay uydurulmaz. APK/deploy ayrıca yetkili kapsamla. |
+| Güvenli geri dönüş | Mevcut birleşik deploy/rollback ve dış veri/ayar koruma yolu değişmedi. Restore provası ve runtime yetki ayrımı açık. |
 
-### 5.0 Güncel faz özeti — 27.10.2026
+### 5.0 Güncel faz özeti - 30.10.2026
+
+| Faz | Güncel durum | Ana task sayısı / ayrıntı |
+|---|---|---|
+| 00 | Devam; 120 task fazlarda, takvim/atamalar ve nihai kabuller açık | [Ana liste](../docs/tasks/project-closure-2026-10-30.md) |
+| 01 | Bloke - iş kararları ve müşteri girdileri açık | 8 / [Faz01](./Faz01_Kesif_ve_Kararlar.md) |
+| 02 | Devam - web ve Flutter düzeltildi; manuel erişilebilirlik/handoff kabulü açık | 3 / [Faz02](./Faz02_Tasarim_ve_UIUX.md) |
+| 03 | Devam - temel regresyon kayıtlı; SQL/güvenlik/posta/işletim kabulü açık | 21 / [Faz03](./Faz03_Teknik_Altyapi_Kimlik_Veritabani.md) |
+| 04 | Devam - katalog teknik kabulü var; veri ve ticari altyapı eksikleri açık | 14 / [Faz04](./Faz04_Katalog_Stok_Fiyat_Icerik_SEO.md) |
+| 05 | Bloke - gerçek ödeme, rezervasyon, kargo ve ticari kabul açık | 13 / [Faz05](./Faz05_ETicaret_Odeme_Siparis.md) |
+| 06 | Devam - KIS-01 teknik profil hazır; fiziksel ve üretim dosyası kabulü açık | 8 / [Faz06](./Faz06_Kisisellestirme_Editor_Baski.md) |
+| 07 | Bloke - D07 ve firma/teklif-sipariş teslimleri açık | 8 / [Faz07](./Faz07_Kurumsal_Teklif_Toplu_Siparis.md) |
+| 08 | Bloke - Mikro erişim/alan sözleşmesi ve gerçek adaptörler açık | 8 / [Faz08](./Faz08_Mikro_Muhasebe_Entegrasyonu.md) |
+| 09 | Bloke - üç kanalın erişimi, adaptörleri ve mutabakatı açık | 8 / [Faz09](./Faz09_Pazaryerleri_Merkezi_Siparis.md) |
+| 10 | Devam - üretim mevcut; SQL/kota/moderasyon/kalite kabulü açık | 8 / [Faz10](./Faz10_AI_Tasarim_Satis_Asistani.md) |
+| 11 | Devam - Flutter eşliği düzeltildi; kurulum, cihaz, push, mağaza ve final UAT açık | 21 / [Faz11](./Faz11_Mobil_UAT_Canliya_Gecis.md) |
+
+**Sayım:** 120 ana task, her biri tek ana faz; ortak bağımlılıklar ayrıca bağlıdır. Alt işler task sayısını artırmaz. Hiçbir faza yeni rol/PM onayı verilmedi; eski yüzdeler güncel oran değildir. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+### 5.0B Tarihsel faz özeti — 27.10.2026
 
 | Faz | Güncel durum | Ayrıntı |
 |---|---|---|
@@ -156,7 +178,7 @@ Blokaj nedeniyle bağımsız iş ve mock yapılabilir; ilgili faz **gerçek ente
 | 10 | Devam — AI üretim ve UI iyileşti; kalite kabulü açık | [Faz10_AI_Tasarim_Satis_Asistani](./Faz10_AI_Tasarim_Satis_Asistani.md) güncel uygulama bölümü |
 | 11 | Devam — birleşik yayın var; UAT/mağaza kabulü açık | [Faz11_Mobil_UAT_Canliya_Gecis](./Faz11_Mobil_UAT_Canliya_Gecis.md) güncel uygulama bölümü |
 
-**Kabul ve ölçüm:** Hiçbir faza yeni rol/PM onayı verilmedi. Aşağıdaki 20.10 yüzdeleri tarihsel tahmindir; bu denetimde yeni yüzde veya ağırlıksız genel tamamlanma oranı üretilmedi. Güncel kapsam, her fazın 27.10 tablosudur.
+**Kabul ve ölçüm:** Hiçbir faza yeni rol/PM onayı verilmedi. Aşağıdaki 20.10 yüzdeleri tarihsel tahmindir; bu denetimde yeni yüzde veya ağırlıksız genel tamamlanma oranı üretilmedi. 27.10 tablosu tarihsel kesittir; güncel kapsam her fazın 30.10 bölümü ve 120 task ana listesindedir.
 
 ### 5.1 Tarihsel faz ilerleme ve eksik özeti — 20.10.2026
 
@@ -611,3 +633,9 @@ Kullanıcının doğruladığı canlı /admin/ adresinde yeni Chrome ve uygulama
 ## 30.10.2026 - Flutter ana sayfa XINOBI U web yerleşim eşliği
 
 Kullanıcının ekran görüntüsündeki eski üst üste kart düzeni, mobil webdeki label/ürün/alt kart satırlarıyla eşlendi. Ürün 300px kendi satırında; soru kartı altta, desen kartı sağ alt hizalı, Temsilidir görünür. İçerik doğal yükseklikte; 320/390/700px ve 2x metinde örtüşme yok. Analiz temiz, 7 odaklı ve 79 tam Flutter testi geçti. [TST-170-174](../test/2026-10-30/TST-170-flutter-home-web-parity.md). Fiziksel cihaz, APK/kurulum veya yayın yapılmadı. KIS fiziksel üretim ve resmi mobil UAT açık kalır.
+
+## 30.10.2026 - Tüm eksik işlerin fazlara aktarımı
+
+120 kapanış taskı Faz01-11 arasında tek ana fazla eşlendi; Faz00 anlık durum/12 faz özeti yenilendi. Müşteri/veri/erişim girdileri, teknik geliştirme ve gerçek kabul işleri ayrıldı; ortak bağımlılıklar task sayısını artırmadan bağlandı. Admin gerçek posta teslimi, 23 ürün/fiyat, WEB-07 cihaz/a11y, KIS-01 ölçü/numune/SQL ve Flutter paket/telefon kurulumu özel alt kayıtlarla açık. [Ana liste](../docs/tasks/project-closure-2026-10-30.md), [denetim/16 commit](../docs/tasks/phase-audit-2026-10-30.md).
+
+[TST-175-178](../test/2026-10-30/TST-175-phase-closure-sync.md): 120/120 görev, 272 yeni yerel link/anchor, tarihsel içerik/rol kabul koruması ve diff/upstream PASS. Yeni uygulama testi, SQL yazımı, sağlayıcı, APK veya deployment yapılmadı; faz/PM onayı ve yüzde üretilmedi.

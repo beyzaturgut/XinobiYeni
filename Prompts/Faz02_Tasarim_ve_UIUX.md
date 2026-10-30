@@ -1,8 +1,41 @@
 # Faz02 — Xinobi yaratıcı yön, UI/UX ve tasarım teslimi
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Devam — tasarım ve erişilebilirlik kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Devam - web ve Flutter düzeltildi; manuel erişilebilirlik/handoff kabulü açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** WEB-07 (4d32780): 52 rota/boyut, 27 benzersiz test ve 15 ek axe taraması. Flutter ana sayfa önizlemesi (de99958): ürün ayrı satır, soru kartı altta, desen sağında; 7 odaklı test ve 79 tam mobil test. Bu sonuçlar VoiceOver/TalkBack veya tasarım teslim onayı değil.
+
+**Müşteriden / iş sahibinden beklenenler:** Onaylı görsel yön/hi-fi/handoff ve hedef cihaz/erişilebilirlik matrisi. Teknik ekip manuel klavye/ekran okuyucu/zoom ve tasarım kusuru kapatmalarını ayrıca yürütür.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [WEB-07](../docs/tasks/project-closure-2026-10-30.md#web-07) - Duyarlı tasarım ve erişilebilirlik kusurlarını kapat | Kısmen yapıldı | Gerçek Safari/VoiceOver, iOS/Android VoiceOver/TalkBack, tarayıcı zoom/OS ölçeği ve Creative/UX-handoff kabulü açık. |
+| [ADM-08](../docs/tasks/project-closure-2026-10-30.md#adm-08) - Panel veri dili ve kullanıcı deneyimini temizle | Yapılmadı - kapanış açık | Tüm modüllerde taslak koruma/toplu işlem/dar ekran ve gerçek kayıtla son kullanıcı kabulü ayrı çalışılmalı. |
+| [QA-03](../docs/tasks/project-closure-2026-10-30.md#qa-03) - Erişilebilirlik ve tasarım teslimini kabul et | Kısmen yapıldı | Web/admin/Android/iOS tam matris, gerçek VoiceOver/TalkBack ve Creative/UX/handoff imzaları eksik. |
+
+### Açık alt işler ve özel kabul kayıtları
+
+| Alt iş | Ana task | Durum | Kalan / kanıt |
+|---|---|---|---|
+| WEB-07-UAT-01 | WEB-07, QA-03 | Açık | Safari/macOS VoiceOver ile gerçek duyurular, hata, başlık ve odak kontrolü. |
+| WEB-07-UAT-02 | WEB-07, QA-03 | Açık | Gerçek Android/iOS: TalkBack/VoiceOver, sanal klavye, büyük metin ve yön değişimi. |
+| WEB-07-UAT-03 | WEB-07, QA-03 | Açık | Gerçek tarayıcı zoom/OS metin ölçeği ile Creative/UX/handoff kabul kaydı. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [WEB-01](../docs/tasks/project-closure-2026-10-30.md#web-01), [WEB-02](../docs/tasks/project-closure-2026-10-30.md#web-02), [KIS-04](../docs/tasks/project-closure-2026-10-30.md#kis-04), [MOB-05](../docs/tasks/project-closure-2026-10-30.md#mob-05), [MOB-07](../docs/tasks/project-closure-2026-10-30.md#mob-07).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — tasarım ve erişilebilirlik kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

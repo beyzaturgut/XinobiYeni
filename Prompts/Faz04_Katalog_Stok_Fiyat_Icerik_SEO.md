@@ -1,8 +1,51 @@
 # Faz04 — Ürün kataloğu, içerik ve yayın
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Devam — katalog iyileştirildi, ticari altyapı eksikleri açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Devam - katalog teknik kabulü var; veri ve ticari altyapı eksikleri açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** 358d42d: WEB-01 yerel teknik kabul, 24 ürün/8 kategori ve üç boyut. c1ba427: WEB-02 237 renk/boyut kontrolü, 110/110 medya ve 30/30 önizleme yanıtı; yerel üç dosya kurtarıldı. 35a4326/799e1af: kategori penceresi ve tam genişlik katalog promptu. Bunlar canlı ticari veri tamlığı değil.
+
+**Müşteriden / iş sahibinden beklenenler:** 23 ürün için onaylı açıklama/teknik özellik dosyası ve SKU 117 fiyatı; ana veri/kanal fiyatı ve desen lisans/kapsam kararı. Kullanıcının içerik dosyası gelene kadar açık bırakma talebi korunur.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [WEB-01](../docs/tasks/project-closure-2026-10-30.md#web-01) - Katalog gezinmesini gerçek veriyle kabul et | Yapıldı - teknik | Bu taskın yerel teknik kontrolü kapalı. CAT-01 veri tamlığı, canlı kurulum ve resmi iş sahibi UAT bu sonuçla kapanmaz. |
+| [WEB-02](../docs/tasks/project-closure-2026-10-30.md#web-02) - Ürün detayını satışa hazır doğrula | Kısmen yapıldı | 23 ürünün açıklama/teknik özellik dosyası bekleniyor. SKU 117 fiyatı eksik; alım kapalı. Kullanıcı içerik kısmını dosya gelene kadar açık bıraktı. |
+| [WEB-06](../docs/tasks/project-closure-2026-10-30.md#web-06) - CMS, destek ve iletişim deneyimini tamamla | Yapılmadı - kapanış açık | Tam CMS destekli SSS/blog/iletişim, mesaj teslimi/spam sınırı ve yayın-taslak indeksleme akışı tamamlanmadı. |
+| [WEB-08](../docs/tasks/project-closure-2026-10-30.md#web-08) - SEO ve ölçüm kurulumunu tamamla | Yapılmadı - kapanış açık | Gerçek ürün sitemap/URL/canonical-breadcrumb, eski URL 301 haritası ve izinli analitik satın alma tekilliği yayın alan adında kabul edilmedi. |
+| [ADM-02](../docs/tasks/project-closure-2026-10-30.md#adm-02) - Sistem ayarlarını kalıcı ve sürümlü yap | Yapılmadı - kapanış açık | Sürümlü kalıcı ayar API/deposu, eşzamanlı kayıt kontrolü ve onaylı ayar alanları tamamlanmadı. |
+| [ADM-03](../docs/tasks/project-closure-2026-10-30.md#adm-03) - Dashboard metriklerini gerçek kaynaklara bağla | Yapılmadı - kapanış açık | Ciro/net iade/tahsilat, stok ve dönüşüm tanımları ile gerçek kaynak ve finans mutabakatı açık. |
+| [CAT-01](../docs/tasks/project-closure-2026-10-30.md#cat-01) - Gerçek katalog veri kalitesini kapat | Kısmen yapıldı | 23 ürünün onaylı açıklama/teknik özellikleri ve SKU 117 fiyatı bekleniyor; tüm ticari veri kalite kapısı açık. |
+| [CAT-02](../docs/tasks/project-closure-2026-10-30.md#cat-02) - Depo ve stok hareket defterini kur | Yapılmadı - kapanış açık | Depo bazlı hareket defteri, giriş/çıkış/sayım/düzeltme, rezervasyon ve negatif stok uzlaştırması eksik. |
+| [CAT-03](../docs/tasks/project-closure-2026-10-30.md#cat-03) - Kalıcı kampanya ve kupon motorunu kur | Yapılmadı - kapanış açık | Kalıcı kupon/kampanya motoru, limit yarışı, kanal/varyant koşulları ve checkout/iade hesabı eksik. |
+| [CAT-04](../docs/tasks/project-closure-2026-10-30.md#cat-04) - Marka, doküman ve kanal fiyatını tamamla | Yapılmadı - kapanış açık | Marka, teknik doküman/kılavuz yaşam döngüsü ve kanal fiyatı sözleşmesi tamamlanmadı. |
+| [CAT-05](../docs/tasks/project-closure-2026-10-30.md#cat-05) - CMS yayınlama ve içerik yönetimini kur | Yapılmadı - kapanış açık | Tam sayfa/blog/SSS/iletişim CMS, taslak-yayın, slug, geçmiş ve güvenli içerik kabulü eksik. |
+| [CAT-06](../docs/tasks/project-closure-2026-10-30.md#cat-06) - Medya kütüphanesini ve dosya yaşam döngüsünü kur | Yapılmadı - kapanış açık | Aranabilir medya kütüphanesi, kullanım ilişkisi/alt metin, genel finalize/temizleme ve güvenli silme kapsamı açık. |
+| [CAT-07](../docs/tasks/project-closure-2026-10-30.md#cat-07) - İlk katalog aktarımı ve değişiklik geçmişini tamamla | Yapılmadı - kapanış açık | İşletim için CSV önizleme/satır hatası/dry-run/geri alma ve tam katalog değişim geçmişi eksik. |
+| [CAT-08](../docs/tasks/project-closure-2026-10-30.md#cat-08) - Desenler ve ürün keşif modelini uygula | Yapılmadı - kapanış açık | Desen lisans/satın alma kararı D13, tam ürün slug/301 haritası ve desenler kapsam kabulü açık. |
+
+### Açık alt işler ve özel kabul kayıtları
+
+| Alt iş | Ana task | Durum | Kalan / kanıt |
+|---|---|---|---|
+| WEB-02-DATA-01 | WEB-02, CAT-01 | Müşteri dosyası bekliyor | 23 ürünün açıklama/teknik özellikleri; dosya geldiğinde onaylı kaynaktan doldur ve tekrar doğrula. |
+| WEB-02-DATA-02 | WEB-02, CAT-01 | Onaylı fiyat bekliyor | Elektrikli Çay Makinesi 116120 / Metalik Lacivert / SKU 117; fiyat gelene kadar sepete ekleme kapalı. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [WEB-07](../docs/tasks/project-closure-2026-10-30.md#web-07), [ADM-01](../docs/tasks/project-closure-2026-10-30.md#adm-01), [ADM-08](../docs/tasks/project-closure-2026-10-30.md#adm-08), [KIS-02](../docs/tasks/project-closure-2026-10-30.md#kis-02), [TIC-02](../docs/tasks/project-closure-2026-10-30.md#tic-02), [TIC-03](../docs/tasks/project-closure-2026-10-30.md#tic-03).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Devam — katalog iyileştirildi, ticari altyapı eksikleri açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

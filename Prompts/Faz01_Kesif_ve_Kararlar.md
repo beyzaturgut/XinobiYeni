@@ -1,8 +1,36 @@
 # Faz01 — Keşif, kararlar ve uygulanabilir teslim temeli
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Bloke — müşteri kararları. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Bloke - iş kararları ve müşteri girdileri açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** 120 task ve güncel as-is envanteri eşlendi. Teknik tercihten iş sahibi onayı üretilmedi; müşteri kararları/atamalar/takvim hâlâ bekliyor.
+
+**Müşteriden / iş sahibinden beklenenler:** KAR-01...08: kapsam, veri sahipliği, ticaret, sağlayıcı erişimi, baskı şartnamesi, kurumsal satış, AI/mobil, hukuk/işletim kararları; gerçek kişi, tarih ve kabul kaydı.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [KAR-01](../docs/tasks/project-closure-2026-10-30.md#kar-01) - Güncel kapsamı ve teslim sınırını onayla | Yapılmadı - kapanış açık | Kapsam dahil/hariç listesi ve D01/D12/D13 için iş sahibi imzalı güncel karar eksik. |
+| [KAR-02](../docs/tasks/project-closure-2026-10-30.md#kar-02) - Veri sahipliğini alan bazında belirle | Yapılmadı - kapanış açık | Ürün, fiyat, stok, depo, cari, sipariş ve fatura için ana kaynak/yazma yönü/çakışma kararı onaylanmadı. |
+| [KAR-03](../docs/tasks/project-closure-2026-10-30.md#kar-03) - Ticaret durum makinesini kesinleştir | Yapılmadı - kapanış açık | Rezervasyon, tahsilat kesinleşmesi, vergi/kargo/taksit/havale ve kişiselleştirilmiş iade kararları açık. |
+| [KAR-04](../docs/tasks/project-closure-2026-10-30.md#kar-04) - Sağlayıcı ve sandbox erişimlerini tamamla | Yapılmadı - kapanış açık | Tüm sağlayıcılar için sahipli erişim, sandbox, limit ve test hesabı envanteri tamamlanmadı; kodun varlığı erişim kanıtı değil. |
+| [KAR-05](../docs/tasks/project-closure-2026-10-30.md#kar-05) - Fiziksel baskı standardını onayla | Yapılmadı - kapanış açık | Gerçek SKU ölçüleri, baskı tekniği/ICC/format kararı, üretim şablonları ve imzalı fiziksel numune kabulü bekleniyor. |
+| [KAR-06](../docs/tasks/project-closure-2026-10-30.md#kar-06) - Kurumsal satış modelini netleştir | Yapılmadı - kapanış açık | Firma modeli, teklifin siparişe hangi koşulda dönüşeceği, ödeme/fatura ve toplu sipariş modeli için D07 onayı eksik. |
+| [KAR-07](../docs/tasks/project-closure-2026-10-30.md#kar-07) - AI ve mobil ürün sınırlarını onayla | Yapılmadı - kapanış açık | Kota/bütçe, içerik/lisans politikası, alternatif kapsamı, hedef cihazlar, push ve mağaza sorumluluklarının tamamı kabul edilmedi. |
+| [KAR-08](../docs/tasks/project-closure-2026-10-30.md#kar-08) - Hukuk, işletim ve kalite girdilerini kapat | Yapılmadı - kapanış açık | Hukuk/muhasebe onaylı metinler, saklama/silme, SLA, RPO/RTO, maliyet ve bakım sorumluları kesinleşmedi. |
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — müşteri kararları. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

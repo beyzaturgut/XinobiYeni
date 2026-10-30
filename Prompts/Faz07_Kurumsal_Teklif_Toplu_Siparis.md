@@ -1,8 +1,38 @@
 # Faz07 — Kurumsal teklif ve toplu sipariş
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Bloke — D07; panel akışı iyileştirildi. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Bloke - D07 ve firma/teklif-sipariş teslimleri açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** Mevcut talep/mesaj/teklif/kabul-red ve yetkili panel devam eder. Son commitler firma başvurusu, ek dosya, teklifsiz toplu sipariş veya tekliften gerçek sipariş üretimini tamamlamadı.
+
+**Müşteriden / iş sahibinden beklenenler:** D07 firma alanları, teklif geçerliliği/fiyat-vergi kuralları, tek siparişe dönüşüm ve toplu satış modeli; kurumsal e-posta şablonları.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [B2B-01](../docs/tasks/project-closure-2026-10-30.md#b2b-01) - Firma başvurusu ve kurumsal profil oluştur | Yapılmadı - kapanış açık | Firma başvurusu, vergi/fatura profili, onay/red ve firma-kullanıcı modeli tamamlanmadı. |
+| [B2B-02](../docs/tasks/project-closure-2026-10-30.md#b2b-02) - Teklifin sürüm ve geçerlilik modelini tamamla | Yapılmadı - kapanış açık | Sürümlü fiyat/adet/vergi/kişiselleştirme, geçerlilik ve eski sürüm kabulünü engelleme modeli eksik. |
+| [B2B-03](../docs/tasks/project-closure-2026-10-30.md#b2b-03) - Teklif ek dosya akışını güvenli kur | Yapılmadı - kapanış açık | Güvenli ek dosya tür/boyut/tarama, sahiplik ve süreli indirme uçtan uca eksik. |
+| [B2B-04](../docs/tasks/project-closure-2026-10-30.md#b2b-04) - Kabul edilen teklifi tek siparişe dönüştür | Yapılmadı - kapanış açık | Kabulden tek siparişe atomik dönüşüm, fiyat snapshot’ı, stok/ödeme ve firma faturası açık. |
+| [B2B-05](../docs/tasks/project-closure-2026-10-30.md#b2b-05) - Teklifsiz toplu sipariş yolunu uygula | Yapılmadı - kapanış açık | Teklifsiz toplu SKU/adet yükleme, minimum adet/kurumsal fiyat ve checkout yolu tamamlanmadı. |
+| [B2B-06](../docs/tasks/project-closure-2026-10-30.md#b2b-06) - Kurumsal bildirim şablonlarını onayla ve bağla | Yapılmadı - kapanış açık | Kurumsal olayların onaylı, sürümlü e-posta/izinli kanal şablonları ve gerçek teslim kanıtı eksik. |
+| [B2B-07](../docs/tasks/project-closure-2026-10-30.md#b2b-07) - Kurumsal satış raporunu oluştur | Yapılmadı - kapanış açık | Cevap süresi, kabul oranı, kayıp nedeni ve siparişe dönüşüm sunucu raporu eksik. |
+| [B2B-08](../docs/tasks/project-closure-2026-10-30.md#b2b-08) - Teklif ve toplu siparişi üç kanalda kabul et | Yapılmadı - kapanış açık | Firma başvurusundan gerçek siparişe kadar web/Android/iOS/panel uçtan uca iş kabulü açık. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [ADM-04](../docs/tasks/project-closure-2026-10-30.md#adm-04), [ADM-06](../docs/tasks/project-closure-2026-10-30.md#adm-06), [SEC-07](../docs/tasks/project-closure-2026-10-30.md#sec-07), [TIC-02](../docs/tasks/project-closure-2026-10-30.md#tic-02), [TIC-03](../docs/tasks/project-closure-2026-10-30.md#tic-03).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — D07; panel akışı iyileştirildi. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

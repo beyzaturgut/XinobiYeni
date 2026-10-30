@@ -1,13 +1,43 @@
 # Faz10 — AI tasarım üretimi, satış asistanı ve AI yönetim paneli
 
+## Güncel durum ve tüm açık işler - 30.10.2026
+
+**Durum:** Devam - üretim mevcut; SQL/kota/moderasyon/kalite kabulü açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** 27.10 son tercihi dda85b6: tek aday üretimi ve prompt v5; ek yerel inceleme kaldırıldı. Prompt kuralları moderasyon/garanti değildir. Önceki 5f7792a incelemesi mevcut özellik olarak sayılmaz. de99958 ana sayfa tanıtım yerleşimidir; soru motoru/AI kalitesi değişmedi.
+
+**Müşteriden / iş sahibinden beklenenler:** AI kota/bütçe, içerik/lisans ve insan inceleme politikası; alternatif/yeniden üretim ve ek düzenleme kapsamı, WhatsApp muhatabı ve kalite kabul matrisi.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [AI-01](../docs/tasks/project-closure-2026-10-30.md#ai-01) - AI oturum ve iş durumunu kalıcı SQL'e taşı | Yapılmadı - kapanış açık | XINOBI U oturum/iş/soru geçmişinin süreli, yarış güvenli SQL geçişi tamamlanmadı. |
+| [AI-02](../docs/tasks/project-closure-2026-10-30.md#ai-02) - Atomik kota, maliyet ve kötüye kullanım kontrolü kur | Yapılmadı - kapanış açık | Atomik hesap/anonim kota, bütçe rezervasyonu, başarısız iş ve gerçek sağlayıcı kullanım uzlaştırması kabul edilmedi. |
+| [AI-03](../docs/tasks/project-closure-2026-10-30.md#ai-03) - AI girdi ve çıktı güvenlik denetimini kur | Yapılmadı - kapanış açık | Prompt yasakları moderasyon değildir. Onaylı girdi/çıktı güvenlik politikası ve red/insan inceleme yolu açık. |
+| [AI-04](../docs/tasks/project-closure-2026-10-30.md#ai-04) - Prompt kalitesi ve alternatif üretimini kabul et | Yapılmadı - kapanış açık | Gerçek ürün/renk/stil kalite matrisi, başarısız çıktı ve alternatif/yeniden üretim iş kabulü kapanmadı. |
+| [AI-05](../docs/tasks/project-closure-2026-10-30.md#ai-05) - AI ek düzenleme ve şablon kapsamını tamamla | Yapılmadı - kapanış açık | Arka plan kaldırma/genişletme, şablon/çıktı seçenekleri ve lisans/sağlayıcı yetenek kabulü eksik. |
+| [AI-06](../docs/tasks/project-closure-2026-10-30.md#ai-06) - Soru havuzu ve özellik bayrağı yönetimini kur | Yapılmadı - kapanış açık | Yetkili soru düzenleme/yayın/geri alma ve ortam/hesap bazlı güvenli özellik bayrakları tamamlanmadı. |
+| [AI-07](../docs/tasks/project-closure-2026-10-30.md#ai-07) - Nobi gerçek yanıt ve insan devrini kabul et | Yapılmadı - kapanış açık | Güncel gerçek yapılandırmada kaynak doğruluğu/hata/WhatsApp veya lead devri uçtan uca kabul edilmeli. |
+| [AI-08](../docs/tasks/project-closure-2026-10-30.md#ai-08) - AI operasyon raporunu ve yaşam döngüsünü tamamla | Yapılmadı - kapanış açık | Tüm geçmişi kapsayan sunucu sorgusu, gerçek maliyet mutabakatı, alarm, saklama/silme ve sağlayıcı çıkış planı açık. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [KAR-07](../docs/tasks/project-closure-2026-10-30.md#kar-07), [KIS-04](../docs/tasks/project-closure-2026-10-30.md#kis-04), [KIS-05](../docs/tasks/project-closure-2026-10-30.md#kis-05), [ADM-06](../docs/tasks/project-closure-2026-10-30.md#adm-06), [SEC-03](../docs/tasks/project-closure-2026-10-30.md#sec-03), [SEC-07](../docs/tasks/project-closure-2026-10-30.md#sec-07), [OPS-04](../docs/tasks/project-closure-2026-10-30.md#ops-04).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
 **27.10 son üretim tercihi:** Ek yerel denetim ve bağlı kurulum kullanıcı isteğiyle kaldırıldı; tek aday üretimi geri geldi. Prompt v5 her isteme açık yazı/imza/logo/ürün/eşya yasakları ekler, rafine çizim kuralları korunur. [Test kaydı](../test/2026-10-27/TST-art-direction-v5.md).
 
 
 **27.10 prompt v3 ek kaydı:** AI desen üretimine olumlu motif tarifi, ana/yardımcı motif hiyerarşisi, zemin/ana/destek/vurgu renk rolleri ve kısa yazısızlık kuralları eklendi (`xinobi-art-direction-3`). Model ve dört adım korunur. Yeni ücretli üretim/estetik kabul veya canlı deploy yapılmadı; görsel sonuçlar kullanıcıyla iteratif değerlendirilecek. [Kurallar](../docs/xinobi-u-art-direction.md), [test kaydı](../test/2026-10-27/TST-art-direction-v3.md).
 
-## Güncel uygulama durumu — 27.10.2026
+## Tarihsel uygulama durumu — 27.10.2026
 
-**Durum:** Devam — AI üretim ve UI iyileşti; kalite kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Devam — AI üretim ve UI iyileşti; kalite kabulü açık. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

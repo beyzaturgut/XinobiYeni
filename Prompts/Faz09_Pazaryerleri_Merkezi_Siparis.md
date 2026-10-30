@@ -1,8 +1,38 @@
 # Faz09 — Trendyol, Hepsiburada ve N11 ile merkezi sipariş
 
-## Güncel uygulama durumu — 27.10.2026
+## Güncel durum ve tüm açık işler - 30.10.2026
 
-**Durum:** Bloke — D02/D03/D06. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Aşağıdaki kayıt günceldir; 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
+**Durum:** Bloke - üç kanalın erişimi, adaptörleri ve mutabakatı açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+
+**Yapılan son işler:** Son commitlerde Trendyol/Hepsiburada/N11 gerçek adaptörleri eklenmedi. Panelin doğrulanmamış bağlantıyı açık göstermesi korunur; sahte başarılı senkron sonucu yok.
+
+**Müşteriden / iş sahibinden beklenenler:** Üç mağaza/test erişimi, kanal kategori/özellik/barkod ve komisyon/fatura/kargo sözleşmeleri; veri sahipliği ve kanal açılış kabul sahipleri.
+
+### Teknik ekipte ve kabulde kalan ana görevler
+
+Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını içerir; tamamlanan teknik kapsamlar da kaybolmaması için listede korunur. Hedef iş, mevcut temel, kapanış kanıtı, bağımlılık ve önerilen sorumlu task bağlantısındadır.
+
+| Task / konu | Durum | Yapılmadı / kapanış için kalan |
+|---|---|---|
+| [PAZ-01](../docs/tasks/project-closure-2026-10-30.md#paz-01) - Üç kanalın erişim ve eşleme sözleşmesini tamamla | Yapılmadı - kapanış açık | Her kanalın mağaza/test erişimi, kategori/özellik/barkod ve operasyon/API sözleşmeleri bekleniyor. |
+| [PAZ-02](../docs/tasks/project-closure-2026-10-30.md#paz-02) - Trendyol adaptörünü uygula | Yapılmadı - kapanış açık | Gerçek Trendyol ürün, fiyat/stok, sipariş ve kargo/durum adaptörü ve sandbox kabulü eksik. |
+| [PAZ-03](../docs/tasks/project-closure-2026-10-30.md#paz-03) - Hepsiburada adaptörünü uygula | Yapılmadı - kapanış açık | Kanala özel kategori/listeleme/sipariş/gönderi adaptörü ve hata eşlemesi eksik. |
+| [PAZ-04](../docs/tasks/project-closure-2026-10-30.md#paz-04) - N11 adaptörünü uygula | Yapılmadı - kapanış açık | Gerçek N11 API adaptörü, stok/fiyat/sipariş/durum/gönderi ve kabul eksik. |
+| [PAZ-05](../docs/tasks/project-closure-2026-10-30.md#paz-05) - Merkezi sipariş ve kanal stok dağıtımını kur | Yapılmadı - kapanış açık | Kanal sipariş tekilleştirme, ortak rezervasyon, kanal fiyat/stok yayını ve gecikme yönetimi eksik. |
+| [PAZ-06](../docs/tasks/project-closure-2026-10-30.md#paz-06) - Kanal kargo, iptal/iade ve faturayı bağla | Yapılmadı - kapanış açık | Kanal durum eşlemesi, etiket/takip, müşteri iptali/iadesi ve fatura bağlantısı eksik. |
+| [PAZ-07](../docs/tasks/project-closure-2026-10-30.md#paz-07) - Panel eşleme, iş geçmişi ve fark yönetimini kur | Yapılmadı - kapanış açık | Gerçek ürün eşleme, son senkron/job/hatalı satır/retry ve stok-fiyat-sipariş fark ekranları açık. |
+| [PAZ-08](../docs/tasks/project-closure-2026-10-30.md#paz-08) - Her kanalı ayrı kabul edip kontrollü aç | Yapılmadı - kapanış açık | Trendyol/Hepsiburada/N11 ayrı sandbox UAT, ilk yükleme dry-run ve sınırlı canlı açılış yapılmadı. |
+
+**Çapraz bağımlılıklar (tekrar sayılmaz):** [KAR-02](../docs/tasks/project-closure-2026-10-30.md#kar-02), [KAR-04](../docs/tasks/project-closure-2026-10-30.md#kar-04), [CAT-02](../docs/tasks/project-closure-2026-10-30.md#cat-02), [TIC-03](../docs/tasks/project-closure-2026-10-30.md#tic-03), [SEC-06](../docs/tasks/project-closure-2026-10-30.md#sec-06), [ADM-06](../docs/tasks/project-closure-2026-10-30.md#adm-06).
+
+**Kapanış kuralı:** Teknik ekip geliştirme/test kanıtını, müşteri/operasyon gerekli girdiyi sağlar; gerçek SQL, sağlayıcı, fiziksel cihaz, üretim numunesi ve resmi UAT ayrı kapılardır. Bu belge güncellemesinde uygulama testi tekrar koşulmadı. [Doküman doğrulaması TST-175](../test/2026-10-30/TST-175-phase-closure-sync.md).
+
+---
+
+
+## Tarihsel uygulama durumu — 27.10.2026
+
+**Durum:** Bloke — D02/D03/D06. Kaynak kesiti: `main` / `5791181`; [27.10.2026 faz denetimi](../docs/tasks/phase-audit-2026-10-27.md). Bu kayıt 27.10 kesitidir; güncel 30.10 durumu yukarıdadır. 16/20 Ekim tarihli durum, oran, sonraki adım ve dağıtım ifadeleri tarihsel karşılaştırma için korunmuştur. Yüzdeler yeniden hesaplanmadı; eski yüzdeler güncel ilerleme ölçümü değildir. Rol ve PM kabulü verilmedi.
 
 | İş / kapsam | Güncel durum | Uygulama ve sınır |
 |---|---|---|

@@ -35,19 +35,19 @@ function MethodIcon({ method }: { method: Method }) {
 function MethodSelection() {
   const params = useSearchParams();
   const id = params.get('product') || '';
-  const { state, error } = useCommerce();
+  const { state, error, retry: reloadCatalog } = useCommerce();
   // The product page hands over its selected colour; otherwise the last choice for this product is used.
-  const [requested] = useState(() => params.get('variant') || (typeof window === 'undefined' ? '' : sessionStorage.getItem(`xinobi-u-selected-variant:${id}`) || ''));
+  const [requested, setRequested] = useState(() => params.get('variant') || (typeof window === 'undefined' ? '' : sessionStorage.getItem(`xinobi-u-selected-variant:${id}`) || ''));
   const [method, setMethod] = useState<Method>('image');
   const [retry, setRetry] = useState(0);
   const [navigating, setNavigating] = useState(false);
   const product = state?.products.find(item => item.id === id && isPersonalizable(item));
   const accepted = useAcceptedVariants(product, retry);
 
-  if (!state) return <main className={studioStyles.main}><p role="status">{error || 'Ürün yükleniyor…'}</p></main>;
+  if (error || !state) return <main className={studioStyles.main}>{error?<div role="alert"><p>{error}</p><button type="button" onClick={reloadCatalog}>Ürünü yeniden yükle</button></div>:<p role="status">Ürün yükleniyor…</p>}</main>;
   if (!product) return <main className={studioStyles.main}><p>Bu ürün kişiselleştirmeye açık değil.</p><Link href="/xinobi-u">Ürünleri keşfet</Link></main>;
 
-  const start = accepted.status === 'ready' ? startingVariant(product, accepted.surfaces, requested) : undefined;
+  const start = accepted.status === 'ready' ? requested ? product.variants.find(variant=>variant.id===requested&&accepted.surfaces[variant.id]) : startingVariant(product, accepted.surfaces) : undefined;
   const shown = product.variants.find(variant => variant.id === requested) ?? product.variants[0];
   const image = shown?.image || product.originalImage || product.variants.find(variant => variant.image)?.image;
   const readiness = accepted.status === 'ready' ? start ? 'ready' : 'unavailable' : accepted.status;
@@ -81,8 +81,9 @@ function MethodSelection() {
         </fieldset>
         <div className={styles.status}>
           <p role="status" hidden={readiness === 'ready'} data-preview-readiness={readiness} data-product-reference={product.id} data-variant-reference={start?.id}>
-            {readiness === 'loading' ? 'Kontrol ediliyor…' : readiness === 'ready' ? null : readiness === 'error' ? 'Kişiselleştirme şu anda doğrulanamıyor. Tekrar deneyin.' : 'Bu ürün için kişiselleştirme henüz kullanılamıyor.'}
+            {readiness === 'loading' ? 'Kontrol ediliyor…' : readiness === 'ready' ? null : readiness === 'error' ? 'Kişiselleştirme şu anda doğrulanamıyor. Tekrar deneyin.' : requested?'Seçtiğin renk şu anda kişiselleştirilemiyor. Devam etmek için uygun bir renk seç.':'Bu ürün için kişiselleştirme henüz kullanılamıyor.'}
           </p>
+          {readiness==='unavailable' && accepted.status==='ready' && product.variants.some(variant=>accepted.surfaces[variant.id]) && <fieldset><legend>Kişiselleştirilebilen renkler</legend>{product.variants.filter(variant=>accepted.surfaces[variant.id]).map(variant=><button type="button" key={variant.id} onClick={()=>setRequested(variant.id)}>{variant.color} rengini kullan</button>)}</fieldset>}
         </div>
         <div className={styles.actions}>
           <Link className={styles.secondary} href={productHref}>Geri</Link>

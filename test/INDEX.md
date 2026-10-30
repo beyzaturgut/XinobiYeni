@@ -2,6 +2,14 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-142 | 30.10.2026 | WEB-02 medya 107/110 -> üç yerel restore -> 110/110 | PASS | READ-ONLY HTTP / LOCAL MEDIA | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-143 | 30.10.2026 | WEB-02 24 ürün, 79 renk, üç boyutta 237 kontrol | PASS | LOCAL CATALOG / E2E / GET FIXTURE | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-144 | 30.10.2026 | WEB-02 renk/maske/yorum/kesinti 5+1 regresyon | PASS | CHROME FIXTURE / E2E | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-145 | 30.10.2026 | WEB-02 TypeScript | PASS | STATIC | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-146 | 30.10.2026 | WEB-02 tam web lint | PASS | STATIC | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-147 | 30.10.2026 | WEB-02 üretim build, 38 sayfa | PASS | BUILD | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-148 | 30.10.2026 | WEB-02 diff bütünlüğü | PASS | STATIC | `2026-10-30/TST-142-web02-product-detail.md` |
+| TST-149 | 30.10.2026 | WEB-02 gerçek yüzey uygunluğu 30/30 | PASS | READ-ONLY LOCAL API | `2026-10-30/TST-142-web02-product-detail.md` |
 | TST-136 | 30.10.2026 | WEB-01 gerçek katalog 24 ürün/8 kategori, üç boyut ve kenar durumları | PASS; ilk çerez paneli test engeli düzeltilip tekrarlandı | READ-ONLY LOCAL / E2E / GET FIXTURE | `2026-10-30/TST-136-web01-catalog-navigation.md` |
 | TST-137 | 30.10.2026 | Mevcut katalog/arama/karşılaştırma 3 regresyon | PASS | CHROME FIXTURE / E2E | `2026-10-30/TST-136-web01-catalog-navigation.md` |
 | TST-138 | 30.10.2026 | WEB-01 TypeScript | PASS | STATIC | `2026-10-30/TST-136-web01-catalog-navigation.md` |

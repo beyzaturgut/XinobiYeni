@@ -1,4 +1,6 @@
 import {test,expect} from "@playwright/test";
+import {mockStore} from './fixtures';
+import {mockAcceptedSurfaces} from './preview-readiness-fixtures';
 const pairs=[["DEMO-P101","DEMO-V101-B",true],["DEMO-P101","DEMO-V101-R",false],["DEMO-P101","DEMO-V101-S",false],["DEMO-P101","DEMO-V101-G",false],["DEMO-P102","DEMO-V102-R",false]] as const;
 for(const [product,variant,ready] of pairs)test("exact preview readiness "+variant,async({page,request})=>{
  const bundle=await(await request.get("/api/v1/dev/product-surfaces/commerce/"+product+"/"+variant+"/rendering-inputs")).json();
@@ -18,9 +20,16 @@ test("XINOBI U eligibility remains separate from exact preview readiness",async(
  await expect(page.locator('[data-product-reference="DEMO-P102"]')).toHaveAttribute("data-preview-readiness","unavailable");
  await expect(page.getByRole("link",{name:/→$/}).filter({hasText:/Görsel yükle|Sorulara başla|Desen yükle/})).toHaveCount(0);
 });
-test("method step keeps the questionnaire identity on a colour with an accepted surface",async({page})=>{
+test("method step requires explicit accepted colour selection instead of borrowing another mask",async({page})=>{
+ await mockStore(page);await mockAcceptedSurfaces(page);
  for(const requested of ["DEMO-V101-B","DEMO-V101-R","DEMO-V101-S","DEMO-V101-G"]){
   await page.goto("/xinobi-u/renk/?product=DEMO-P101&variant="+requested);
+  if(requested!=="DEMO-V101-B"){
+   await page.getByRole("button",{name:"Çerez tercih panelini kapat"}).click();
+   await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-preview-readiness","unavailable");
+   await expect(page.getByRole("link",{name:"Görsel yükle →"})).toHaveCount(0);
+   await page.getByRole("button",{name:"Lacivert rengini kullan"}).click();
+  }
   await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-preview-readiness","ready");
   await expect(page.locator('[data-preview-readiness]')).toHaveAttribute("data-variant-reference","DEMO-V101-B");
   const ask=page.getByRole("radio",{name:/Sorularla tasarla/});await ask.dispatchEvent("click");await expect(ask).toBeChecked();

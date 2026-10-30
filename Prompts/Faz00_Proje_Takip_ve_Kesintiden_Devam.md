@@ -587,3 +587,8 @@ Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST
 ### WEB-01 - Gerçek katalog gezinme kabulü / 30.10.2026
 
 [Task kapanışı](../docs/tasks/web-01-catalog-navigation-2026-10-30.md), [TST-136...141](../test/2026-10-30/TST-136-web01-catalog-navigation.md): 24 aktif ürün/8 kategoriyle 390/768/1440 px gezinme kabulü başarılı. URL arama/sıralama ve geri dönüş koruması, kategori kimliği/çakışması, gerçek hata-boş-yükleniyor ayrımı, retry ve silinen/pasif karşılaştırma seçimi düzeltildi. 3 mevcut fixture regresyonu, TypeScript, tam web lint ve statik production build başarılı. İlk çerez paneli kaynaklı test tıklama engeli korunarak raporlandı ve test navigasyon yardımcısı düzeltilerek tekrarlandı. WEB-01 yerel teknik kabul tamamlandı; CAT-01 veri/medya tamlığı, canlı deploy ve resmi UAT kapanmadı. Faz yüzdeleri değiştirilmedi; veri yazımı/migration/APK/sağlayıcı işlemi yok.
+
+
+### WEB-02 - Ürün detay teknik kabulü / 30.10.2026
+
+[Task / açık veri işleri](../docs/tasks/web-02-product-detail-2026-10-30.md), [TST-142...149](../test/2026-10-30/TST-142-web02-product-detail.md): 24 ürün/79 renk, 390/768/1440 px toplam 237 kontrol başarılı. Renk URL/geçmiş, eksik/geçersiz fiyat ve stok, kesinti/retry, bozuk görsel mesajı, doğru SKU sepeti ve maskesiz renkte açık renk seçimi uygulandı. Üç eksik public dosya yalnız yerele geri getirildi, medya 110/110; gerçek yüzey GET 30/30 hazır. 5+1 fixture regresyonu, TypeScript/lint/build başarılı. Teknik kısım tamamlandı; kullanıcı 23 ürünün açıklama/özelliklerini dosya gelene kadar açık bıraktı. SKU 117 fiyatı da açık, satın alma kapalı. Tüm WEB-02 ticari veri kabulü, canlı yayın veya faz kapanışı iddia edilmez; yüzdeler değiştirilmedi.

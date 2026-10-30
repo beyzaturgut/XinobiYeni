@@ -1,3 +1,4 @@
+import TableRegion from './TableRegion'
 import {useEffect,useState} from 'react'
 import {commerceApi,commerceRequest} from './commerce'
 import {useAdminSession} from './AdminAccess'
@@ -24,7 +25,7 @@ export default function AuditLog(){
   <p className="audit-help">Seçilen alanın en yeni 200 kaydı gösterilir. Tarih ve saat: Türkiye saati (Europe/Istanbul). Adı doğrulanamayan kullanıcılar ve test/canlı kaynağı tahmin edilmez.</p>
   {!current&&<p role="status">İşlem geçmişi yükleniyor…</p>}
   {current?.error&&<p role="alert">{current.error} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
-  {current&&!current.error&&<><div className="table-scroll audit-table"><table><caption>İşlem geçmişi · En fazla 200 kayıt</caption><thead><tr>{['Tarih / saat','İşlem','İşlemi yapan','İlgili kayıt','Sonuç'].map(title=><th key={title} scope="col">{title}</th>)}</tr></thead><tbody>{current.items.map(item=><tr key={item.id}>
+  {current&&!current.error&&<><TableRegion className="audit-table"><table><caption>İşlem geçmişi · En fazla 200 kayıt</caption><thead><tr>{['Tarih / saat','İşlem','İşlemi yapan','İlgili kayıt','Sonuç'].map(title=><th key={title} scope="col">{title}</th>)}</tr></thead><tbody>{current.items.map(item=><tr key={item.id}>
    <td><time dateTime={item.occurredAt}>{auditDate(item.occurredAt)}</time></td>
    <th scope="row"><span>{auditAction(item.action)}</span><details><summary>Teknik detaylar</summary><dl>
     <div><dt>Kayıt numarası</dt><dd>{item.id}</dd></div>
@@ -39,6 +40,6 @@ export default function AuditLog(){
    <td>{auditActor(item.actorId,session?.account)}</td>
    <td>{auditAreas[item.entityType]??'İlgili kayıt'} · {item.entityId&&item.entityId!=='-'?'Kayıt kimliği ayrıntılarda':'Hedef belirtilmemiş'}</td>
    <td><span className="order-state">{auditResult(item.status)}</span></td>
-  </tr>)}</tbody></table></div>{current.items.length===0&&<div className="empty-widget"><strong>Kayıt bulunamadı</strong><p>Seçilen alan için gösterilebilecek işlem kaydı yok.</p></div>}</>}
+  </tr>)}</tbody></table></TableRegion>{current.items.length===0&&<div className="empty-widget"><strong>Kayıt bulunamadı</strong><p>Seçilen alan için gösterilebilecek işlem kaydı yok.</p></div>}</>}
  </section>
 }

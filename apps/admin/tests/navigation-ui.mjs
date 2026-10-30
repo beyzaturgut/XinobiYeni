@@ -19,6 +19,8 @@ try {
     const url = new URL(route.request().url())
     const data = url.pathname.endsWith('/admin/session') ? {account:{id:'navigation-test',name:'Yönetici'},permissions:[...new Set(navigationItems.map(item=>item.permission)),'catalog.write']}
       : url.pathname.endsWith('/state') ? fixture
+      : url.pathname.endsWith('/orders') ? []
+      : url.pathname.endsWith('/order-options') ? {carriers:['Synthetic'],returnWindowDays:14}
       : url.pathname.endsWith('/dashboard') ? {orderCount:0,customerCount:0,statuses:[],days:[],recordedAmounts:[]}
       : url.pathname.endsWith('/customers') ? { items: [], page: 1, pageSize: 20, total: 0, totalPages: 0 }
       : url.pathname.endsWith('/inventory') ? { items: [], page: 1, pageSize: 20, total: 0, totalAvailableToSell: 0, lowStockCount: 0, outOfStockCount: 0 }
@@ -28,12 +30,12 @@ try {
     return data ? route.fulfill({ json: data }) : route.fulfill({ status: 503, json: { message: 'İzole UI testi: servis kullanılamıyor.' } })
   })
   const base=process.env.ADMIN_UI_URL || 'http://127.0.0.1:5174/'
-  const headings={dashboard:'Operasyon özeti',orders:'Sipariş yönetimi',catalog:'Katalog ve varyantlar',inventory:'Stok ve depo yönetimi',surfaces:'Ürün yüzeyi inceleme',reviews:'Ürün değerlendirmeleri',pricing:'Fiyat ve kampanya yönetimi',content:'İçerik yönetimi',print:'Tasarım ve baskı operasyonları',integrations:'Entegrasyon izleme',settings:'Rol, ayar ve denetim',ai:'AI yönetimi',quotes:'Kurumsal teklif yönetimi',notifications:'Bildirim kayıtları',audit:'Denetim kaydı'}
+  const headings={customers:'Müşteri yönetimi',dashboard:'Operasyon özeti',orders:'Sipariş yönetimi',catalog:'Katalog ve varyantlar',inventory:'Stok ve depo yönetimi',surfaces:'Ürün yüzeyi inceleme',reviews:'Ürün değerlendirmeleri',pricing:'Fiyat ve kampanya yönetimi',content:'İçerik yönetimi',print:'Tasarım ve baskı operasyonları',integrations:'Entegrasyon izleme',settings:'Rol, ayar ve denetim',ai:'AI yönetimi',quotes:'Kurumsal teklif yönetimi',notifications:'Bildirim kayıtları',audit:'Denetim kaydı'}
   const sideOrder=sideNavigation.flatMap(group=>group.items.map(item=>item.view))
   assert.deepEqual([...sideOrder].sort(),['audit','dashboard','notifications'])
   const topViews=topNavigation.flatMap(group=>group.links.map(item=>item.view))
-  assert.equal(topViews.length,12)
-  assert.equal(new Set([...topViews,...sideOrder]).size,15)
+  assert.equal(topViews.length,13)
+  assert.equal(new Set([...topViews,...sideOrder]).size,16)
   assert.ok(topViews.every(view=>!sideOrder.includes(view)),'Ownership partitions must never overlap')
   assert.deepEqual([...topViews,...sideOrder].sort(),Object.keys(headings).sort(),'No existing screen may be lost')
   for(const width of [1440,1280,768,390]){
@@ -73,7 +75,7 @@ try {
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),width+'px overflow: '+item.view)
       homes.push(item.view)
     }
-    assert.equal(new Set(homes).size,15,'15/15 existing screens reached')
+    assert.equal(new Set(homes).size,16,'16/16 existing screens reached')
     // Enumerate visible primary links, including dropdowns, rather than trusting only the definition.
     const visibleHomes=await sidebar.locator('[data-nav-view]').evaluateAll(nodes=>nodes.map(node=>node.dataset.navView))
     visibleHomes.push(...await top.locator('[data-nav-view]').evaluateAll(nodes=>nodes.map(node=>node.dataset.navView)))
@@ -91,8 +93,8 @@ try {
       await page.keyboard.press('Escape')
       assert.ok(await button.evaluate(node=>node===document.activeElement))
     }
-    assert.equal(visibleHomes.length,15)
-    assert.equal(new Set(visibleHomes).size,15,'Zero duplicate primary page links across the two menus')
+    assert.equal(visibleHomes.length,16)
+    assert.equal(new Set(visibleHomes).size,16,'Zero duplicate primary page links across the two menus')
     await navigateTo(page,'Stok ve depolar')
     await page.reload()
     await page.waitForURL(url=>url.searchParams.get('view')==='inventory')
@@ -110,7 +112,7 @@ try {
     await sidebar.locator('[data-nav-view=notifications][aria-current=page]').waitFor()
     assert.equal(await top.locator('[aria-current=true]').count(),0)
     await products.focus();await page.keyboard.press('ArrowRight')
-    assert.ok(await top.getByRole('button',{name:'Müşteriler',exact:true}).evaluate(node=>node===document.activeElement))
+    assert.ok(await top.getByRole('button',{name:topNavigation[(topNavigation.findIndex(group=>group.name==='Ürünler')+1)%topNavigation.length].name,exact:true}).evaluate(node=>node===document.activeElement))
     await page.keyboard.press('ArrowLeft');await page.keyboard.press('ArrowDown')
     await page.waitForFunction(()=>document.activeElement?.getAttribute('data-nav-view')==='catalog')
     assert.equal(await page.locator('#admin-header-popup [data-nav-view=catalog]').evaluate(node=>getComputedStyle(node).outlineStyle),'solid')
@@ -144,10 +146,14 @@ try {
       await page.evaluate(()=>window.scrollTo(0,0))
       await page.setViewportSize({width,height:400})
       await sidebar.hover()
-      const before=await page.evaluate(()=>scrollY)
-      await page.mouse.wheel(0,600)
-      await page.waitForFunction(()=>document.querySelector('.icon-rail').scrollTop>0)
-      assert.equal(await page.evaluate(()=>scrollY),before,'Sidebar scroll cannot move main content')
+      // At 400px height the header now flows with the page, leaving room for all operation links.
+      assert.equal(await page.locator('.panel-header').evaluate(node=>getComputedStyle(node).position),'static')
+      const rail=await sidebar.boundingBox()
+      assert.ok(rail.height<=400,'Short viewport navigation remains bounded')
+      for(const button of await sidebar.locator('[data-nav-view]').all()){
+        await button.focus();const rect=await button.boundingBox()
+        assert.ok(rect.y>=0&&rect.y+rect.height<=400,'Every short-viewport operation link is reachable')
+      }
       await page.setViewportSize({width,height:1000})
       await sidebar.evaluate(node=>node.scrollTop=0)
     }
@@ -161,7 +167,7 @@ try {
     assert.ok((await dialog.boundingBox()).width<=width)
     await page.keyboard.press('Escape')
     assert.equal(await dialog.count(),0)
-    console.log(width+'px PASS: 15/15 unique owners, independent menus, active states, history/reload, keyboard/Escape, hover, scrolling and overflow')
+    console.log(width+'px PASS: 16/16 unique owners, independent menus, active states, history/reload, keyboard/Escape, hover, scrolling and overflow')
   }
   await page.goto(base+'?view=unknown')
   await page.locator('#rail-links [data-nav-view=dashboard][aria-current=page]').waitFor()

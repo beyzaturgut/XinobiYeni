@@ -1,5 +1,7 @@
 # Faz02 — Xinobi yaratıcı yön, UI/UX ve tasarım teslimi
 
+**30.10 admin görsel/durum uygulaması:** 16 modül ortak tablo, kontrol, hata/başarı ve pencere odağı dilinde denetlendi; başarısız yazmada taslak, içerik/yüzey yetkileri, eksik sayaç ve yüklenme ayrımları düzeltildi. [Modül/bulgu/açık iş matrisi](../design/admin-consistency-audit-2026-10-30.md), [TST-188](../test/2026-10-30/TST-188-admin-consistency.md). Gerçek SQL/operasyon/sağlayıcı/handoff kabulü açık; faz onayı verilmedi.
+
 **30.10 web görsel/durum uygulaması:** 33 rota dört genişlikte normal/%200 metinle denetlendi; bağımsız hesap veri durumları, yeniden deneme/taslak koruma, yorum modal odağı, katalog/checkout/iade hata kapıları ve dar ekran reflow düzeltildi. [Ekran/kusur/açık iş matrisi](../design/web-consistency-audit-2026-10-30.md), [test raporu](../test/2026-10-30/TST-179-web-consistency.md). Yalnız web; müşteri verileri, gerçek sağlayıcı/cihaz/baskı ve resmi handoff kabulü açık. Faz onayı/yüzde değiştirilmedi.
 
 ## Güncel durum ve tüm açık işler - 30.10.2026
@@ -17,7 +19,7 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 | Task / konu | Durum | Yapılmadı / kapanış için kalan |
 |---|---|---|
 | [WEB-07](../docs/tasks/project-closure-2026-10-30.md#web-07) - Duyarlı tasarım ve erişilebilirlik kusurlarını kapat | Kısmen yapıldı | Gerçek Safari/VoiceOver, iOS/Android VoiceOver/TalkBack, tarayıcı zoom/OS ölçeği ve Creative/UX-handoff kabulü açık. |
-| [ADM-08](../docs/tasks/project-closure-2026-10-30.md#adm-08) - Panel veri dili ve kullanıcı deneyimini temizle | Yapılmadı - kapanış açık | Tüm modüllerde taslak koruma/toplu işlem/dar ekran ve gerçek kayıtla son kullanıcı kabulü ayrı çalışılmalı. |
+| [ADM-08](../docs/tasks/project-closure-2026-10-30.md#adm-08) - Panel veri dili ve kullanıcı deneyimini temizle | Kısmen yapıldı | 16 modül görsel/durum kontrolü ve başarısız kayıtta taslak düzeltmeleri uygulandı. Global navigasyon taslak/toplu işlem politikası ve gerçek operasyon kabulü açık. |
 | [QA-03](../docs/tasks/project-closure-2026-10-30.md#qa-03) - Erişilebilirlik ve tasarım teslimini kabul et | Kısmen yapıldı | Web/admin/Android/iOS tam matris, gerçek VoiceOver/TalkBack ve Creative/UX/handoff imzaları eksik. |
 
 ### Açık alt işler ve özel kabul kayıtları

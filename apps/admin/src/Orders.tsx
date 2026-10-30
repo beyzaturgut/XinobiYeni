@@ -1,3 +1,5 @@
+import AdminDialog from './AdminDialog'
+import TableRegion from './TableRegion'
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 import {useAdminSession} from './AdminAccess'
@@ -33,7 +35,7 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
   const [items, setItems] = useState<StaffOrder[]>([]), [options, setOptions] = useState<Options | null>(null)
   const [designFilter,setDesignFilter]=useState('all')
   const [query, setQuery] = useState(''), [status, setStatus] = useState('Tümü'), [selectedId, setSelectedId] = useState<string | null>(null)
-  const [error, setError] = useState(commerceApi ? '' : 'Sipariş API adresi yapılandırılmadı.'), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false), [reload, setReload] = useState(0)
+  const [error, setError] = useState(commerceApi ? '' : 'Sipariş API adresi yapılandırılmadı.'), [notice, setNotice] = useState(''), [actionError,setActionError] = useState(''), [busy, setBusy] = useState(false), [reload, setReload] = useState(0)
   const [loading, setLoading] = useState(Boolean(commerceApi))
   const [optionsLoading, setOptionsLoading] = useState(Boolean(commerceApi)), [optionsError, setOptionsError] = useState(''), [optionsReload, setOptionsReload] = useState(0)
   const [carrier, setCarrier] = useState(''), [tracking, setTracking] = useState(''), [trackingUrl, setTrackingUrl] = useState(''), [note, setNote] = useState('')
@@ -93,14 +95,14 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
   async function act(route: string, body: unknown, done: string) {
     if (!selected || writing.current || !ready || (route === '/shipment' && (optionsLoading || optionsError || !options)) || !(route.startsWith('/requests/')?canCancel:canWrite)) return
     writing.current=true
-    setBusy(true); setNotice('')
+    setBusy(true); setNotice('');setActionError('')
     try {
       await commerceRequest(commerceApi, `/orders/${encodeURIComponent(selected.order.id)}${route}`, 'POST', body)
       load(); setNotice(done + ' Bildirim kuyruğa alındı; teslim durumu bildirim kayıtlarından izlenir.'); setNote('')
-    } catch (e) { setNotice(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
+    } catch (e) { setActionError(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
     finally { writing.current=false;setBusy(false) }
   }
-  function open(id: string, button: HTMLButtonElement) { onClearRequested?.(); trigger.current = button; setSelectedId(id); setNotice(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
+  function open(id: string, button: HTMLButtonElement) { onClearRequested?.(); trigger.current = button; setSelectedId(id); setNotice('');setActionError(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
   function restoreFocus() { (trigger.current?.isConnected ? trigger.current : refreshButton.current)?.focus() }
   function close() { directVersion.current++; onClearRequested?.(); dialog.current?.close(); restoreFocus() }
   const order = selected?.order
@@ -111,10 +113,10 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
     {optionsLoading && <p role="status">Sipariş seçenekleri yükleniyor…</p>}
     {optionsError && <p role="alert">Sipariş seçenekleri: {optionsError} <button onClick={retryOptions}>Seçenekleri tekrar dene</button></p>}
     {ready && <><p role="status">{filtered.length} sipariş · Bu ekran ödeme tahsilatı gerçekleştirmez.</p>
-    <div className="table-scroll"><table><caption>Web ve mobil siparişleri</caption><thead><tr>{['Sipariş', 'Müşteri', 'Tarih', 'Durum', 'Talep', 'Tutar', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
-      <tbody>{filtered.map(({ order, customerName, customerEmail }) => <tr key={order.id}><th scope="row">{order.number}</th><td>{customerName}<br /><small>{customerEmail}</small></td><td>{date(order.createdAt)}</td><td><span className="order-state">{statusText[order.status] ?? order.status}</span></td><td>{openRequests(order).map(item => <span className="order-state" key={item.id}>{item.type === 'cancel' ? 'İptal' : 'İade'} · {requestText[item.status]}</span>)}</td><td>{money(order.total)}</td><td><button aria-label={`${order.number} detayını aç`} onClick={event => open(order.id, event.currentTarget)}>İncele</button></td></tr>)}</tbody></table></div>
+    <TableRegion><table><caption>Web ve mobil siparişleri</caption><thead><tr>{['Sipariş', 'Müşteri', 'Tarih', 'Durum', 'Talep', 'Tutar', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
+      <tbody>{filtered.map(({ order, customerName, customerEmail }) => <tr key={order.id}><th scope="row">{order.number}</th><td>{customerName}<br /><small>{customerEmail}</small></td><td>{date(order.createdAt)}</td><td><span className="order-state">{statusText[order.status] ?? order.status}</span></td><td>{openRequests(order).map(item => <span className="order-state" key={item.id}>{item.type === 'cancel' ? 'İptal' : 'İade'} · {requestText[item.status]}</span>)}</td><td>{money(order.total)}</td><td><button aria-label={`${order.number} detayını aç`} onClick={event => open(order.id, event.currentTarget)}>İncele</button></td></tr>)}</tbody></table></TableRegion>
     {filtered.length === 0 && <div className="empty-widget"><strong>{items.length ? 'Filtrelere uygun sipariş yok' : 'Henüz sipariş yok'}</strong><p>{items.length ? 'Aramayı veya durum seçimini değiştirin.' : 'Web veya mobilden verilen siparişler burada görünür.'}</p></div>}</>}
-    <dialog ref={dialog} className="order-dialog" aria-labelledby="order-detail-title" onClose={restoreFocus} onCancel={event => { event.preventDefault(); close() }}>
+    <AdminDialog ref={dialog} className="order-dialog" aria-labelledby="order-detail-title" onClose={restoreFocus} onCancel={event => { event.preventDefault(); close() }}>
       <header className="dialog-heading"><h2 id="order-detail-title">{order?.number ?? 'Sipariş'}</h2><button onClick={close} aria-label="Sipariş detayını kapat">×</button></header>
       {requestedOrderId && <div className="dialog-body">{directLoading && <p role="status">Sipariş detayı yükleniyor…</p>}{directError && <p role="alert">{directError} <button onClick={retryDirect}>Sipariş detayını tekrar dene</button></p>}{onBackToDesign && <button onClick={onBackToDesign}>Tasarım yönetimine dön</button>}</div>}
       {selected && order && <div className="dialog-body">
@@ -144,10 +146,10 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
           {order.status === 'shipped' && <button disabled={actionsDisabled||!canWrite} onClick={() => void act('/status', { status: 'delivered', note: note || null }, 'Sipariş teslim edildi.')}>Teslim edildi</button>}
           {(order.status === 'received' || order.status === 'preparing') && <button disabled={actionsDisabled||!canWrite||!canCancel} onClick={() => { if (window.confirm(`${order.number} iptal edilsin mi?`)) void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.') }}>Siparişi iptal et</button>}
         </div>
-        {notice && <p role="status">{notice}</p>}
+        {actionError && <p role="alert">{actionError}</p>}{notice && <p role="status">{notice}</p>}
         <h3>Geçmiş</h3>
         <ol className="order-history">{(order.history ?? []).map((item, index) => <li key={index}>{date(item.at)} · {statusText[item.status] ?? item.status} · {item.actor === 'customer' ? 'Müşteri' : 'Panel'}{item.note ? ` · ${item.note}` : ''}</li>)}</ol>
       </div>}
-    </dialog>
+    </AdminDialog>
   </section>
 }

@@ -1,0 +1,1235 @@
+{
+  "matrix": [
+    {
+      "view": "customers",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "orders",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "catalog",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "inventory",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "surfaces",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "reviews",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "quotes",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "pricing",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "content",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "print",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "integrations",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "dashboard",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "settings",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "ai",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "notifications",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "audit",
+      "width": 320,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "customers",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "orders",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "catalog",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "inventory",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "surfaces",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "reviews",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "quotes",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "pricing",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "content",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "print",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "integrations",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "dashboard",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "settings",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "ai",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "notifications",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "audit",
+      "width": 390,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "customers",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "orders",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "catalog",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "inventory",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "surfaces",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "reviews",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "quotes",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "pricing",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "content",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "print",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "integrations",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "dashboard",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "settings",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "ai",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "notifications",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "audit",
+      "width": 768,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "customers",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "orders",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "catalog",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "inventory",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "surfaces",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "reviews",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "quotes",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "pricing",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "content",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "print",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "integrations",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "dashboard",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "settings",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "ai",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "notifications",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    },
+    {
+      "view": "audit",
+      "width": 1440,
+      "normal": {
+        "overflow": false,
+        "offenders": []
+      },
+      "enlarged": {
+        "overflow": false,
+        "offenders": []
+      }
+    }
+  ],
+  "states": [
+    {
+      "view": "customers",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "0 müşteri · Sayfa 0/0"
+      ]
+    },
+    {
+      "view": "orders",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "0 sipariş · Bu ekran ödeme tahsilatı gerçekleştirmez."
+      ]
+    },
+    {
+      "view": "catalog",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "Katalogda ürün yok.",
+        "0 ürün bulundu."
+      ]
+    },
+    {
+      "view": "inventory",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "0 katalog varyantı. Sonuç bulunmaması doğrulanmış sıfır depo stoğu anlamına gelmez."
+      ]
+    },
+    {
+      "view": "surfaces",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "reviews",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "quotes",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "pricing",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "content",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        ""
+      ]
+    },
+    {
+      "view": "print",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "0 tasarım · Sayfa 1/1 · Saat dilimi: Europe/Istanbul",
+        "Henüz kayıtlı tasarım yok."
+      ]
+    },
+    {
+      "view": "integrations",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "Eşlemeler: veri kaynağı bağlı değilMikro API sürümü, test erişimi, alan eşlemeleri ve veri sahipliği D02/D06 kapsamında doğrulanmadan kayıt veya mutabakat sonucu gösterilmez."
+      ]
+    },
+    {
+      "view": "dashboard",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi.",
+        "Kartları yukarı/aşağı düğmeleriyle sıralayabilirsiniz. Bu tercih iş verilerini değiştirmez."
+      ]
+    },
+    {
+      "view": "settings",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "ai",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "notifications",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "audit",
+      "mode": "empty",
+      "alerts": [],
+      "statuses": [
+        "Katalog verileri yüklendi."
+      ]
+    },
+    {
+      "view": "customers",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "orders",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Siparişleri tekrar dene",
+        "Sipariş seçenekleri: İzole servis kesintisi Seçenekleri tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "catalog",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "inventory",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "surfaces",
+      "mode": "error",
+      "alerts": [
+        "Yüzey servisi hata verdi (503). Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "reviews",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "quotes",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "pricing",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "content",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "print",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi",
+        "Tasarım veri kaynağı şu anda kullanılamıyor. Bu durum kayıt olmadığı anlamına gelmez. Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi",
+        "Profil listesi kullanılamıyor."
+      ]
+    },
+    {
+      "view": "integrations",
+      "mode": "error",
+      "alerts": [],
+      "statuses": [
+        "İzole servis kesintisi",
+        "Eşlemeler: veri kaynağı bağlı değilMikro API sürümü, test erişimi, alan eşlemeleri ve veri sahipliği D02/D06 kapsamında doğrulanmadan kayıt veya mutabakat sonucu gösterilmez."
+      ]
+    },
+    {
+      "view": "dashboard",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi",
+        "Kartları yukarı/aşağı düğmeleriyle sıralayabilirsiniz. Bu tercih iş verilerini değiştirmez."
+      ]
+    },
+    {
+      "view": "settings",
+      "mode": "error",
+      "alerts": [],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "ai",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisiTekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "notifications",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "audit",
+      "mode": "error",
+      "alerts": [
+        "İzole servis kesintisi Tekrar dene"
+      ],
+      "statuses": [
+        "İzole servis kesintisi"
+      ]
+    },
+    {
+      "view": "customers",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "orders",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Siparişleri tekrar dene",
+        "Sipariş seçenekleri: Bu işlem için yetkiniz yok. Seçenekleri tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "catalog",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok."
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "inventory",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok."
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "surfaces",
+      "mode": "denied",
+      "alerts": [
+        "Bu hesapla ürün yüzeyini değiştirme yetkin yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "reviews",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "quotes",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "pricing",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok."
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "content",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok."
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "print",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok.",
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok.",
+        "Profil listesi kullanılamıyor."
+      ]
+    },
+    {
+      "view": "integrations",
+      "mode": "denied",
+      "alerts": [],
+      "statuses": [
+        "Bu işlem için yetkiniz yok.",
+        "Eşlemeler: veri kaynağı bağlı değilMikro API sürümü, test erişimi, alan eşlemeleri ve veri sahipliği D02/D06 kapsamında doğrulanmadan kayıt veya mutabakat sonucu gösterilmez."
+      ]
+    },
+    {
+      "view": "dashboard",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok.",
+        "Kartları yukarı/aşağı düğmeleriyle sıralayabilirsiniz. Bu tercih iş verilerini değiştirmez."
+      ]
+    },
+    {
+      "view": "settings",
+      "mode": "denied",
+      "alerts": [],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "ai",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok."
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "notifications",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    },
+    {
+      "view": "audit",
+      "mode": "denied",
+      "alerts": [
+        "Bu işlem için yetkiniz yok. Tekrar dene"
+      ],
+      "statuses": [
+        "Bu işlem için yetkiniz yok."
+      ]
+    }
+  ],
+  "issues": []
+}

@@ -20,6 +20,7 @@ async function fixture({ permissions = ['print.read'], list, detail, image, orde
     if (path.endsWith('/auth/admin/refresh')) { assert.ok(refresh); return reply({ status: refresh === 'success' ? 200 : 401 }) }
     assert.equal(request.method(), 'GET', 'Metadata UI must not write')
     if (path.endsWith('/admin/session')) return reply({ body: { account: { name: 'Synthetic staff' }, permissions } })
+    if (path.endsWith('/admin/print-profiles')) return reply({body:[]})
     if (path.endsWith('/local-commerce/state')) return reply({ status: 503, body: { code: 'catalog_unavailable', title: 'Katalog kullanılamıyor' } })
     if (path.endsWith('/local-commerce/notifications')) return reply({ body: { channels: [], items: [] } })
     if (path.endsWith('/admin/designs')) { assert.equal(url.searchParams.get('pageSize'), '20'); return reply(await list?.(Number(url.searchParams.get('page')), ++reads) ?? { body: paged() }) }

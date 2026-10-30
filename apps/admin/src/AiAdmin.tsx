@@ -1,3 +1,4 @@
+import TableRegion from './TableRegion'
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 import { useAdminSession } from './AdminAccess'
@@ -19,7 +20,7 @@ export default function AiAdmin() {
   const canWrite = useAdminSession()?.permissions.includes('ai.write') ?? false
   const writing = useRef(false)
   const [busy, setBusy] = useState(false)
-  const [tab, setTab] = useState<typeof tabs[number]>('Politika ve istem'), [reload, setReload] = useState(0), [error, setError] = useState(''), [notice, setNotice] = useState('')
+  const [tab, setTab] = useState<typeof tabs[number]>('Politika ve istem'), [reload, setReload] = useState(0), [error, setError] = useState(''), [notice, setNotice] = useState(''), [actionError,setActionError] = useState('')
   const [policies, setPolicies] = useState<Policy[]>([]), [modelConfigured, setModelConfigured] = useState(false), [draft, setDraft] = useState<(Policy & { quick: string }) | null>(null)
   const [sources, setSources] = useState<Source[]>([]), [editing, setEditing] = useState<{ id?: string; title: string; body: string; keywords: string; validUntil: string } | null>(null)
   const [conversations, setConversations] = useState<Conversation[]>([]), [openConversation, setOpenConversation] = useState('')
@@ -48,17 +49,17 @@ export default function AiAdmin() {
     if (route.startsWith('/assistant/knowledge/') && editing?.id && route.endsWith(`/${editing.id}`) && !sources.some(source=>source.id===editing.id)) return false
     const version = requestVersion.current
     writing.current = true; setBusy(true)
-    setNotice('')
+    setNotice('');setActionError('')
     try { await commerceRequest(commerceApi, route, method, body); if(version!==requestVersion.current)return false; setReload(value => value + 1); setNotice(done); return true }
-    catch (e) { if(version===requestVersion.current)setNotice(e instanceof Error ? e.message : 'Kaydedilemedi.'); return false }
+    catch (e) { if(version===requestVersion.current)setActionError(e instanceof Error ? e.message : 'Kaydedilemedi.'); return false }
     finally { writing.current = false; setBusy(false) }
   }
   const current = policies.at(-1)
   return <section aria-label="AI yönetimi">
     <div className="integration-status"><strong>Cloudflare Workers AI</strong><span>Metin modeli: {tab !== 'Politika ve istem' || !ready ? 'bu görünümde doğrulanmadı' : modelConfigured ? 'yapılandırıldı · başarılı sağlayıcı çağrısı ayrıca doğrulanmalı' : 'yapılandırılmadı · Nobi kural tabanlı yanıt verir'}</span><span>XINOBI U görsel üretimi: bu metin modeli yanıtıyla doğrulanmaz</span></div>
-    <div className="catalog-tabs" role="group" aria-label="AI bölümleri">{tabs.map(item => <button key={item} aria-pressed={tab === item} onClick={() => { if(item!==tab){requestVersion.current++;setLoaded('');setTab(item)} setNotice('') }}>{item}</button>)}</div>
+    <div className="catalog-tabs" role="group" aria-label="AI bölümleri">{tabs.map(item => <button key={item} aria-pressed={tab === item} onClick={() => { if(item!==tab){requestVersion.current++;setLoaded('');setTab(item)} setNotice('');setActionError('') }}>{item}</button>)}</div>
     {loading && <p role="status">AI yönetim verileri yükleniyor…</p>}
-    {!loading && error && <p role="alert">{error}{!denied && <button onClick={()=>{requestVersion.current++;setLoaded('');setReload(value=>value+1)}}>Tekrar dene</button>}</p>}{notice && <p role="status">{notice}</p>}
+    {!loading && error && <p role="alert">{error}{!denied && <button onClick={()=>{requestVersion.current++;setLoaded('');setReload(value=>value+1)}}>Tekrar dene</button>}</p>}{actionError && <p role="alert">{actionError}</p>}{notice && <p role="status">{notice}</p>}
     {ready && <>
     {tab === 'Politika ve istem' && !current && <p>Politika kaydı yok.</p>}
 
@@ -93,26 +94,26 @@ export default function AiAdmin() {
         {editing.id && !sources.some(source=>source.id===editing.id) && <p role="alert">Düzenlenen kaynak güncel listede yok. Taslağınız korunuyor; kayıt işlemi kapalı.</p>}
         <div className="dialog-actions"><button type="submit" disabled={busy || Boolean(editing.id && !sources.some(source=>source.id===editing.id))}>Taslağı kaydet</button><button type="button" disabled={busy} onClick={() => setEditing(null)}>Vazgeç</button></div>
       </form>}
-      <div className="table-scroll"><table><caption>{sources.length} kaynak</caption><thead><tr>{['Başlık', 'Durum', 'Sürüm', 'Geçerlilik', 'Güncelleme', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
+      <TableRegion><table><caption>{sources.length} kaynak</caption><thead><tr>{['Başlık', 'Durum', 'Sürüm', 'Geçerlilik', 'Güncelleme', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
         <tbody>{sources.map(source => <tr key={source.id}><th scope="row">{source.title}<br /><small>{source.keywords.join(', ')}</small></th><td><span className="order-state">{sourceStatus[source.status]}</span></td><td>v{source.version}</td><td>{source.validUntil ?? 'Süresiz'}</td><td>{date(source.updatedAt)}</td><td>
           {source.status !== 'approved' && <button disabled={!canWrite || busy} onClick={() => void post(`/assistant/knowledge/${source.id}/status`, { status: 'approved' }, 'POST', 'Kaynak onaylandı; Nobi yanıtlarında kullanılacak.')}>Onayla</button>}
           {source.status !== 'archived' && <button disabled={!canWrite || busy} onClick={() => void post(`/assistant/knowledge/${source.id}/status`, { status: 'archived' }, 'POST', 'Kaynak arşivlendi.')}>Arşivle</button>}
           <button disabled={!canWrite || busy} onClick={() => { if(canWrite)setEditing({ id: source.id, title: source.title, body: source.body, keywords: source.keywords.join(', '), validUntil: source.validUntil ?? '' }) }}>Düzenle</button>
-        </td></tr>)}</tbody></table></div>
+        </td></tr>)}</tbody></table></TableRegion>
     </>}
 
     {tab === 'Konuşmalar' && <>
       <p className="panel-notice">Son 300 konuşma; 90 gün saklanır. Kart/kimlik numarası benzeri rakamlar ve e-postalar kayıtta maskelenir. Müşteriler cihaz kimliğiyle ayırt edilir, kişisel veri gösterilmez.</p>
-      <div className="table-scroll"><table><caption>{conversations.length} konuşma</caption><thead><tr>{['Başlangıç', 'Kanal', 'Mesaj', 'AI / kural', 'Durum', ''].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
-        <tbody>{conversations.map(item => <tr key={item.id}><td>{date(item.createdAt)}</td><td>{item.channel === 'mobile' ? 'Mobil' : 'Web'}{item.accountId ? ' · üye' : ''}</td><td>{item.messages.filter(message => message.role === 'user').length}</td><td>{item.messages.filter(message => message.source === 'ai').length} / {item.messages.filter(message => message.source === 'rules').length}</td><td>{item.leadSent && <span className="order-state">Talep</span>}{item.handedOff && <span className="order-state">Devir</span>}</td><td><button onClick={() => setOpenConversation(openConversation === item.id ? '' : item.id)}>{openConversation === item.id ? 'Kapat' : 'Oku'}</button></td></tr>)}</tbody></table></div>
+      <TableRegion><table><caption>{conversations.length} konuşma</caption><thead><tr>{['Başlangıç', 'Kanal', 'Mesaj', 'AI / kural', 'Durum', ''].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
+        <tbody>{conversations.map(item => <tr key={item.id}><td>{date(item.createdAt)}</td><td>{item.channel === 'mobile' ? 'Mobil' : 'Web'}{item.accountId ? ' · üye' : ''}</td><td>{item.messages.filter(message => message.role === 'user').length}</td><td>{item.messages.filter(message => message.source === 'ai').length} / {item.messages.filter(message => message.source === 'rules').length}</td><td>{item.leadSent && <span className="order-state">Talep</span>}{item.handedOff && <span className="order-state">Devir</span>}</td><td><button onClick={() => setOpenConversation(openConversation === item.id ? '' : item.id)}>{openConversation === item.id ? 'Kapat' : 'Oku'}</button></td></tr>)}</tbody></table></TableRegion>
       {conversations.filter(item => item.id === openConversation).map(item => <ul key={item.id} className="quote-messages">{item.messages.map(message => <li key={message.id} data-from={message.role === 'assistant' ? 'store' : 'customer'}><strong>{message.role === 'assistant' ? `Nobi (${message.source === 'ai' ? 'AI' : 'kural'})` : 'Müşteri'}</strong> · {date(message.at)}<p>{message.text}</p>{message.productIds.length > 0 && <small>Ürünler: {message.productIds.length}</small>}</li>)}</ul>)}
     </>}
 
-    {tab === 'Talepler' && <div className="table-scroll"><table><caption>Nobi'den gelen iletişim talepleri (açık onaylı)</caption><thead><tr>{['Tarih', 'Ad', 'İletişim', 'Konu', 'Durum', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
+    {tab === 'Talepler' && <TableRegion><table><caption>Nobi'den gelen iletişim talepleri (açık onaylı)</caption><thead><tr>{['Tarih', 'Ad', 'İletişim', 'Konu', 'Durum', 'İşlem'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
       <tbody>{leads.map(lead => <tr key={lead.id}><td>{date(lead.createdAt)}</td><td>{lead.name}</td><td>{lead.email}{lead.phone ? <><br />{lead.phone}</> : null}</td><td>{lead.topic}{lead.note ? <><br /><small>Not: {lead.note}</small></> : null}</td><td><span className="order-state">{leadStatus[lead.status]}</span></td><td>
         {lead.status === 'new' && <button disabled={!canWrite || busy} onClick={() => { if(canWrite && !writing.current)void post(`/assistant/leads/${lead.id}/status`, { status: 'contacted', note: window.prompt('Not (isteğe bağlı)') || null }, 'POST', 'Talep güncellendi.') }}>İletişime geçildi</button>}
         {lead.status !== 'closed' && <button disabled={!canWrite || busy} onClick={() => void post(`/assistant/leads/${lead.id}/status`, { status: 'closed', note: null }, 'POST', 'Talep kapatıldı.')}>Kapat</button>}
-      </td></tr>)}</tbody></table>{leads.length === 0 && <div className="empty-widget"><strong>Talep yok</strong></div>}</div>}
+      </td></tr>)}</tbody></table>{leads.length === 0 && <div className="empty-widget"><strong>Talep yok</strong></div>}</TableRegion>}
 
     {tab === 'Kullanım ve maliyet' && usage && <>
       <p>Bugünkü göstergeler tarih filtresinden bağımsızdır.</p>
@@ -122,8 +123,8 @@ export default function AiAdmin() {
       <div className="order-filters"><label>Başlangıç tarihi<input type="date" value={usageFrom} aria-invalid={invalidUsageRange} aria-describedby={invalidUsageRange?'usage-date-error':undefined} onChange={event=>setUsageFrom(event.target.value)} /></label><label>Bitiş tarihi<input type="date" value={usageTo} aria-invalid={invalidUsageRange} aria-describedby={invalidUsageRange?'usage-date-error':undefined} onChange={event=>setUsageTo(event.target.value)} /></label><button disabled={!usageFrom&&!usageTo} onClick={()=>{setUsageFrom('');setUsageTo('')}}>Tarihleri temizle</button></div>
       {invalidUsageRange && <p id="usage-date-error" role="alert">Başlangıç tarihi bitiş tarihinden sonra olamaz.</p>}
       {!invalidUsageRange && <>
-      <div className="table-scroll"><table><caption>Günlük kullanım</caption><thead><tr>{['Gün', 'Özellik', 'Çağrı', 'Hata', 'Girdi token', 'Çıktı token', 'Tahmini maliyet'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
-        <tbody>{usageRows.map(day => <tr key={day.day + day.feature}><td>{new Date(day.day).toLocaleDateString('tr-TR')}</td><td>{day.feature === 'assistant' ? 'Nobi' : 'XINOBI U görsel'}</td><td>{day.calls}</td><td>{day.failures}</td><td>{day.inputTokens}</td><td>{day.outputTokens}</td><td>{day.estimatedCost == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 4 }).format(day.estimatedCost)}</td></tr>)}</tbody></table></div>
+      <TableRegion><table><caption>Günlük kullanım</caption><thead><tr>{['Gün', 'Özellik', 'Çağrı', 'Hata', 'Girdi token', 'Çıktı token', 'Tahmini maliyet'].map(item => <th scope="col" key={item}>{item}</th>)}</tr></thead>
+        <tbody>{usageRows.map(day => <tr key={day.day + day.feature}><td>{new Date(day.day).toLocaleDateString('tr-TR')}</td><td>{day.feature === 'assistant' ? 'Nobi' : 'XINOBI U görsel'}</td><td>{day.calls}</td><td>{day.failures}</td><td>{day.inputTokens}</td><td>{day.outputTokens}</td><td>{day.estimatedCost == null ? '—' : new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 4 }).format(day.estimatedCost)}</td></tr>)}</tbody></table></TableRegion>
       {usage.days.length>0 && usageRows.length===0 && <p>Seçilen tarih aralığında kayıt yok.</p>}
       </>}
     </>}

@@ -37,7 +37,7 @@ try{
  assert.deepEqual([...destinations].sort(),[...allowed].sort(),'Top and sidebar must expose only permitted screens, once each')
  assert.equal(await page.locator('.panel-header nav>button').count(),4,'Empty and forbidden top categories stay hidden')
  assert.equal(await page.locator('#rail-links .rail-group').count(),1,'Empty side groups stay hidden')
- assert.equal(new Set(navigationItems.map(item=>item.view)).size,15,'Central definition cannot duplicate a screen')
+ assert.equal(new Set(navigationItems.map(item=>item.view)).size,16,'Central definition cannot duplicate a screen')
  await page.goto('http://127.0.0.1:5174/?view=settings')
  await page.locator('#rail-links [data-nav-view=dashboard][aria-current=page]').waitFor()
  assert.equal(await page.locator('[data-nav-view=settings]').count(),0,'A URL cannot expose a forbidden view')

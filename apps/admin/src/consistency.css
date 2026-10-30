@@ -1,0 +1,53 @@
+/* Shared panel controls and request feedback; preserve the black/white module hierarchy. */
+.admin-editor-fields{border:0;padding:0;margin:0;min-width:0}
+.admin-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;clip-path:inset(50%);overflow:hidden;white-space:nowrap}
+.panel-shell{--admin-error:#8f2020;--admin-border:#d4d4d4;--admin-radius:6px}
+.panel-main button{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere;cursor:pointer}
+.panel-shell button:disabled,.admin-access button:disabled{cursor:not-allowed;opacity:.55}
+.panel-shell :is(input,select,textarea){max-width:100%;min-width:0;border-radius:4px;font:inherit}
+.panel-shell textarea{padding:10px;border:1px solid #bbb;resize:vertical}
+.panel-shell :is(a,button,input,select,textarea,summary,[tabindex]):focus-visible,.admin-access :is(a,button,input,select,textarea):focus-visible{outline:3px solid #b47d00;outline-offset:3px}
+.panel-shell :is(p,div)[role=alert]{padding:12px 14px;border:1px solid #debaba;border-radius:var(--admin-radius);background:#fff4f4;color:var(--admin-error);line-height:1.5;overflow-wrap:anywhere}
+.panel-shell [role=alert] button{margin:6px 8px 0 0;border:1px solid currentColor;border-radius:4px;background:#fff;color:inherit;padding:8px 12px}
+.panel-shell [role=status]{line-height:1.5;overflow-wrap:anywhere}
+.panel-shell .save-row p[role=alert]{color:var(--admin-error)}
+.panel-shell .table-scroll{min-width:0;max-width:100%;overscroll-behavior-inline:contain}
+.panel-shell .page-heading,.panel-shell .widget>header{flex-wrap:wrap}
+.panel-shell :is(h1,h2,h3,legend,dt,dd,.status-note span,.slide-name){min-width:0;overflow-wrap:anywhere}
+.panel-shell :is(.order-filters,.catalog-form,.form-grid,.save-row,.catalog-footer,.topbar,.content-tabs,.integration-status){min-width:0}
+.panel-shell .order-filters>*{min-width:0;max-width:100%}
+.panel-shell .catalog-form>label,.panel-shell .quote-detail>label{display:grid;gap:8px;min-width:0}
+.panel-shell .quote-detail>label{margin-block:12px}
+.panel-shell .quote-detail>label :is(input,textarea){width:100%}
+.panel-shell .dialog-heading{position:sticky;top:0;z-index:1}
+.panel-shell .dialog-heading button{flex-shrink:0}
+.panel-shell .catalog-footer,.panel-shell .save-row{flex-wrap:wrap}
+.panel-shell .widget>header>div{flex-shrink:0}
+.panel-shell .widget h2{flex:1 1 100px}
+.panel-shell .panel-skip{max-width:calc(100vw - 32px);overflow-wrap:anywhere;white-space:normal}
+.admin-access,.admin-access>section,.admin-access input{box-sizing:border-box;min-width:0}
+.admin-access>section{max-width:100%}
+@media(max-width:700px){
+ .panel-shell .order-filters{grid-template-columns:minmax(0,1fr)}
+ .panel-shell .page-heading{align-items:flex-start}
+ .panel-shell .order-dialog dl div{grid-template-columns:minmax(0,1fr)}
+ .panel-shell .order-dialog dd{text-align:left}
+ .panel-shell .content-editor .form-grid{grid-template-columns:minmax(0,1fr)}
+ .panel-shell .content-editor .panel-heading{flex-wrap:wrap;gap:12px}
+ .panel-shell .content-editor .panel-heading>button{max-width:100%}
+ .admin-access{padding:16px}.admin-access>section{padding:24px 18px}
+}
+/* Fieldsets have an intrinsic minimum that otherwise escapes a 320px viewport at large text. */
+.panel-shell fieldset{min-width:0;max-width:100%}
+.panel-shell :is(.inventory-check,fieldset form){max-width:100%;min-width:0}
+.panel-shell .inventory-panel fieldset form{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.panel-shell .inventory-panel fieldset form label{display:grid;gap:8px;min-width:0;max-width:100%}
+.panel-shell td small,.panel-shell .slide-name small,.panel-shell .slide-row .order{color:#616161}
+/* A landscape/short viewport must not devote most of its height to sticky navigation. */
+@media(min-width:701px) and (max-height:500px){
+ .panel-header.unified-navigation{position:static}
+ .panel-body.sidebar-open .icon-rail{top:12px;max-height:calc(100dvh - 24px)}
+}
+/* The hidden skip link must stay hidden even if its text wraps at 200%. */
+.panel-shell .panel-skip{top:0;transform:translateY(calc(-100% - 16px))}
+.panel-shell .panel-skip:focus{transform:translateY(8px)}

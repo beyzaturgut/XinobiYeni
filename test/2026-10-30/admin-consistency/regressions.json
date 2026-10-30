@@ -1,0 +1,79 @@
+[
+  {
+    "file": "apps/admin/tests/admin-operation-results.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/price-results.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/admin-write-permissions.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/admin-data-honesty.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/dashboard-summary.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/catalog-source-states.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/navigation-ui.mjs",
+    "code": 0,
+    "signal": null,
+    "evidence": "/tmp/xinobi-admin-navigation-verified.log"
+  },
+  {
+    "file": "tools/test-admin-review-reply.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "tools/test-admin-order-states.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "tools/test-admin-notification-states.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "tools/test-admin-ai-states.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "tools/test-admin-quote-list-states.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "tools/test-admin-customer-read.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "tools/test-admin-print-source-state.mjs",
+    "code": 0,
+    "signal": null
+  },
+  {
+    "file": "apps/admin/tests/print-profiles.mjs",
+    "code": 0,
+    "signal": null,
+    "evidence": "/tmp/xinobi-admin-print-profiles-final.log"
+  }
+]

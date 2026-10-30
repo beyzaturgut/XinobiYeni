@@ -193,7 +193,7 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### ADM-08
 
-**Panel veri dili ve kullanıcı deneyimini temizle** — P1 / Doğrulama / **Yapılmadı - kapanış açık**
+**Panel veri dili ve kullanıcı deneyimini temizle** — P1 / Doğrulama / **Kısmen yapıldı**
 
 **Önerilen sorumlu:** Admin geliştirici + Backend + operasyon. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
@@ -201,11 +201,14 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapıldı / mevcut temel:** Sahte metrik/depo/entegrasyon başarıları kaldırıldı; kategori onay penceresi ve fotoğraf prompt alanı iyileştirildi. KIS-01 gerçek profil ekranı eklendi.
 
-**Yapılmadı / açık kalan:** Tüm modüllerde taslak koruma/toplu işlem/dar ekran ve gerçek kayıtla son kullanıcı kabulü ayrı çalışılmalı.
+**Yapılmadı / açık kalan:** Global navigasyonda taslak/toplu işlem politikası ve gerçek SQL/rol/operasyon/cihaz/handoff kabulü açık.
 
 **Kapanış kanıtı:** Gerçek işlem sahte başarı göstermiyor; kaydedilmemiş değişiklik kaybolmuyor; son kategori penceresi ve prompt alanı regresyondan geçiyor.
 
 **Bağımlılıklar:** QA-04.
+
+
+**30.10 ek kanıt:** [16 modül tutarlılık matrisi](../../design/admin-consistency-audit-2026-10-30.md), [TST-188](../../test/2026-10-30/TST-188-admin-consistency.md). Hata/başarı, taslak, readonly içerik/yüzey, tablo/pencere/kontrast ve bilinmeyen sayaç düzeltildi.
 
 ### QA-03
 

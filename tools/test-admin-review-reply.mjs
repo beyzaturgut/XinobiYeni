@@ -56,8 +56,9 @@ try{
   const f=await fixture({save:async(_,n)=>n===1?{status:code,body:{title:'Fixture save unavailable'}}:undefined})
   await f.editor.fill('Draft to preserve');await f.section.getByLabel('Ret nedeni (müşteriye iletilir)').fill('Keep note')
   await f.section.getByRole('button',{name:'Yanıtı güncelle'}).click();await f.section.getByRole('alert').waitFor()
-  assert.equal(await f.section.getByRole('button',{name:'Yanıtı güncelle'}).count(),0)
-  await f.section.getByRole('button',{name:'Tekrar dene'}).click();await f.editor.waitFor()
+  assert.equal(await f.section.getByRole('button',{name:'Yanıtı güncelle'}).isEnabled(),true)
+  // A write failure keeps the editable draft visible; retry the operation directly.
+  await f.editor.waitFor()
   assert.equal(await f.editor.inputValue(),'Draft to preserve');assert.equal(await f.section.getByLabel('Ret nedeni (müşteriye iletilir)').inputValue(),'Keep note')
   await f.section.getByRole('button',{name:'Yanıtı güncelle'}).click();await until(()=>f.payloads.length===2)
   assert.equal(f.payloads[1].reply,'Draft to preserve');await f.close()

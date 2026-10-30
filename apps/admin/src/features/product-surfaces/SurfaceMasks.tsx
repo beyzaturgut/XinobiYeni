@@ -1,3 +1,4 @@
+import {useAdminSession} from '../../AdminAccess'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { commerceApi, mediaUrl } from '../../commerce'
@@ -41,19 +42,20 @@ async function loadAlpha(url: string, width: number, height: number) {
 export default function SurfaceMasks() {
   const [items, setItems] = useState<Summary[]>([]), [filter, setFilter] = useState<'all' | Status>('all'), [query, setQuery] = useState('')
   const [selected, setSelected] = useState<{ productId: string; variantId: string } | null>(null)
+  const [loading,setLoading]=useState(true)
   const [error, setError] = useState(''), [sideSlot, setSideSlot] = useState<HTMLDivElement | null>(null)
-  const refresh = useCallback(async () => { try { setItems(await request<Summary[]>('')); setError('') } catch (problem) { setError(problem instanceof Error ? problem.message : 'Liste yüklenemedi.') } }, [])
+  const refresh = useCallback(async () => { setLoading(true);setError('');try { setItems(await request<Summary[]>('')); setError('') } catch (problem) { setError(problem instanceof Error ? problem.message : 'Liste yüklenemedi.') }finally{setLoading(false)} }, [])
   useEffect(() => { void refresh() }, [refresh])
-  const shown = items.filter(item => (filter === 'all' || item.status === filter) && (`${item.productName} ${item.color}`).toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
+  const shown = (loading||error?[]:items).filter(item => (filter === 'all' || item.status === filter) && (`${item.productName} ${item.color}`).toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
   const groups = shown.reduce<Record<string, Summary[]>>((all, item) => ({ ...all, [item.productId]: [...(all[item.productId] ?? []), item] }), {})
   const counts = items.reduce<Record<Status, number>>((all, item) => ({ ...all, [item.status]: all[item.status] + 1 }), { none: 0, draft: 0, approved: 0, stale: 0 })
   return <section className="surface-masks" aria-label="Ürün yüzey maskeleri">
     <div className="surface-side"><aside className="surface-list">
       <p className="surface-intro">Yalnız XINOBI U işaretli ürünler listelenir. Referans renkte WebP maske yükle; aynı tuvalde ve aynı konumda çekilmiş renklere tek onayla uygula.</p>
       <label>Ürün veya renk ara<input value={query} onChange={event => setQuery(event.target.value)} /></label>
-      <div className="surface-filters" role="group" aria-label="Durum filtresi">{(['all', 'none', 'draft', 'approved', 'stale'] as const).map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{value === 'all' ? `Tümü (${items.length})` : `${statusText[value]} (${counts[value]})`}</button>)}</div>
-      {error && <p role="alert" className="surface-error">{error}</p>}
-      {!error && shown.length === 0 && <p className="surface-empty">Listelenecek XINOBI U ürünü veya rengi yok.</p>}
+      <div className="surface-filters" role="group" aria-label="Durum filtresi">{(['all', 'none', 'draft', 'approved', 'stale'] as const).map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{value === 'all' ? `Tümü${loading||error?'':` (${items.length})`}` : `${statusText[value]}${loading||error?'':` (${counts[value]})`}`}</button>)}</div>
+      {loading&&<p role="status">Ürün yüzeyleri yükleniyor…</p>}{error && <p role="alert" className="surface-error">{error} <button onClick={()=>void refresh()}>Tekrar dene</button></p>}
+      {!loading && !error && shown.length === 0 && <p className="surface-empty">Listelenecek XINOBI U ürünü veya rengi yok.</p>}
       {Object.entries(groups).map(([productId, variants]) => <div key={productId} className="surface-group"><strong>{variants[0].productName}</strong>
         {variants.map(item => <button key={item.variantId} className="surface-row" aria-current={selected?.variantId === item.variantId ? 'true' : undefined} onClick={() => setSelected({ productId, variantId: item.variantId })}>
           <img src={asset(item.image)} alt="" /><span>{item.color}</span><em data-status={item.status}>{statusText[item.status]}</em></button>)}
@@ -65,6 +67,7 @@ export default function SurfaceMasks() {
 
 /** <c>side</c>: the slot under the product list that holds the source download and the mask prompt. */
 function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: string; variantId: string; onChanged: () => void; side: HTMLElement | null }) {
+  const canWrite=useAdminSession()?.permissions.includes('catalog.write')??false
   const path = `/${encodeURIComponent(productId)}/${encodeURIComponent(variantId)}`
   const [detail, setDetail] = useState<Detail | null>(null), [busy, setBusy] = useState(''), [error, setError] = useState(''), [notice, setNotice] = useState('')
   const [base, setBase] = useState<ImageData | null>(null), [showing, setShowing] = useState<'draft' | 'approved'>('draft')
@@ -75,13 +78,13 @@ function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: s
 
   const busyRef = useRef(false)
   const run = useCallback(async (label: string, action: () => Promise<Detail>, done?: string) => {
-    if (busyRef.current) return
+    if (busyRef.current || (done && !canWrite)) return
     busyRef.current = true
     setBusy(label); setError(''); setNotice(''); setShowing('draft')
     try { setDetail(await action()); setSamePlacement(false); if (done) setNotice(done); onChanged() }
     catch (problem) { setError(problem instanceof Error ? problem.message : 'İşlem tamamlanamadı.') }
     finally { busyRef.current = false; setBusy('') }
-  }, [onChanged])
+  }, [onChanged,canWrite])
   useEffect(() => { void run('Yükleniyor…', () => request<Detail>(path)) }, [path, run])
 
   // The mask on show: the draft when there is one (or the admin chose it), otherwise the approved mask.
@@ -125,7 +128,7 @@ function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: s
     finally { busyRef.current = false; setBusy('') }
   }
 
-  if (!detail) return <div className="surface-editor"><p role="status">{busy || error}</p></div>
+  if (!detail) return <div className="surface-editor"><p role={error?"alert":"status"}>{busy || error}</p>{error&&<button onClick={()=>void run('Yükleniyor…',()=>request<Detail>(path))}>Yüzeyi tekrar dene</button>}</div>
   const previewed = detail.colors.find(color => color.variantId === previewColor)
   return <div className="surface-editor">
     <header><div><h2>{detail.productName}</h2><p>{detail.color} · {detail.width}×{detail.height} px · <em data-status={detail.status}>{statusText[detail.status]}</em></p></div>
@@ -144,10 +147,10 @@ function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: s
       </div>
       <div className="surface-tools">
         <div className="surface-panel">
-          <h3>WebP maske yükle</h3><p>Fotoğrafla aynı boyutta ({detail.width}×{detail.height}) WebP seç. Şeffaf maskede dolu alanlar, siyah-beyaz maskede beyaz alanlar desen alır.</p>
-          <label>Maske WebP dosyası<input type="file" accept="image/webp,.webp" disabled={!!busy} onChange={event => setWebpFile(event.target.files?.[0] ?? null)} /></label>
+          <h3>WebP maske yükle</h3>{!canWrite&&<p role="status">Maske işlemleri salt okunur. Değişiklik için katalog yazma yetkisi gerekir.</p>}<p>Fotoğrafla aynı boyutta ({detail.width}×{detail.height}) WebP seç. Şeffaf maskede dolu alanlar, siyah-beyaz maskede beyaz alanlar desen alır.</p>
+          <label>Maske WebP dosyası<input type="file" accept="image/webp,.webp" disabled={!!busy||!canWrite} onChange={event => setWebpFile(event.target.files?.[0] ?? null)} /></label>
           <label>WebP maske türü<select value={webpMode} disabled={!!busy} onChange={event => setWebpMode(event.target.value)}><option value="alpha">Şeffaf WebP — dolu alanları kullan</option><option value="luminance">Siyah-beyaz — beyaz alanları kullan</option></select></label>
-          <button className="primary" disabled={!!busy || !webpFile} onClick={() => void run('WebP yükleniyor…', async () => {
+          <button className="primary" disabled={!!busy || !canWrite || !webpFile} onClick={() => void run('WebP yükleniyor…', async () => {
             if (!/\.webp$/i.test(webpFile!.name) || (webpFile!.type && webpFile!.type !== 'image/webp')) throw new Error('Yalnız WebP maske dosyası yükleyebilirsin.')
             if (webpFile!.size > 8 * 1024 * 1024) throw new Error('WebP en fazla 8 MB olabilir.')
             const webpBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1]); reader.onerror = () => reject(new Error('Dosya okunamadı.')); reader.readAsDataURL(webpFile!) })
@@ -166,16 +169,16 @@ function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: s
               <img src={asset(color.image)} alt="" width={48} height={64} style={{ objectFit: 'contain' }} />{color.color}{!compatible && ' · Görsel boyutu farklı / okunamadı'}</label>
           })}
           <label><input type="checkbox" checked={samePlacement} disabled={!!busy} onChange={event => setSamePlacement(event.target.checked)} />Seçtiğim her rengi kontrol ettim; ürün aynı konumda, maske kenarları ile logo/kulp alanları doğru.</label>
-          <button className="approve" disabled={!!busy || !detail.draft || !samePlacement} onClick={() => run('Renklere uygulanıyor…', () => request<Detail>(`${path}/approval/colors`, 'POST', { colors: detail.colors.filter(color => colors.includes(color.variantId)), samePlacementConfirmed: samePlacement, expectedDraftUpdatedAt: detail.draft!.updatedAt }), 'Ortak maske seçilen renklerde onaylandı.')}>Seçilen renklerde onayla</button>
+          <button className="approve" disabled={!!busy || !canWrite || !detail.draft || !samePlacement} onClick={() => run('Renklere uygulanıyor…', () => request<Detail>(`${path}/approval/colors`, 'POST', { colors: detail.colors.filter(color => colors.includes(color.variantId)), samePlacementConfirmed: samePlacement, expectedDraftUpdatedAt: detail.draft!.updatedAt }), 'Ortak maske seçilen renklerde onaylandı.')}>Seçilen renklerde onayla</button>
         </div>
         {detail.draft && <a className="surface-mask-download" href={`${root}${path}/draft.webp?v=${encodeURIComponent(detail.draft.updatedAt)}`} download="surface-mask.webp" target="_blank" rel="noreferrer">Taslak WebP maskeyi aç / indir</a>}
         {detail.draft && <dl className="surface-facts"><dt>Taslak</dt><dd>{methodText[detail.draft.method] ?? detail.draft.method}</dd></dl>}
         {error && <p role="alert" className="surface-error">{error}</p>}
         {notice && <p role="status" className="surface-ok">{notice}</p>}
         <div className="surface-decisions">
-          <button className="approve" disabled={!!busy || !detail.draft} onClick={() => run('Onaylanıyor…', () => request<Detail>(`${path}/approval`, 'POST'), 'Maske onaylandı. Müşteri tasarımı bu renkte yalnız bu bölgeye uygulanır.')}>Taslağı onayla</button>
-          {detail.draft && <button disabled={!!busy} onClick={() => run('Siliniyor…', () => request<Detail>(`${path}/draft`, 'DELETE'), 'Taslak silindi.')}>Taslağı sil</button>}
-          {(detail.status === 'approved' || detail.status === 'stale') && <button className="danger" disabled={!!busy} onClick={() => { if (window.confirm('Onaylı maske kaldırılsın mı? Vitrin bu renkte genel önizlemeye döner.')) void run('Kaldırılıyor…', () => request<Detail>(`${path}/approval`, 'DELETE'), 'Onay kaldırıldı.') }}>Onayı kaldır</button>}
+          <button className="approve" disabled={!!busy || !canWrite || !detail.draft} onClick={() => run('Onaylanıyor…', () => request<Detail>(`${path}/approval`, 'POST'), 'Maske onaylandı. Müşteri tasarımı bu renkte yalnız bu bölgeye uygulanır.')}>Taslağı onayla</button>
+          {detail.draft && <button disabled={!!busy||!canWrite} onClick={() => run('Siliniyor…', () => request<Detail>(`${path}/draft`, 'DELETE'), 'Taslak silindi.')}>Taslağı sil</button>}
+          {(detail.status === 'approved' || detail.status === 'stale') && <button className="danger" disabled={!!busy||!canWrite} onClick={() => { if (window.confirm('Onaylı maske kaldırılsın mı? Vitrin bu renkte genel önizlemeye döner.')) void run('Kaldırılıyor…', () => request<Detail>(`${path}/approval`, 'DELETE'), 'Onay kaldırıldı.') }}>Onayı kaldır</button>}
         </div>
       </div>
     </div>

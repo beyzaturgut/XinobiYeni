@@ -557,9 +557,9 @@
       "work": "Gerçek SQL kataloğunda kalan örnek/demo etiketlerini veri kaynağına göre düzelt; taslak koruma, onay penceresi, toplu işlem ve dar ekranı kabul et.",
       "accept": "Gerçek işlem sahte başarı göstermiyor; kaydedilmemiş değişiklik kaybolmuyor; son kategori penceresi ve prompt alanı regresyondan geçiyor.",
       "deps": "QA-04",
-      "done": "Sahte metrik/depo/entegrasyon başarıları kaldırıldı; kategori onay penceresi ve fotoğraf prompt alanı iyileştirildi. KIS-01 gerçek profil ekranı eklendi.",
-      "remaining": "Tüm modüllerde taslak koruma/toplu işlem/dar ekran ve gerçek kayıtla son kullanıcı kabulü ayrı çalışılmalı.",
-      "status": "Yapılmadı - kapanış açık",
+      "done": "Sahte metrik/depo/entegrasyon başarıları kaldırıldı; kategori onay penceresi ve fotoğraf prompt alanı iyileştirildi. KIS-01 gerçek profil ekranı eklendi. 30.10 admin tutarlılığı: 16 modül/128 görünüm, 48 giriş durumu, 15 odaklı fixture senaryosu; hata/başarı, taslak, readonly içerik/yüzey, tablo/pencere/kontrast ve bilinmeyen sayaç düzeltildi. Kanıt: design/admin-consistency-audit-2026-10-30.md.",
+      "remaining": "Global navigasyonda taslak/toplu işlem politikası ve gerçek SQL/rol/operasyon/cihaz/handoff kabulü açık.",
+      "status": "Kısmen yapıldı",
       "phase": "Faz02",
       "owner": "Admin geliştirici + Backend + operasyon"
     },
@@ -1762,5 +1762,6 @@
       }
     ]
   },
-  "web_consistency_evidence": "design/web-consistency-audit-2026-10-30.md"
+  "web_consistency_evidence": "design/web-consistency-audit-2026-10-30.md",
+  "admin_consistency_evidence": "design/admin-consistency-audit-2026-10-30.md"
 }

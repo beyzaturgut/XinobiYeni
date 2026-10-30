@@ -9,7 +9,7 @@ export default function Inventory({products,onStock}:{products:Product[];onStock
   const writing=useRef(false)
   const matches=(product:Product,variant:Product['variants'][number])=>`${product.name} ${variant.sku} ${variant.color}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR'))
   const count=products.reduce((sum,product)=>sum+product.variants.filter(variant=>matches(product,variant)).length,0)
-  return <section aria-label="Stok ve depo yönetimi">
+  return <section className="inventory-panel" aria-label="Stok ve depo yönetimi">
     <p className="panel-notice">Web stokları bağlı katalogdan okunur; depo bakiyesi veya rezervasyon olarak yorumlanamaz. Depo ve stok hareketi kaynağı D02/D03 ve ilgili API doğrulamasını bekliyor.</p>
     <div className="catalog-tabs" role="group" aria-label="Stok bölümleri">{tabs.map(item=><button key={item} aria-pressed={tab===item} onClick={()=>{setTab(item);setError('');setNotice('')}}>{item}</button>)}</div>
     {tab!=='Web stokları'?<p role="status">{tab}: doğrulanmış depo ve hareket veri kaynağı bağlı değil. D02/D03 kararları ve ilgili API olmadan bakiye, mutabakat veya sayım sonucu üretilmez.</p>:<>

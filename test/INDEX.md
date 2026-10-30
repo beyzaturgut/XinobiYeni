@@ -2,6 +2,14 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-188 | 30.10.2026 | Admin 16 modül / 128 görünüm / 16 axe | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-189 | 30.10.2026 | Admin 48 giriş durumu / 15 odaklı senaryo | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-190 | 30.10.2026 | Admin 15 mevcut browser regresyonu | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-191 | 30.10.2026 | Admin ortak request | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-192 | 30.10.2026 | Admin TypeScript/production build | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-193 | 30.10.2026 | Admin lint: 0 error / 5 mevcut warning | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-194 | 30.10.2026 | Admin görsel inceleme | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
+| TST-195 | 30.10.2026 | Admin belge/diff/upstream | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
 | TST-179 | 30.10.2026 | Web rota/envanter ve kaynak inceleme | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
 | TST-180 | 30.10.2026 | Web 264 rota/boyut/metin ve 33 axe | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |
 | TST-181 | 30.10.2026 | Web 19 izole durum/akış testi | Ayrıntılı sonuç/sınırlar raporda | WEB / CHROME / STATIC | [Rapor](2026-10-30/TST-179-web-consistency.md) |

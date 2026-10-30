@@ -1,3 +1,5 @@
+import AdminDialog from './AdminDialog'
+import TableRegion from './TableRegion'
 import { useEffect, useRef, useState } from 'react'
 import PrintProfiles from './PrintProfiles'
 import type {Product} from './commerce'
@@ -39,7 +41,7 @@ function DesignOrderReferences({ designId, onOpenOrder }: { designId: string; on
     {loading && <p role="status">İlişkili siparişler yükleniyor…</p>}
     {error && <p role="alert">{error} <button onClick={() => load()}>Siparişleri tekrar dene</button></p>}
     {!loading && !error && data && <><p role="status">{data.total} ilişkili sipariş · Sayfa {data.totalPages ? data.page : 1}/{data.totalPages || 1}</p>
-      {data.total === 0 ? <p>İlişkili sipariş bulunamadı.</p> : <><div className="table-scroll"><table><caption>Sipariş referansları · saat dilimi Europe/Istanbul</caption><thead><tr><th scope="col">Sipariş numarası</th><th scope="col">Tarih</th></tr></thead><tbody>{data.items?.map(order => <tr key={order.id}><th scope="row"><button disabled={!order.id || !onOpenOrder} onClick={() => order.id && onOpenOrder?.(order.id)} aria-label={`${order.number} sipariş detayını aç`}>{order.number}</button></th><td>{date(order.createdAt!)}</td></tr>)}</tbody></table></div>
+      {data.total === 0 ? <p>İlişkili sipariş bulunamadı.</p> : <><TableRegion><table><caption>Sipariş referansları · saat dilimi Europe/Istanbul</caption><thead><tr><th scope="col">Sipariş numarası</th><th scope="col">Tarih</th></tr></thead><tbody>{data.items?.map(order => <tr key={order.id}><th scope="row"><button disabled={!order.id || !onOpenOrder} onClick={() => order.id && onOpenOrder?.(order.id)} aria-label={`${order.number} sipariş detayını aç`}>{order.number}</button></th><td>{date(order.createdAt!)}</td></tr>)}</tbody></table></TableRegion>
         {!data.items?.length && <p>Bu sayfada kayıt yok. Önceki sayfaya dönebilirsiniz.</p>}
         </>}
       <div className="periods" aria-label="İlişkili sipariş sayfaları"><button disabled={data.page! <= 1} onClick={() => load(page - 1)}>Önceki sipariş sayfası</button><button disabled={!data.totalPages || data.page! >= data.totalPages} onClick={() => load(page + 1)}>Sonraki sipariş sayfası</button></div>
@@ -91,10 +93,10 @@ export default function PrintOperations({ onOpenOrder, products }: { products:Pr
     {loading && <p role="status">Tasarım kayıtları yükleniyor…</p>}
     {error && <p role="alert">{error} <button onClick={() => load()}>Tekrar dene</button></p>}
     {ready && <><p role="status">{data.total} tasarım · Sayfa {data.totalPages ? data.page : 1}/{data.totalPages || 1} · Saat dilimi: Europe/Istanbul</p>
-      <div className="table-scroll"><table><caption>Kayıtlı tasarım bilgileri · en yeni kayıt önce</caption><thead><tr>{['Tasarım', 'Tür', 'Ürün / varyant', 'Renk', 'Kayıt zamanı', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead><tbody>{rows.map(item => <tr key={item.id}><th scope="row">{item.id}</th><td>{item.kind}</td><td>{item.productName}<br /><small>{item.productId} · {item.variantId || '—'}</small></td><td>{item.color || '—'}</td><td>{date(item.createdAt!)}</td><td><button onClick={event => { trigger.current = event.currentTarget; dialog.current?.showModal(); void readDetail(item.id!) }}>İncele</button></td></tr>)}</tbody></table></div>
+      <TableRegion><table><caption>Kayıtlı tasarım bilgileri · en yeni kayıt önce</caption><thead><tr>{['Tasarım', 'Tür', 'Ürün / varyant', 'Renk', 'Kayıt zamanı', 'İşlem'].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead><tbody>{rows.map(item => <tr key={item.id}><th scope="row">{item.id}</th><td>{item.kind}</td><td>{item.productName}<br /><small>{item.productId} · {item.variantId || '—'}</small></td><td>{item.color || '—'}</td><td>{date(item.createdAt!)}</td><td><button onClick={event => { trigger.current = event.currentTarget; dialog.current?.showModal(); void readDetail(item.id!) }}>İncele</button></td></tr>)}</tbody></table></TableRegion>
       {!rows.length && <p role="status">{query ? 'Bu sayfada aramaya uygun tasarım yok.' : data.total === 0 ? 'Henüz kayıtlı tasarım yok.' : 'Bu sayfada tasarım yok. Önceki sayfaya dönebilirsiniz.'}</p>}
       <div className="periods" aria-label="Tasarım sayfaları"><button disabled={data.page <= 1} onClick={() => load(page - 1)}>← Önceki</button><button disabled={!data.totalPages || data.page! >= data.totalPages} onClick={() => load(page + 1)}>Sonraki →</button></div></>}
-    <dialog ref={dialog} aria-labelledby="design-detail-title" onCancel={event => { event.preventDefault(); close() }} onClose={() => trigger.current?.focus()}><header className="dialog-heading"><h2 id="design-detail-title">Tasarım bilgileri</h2><button aria-label="Tasarım detayını kapat" onClick={close}>×</button></header><div className="dialog-body">
+    <AdminDialog ref={dialog} aria-labelledby="design-detail-title" onCancel={event => { event.preventDefault(); close() }} onClose={() => trigger.current?.focus()}><header className="dialog-heading"><h2 id="design-detail-title">Tasarım bilgileri</h2><button aria-label="Tasarım detayını kapat" onClick={close}>×</button></header><div className="dialog-body">
       {detailLoading && <p role="status">Tasarım detayı yükleniyor…</p>}{detailError && <p role="alert">{detailError} <button onClick={() => void readDetail(selectedId)}>Tekrar dene</button></p>}
       {detail && <><dl>{[['Tasarım', detail.id], ['Tür', detail.kind], ['Ürün kimliği', detail.productId], ['Ürün', detail.productName], ['Varyant', detail.variantId], ['Renk', detail.color], ['Kayıt zamanı (Europe/Istanbul)', date(detail.createdAt!)], ['Dosya türü', detail.mime]].map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || '—'}</dd></div>)}</dl>
         <section aria-label="Kayıtlı tasarım görseli"><p>Kaydedilen desen görselidir; ürün mockup'ı veya baskı uygunluğu onayı değildir.</p>
@@ -102,6 +104,6 @@ export default function PrintOperations({ onOpenOrder, products }: { products:Pr
           {imageError && <p role="alert">{imageError} <button onClick={() => { setImageUrl(''); setImageError(''); setImageLoading(true); setImageReload(value => value + 1) }}>Görseli tekrar dene</button></p>}
           {imageUrl && <img src={imageUrl} alt={`${detail.productName} için kaydedilen tasarım`} style={{ maxWidth: '100%', maxHeight: '50vh', objectFit: 'contain' }} onLoad={() => setImageLoading(false)} onError={() => { setImageUrl(''); setImageLoading(false); setImageError('Tasarım görseli görüntülenemedi.') }} />}
         </section>{canReadOrders && detail.id && <DesignOrderReferences key={detail.id} designId={detail.id} onOpenOrder={onOpenOrder} />}</>}<button onClick={close}>Kapat</button>
-    </div></dialog>
+    </div></AdminDialog>
   </section>
 }

@@ -1,0 +1,62 @@
+[
+  {
+    "name": "order failed action is alert, draft remains, success only after confirmation",
+    "result": "PASS"
+  },
+  {
+    "name": "quote failed send is alert and preserves message, success clears confirmed draft",
+    "result": "PASS"
+  },
+  {
+    "name": "review failed moderation keeps reply form and displays alert",
+    "result": "PASS"
+  },
+  {
+    "name": "AI failed policy write keeps draft and alerts rather than success status",
+    "result": "PASS"
+  },
+  {
+    "name": "content save lock, failed draft retained, confirmed save status",
+    "result": "PASS"
+  },
+  {
+    "name": "announcement write failure alerts and preserves form",
+    "result": "PASS"
+  },
+  {
+    "name": "catalog delete failure never announces success or removes row",
+    "result": "PASS"
+  },
+  {
+    "name": "missing catalogue count is unknown in integrations rather than zero",
+    "result": "PASS"
+  },
+  {
+    "name": "surface loading then error never presents zero/empty, retry shows confirmed empty",
+    "result": "PASS"
+  },
+  {
+    "name": "undefined price remains undefined and table keyboard region is reachable",
+    "result": "PASS"
+  },
+  {
+    "name": "catalog dialog Tab containment, Escape and return focus",
+    "result": "PASS"
+  },
+  {
+    "name": "server 403 is an authorization alert rather than empty data",
+    "result": "PASS"
+  },
+  {
+    "name": "read-only permission disables price writes",
+    "result": "PASS"
+  },
+  {
+    "name": "read-only content allows tab inspection but blocks edits and sends no write",
+    "result": "PASS"
+  },
+  {
+    "name": "read-only surface detail permits inspection but blocks mask mutations",
+    "result": "PASS"
+  }
+]

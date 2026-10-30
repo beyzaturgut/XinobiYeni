@@ -1,3 +1,4 @@
+import TableRegion from './TableRegion'
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 import {useAdminSession} from './AdminAccess'
@@ -17,7 +18,7 @@ export default function Quotes() {
   const [loaded,setLoaded]=useState('')
   const [query, setQuery] = useState(''), [page, setPage] = useState(1)
   const [items, setItems] = useState<Quote[]>([]), [status, setStatus] = useState(''), [selectedId, setSelectedId] = useState(''), [reload, setReload] = useState(0)
-  const [error, setError] = useState(''), [notice, setNotice] = useState(''), [busy, setBusy] = useState(false)
+  const [error, setError] = useState(''), [notice, setNotice] = useState(''), [actionError,setActionError] = useState(''), [busy, setBusy] = useState(false)
   const [prices, setPrices] = useState<Record<string, string>>({}), [validUntil, setValidUntil] = useState(inTenDays()), [offerNote, setOfferNote] = useState(''), [message, setMessage] = useState('')
   useEffect(() => {
     let active = true
@@ -36,13 +37,13 @@ export default function Quotes() {
   async function act(route: string, body: unknown, done: string) {
     if (!quote || writing.current || !canWrite) return false
     writing.current=true
-    setBusy(true); setNotice('')
+    setBusy(true); setNotice('');setActionError('')
     try { await commerceRequest(commerceApi, `/quotes/${encodeURIComponent(quote.id)}${route}`, 'POST', body); setReload(value => value + 1); setNotice(done);return true }
-    catch (e) { setNotice(e instanceof Error ? e.message : 'İşlem yapılamadı.');return false }
+    catch (e) { setActionError(e instanceof Error ? e.message : 'İşlem yapılamadı.');return false }
     finally { writing.current=false;setBusy(false) }
   }
   function select(next: Quote) {
-    setSelectedId(next.id); setNotice(''); setMessage(''); setOfferNote(next.offer?.note ?? ''); setValidUntil(next.offer?.validUntil ?? inTenDays())
+    setSelectedId(next.id); setNotice('');setActionError(''); setMessage(''); setOfferNote(next.offer?.note ?? ''); setValidUntil(next.offer?.validUntil ?? inTenDays())
     setPrices(Object.fromEntries(next.items.map(item => [item.productId, item.unitPrice ? (item.unitPrice.amountMinor / 100).toFixed(2) : ''])))
   }
   const priced = quote?.items.every(item => Number(prices[item.productId]?.replace(',', '.')) > 0)
@@ -53,11 +54,11 @@ export default function Quotes() {
     {currentError && <p role="alert">{currentError} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
     {loading&&<p role="status">Teklifler yükleniyor…</p>}
     <div className="quote-desk">
-      <div className="table-scroll"><table><caption>{ready?`${matches.length} talep`:'Kurumsal teklif talepleri'}</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
-        <tbody>{pageItems.map(item => <tr key={item.id} aria-selected={item.id === selectedId}><th scope="row">{item.code}</th><td>{item.company}<br /><small>{item.contactName}</small></td><td>{item.items.map(line => `${line.productName} × ${line.quantity}`).join(', ')}</td><td>{date(item.createdAt)}</td><td><span className="order-state">{statusText[item.status]}</span>{item.messages.at(-1)?.from === 'customer' && <span className="order-state">Yeni mesaj</span>}</td><td>{tl(item.offer?.total)}</td><td><button disabled={busy} onClick={() => select(item)}>Aç</button></td></tr>)}</tbody></table></div>
+      <TableRegion><table><caption>{ready?`${matches.length} talep`:'Kurumsal teklif talepleri'}</caption><thead><tr>{['Kod', 'Firma', 'Ürünler', 'Tarih', 'Durum', 'Toplam', ''].map(title => <th scope="col" key={title}>{title}</th>)}</tr></thead>
+        <tbody>{pageItems.map(item => <tr key={item.id} aria-selected={item.id === selectedId}><th scope="row">{item.code}</th><td>{item.company}<br /><small>{item.contactName}</small></td><td>{item.items.map(line => `${line.productName} × ${line.quantity}`).join(', ')}</td><td>{date(item.createdAt)}</td><td><span className="order-state">{statusText[item.status]}</span>{item.messages.at(-1)?.from === 'customer' && <span className="order-state">Yeni mesaj</span>}</td><td>{tl(item.offer?.total)}</td><td><button disabled={busy} onClick={() => select(item)}>Aç</button></td></tr>)}</tbody></table></TableRegion>
       {ready&&matches.length === 0 && <div className="empty-widget"><strong>{search?'Aramaya uygun talep yok':'Talep yok'}</strong><p>{search?'Aramayı değiştirin veya temizleyin.':'Web veya mobilden gelen kurumsal talepler burada görünür.'}</p></div>}
       {ready&&<nav className="periods" aria-label="Teklif sayfaları"><span>Yüklenen sonuçlar · Sayfa {currentPage}/{totalPages} · Sayfada 20 kayıt</span><button disabled={currentPage<=1} onClick={()=>setPage(currentPage-1)}>Önceki teklif sayfası</button><button disabled={currentPage>=totalPages} onClick={()=>setPage(currentPage+1)}>Sonraki teklif sayfası</button></nav>}
-      {notice&&<p role="status">{notice}</p>}
+      {actionError&&<p role="alert">{actionError}</p>}{notice&&<p role="status">{notice}</p>}
       {quote && <article className="quote-detail">
         <h2>{quote.code} · {quote.company} <span className="order-state">{statusText[quote.status]}</span></h2>
         <dl><div><dt>Yetkili</dt><dd>{quote.contactName} · {quote.email}{quote.phone ? ` · ${quote.phone}` : ''}</dd></div><div><dt>Vergi no</dt><dd>{quote.taxNumber ?? '—'}</dd></div><div><dt>Kişiselleştirme</dt><dd>{quote.personalization ? quote.personalizationNote || 'İsteniyor' : 'Yok'}</dd></div><div><dt>Hedef tarih</dt><dd>{quote.desiredDate ?? '—'}</dd></div><div><dt>Amaç</dt><dd>{quote.purpose ?? '—'}</dd></div></dl>
@@ -66,7 +67,7 @@ export default function Quotes() {
           <h3>Kayıtlı teklif</h3>
           {quote.offer ? <>
             <dl><div><dt>Geçerlilik tarihi</dt><dd>{new Date(quote.offer.validUntil).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' })}</dd></div><div><dt>Teklif notu</dt><dd>{quote.offer.note || 'Not belirtilmemiş.'}</dd></div></dl>
-            <div className="table-scroll"><table><caption>Kayıtlı teklif birim fiyatları</caption><thead><tr><th scope="col">Ürün</th><th scope="col">Birim fiyat</th></tr></thead><tbody>{quote.items.map(item => <tr key={item.productId}><th scope="row">{item.productName}</th><td>{tl(item.unitPrice)}</td></tr>)}</tbody></table></div>
+            <TableRegion><table><caption>Kayıtlı teklif birim fiyatları</caption><thead><tr><th scope="col">Ürün</th><th scope="col">Birim fiyat</th></tr></thead><tbody>{quote.items.map(item => <tr key={item.productId}><th scope="row">{item.productName}</th><td>{tl(item.unitPrice)}</td></tr>)}</tbody></table></TableRegion>
           </> : <p>Henüz teklif oluşturulmamış.</p>}
         </section>
         {open && <form className="catalog-form" onSubmit={event => { event.preventDefault(); if (priced) void act('/offer', { lines: quote.items.map(item => ({ productId: item.productId, unitPriceMinor: Math.round(Number(prices[item.productId].replace(',', '.')) * 100) })), validUntil, note: offerNote || null }, 'Teklif kaydedildi; bildirim kuyruğa alındı.') }}>

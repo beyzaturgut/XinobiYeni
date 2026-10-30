@@ -12,6 +12,7 @@ export default function Reviews({ productName }: { productName: (id: string) => 
   const writing=useRef(false)
   const [loaded,setLoaded]=useState('')
   const [items, setItems] = useState<Review[]>([]), [status, setStatus] = useState<'pending' | 'approved' | 'rejected' | ''>('pending'), [error, setError] = useState(''), [reload, setReload] = useState(0)
+  const [actionError,setActionError]=useState(''),[notice,setNotice]=useState('')
   const [notes, setNotes] = useState<Record<string, { note: string; reply: string }>>({}), [busy, setBusy] = useState('')
   useEffect(() => {
     let active = true
@@ -21,15 +22,16 @@ export default function Reviews({ productName }: { productName: (id: string) => 
   async function moderate(review: Review, decision: 'approved' | 'rejected') {
     if(writing.current||!canWrite||error||loaded!==`${status}:${reload}`)return
     writing.current=true
-    setBusy(review.id)
-    try { await commerceRequest(commerceApi, `/reviews/${review.id}/moderation`, 'POST', { status: decision, note: notes[review.id]?.note || null, reply: notes[review.id]?.reply ?? review.storeReply ?? null }); setReload(value => value + 1) }
-    catch (e) { setError(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
+    setBusy(review.id);setActionError('');setNotice('')
+    try { await commerceRequest(commerceApi, `/reviews/${review.id}/moderation`, 'POST', { status: decision, note: notes[review.id]?.note || null, reply: notes[review.id]?.reply ?? review.storeReply ?? null }); setReload(value => value + 1);setNotice('Değerlendirme kaydedildi; müşteri bildiriminin teslimi ayrıca doğrulanır.') }
+    catch (e) { setActionError(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
     finally { writing.current=false;setBusy('') }
   }
   return <section aria-label="Ürün değerlendirmeleri">
     <p className="panel-notice">Yalnız ürünü teslim almış müşteriler değerlendirme yazabilir. Onaylananlar ürün sayfasında “Ayşe Y.” biçiminde yayınlanır; müşteri kararı bildirimle öğrenir. Kişisel veri, hakaret veya ürünle ilgisiz içerik varsa reddedin.</p>
     <div className="order-filters"><label>Durum<select value={status} onChange={event => setStatus(event.target.value as typeof status)}><option value="pending">Onay bekleyenler</option><option value="approved">Yayında</option><option value="rejected">Reddedilenler</option><option value="">Tümü</option></select></label></div>
     <button onClick={()=>setReload(value=>value+1)}>Yenile</button>
+    {actionError&&<p role="alert">{actionError}</p>}{notice&&<p role="status">{notice}</p>}
     {error && <p role="alert">{error} <button onClick={()=>setReload(value=>value+1)}>Tekrar dene</button></p>}
     {loaded!==`${status}:${reload}`&&!error&&<p role="status">Değerlendirmeler yükleniyor…</p>}
     {loaded===`${status}:${reload}`&&items.length === 0 && !error && <div className="empty-widget"><strong>Bu durumda değerlendirme yok</strong></div>}

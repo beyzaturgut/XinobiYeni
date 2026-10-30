@@ -68,7 +68,7 @@ export default function NobiChat({onNavigate,full=false}:{onNavigate?:()=>void;f
   }
   function reset(){rememberConversation(null);setConversationId(null);setMessages([]);setLeadOpen(false);setLeadSent(false);setRemaining(null);setNotice('');setError('')}
   return <div className={full?`${styles.chat} ${styles.full}`:styles.chat}>
-    <div className={styles.messages} ref={list} aria-live="polite">
+    <div className={styles.messages} ref={list} role="log" aria-label="Nobi konuşması" aria-live="polite" aria-relevant="additions text">
       <article className={styles.assistant}><NobiMark compact/><div><p>{config?.greeting??'Merhaba, ben Nobi. Size nasıl yardımcı olabilirim?'}</p></div></article>
       {messages.map(message=>message.role==='user'?<article key={message.id} className={styles.user}><p>{message.text}</p></article>:
         <article key={message.id} className={styles.assistant}><NobiMark compact/><div>

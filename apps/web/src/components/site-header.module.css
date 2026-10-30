@@ -37,3 +37,10 @@
 .compareLink{display:inline-flex;align-items:center;gap:6px}.compareCount{min-width:18px;height:18px;padding:0 5px;display:inline-grid;place-items:center;border-radius:9px;background:#fff;color:#000;font-size:11px;font-weight:600;line-height:1}
 
 .cartLink{position:relative}.chevron{transition:transform .2s}button[aria-expanded="true"] .chevron{transform:rotate(180deg)}
+
+/* Let enlarged navigation text wrap without pushing the action buttons offscreen. */
+@media(min-width:1025px){.bar{height:auto;min-height:64px}.inner{height:auto;min-height:64px;flex-wrap:wrap;row-gap:8px}.desktopNav{flex:1 1 480px;min-width:0;flex-wrap:wrap;line-height:1.5}.headerActions{max-width:100%}}
+
+/* At narrow widths keep the labelled search link usable without enlarged text overlapping its neighbours. */
+.search{container-type:inline-size}
+@container(max-width:110px){.search span{display:none}.search svg{margin-inline:auto}}

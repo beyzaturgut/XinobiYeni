@@ -2,6 +2,13 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-150 | 30.10.2026 | WEB-07 mevcut 21 erişilebilirlik testi | PASS (ilk hatalar ve tekrarlar raporda) | CHROME FIXTURE / E2E | `2026-10-30/TST-150-web07-accessibility.md` |
+| TST-151 | 30.10.2026 | WEB-07 52 rota/boyut, 27 benzersiz test; son odaklı tekrarlar | PASS (ilk hatalar ve tekrarlar raporda) | CHROME FIXTURE / AXE / KEYBOARD / 200% TEXT | `2026-10-30/TST-150-web07-accessibility.md` |
+| TST-152 | 30.10.2026 | WEB-07 gerçek public katalog 15 axe taraması | PASS (ilk hatalar ve tekrarlar raporda) | READ-ONLY LOCAL / AXE | `2026-10-30/TST-150-web07-accessibility.md` |
+| TST-153 | 30.10.2026 | WEB-07 lint ve TypeScript | PASS (ilk hatalar ve tekrarlar raporda) | STATIC | `2026-10-30/TST-150-web07-accessibility.md` |
+| TST-154 | 30.10.2026 | WEB-07 production build, 38 sayfa | PASS (ilk hatalar ve tekrarlar raporda) | BUILD | `2026-10-30/TST-150-web07-accessibility.md` |
+| TST-155 | 30.10.2026 | WEB-07 diff bütünlüğü | PASS (ilk hatalar ve tekrarlar raporda) | STATIC | `2026-10-30/TST-150-web07-accessibility.md` |
+| TST-156 | 30.10.2026 | WEB-07 büyük metin DOM tanılaması | PASS (ilk hatalar ve tekrarlar raporda) | LOCAL DOM DIAGNOSTIC | `2026-10-30/TST-150-web07-accessibility.md` |
 | TST-142 | 30.10.2026 | WEB-02 medya 107/110 -> üç yerel restore -> 110/110 | PASS | READ-ONLY HTTP / LOCAL MEDIA | `2026-10-30/TST-142-web02-product-detail.md` |
 | TST-143 | 30.10.2026 | WEB-02 24 ürün, 79 renk, üç boyutta 237 kontrol | PASS | LOCAL CATALOG / E2E / GET FIXTURE | `2026-10-30/TST-142-web02-product-detail.md` |
 | TST-144 | 30.10.2026 | WEB-02 renk/maske/yorum/kesinti 5+1 regresyon | PASS | CHROME FIXTURE / E2E | `2026-10-30/TST-142-web02-product-detail.md` |

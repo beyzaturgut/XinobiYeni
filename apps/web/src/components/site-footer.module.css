@@ -6,3 +6,5 @@
 .footer a{display:block;padding:6px 0;color:#cfcfcf;font-size:14px}
 @media(max-width:1023px){.footer{padding:60px 32px;grid-template-columns:2fr 1fr 1fr}.footerBrand+div{display:none}}
 @media(max-width:767px){.footer{padding:54px 20px 100px;grid-template-columns:1fr 1fr;gap:34px}.footerBrand{grid-column:1/-1}.footerBrand+div{display:block}}
+
+.footer>*{min-width:0;overflow-wrap:anywhere}@media(max-width:767px){.footer{grid-template-columns:repeat(2,minmax(0,1fr))}}

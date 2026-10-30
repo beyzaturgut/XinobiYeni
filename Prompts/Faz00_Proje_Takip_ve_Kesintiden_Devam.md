@@ -592,3 +592,8 @@ Yerel web maske okuma düzeltmesi (16.10.2026): [TST-130](../test/2026-10-16/TST
 ### WEB-02 - Ürün detay teknik kabulü / 30.10.2026
 
 [Task / açık veri işleri](../docs/tasks/web-02-product-detail-2026-10-30.md), [TST-142...149](../test/2026-10-30/TST-142-web02-product-detail.md): 24 ürün/79 renk, 390/768/1440 px toplam 237 kontrol başarılı. Renk URL/geçmiş, eksik/geçersiz fiyat ve stok, kesinti/retry, bozuk görsel mesajı, doğru SKU sepeti ve maskesiz renkte açık renk seçimi uygulandı. Üç eksik public dosya yalnız yerele geri getirildi, medya 110/110; gerçek yüzey GET 30/30 hazır. 5+1 fixture regresyonu, TypeScript/lint/build başarılı. Teknik kısım tamamlandı; kullanıcı 23 ürünün açıklama/özelliklerini dosya gelene kadar açık bıraktı. SKU 117 fiyatı da açık, satın alma kapalı. Tüm WEB-02 ticari veri kabulü, canlı yayın veya faz kapanışı iddia edilmez; yüzdeler değiştirilmedi.
+
+
+### WEB-07 - Web erişilebilirlik teknik düzenlemeleri / 30.10.2026
+
+[Task](../docs/tasks/web-07-accessibility-2026-10-30.md), [denetim matrisi](../design/a11y-audit.md), [TST-150...156](../test/2026-10-30/TST-150-web07-accessibility.md): görünür odak, mobil menü/Nobi/duyuru odak yönetimi, dialog klavye döngüsü, etkin ödeme düğmesi kontrastı ve büyük metin yerleşimleri düzeltildi. 320/390/768/1440 px'de 13 kritik sayfa (52 birleşim), toplam 27 benzersiz test son odaklı tekrarlarla başarılı; gerçek public katalogda 15 axe taraması başarılı. İlk başarısızlıklar ve son tekrarlar raporda korunur. Teknik bölüm tamamlandı; gerçek VoiceOver/TalkBack/fiziksel cihaz/zoom ve QA-03 tasarım/handoff kabulü açık. Faz yüzdeleri, ürün içeriği, ticari veri, API/mobil veya canlı kurulum değişmedi.

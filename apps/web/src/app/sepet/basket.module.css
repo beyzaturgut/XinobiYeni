@@ -10,3 +10,7 @@
 .design{margin-top:6px}
 /* A personalised line shows the customer's design as its picture. */
 .designImage{display:block!important;width:100%;aspect-ratio:1;background:#f1f1f1}
+
+.layout>*{min-width:0}.lineCopy,.lineActions{min-width:0;overflow-wrap:anywhere}.sectionTitle,.categories>div{flex-wrap:wrap;gap:12px}@media(max-width:850px){.layout{grid-template-columns:minmax(0,1fr)}}
+
+.summary dl>div{flex-wrap:wrap}.summary dd{max-width:100%;overflow-wrap:anywhere}

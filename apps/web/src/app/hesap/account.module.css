@@ -37,3 +37,10 @@
 .addressForm{max-width:620px}.addressForm textarea{padding:10px 12px;border:1px solid #c9c9c9;border-radius:4px;font:inherit;font-size:14px;resize:vertical}
 .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:600px){.addressList li{flex-direction:column;align-items:flex-start}.pair{grid-template-columns:1fr}}
+
+.form input:focus-visible{outline:2px solid #111;outline-offset:3px}
+
+/* Form controls and footer columns must be allowed to shrink at 200% text. */
+.settings>*{min-width:0}.form{min-width:0}.form input{width:100%;min-width:0}
+.footerGrid>*{min-width:0;overflow-wrap:anywhere}
+@media(max-width:767px){.footerGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}

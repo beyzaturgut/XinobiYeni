@@ -40,3 +40,16 @@ Araç gerçek public katalogda en az beş aktif ürün bekler; 390/768/1440 px'd
 Mevcut yerel web/API çalışırken kökten `node apps/web/tests/product-detail-acceptance.mjs` her aktif ürün ve rengini 390/768/1440 px'de denetler. Gerçek fiyat/stok, SKU/renk, galeri decode ve izole browser sepeti kullanılır. Eksik metinler otomatik doldurulmaz. Hata/bozuk görsel/geçersiz fiyat testleri yalnız GET fixture'larıdır; hesap/sipariş/provider mutasyonu engellenir.
 
 `WEB02_BASE_URL`, `WEB02_CATALOG_URL`, `WEB02_OUTPUT_DIR`, `PLAYWRIGHT_CHROME_PATH` ile adres/çıktı değişir. Varsayılan kanıt `/tmp/xinobi-web02`; commit edilmez. `web02-detail.spec.ts` ve güncellenen `variant-preview-readiness.spec.ts` içindeki açık renk seçimi testi sentetik kabul girdileri kullanır; gerçek maske veya fiziksel baskı onayı oluşturmaz.
+
+
+## WEB-07 - Erişilebilirlik, klavye ve büyük metin
+
+Mevcut yerel web çalışırken kökten:
+
+```sh
+pnpm --filter web exec playwright test --config tests/playwright.web07.config.ts
+```
+
+19 mevcut rota ve iki klavye testi; güncel 13 kritik rota için 320/390/768/1440 px axe/200% hesaplanan metin matrisi ve iki odak/hata testi: toplam 27 test. `WEB07_BASE_URL`, `WEB07_OUTPUT_DIR`, `PLAYWRIGHT_CHROME_PATH` desteklenir. Config sunucu başlatmaz; hesap/iş istekleri browser fixture'dır. Tek bir çıktı dizininde eşzamanlı koşu başlatmayın. PNG/trace'ler varsayılan OS temp `xinobi-web07-final` dizinine gider ve commit edilmez.
+
+Hesaplanan fontların 2x yapılması, gerçek browser zoom, cihaz veya ekran okuyucu kabulü değildir. Manuel bekleyenler `design/a11y-audit.md` içindedir. Axe critical/serious kapısı tüm WCAG ölçütleri için uygunluk beyanı sayılmaz.

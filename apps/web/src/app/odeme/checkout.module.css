@@ -8,3 +8,5 @@
 .address span,.addressChosen span{display:grid;gap:2px}.address strong,.addressChosen strong{display:flex;align-items:center;gap:8px;font-size:14px}
 .address em,.addressChosen em{font-style:normal;font-size:11px;padding:1px 8px;border-radius:999px;background:#111;color:#fff}
 .address small,.addressChosen small{font-size:12px;color:#5d5d5d}
+
+.summary button:not(:disabled){color:#212121;cursor:pointer}.summary button:disabled{color:#666;cursor:not-allowed}

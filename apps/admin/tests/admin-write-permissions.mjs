@@ -21,7 +21,7 @@ try{
   if(path.endsWith('/assistant/knowledge'))return route.fulfill({json:[{id:'source',title:'Synthetic source',keywords:[],status:'draft',version:1,updatedAt:'2026-10-16T00:00:00Z'}]})
   return route.fulfill({status:503,json:{title:'Isolated unavailable'}})
  })
- await page.goto('http://127.0.0.1:5174/')
+ await page.goto((process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/'))
  await page.locator('#panel-main').waitFor()
  assert.equal(await page.locator('#rail-links button').count(),2,'Only permitted side-owned screens belong in the sidebar')
  for(const name of ['Müşteriler','Katalog','Stok ve depolar','Rol, ayar ve denetim','İşlem geçmişi'])
@@ -38,7 +38,7 @@ try{
  assert.equal(await page.locator('.panel-header nav>button').count(),4,'Empty and forbidden top categories stay hidden')
  assert.equal(await page.locator('#rail-links .rail-group').count(),1,'Empty side groups stay hidden')
  assert.equal(new Set(navigationItems.map(item=>item.view)).size,16,'Central definition cannot duplicate a screen')
- await page.goto('http://127.0.0.1:5174/?view=settings')
+ await page.goto((process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/')+'?view=settings')
  await page.locator('#rail-links [data-nav-view=dashboard][aria-current=page]').waitFor()
  assert.equal(await page.locator('[data-nav-view=settings]').count(),0,'A URL cannot expose a forbidden view')
  for(const width of [1440,1280,768,390]){

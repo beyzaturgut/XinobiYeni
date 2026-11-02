@@ -15,7 +15,7 @@ export default function AdminAccess({children}:{children:ReactNode}){
   return()=>window.removeEventListener('hashchange',openReset)
  },[])
  const [recoveryMessage,setRecoveryMessage]=useState(''),[previewUrl,setPreviewUrl]=useState('')
- const [retryAt,setRetryAt]=useState(0),[now,setNow]=useState(Date.now())
+ const [retryAt,setRetryAt]=useState(0),[now,setNow]=useState(()=>Date.now())
  const retrySeconds=Math.max(0,Math.ceil((retryAt-now)/1000))
  useEffect(()=>{if(!retryAt)return;const timer=window.setInterval(()=>setNow(Date.now()),250);return()=>window.clearInterval(timer)},[retryAt])
  const [checking,setChecking]=useState(true),[busy,setBusy]=useState(false),[error,setError]=useState('')

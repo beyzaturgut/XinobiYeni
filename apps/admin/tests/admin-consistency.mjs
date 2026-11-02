@@ -26,7 +26,7 @@ try{
  const states=[]
  for(const mode of ['empty','error','denied']){
   const context=await browser.newContext({viewport:{width:390,height:1000}}),page=await context.newPage();await mockPanel(page,{mode});const errors=[];page.on('pageerror',e=>errors.push(e.message))
-  for(const{view}of navigationItems){await page.goto(base+'?view='+view);await page.locator('#panel-main>.page-heading').waitFor();await page.waitForTimeout(200);states.push({view,mode,alerts:await page.getByRole('alert').allTextContents(),statuses:await page.getByRole('status').allTextContents()})}
+  for(const{view}of navigationItems){await page.goto(base+'?view='+view);await page.locator('#panel-main>.page-heading').waitFor();if(mode!=='empty'&&!['integrations','settings'].includes(view))await page.getByRole('alert').first().waitFor();await page.waitForTimeout(200);states.push({view,mode,alerts:await page.getByRole('alert').allTextContents(),statuses:await page.getByRole('status').allTextContents()})}
   if(errors.length)issues.push({mode,errors});await context.close()
  }
  for(const row of states)if(row.mode!=='empty'&&!['integrations','settings'].includes(row.view))assert.ok(row.alerts.length,`${row.view} ${row.mode}: missing error/authorization alert`)

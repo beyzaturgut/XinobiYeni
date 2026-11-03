@@ -6,3 +6,5 @@
 - [Tasarım denetimleri](../design/) ve [test kayıtları](../test/INDEX.md).
 
 Bu klasördeki mevcut kapsam, analiz ve müşteri belgeleri yerlerinde korunur. Arşiv raporları tarihsel kayıttır; güncel task durumunun kaynağı Faz00 ve ilgili faz kayıtlarıdır.
+
+[Entegrasyon hazırlık dizini](../Entegrasyonlar/README.md).

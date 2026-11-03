@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Entegrasyon klasörleri
+
+[Entegrasyonlar](../Entegrasyonlar/README.md) altında 13 ayrı hazırlık klasörü açıldı; kapsam, açık kararlar ve faz bağlantıları eklendi. Sürat plan/PDF kaynaklarına bağlandı. Sağlayıcı seçimi açık başlıklar adlandırılmadı; geliştirme/bağlantı testi yapılmadı ve task statüleri değiştirilmedi.
+
 **03.11 SIP-TAS-07 uygulaması:** Desen, ürün kaynak görseli ve kompozisyon uçları ile müşteri, panel ve açık medya yolları uçtan uca denetlendi. Her istekte personel+MFA+`orders.read` kontrolü yapılıyor; dosya saklı sipariş/satır referansından çözülüyor, hata gövdeleri iç bilgi sızdırmıyor. İzole API matrisi PASS: anonim, müşteri, başka müşteri, izinsiz, MFA'sız ve süresi dolmuş personel; başka sipariş/satır; 404/503. Admin indirmesi: `aria-disabled` kilidi odak koruyarak çalışıyor, hata açıklamasına odak taşınıyor, 503 ve bağlantı kesintisinde tekrar dene var; başarı mesajı yalnız “tarayıcıya verildi” diyor (21 Chrome senaryosu PASS). API 511 test PASS (29 atlandı). İndirmelerin audit kaydı mevcut yaklaşımda yok; ayrı karar açık. [TST-231](../test/2026-11-03/TST-231-sip-tas-07-file-access.md). SIP-TAS-08/09, gerçek SQL/canlı kabul ve rol/PM onayı açık.
 
 ## 03.11.2026 - Belge arşivi düzeni

@@ -335,3 +335,5 @@
 - 03.11.2026 · [TST-231 Sürat Kargo entegrasyon planı](2026-11-03/TST-231-surat-kargo-integration-plan.md) — ZIP/e-posta incelemesi, task/alan/secret planı ve prompt; 14 sayfa PDF görsel kontrolü PASS. Uygulama ve sağlayıcı çağrısı yok.
 
 - 03.11.2026 · [TST-232 belge arşivi](2026-11-03/TST-232-document-archive.md) — 6 PDF tarihli klasörlerde; SHA-256/sayfa ve dizin bağlantıları PASS. Eski yollar ve belge içerikleri korundu.
+
+- 03.11.2026 · [TST-235 entegrasyon klasörleri](2026-11-03/TST-235-integration-folders.md) — 13 klasör, kapsam/durum/kaynak notları ve yerel bağlantılar PASS; uygulama yok.

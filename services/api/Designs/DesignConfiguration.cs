@@ -48,6 +48,13 @@ public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvi
 {
     public async Task Validate(string productId, string variantId, DesignPlacement placement) => await Resolve(productId, variantId, placement);
 
+    /// <summary>The editor canvas for a product photo: very large photos are scaled down to about 16 MP, others keep their size.</summary>
+    public static (int Width, int Height) EditorCanvas(int width, int height)
+    {
+        var ratio = (double)width * height > 20_000_000 ? Math.Sqrt(16_000_000d / ((double)width * height)) : 1;
+        return (Math.Max(1, (int)(width * ratio)), Math.Max(1, (int)(height * ratio)));
+    }
+
     /// <summary>
     /// Validates the placement like <see cref="Validate"/> and returns the exact product photo the editor masked, checked against
     /// the surface's recorded source checksum, so an order can keep its own copy instead of pointing at the live catalogue photo.
@@ -119,9 +126,9 @@ public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvi
         }
         if (inputs is not { } value) throw new ProblemException("surface_unavailable", "Bu renk için onaylı yüzey sunucuda doğrulanamıyor.", 409);
         var width = value.GetProperty("width").GetInt32(); var height = value.GetProperty("height").GetInt32();
-        var ratio = (double)width * height > 20_000_000 ? Math.Sqrt(16_000_000d / ((double)width * height)) : 1;
+        var canvas = EditorCanvas(width, height);
         if (value.GetProperty("surfaceVersion").GetString() != placement.SurfaceVersion
-            || placement.SourceWidth != Math.Max(1, (int)(width * ratio)) || placement.SourceHeight != Math.Max(1, (int)(height * ratio)))
+            || placement.SourceWidth != canvas.Width || placement.SourceHeight != canvas.Height)
             throw new ProblemException("surface_changed", "Ürün yüzeyi değişti. Tasarımını güncel yüzeyde yeniden aç.", 409);
         return (value, readSource!);
     }

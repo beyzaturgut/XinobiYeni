@@ -13,6 +13,7 @@ Method | HTTP request | Description
 [**assignAdminRole**](AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [**createAdminInvitation**](AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
 [**downloadAdminOrderLinePattern**](AdminApi.md#downloadadminorderlinepattern) | **GET** /api/v1/admin/orders/{id}/lines/{line}/pattern | Sipariş satırına kopyalanmış ham deseni özgün baytlarıyla indirir; ürün fotoğrafı veya giydirilmiş önizleme değildir.
+[**downloadAdminOrderLineProductSource**](AdminApi.md#downloadadminorderlineproductsource) | **GET** /api/v1/admin/orders/{id}/lines/{line}/source | Editörde maskelenen ürün fotoğrafının sipariş anındaki kopyasını özgün baytlarıyla indirir; desen uygulanmamıştır, maske dosyası değildir.
 [**downloadPrintCalibration**](AdminApi.md#downloadprintcalibration) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision}/calibration.svg |
 [**getAdminCustomer**](AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [**getAdminDesign**](AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |
@@ -175,6 +176,49 @@ try {
     print(response);
 } on DioException catch (e) {
     print('Exception when calling AdminApi->downloadAdminOrderLinePattern: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **line** | **int**|  |
+
+### Return type
+
+[**Uint8List**](Uint8List.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, image/png, image/jpeg, image/webp
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **downloadAdminOrderLineProductSource**
+> Uint8List downloadAdminOrderLineProductSource(id, line)
+
+Editörde maskelenen ürün fotoğrafının sipariş anındaki kopyasını özgün baytlarıyla indirir; desen uygulanmamıştır, maske dosyası değildir.
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final int line = 56; // int |
+
+try {
+    final response = api.downloadAdminOrderLineProductSource(id, line);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->downloadAdminOrderLineProductSource: $e\n');
 }
 ```
 

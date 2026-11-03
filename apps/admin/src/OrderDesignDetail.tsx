@@ -20,35 +20,41 @@ function Facts({ rows }: { rows: [string, unknown][] }) {
 
 type DownloadState = { busy?: boolean; done?: string; error?: string; retry?: boolean }
 
-/** Downloads the order line's own pattern copy from the staff API (resolved on the server by order and line), one request at a time. */
-function PatternDownload({ orderId, orderNumber, index, name }: { orderId: string; orderNumber: string; index: number; name: string }) {
-  const [state, setState] = useState<DownloadState>({}), running = useRef(false)
+const downloads = {
+  pattern: { route: 'pattern', file: 'desen', idle: 'Ham deseni indir', busy: 'Ham desen indiriliyor…', done: 'Ham desen indirildi', missing: 'Bu sipariş satırının desen dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Ham deseni indirme yetkiniz yok.', failed: 'Ham desen şu anda indirilemedi.', what: 'ham desen dosyası' },
+  source: { route: 'source', file: 'urun-kaynak', idle: 'Ürün kaynak görselini indir', busy: 'Ürün kaynak görseli indiriliyor…', done: 'Ürün kaynak görseli indirildi', missing: 'Bu sipariş satırının ürün kaynak görseli bulunamadı; indirilecek dosya yok.', forbidden: 'Ürün kaynak görselini indirme yetkiniz yok.', failed: 'Ürün kaynak görseli şu anda indirilemedi.', what: 'ürün kaynak görseli' },
+} as const
+
+/** Downloads one of the order line's own copies from the staff API (resolved on the server by order and line), one request at a time. */
+function FileDownload({ kind, orderId, orderNumber, index, name }: { kind: keyof typeof downloads; orderId: string; orderNumber: string; index: number; name: string }) {
+  const text = downloads[kind], [state, setState] = useState<DownloadState>({}), running = useRef(false)
   async function download() {
     if (running.current) return
     running.current = true; setState({ busy: true })
     try {
-      const file = await commerceRequest<AdminFile>(commerceApi.replace(/\/local-commerce\/?$/, ''), `/admin/orders/${encodeURIComponent(orderId)}/lines/${index}/pattern`, 'GET', undefined, 'file')
+      const file = await commerceRequest<AdminFile>(commerceApi.replace(/\/local-commerce\/?$/, ''), `/admin/orders/${encodeURIComponent(orderId)}/lines/${index}/${text.route}`, 'GET', undefined, 'file')
       const url = URL.createObjectURL(file.blob), link = document.createElement('a')
       // Without a readable server name, keep the same pattern with the type's real extension.
       const extension = ({ 'image/png': '.png', 'image/jpeg': '.jpg', 'image/webp': '.webp' } as Record<string, string>)[file.blob.type] ?? ''
-      const fileName = file.fileName || `xinobi-${orderNumber.replace(/[^A-Za-z0-9-]+/g, '-')}-satir-${index + 1}-desen${extension}`
+      const fileName = file.fileName || `xinobi-${orderNumber.replace(/[^A-Za-z0-9-]+/g, '-')}-satir-${index + 1}-${text.file}${extension}`
       link.href = url; link.download = fileName; document.body.append(link); link.click(); link.remove()
       window.setTimeout(() => URL.revokeObjectURL(url), 1000)
       setState({ done: fileName })
     } catch (problem) {
-      const status = (problem as { status?: number })?.status
-      setState(status === 404 ? { error: 'Bu sipariş satırının desen dosyası bulunamadı; indirilecek dosya yok.' }
-        : status === 403 ? { error: 'Ham deseni indirme yetkiniz yok.' }
+      const status = (problem as { status?: number })?.status, code = (problem as { code?: string })?.code
+      setState(status === 404 ? { error: code?.endsWith('_not_recorded') && problem instanceof Error ? problem.message : text.missing }
+        : status === 403 ? { error: text.forbidden }
         : status === 401 ? { error: 'Oturum doğrulanamadı. Yeniden giriş yapın.' }
-        : { retry: true, error: `Ham desen şu anda indirilemedi. ${problem instanceof Error ? problem.message : ''}`.trim() })
+        : { retry: true, error: `${text.failed} ${problem instanceof Error ? problem.message : ''}`.trim() })
     } finally { running.current = false }
   }
+  const described = `${orderId}-${index}-${kind}-download-state`
   return <div className="order-design-download">
-    {!state.error || state.retry ? <button type="button" disabled={state.busy} aria-describedby={`${orderId}-${index}-download-state`} onClick={() => void download()}>
-      {state.busy ? 'Ham desen indiriliyor…' : state.retry ? 'İndirmeyi tekrar dene' : 'Ham deseni indir'}</button> : null}
-    <span id={`${orderId}-${index}-download-state`} className="admin-sr-only">{`${name} ham desen dosyası`}</span>
-    {state.busy && <p role="status">Ham desen indiriliyor…</p>}
-    {state.done && <p role="status">Ham desen indirildi: {state.done}</p>}
+    {!state.error || state.retry ? <button type="button" disabled={state.busy} aria-describedby={described} onClick={() => void download()}>
+      {state.busy ? text.busy : state.retry ? 'İndirmeyi tekrar dene' : text.idle}</button> : null}
+    <span id={described} className="admin-sr-only">{`${name} ${text.what}`}</span>
+    {state.busy && <p role="status">{text.busy}</p>}
+    {state.done && <p role="status">{text.done}: {state.done}</p>}
     {state.error && <p role="alert">{state.error}</p>}
   </div>
 }
@@ -73,7 +79,7 @@ function RawPattern({ path, name, orderId, orderNumber, index }: { path?: string
   return <>
     <img src={current.url} alt={`${name} ham deseni`} onError={() => setState({ path, retry: true, error: 'Desen dosyası görüntülenemedi. İndirme kapalı.' })} />
     <p className="order-design-actions"><a href={designUrl(path)} target="_blank" rel="noreferrer">Ham deseni yeni sekmede aç</a></p>
-    <PatternDownload orderId={orderId} orderNumber={orderNumber} index={index} name={name} />
+    <FileDownload kind="pattern" orderId={orderId} orderNumber={orderNumber} index={index} name={name} />
   </>
 }
 
@@ -96,7 +102,10 @@ export default function OrderDesignDetail({ orderId, orderNumber, line, index }:
     <section aria-label="Tasarım görselleri"><h4>Görseller</h4>
       <div className="order-design-files">
         <article aria-labelledby={`${id}-raw`}><h5 id={`${id}-raw`}>Ham desen</h5><p>Müşterinin yüklediği veya AI ile üretilen özgün dosya; ürün üstüne giydirilmemiştir.</p><RawPattern path={design.imageUrl} name={design.name} orderId={orderId} orderNumber={orderNumber} index={index} /></article>
-        <article aria-labelledby={`${id}-source`}><h5 id={`${id}-source`}>Ürün kaynak görseli</h5><p>Editörde maskelemenin uygulandığı ürün ve renk fotoğrafı.</p><p className="order-design-missing">{design.files?.productSource ? 'Bu siparişe bağlı kaynak görsel kopyası saklandı; panelde görüntüleme ve indirme henüz hazır değil.' : 'Bu siparişte ürün kaynak görseli kopyası yok. Güncel katalog fotoğrafı bu siparişin kaynağı sayılmaz.'} İndirme hazır değil.</p></article>
+        <article aria-labelledby={`${id}-source`}><h5 id={`${id}-source`}>Ürün kaynak görseli</h5><p>Editörde maskelemenin uygulandığı ürün ve renk fotoğrafı; desen uygulanmamıştır, maske dosyası değildir.</p>
+          {design.files?.productSource
+            ? <><p>Sipariş anında kopyalandı ({design.files.productSource.mime}, {Math.ceil(design.files.productSource.bytes / 1024).toLocaleString('tr-TR')} KB).</p><FileDownload kind="source" orderId={orderId} orderNumber={orderNumber} index={index} name={design.name} /></>
+            : <p className="order-design-missing">{design.placement ? 'Bu sipariş, ürün kaynak görseli kopyası saklanmadan önce verilmiş.' : 'Bu sipariş satırında kayıtlı yerleşim olmadığı için ürün kaynak görseli kopyası yok.'} Güncel katalog fotoğrafı veya başka renk görseli yerine kullanılmaz. İndirme kullanılamıyor.</p>}</article>
         <article aria-labelledby={`${id}-preview`}><h5 id={`${id}-preview`}>Giydirilmiş önizleme</h5><p>Desenin kayıtlı yerleşimle ürün üstündeki temsili görünümü.</p><p className="order-design-missing">{design.files?.composition ? 'Bu siparişe bağlı giydirilmiş önizleme saklandı; panelde görüntüleme henüz hazır değil.' : 'Bu sipariş için giydirilmiş önizleme kaydı yok.'} Ham desen onun yerine gösterilmez. İndirme hazır değil.</p></article>
       </div>
     </section>

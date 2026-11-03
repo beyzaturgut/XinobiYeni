@@ -5,14 +5,15 @@ import {join} from 'node:path'
 const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
 const browser=await chromium.launch({channel:'chrome',headless:true})
 const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/',output=process.env.ADMIN_CONSISTENCY_OUTPUT
+const webp=Buffer.from('RIFF\x1a\x00\x00\x00WEBPVP8L','latin1')
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64')
 const pattern='<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#f4efe6"/><circle cx="70" cy="80" r="44" fill="#d1495b"/><rect x="120" y="36" width="88" height="88" fill="#00798c" transform="rotate(12 164 80)"/></svg>'
 const money={amountMinor:125000,currency:'TRY'}
 const placement={sourceWidth:1024,sourceHeight:1536,surfaceVersion:'c'.repeat(64),x:512.5,y:700,scale:.85,rotation:-12,curvatureStrength:0,mode:'artwork',fillMask:false,bodyAdjustments:{'upper-body':{x:4,y:null,scale:1.1,rotation:0}}}
-const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:1,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE'})}})
+const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:1,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE',files:{pattern:{sha256:'d'.repeat(64),mime:'image/png',bytes:68},productSource:{sha256:'e'.repeat(64),mime:'image/webp',bytes:4096},composition:null}})}})
 const order=(id,legacy=false)=>({accountId:'synthetic',customerName:'Synthetic müşteri',customerEmail:'synthetic@example.invalid',order:{id,number:'SYN-'+id,createdAt:'2026-11-03T09:00:00Z',status:'received',address:{title:'Ev',fullName:'Synthetic',phone:'+905321234567',line:'Synthetic adres',district:'Test',city:'Test'},lines:[line(id,legacy),{productId:'P2',variantId:'V2',name:'Kişiselleştirilmemiş ürün',color:'Siyah',quantity:1,unitPrice:money,lineTotal:money}],total:money,history:[],requests:[]}})
 const gate=()=>{let release;const promise=new Promise(resolve=>{release=resolve});return{promise,release}}
-async function fixture({width=1440,design,download}={}){
+async function fixture({width=1440,design,download,source}={}){
  const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],paths=[];let writes=0,designReads=0,patternReads=0
  page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push(error.message))
  await page.route('**/api/**',async route=>{
@@ -21,6 +22,8 @@ async function fixture({width=1440,design,download}={}){
   if(path.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Synthetic'},permissions:['orders.read','orders.write','orders.cancel','print.read']}})
   if(path.endsWith('/local-commerce/orders'))return route.fulfill({json:[order('NEW'),order('OLD',true)]})
   if(path.endsWith('/order-options'))return route.fulfill({json:{carriers:['Synthetic kargo'],returnWindowDays:14}})
+  if(path.endsWith('/lines/0/source')){const result=await source?.();if(result?.status)return route.fulfill({status:result.status,json:{title:result.title??'Synthetic source error',code:result.code??'synthetic'}})
+   return route.fulfill({body:webp,contentType:'image/webp',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':'attachment; filename=xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp'}})}
   if(path.endsWith('/lines/0/pattern')){patternReads++;const result=await download?.(patternReads);if(result?.status)return route.fulfill({status:result.status,json:{title:'Synthetic pattern error',code:'synthetic'}})
    return route.fulfill({body:png,contentType:'image/png',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':`attachment; filename=xinobi-SYN-NEW-satir-1-desen-rev3.png; filename*=UTF-8''xinobi-SYN-NEW-satir-1-desen-rev3.png`}})}
   if(path.endsWith('/design')){const result=await design?.(++designReads);if(result?.status)return route.fulfill({status:result.status,json:{title:'Synthetic file error'}})
@@ -43,10 +46,10 @@ try{
   assert.equal(await layout.locator('dd.order-design-missing').count(),1,'The unsaved body Y value is shown as missing, not zero')
   const raw=card(detail,'Ham desen');await raw.getByRole('img').evaluate(image=>image.decode())
   await raw.getByRole('button',{name:'Ham deseni indir'}).waitFor()
-  for(const name of ['Ürün kaynak görseli','Giydirilmiş önizleme']){
-   const item=card(detail,name);await item.getByText(/İndirme hazır değil\./).waitFor()
-   assert.equal(await item.locator('img,a,button').count(),0,`${name} must not offer a file it does not have`)
-  }
+  const productSource=card(detail,'Ürün kaynak görseli');await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).waitFor()
+  assert.equal(await productSource.locator('img,a').count(),0,'No catalogue photo is shown in place of the order copy')
+  const composed=card(detail,'Giydirilmiş önizleme');await composed.getByText(/İndirme hazır değil\./).waitFor()
+  assert.equal(await composed.locator('img,a,button').count(),0,'Giydirilmiş önizleme must not offer a file it does not have')
   assert.equal(await dialog.getByRole('button',{name:'Hazırlanmaya başla'}).count(),1,'Existing order actions stay')
   await dialog.getByRole('heading',{name:'Kargoya ver'}).waitFor()
   assert.equal(await dialog.locator('button,a').filter({hasText:/üretim|baskıya|kalibrasyon|render|profil/i}).count(),0)
@@ -62,7 +65,23 @@ try{
   await detail.getByText(/Bu eski siparişte yerleşim ayarları kaydedilmemiş; güncel tasarımdan tahmin edilmez\./).waitFor()
   const product=detail.getByRole('region',{name:'Sipariş ve ürün bilgileri'})
   assert.equal(await product.getByText('Bu siparişte kaydedilmemiş',{exact:true}).count(),4,'SKU, configuration, revision and schema are missing, not guessed')
-  assert.equal(await detail.getByText(/^0$/).count(),0);await card(detail,'Ham desen').getByRole('img').waitFor();await f.close() }
+  assert.equal(await detail.getByText(/^0$/).count(),0);await card(detail,'Ham desen').getByRole('img').waitFor()
+  const oldSource=card(detail,'Ürün kaynak görseli');await oldSource.getByText(/kayıtlı yerleşim olmadığı için ürün kaynak görseli kopyası yok\. Güncel katalog fotoğrafı veya başka renk görseli yerine kullanılmaz\. İndirme kullanılamıyor\./).waitFor()
+  assert.equal(await oldSource.locator('img,a,button').count(),0);await f.close() }
+ { const f=await fixture(),productSource=card(await f.open('SYN-NEW'),'Ürün kaynak görseli')
+  const downloaded=f.page.waitForEvent('download');await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).click()
+  const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp')
+  assert.deepEqual(await (async()=>{const chunks=[];for await(const chunk of await file.createReadStream())chunks.push(chunk);return Buffer.concat(chunks)})(),webp)
+  await productSource.getByRole('status').filter({hasText:'Ürün kaynak görseli indirildi: xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp'}).waitFor()
+  assert.ok(f.paths.includes('/api/v1/admin/orders/NEW/lines/0/source'));await f.close() }
+ for(const [result,text,retry] of [[{status:404,code:'order_source_not_recorded',title:'Bu sipariş, ürün kaynak görseli kopyası saklanmadan önce verilmiş; güncel katalog fotoğrafı yerine kullanılmaz.'},/saklanmadan önce verilmiş/,false],[{status:404},/ürün kaynak görseli bulunamadı; indirilecek dosya yok/,false],[{status:403},/ürün kaynak görselini indirme yetkiniz yok/i,false],[{status:503},/Ürün kaynak görseli şu anda indirilemedi/,true]]){
+  let fail=true;const f=await fixture({source:()=>fail?result:{}}),productSource=card(await f.open('SYN-NEW'),'Ürün kaynak görseli')
+  await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).click();await productSource.getByRole('alert').filter({hasText:text}).waitFor()
+  assert.equal(await productSource.getByRole('status').filter({hasText:'indirildi'}).count(),0)
+  assert.equal(await productSource.getByRole('button',{name:'İndirmeyi tekrar dene'}).count(),retry?1:0)
+  if(retry){fail=false;const downloaded=f.page.waitForEvent('download');await productSource.getByRole('button',{name:'İndirmeyi tekrar dene'}).click();await downloaded}
+  await f.close()
+ }
  for(const [status,text,retry] of [[404,/bulunamadı\. İndirme kapalı/,false],[403,/görme yetkiniz yok/,false],[503,/şu anda alınamadı/,true],['invalid',/görüntülenemedi\. İndirme kapalı/,true]]){
   // React development mode runs the first effect twice, so the failure lasts until the retry is chosen.
   let fail=true;const f=await fixture({design:()=>fail?(status==='invalid'?{bytes:Buffer.from('not an image')}:{status}):{}}),raw=card(await f.open('SYN-NEW'),'Ham desen')
@@ -99,5 +118,5 @@ try{
   assert.equal(await f.page.getByText(/Fiziksel baskı profil|Kalibrasyon|Üretime gönder/i).count(),0)
   assert.equal(f.paths.some(path=>path.includes('print-profiles')),false,'The removed profile screen must not load profile data')
   await f.close() }
- console.log('PASS: order design detail product/placement/three image cards at 4 widths, legacy/missing values, raw file loading/404/403/503/invalid/retry, pattern download name/bytes/lock/404/403/503 retry, 390 px axe, 320 px 200 % text, no production controls, existing order actions, no writes')
+ console.log('PASS: order design detail product/placement/three image cards at 4 widths, legacy/missing values, raw file loading/404/403/503/invalid/retry, pattern download name/bytes/lock/404/403/503 retry, product source download/not-recorded/404/403/503 retry, 390 px axe, 320 px 200 % text, no production controls, existing order actions, no writes')
 }finally{await browser.close()}

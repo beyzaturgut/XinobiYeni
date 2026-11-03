@@ -345,6 +345,104 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(PatternRoute(order.Id, 0))).StatusCode);
     }
 
+    /// <summary>A real encoded photo of the editor canvas size; the colour tells two catalogue photos apart.</summary>
+    private static byte[] CanvasPhoto(SkiaSharp.SKColor colour, int width = 100, int height = 100)
+    {
+        using var bitmap = new SkiaSharp.SKBitmap(width, height);
+        bitmap.Erase(colour);
+        using var image = SkiaSharp.SKImage.FromBitmap(bitmap);
+        using var data = image.Encode(SkiaSharp.SKEncodedImageFormat.Png, 100);
+        return data.ToArray();
+    }
+
+    private static string SourceRoute(string orderId, int line) => $"/api/v1/admin/orders/{orderId}/lines/{line}/source";
+
+    private static string? FileName(HttpResponseMessage response) =>
+        response.Content.Headers.ContentDisposition?.FileNameStar ?? response.Content.Headers.ContentDisposition?.FileName?.Trim('"');
+
+    [Fact]
+    public async Task SourceDownloadIsTheOrderedPhotoAfterCatalogueColourAndMaskChange()
+    {
+        using var f = await Start("source@example.com");
+        byte[] red = CanvasPhoto(SkiaSharp.SKColors.Red), blue = CanvasPhoto(SkiaSharp.SKColors.Blue);
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, red, Mask), 25, 35, 1, 0, 0);
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "source-request-1", await Configure(f, placement)))));
+        var line = order.Lines[0].Personalization!;
+        Assert.Equal(Sha(red), line.Files!.ProductSource!.Sha256);
+
+        // Later: a new photo and mask are published, the variant's catalogue image changes and the design is deleted.
+        await Publish(f.ProductId, f.VariantId, f.SourceImage, blue, NewMask);
+        var state = (await f.Staff.GetFromJsonAsync<Xinobi.Api.LocalCommerce.CommerceState>("/api/v1/local-commerce/state"))!;
+        var product = state.Products.First(p => p.Id == f.ProductId);
+        (await f.Staff.PutAsJsonAsync("/api/v1/local-commerce/products/" + product.Id, product with
+            { Variants = [.. product.Variants.Select(v => v.Id == f.VariantId ? v with { Image = "/assets/changed-colour.webp" } : v)] })).EnsureSuccessStatusCode();
+        (await Send(f.Client, HttpMethod.Delete, $"/api/v1/me/designs/{f.Design.Id}", f.Token)).EnsureSuccessStatusCode();
+
+        using var download = await f.Staff.GetAsync(SourceRoute(order.Id, 0));
+        Assert.Equal(HttpStatusCode.OK, download.StatusCode);
+        var bytes = await download.Content.ReadAsByteArrayAsync();
+        Assert.Equal(red, bytes);
+        Assert.NotEqual(blue, bytes); Assert.NotEqual(Pattern, bytes);
+        Assert.Equal(line.Files.ProductSource.Sha256, Sha(bytes));
+        Assert.Equal("image/png", download.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("attachment", download.Content.Headers.ContentDisposition?.DispositionType);
+        var number = System.Text.RegularExpressions.Regex.Replace(order.Number, "[^A-Za-z0-9-]+", "-").Trim('-');
+        var sku = System.Text.RegularExpressions.Regex.Replace(line.Sku!, "[^A-Za-z0-9-]+", "-").Trim('-');
+        Assert.Equal($"xinobi-{number}-satir-1-urun-kaynak-{sku}.png", FileName(download));
+        Assert.Equal("nosniff", download.Headers.GetValues("X-Content-Type-Options").Single());
+
+        // Only the order and line choose the file: extra query values, odd ids and lines never open anything else.
+        using var withUrl = await f.Staff.GetAsync(SourceRoute(order.Id, 0) + "?url=https%3A%2F%2Fexample.invalid%2Fx.png&path=..%2F..%2Fappsettings.json&key=" + SavedDesignStore.OrderFile(order.Id, 0));
+        Assert.Equal(red, await withUrl.Content.ReadAsByteArrayAsync());
+        foreach (var route in new[] { SourceRoute("..%2F..%2Fdesigns", 0), SourceRoute("%2E%2E", 0), SourceRoute(SavedDesignStore.OrderFile(order.Id, 0), 0), SourceRoute("https%3A%2F%2Fexample.invalid", 0) })
+        {
+            using var response = await f.Staff.GetAsync(route);
+            Assert.True(response.StatusCode is HttpStatusCode.NotFound or HttpStatusCode.BadRequest, route + " -> " + response.StatusCode);
+            Assert.NotEqual(red, await response.Content.ReadAsByteArrayAsync());
+        }
+        Assert.Equal(HttpStatusCode.NotFound, (await f.Staff.GetAsync($"/api/v1/admin/orders/{order.Id}/lines/-1/source")).StatusCode);
+    }
+
+    [Fact]
+    public async Task MissingChangedOrMismatchedSourceCopiesAreExplainedNotReplaced()
+    {
+        using var f = await Start("source-states@example.com");
+        var photo = CanvasPhoto(SkiaSharp.SKColors.Green);
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, photo, Mask), 25, 35, 1, 0, 0);
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "source-states-1", await Configure(f, placement)))));
+        var legacy = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "source-states-2", null))));
+        var accounts = f.Factory.Services.GetRequiredService<IAccountStore>();
+        var account = (await accounts.FindByAccessToken(f.Token))!;
+        var files = f.Factory.Services.GetRequiredService<IFileStore>();
+
+        // No placement, so nothing was masked: the reason is given.
+        using (var none = await f.Staff.GetAsync(SourceRoute(legacy.Id, 0)))
+        {
+            Assert.Equal("order_source_not_recorded", await Code(none));
+        }
+        // The canvas the placement was saved on must match the photo's size.
+        await accounts.ChangeOrder(account.Id, order.Id, stored => stored with { Lines = [stored.Lines[0] with { Personalization = stored.Lines[0].Personalization! with { Placement = placement with { SourceWidth = 200 } } }] });
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(SourceRoute(order.Id, 0))).StatusCode);
+        await accounts.ChangeOrder(account.Id, order.Id, stored => stored with { Lines = [stored.Lines[0] with { Personalization = stored.Lines[0].Personalization! with { Placement = placement } }] });
+        Assert.Equal(photo, await (await f.Staff.GetAsync(SourceRoute(order.Id, 0))).Content.ReadAsByteArrayAsync());
+        // A changed copy is unavailable; a removed copy is missing; neither falls back to the catalogue.
+        await files.Save(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0) + "-source", new MemoryStream(CanvasPhoto(SkiaSharp.SKColors.Black)), "image/png");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(SourceRoute(order.Id, 0))).StatusCode);
+        await files.Delete(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0) + "-source");
+        Assert.Equal("order_source_not_found", await Code(await f.Staff.GetAsync(SourceRoute(order.Id, 0))));
+        // An order placed before copies were kept (no reference) is explained, with the placement still present.
+        await accounts.ChangeOrder(account.Id, order.Id, stored => stored with { Lines = [stored.Lines[0] with { Personalization = stored.Lines[0].Personalization! with { Files = stored.Lines[0].Personalization!.Files! with { ProductSource = null } } }] });
+        using var older = await f.Staff.GetAsync(SourceRoute(order.Id, 0));
+        Assert.Equal("order_source_not_recorded", await Code(older));
+
+        // Access: anonymous 401, the customer 403, staff without orders.read 403.
+        Assert.Equal(HttpStatusCode.Unauthorized, (await f.Client.GetAsync(SourceRoute(order.Id, 0))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Send(f.Client, HttpMethod.Get, SourceRoute(order.Id, 0), f.Token)).StatusCode);
+        using var restricted = f.Factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddTransient<IClaimsTransformation, WithoutOrdersRead>()));
+        using var noRead = await TestStaff.Client(restricted);
+        Assert.Equal(HttpStatusCode.Forbidden, (await noRead.GetAsync(SourceRoute(order.Id, 0))).StatusCode);
+    }
+
     [Fact]
     public void FileReferencesSurviveTheSqlOrderLineJsonColumn()
     {

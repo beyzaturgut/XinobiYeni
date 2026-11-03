@@ -2,7 +2,7 @@
 
 **MostGate konu/açıklama ve uygulama promptları:** [9 taskın düzenlenebilir dokümanı](order-design-mostgate-prompts-2026-11-03.md) ve [PDF](../../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf). Yalnız doküman hazırlandı; tasklar uygulanmadı.
 
-**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05...09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
+**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05 uygulandı (03.11, [TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md)); SIP-TAS-06...09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
 
 Kullanıcının açık kararı: kapsamlı bir üretime hazırlık/üretime gönderme bölümü olmayacak. Panelde siparişe ait kayıtlı editör yerleşimi, desenin ayrı indirilmesi, maskelemede kullanılan ürün görselinin ayrı indirilmesi ve indirilebilir giydirilmiş görsel olacak. Kullanıcı yalnız task/faz planlamasını istedi; kod geliştirmesini durdurdu.
 
@@ -22,7 +22,7 @@ Kaynak okumasında admin tasarım listesi, ilişkili sipariş bağlantısı, sip
 
 ## Alt tasklar
 
-Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01/02/03/04 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
+Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01…05 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
 
 ### SIP-TAS-01 - Baskı alanını sipariş tasarım detayına sadeleştir
 
@@ -62,6 +62,7 @@ Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımı
 **Açıklama:** Editörde yerleşimin uygulandığı, doğru ürün/SKU/renge ait kaynak ürün görselini ayrı indir. Siparişe bağlı kaynak kopyasını kullan; güncel katalog fotoğrafını sessizce ikame etme.
 **Kapanış koşulu:** Dosya editörde kullanılan ürün fotoğrafıyla aynı sürüm ve tuvalde; başka renk veya yeni fotoğraf indirilmiyor.
 **Bağımlılık:** SIP-TAS-02
+**Durum (03.11):** Uygulandı - kabul açık. `GET /api/v1/admin/orders/{id}/lines/{line}/source` (`orders.read`) yalnız siparişe bağlı `Files.ProductSource` kopyasını verir; SHA-256, bayttan tür ve fotoğraf ölçüsünün kayıtlı editör tuvaline eşitliği doğrulanır; ad `xinobi-{no}-satir-{n}-urun-kaynak-{SKU}.{uzantı}`. Kopya yoksa nedeniyle 404; katalog/başka renk/maske yedek olarak verilmez. Admin kartında kilitli indirme düğmesi. Kanıt: [TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md).
 
 ### SIP-TAS-06 - Giydirilmiş görseli göster ve indir
 

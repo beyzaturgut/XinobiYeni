@@ -1,5 +1,7 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+**03.11 task prompt dokümanı:** SIP-TAS-01...09 için MostGate konusu/açıklaması ve bağımsız uygulama promptları [Markdown](../docs/tasks/order-design-mostgate-prompts-2026-11-03.md) / [PDF](../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf) olarak hazırlandı. Bu doküman çalışmasında uygulama yapılmadı ve MostGate kaydı açılmadı; önceki kapsam ve task durumları değiştirilmedi. [TST-206](../test/2026-11-03/TST-206-mostgate-prompt-document.md).
+
 ## 03.11.2026 - Kapsam kararı: sade sipariş tasarım detayı
 
 **Karar sahibi/kaynak:** Kullanıcının bu sohbetteki açık talebi. Üretime hazırlık/gönderim, fiziksel profil/kalibrasyon, üretim onayı ve baskı render kuyruğu istenmiyor. Kullanıcı yalnız plan/task/faz kaydı istedi; geliştirme yetkisi bu iş için verilmedi.

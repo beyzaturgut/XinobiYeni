@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-239 | 03.11.2026 | SIP-TAS-09 API kabul: kimlik/yerleşim/üç dosya eşliği düzenleme, silme, katalog/maske değişimi ve dosya deposu restart sonrası | PASS 16/16 | API / ISOLATED ACCEPTANCE | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |
+| TST-240 | 03.11.2026 | API tam paket + Release derleme + sözleşme | PASS 514 (29 atlandı; 17 SQL) | API / CONTRACT | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |
+| TST-241 | 03.11.2026 | Admin ekran kabulü 320/390/768/1440 × normal/%200, axe, klavye/odak/duyuru, üretim eylemi yok | PASS (1 tek seferlik taşma ölçümü raporda) | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |
+| TST-242 | 03.11.2026 | Admin 18 + tools 4 regresyon, admin/web statik, web design-configuration e2e | PASS; web e2e 17/18 (bilinen kararsız test) | ADMIN / WEB | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |
 | TST-235 | 03.11.2026 | SIP-TAS-08 eski kayıt API fixture (doğrulanmamış eski kopyalar, saklanmayan dosyalar, 503≠eksik) + salt okunur dry-run envanteri | PASS 15/15; yazma yok | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |
 | TST-236 | 03.11.2026 | API tam paket + sözleşme üretimi (değişiklik yok) | PASS 513, 29 atlandı | API / CONTRACT | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |
 | TST-237 | 03.11.2026 | Admin lint/TS/build | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |

@@ -713,6 +713,63 @@ public sealed class OrderDesignSnapshotTests : IDisposable
     }
 
     [Fact]
+    public async Task AcceptanceBindsLineIdentityPlacementAndAllThreeFilesAcrossEditsAndRestart()
+    {
+        using var f = await Start("acceptance@example.com");
+        var photo = CanvasPhoto(SkiaSharp.SKColors.Navy);
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, photo, Mask), 30, 40, 1.1, 5, .2,
+            new() { ["upper-body"] = new(1, 2, .9, 3) }, "artwork", true);
+        var first = await Configure(f, placement);
+        var state = (await f.Staff.GetFromJsonAsync<Xinobi.Api.LocalCommerce.CommerceState>("/api/v1/local-commerce/state"))!;
+        var variant = state.Products.Single(p => p.Id == f.ProductId).Variants.Single(v => v.Id == f.VariantId);
+        // Revision 2 exists before ordering; revision 1 is the one ordered.
+        await Configure(f, placement with { X = 70, Rotation = 0 }, first.Id, 1, NewComposition);
+        var request = new PlaceOrder(f.Address.Id, [new(f.ProductId, f.VariantId, 2, f.Design.Id, first.Id, 1)], "acceptance-request-1");
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(request)));
+
+        async Task Verify(HttpClient staff, CustomerOrder placed)
+        {
+            var line = placed.Lines[0]; var design = line.Personalization!;
+            Assert.Equal((f.ProductId, f.VariantId, variant.Color, variant.Sku, 2), (line.ProductId, line.VariantId, line.Color, design.Sku, line.Quantity));
+            Assert.Equal((f.Design.Id, first.Id, 1, first.SchemaVersion, first.SourceSha256), (design.DesignId, design.ConfigurationId, design.ConfigurationRevision, design.SchemaVersion, design.SourceSha256));
+            Assert.Equal(first.Placement with { BodyAdjustments = null }, design.Placement! with { BodyAdjustments = null });
+            Assert.Equal(first.Placement.BodyAdjustments!["upper-body"], design.Placement!.BodyAdjustments!["upper-body"]);
+            Assert.Equal(design.SourceSha256, design.Files!.Pattern.Sha256);
+            foreach (var (kind, reference, bytes) in new[] { ("pattern", design.Files.Pattern, Pattern), ("source", design.Files.ProductSource!, photo), ("composition", design.Files.Composition!, Composition) })
+            {
+                using var response = await staff.GetAsync($"/api/v1/admin/orders/{placed.Id}/lines/0/{kind}");
+                var content = await response.Content.ReadAsByteArrayAsync();
+                Assert.Equal(bytes, content);
+                Assert.Equal((reference.Sha256, reference.Mime, reference.Bytes), (Sha(content), response.Content.Headers.ContentType?.MediaType, (long)content.Length));
+                Assert.Equal("sha256", response.Headers.GetValues("X-Xinobi-File-Check").Single());
+                Assert.EndsWith(kind == "pattern" ? "-desen-rev1.png" : kind == "source" ? ".png" : "-giydirilmis-onizleme-rev1.jpg", FileName(response));
+            }
+            // Staff and customer views carry the same binding.
+            var panel = (await staff.GetFromJsonAsync<StaffOrder[]>("/api/v1/local-commerce/orders"))!.Single(item => item.Order.Id == placed.Id).Order.Lines[0].Personalization!;
+            Assert.Equal((design.Files, design.ConfigurationRevision, design.Sku), (panel.Files, panel.ConfigurationRevision, panel.Sku));
+        }
+        await Verify(f.Staff, order);
+
+        // Later edits: rename, revision 3, new catalogue photo and mask, colour image change, design deleted.
+        (await Send(f.Client, HttpMethod.Patch, $"/api/v1/me/designs/{f.Design.Id}", f.Token, JsonContent.Create(new RenameDesign("Yeniden adlandırıldı")))).EnsureSuccessStatusCode();
+        await Configure(f, placement with { X = 10 }, first.Id, 2, [255, 216, 255, 9, 217]);
+        await Publish(f.ProductId, f.VariantId, f.SourceImage, CanvasPhoto(SkiaSharp.SKColors.Yellow), NewMask);
+        var product = state.Products.Single(p => p.Id == f.ProductId);
+        (await f.Staff.PutAsJsonAsync("/api/v1/local-commerce/products/" + product.Id, product with
+            { Variants = [.. product.Variants.Select(v => v.Id == f.VariantId ? v with { Image = "/assets/acceptance-new-photo.webp" } : v)] })).EnsureSuccessStatusCode();
+        (await Send(f.Client, HttpMethod.Delete, $"/api/v1/me/designs/{f.Design.Id}", f.Token)).EnsureSuccessStatusCode();
+        var after = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}", f.Token));
+        Assert.Equal(order.Lines[0].Personalization!.Name, after.Lines[0].Personalization!.Name);
+        await Verify(f.Staff, after);
+
+        // A fresh host on the same isolated data folder (file store restart, not SQL) reads the same order and files.
+        using var restarted = Factory();
+        using var restartedStaff = await TestStaff.Client(restarted);
+        var reloaded = (await restartedStaff.GetFromJsonAsync<StaffOrder[]>("/api/v1/local-commerce/orders"))!.Single(item => item.Order.Id == order.Id).Order;
+        await Verify(restartedStaff, reloaded);
+    }
+
+    [Fact]
     public void FileReferencesSurviveTheSqlOrderLineJsonColumn()
     {
         // SqlAccountStore keeps a line's personalization as JSON with web defaults; this is the same round trip (not a SQL acceptance).

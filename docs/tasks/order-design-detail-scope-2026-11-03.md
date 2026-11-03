@@ -2,7 +2,7 @@
 
 **MostGate konu/açıklama ve uygulama promptları:** [9 taskın düzenlenebilir dokümanı](order-design-mostgate-prompts-2026-11-03.md) ve [PDF](../../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf). Yalnız doküman hazırlandı; tasklar uygulanmadı.
 
-**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05 uygulandı (03.11, [TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md)); SIP-TAS-06 uygulandı (03.11, [TST-227](../../test/2026-11-03/TST-227-sip-tas-06-composition.md)); SIP-TAS-07 uygulandı (03.11, [TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md)); SIP-TAS-08 uygulandı (03.11, [TST-235](../../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md)); SIP-TAS-09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
+**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05 uygulandı (03.11, [TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md)); SIP-TAS-06 uygulandı (03.11, [TST-227](../../test/2026-11-03/TST-227-sip-tas-06-composition.md)); SIP-TAS-07 uygulandı (03.11, [TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md)); SIP-TAS-08 uygulandı (03.11, [TST-235](../../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md)); SIP-TAS-09 teknik kabul kaydı hazır (03.11, [TST-239](../../test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md)); SQL, canlı, ekran okuyucu ve iş sahibi kabulü açık.  |  **Kaynak kesiti:** e89c649
 
 Kullanıcının açık kararı: kapsamlı bir üretime hazırlık/üretime gönderme bölümü olmayacak. Panelde siparişe ait kayıtlı editör yerleşimi, desenin ayrı indirilmesi, maskelemede kullanılan ürün görselinin ayrı indirilmesi ve indirilebilir giydirilmiş görsel olacak. Kullanıcı yalnız task/faz planlamasını istedi; kod geliştirmesini durdurdu.
 
@@ -22,7 +22,7 @@ Kaynak okumasında admin tasarım listesi, ilişkili sipariş bağlantısı, sip
 
 ## Alt tasklar
 
-Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01…08 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
+Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. Tüm alt taskların durumu ve açık kabul koşulları [kabul matrisinde](../../design/order-design-acceptance-2026-11-03.md). Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
 
 ### SIP-TAS-01 - Baskı alanını sipariş tasarım detayına sadeleştir
 
@@ -94,6 +94,7 @@ Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımı
 **Açıklama:** Dar/masaüstü admin görünümü, dosya içeriği/kimliği, eski revizyon, silinen tasarım, değişen katalog, izinler, servis kesintisi ve indirme tekrarını izole fixture ile sınayacak testleri planla. Sipariş snapshot kalıcılığı için izole SQL kabulünü ayrıca tut.
 **Kapanış koşulu:** Üç indirme ve yerleşim doğru sürümle eşleşiyor; üretim eylemi yok; gerekli regresyon/erişilebilirlik ve kullanıcı kabulü kanıtlı.
 **Bağımlılık:** SIP-TAS-01...08
+**Durum (03.11):** Teknik kabul tamam - gerçek kabul açık. SIP-TAS-01…08 kaynak/test kaydından doğrulandı; kimlik/yerleşim/üç dosya eşliği düzenleme, silme, katalog/maske değişimi ve dosya deposu yeniden başlatmasıyla; 320/390/768/1440 normal ve %200 metin, axe, klavye, odak, duyuru; üretim eylemi yok. İzole SQL, canlı IIS, ekran okuyucu/cihaz ve iş sahibi kabulü açık. [Kabul matrisi](../../design/order-design-acceptance-2026-11-03.md), [TST-239](../../test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md).
 
 ## Ana tasklara etkisi
 

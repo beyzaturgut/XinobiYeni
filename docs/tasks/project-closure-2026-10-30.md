@@ -218,6 +218,8 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### QA-03
 
+**03.11 SIP-TAS-09:** [Admin sipariş tasarım detayı kabul matrisi](../../design/order-design-acceptance-2026-11-03.md): 4 genişlik × normal/%200 metin, axe, klavye/odak/duyuru otomasyonu; ekran okuyucu/cihaz açık.
+
 **03.11 ek teknik kanıt:** [Flutter 32 rota × 3 genişlik × 2 metin ölçeği matrisi](../../design/flutter-consistency-audit-2026-11-03.md); Android emülatör OS %200 yazı kontrolü. TalkBack/VoiceOver ve iOS açık.
 
 **30.10 ek teknik kanıt:** [33 ekran görsel/durum denetimi](../../design/web-consistency-audit-2026-10-30.md); Chrome/fixture kanıtı manuel ekran okuyucu kabulü değildir.
@@ -1183,7 +1185,9 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **SIP-TAS-08 (03.11):** eski/eksik kayıtların kart bazında dürüst sunumu ve salt okunur dry-run envanteri ([TST-235](../../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md)).
 
-**Yapılmadı / açık kalan:** SIP-TAS-09: kabul; gerçek veride envanter ve geri doldurma kararı; SIP-TAS-01 rol/PM ekran kabulü.
+**SIP-TAS-09 (03.11):** teknik kabul kaydı ve [ekran/senaryo matrisi](../../design/order-design-acceptance-2026-11-03.md) ([TST-239](../../test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md)).
+
+**Yapılmadı / açık kalan:** gerçek kabul (izole SQL, canlı IIS, ekran okuyucu/cihaz, iş sahibi/rol/PM); gerçek veride envanter ve geri doldurma kararı; SIP-TAS-01 rol/PM ekran kabulü.
 
 **Kapanış kanıtı:** Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.
 
@@ -1224,7 +1228,7 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 | SIP-TAS-06 | KIS-07 | Uygulandı - kabul açık ([TST-227](../../test/2026-11-03/TST-227-sip-tas-06-composition.md)) | [Giydirilmiş görseli göster ve indir](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-07 | SEC-07, KIS-07 | Uygulandı - canlı/SQL kabulü açık ([TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md)) | [Yetki, dosya erişimi ve işlem durumlarını tamamla](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-08 | KIS-03, KIS-07 | Uygulandı - gerçek envanter/karar açık ([TST-235](../../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md)) | [Eski ve eksik sipariş kayıtlarını dürüst ele al](order-design-detail-scope-2026-11-03.md) |
-| SIP-TAS-09 | KIS-03, KIS-07, QA-03 | Planlandı - uygulanmadı | [Sipariş tasarım detayını test et ve kabul kaydını yaz](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-09 | KIS-03, KIS-07, QA-03 | Teknik kabul tamam - gerçek kabul açık ([TST-239](../../test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md)) | [Sipariş tasarım detayını test et ve kabul kaydını yaz](order-design-detail-scope-2026-11-03.md) |
 
 ## Faz07 / Kurumsal teklif ve toplu sipariş
 

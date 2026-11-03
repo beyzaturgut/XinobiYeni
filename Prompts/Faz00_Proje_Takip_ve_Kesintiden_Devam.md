@@ -1,5 +1,7 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+**03.11 SIP-TAS-09 son test/kabul kaydı:** SIP-TAS-01…08 kaynak ve test kayıtlarından doğrulandı. Kimlik, yerleşim ve üç dosyanın eşliği; düzenleme, silme, katalog/maske değişimi ve dosya deposunun yeniden başlatılmasından sonra da korunuyor. 320/390/768/1440 px'te normal ve %200 metin, axe (kritik/ciddi 0), klavye, odak ve duyuru kontrolleri geçti; üretim eylemi yok. Admin 18 test dosyası + 4 tools senaryosu, API 514 test (29 atlandı) PASS; web e2e 17/18 (1 bilinen kararsız test). Teknik kabul tamam; izole SQL, canlı IIS, ekran okuyucu/cihaz ve iş sahibi kabulü açık. [Kabul matrisi](../design/order-design-acceptance-2026-11-03.md), [TST-239](../test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md). KIS-07 kapanmadı.
+
 ## 03.11.2026 - Sürat iletilen bilgiler eki
 
 Sürat klasöründe e-posta bilgileri ve teknik plan birleşik yerel PDF/Markdown olarak hazırlandı. Test/canlı hesap bilgileri alındı; parola değerleri çoğaltılmadan özgün RTF kaynak gösterildi. RTF/ekler ve yerel nüsha Git dışında. Bağlantı veya gönderi testi yapılmadı.
@@ -157,7 +159,7 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 | D01 | Mevcut kod/veri ve yeniden kullanım | Faz01–03 | Kısmi karar · mevcut uygulama kodu yok, sıfırdan yeni geliştirme; private monorepo ve araç zinciri doğrulandı. Mevcut operasyon/veri örneği ve barındırma envanteri bekliyor |
 | D02 | Ürün-varyant-fiyat-stok ana kaynak ve Mikro yazma yönü | Faz04,08,09 | Açık / operasyon + Mikro sahibi |
 | D03 | Sipariş/ödeme, havale, stok rezervasyon, iptal-iade/kargo | Faz05,08,09,11 | Açık / satış-operasyon |
-| D04 | Sipariş yerleşimi ve üç görsel teslimi; fiziksel üretim hazırlığı yok | Faz06,05,02,03,11 | 03.11.2026 kullanıcı kapsam kararı kaydedildi; SIP-TAS-01 (TST-207), SIP-TAS-02 (TST-211, SQL kabulü açık) SIP-TAS-03 (TST-215), SIP-TAS-04 (TST-219), SIP-TAS-05 (TST-223), SIP-TAS-06 (TST-227), SIP-TAS-07 (TST-231) ve SIP-TAS-08 (TST-235) uygulandı; SIP-TAS-09 ve kabul açık |
+| D04 | Sipariş yerleşimi ve üç görsel teslimi; fiziksel üretim hazırlığı yok | Faz06,05,02,03,11 | 03.11.2026 kullanıcı kapsam kararı kaydedildi; SIP-TAS-01 (TST-207), SIP-TAS-02 (TST-211, SQL kabulü açık) SIP-TAS-03 (TST-215), SIP-TAS-04 (TST-219), SIP-TAS-05 (TST-223), SIP-TAS-06 (TST-227), SIP-TAS-07 (TST-231), SIP-TAS-08 (TST-235) uygulandı, SIP-TAS-09 teknik kabul (TST-239); gerçek kabul açık |
 | D05 | Ödeme/kargo/SMS/e-posta/AI ve destek erişimleri | Faz05,10,11 | Açık / sağlayıcı hesapları |
 | D06 | Mikro sürüm/API ve üç pazaryeri mağaza/sandbox | Faz08,09 | Açık / entegrasyon sahipleri |
 | D07 | Tekliften toplu siparişe onay ve fiyatlama | Faz07 | Açık / kurumsal satış |

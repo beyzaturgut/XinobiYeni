@@ -853,8 +853,8 @@
       "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
       "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
       "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
-      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi. SIP-TAS-05 (03.11): ürün kaynak görselinin yetkili ayrı indirmesi. SIP-TAS-06 (03.11): giydirilmiş önizlemenin gösterimi ve yetkili indirmesi. SIP-TAS-07 (03.11): dosya erişim yetkisi ve indirme işlem durumları doğrulandı. SIP-TAS-08 (03.11): eski/eksik kayıtların dürüst sunumu ve salt okunur envanter.",
-      "remaining": "SIP-TAS-09: yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
+      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi. SIP-TAS-05 (03.11): ürün kaynak görselinin yetkili ayrı indirmesi. SIP-TAS-06 (03.11): giydirilmiş önizlemenin gösterimi ve yetkili indirmesi. SIP-TAS-07 (03.11): dosya erişim yetkisi ve indirme işlem durumları doğrulandı. SIP-TAS-08 (03.11): eski/eksik kayıtların dürüst sunumu ve salt okunur envanter. SIP-TAS-09 (03.11): teknik kabul kaydı ve ekran matrisi.",
+      "remaining": "Gerçek kabul: izole SQL, canlı IIS, ekran okuyucu/cihaz, iş sahibi/rol/PM; gerçek veride eski kayıt envanteri ve geri doldurma kararı; indirme audit kararı.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
       "owner": "Admin/Web geliştirici + Backend + UX/QA",
@@ -1619,7 +1619,7 @@
       "work": "Web/admin/Android/iOS ekran matrisi, hi-fi/handoff, klavye ve VoiceOver/TalkBack tutanaklarını tamamla.",
       "accept": "Creative/UX/Frontend onayı var; otomatik tarama yanında manuel cihaz kanıtı bulunuyor; kritik erişilebilirlik kusuru kalmamış.",
       "deps": "KAR-01",
-      "done": "WEB-07 otomatik tarama, klavye/odak ve %200 metin düzeltmeleri; tarihli test/audit kaydı var. de99958 native Flutter ana sayfa yerleşimi 7 odaklı testle doğrulandı; fiziksel cihaz değil. 30.10 web görsel/durum çalışması: 33 rota × 4 genişlik × 2 metin ölçeği; hesap/katalog/iade/Nobi hata ayrımı, taslak ve modal odak düzeltmeleri. Kanıt: design/web-consistency-audit-2026-10-30.md ve test/2026-10-30/TST-179-web-consistency.md. Gerçek kabul açık. 03.11 Flutter: 32 rota × 3 genişlik × 1x/2x widget matrisi ve Android emülatör OS %200 yazı kontrolü (design/flutter-consistency-audit-2026-11-03.md).",
+      "done": "WEB-07 otomatik tarama, klavye/odak ve %200 metin düzeltmeleri; tarihli test/audit kaydı var. de99958 native Flutter ana sayfa yerleşimi 7 odaklı testle doğrulandı; fiziksel cihaz değil. 30.10 web görsel/durum çalışması: 33 rota × 4 genişlik × 2 metin ölçeği; hesap/katalog/iade/Nobi hata ayrımı, taslak ve modal odak düzeltmeleri. Kanıt: design/web-consistency-audit-2026-10-30.md ve test/2026-10-30/TST-179-web-consistency.md. Gerçek kabul açık. 03.11 Flutter: 32 rota × 3 genişlik × 1x/2x widget matrisi ve Android emülatör OS %200 yazı kontrolü (design/flutter-consistency-audit-2026-11-03.md). 03.11 SIP-TAS-09: admin sipariş tasarım detayı 4 genişlik × normal/%200 metin, axe, klavye/odak/duyuru otomasyonu PASS; ekran okuyucu/cihaz açık.",
       "remaining": "Web/admin/Android/iOS tam matris, gerçek VoiceOver/TalkBack ve Creative/UX/handoff imzaları eksik.",
       "status": "Kısmen yapıldı",
       "phase": "Faz02",
@@ -2003,11 +2003,13 @@
         "id": "SIP-TAS-09",
         "title": "Sipariş tasarım detayını test et ve kabul kaydını yaz",
         "parents": "KIS-03, KIS-07, QA-03",
-        "status": "Planlandı - uygulanmadı",
-        "remaining": "Dar/masaüstü admin görünümü, dosya içeriği/kimliği, eski revizyon, silinen tasarım, değişen katalog, izinler, servis kesintisi ve indirme tekrarını izole fixture ile sınayacak testleri planla. Sipariş snapshot kalıcılığı için izole SQL kabulünü ayrıca tut.",
+        "status": "Teknik kabul tamam - gerçek kabul açık",
+        "remaining": "İzole SQL kalıcılık/restart; canlı IIS; ekran okuyucu ve gerçek cihaz; iş sahibi/rol/PM kabulü; gerçek veride eski kayıt envanteri/geri doldurma; indirme audit kararı; mobil kaynaklı sipariş önizlemesi.",
         "accept": "Üç indirme ve yerleşim doğru sürümle eşleşiyor; üretim eylemi yok; gerekli regresyon/erişilebilirlik ve kullanıcı kabulü kanıtlı.",
         "deps": "SIP-TAS-01...08",
-        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+        "done": "03.11: SIP-TAS-01…08 kaynak/test doğrulaması; kimlik/yerleşim/üç dosya eşliği düzenleme, silme, katalog/maske değişimi ve dosya deposu yeniden başlatmasında; 4 genişlik × normal/%200 metin, axe, klavye/odak/duyuru; üretim eylemi yok; admin 18 + tools 4 + API 514 + web e2e 17/18 (1 bilinen kararsız).",
+        "evidence": "test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md"
       }
     ],
     "Faz11": [

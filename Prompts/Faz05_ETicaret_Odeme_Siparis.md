@@ -1,5 +1,10 @@
 # Faz05 — B2C satış, müşteri hesabı ve sipariş sonrası işlemler
 
+## 03.11.2026 - Sürat Kargo entegrasyon hazırlığı (yalnız plan)
+
+TIC-08 alt işi KRG-SUR-01 planlandı: Sürat gönderi oluşturma, Code128 kargo etiketi, şube kabulünden sonra takip ve admin sipariş işlemleri. Sağlayıcıda kayıt siparişi kargolandı yapmayacak. Tarife/checkout kargo ücret hesaplama ayrı açık; COD ve canlı kullanım teyide bağlı. Ürün üretim/baskı operasyonu kapsam dışı. [Task, alan eşleştirmesi ve prompt](../docs/tasks/surat-kargo-integration-plan-2026-11-03.md). [PDF](../output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf).
+
+
 ## 03.11.2026 - Sipariş tasarım detayı kapsam kararı (yalnız plan)
 
 Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş satırındaki kayıtlı editör yerleşimi, ayrı ham desen, maskelemede kullanılan ürün kaynak görseli ve indirilebilir giydirilmiş dijital önizleme. [9 alt task ve kabul koşulları](../docs/tasks/order-design-detail-scope-2026-11-03.md). Uygulama başlamadı; eski planlarda çelişen fiziksel üretim şartları bu karar için geçerli değil. Tarihsel kod/test kayıtları silinmedi.

@@ -1,5 +1,10 @@
 # Faz09 — Trendyol, Hepsiburada ve N11 ile merkezi sipariş
 
+## 03.11.2026 - Sürat Kargo entegrasyon hazırlığı (yalnız plan)
+
+KRG-SUR-01 kanal planı: kendi mağazada Pazaryerimi=0 / EntegrasyonFirmasi boş; markette 1 / sağlayıcı onaylı isim ve pazaryerinin gerçek sipariş referansı. Market adı, ödeme borçlandırması ve parçalı gönderi sözleşmesi teyit bekliyor; uygulama başlamadı. [Task, alan eşleştirmesi ve prompt](../docs/tasks/surat-kargo-integration-plan-2026-11-03.md). [PDF](../output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf).
+
+
 ## Güncel durum ve tüm açık işler - 30.10.2026
 
 **Durum:** Bloke - üç kanalın erişimi, adaptörleri ve mutabakatı açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.

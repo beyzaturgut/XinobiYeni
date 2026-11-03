@@ -1,5 +1,10 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Sürat Kargo entegrasyon hazırlığı (yalnız plan)
+
+KRG-SUR-01 planlandı. E-posta ve ZIP (17 PDF sayfası, 6 Postman isteği) incelendi; MostGate konusu/açıklaması, alan/config yerleşimi, alt işler ve uygulama promptu hazır. Kod/secret/gerçek gönderi değişikliği ve sağlayıcı çağrısı yapılmadı. [Task, alan eşleştirmesi ve prompt](../docs/tasks/surat-kargo-integration-plan-2026-11-03.md). [PDF](../output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf).
+
+
 **03.11 SIP-TAS-06 uygulaması:** Yeni yönetici ucu `GET /api/v1/admin/orders/{id}/lines/{line}/composition` (`orders.read`) siparişe bağlı kompozisyon kopyasını SHA-256 ve JPEG türüyle doğrulayıp veriyor; dosya adı `…-giydirilmis-onizleme-rev{r}.jpg`. Kopya yoksa nedeni yazılıyor; ham desen veya güncel tasarım yedek olarak kullanılmıyor. Admin kartı aynı dosyayı “Temsilidir … Baskıya hazır dosya değildir” etiketiyle gösteriyor ve indiriyor. Web kaydı, önizleme tuvali olmadan yerleşim kaydetmiyor. API 510 test PASS (29 atlandı); sözleşme, admin, web ve Flutter analizi PASS. Web design-configuration e2e 16/18; düşen 2 test değişiklik olmadan da kararsız, değişiklikle 2/2 PASS. [TST-227](../test/2026-11-03/TST-227-sip-tas-06-composition.md). SIP-TAS-07…09 yapılmadı; gerçek veri/canlı kabul ve rol/PM onayı açık.
 
 **03.11 SIP-TAS-05 uygulaması:** Yeni yönetici ucu `GET /api/v1/admin/orders/{id}/lines/{line}/source` (`orders.read`), editörün maskelediği ürün fotoğrafının sipariş anındaki kopyasını veriyor. SHA-256, baytlardan saptanan tür ve fotoğraf ölçüsünün kayıtlı editör tuvaline eşitliği doğrulanıyor; dosya adı `…-urun-kaynak-{SKU}`. Kopya yoksa nedeni yazılıyor; katalog fotoğrafı, başka renk veya maske yedek olarak verilmiyor. Admin kartında kilitli indirme düğmesi var. Katalog/renk/maske değişimi, yol aşımı ve keyfi URL senaryoları izole testte PASS. API 508 test PASS (29 atlandı); sözleşme, admin, web ve Flutter analizi PASS. [TST-223](../test/2026-11-03/TST-223-sip-tas-05-source-download.md). SIP-TAS-06…09 yapılmadı; gerçek veri/canlı kabul ve rol/PM onayı açık.

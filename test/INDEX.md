@@ -327,3 +327,5 @@
 - 27.10.2026 · [Prompt v5 / tek aday üretim](2026-10-27/TST-art-direction-v5.md) — Açık yazı/imza/eşya yasakları; ek denetim kaldırıldı, 25 hedefli test geçti.
 
 - 27.10.2026 · [Release dda85b6 doğrulaması](2026-10-27/TST-release-dda85b6.md) — Web/admin/API üretim derlemesi, ZIP ve yayımlanmış üç asset/hash doğrulandı; IIS kurulumu bekliyor.
+
+- 03.11.2026 · [TST-231 Sürat Kargo entegrasyon planı](2026-11-03/TST-231-surat-kargo-integration-plan.md) — ZIP/e-posta incelemesi, task/alan/secret planı ve prompt; 14 sayfa PDF görsel kontrolü PASS. Uygulama ve sağlayıcı çağrısı yok.

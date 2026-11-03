@@ -33,3 +33,8 @@ apps/web/public/assets/product-previews/
 
 # Generated review renders and fixture inspection output
 artifacts/
+
+# Local carrier source documents can contain credentials
+/Entegrasyonlar/01-Surat-Kargo/Yerel-Bilgiler/
+/Entegrasyonlar/01-Surat-Kargo/kargo.rtf
+/Entegrasyonlar/01-Surat-Kargo/Re__*

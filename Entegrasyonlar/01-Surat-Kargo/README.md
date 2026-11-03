@@ -12,7 +12,7 @@ Plan hazır; uygulama başlamadı. Bu klasörün açılması entegrasyonun uygul
 
 ## Beklenen bilgiler ve kararlar
 
-Test/canlı yetkileri, IP whitelist, paket desi/kg, etiket ve sözleşme çelişkilerinin teyidi.
+Test/canlı kullanıcı bilgileri alındı; canlı cari için takip yetkisi bildirildi. Gerçek bağlantı/oluşturma testi, IP whitelist, paket desi/kg, etiket ve sözleşme çelişkilerinin teyidi açık.
 
 ## İlgili kayıtlar
 
@@ -28,3 +28,10 @@ Test/canlı yetkileri, IP whitelist, paket desi/kg, etiket ve sözleşme çeliş
 Gizli bilgi içermeyen sağlayıcı sözleşme notları, alan eşleştirmesi, task/prompt, kurulum yönergesi ve izinli test/kabul raporu bağlantıları. Mevcut kaynaklar yukarıda bağlanmıştır; kopyalarıyla yeni bir durum kaynağı oluşturulmaz. Henüz bu belgeler yoksa hazırmış gibi gösterilmez.
 
 Parola, API anahtarı, gerçek müşteri verisi, gizli bilgi içeren ZIP/Postman ve gerçek ortam dosyası buraya/Git’e konmaz. Gerçek erişimler sunucunun gizli ayar deposunda tutulur. Bu düzenleme sırasında sağlayıcı çağrısı veya geliştirme yapılmadı.
+
+## İletilmiş hesap bilgileri ve kaynak e-posta
+
+- RE-14057; canlı cari ve kullanıcı adı: 1505859998. Test kullanıcı adı: 1361590662.
+- Test/canlı parolalar alındı; özgün yerel `kargo.rtf` dosyasında. Yeni belgelere çoğaltılmadı ve Git’e alınmaz.
+- E-postadaki bilgiler, kargo kuralları ve teknik planın birleşik yerel nüshası: `Yerel-Bilgiler/surat-kargo-iletilen-bilgiler-ve-plan-2026-11-03.pdf` ve aynı adlı Markdown. Parola yerlerinde özgün RTF referansı vardır.
+- Özgün RTF ve `Re__...` ek klasörü Git dışında tutulur. Takip yetkisi bildirimi alındı; bağlantı/oluşturma testi başarılı sayılmaz.

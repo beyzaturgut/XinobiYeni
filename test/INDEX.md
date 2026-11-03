@@ -341,3 +341,5 @@
 - 03.11.2026 · [TST-232 belge arşivi](2026-11-03/TST-232-document-archive.md) — 6 PDF tarihli klasörlerde; SHA-256/sayfa ve dizin bağlantıları PASS. Eski yollar ve belge içerikleri korundu.
 
 - 03.11.2026 · [TST-235 entegrasyon klasörleri](2026-11-03/TST-235-integration-folders.md) — 13 klasör, kapsam/durum/kaynak notları ve yerel bağlantılar PASS; uygulama yok.
+
+- 03.11.2026 · [TST-239 Sürat iletilen bilgiler](2026-11-03/TST-239-surat-provided-information.md) — E-posta + teknik plan yerel 16 sayfa; parolalar özgün RTF referansıyla; görsel/secret dışlama kontrolü PASS.

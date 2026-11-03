@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Sürat iletilen bilgiler eki
+
+Sürat klasöründe e-posta bilgileri ve teknik plan birleşik yerel PDF/Markdown olarak hazırlandı. Test/canlı hesap bilgileri alındı; parola değerleri çoğaltılmadan özgün RTF kaynak gösterildi. RTF/ekler ve yerel nüsha Git dışında. Bağlantı veya gönderi testi yapılmadı.
+
 **03.11 SIP-TAS-08 uygulaması:** Eski, eksik ve kısmi sipariş tasarım kayıtları her kartta bağımsız değerlendiriliyor. SIP-TAS-02 öncesi siparişin kendi desen ve kompozisyon kopyası, “doğrulama özeti kaydedilmedi” etiketiyle (`X-Xinobi-File-Check: unrecorded`) erişilebilir kalıyor. Saklanmamış dosyalarda indirme kapalı ve nedeni yazıyor. Servis hatası eksik kayıt sayılmıyor; “kaydın olup olmadığı bilinmiyor” mesajı ve tekrar dene var. Katalog/tasarım yedeği kullanılmıyor. Salt okunur `order-design-files-dry-run` envanteri ve geri dönüş planı hazır; gerçek veriye yazma yapılmadı. API 513 test PASS (29 atlandı); 7 durumlu Chrome matrisi ve regresyonlar PASS. [TST-235](../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md). Gerçek veride envanter/geri doldurma kararı, SIP-TAS-09 ve rol/PM onayı açık.
 
 ## 03.11.2026 - Entegrasyon klasörleri

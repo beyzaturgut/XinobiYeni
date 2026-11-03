@@ -1,6 +1,6 @@
 # Sürat Kargo sunucu adaptörü - ilk uygulama
 
-03.11.2026. `services/api/Shipping/SuratKargoClient.cs` ve Program.cs kaydı eklendi. Bu sürüm taşıma/sözleşme katmanıdır; admin gönderi oluşturma, kalıcı deneme kaydı, etiket ve otomatik takip henüz bağlı değildir. Manuel kargo davranışı değiştirilmedi. Hiçbir gerçek sağlayıcı çağrısı yapılmadı.
+03.11.2026. `services/api/Shipping/SuratKargoClient.cs` ve Program.cs kaydı eklendi. Taşıma/sözleşme katmanına kalıcı gönderi/deneme kaydı ve yetkili admin API uçları eklendi. Admin ekranı, etiket ve otomatik takip henüz bağlı değildir. Manuel kargo davranışı değiştirilmedi. Hiçbir gerçek sağlayıcı çağrısı yapılmadı.
 
 ## Güvenli ayar yerleşimi
 
@@ -37,3 +37,15 @@ HttpClient logları kaldırıldı; uygulama ham istek/yanıt/parola/exception UR
 5. Kaynak plandaki sözleşme çelişkileri, egress IP/whitelist ve gerçek hesap yetkileri; ayrı izinli sandbox kabulü. Canlı pilot/deploy bu ilk kod tesliminde yok.
 
 [Asıl task/alan eşleştirmesi](../../docs/tasks/surat-kargo-integration-plan-2026-11-03.md).
+
+## İkinci kod teslimi: kalıcı kayıt ve admin API
+
+- `GET /api/v1/admin/orders/{id}/surat-shipment` (orders.read): seçili ortam kaydı; kayıt yoksa boş yanıt. Sipariş varlığı ve erişim önce doğrulanır.
+- `POST /api/v1/admin/orders/{id}/surat-shipment` (orders.write): `parcelCount`, `parcelDesi`, `parcelKg`, `paymentType` alır. Adres ve telefon sipariş anı adresinden gelir; istemci referans/adres gönderemez. Canlı mod doğrulanmış ödeme/operasyon uygunluğu olmadığından 409 ile kapalıdır.
+- `shipping/surat-shipments.json`, ortak DocumentStore aracılığıyla Development'ta atomik dosya; SQL seçildiğinde mevcut `ops.FeatureDocuments` satırı ve transaction applock kullanır. Yeni tablo/migration gerekmez. Kayıt, ortam+sipariş tekilliği, hesap/istek fingerprint, sabit referans, attempt, personel kimliği, paket/adres kopyası ve zamanları içerir. Parola içermez.
+- SQL çoklu API örneğini ortak transaction kilidiyle korur. Development dosya modu yalnız tek API sürecinde desteklenir. Ayrı süreçlerle aynı dosya alanı üzerinden gönderim çalıştırılmamalıdır. İzole gerçek SQL kabulü halen açık.
+- Önce `submitting` kaydı kalıcılaşır, sonra ağ çağrısı yapılır. Aynı isteğin tekrarı kaydı döndürür; değişen hesap/paket/adres 409. Sonuç `registered` veya `reconciliation_required`. Kayıttan sonra kesinti yaşanırsa `submitting` korunur; otomatik tekrar yapılmaz. Manuel uzlaştırma arayüzü sonraki iştir.
+- HTTP çağrısı sırasında SQL kilidi tutulmaz. Tamamlama yazılamazsa başlangıç kaydı kalır ve sonraki istek ikinci POST göndermez. Kalıcı gönderi kaydı sipariş statusunu değiştirmez; iptal/gönderim yarışının gerçek operasyon uygunluğu ve işlem sınırları canlı açılıştan önce ayrıca kapanmalıdır.
+- TypeScript/Dart sözleşmeleri yeniden üretildi. Bu API müşteriye açık değildir; hassas kaydedilmiş adres veya ham provider cevabı operation DTO'suna konmaz.
+
+Sıradaki işler: admin ekranı ve uzlaştırma; etiket; takip işi ve müşteri DTO; gerçek sandbox/SQL/barkod kabulü; canlı uygunluk ve iptal-gönderim eşzamanlılığı. Yukarıdaki ilk yol haritasının kalıcı kayıt ve API kısmı bu teslimle ilerledi; tüm kalemler tamamlandı sayılmaz.

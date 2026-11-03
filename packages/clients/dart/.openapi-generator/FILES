@@ -53,6 +53,7 @@ doc/ConfirmPasswordReset.md
 doc/ContentApi.md
 doc/CreateAdminInvitation.md
 doc/CreateQuote.md
+doc/CreateSuratShipment.md
 doc/CreateXinobiUSession.md
 doc/CustomerAddress.md
 doc/CustomerOrder.md
@@ -127,6 +128,7 @@ doc/StartAdminPasswordReset.md
 doc/StartEmailChange.md
 doc/StartPasswordReset.md
 doc/SubmitReview.md
+doc/SuratShipmentView.md
 doc/SystemApi.md
 doc/TrackQuoteMessage.md
 doc/UpdateMyAccount.md
@@ -204,6 +206,7 @@ lib/src/model/confirm_email_change.dart
 lib/src/model/confirm_password_reset.dart
 lib/src/model/create_admin_invitation.dart
 lib/src/model/create_quote.dart
+lib/src/model/create_surat_shipment.dart
 lib/src/model/create_xinobi_u_session.dart
 lib/src/model/customer_address.dart
 lib/src/model/customer_order.dart
@@ -278,6 +281,7 @@ lib/src/model/start_admin_password_reset.dart
 lib/src/model/start_email_change.dart
 lib/src/model/start_password_reset.dart
 lib/src/model/submit_review.dart
+lib/src/model/surat_shipment_view.dart
 lib/src/model/track_quote_message.dart
 lib/src/model/update_my_account.dart
 lib/src/model/variant_detail.dart

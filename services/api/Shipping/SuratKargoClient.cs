@@ -66,7 +66,13 @@ public sealed record SuratTrackingDocument(string? Id, int? StatusCode, string? 
     string? TrackingNumber, string? LastMovementRaw, string? DeliveredDateRaw, string NormalizedState, JsonElement Source);
 
 /// <summary>Server-only transport. Never changes order status or retries a write.</summary>
-public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Options.IOptions<SuratKargoOptions> options)
+public interface ISuratKargoClient
+{
+    Task<SuratCreateResult> CreateAsync(SuratShipment shipment, CancellationToken cancellationToken = default);
+    Task<SuratTrackingResult> TrackAsync(string reference, CancellationToken cancellationToken = default);
+}
+
+public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Options.IOptions<SuratKargoOptions> options) : ISuratKargoClient
 {
     private static readonly JsonSerializerOptions Wire = new() { PropertyNamingPolicy = null };
 

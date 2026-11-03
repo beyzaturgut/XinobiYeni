@@ -1,5 +1,9 @@
 # Xinobi | Sürat Kargo entegrasyon planı
 
+## Güncel uygulama eki - 03.11.2026
+
+Planın ardından adaptör, kalıcı gönderi/deneme ve yetkili admin API uygulanmaya başlandı. SQL için mevcut FeatureDocuments altyapısı kullanıldı; yeni tablo migrationı eklenmedi. Orijinal PDF tarihsel plan sürümüdür. Canlı uygunluk, admin ekranı, etiket, polling ve gerçek kabul henüz tamamlanmadı. Güncel ayrıntılar: [sunucu kurulum kaydı](../../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md).
+
 ## 03.11.2026 - Alınmış sağlayıcı bilgilerinin ek kaydı
 
 RE-14057: canlı cari/kullanıcı 1505859998, test kullanıcı 1361590662. İki ortamın parolaları da alındı; özgün yerel `Entegrasyonlar/01-Surat-Kargo/kargo.rtf` dosyasındadır. Bunlar beklenen bilgi değil alınmış bilgidir. Canlı takip yetkisi e-postayla bildirildi; gerçek bağlantı, gönderi yazma yetkisi ve IP izni henüz test edilmedi. E-posta kuralları ile bu planın birleşik PDF/Markdown nüshası `Entegrasyonlar/01-Surat-Kargo/Yerel-Bilgiler/` altında Git dışında tutulur; parola kopyalamak yerine özgün RTF kaynak gösterilir. Genel PDF parolasız teknik plan sürümüdür.

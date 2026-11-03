@@ -61,6 +61,7 @@ import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
 import 'package:xinobi_api_client/src/model/confirm_password_reset.dart';
 import 'package:xinobi_api_client/src/model/create_admin_invitation.dart';
 import 'package:xinobi_api_client/src/model/create_quote.dart';
+import 'package:xinobi_api_client/src/model/create_surat_shipment.dart';
 import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
 import 'package:xinobi_api_client/src/model/customer_order.dart';
@@ -134,6 +135,7 @@ import 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
 import 'package:xinobi_api_client/src/model/start_password_reset.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
+import 'package:xinobi_api_client/src/model/surat_shipment_view.dart';
 import 'package:xinobi_api_client/src/model/track_quote_message.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
@@ -197,6 +199,7 @@ part 'serializers.g.dart';
   ConfirmPasswordReset,
   CreateAdminInvitation,
   CreateQuote,
+  CreateSuratShipment,
   CreateXinobiUSession,
   CustomerAddress,
   CustomerOrder,
@@ -270,6 +273,7 @@ part 'serializers.g.dart';
   StartEmailChange,
   StartPasswordReset,
   SubmitReview,
+  SuratShipmentView,
   TrackQuoteMessage,
   UpdateMyAccount,
   VariantDetail,

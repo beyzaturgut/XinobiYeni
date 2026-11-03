@@ -125,6 +125,7 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**approvePrintProfile**](doc/AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[*AdminApi*](doc/AdminApi.md) | [**createAdminSuratShipment**](doc/AdminApi.md#createadminsuratshipment) | **POST** /api/v1/admin/orders/{id}/surat-shipment |
 [*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLineComposition**](doc/AdminApi.md#downloadadminorderlinecomposition) | **GET** /api/v1/admin/orders/{id}/lines/{line}/composition | Sipariş anındaki yerleşim revizyonunun giydirilmiş temsili önizlemesi (JPEG); baskıya hazır dosya veya ham desen değildir.
 [*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLinePattern**](doc/AdminApi.md#downloadadminorderlinepattern) | **GET** /api/v1/admin/orders/{id}/lines/{line}/pattern | Sipariş satırına kopyalanmış ham deseni özgün baytlarıyla indirir; ürün fotoğrafı veya giydirilmiş önizleme değildir.
 [*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLineProductSource**](doc/AdminApi.md#downloadadminorderlineproductsource) | **GET** /api/v1/admin/orders/{id}/lines/{line}/source | Editörde maskelenen ürün fotoğrafının sipariş anındaki kopyasını özgün baytlarıyla indirir; desen uygulanmamıştır, maske dosyası değildir.
@@ -135,6 +136,7 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**getAdminOrder**](doc/AdminApi.md#getadminorder) | **GET** /api/v1/admin/orders/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminReportSummary**](doc/AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminSuratShipment**](doc/AdminApi.md#getadminsuratshipment) | **GET** /api/v1/admin/orders/{id}/surat-shipment |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*AdminApi*](doc/AdminApi.md) | [**getPrintProfileRevision**](doc/AdminApi.md#getprintprofilerevision) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision} |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
@@ -221,6 +223,7 @@ Class | Method | HTTP request | Description
  - [ConfirmPasswordReset](doc/ConfirmPasswordReset.md)
  - [CreateAdminInvitation](doc/CreateAdminInvitation.md)
  - [CreateQuote](doc/CreateQuote.md)
+ - [CreateSuratShipment](doc/CreateSuratShipment.md)
  - [CreateXinobiUSession](doc/CreateXinobiUSession.md)
  - [CustomerAddress](doc/CustomerAddress.md)
  - [CustomerOrder](doc/CustomerOrder.md)
@@ -294,6 +297,7 @@ Class | Method | HTTP request | Description
  - [StartEmailChange](doc/StartEmailChange.md)
  - [StartPasswordReset](doc/StartPasswordReset.md)
  - [SubmitReview](doc/SubmitReview.md)
+ - [SuratShipmentView](doc/SuratShipmentView.md)
  - [TrackQuoteMessage](doc/TrackQuoteMessage.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)

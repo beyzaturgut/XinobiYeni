@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**approvePrintProfile**](AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [**assignAdminRole**](AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [**createAdminInvitation**](AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[**createAdminSuratShipment**](AdminApi.md#createadminsuratshipment) | **POST** /api/v1/admin/orders/{id}/surat-shipment |
 [**downloadAdminOrderLineComposition**](AdminApi.md#downloadadminorderlinecomposition) | **GET** /api/v1/admin/orders/{id}/lines/{line}/composition | Sipariş anındaki yerleşim revizyonunun giydirilmiş temsili önizlemesi (JPEG); baskıya hazır dosya veya ham desen değildir.
 [**downloadAdminOrderLinePattern**](AdminApi.md#downloadadminorderlinepattern) | **GET** /api/v1/admin/orders/{id}/lines/{line}/pattern | Sipariş satırına kopyalanmış ham deseni özgün baytlarıyla indirir; ürün fotoğrafı veya giydirilmiş önizleme değildir.
 [**downloadAdminOrderLineProductSource**](AdminApi.md#downloadadminorderlineproductsource) | **GET** /api/v1/admin/orders/{id}/lines/{line}/source | Editörde maskelenen ürün fotoğrafının sipariş anındaki kopyasını özgün baytlarıyla indirir; desen uygulanmamıştır, maske dosyası değildir.
@@ -22,6 +23,7 @@ Method | HTTP request | Description
 [**getAdminOrder**](AdminApi.md#getadminorder) | **GET** /api/v1/admin/orders/{id} |
 [**getAdminReportSummary**](AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [**getAdminSession**](AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
+[**getAdminSuratShipment**](AdminApi.md#getadminsuratshipment) | **GET** /api/v1/admin/orders/{id}/surat-shipment |
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [**getPrintProfileRevision**](AdminApi.md#getprintprofilerevision) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision} |
 [**listAdminAudit**](AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
@@ -147,6 +149,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**AdminInvitationResponse**](AdminInvitationResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **createAdminSuratShipment**
+> SuratShipmentView createAdminSuratShipment(id, createSuratShipment)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final CreateSuratShipment createSuratShipment = ; // CreateSuratShipment |
+
+try {
+    final response = api.createAdminSuratShipment(id, createSuratShipment);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->createAdminSuratShipment: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **createSuratShipment** | [**CreateSuratShipment**](CreateSuratShipment.md)|  |
+
+### Return type
+
+[**SuratShipmentView**](SuratShipmentView.md)
 
 ### Authorization
 
@@ -565,6 +610,47 @@ This endpoint does not need any parameter.
 ### Return type
 
 [**AdminSession**](AdminSession.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAdminSuratShipment**
+> SuratShipmentView getAdminSuratShipment(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+
+try {
+    final response = api.getAdminSuratShipment(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminSuratShipment: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**SuratShipmentView**](SuratShipmentView.md)
 
 ### Authorization
 

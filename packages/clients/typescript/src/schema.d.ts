@@ -1333,6 +1333,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/orders/{id}/surat-shipment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetAdminSuratShipment"];
+        put?: never;
+        post: operations["CreateAdminSuratShipment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/orders/{id}/lines/{line}/pattern": {
         parameters: {
             query?: never;
@@ -1876,6 +1892,16 @@ export interface components {
             desiredDate: null | string;
             purpose: null | string;
             note: null | string;
+        };
+        CreateSuratShipment: {
+            /** Format: int32 */
+            parcelCount: number;
+            /** Format: double */
+            parcelDesi: number;
+            /** Format: double */
+            parcelKg: number;
+            /** Format: int32 */
+            paymentType: number;
         };
         CreateXinobiUSession: {
             productId: string;
@@ -2490,6 +2516,15 @@ export interface components {
             rating: number;
             title: null | string;
             body: string;
+        };
+        SuratShipmentView: {
+            reference: string;
+            state: string;
+            /** Format: date-time */
+            startedAt: string;
+            /** Format: date-time */
+            completedAt: null | string;
+            message: string;
         };
         TrackQuoteMessage: {
             email: string;
@@ -6352,6 +6387,72 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetAdminSuratShipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratShipmentView"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    CreateAdminSuratShipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateSuratShipment"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratShipmentView"];
                 };
             };
             /** @description Service Unavailable */

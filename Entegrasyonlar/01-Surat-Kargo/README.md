@@ -8,7 +8,7 @@ Gönderi oluşturma, Code128 etiket, şube kabulünden sonra takip. Tarife/check
 
 ## Mevcut kayıt
 
-İlk sunucu adaptörü ve izole sözleşme testleri eklendi. Kalıcı gönderi/admin/etiket/takip işi ve gerçek kabul açık. Bu klasörün açılması entegrasyonun uygulandığı veya canlıda doğrulandığı anlamına gelmez.
+Sunucu adaptörü, kalıcı gönderi/deneme ve yetkili admin API eklendi. Admin ekranı/etiket/takip işi ve gerçek kabul açık. Bu klasörün açılması entegrasyonun uygulandığı veya canlıda doğrulandığı anlamına gelmez.
 
 ## Beklenen bilgiler ve kararlar
 

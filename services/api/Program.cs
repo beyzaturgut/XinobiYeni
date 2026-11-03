@@ -162,10 +162,12 @@ builder.Services.AddSingleton<Xinobi.Api.Infrastructure.IFileStore>(services =>
         ? new Xinobi.Api.Infrastructure.LocalFileStore(fileRoot) : new Xinobi.Api.Infrastructure.UnavailableFileStore());
 // No provider requests run at startup; disabled unless explicitly configured.
 builder.Services.Configure<Xinobi.Api.Shipping.SuratKargoOptions>(builder.Configuration.GetSection("Shipping:Surat"));
-builder.Services.AddHttpClient<Xinobi.Api.Shipping.SuratKargoClient>(client =>
+builder.Services.AddHttpClient<Xinobi.Api.Shipping.ISuratKargoClient, Xinobi.Api.Shipping.SuratKargoClient>(client =>
     { client.Timeout = TimeSpan.FromSeconds(20); client.MaxResponseContentBufferSize = 2 * 1024 * 1024; })
     .RemoveAllLoggers()
     .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { AllowAutoRedirect = false });
+builder.Services.AddSingleton<Xinobi.Api.Shipping.SuratShipmentStore>();
+builder.Services.AddTransient<Xinobi.Api.Shipping.SuratShipmentWorkflow>();
 builder.Services.AddSingleton<AuditTrail>();
 builder.Services.AddSingleton<NotificationTexts>();
 builder.Services.AddSingleton<INotificationChannelSender, EmailNotificationSender>();

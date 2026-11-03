@@ -4678,6 +4678,94 @@
         }
       }
     },
+    "/api/v1/admin/orders/{id}/surat-shipment": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "GetAdminSuratShipment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratShipmentView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "CreateAdminSuratShipment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSuratShipment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratShipmentView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/orders/{id}/lines/{line}/pattern": {
       "get": {
         "tags": [
@@ -6793,6 +6881,33 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "CreateSuratShipment": {
+        "required": [
+          "parcelCount",
+          "parcelDesi",
+          "parcelKg",
+          "paymentType"
+        ],
+        "type": "object",
+        "properties": {
+          "parcelCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parcelDesi": {
+            "type": "number",
+            "format": "double"
+          },
+          "parcelKg": {
+            "type": "number",
+            "format": "double"
+          },
+          "paymentType": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -9247,6 +9362,38 @@
             ]
           },
           "body": {
+            "type": "string"
+          }
+        }
+      },
+      "SuratShipmentView": {
+        "required": [
+          "reference",
+          "state",
+          "startedAt",
+          "completedAt",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "message": {
             "type": "string"
           }
         }

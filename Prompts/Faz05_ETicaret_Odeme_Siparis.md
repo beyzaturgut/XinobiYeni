@@ -1,5 +1,9 @@
 # Faz05 — B2C satış, müşteri hesabı ve sipariş sonrası işlemler
 
+## 03.11.2026 - Sürat kalıcı gönderi ve admin API
+
+Ortak FeatureDocuments transaction/kilidiyle kalıcı referans, attempt, paket/adres kopyası ve sonuç kaydı; çift istek/yeniden başlatmada write tekrarını engelleme eklendi. GET/POST admin orders/{id}/surat-shipment, sunucu orders.read/write kontrolüyle açık. Canlı mod uygunluk doğrulanmadığından engelli; sipariş statüsü değişmez. Admin ekranı, uzlaştırma, etiket ve polling açık. [TST-244](../test/2026-11-03/TST-244-surat-persistent-admin-api.md): 26 odaklı PASS; tam API 540 PASS / 29 SKIP / 0 FAIL; TS/Dart PASS. [Kurulum/sınırlar](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md).
+
 ## 03.11.2026 - Sürat Kargo ilk sunucu adaptörü
 
 KRG-SUR-01 başladı: kapalı varsayılan/test-canlı ayrımı, doğrudan taşıyıcı JSON istemcisi, katı kabul yanıtı, write retry olmadan belirsizlik, takip belge/ID/durum ayrımı eklendi. [Kurulum ve sınırlar](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Kalıcı idempotency, admin sipariş bağlantısı, Code128 etiket ve takip işi henüz yok; entegrasyon tamamlandı sayılmaz. Gerçek çağrı/secret/deploy yok. [TST-243](../test/2026-11-03/TST-243-surat-server-adapter.md): 17/17 odaklı; tam API 531 PASS / 29 SKIP / 0 FAIL.

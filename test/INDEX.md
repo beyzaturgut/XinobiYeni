@@ -349,3 +349,5 @@
 - 03.11.2026 · [TST-239 Sürat iletilen bilgiler](2026-11-03/TST-239-surat-provided-information.md) — E-posta + teknik plan yerel 16 sayfa; parolalar özgün RTF referansıyla; görsel/secret dışlama kontrolü PASS.
 
 - 03.11.2026 · [TST-243 Sürat sunucu adaptörü](2026-11-03/TST-243-surat-server-adapter.md) — 17/17 odaklı, tam API 531 PASS / 29 SKIP / 0 FAIL. Gerçek çağrı yok; kalıcı gönderi/admin/etiket/takip işi açık.
+
+- 03.11.2026 · [TST-244 Sürat kalıcı gönderi/admin API](2026-11-03/TST-244-surat-persistent-admin-api.md) — 26 odaklı PASS; tam API 540 PASS / 29 SKIP / 0 FAIL; sözleşme/TS/Dart PASS. Gerçek çağrı ve SQL kabulü yok.

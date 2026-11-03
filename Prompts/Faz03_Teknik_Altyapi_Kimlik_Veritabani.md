@@ -1,5 +1,12 @@
 # Faz03 — Teknik temel, kimlik ve veritabanı iskeleti
 
+## 03.11.2026 - Sipariş tasarım detayı kapsam kararı (yalnız plan)
+
+Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş satırındaki kayıtlı editör yerleşimi, ayrı ham desen, maskelemede kullanılan ürün kaynak görseli ve indirilebilir giydirilmiş dijital önizleme. [9 alt task ve kabul koşulları](../docs/tasks/order-design-detail-scope-2026-11-03.md). Uygulama başlamadı; eski planlarda çelişen fiziksel üretim şartları bu karar için geçerli değil. Tarihsel kod/test kayıtları silinmedi.
+
+**Bu fazın işi:** SIP-TAS-02/07/09: sipariş/satır/sürüm dosya bağı, sunucu yetkisi ve izole kalıcılık/erişim testleri. Genel finans/kargo yetkileri korunur.
+
+
 ## Güncel durum ve tüm açık işler - 30.10.2026
 
 **Durum:** Devam - temel regresyon kayıtlı; SQL/güvenlik/posta/işletim kabulü açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.

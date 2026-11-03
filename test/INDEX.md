@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-205 | 03.11.2026 | Sipariş tasarım detayı: 9 alt task/faz kapsam planı | PASS; uygulama yapılmadı | DOCUMENTATION / STATIC | [Rapor](2026-11-03/TST-205-order-design-scope-plan.md) |
 | TST-204 | 03.11.2026 | Genel durum ve 13 ana iş PDF | PASS; 2 sayfa, görsel/metin kontrolü | DOCUMENT / PDF | [Rapor](2026-11-03/TST-204-project-status-pdf.md) |
 | TST-203 | 03.11.2026 | Flutter eşlik bağımsız inceleme | 280/280 ve analiz PASS; 2 açık bulgu | REVIEW / ISOLATED | [Rapor](2026-11-03/TST-203-flutter-parity-review.md) |
 | TST-196 | 03.11.2026 | Flutter analiz | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |

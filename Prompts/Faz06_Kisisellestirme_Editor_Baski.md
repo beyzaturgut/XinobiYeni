@@ -1,16 +1,23 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
+## 03.11.2026 - Sipariş tasarım detayı kapsam kararı (yalnız plan)
+
+Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş satırındaki kayıtlı editör yerleşimi, ayrı ham desen, maskelemede kullanılan ürün kaynak görseli ve indirilebilir giydirilmiş dijital önizleme. [9 alt task ve kabul koşulları](../docs/tasks/order-design-detail-scope-2026-11-03.md). Uygulama başlamadı; eski planlarda çelişen fiziksel üretim şartları bu karar için geçerli değil. Tarihsel kod/test kayıtları silinmedi.
+
+**Bu fazın işi:** Ana sorumluluk KIS-03/KIS-07; SIP-TAS-01...09. KIS-01/05/06 üretim hedefleri kapsam dışı; tamamlandı sayılmaz. KIS-02 görsel maske doğruluğu, KIS-04 genel editör kapsamı ve KIS-08 fiyat/dosya teslim kabulü sürer.
+
+
 **30.10 admin görsel/durum uygulaması:** 16 modül ortak tablo, kontrol, hata/başarı ve pencere odağı dilinde denetlendi; başarısız yazmada taslak, içerik/yüzey yetkileri, eksik sayaç ve yüklenme ayrımları düzeltildi. [Modül/bulgu/açık iş matrisi](../design/admin-consistency-audit-2026-10-30.md), [TST-188](../test/2026-10-30/TST-188-admin-consistency.md). Gerçek SQL/operasyon/sağlayıcı/handoff kabulü açık; faz onayı verilmedi.
 
 **30.10 web görsel/durum uygulaması:** 33 rota dört genişlikte normal/%200 metinle denetlendi; bağımsız hesap veri durumları, yeniden deneme/taslak koruma, yorum modal odağı, katalog/checkout/iade hata kapıları ve dar ekran reflow düzeltildi. [Ekran/kusur/açık iş matrisi](../design/web-consistency-audit-2026-10-30.md), [test raporu](../test/2026-10-30/TST-179-web-consistency.md). Yalnız web; müşteri verileri, gerçek sağlayıcı/cihaz/baskı ve resmi handoff kabulü açık. Faz onayı/yüzde değiştirilmedi.
 
-## Güncel durum ve tüm açık işler - 30.10.2026
+## Güncel durum - 03.11.2026 (önceki uygulama temeli korunur)
 
-**Durum:** Devam - KIS-01 teknik profil hazır; fiziksel ve üretim dosyası kabulü açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+**Durum:** Planlandı - sade sipariş tasarım detayı, kayıtlı yerleşim ve üç görsel teslimi. Üretime hazırlık kapsam dışı; uygulama başlamadı. Plan kaynak kesiti `main / e89c649`; önceki uygulama kayıtları aşağıda korunur; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
 
 **Yapılan son işler:** 42bee88: ürün/renk/yüz bazlı mm-DPI-taşma-renk-format, boş ölçülü taslak, kanıtlı onay/kaldırma ve geçmiş; düzlemsel mm/DPI/korunan bölge ölçümü ve fiziksel kalibrasyon SVG. Yeni yerleşim/sipariş profil kopyası ve SHA alır. Gerçek SKU profili oluşturulmadı; productionReady=false.
 
-**Müşteriden / iş sahibinden beklenenler:** SKU/renk/yüz bazlı mm alan/konum/yasak bölgeler, DPI/taşma/ICC/format/şeffaflık, baskı tekniği/açınım şablonu, referans dosya ve fiziksel kabul sorumlusu (KAR-05).
+**03.11 yeni kapsamda beklenenler:** Ürün/renk kaynak görseli ve doğru sipariş yerleşimi/dosya eşliği için örnek kabul. Fiziksel mm/DPI/ICC/kalibrasyon/numune dosyası bu bölümün yazılım teslim şartı değil.
 
 ### Teknik ekipte ve kabulde kalan ana görevler
 
@@ -18,22 +25,22 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 
 | Task / konu | Durum | Yapılmadı / kapanış için kalan |
 |---|---|---|
-| [KIS-01](../docs/tasks/project-closure-2026-10-30.md#kis-01) - Fiziksel PrintArea ve üretim profilini kur | Kısmen yapıldı | Gerçek SKU ölçü/şablon/ICC/DPI bilgileri, fiziksel ölçek-konum numunesi ve gerçek SQL kalıcılık kabulü bekliyor. productionReady=false; kavisli otomatik üretim render’ı yok. |
+| [KIS-01](../docs/tasks/project-closure-2026-10-30.md#kis-01) - Fiziksel PrintArea ve üretim profilini kur | Kapsam dışı - 03.11.2026 kararı | Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı. |
 | [KIS-02](../docs/tasks/project-closure-2026-10-30.md#kis-02) - Tüm gerçek renklerin maske kabulünü yap | Yapılmadı - kapanış açık | Her gerçek renk için logo/kenar/kulp ve geometriyi insanın görsel inceleyip SKU bazında imzalı kabul etmesi eksik. |
-| [KIS-03](../docs/tasks/project-closure-2026-10-30.md#kis-03) - Revizyon ve sipariş bağımsızlığını SQL'de doğrula | Yapılmadı - kapanış açık | Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı. |
-| [KIS-04](../docs/tasks/project-closure-2026-10-30.md#kis-04) - Kaynak kapsamdaki editör araçlarını tamamla | Yapılmadı - kapanış açık | Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik. |
-| [KIS-05](../docs/tasks/project-closure-2026-10-30.md#kis-05) - Değişmez üretim sürümü ve insan onayı ekle | Yapılmadı - kapanış açık | Bunlardan ayrı üretim DesignVersion, dosya ön kontrolü, müşteri/operatör onayı ve yeniden onay şartları tamamlanmadı. |
-| [KIS-06](../docs/tasks/project-closure-2026-10-30.md#kis-06) - Baskı render kuyruğunu uygula | Yapılmadı - kapanış açık | Deterministik yüksek çözünürlüklü gerçek baskı render kuyruğu, retry/iş kimliği ve arızadan kurtarma eksik. |
-| [KIS-07](../docs/tasks/project-closure-2026-10-30.md#kis-07) - Panel üretim akışı ve güvenli indirmeyi tamamla | Yapılmadı - kapanış açık | Tasarım bazlı üretim bekliyor/onay/hazır/red akışı ve doğru üretim sürümünün güvenli indirmesi eksik. |
-| [KIS-08](../docs/tasks/project-closure-2026-10-30.md#kis-08) - Fiziksel numune ve kişiselleştirme fiyatını kabul et | Yapılmadı - kapanış açık | Fiziksel ürün/renk/yüz numuneleri, üretim sahibi kabulü ve kişiselleştirme fiyatının checkout/iade politikasına bağlanması açık. |
+| [KIS-03](../docs/tasks/project-closure-2026-10-30.md#kis-03) - Revizyon ve sipariş bağımsızlığını SQL'de doğrula | Yapılmadı - kapanış açık | Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı. Üç görselin siparişe bağlı korunması ve eski/eksik kayıt davranışı ayrıca tamamlanmalı. |
+| [KIS-04](../docs/tasks/project-closure-2026-10-30.md#kis-04) - Kaynak kapsamdaki editör araçlarını tamamla | Yapılmadı - kapanış açık | Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik. Bu karar genel editör araçlarını iptal etmez; sade sipariş tasarım detayının önkoşulu da değildir. |
+| [KIS-05](../docs/tasks/project-closure-2026-10-30.md#kis-05) - Değişmez üretim sürümü ve insan onayı ekle | Kapsam dışı - 03.11.2026 kararı | Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı. |
+| [KIS-06](../docs/tasks/project-closure-2026-10-30.md#kis-06) - Baskı render kuyruğunu uygula | Kapsam dışı - 03.11.2026 kararı | Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı. |
+| [KIS-07](../docs/tasks/project-closure-2026-10-30.md#kis-07) - Sipariş tasarım detayını ve ayrı görsel indirmelerini tamamla | Yapılmadı - kapanış açık | SIP-TAS-01...09 planlandı; uygulama, sürüme bağlı dosya koruması, indirmeler ve kabul henüz yapılmadı. |
+| [KIS-08](../docs/tasks/project-closure-2026-10-30.md#kis-08) - Kişiselleştirme fiyatı ve sipariş dosya teslimini kabul et | Yapılmadı - kapanış açık | Kişiselleştirme fiyatlandırma/checkout-iade kabulü ve SIP-TAS dosya teslim kabulü açık; fiziksel numune yazılım kapısı olarak beklenmiyor. |
 
 ### Açık alt işler ve özel kabul kayıtları
 
 | Alt iş | Ana task | Durum | Kalan / kanıt |
 |---|---|---|---|
-| KIS-01-DATA-01 | KIS-01, KAR-05 | Üretim bilgisi bekliyor | Gerçek SKU ölçü, konum, DPI, pay, renk/format ve kavisli ürün üretim şablonu. |
-| KIS-01-UAT-01 | KIS-01, KIS-08 | Açık | Ölçekleme kapalı kalibrasyon çıktısı ve gerçek numunede alan/konumu üretim sahibiyle ölçerek kabul et. |
-| KIS-01-SQL-01 | KIS-01, KIS-03, QA-02 | Açık | İzole gerçek SQL’de sürüm kalıcılığı/restart/yazma yarışı ve eski sipariş kopyası kontrolü. Dosya fixture’ı SQL kabulü değil. |
+| KIS-01-DATA-01 | KIS-01, KAR-05 | Kapsam dışı (03.11) | Tarihsel beklenti; yeni sipariş detayı için istenmiyor.  Gerçek SKU ölçü, konum, DPI, pay, renk/format ve kavisli ürün üretim şablonu. |
+| KIS-01-UAT-01 | KIS-01, KIS-08 | Kapsam dışı (03.11) | Tarihsel fiziksel kabul; yeni teslim kapısı değil.  Ölçekleme kapalı kalibrasyon çıktısı ve gerçek numunede alan/konumu üretim sahibiyle ölçerek kabul et. |
+| KIS-01-SQL-01 | KIS-01, KIS-03, QA-02 | Revize (03.11) | Fiziksel profil kabulü değil; SIP-TAS-02/09 altında sipariş yerleşimi ve görsel kalıcılığı devam eder.  İzole gerçek SQL’de sürüm kalıcılığı/restart/yazma yarışı ve eski sipariş kopyası kontrolü. Dosya fixture’ı SQL kabulü değil. |
 
 **Çapraz bağımlılıklar (tekrar sayılmaz):** [KAR-05](../docs/tasks/project-closure-2026-10-30.md#kar-05), [AI-04](../docs/tasks/project-closure-2026-10-30.md#ai-04), [CAT-01](../docs/tasks/project-closure-2026-10-30.md#cat-01), [WEB-02](../docs/tasks/project-closure-2026-10-30.md#web-02), [MOB-05](../docs/tasks/project-closure-2026-10-30.md#mob-05), [SEC-07](../docs/tasks/project-closure-2026-10-30.md#sec-07), [UAT-04](../docs/tasks/project-closure-2026-10-30.md#uat-04).
 

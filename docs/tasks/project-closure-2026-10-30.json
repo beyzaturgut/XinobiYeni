@@ -63,15 +63,30 @@
       "id": "KAR-05",
       "priority": "P0",
       "kind": "Karar / kabul",
-      "title": "Fiziksel baskı standardını onayla",
-      "work": "D04 için ürün ve renk bazlı mm, DPI, taşma, renk profili, format, baskı tekniği, lisans ve insan onayı örneklerini üretim ekibinden al.",
-      "accept": "En az bir gerçek ürün için referans baskı dosyası ve fiziksel numune kabulü var; kalan SKU profilleri listelenmiş.",
+      "title": "Sipariş tasarım dosyası teslim sınırını kaydet",
+      "work": "03.11 kullanıcı kararını uygula: kayıtlı editör yerleşimi, ayrı desen ve ürün kaynak görseli indirmesi, gösterilebilir/indirilebilir giydirilmiş dijital önizleme; üretime hazırlık/gönderim yok.",
+      "accept": "Kapsam kararı faz/tasklarda tutarlı; SIP-TAS-01...09 uygulama ve kabulü ayrıca kapanır.",
       "deps": "KAR-01",
-      "done": "KIS-01 ile mm/DPI/taşma/renk/format alanları, sürümlü profil ve kalibrasyon SVG altyapısı eklendi.",
-      "remaining": "Gerçek SKU ölçüleri, baskı tekniği/ICC/format kararı, üretim şablonları ve imzalı fiziksel numune kabulü bekleniyor.",
-      "status": "Yapılmadı - kapanış açık",
+      "done": "KIS-01 ile mm/DPI/taşma/renk/format alanları, sürümlü profil ve kalibrasyon SVG altyapısı eklendi. 03.11: Kullanıcı üretim hazırlığı istemediğini ve yalnız sipariş yerleşimi/üç görsel teslimini açıkça belirtti; planlama istendi.",
+      "remaining": "Kapsam kararı kaydedildi; ekran ve dosya teslim uygulaması KIS-03/KIS-07 altında açık. Fiziksel mm/DPI/ICC/numune bilgisi bu bölümün önkoşulu değil.",
+      "status": "Yapıldı - kapsam kararı",
       "phase": "Faz01",
-      "owner": "Ürün sahibi + PM + ilgili operasyon sahibi"
+      "owner": "Ürün sahibi + PM + ilgili operasyon sahibi",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "title": "Fiziksel baskı standardını onayla",
+            "work": "D04 için ürün ve renk bazlı mm, DPI, taşma, renk profili, format, baskı tekniği, lisans ve insan onayı örneklerini üretim ekibinden al.",
+            "accept": "En az bir gerçek ürün için referans baskı dosyası ve fiziksel numune kabulü var; kalan SKU profilleri listelenmiş.",
+            "status": "Yapılmadı - kapanış açık",
+            "remaining": "Gerçek SKU ölçüleri, baskı tekniği/ICC/format kararı, üretim şablonları ve imzalı fiziksel numune kabulü bekleniyor.",
+            "done": "KIS-01 ile mm/DPI/taşma/renk/format alanları, sürümlü profil ve kalibrasyon SVG altyapısı eklendi."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KAR-06",
@@ -681,41 +696,75 @@
       "kind": "Geliştirme",
       "title": "Fiziksel PrintArea ve üretim profilini kur",
       "work": "Onaylı mm/DPI/taşma/renk/format bilgisini ürün-varyant-yüz bazında sürümle; piksel yerleşimini fiziksel koordinata bağla.",
-      "accept": "Ölçekli referans çıktıda alan ve konum ölçüsü tutuyor; profil değişimi eski sipariş sürümünü değiştirmiyor.",
-      "deps": "KAR-05",
+      "accept": "Yeni kapsam için bu üretim teslimi kapanış koşulu değildir; eski geliştirme/test kaydı tarihsel olarak korunur.",
+      "deps": "Yeni kapsamda zorunlu bağımlılık değil",
       "done": "Sürümlü ürün/renk/yüz profili, boş ölçülü taslak, kanıtlı onay/kaldırma, kalibrasyon SVG ve düzlemsel mm/DPI hesabı eklendi. Profil sürümü/SHA yerleşim ve siparişe kopyalanıyor.",
-      "remaining": "Gerçek SKU ölçü/şablon/ICC/DPI bilgileri, fiziksel ölçek-konum numunesi ve gerçek SQL kalıcılık kabulü bekliyor. productionReady=false; kavisli otomatik üretim render’ı yok.",
-      "status": "Kısmen yapıldı",
+      "remaining": "Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı.",
+      "status": "Kapsam dışı - 03.11.2026 kararı",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "status": "Kısmen yapıldı",
+            "remaining": "Gerçek SKU ölçü/şablon/ICC/DPI bilgileri, fiziksel ölçek-konum numunesi ve gerçek SQL kalıcılık kabulü bekliyor. productionReady=false; kavisli otomatik üretim render’ı yok.",
+            "accept": "Ölçekli referans çıktıda alan ve konum ölçüsü tutuyor; profil değişimi eski sipariş sürümünü değiştirmiyor.",
+            "deps": "KAR-05"
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-02",
       "priority": "P0",
       "kind": "Doğrulama",
       "title": "Tüm gerçek renklerin maske kabulünü yap",
-      "work": "Kaynak fotoğraf, alfa maske, geometri, logo/kenar/handle koruması, checksum ve renk bağını SKU bazında denetle.",
+      "work": "Kaynak fotoğraf, alfa maske, geometri, logo/kenar/handle koruması, checksum ve renk bağını SKU bazında denetle. Kabul dijital önizleme içindir; fiziksel baskı uygunluğu onayı değildir.",
       "accept": "Her kişiselleştirilebilir aktif renk için insan onaylı örnek var; eksik/stale maske açık hata veriyor; başka renk maskesi kullanılmıyor.",
       "deps": "CAT-01",
       "done": "Onaylı yüzey/maske okuma ve checksum/renk bağı kontrolleri var; 30/30 kişiselleştirilebilir renk teknik önizleme yanıtı hazır.",
       "remaining": "Her gerçek renk için logo/kenar/kulp ve geometriyi insanın görsel inceleyip SKU bazında imzalı kabul etmesi eksik.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "work": "Kaynak fotoğraf, alfa maske, geometri, logo/kenar/handle koruması, checksum ve renk bağını SKU bazında denetle."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-03",
       "priority": "P0",
       "kind": "Doğrulama",
       "title": "Revizyon ve sipariş bağımsızlığını SQL'de doğrula",
-      "work": "Kaydet/yeniden aç, renk/kaynak değişimi, favori/sepet ayrımı, hesap sahipliği ve sipariş kopyasını izole gerçek SQL ile test et.",
+      "work": "Kaydet/yeniden aç, renk/kaynak değişimi, favori/sepet ayrımı, hesap sahipliği ve sipariş kopyasını izole gerçek SQL ile test et. SIP-TAS-02/03/08/09: desen, ürün kaynak görseli ve kompozisyon sipariş satırının aynı revizyonuna bağlanır.",
       "accept": "Servis yeniden başlatılınca revizyon aynı; tasarım silinmesi sipariş dosyasını bozmaz; başka kullanıcı kaydı okunamaz.",
       "deps": "QA-02, KIS-02",
       "done": "Konfigürasyon revizyonu, sahiplik, kaynak kontrolü, sipariş kopyası ve tasarım silme bağımsızlığı izole dosya/HTTP testlerinde doğrulandı.",
-      "remaining": "Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı.",
+      "remaining": "Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı. Üç görselin siparişe bağlı korunması ve eski/eksik kayıt davranışı ayrıca tamamlanmalı.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "work": "Kaydet/yeniden aç, renk/kaynak değişimi, favori/sepet ayrımı, hesap sahipliği ve sipariş kopyasını izole gerçek SQL ile test et.",
+            "remaining": "Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-04",
@@ -724,12 +773,23 @@
       "title": "Kaynak kapsamdaki editör araçlarını tamamla",
       "work": "Metin/font, şekil, katman sırası/kilit, şablon kategorisi, çoklu yüz ve hizalama araçlarını onaylı kapsamla uygula; mevcut undo/redo'yu yeniden iş sayma.",
       "accept": "Web ve mobilde onaylı araç matrisi çalışıyor; font lisansı ve çoklu yüz kayıtları sürümlü; kapsam azaltımı yazılı karar gerektiriyor.",
-      "deps": "KAR-01, KIS-01",
+      "deps": "KAR-01",
       "done": "Ortak görsel/desen yerleşimi, konum/ölçek/dönüş/kavis, yakınlaştırma ve undo/redo mevcut.",
-      "remaining": "Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik.",
+      "remaining": "Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik. Bu karar genel editör araçlarını iptal etmez; sade sipariş tasarım detayının önkoşulu da değildir.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "deps": "KAR-01, KIS-01",
+            "remaining": "Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-05",
@@ -737,13 +797,26 @@
       "kind": "Geliştirme",
       "title": "Değişmez üretim sürümü ve insan onayı ekle",
       "work": "Yerleşim revizyonundan ayrı üretim DesignVersion, baskı ön kontrolü, müşteri/operatör onayı ve yeniden onay koşullarını oluştur.",
-      "accept": "Onaylanan dosya/sürüm checksum ile sabit; sipariş sonrası düzenleme üretimi sessizce değiştirmiyor; DPI/taşma hatası engelleniyor.",
-      "deps": "KIS-01, KIS-03",
+      "accept": "Yeni kapsam için bu üretim teslimi kapanış koşulu değildir; eski geliştirme/test kaydı tarihsel olarak korunur.",
+      "deps": "Yeni kapsamda zorunlu bağımlılık değil",
       "done": "Yerleşim revizyonu ve KIS-01 profil snapshot/checksum temeli var.",
-      "remaining": "Bunlardan ayrı üretim DesignVersion, dosya ön kontrolü, müşteri/operatör onayı ve yeniden onay şartları tamamlanmadı.",
-      "status": "Yapılmadı - kapanış açık",
+      "remaining": "Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı.",
+      "status": "Kapsam dışı - 03.11.2026 kararı",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "status": "Yapılmadı - kapanış açık",
+            "remaining": "Bunlardan ayrı üretim DesignVersion, dosya ön kontrolü, müşteri/operatör onayı ve yeniden onay şartları tamamlanmadı.",
+            "accept": "Onaylanan dosya/sürüm checksum ile sabit; sipariş sonrası düzenleme üretimi sessizce değiştirmiyor; DPI/taşma hatası engelleniyor.",
+            "deps": "KIS-01, KIS-03"
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-06",
@@ -751,41 +824,82 @@
       "kind": "Geliştirme",
       "title": "Baskı render kuyruğunu uygula",
       "work": "Yüksek çözünürlüklü üretim dosyasını profilden deterministik üret; retry, iş kimliği, kaynak bütünlüğü ve arızadan kurtarma ekle.",
-      "accept": "Aynı sürüm aynı üretim içeriğini veriyor; hata başarı görünmüyor; gerçek baskı formatı ve çözünürlük sağlanıyor.",
-      "deps": "KIS-05, SEC-06",
+      "accept": "Yeni kapsam için bu üretim teslimi kapanış koşulu değildir; eski geliştirme/test kaydı tarihsel olarak korunur.",
+      "deps": "Yeni kapsamda zorunlu bağımlılık değil",
       "done": "Dijital önizleme ve kalibrasyon referansı üretilebiliyor.",
-      "remaining": "Deterministik yüksek çözünürlüklü gerçek baskı render kuyruğu, retry/iş kimliği ve arızadan kurtarma eksik.",
-      "status": "Yapılmadı - kapanış açık",
+      "remaining": "Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı.",
+      "status": "Kapsam dışı - 03.11.2026 kararı",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "status": "Yapılmadı - kapanış açık",
+            "remaining": "Deterministik yüksek çözünürlüklü gerçek baskı render kuyruğu, retry/iş kimliği ve arızadan kurtarma eksik.",
+            "accept": "Aynı sürüm aynı üretim içeriğini veriyor; hata başarı görünmüyor; gerçek baskı formatı ve çözünürlük sağlanıyor.",
+            "deps": "KIS-05, SEC-06"
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-07",
       "priority": "P0",
       "kind": "Geliştirme",
-      "title": "Panel üretim akışı ve güvenli indirmeyi tamamla",
-      "work": "Mevcut metadata/ham görsel ekranına üretim bekliyor/onay/hazır/red durumları, yetkili dosya indirme ve üretim izi ekle.",
-      "accept": "Operatör yanlış revizyonu indiremez; dosya erişimi audit'li; ham desen ve birleşik JPEG üretim dosyası diye etiketlenmiyor.",
-      "deps": "KIS-06, ADM-01",
+      "title": "Sipariş tasarım detayını ve ayrı görsel indirmelerini tamamla",
+      "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
+      "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
+      "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
       "done": "Panelde metadata, korumalı ham görsel, sipariş bağı ve KIS-01 profil/kalibrasyon ekranı var.",
-      "remaining": "Tasarım bazlı üretim bekliyor/onay/hazır/red akışı ve doğru üretim sürümünün güvenli indirmesi eksik.",
+      "remaining": "SIP-TAS-01...09 planlandı; uygulama, sürüme bağlı dosya koruması, indirmeler ve kabul henüz yapılmadı.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Admin/Web geliştirici + Backend + UX/QA",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "title": "Panel üretim akışı ve güvenli indirmeyi tamamla",
+            "work": "Mevcut metadata/ham görsel ekranına üretim bekliyor/onay/hazır/red durumları, yetkili dosya indirme ve üretim izi ekle.",
+            "accept": "Operatör yanlış revizyonu indiremez; dosya erişimi audit'li; ham desen ve birleşik JPEG üretim dosyası diye etiketlenmiyor.",
+            "deps": "KIS-06, ADM-01",
+            "remaining": "Tasarım bazlı üretim bekliyor/onay/hazır/red akışı ve doğru üretim sürümünün güvenli indirmesi eksik.",
+            "owner": "Web/Mobil + Backend + üretim + Creative"
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "KIS-08",
       "priority": "P0",
       "kind": "Doğrulama",
-      "title": "Fiziksel numune ve kişiselleştirme fiyatını kabul et",
-      "work": "Ürün/renk/yüz bazlı numuneyi üret; ekran-çıktı farkını üretimle onayla; fiyat farkını checkout ve iade politikasına bağla.",
-      "accept": "Üretim sahibi imzalı numune tutanağı var; kişiselleştirme tutarı sunucuda hesaplanıp sipariş snapshot'ında saklanıyor.",
+      "title": "Kişiselleştirme fiyatı ve sipariş dosya teslimini kabul et",
+      "work": "Kişiselleştirme fiyatının checkout/iade kuralı ve sipariş snapshot bağı devam eder; sade sipariş tasarım detayındaki yerleşim/üç indirme için kullanıcı kabulü al. Fiziksel baskı numunesi ve üretim onayı bu yazılım teslimine dahil değil.",
+      "accept": "Üç dosya ve yerleşim sipariş revizyonuyla eşleşiyor; varsa kişiselleştirme tutarı sunucuda doğru hesaplanıp saklanıyor.",
       "deps": "KIS-07, TIC-02, KAR-03",
       "done": "Ürün kompozisyonu ve profil sınırları ekranda temsil ediliyor.",
-      "remaining": "Fiziksel ürün/renk/yüz numuneleri, üretim sahibi kabulü ve kişiselleştirme fiyatının checkout/iade politikasına bağlanması açık.",
+      "remaining": "Kişiselleştirme fiyatlandırma/checkout-iade kabulü ve SIP-TAS dosya teslim kabulü açık; fiziksel numune yazılım kapısı olarak beklenmiyor.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
-      "owner": "Web/Mobil + Backend + üretim + Creative"
+      "owner": "Web/Mobil + Backend + üretim + Creative",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "title": "Fiziksel numune ve kişiselleştirme fiyatını kabul et",
+            "work": "Ürün/renk/yüz bazlı numuneyi üret; ekran-çıktı farkını üretimle onayla; fiyat farkını checkout ve iade politikasına bağla.",
+            "accept": "Üretim sahibi imzalı numune tutanağı var; kişiselleştirme tutarı sunucuda hesaplanıp sipariş snapshot'ında saklanıyor.",
+            "remaining": "Fiziksel ürün/renk/yüz numuneleri, üretim sahibi kabulü ve kişiselleştirme fiyatının checkout/iade politikasına bağlanması açık."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "AI-01",
@@ -1325,13 +1439,23 @@
       "kind": "Geliştirme",
       "title": "Güvenli upload ve dosya erişim sözleşmesini tamamla",
       "work": "MIME/imza/boyut kontrollerini koruyarak finalize, zararlı içerik taraması, özel indirme ve imzalı/kısa ömürlü erişim ihtiyacını uygula.",
-      "accept": "Dosya türü taklidi, yol aşımı, yarım yükleme ve yetkisiz erişim testleri geçiyor; tarama sonucu olmadan üretime gitmiyor.",
+      "accept": "Dosya türü taklidi, yol aşımı, yarım yükleme ve yetkisiz erişim testleri geçiyor; güvenli erişim ve içerik kontrolü olmadan indirme/işleme açılmıyor.",
       "deps": "KAR-08",
       "done": "MIME/boyut kontrolleri, IFileStore ve korumalı tasarım/önizleme okuma mevcut.",
       "remaining": "Genel finalize ve zararlı içerik taraması; özel indirme/süreli erişim/sahipsiz dosya sözleşmesi tamamlanmadı.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz03",
-      "owner": "Backend + DBA + güvenlik + hukuk"
+      "owner": "Backend + DBA + güvenlik + hukuk",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "accept": "Dosya türü taklidi, yol aşımı, yarım yükleme ve yetkisiz erişim testleri geçiyor; tarama sonucu olmadan üretime gitmiyor."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "SEC-08",
@@ -1617,15 +1741,28 @@
       "id": "UAT-04",
       "priority": "P0",
       "kind": "Doğrulama",
-      "title": "Üretim ve entegrasyon operasyonunu kabul ettir",
-      "work": "Fiziksel numune, teklif dönüşümü, Mikro ve tüm pazaryeri mutabakatını üretim/muhasebe/kanal ekipleriyle kapat.",
-      "accept": "Ayrı kabul sahipleri kanıtları imzalamış; eksik kanal tam proje kapsamından sessizce çıkarılmamış.",
+      "title": "Sipariş tasarım dosyaları ve entegrasyon operasyonunu kabul ettir",
+      "work": "Sipariş tasarım detayında yerleşim ve üç görsel indirmesini; teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarını ilgili iş sahipleriyle kabul et.",
+      "accept": "Yetkili iş sahibi dosya-sipariş revizyon eşliğini ve ilgili entegrasyon sonuçlarını kabul etmiş; üretime gönderme adımı şart koşulmamış.",
       "deps": "KIS-08, B2B-08, ERP-08, PAZ-08",
       "done": "Profil/teklif ve entegrasyon temelleri için task/kod kayıtları mevcut.",
-      "remaining": "Fiziksel numune, teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarının üretim/muhasebe/kanal kabulü yok.",
+      "remaining": "Sipariş tasarım dosyası/yerleşim ve entegrasyon/muhasebe/kanal kabulleri açık; üretime hazırlık ve fiziksel numune bu yazılım tesliminde yok.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz11",
-      "owner": "PM + ürün/operasyon + teknik lider"
+      "owner": "PM + ürün/operasyon + teknik lider",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "title": "Üretim ve entegrasyon operasyonunu kabul ettir",
+            "work": "Fiziksel numune, teklif dönüşümü, Mikro ve tüm pazaryeri mutabakatını üretim/muhasebe/kanal ekipleriyle kapat.",
+            "remaining": "Fiziksel numune, teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarının üretim/muhasebe/kanal kabulü yok.",
+            "accept": "Ayrı kabul sahipleri kanıtları imzalamış; eksik kanal tam proje kapsamından sessizce çıkarılmamış."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     },
     {
       "id": "UAT-05",
@@ -1674,14 +1811,24 @@
       "priority": "P0",
       "kind": "Karar / kabul",
       "title": "Eğitim, bakım ve nihai teslimi kapat",
-      "work": "Panel/üretim/entegrasyon eğitimi, teknik doküman, erişim devri, destek/SLA, maliyet ve garanti koşullarını imzalı teslim paketine al.",
+      "work": "Panel/sipariş dosyası inceleme-indirme/entegrasyon eğitimi, teknik doküman, erişim devri, destek/SLA, maliyet ve garanti koşullarını imzalı teslim paketine al.",
       "accept": "Açık task yok veya açıkça onaylı kapsam değişikliği var; tüm üç kanal ve ortak servisler için kapanış tutanağı tamam.",
       "deps": "UAT-07, OPS-08, QA-08",
       "done": "Kaynak kod, mevcut runbook ve tarihli test dokümanları var.",
-      "remaining": "Panel/üretim/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı.",
+      "remaining": "Panel/sipariş dosyası inceleme-indirme/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz11",
-      "owner": "PM + ürün/operasyon + teknik lider"
+      "owner": "PM + ürün/operasyon + teknik lider",
+      "scope_history": [
+        {
+          "date": "2026-11-03",
+          "source": "Kullanıcı talebi; yalnız planlama",
+          "previous": {
+            "remaining": "Panel/üretim/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı."
+          }
+        }
+      ],
+      "scope_plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
     }
   ],
   "followups": {
@@ -1731,20 +1878,120 @@
       {
         "id": "KIS-01-DATA-01",
         "parents": "KIS-01, KAR-05",
-        "status": "Üretim bilgisi bekliyor",
-        "remaining": "Gerçek SKU ölçü, konum, DPI, pay, renk/format ve kavisli ürün üretim şablonu."
+        "status": "Kapsam dışı - 03.11.2026 kararı",
+        "remaining": "Fiziksel üretim bilgisi/numunesi yeni yazılım tesliminin şartı değil; eski kayıt tarihsel olarak korunur.",
+        "scope_history": {
+          "date": "2026-11-03",
+          "previous_status": "Üretim bilgisi bekliyor",
+          "previous_remaining": "Gerçek SKU ölçü, konum, DPI, pay, renk/format ve kavisli ürün üretim şablonu."
+        }
       },
       {
         "id": "KIS-01-UAT-01",
         "parents": "KIS-01, KIS-08",
-        "status": "Açık",
-        "remaining": "Ölçekleme kapalı kalibrasyon çıktısı ve gerçek numunede alan/konumu üretim sahibiyle ölçerek kabul et."
+        "status": "Kapsam dışı - 03.11.2026 kararı",
+        "remaining": "Fiziksel üretim bilgisi/numunesi yeni yazılım tesliminin şartı değil; eski kayıt tarihsel olarak korunur.",
+        "scope_history": {
+          "date": "2026-11-03",
+          "previous_status": "Açık",
+          "previous_remaining": "Ölçekleme kapalı kalibrasyon çıktısı ve gerçek numunede alan/konumu üretim sahibiyle ölçerek kabul et."
+        }
       },
       {
         "id": "KIS-01-SQL-01",
-        "parents": "KIS-01, KIS-03, QA-02",
-        "status": "Açık",
-        "remaining": "İzole gerçek SQL’de sürüm kalıcılığı/restart/yazma yarışı ve eski sipariş kopyası kontrolü. Dosya fixture’ı SQL kabulü değil."
+        "parents": "KIS-03, QA-02",
+        "status": "Revize - planlandı",
+        "remaining": "SIP-TAS-02/09: sipariş yerleşimi ve üç görsel dosyasının sürüm/kalıcılık bağı; fiziksel profil kalibrasyonu değil."
+      },
+      {
+        "id": "SIP-TAS-01",
+        "title": "Baskı alanını sipariş tasarım detayına sadeleştir",
+        "parents": "KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Panelde sipariş/satır odaklı bir tasarım detayı planla. Fiziksel profil/kalibrasyon, üretime gönder, üretim onayı ve hazır/red üretim durumlarını bu ekrandan çıkar. Mevcut sipariş, ödeme ve kargo eylemleri ayrı kalır; eski profil/veri silme işi eklenmez.",
+        "accept": "Ürün/SKU/renk, desen, kayıtlı yerleşim ve üç görsel dosyası bir arada; üretime hazırlama eylemi yok.",
+        "deps": "Yok",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-02",
+        "title": "Siparişe bağlı görsel ve revizyon paketini tanımla",
+        "parents": "KIS-03, KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Sipariş kimliği + satır kimliği/indeksi + ürün/varyant/SKU + tasarım/konfigürasyon revizyonunu ilişkilendir. Desen, maskelemede kullanılan ürün kaynak görseli ve giydirilmiş önizlemeyi sipariş anındaki sürümle koru. Güncel katalog/tasarım sonradan değişince eski sipariş değişmesin.",
+        "accept": "Tasarım silme/yeniden düzenleme, katalog görseli veya maske değişimi eski dosyaları ve yerleşimi değiştirmiyor.",
+        "deps": "SIP-TAS-01",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-03",
+        "title": "Müşterinin kaydettiği yerleşim detaylarını göster",
+        "parents": "KIS-03, KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Kayıtlı şemadan kaynak tuval boyutu, yatay/dikey konum, ölçek, döndürme, yerleşim modu, kavis ve varsa gövde/bölge ayarlarını okunabilir sun. Birimleri ve seçili sürümü belirt. Gerçekte saklanmayan mm/DPI, fiziksel ölçü veya üretim uygunluğu hesaplama.",
+        "accept": "Ekran editörde kaydedilen aynı revizyonu gösteriyor; uygulanmayan/eksik alanlar sıfır gibi sunulmuyor.",
+        "deps": "SIP-TAS-02",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-04",
+        "title": "Ham deseni ayrı indir",
+        "parents": "KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Sipariş satırında korunmuş kullanıcı/AI desenini ürün görselinden ayrı indirilebilir yap. Dosyanın gerçek türünü ve özgün içeriğini koru; giydirilmiş önizlemeyi desen diye verme.",
+        "accept": "İndirilen desen doğru sipariş/satır/tasarım sürümüne ait; dosya türü ve adı doğru.",
+        "deps": "SIP-TAS-02",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-05",
+        "title": "Maskelemede kullanılan ürün görselini ayrı indir",
+        "parents": "KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Editörde yerleşimin uygulandığı, doğru ürün/SKU/renge ait kaynak ürün görselini ayrı indir. Siparişe bağlı kaynak kopyasını kullan; güncel katalog fotoğrafını sessizce ikame etme.",
+        "accept": "Dosya editörde kullanılan ürün fotoğrafıyla aynı sürüm ve tuvalde; başka renk veya yeni fotoğraf indirilmiyor.",
+        "deps": "SIP-TAS-02",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-06",
+        "title": "Giydirilmiş görseli göster ve indir",
+        "parents": "KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Kayıtlı yerleşimle oluşan ürün üstü kompozisyonu sipariş detayında göster ve ayrı indir. Kaydetme/sipariş akışındaki dijital önizlemeyi sürümüyle koru; üretim dosyası, ICC/DPI renderı veya üretim kuyruğu kurma.",
+        "accept": "Görünen ve indirilen kompozisyon aynı sipariş revizyonuna ait; temsili önizleme etiketi var, baskıya hazır dosya iddiası yok.",
+        "deps": "SIP-TAS-02, SIP-TAS-03",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-07",
+        "title": "Yetki, dosya erişimi ve işlem durumlarını tamamla",
+        "parents": "SEC-07, KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Admin sipariş okuma/dosya erişimi izinlerini sunucuda doğrula. Yüklenme, indirme sürüyor, eksik dosya, yetki yok, servis hatası ve yeniden denemeyi ayır; istemciden verilen keyfi dosya URL/kimliklerini güvenilir sayma.",
+        "accept": "Yetkisiz kullanıcı dosya alamıyor; erişim denetimi sipariş/satır bağına göre; hata veya eksik kayıt başarı görünmüyor.",
+        "deps": "SIP-TAS-04, SIP-TAS-05, SIP-TAS-06",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-08",
+        "title": "Eski ve eksik sipariş kayıtlarını dürüst ele al",
+        "parents": "KIS-03, KIS-07",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Eski siparişlerde kayıtlı yerleşim, ürün kopyası veya kompozisyon bulunmayabilir. Kaynak yoksa bunu açık göster; ham deseni kompozisyon diye sunma ve güncel tasarımdan eski yerleşim tahmin etme. Kanıtlanabilen eski veri için güvenli geçiş yaklaşımı belirle.",
+        "accept": "Eski/eksik kayıtlar ekranı bozmaz; olmayan dosyanın indirmesi kapalı ve nedeni anlaşılır.",
+        "deps": "SIP-TAS-02, SIP-TAS-07",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+      },
+      {
+        "id": "SIP-TAS-09",
+        "title": "Sipariş tasarım detayını test et ve kabul kaydını yaz",
+        "parents": "KIS-03, KIS-07, QA-03",
+        "status": "Planlandı - uygulanmadı",
+        "remaining": "Dar/masaüstü admin görünümü, dosya içeriği/kimliği, eski revizyon, silinen tasarım, değişen katalog, izinler, servis kesintisi ve indirme tekrarını izole fixture ile sınayacak testleri planla. Sipariş snapshot kalıcılığı için izole SQL kabulünü ayrıca tut.",
+        "accept": "Üç indirme ve yerleşim doğru sürümle eşleşiyor; üretim eylemi yok; gerekli regresyon/erişilebilirlik ve kullanıcı kabulü kanıtlı.",
+        "deps": "SIP-TAS-01...08",
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
       }
     ],
     "Faz11": [
@@ -1764,5 +2011,23 @@
   },
   "web_consistency_evidence": "design/web-consistency-audit-2026-10-30.md",
   "admin_consistency_evidence": "design/admin-consistency-audit-2026-10-30.md",
-  "flutter_consistency_evidence": "design/flutter-consistency-audit-2026-11-03.md"
+  "flutter_consistency_evidence": "design/flutter-consistency-audit-2026-11-03.md",
+  "order_design_scope": {
+    "date": "2026-11-03",
+    "decision": "Sipariş tasarım detayı; üretim hazırlığı yok",
+    "document": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+    "implementation_started": false,
+    "subtask_ids": [
+      "SIP-TAS-01",
+      "SIP-TAS-02",
+      "SIP-TAS-03",
+      "SIP-TAS-04",
+      "SIP-TAS-05",
+      "SIP-TAS-06",
+      "SIP-TAS-07",
+      "SIP-TAS-08",
+      "SIP-TAS-09"
+    ],
+    "source_head": "e89c649"
+  }
 }

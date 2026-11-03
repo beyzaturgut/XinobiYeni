@@ -1,5 +1,7 @@
 # Editör davranış ve teslim sözleşmesi
 
+**03.11.2026 kapsam önceliği:** Sipariş tasarım detayı yalnız kayıtlı yerleşim ve üç görselin (desen, ürün kaynak görseli, giydirilmiş önizleme) ayrı indirmesidir. Üretim profili/onay/render/gönderim yeni teslimin parçası değildir. [Güncel task planı](../docs/tasks/order-design-detail-scope-2026-11-03.md). Aşağıdaki eski üretim sözleşmesi bu konuda tarihsel; genel editör kapsamı ayrıca korunur.
+
 Sürüm: 0.1.0 · 02.10.2026 · F02-A05
 
 Durum: Belge taslağı tamamlandı; Creative/FE/BE incelemesi ve D04 üretim kabulü bekliyor. Kaynaklar: Faz06 §1–5, `flows.md` §5, `components.md` §7 ve Analiz2 K-12/K-14–K-21.

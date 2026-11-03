@@ -1,5 +1,7 @@
 # KIS-01 — Fiziksel PrintArea ve üretim profili
 
+**03.11 kapsam değişikliği:** Fiziksel profil/kalibrasyon teslimi yeni kapsam dışında. Bu dosya geçmiş uygulama kanıtıdır, yeni gereksinim değildir. Panel sadeleştirmesi ve sipariş yerleşimi/üç görsel teslimi [yeni planda](order-design-detail-scope-2026-11-03.md) yalnız task olarak kayıtlı; kod kaldırılmadı.
+
 30.10.2026. Teknik uygulama hazır; gerçek ürün ölçüleri ve fiziksel referans kabulü bekliyor (KAR-05). Gerçek ürün profili/onayı oluşturulmadı.
 
 ## Yapılanlar

@@ -1,5 +1,12 @@
 # Faz01 — Keşif, kararlar ve uygulanabilir teslim temeli
 
+## 03.11.2026 - Sipariş tasarım detayı kapsam kararı (yalnız plan)
+
+Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş satırındaki kayıtlı editör yerleşimi, ayrı ham desen, maskelemede kullanılan ürün kaynak görseli ve indirilebilir giydirilmiş dijital önizleme. [9 alt task ve kabul koşulları](../docs/tasks/order-design-detail-scope-2026-11-03.md). Uygulama başlamadı; eski planlarda çelişen fiziksel üretim şartları bu karar için geçerli değil. Tarihsel kod/test kayıtları silinmedi.
+
+**Bu fazın işi:** KAR-05 kapsam kararı kaydedildi; fiziksel mm/DPI/ICC/numune şartnamesi bu bölümün teslim kapısı değil.
+
+
 ## Güncel durum ve tüm açık işler - 30.10.2026
 
 **Durum:** Bloke - iş kararları ve müşteri girdileri açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
@@ -18,7 +25,7 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 | [KAR-02](../docs/tasks/project-closure-2026-10-30.md#kar-02) - Veri sahipliğini alan bazında belirle | Yapılmadı - kapanış açık | Ürün, fiyat, stok, depo, cari, sipariş ve fatura için ana kaynak/yazma yönü/çakışma kararı onaylanmadı. |
 | [KAR-03](../docs/tasks/project-closure-2026-10-30.md#kar-03) - Ticaret durum makinesini kesinleştir | Yapılmadı - kapanış açık | Rezervasyon, tahsilat kesinleşmesi, vergi/kargo/taksit/havale ve kişiselleştirilmiş iade kararları açık. |
 | [KAR-04](../docs/tasks/project-closure-2026-10-30.md#kar-04) - Sağlayıcı ve sandbox erişimlerini tamamla | Yapılmadı - kapanış açık | Tüm sağlayıcılar için sahipli erişim, sandbox, limit ve test hesabı envanteri tamamlanmadı; kodun varlığı erişim kanıtı değil. |
-| [KAR-05](../docs/tasks/project-closure-2026-10-30.md#kar-05) - Fiziksel baskı standardını onayla | Yapılmadı - kapanış açık | Gerçek SKU ölçüleri, baskı tekniği/ICC/format kararı, üretim şablonları ve imzalı fiziksel numune kabulü bekleniyor. |
+| [KAR-05](../docs/tasks/project-closure-2026-10-30.md#kar-05) - Sipariş tasarım dosyası teslim sınırını kaydet | Yapıldı - kapsam kararı | Kapsam kararı kaydedildi; ekran ve dosya teslim uygulaması KIS-03/KIS-07 altında açık. Fiziksel mm/DPI/ICC/numune bilgisi bu bölümün önkoşulu değil. |
 | [KAR-06](../docs/tasks/project-closure-2026-10-30.md#kar-06) - Kurumsal satış modelini netleştir | Yapılmadı - kapanış açık | Firma modeli, teklifin siparişe hangi koşulda dönüşeceği, ödeme/fatura ve toplu sipariş modeli için D07 onayı eksik. |
 | [KAR-07](../docs/tasks/project-closure-2026-10-30.md#kar-07) - AI ve mobil ürün sınırlarını onayla | Yapılmadı - kapanış açık | Kota/bütçe, içerik/lisans politikası, alternatif kapsamı, hedef cihazlar, push ve mağaza sorumluluklarının tamamı kabul edilmedi. |
 | [KAR-08](../docs/tasks/project-closure-2026-10-30.md#kar-08) - Hukuk, işletim ve kalite girdilerini kapat | Yapılmadı - kapanış açık | Hukuk/muhasebe onaylı metinler, saklama/silme, SLA, RPO/RTO, maliyet ve bakım sorumluları kesinleşmedi. |

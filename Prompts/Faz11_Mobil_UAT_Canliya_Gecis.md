@@ -1,5 +1,12 @@
 # Faz11 — iOS/Android, çapraz kanal kabulü ve canlıya geçiş
 
+## 03.11.2026 - Sipariş tasarım detayı kapsam kararı (yalnız plan)
+
+Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş satırındaki kayıtlı editör yerleşimi, ayrı ham desen, maskelemede kullanılan ürün kaynak görseli ve indirilebilir giydirilmiş dijital önizleme. [9 alt task ve kabul koşulları](../docs/tasks/order-design-detail-scope-2026-11-03.md). Uygulama başlamadı; eski planlarda çelişen fiziksel üretim şartları bu karar için geçerli değil. Tarihsel kod/test kayıtları silinmedi.
+
+**Bu fazın işi:** SIP-TAS-09 ve UAT-04/08: web/mobilden oluşan siparişlerde aynı dosya/sürümün admin teslimi, kullanıcı kabulü ve inceleme/indirme eğitimi. Yeni mobil üretim modülü yok.
+
+
 **03.11 Flutter–web görsel/durum uygulaması:** Flutter ekranları web istek durumlarıyla karşılaştırıldı: favoriler hesap API'sine taşındı, hata/tekrar dene/teyitli başarı/taslak/işlem kilidi eklendi, 192 hücrelik widget matrisi (32 rota × 3 genişlik × 1x/2x) ve Android 14 doğrusal olmayan ölçek testi geçti; 280/280 Flutter testi. Android emülatörde oturum kapalı akışlar ve OS %200 yazı denendi; iOS Bloke (Xcode yok). [Ekran/kusur matrisi](../design/flutter-consistency-audit-2026-11-03.md), [TST-196](../test/2026-11-03/TST-196-flutter-web-consistency.md). Gerçek telefon, oturum açık cihaz akışı, TalkBack/VoiceOver ve handoff kabulü açık; faz onayı/yüzde değiştirilmedi.
 
 ## Güncel durum ve tüm açık işler - 30.10.2026
@@ -32,11 +39,11 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 | [UAT-01](../docs/tasks/project-closure-2026-10-30.md#uat-01) - Takvim, sorumlu ve kapasiteyi kesinleştir | Yapılmadı - kapanış açık | Kişi bazlı kapasite/tahmin/hedef tarih, dış bekleme süreleri ve imzalı sprint/milestone planı yok. |
 | [UAT-02](../docs/tasks/project-closure-2026-10-30.md#uat-02) - Web ve admin iş sahibi UAT'sini tamamla | Yapılmadı - kapanış açık | Gerçek ödeme-kargo-iade ve panel finans/rol/destek akışlarının ürün/operasyon sahibi imzalı UAT’si eksik. |
 | [UAT-03](../docs/tasks/project-closure-2026-10-30.md#uat-03) - Mobil iş sahibi UAT'sini tamamla | Yapılmadı - kapanış açık | Her iki gerçek platformda ödeme/editör/push/deep link/erişilebilirlik için iş sahibi imzalı UAT yok. |
-| [UAT-04](../docs/tasks/project-closure-2026-10-30.md#uat-04) - Üretim ve entegrasyon operasyonunu kabul ettir | Yapılmadı - kapanış açık | Fiziksel numune, teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarının üretim/muhasebe/kanal kabulü yok. |
+| [UAT-04](../docs/tasks/project-closure-2026-10-30.md#uat-04) - Sipariş tasarım dosyaları ve entegrasyon operasyonunu kabul ettir | Yapılmadı - kapanış açık | Sipariş tasarım dosyası/yerleşim ve entegrasyon/muhasebe/kanal kabulleri açık; üretime hazırlık ve fiziksel numune bu yazılım tesliminde yok. |
 | [UAT-05](../docs/tasks/project-closure-2026-10-30.md#uat-05) - GO/NO-GO ve veri geçiş planını imzala | Yapılmadı - kapanış açık | Final katalog, açık kusurlar, güvenlik/yük/restore, sağlayıcılar ve rollback eşikleriyle imzalı GO/NO-GO eksik. |
 | [UAT-06](../docs/tasks/project-closure-2026-10-30.md#uat-06) - Mağaza başvurularını ve yayınını tamamla | Yapılmadı - kapanış açık | Google Play/App Store hesap-beyan-inceleme ve onaylı erişilebilir mağaza sürümleri tamamlanmadı. |
 | [UAT-07](../docs/tasks/project-closure-2026-10-30.md#uat-07) - Canlı cutover ve yayın sonrası smoke yap | Yapılmadı - kapanış açık | Güncel sürüm için onaylı canlı cutover, deployment.json/health smoke ve yayın sonrası izleme kabulü eksik. |
-| [UAT-08](../docs/tasks/project-closure-2026-10-30.md#uat-08) - Eğitim, bakım ve nihai teslimi kapat | Yapılmadı - kapanış açık | Panel/üretim/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı. |
+| [UAT-08](../docs/tasks/project-closure-2026-10-30.md#uat-08) - Eğitim, bakım ve nihai teslimi kapat | Yapılmadı - kapanış açık | Panel/sipariş dosyası inceleme-indirme/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı. |
 
 ### Açık alt işler ve özel kabul kayıtları
 

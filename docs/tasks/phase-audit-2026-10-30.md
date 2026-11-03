@@ -1,5 +1,7 @@
 # Faz eksikleri ve kapanış taskları denetimi - 30.10.2026
 
+**03.11 yeni kapsam:** [Sipariş tasarım detayı planı](order-design-detail-scope-2026-11-03.md); KIS-01/05/06 kapsam dışı, KIS-07 sade detay/üç indirme. Eski üretim kapıları tarihsel; 120 ana task kimliği ve faz sayıları korunur. Uygulama yapılmadı.
+
 ## Kapsam ve yöntem
 
 Kullanıcı şimdiye kadar eksik kalan her işin fazlara işlenmesini istedi. Kaynak kesiti `main / de99958`. Önceki 120 task planı/durum raporu, ilgili güncel task ve test kayıtları, 27.10 faz denetimi ve `git log 5791181..de99958` karşılaştırıldı. Bu çalışma kaynak/test kayıtlarının dokümantasyona aktarımıdır; 120 task için yeni tam kod/canlı sistem denetimi değildir.

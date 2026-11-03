@@ -1,5 +1,15 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Kapsam kararı: sade sipariş tasarım detayı
+
+**Karar sahibi/kaynak:** Kullanıcının bu sohbetteki açık talebi. Üretime hazırlık/gönderim, fiziksel profil/kalibrasyon, üretim onayı ve baskı render kuyruğu istenmiyor. Kullanıcı yalnız plan/task/faz kaydı istedi; geliştirme yetkisi bu iş için verilmedi.
+
+**Teslim:** Kayıtlı editör yerleşimi + ayrı desen + maskelemede kullanılan ürün kaynak görseli + gösterilebilir/indirilebilir giydirilmiş görsel. Üç dosya doğru sipariş/satır/revizyona bağlı kalır. [SIP-TAS-01...09 planı](../docs/tasks/order-design-detail-scope-2026-11-03.md).
+
+**Plan etkisi:** KAR-05 revize; KIS-01/05/06 kapsam dışı (tamamlandı değil); KIS-03/07 sipariş dosya/sürüm teslimi; KIS-08 dosya kabulü/fiyatlandırma. Faz01/02/03/05/06/11 ve 120 ana task listesi eşlendi. Geçmiş kapsamlar tarihsel; bu karar çelişkide öncelikli. Genel editör, ödeme/kargo/iade ve entegrasyon işleri iptal edilmedi. Faz/PM uygulama onayı verilmedi.
+
+**Durum:** 9 alt task planlandı; API/admin/web/Flutter kodu veya veri değiştirilmedi. [Doküman kontrolü TST-205](../test/2026-11-03/TST-205-order-design-scope-plan.md).
+
 **03.11 Flutter eşlik incelemesi:** Kaynak5da96ed; analiz ve280 test PASS, favori iptal/taşıma kaybı P1 ve açılış oturum hatası P2 açık. [TST-203](../test/2026-11-03/TST-203-flutter-parity-review.md). İnceleme yapıldı, kod düzeltmesi veya platform kabulü verilmedi.
 
 **03.11 Flutter–web görsel/durum uygulaması:** Flutter ekranları web istek durumlarıyla karşılaştırıldı: favoriler hesap API'sine taşındı, hata/tekrar dene/teyitli başarı/taslak/işlem kilidi eklendi, 192 hücrelik widget matrisi (32 rota × 3 genişlik × 1x/2x) ve Android 14 doğrusal olmayan ölçek testi geçti; 280/280 Flutter testi. Android emülatörde oturum kapalı akışlar ve OS %200 yazı denendi; iOS Bloke (Xcode yok). [Ekran/kusur matrisi](../design/flutter-consistency-audit-2026-11-03.md), [TST-196](../test/2026-11-03/TST-196-flutter-web-consistency.md). Gerçek telefon, oturum açık cihaz akışı, TalkBack/VoiceOver ve handoff kabulü açık; faz onayı/yüzde değiştirilmedi.
@@ -112,7 +122,7 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 | D01 | Mevcut kod/veri ve yeniden kullanım | Faz01–03 | Kısmi karar · mevcut uygulama kodu yok, sıfırdan yeni geliştirme; private monorepo ve araç zinciri doğrulandı. Mevcut operasyon/veri örneği ve barındırma envanteri bekliyor |
 | D02 | Ürün-varyant-fiyat-stok ana kaynak ve Mikro yazma yönü | Faz04,08,09 | Açık / operasyon + Mikro sahibi |
 | D03 | Sipariş/ödeme, havale, stok rezervasyon, iptal-iade/kargo | Faz05,08,09,11 | Açık / satış-operasyon |
-| D04 | Baskı tekniği, fiziksel alan, çıktı ve onay | Faz06,11 | Açık / üretim |
+| D04 | Sipariş yerleşimi ve üç görsel teslimi; fiziksel üretim hazırlığı yok | Faz06,05,02,03,11 | 03.11.2026 kullanıcı kapsam kararı kaydedildi; SIP-TAS-01...09 planlandı, uygulama/kabul açık |
 | D05 | Ödeme/kargo/SMS/e-posta/AI ve destek erişimleri | Faz05,10,11 | Açık / sağlayıcı hesapları |
 | D06 | Mikro sürüm/API ve üç pazaryeri mağaza/sandbox | Faz08,09 | Açık / entegrasyon sahipleri |
 | D07 | Tekliften toplu siparişe onay ve fiyatlama | Faz07 | Açık / kurumsal satış |

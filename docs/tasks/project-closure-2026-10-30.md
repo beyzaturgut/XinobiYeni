@@ -1,8 +1,12 @@
 # Xinobi - Fazlara işlenmiş tam kapanış listesi / 30.10.2026
 
+**03.11 kapsam değişikliği:** [Sipariş tasarım detayı ve 9 alt task](order-design-detail-scope-2026-11-03.md); KIS-01/05/06 yeni kapsam dışında, KIS-07 sipariş detayı/dosyalar olarak revize. 120 ana ID korundu; kod uygulanmadı.
+
 Kaynak kesiti: `main / de99958`. Aynı 120 task kimliği korunur. Önceki PDF durumları, 30 Ekim uygulama kayıtları ve tarihli test raporları birleştirildi; müşteri girdisi ve teknik iş aynı kayıtta ayrı izlenir. [Makine okunur liste](project-closure-2026-10-30.json).
 
 Bu çalışma dokümantasyon güncellemesidir: kod/SQL/hosting değişmedi, testler yeniden koşulmadı, APK/release/deploy veya gerçek posta/AI/ödeme çağrısı yok. Hiçbir faz için rol/PM/kullanıcı/üretim kabulü verilmedi; eski yüzdeler güncel ölçüm değildir.
+
+**Yeni kapsam durumları:** Kapsam dışı = kullanıcı bu teslimi istemiyor, tamamlandı sayılmaz; Yapıldı - kapsam kararı = yalnız kapsam tanımı verildi, uygulama yapılmadı.
 
 **Durum dili:** Yapıldı - teknik = sınırlı teknik kapsamın kanıtı; Kısmen yapıldı = somut alt işler var; Yapılmadı - kapanış açık = hedef geliştirme/karar/kabul bütünü kapanmadı. Mevcut temel özellikler tamamen yok sayılmaz. QA-01 farklı kaynaklarda son ilgili regresyonları birleştirir; tüm testlerin bu dokümantasyon HEAD’inde koşulduğu iddia edilmez.
 
@@ -13,7 +17,7 @@ Bu çalışma dokümantasyon güncellemesidir: kod/SQL/hosting değişmedi, test
 | [Faz03](../../Prompts/Faz03_Teknik_Altyapi_Kimlik_Veritabani.md) | 21 | Devam - temel regresyon kayıtlı; SQL/güvenlik/posta/işletim kabulü açık |
 | [Faz04](../../Prompts/Faz04_Katalog_Stok_Fiyat_Icerik_SEO.md) | 14 | Devam - katalog teknik kabulü var; veri ve ticari altyapı eksikleri açık |
 | [Faz05](../../Prompts/Faz05_ETicaret_Odeme_Siparis.md) | 13 | Bloke - gerçek ödeme, rezervasyon, kargo ve ticari kabul açık |
-| [Faz06](../../Prompts/Faz06_Kisisellestirme_Editor_Baski.md) | 8 | Devam - KIS-01 teknik profil hazır; fiziksel ve üretim dosyası kabulü açık |
+| [Faz06](../../Prompts/Faz06_Kisisellestirme_Editor_Baski.md) | 8 | Planlandı - sipariş yerleşimi ve üç görsel teslimi; üretim hazırlığı kapsam dışı |
 | [Faz07](../../Prompts/Faz07_Kurumsal_Teklif_Toplu_Siparis.md) | 8 | Bloke - D07 ve firma/teklif-sipariş teslimleri açık |
 | [Faz08](../../Prompts/Faz08_Mikro_Muhasebe_Entegrasyonu.md) | 8 | Bloke - Mikro erişim/alan sözleşmesi ve gerçek adaptörler açık |
 | [Faz09](../../Prompts/Faz09_Pazaryerleri_Merkezi_Siparis.md) | 8 | Bloke - üç kanalın erişimi, adaptörleri ve mutabakatı açık |
@@ -105,19 +109,21 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### KAR-05
 
-**Fiziksel baskı standardını onayla** — P0 / Karar / kabul / **Yapılmadı - kapanış açık**
+**Sipariş tasarım dosyası teslim sınırını kaydet** — P0 / Karar / kabul / **Yapıldı - kapsam kararı**
 
 **Önerilen sorumlu:** Ürün sahibi + PM + ilgili operasyon sahibi. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** D04 için ürün ve renk bazlı mm, DPI, taşma, renk profili, format, baskı tekniği, lisans ve insan onayı örneklerini üretim ekibinden al.
+**Hedef iş:** 03.11 kullanıcı kararını uygula: kayıtlı editör yerleşimi, ayrı desen ve ürün kaynak görseli indirmesi, gösterilebilir/indirilebilir giydirilmiş dijital önizleme; üretime hazırlık/gönderim yok.
 
-**Yapıldı / mevcut temel:** KIS-01 ile mm/DPI/taşma/renk/format alanları, sürümlü profil ve kalibrasyon SVG altyapısı eklendi.
+**Yapıldı / mevcut temel:** KIS-01 ile mm/DPI/taşma/renk/format alanları, sürümlü profil ve kalibrasyon SVG altyapısı eklendi. 03.11: Kullanıcı üretim hazırlığı istemediğini ve yalnız sipariş yerleşimi/üç görsel teslimini açıkça belirtti; planlama istendi.
 
-**Yapılmadı / açık kalan:** Gerçek SKU ölçüleri, baskı tekniği/ICC/format kararı, üretim şablonları ve imzalı fiziksel numune kabulü bekleniyor.
+**Yapılmadı / açık kalan:** Kapsam kararı kaydedildi; ekran ve dosya teslim uygulaması KIS-03/KIS-07 altında açık. Fiziksel mm/DPI/ICC/numune bilgisi bu bölümün önkoşulu değil.
 
-**Kapanış kanıtı:** En az bir gerçek ürün için referans baskı dosyası ve fiziksel numune kabulü var; kalan SKU profilleri listelenmiş.
+**Kapanış kanıtı:** Kapsam kararı faz/tasklarda tutarlı; SIP-TAS-01...09 uygulama ve kabulü ayrıca kapanır.
 
-**Bağımlılıklar:** KAR-01.
+**Bağımlılıklar:** KAR-01
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KAR-06
 
@@ -400,9 +406,11 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapılmadı / açık kalan:** Genel finalize ve zararlı içerik taraması; özel indirme/süreli erişim/sahipsiz dosya sözleşmesi tamamlanmadı.
 
-**Kapanış kanıtı:** Dosya türü taklidi, yol aşımı, yarım yükleme ve yetkisiz erişim testleri geçiyor; tarama sonucu olmadan üretime gitmiyor.
+**Kapanış kanıtı:** Dosya türü taklidi, yol aşımı, yarım yükleme ve yetkisiz erişim testleri geçiyor; güvenli erişim ve içerik kontrolü olmadan indirme/işleme açılmıyor.
 
-**Bağımlılıklar:** KAR-08.
+**Bağımlılıklar:** KAR-08
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### SEC-08
 
@@ -1039,13 +1047,13 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ## Faz06 / Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
-**Müşteri/işletme girdileri:** SKU/renk/yüz bazlı mm alan/konum/yasak bölgeler, DPI/taşma/ICC/format/şeffaflık, baskı tekniği/açınım şablonu, referans dosya ve fiziksel kabul sorumlusu (KAR-05).
+**03.11 güncel teslim sınırı:** Siparişe bağlı yerleşim ve ayrı desen/ürün kaynak görseli/giydirilmiş önizleme indirmeleri. Fiziksel üretim profili/numune girdisi bu bölümün önkoşulu değil; [yeni plan](order-design-detail-scope-2026-11-03.md).
 
 **Son değişiklik:** 42bee88: ürün/renk/yüz bazlı mm-DPI-taşma-renk-format, boş ölçülü taslak, kanıtlı onay/kaldırma ve geçmiş; düzlemsel mm/DPI/korunan bölge ölçümü ve fiziksel kalibrasyon SVG. Yeni yerleşim/sipariş profil kopyası ve SHA alır. Gerçek SKU profili oluşturulmadı; productionReady=false.
 
 ### KIS-01
 
-**Fiziksel PrintArea ve üretim profilini kur** — P0 / Geliştirme / **Kısmen yapıldı**
+**Fiziksel PrintArea ve üretim profilini kur** — P0 / Geliştirme / **Kapsam dışı - 03.11.2026 kararı**
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
@@ -1053,11 +1061,13 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapıldı / mevcut temel:** Sürümlü ürün/renk/yüz profili, boş ölçülü taslak, kanıtlı onay/kaldırma, kalibrasyon SVG ve düzlemsel mm/DPI hesabı eklendi. Profil sürümü/SHA yerleşim ve siparişe kopyalanıyor.
 
-**Yapılmadı / açık kalan:** Gerçek SKU ölçü/şablon/ICC/DPI bilgileri, fiziksel ölçek-konum numunesi ve gerçek SQL kalıcılık kabulü bekliyor. productionReady=false; kavisli otomatik üretim render’ı yok.
+**Yapılmadı / açık kalan:** Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı.
 
-**Kapanış kanıtı:** Ölçekli referans çıktıda alan ve konum ölçüsü tutuyor; profil değişimi eski sipariş sürümünü değiştirmiyor.
+**Kapanış kanıtı:** Yeni kapsam için bu üretim teslimi kapanış koşulu değildir; eski geliştirme/test kaydı tarihsel olarak korunur.
 
-**Bağımlılıklar:** KAR-05.
+**Bağımlılıklar:** Yeni kapsamda zorunlu bağımlılık değil
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-02
 
@@ -1065,7 +1075,7 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** Kaynak fotoğraf, alfa maske, geometri, logo/kenar/handle koruması, checksum ve renk bağını SKU bazında denetle.
+**Hedef iş:** Kaynak fotoğraf, alfa maske, geometri, logo/kenar/handle koruması, checksum ve renk bağını SKU bazında denetle. Kabul dijital önizleme içindir; fiziksel baskı uygunluğu onayı değildir.
 
 **Yapıldı / mevcut temel:** Onaylı yüzey/maske okuma ve checksum/renk bağı kontrolleri var; 30/30 kişiselleştirilebilir renk teknik önizleme yanıtı hazır.
 
@@ -1073,7 +1083,9 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Kapanış kanıtı:** Her kişiselleştirilebilir aktif renk için insan onaylı örnek var; eksik/stale maske açık hata veriyor; başka renk maskesi kullanılmıyor.
 
-**Bağımlılıklar:** CAT-01.
+**Bağımlılıklar:** CAT-01
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-03
 
@@ -1081,15 +1093,17 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** Kaydet/yeniden aç, renk/kaynak değişimi, favori/sepet ayrımı, hesap sahipliği ve sipariş kopyasını izole gerçek SQL ile test et.
+**Hedef iş:** Kaydet/yeniden aç, renk/kaynak değişimi, favori/sepet ayrımı, hesap sahipliği ve sipariş kopyasını izole gerçek SQL ile test et. SIP-TAS-02/03/08/09: desen, ürün kaynak görseli ve kompozisyon sipariş satırının aynı revizyonuna bağlanır.
 
 **Yapıldı / mevcut temel:** Konfigürasyon revizyonu, sahiplik, kaynak kontrolü, sipariş kopyası ve tasarım silme bağımsızlığı izole dosya/HTTP testlerinde doğrulandı.
 
-**Yapılmadı / açık kalan:** Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı.
+**Yapılmadı / açık kalan:** Bu senaryoların izole gerçek SQL üzerinde restart/eşzamanlılık ve kalıcılık kabulü bu task için yapılmadı. Üç görselin siparişe bağlı korunması ve eski/eksik kayıt davranışı ayrıca tamamlanmalı.
 
 **Kapanış kanıtı:** Servis yeniden başlatılınca revizyon aynı; tasarım silinmesi sipariş dosyasını bozmaz; başka kullanıcı kaydı okunamaz.
 
-**Bağımlılıklar:** QA-02, KIS-02.
+**Bağımlılıklar:** QA-02, KIS-02
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-04
 
@@ -1101,15 +1115,17 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapıldı / mevcut temel:** Ortak görsel/desen yerleşimi, konum/ölçek/dönüş/kavis, yakınlaştırma ve undo/redo mevcut.
 
-**Yapılmadı / açık kalan:** Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik.
+**Yapılmadı / açık kalan:** Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik. Bu karar genel editör araçlarını iptal etmez; sade sipariş tasarım detayının önkoşulu da değildir.
 
 **Kapanış kanıtı:** Web ve mobilde onaylı araç matrisi çalışıyor; font lisansı ve çoklu yüz kayıtları sürümlü; kapsam azaltımı yazılı karar gerektiriyor.
 
-**Bağımlılıklar:** KAR-01, KIS-01.
+**Bağımlılıklar:** KAR-01
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-05
 
-**Değişmez üretim sürümü ve insan onayı ekle** — P0 / Geliştirme / **Yapılmadı - kapanış açık**
+**Değişmez üretim sürümü ve insan onayı ekle** — P0 / Geliştirme / **Kapsam dışı - 03.11.2026 kararı**
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
@@ -1117,15 +1133,17 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapıldı / mevcut temel:** Yerleşim revizyonu ve KIS-01 profil snapshot/checksum temeli var.
 
-**Yapılmadı / açık kalan:** Bunlardan ayrı üretim DesignVersion, dosya ön kontrolü, müşteri/operatör onayı ve yeniden onay şartları tamamlanmadı.
+**Yapılmadı / açık kalan:** Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı.
 
-**Kapanış kanıtı:** Onaylanan dosya/sürüm checksum ile sabit; sipariş sonrası düzenleme üretimi sessizce değiştirmiyor; DPI/taşma hatası engelleniyor.
+**Kapanış kanıtı:** Yeni kapsam için bu üretim teslimi kapanış koşulu değildir; eski geliştirme/test kaydı tarihsel olarak korunur.
 
-**Bağımlılıklar:** KIS-01, KIS-03.
+**Bağımlılıklar:** Yeni kapsamda zorunlu bağımlılık değil
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-06
 
-**Baskı render kuyruğunu uygula** — P0 / Geliştirme / **Yapılmadı - kapanış açık**
+**Baskı render kuyruğunu uygula** — P0 / Geliştirme / **Kapsam dışı - 03.11.2026 kararı**
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
@@ -1133,51 +1151,66 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapıldı / mevcut temel:** Dijital önizleme ve kalibrasyon referansı üretilebiliyor.
 
-**Yapılmadı / açık kalan:** Deterministik yüksek çözünürlüklü gerçek baskı render kuyruğu, retry/iş kimliği ve arızadan kurtarma eksik.
+**Yapılmadı / açık kalan:** Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı.
 
-**Kapanış kanıtı:** Aynı sürüm aynı üretim içeriğini veriyor; hata başarı görünmüyor; gerçek baskı formatı ve çözünürlük sağlanıyor.
+**Kapanış kanıtı:** Yeni kapsam için bu üretim teslimi kapanış koşulu değildir; eski geliştirme/test kaydı tarihsel olarak korunur.
 
-**Bağımlılıklar:** KIS-05, SEC-06.
+**Bağımlılıklar:** Yeni kapsamda zorunlu bağımlılık değil
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-07
 
-**Panel üretim akışı ve güvenli indirmeyi tamamla** — P0 / Geliştirme / **Yapılmadı - kapanış açık**
+**Sipariş tasarım detayını ve ayrı görsel indirmelerini tamamla** — P0 / Geliştirme / **Yapılmadı - kapanış açık**
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** Mevcut metadata/ham görsel ekranına üretim bekliyor/onay/hazır/red durumları, yetkili dosya indirme ve üretim izi ekle.
+**Hedef iş:** SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.
 
 **Yapıldı / mevcut temel:** Panelde metadata, korumalı ham görsel, sipariş bağı ve KIS-01 profil/kalibrasyon ekranı var.
 
-**Yapılmadı / açık kalan:** Tasarım bazlı üretim bekliyor/onay/hazır/red akışı ve doğru üretim sürümünün güvenli indirmesi eksik.
+**Yapılmadı / açık kalan:** SIP-TAS-01...09 planlandı; uygulama, sürüme bağlı dosya koruması, indirmeler ve kabul henüz yapılmadı.
 
-**Kapanış kanıtı:** Operatör yanlış revizyonu indiremez; dosya erişimi audit'li; ham desen ve birleşik JPEG üretim dosyası diye etiketlenmiyor.
+**Kapanış kanıtı:** Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.
 
-**Bağımlılıklar:** KIS-06, ADM-01.
+**Bağımlılıklar:** KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### KIS-08
 
-**Fiziksel numune ve kişiselleştirme fiyatını kabul et** — P0 / Doğrulama / **Yapılmadı - kapanış açık**
+**Kişiselleştirme fiyatı ve sipariş dosya teslimini kabul et** — P0 / Doğrulama / **Yapılmadı - kapanış açık**
 
 **Önerilen sorumlu:** Web/Mobil + Backend + üretim + Creative. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** Ürün/renk/yüz bazlı numuneyi üret; ekran-çıktı farkını üretimle onayla; fiyat farkını checkout ve iade politikasına bağla.
+**Hedef iş:** Kişiselleştirme fiyatının checkout/iade kuralı ve sipariş snapshot bağı devam eder; sade sipariş tasarım detayındaki yerleşim/üç indirme için kullanıcı kabulü al. Fiziksel baskı numunesi ve üretim onayı bu yazılım teslimine dahil değil.
 
 **Yapıldı / mevcut temel:** Ürün kompozisyonu ve profil sınırları ekranda temsil ediliyor.
 
-**Yapılmadı / açık kalan:** Fiziksel ürün/renk/yüz numuneleri, üretim sahibi kabulü ve kişiselleştirme fiyatının checkout/iade politikasına bağlanması açık.
+**Yapılmadı / açık kalan:** Kişiselleştirme fiyatlandırma/checkout-iade kabulü ve SIP-TAS dosya teslim kabulü açık; fiziksel numune yazılım kapısı olarak beklenmiyor.
 
-**Kapanış kanıtı:** Üretim sahibi imzalı numune tutanağı var; kişiselleştirme tutarı sunucuda hesaplanıp sipariş snapshot'ında saklanıyor.
+**Kapanış kanıtı:** Üç dosya ve yerleşim sipariş revizyonuyla eşleşiyor; varsa kişiselleştirme tutarı sunucuda doğru hesaplanıp saklanıyor.
 
-**Bağımlılıklar:** KIS-07, TIC-02, KAR-03.
+**Bağımlılıklar:** KIS-07, TIC-02, KAR-03
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### Alt işler (ana taskı parçalar; yeni ana task sayılmaz)
 
 | Alt iş | Ana task | Durum | Kapanış / kalan |
 |---|---|---|---|
-| KIS-01-DATA-01 | KIS-01, KAR-05 | Üretim bilgisi bekliyor | Gerçek SKU ölçü, konum, DPI, pay, renk/format ve kavisli ürün üretim şablonu. |
-| KIS-01-UAT-01 | KIS-01, KIS-08 | Açık | Ölçekleme kapalı kalibrasyon çıktısı ve gerçek numunede alan/konumu üretim sahibiyle ölçerek kabul et. |
-| KIS-01-SQL-01 | KIS-01, KIS-03, QA-02 | Açık | İzole gerçek SQL’de sürüm kalıcılığı/restart/yazma yarışı ve eski sipariş kopyası kontrolü. Dosya fixture’ı SQL kabulü değil. |
+| KIS-01-DATA-01 | KIS-01, KAR-05 | Kapsam dışı - 03.11.2026 kararı | Fiziksel üretim bilgisi/numunesi yeni yazılım tesliminin şartı değil; eski kayıt tarihsel olarak korunur. |
+| KIS-01-UAT-01 | KIS-01, KIS-08 | Kapsam dışı - 03.11.2026 kararı | Fiziksel üretim bilgisi/numunesi yeni yazılım tesliminin şartı değil; eski kayıt tarihsel olarak korunur. |
+| KIS-01-SQL-01 | KIS-03, QA-02 | Revize - planlandı | SIP-TAS-02/09: sipariş yerleşimi ve üç görsel dosyasının sürüm/kalıcılık bağı; fiziksel profil kalibrasyonu değil. |
+| SIP-TAS-01 | KIS-07 | Planlandı - uygulanmadı | [Baskı alanını sipariş tasarım detayına sadeleştir](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-02 | KIS-03, KIS-07 | Planlandı - uygulanmadı | [Siparişe bağlı görsel ve revizyon paketini tanımla](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-03 | KIS-03, KIS-07 | Planlandı - uygulanmadı | [Müşterinin kaydettiği yerleşim detaylarını göster](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-04 | KIS-07 | Planlandı - uygulanmadı | [Ham deseni ayrı indir](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-05 | KIS-07 | Planlandı - uygulanmadı | [Maskelemede kullanılan ürün görselini ayrı indir](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-06 | KIS-07 | Planlandı - uygulanmadı | [Giydirilmiş görseli göster ve indir](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-07 | SEC-07, KIS-07 | Planlandı - uygulanmadı | [Yetki, dosya erişimi ve işlem durumlarını tamamla](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-08 | KIS-03, KIS-07 | Planlandı - uygulanmadı | [Eski ve eksik sipariş kayıtlarını dürüst ele al](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-09 | KIS-03, KIS-07, QA-03 | Planlandı - uygulanmadı | [Sipariş tasarım detayını test et ve kabul kaydını yaz](order-design-detail-scope-2026-11-03.md) |
 
 ## Faz07 / Kurumsal teklif ve toplu sipariş
 
@@ -1981,19 +2014,21 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### UAT-04
 
-**Üretim ve entegrasyon operasyonunu kabul ettir** — P0 / Doğrulama / **Yapılmadı - kapanış açık**
+**Sipariş tasarım dosyaları ve entegrasyon operasyonunu kabul ettir** — P0 / Doğrulama / **Yapılmadı - kapanış açık**
 
 **Önerilen sorumlu:** PM + ürün/operasyon + teknik lider. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** Fiziksel numune, teklif dönüşümü, Mikro ve tüm pazaryeri mutabakatını üretim/muhasebe/kanal ekipleriyle kapat.
+**Hedef iş:** Sipariş tasarım detayında yerleşim ve üç görsel indirmesini; teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarını ilgili iş sahipleriyle kabul et.
 
 **Yapıldı / mevcut temel:** Profil/teklif ve entegrasyon temelleri için task/kod kayıtları mevcut.
 
-**Yapılmadı / açık kalan:** Fiziksel numune, teklif-sipariş, Mikro ve üç pazaryeri mutabakatlarının üretim/muhasebe/kanal kabulü yok.
+**Yapılmadı / açık kalan:** Sipariş tasarım dosyası/yerleşim ve entegrasyon/muhasebe/kanal kabulleri açık; üretime hazırlık ve fiziksel numune bu yazılım tesliminde yok.
 
-**Kapanış kanıtı:** Ayrı kabul sahipleri kanıtları imzalamış; eksik kanal tam proje kapsamından sessizce çıkarılmamış.
+**Kapanış kanıtı:** Yetkili iş sahibi dosya-sipariş revizyon eşliğini ve ilgili entegrasyon sonuçlarını kabul etmiş; üretime gönderme adımı şart koşulmamış.
 
-**Bağımlılıklar:** KIS-08, B2B-08, ERP-08, PAZ-08.
+**Bağımlılıklar:** KIS-08, B2B-08, ERP-08, PAZ-08
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### UAT-05
 
@@ -2049,15 +2084,17 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Önerilen sorumlu:** PM + ürün/operasyon + teknik lider. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
-**Hedef iş:** Panel/üretim/entegrasyon eğitimi, teknik doküman, erişim devri, destek/SLA, maliyet ve garanti koşullarını imzalı teslim paketine al.
+**Hedef iş:** Panel/sipariş dosyası inceleme-indirme/entegrasyon eğitimi, teknik doküman, erişim devri, destek/SLA, maliyet ve garanti koşullarını imzalı teslim paketine al.
 
 **Yapıldı / mevcut temel:** Kaynak kod, mevcut runbook ve tarihli test dokümanları var.
 
-**Yapılmadı / açık kalan:** Panel/üretim/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı.
+**Yapılmadı / açık kalan:** Panel/sipariş dosyası inceleme-indirme/entegrasyon eğitimi, erişim devri, bakım/SLA/maliyet/garanti ve nihai imzalı teslim kapanmadı.
 
 **Kapanış kanıtı:** Açık task yok veya açıkça onaylı kapsam değişikliği var; tüm üç kanal ve ortak servisler için kapanış tutanağı tamam.
 
-**Bağımlılıklar:** UAT-07, OPS-08, QA-08.
+**Bağımlılıklar:** UAT-07, OPS-08, QA-08
+
+**03.11 kapsam kararı:** [Sipariş tasarım detayı task planı](order-design-detail-scope-2026-11-03.md). Yalnız planlama; önceki fiziksel üretim hedefleri tarihsel kayıt, yeni karar öncelikli.
 
 ### Alt işler (ana taskı parçalar; yeni ana task sayılmaz)
 

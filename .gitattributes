@@ -1,0 +1,2 @@
+# PDF documents are binary artifacts; preserve original bytes.
+*.pdf binary

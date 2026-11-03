@@ -6,4 +6,4 @@
 - 6/6 kaynak-hedef SHA-256 eşitliği PASS; 6/6 PDF pypdf ile açıldı ve sayfa sayısı doğrulandı. İçerik değişmediği için yeniden üretim/render yapılmadı.
 - Belge dizini, kaynak Markdown bağlantıları, kök README ve Faz00 erişimi eklendi. Yeni dizin bağlantıları PASS. Manifest kaynak/hash/sayfa bilgilerini içerir.
 - Eski kaynak ve paylaşım yolları korundu. Geçici dosyalar ve gizli bilgi içeren entegrasyon kaynakları alınmadı. Tarihsel kapsam uyarıları eklendi.
-- git diff --check doğrulandı. Uygulama testi gerektiren değişiklik yok.
+- Bazı eski PDF dosyaları Git tarafından metin algılandığı için PDF iç yapısındaki boşluklar ilk staged kontrolde uyarı verdi. `.gitattributes` ile PDF türü binary tanımlandı; dosya baytları değiştirilmeden kontrol tekrarlandı ve PASS. Uygulama testi gerektiren değişiklik yok.

@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Proje tanıtım dosyası",
+    "date": "tarihsiz",
+    "path": "tarihsiz/Xinobi_Proje_Tanitim_Dosyasi.pdf",
+    "sha256": "ca8761d423966af43d9888bee9e16b212623842786c460b9c1c9ededcadef56c",
+    "pages": 22,
+    "original": "/Users/beyzaturgut/Documents/ChatGPT/Xinobi/output/pdf/Xinobi_Proje_Tanitim_Dosyasi.pdf",
+    "source_markdown": null,
+    "status_note": "Tarihsiz tanıtım; güncel task durumu değildir."
+  },
+  {
+    "title": "Proje tamamlama task planı",
+    "date": "2026-10-30",
+    "path": "2026-10-30/Xinobi_Proje_Tamamlama_Task_Plani_2026-10-30.pdf",
+    "sha256": "5135d851f766923e6a88de709f017267cd6de50b352ef874ebd720e6137a0ec9",
+    "pages": 36,
+    "original": "/Users/beyzaturgut/Documents/ChatGPT/Xinobi/output/pdf/Xinobi_Proje_Tamamlama_Task_Plani_2026-10-30.pdf",
+    "source_markdown": null,
+    "status_note": "30.10.2026 tarihli plan; sonraki kapsam kararlarından önce hazırlanmıştır."
+  },
+  {
+    "title": "Yapıldı / yapılmadı durum raporu",
+    "date": "2026-10-30",
+    "path": "2026-10-30/Xinobi_Task_Durum_Raporu_Yapildi_Yapilmadi_2026-10-30.pdf",
+    "sha256": "cd121484dedbd932779a87371f5709bee92cb7c3d5a97927aff9bb03c901922f",
+    "pages": 69,
+    "original": "/Users/beyzaturgut/Documents/ChatGPT/Xinobi/output/pdf/Xinobi_Task_Durum_Raporu_Yapildi_Yapilmadi_2026-10-30.pdf",
+    "source_markdown": null,
+    "status_note": "30.10.2026 tarihsel durum kaydı; güncel ilerlemeyi temsil etmez."
+  },
+  {
+    "title": "Genel proje durumu",
+    "date": "2026-11-03",
+    "path": "2026-11-03/xinobi-proje-durumu-2026-11-03.pdf",
+    "sha256": "fd60652ed5bdde38c5d3cbcfe173e2a89afe62b0c0c39934c5c3bb74bad7c489",
+    "pages": 2,
+    "original": "output/pdf/xinobi-proje-durumu-2026-11-03.pdf",
+    "source_markdown": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+    "status_note": "Aynı günün sade sipariş tasarım kapsam kararından önceki özet; güncel kapsam için aşağıdaki planı kullan."
+  },
+  {
+    "title": "Sipariş tasarımı MostGate taskları ve promptları",
+    "date": "2026-11-03",
+    "path": "2026-11-03/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf",
+    "sha256": "b99ff1ee121250cf6a7b94a417fa0548665b2a3781909da932154a91030d8c30",
+    "pages": 10,
+    "original": "output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf",
+    "source_markdown": "docs/tasks/order-design-mostgate-prompts-2026-11-03.md",
+    "status_note": "Plan/prompt belgesi; uygulama ilerlemesi Faz00 ve tarihli test kayıtlarından okunur."
+  },
+  {
+    "title": "Sürat Kargo entegrasyon taskı ve uygulama planı",
+    "date": "2026-11-03",
+    "path": "2026-11-03/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf",
+    "sha256": "9f8295d368db7a1edf28c9db40385d4b3f29669ab92d375e16cf76fa89f2b112",
+    "pages": 14,
+    "original": "output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf",
+    "source_markdown": "docs/tasks/surat-kargo-integration-plan-2026-11-03.md",
+    "status_note": "Planlandı; entegrasyon uygulanmadı. Sağlayıcı teyitleri açık."
+  }
+]

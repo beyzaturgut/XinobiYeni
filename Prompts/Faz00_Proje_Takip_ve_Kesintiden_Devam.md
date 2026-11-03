@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Belge arşivi düzeni
+
+Üç önceki PDF ile bugünkü üç PDF [Proje Yönetimi/Belgeler](../Proje%20Y%C3%B6netimi/Belgeler/README.md) altında tarihli klasörlere alındı. Düzenlenebilir kaynaklar bağlandı; eski paylaşım yolları korundu. İçerik/task durumları değiştirilmedi; dosya hashleri manifestte.
+
 ## 03.11.2026 - Sürat Kargo entegrasyon hazırlığı (yalnız plan)
 
 KRG-SUR-01 planlandı. E-posta ve ZIP (17 PDF sayfası, 6 Postman isteği) incelendi; MostGate konusu/açıklaması, alan/config yerleşimi, alt işler ve uygulama promptu hazır. Kod/secret/gerçek gönderi değişikliği ve sağlayıcı çağrısı yapılmadı. [Task, alan eşleştirmesi ve prompt](../docs/tasks/surat-kargo-integration-plan-2026-11-03.md). [PDF](../output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf).

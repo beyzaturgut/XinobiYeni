@@ -329,3 +329,5 @@
 - 27.10.2026 · [Release dda85b6 doğrulaması](2026-10-27/TST-release-dda85b6.md) — Web/admin/API üretim derlemesi, ZIP ve yayımlanmış üç asset/hash doğrulandı; IIS kurulumu bekliyor.
 
 - 03.11.2026 · [TST-231 Sürat Kargo entegrasyon planı](2026-11-03/TST-231-surat-kargo-integration-plan.md) — ZIP/e-posta incelemesi, task/alan/secret planı ve prompt; 14 sayfa PDF görsel kontrolü PASS. Uygulama ve sağlayıcı çağrısı yok.
+
+- 03.11.2026 · [TST-232 belge arşivi](2026-11-03/TST-232-document-archive.md) — 6 PDF tarihli klasörlerde; SHA-256/sayfa ve dizin bağlantıları PASS. Eski yollar ve belge içerikleri korundu.

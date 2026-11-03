@@ -1,5 +1,7 @@
 # XinobiYeni
 
+Önemli proje belgeleri: [tarihli belge arşivi](Proje%20Y%C3%B6netimi/Belgeler/README.md).
+
 Xinobi'nin web mağazası, yönetim paneli, mobil uygulamaları ve merkezi ticaret servisleri için monorepo.
 
 Proje takibi `Prompts/Faz00_Proje_Takip_ve_Kesintiden_Devam.md`, kaynak kopyaları `docs/sources/`, mimari kararlar `docs/decisions/` altındadır. Bu belge repodaki uygulamayı anlatır; bir özelliğin kodda bulunması canlı sunucuda açık veya doğrulanmış olduğu anlamına gelmez.

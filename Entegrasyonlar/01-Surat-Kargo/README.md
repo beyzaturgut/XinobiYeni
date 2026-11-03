@@ -8,7 +8,7 @@ Gönderi oluşturma, Code128 etiket, şube kabulünden sonra takip. Tarife/check
 
 ## Mevcut kayıt
 
-Plan hazır; uygulama başlamadı. Bu klasörün açılması entegrasyonun uygulandığı veya canlıda doğrulandığı anlamına gelmez.
+İlk sunucu adaptörü ve izole sözleşme testleri eklendi. Kalıcı gönderi/admin/etiket/takip işi ve gerçek kabul açık. Bu klasörün açılması entegrasyonun uygulandığı veya canlıda doğrulandığı anlamına gelmez.
 
 ## Beklenen bilgiler ve kararlar
 
@@ -35,3 +35,7 @@ Parola, API anahtarı, gerçek müşteri verisi, gizli bilgi içeren ZIP/Postman
 - Test/canlı parolalar alındı; özgün yerel `kargo.rtf` dosyasında. Yeni belgelere çoğaltılmadı ve Git’e alınmaz.
 - E-postadaki bilgiler, kargo kuralları ve teknik planın birleşik yerel nüshası: `Yerel-Bilgiler/surat-kargo-iletilen-bilgiler-ve-plan-2026-11-03.pdf` ve aynı adlı Markdown. Parola yerlerinde özgün RTF referansı vardır.
 - Özgün RTF ve `Re__...` ek klasörü Git dışında tutulur. Takip yetkisi bildirimi alındı; bağlantı/oluşturma testi başarılı sayılmaz.
+
+## İlk kod teslimi
+
+[Sunucu ayarları, desteklenen sözleşme ve kalan işler](SUNUCU-KURULUMU.md). Gerçek hesaplar kurulmadı; sağlayıcıya istek yapılmadı.

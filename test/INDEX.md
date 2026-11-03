@@ -347,3 +347,5 @@
 - 03.11.2026 · [TST-235 entegrasyon klasörleri](2026-11-03/TST-235-integration-folders.md) — 13 klasör, kapsam/durum/kaynak notları ve yerel bağlantılar PASS; uygulama yok.
 
 - 03.11.2026 · [TST-239 Sürat iletilen bilgiler](2026-11-03/TST-239-surat-provided-information.md) — E-posta + teknik plan yerel 16 sayfa; parolalar özgün RTF referansıyla; görsel/secret dışlama kontrolü PASS.
+
+- 03.11.2026 · [TST-243 Sürat sunucu adaptörü](2026-11-03/TST-243-surat-server-adapter.md) — 17/17 odaklı, tam API 531 PASS / 29 SKIP / 0 FAIL. Gerçek çağrı yok; kalıcı gönderi/admin/etiket/takip işi açık.

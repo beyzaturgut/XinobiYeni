@@ -1,5 +1,9 @@
 # Faz03 — Teknik temel, kimlik ve veritabanı iskeleti
 
+## 03.11.2026 - Sürat Kargo ilk sunucu adaptörü
+
+KRG-SUR-01 başladı: kapalı varsayılan/test-canlı ayrımı, doğrudan taşıyıcı JSON istemcisi, katı kabul yanıtı, write retry olmadan belirsizlik, takip belge/ID/durum ayrımı eklendi. [Kurulum ve sınırlar](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Kalıcı idempotency, admin sipariş bağlantısı, Code128 etiket ve takip işi henüz yok; entegrasyon tamamlandı sayılmaz. Gerçek çağrı/secret/deploy yok. [TST-243](../test/2026-11-03/TST-243-surat-server-adapter.md): 17/17 odaklı; tam API 531 PASS / 29 SKIP / 0 FAIL.
+
 ## 03.11.2026 - Sürat Kargo entegrasyon hazırlığı (yalnız plan)
 
 KRG-SUR-01.2/03/04/06 planı: sunucu secret deposu, test/canlı ayrımı, egress IP whitelist, kalıcı gönderi/deneme/parça/hareket modeli, idempotency ve takip işçisi. Henüz uygulanmadı; query parola redaksiyonu zorunlu. [Task, alan eşleştirmesi ve prompt](../docs/tasks/surat-kargo-integration-plan-2026-11-03.md). [PDF](../output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf).

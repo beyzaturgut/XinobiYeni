@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Sürat Kargo ilk sunucu adaptörü
+
+KRG-SUR-01 başladı: kapalı varsayılan/test-canlı ayrımı, doğrudan taşıyıcı JSON istemcisi, katı kabul yanıtı, write retry olmadan belirsizlik, takip belge/ID/durum ayrımı eklendi. [Kurulum ve sınırlar](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Kalıcı idempotency, admin sipariş bağlantısı, Code128 etiket ve takip işi henüz yok; entegrasyon tamamlandı sayılmaz. Gerçek çağrı/secret/deploy yok. [TST-243](../test/2026-11-03/TST-243-surat-server-adapter.md): 17/17 odaklı; tam API 531 PASS / 29 SKIP / 0 FAIL.
+
 **03.11 SIP-TAS-09 son test/kabul kaydı:** SIP-TAS-01…08 kaynak ve test kayıtlarından doğrulandı. Kimlik, yerleşim ve üç dosyanın eşliği; düzenleme, silme, katalog/maske değişimi ve dosya deposunun yeniden başlatılmasından sonra da korunuyor. 320/390/768/1440 px'te normal ve %200 metin, axe (kritik/ciddi 0), klavye, odak ve duyuru kontrolleri geçti; üretim eylemi yok. Admin 18 test dosyası + 4 tools senaryosu, API 514 test (29 atlandı) PASS; web e2e 17/18 (1 bilinen kararsız test). Teknik kabul tamam; izole SQL, canlı IIS, ekran okuyucu/cihaz ve iş sahibi kabulü açık. [Kabul matrisi](../design/order-design-acceptance-2026-11-03.md), [TST-239](../test/2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md). KIS-07 kapanmadı.
 
 ## 03.11.2026 - Sürat iletilen bilgiler eki

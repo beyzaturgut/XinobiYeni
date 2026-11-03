@@ -22,6 +22,12 @@ using Xinobi.Api.Infrastructure.Segmentation.Roboflow;
 using Xinobi.Api.Notifications;
 using Xinobi.Api.Audit;
 
+if (args.FirstOrDefault() == Xinobi.Api.Shipping.SuratPreflightCommand.Command)
+{
+    Environment.ExitCode = await Xinobi.Api.Shipping.SuratPreflightCommand.RunAsync(args, Console.Out);
+    return;
+}
+
 if (args.Contains(Cm101CandidateCommand.Mode, StringComparer.Ordinal))
 {
     Environment.ExitCode = await Cm101CandidateCommand.RunAsync(args);

@@ -2,7 +2,7 @@
 
 ## Güncel teslim - 03.11.2026
 
-Admin sipariş/entegrasyon ekranı, test Code128 etiketi, kanıtlı uzlaştırma, kontrollü tekrar, kalıcı takip işi ve web/Flutter müşteri gösterimi eklendi. [Gerçek test erişimi 403](../../Entegrasyonlar/01-Surat-Kargo/ERISIM-KONTROLU-2026-11-03.md); canlı kabul tamamlanmadı. Ayrıntılı güncel durum ve bağımlılıklar [sunucu kurulum kaydında](../../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Alt bölümlerdeki başlangıç planı ve PDF tarihsel plan sürümüdür.
+Admin sipariş/entegrasyon ekranı, test Code128 etiketi, kanıtlı uzlaştırma, kontrollü tekrar, kalıcı takip işi ve web/Flutter müşteri gösterimi eklendi. [Güncel .NET test takip erişimi HTTP 200; önceki 403 tarihsel](../../Entegrasyonlar/01-Surat-Kargo/ERISIM-KONTROLU-2026-11-03.md); canlı kabul tamamlanmadı. Ayrıntılı güncel durum ve bağımlılıklar [sunucu kurulum kaydında](../../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Alt bölümlerdeki başlangıç planı ve PDF tarihsel plan sürümüdür.
 
 ## Güncel uygulama eki - 03.11.2026
 

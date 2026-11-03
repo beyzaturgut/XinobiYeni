@@ -120,9 +120,13 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
             if (!response.IsSuccessStatusCode) return new(SuratTrackingState.Unavailable, []);
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
             var root = json.RootElement;
-            if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("IsError", out var error) || error.ValueKind != JsonValueKind.False ||
+            if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("IsError", out var error) ||
                 !root.TryGetProperty("Gonderiler", out var docs) || docs.ValueKind != JsonValueKind.Array)
                 return new(SuratTrackingState.Unavailable, []);
+            // Observed read-only sandbox contract: an unaccepted/unknown reference is an IsError=true response.
+            // Exact message AND empty documents only; never classify auth/general errors or partial data as empty.
+            if (IsReferenceNotFound(root)) return new(SuratTrackingState.AwaitingAcceptance, []);
+            if (error.ValueKind != JsonValueKind.False) return new(SuratTrackingState.Unavailable, []);
             var documents = docs.EnumerateArray().Select(d =>
             {
                 int? code = int.TryParse(Value(d, "KargonunDurumuSayi"), out var n) ? n : null;
@@ -134,6 +138,12 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
         catch (Exception e) when (e is HttpRequestException or OperationCanceledException or IOException or JsonException or InvalidOperationException)
         { return new(SuratTrackingState.Unavailable, []); }
     }
+
+    public static bool IsReferenceNotFound(JsonElement root) => root.ValueKind == JsonValueKind.Object &&
+        root.TryGetProperty("IsError", out var error) && error.ValueKind == JsonValueKind.True &&
+        root.TryGetProperty("Gonderiler", out var docs) && docs.ValueKind == JsonValueKind.Array && docs.GetArrayLength() == 0 &&
+        root.TryGetProperty("errorMessage", out var message) && message.ValueKind == JsonValueKind.String &&
+        message.GetString()?.Trim() == "Sipariş bulunamadı.";
 
     private static string? Value(JsonElement d, string key) => d.TryGetProperty(key, out var v) ? v.ValueKind switch
     { JsonValueKind.String => v.GetString(), JsonValueKind.Number => v.GetRawText(), _ => null } : null;

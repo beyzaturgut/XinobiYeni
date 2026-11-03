@@ -68,6 +68,9 @@ public class SuratKargoTests
     [Theory]
     [InlineData("{\"IsError\":false,\"Gonderiler\":[]}",SuratTrackingState.AwaitingAcceptance)]
     [InlineData("{\"IsError\":true,\"Gonderiler\":[]}",SuratTrackingState.Unavailable)]
+    [InlineData("{\"IsError\":true,\"errorMessage\":\"Sipariş bulunamadı.\",\"Gonderiler\":[]}",SuratTrackingState.AwaitingAcceptance)]
+    [InlineData("{\"IsError\":true,\"errorMessage\":\"Kullanıcı bulunamadı.\",\"Gonderiler\":[]}",SuratTrackingState.Unavailable)]
+    [InlineData("{\"IsError\":true,\"errorMessage\":\"Sipariş bulunamadı.\",\"Gonderiler\":[{}]}",SuratTrackingState.Unavailable)]
     [InlineData("{}",SuratTrackingState.Unavailable)] [InlineData("not json",SuratTrackingState.Unavailable)]
     public async Task Tracking_separates_empty_and_failure(string reply,SuratTrackingState expected)
     { var h=new Handler(_=>Task.FromResult(Response(reply)));Assert.Equal(expected,(await Client(h).TrackAsync("TEST-ORDER-1")).State); }

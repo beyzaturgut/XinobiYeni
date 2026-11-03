@@ -1,5 +1,13 @@
 # Sürat Kargo test erişim kontrolü
 
+## Güncel sonuç: .NET test takip erişimi HTTP 200
+
+Ön kontrolde .NET istemcisi ve test hesabıyla gerçek olmayan kontrol referansı sorgulandı. HTTP 200, IsError=true, tam `Sipariş bulunamadı.` ve boş Gonderiler alındı. Bu dar yanıt artık adaptörde şube kabulü/hareket bekleniyor olarak ayrılıyor; kayıt yokluğu veya gerçek gönderi kabulü kanıtı değildir. Önceki 403, farklı istemcinin tarihsel sonucudur; genel bir IP/hesap engeli olduğu sonucu çıkarılmaz. Ana adresler .NET ile 302 yönlendirdi; bu da takip metodunun erişilemediğini göstermiyor.
+
+[Sansürlenmiş JSON](erisim-on-kontrol-2026-11-03.json), [sunucuda ön kontrol komutu](ON-KONTROL.md). Asıl IIS sunucusu üzerinde egress/erişim kabulü henüz yapılmadı.
+
+## İlk kontrol (tarihsel)
+
 03.11.2026. Sağlayıcının e-postada verdiği **test hesabıyla** tek, salt okunur takip sorgusu yapıldı.
 
 - Hedef: `https://api02.suratkargo.com.tr/api/KargoTakipHareketDetayi`

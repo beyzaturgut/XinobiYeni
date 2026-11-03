@@ -1,6 +1,6 @@
 # Sürat Kargo kurulum ve güncel kabul kaydı
 
-**Güncel durum:** Üçüncü teslimde admin/etiket/takip/uzlaştırma ve müşteri ekranları uygulanmıştır. Aşağıdaki ilk/ikinci teslim başlıkları gelişim geçmişidir; son bölüm geçerli kapsam ve canlı kapıları içerir. [Test erişimi 403](ERISIM-KONTROLU-2026-11-03.md).
+**Güncel durum:** Üçüncü teslimde admin/etiket/takip/uzlaştırma ve müşteri ekranları uygulanmıştır. Aşağıdaki ilk/ikinci teslim başlıkları gelişim geçmişidir; son bölüm geçerli kapsam ve canlı kapıları içerir. [Güncel test erişimi HTTP 200; önceki 403 tarihsel](ERISIM-KONTROLU-2026-11-03.md).
 
 03.11.2026. `services/api/Shipping/SuratKargoClient.cs` ve Program.cs kaydı eklendi. Taşıma/sözleşme katmanına kalıcı gönderi/deneme kaydı ve yetkili admin API uçları eklendi. Admin ekranı, etiket ve otomatik takip henüz bağlı değildir. Manuel kargo davranışı değiştirilmedi. Hiçbir gerçek sağlayıcı çağrısı yapılmadı.
 
@@ -68,11 +68,15 @@ Bu bölüm önceki teslimlerin “sıradaki” maddelerini günceller; aşağıd
 
 ### Canlı kabul için kalan kapılar
 
-1. [Test erişimi 403](ERISIM-KONTROLU-2026-11-03.md): hesap/IP/whitelist nedeninin sağlayıcı tarafından kapatılması. Testte gerçek gönderi, şube kabulü, hareket, hata ve mutabakat senaryoları.
+1. [.NET test takip erişimi HTTP 200](ERISIM-KONTROLU-2026-11-03.md) doğrulandı; önceki 403 genel blokaj sayılmaz. Asıl IIS sunucusunda erişim/egress doğrulaması ve gerçek sandbox gönderi/şube kabul/hareket/mutabakat kabulü hâlâ açık.
 2. Sürat'in onaylı canlı etiket şablonu, cari barkodu/çoklu koli düzeni ve fiziksel yazıcı/okuyucu testi. Mevcut taslak canlıya açılmaz.
 3. İzole gerçek SQL çoklu süreç/yeniden başlatma kabulü; kaynak koddaki shared applock tasarımı tek başına gerçek SQL kabulü değildir.
 4. Doğrulanmış ödeme/operasyon uygunluğu ve iptal-gönderim transaction sınırı (D03). Bu veri olmadan demo sipariş Production gönderisi oluşturamaz; bu sürümde Production oluşturma bilinçli olarak kapalıdır. Manuel “ödenmiş say” bayrağı eklenmedi.
 5. Sağlayıcı sözleşmesindeki kod7/COD/Dosya-Mi/büyük-küçük harf farkları, kanal borçlandırma ve kota/saat dilimi teyitleri. İlk uygulama yalnız kendi mağaza/normal koli/COD kapalı; pazaryeri, COD ve iade oluşturma bu kabul gelmeden açılmaz. Kargo tarife/checkout ücret hesabı ZIP'te yoktur ve TIC-08'de ayrı açık kalır.
 6. Gerçek Android/iOS ve VoiceOver/TalkBack kabulü; widget testi fiziksel cihaz kabulü değildir. Deployment/APK yapılmadı.
 
-**Durum:** Kendi mağaza test akışı için kod ve arayüzler uygulanmıştır; gerçek sandbox kabulü ve canlı entegrasyon tamamlandı sayılmaz. Erişim engeli ve bu kapılar kapanmadan canlı anahtar/flag etkinleştirilmemelidir.
+**Durum:** Kendi mağaza test akışı için kod ve arayüzler uygulanmıştır; gerçek sandbox gönderi kabulü ve canlı entegrasyon tamamlandı sayılmaz. Sunucu erişimi ve bu kapılar kapanmadan canlı anahtar/flag etkinleştirilmemelidir.
+
+## Ön kontrol ve boş kayıt sözleşmesi
+
+`--surat-preflight` komutu API/SQL/worker başlatmadan çalışır. [Sunucu yönergesi](ON-KONTROL.md). Test metodundan gelen HTTP 200 / IsError=true / tam `Sipariş bulunamadı.` / boş Gonderiler yanıtı AwaitingAcceptance olur; diğer IsError yanıtları veya kısmi belge sonuçları servis hatası olarak kalır. Bu yanıt otomatik yeni gönderim, kayıt yokluğu kanıtı ya da canlı kabul değildir.

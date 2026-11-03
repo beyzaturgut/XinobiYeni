@@ -1,6 +1,6 @@
 # Xinobi - Fazlara işlenmiş tam kapanış listesi / 30.10.2026
 
-**03.11 Sürat güncellemesi:** TIC-08 teknik alt işleri kısmen uygulandı; aşağıdaki TIC-08 kaydı günceldir. Diğer eski kaynak/kapsam paragrafları tarihsel kesittir. Gerçek test erişimi 403, canlı kabul açık.
+**03.11 Sürat güncellemesi:** TIC-08 teknik alt işleri kısmen uygulandı; aşağıdaki TIC-08 kaydı günceldir. Diğer eski kaynak/kapsam paragrafları tarihsel kesittir. Güncel .NET test takip yanıtı HTTP 200; gerçek gönderi/sunucu ve canlı kabul açık.
 
 **03.11 kapsam değişikliği:** [Sipariş tasarım detayı ve 9 alt task](order-design-detail-scope-2026-11-03.md); KIS-01/05/06 yeni kapsam dışında, KIS-07 sipariş detayı/dosyalar olarak revize. 120 ana ID korundu; kod uygulanmadı.
 
@@ -963,13 +963,13 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **Yapıldı / mevcut temel:** 03.11: Sürat adaptörü, kalıcı referans/attempt, admin ekranı, test Code128 etiketi, kanıtlı uzlaştırma/tekrar, lease/backoff takip ve web/Flutter müşteri okuması uygulandı; izole regresyonlar kayıtlı.
 
-**Yapılmadı / açık kalan:** Gerçek test erişimi HTTP 403; sağlayıcı/IP/hesap teyidi, gerçek SQL/sandbox/şube/okuyucu/cihaz kabulü, onaylı canlı etiket, ödeme/operasyon uygunluğu ve kargo tarife/bölge/checkout ücret kuralları açık. Production oluşturma kapalı.
+**Yapılmadı / açık kalan:** Test takip erişimi .NET ile HTTP 200; asıl IIS egress/erişim teyidi, gerçek SQL/sandbox/şube/okuyucu/cihaz kabulü, onaylı canlı etiket, ödeme/operasyon uygunluğu ve kargo tarife/bölge/checkout ücret kuralları açık. Production oluşturma kapalı.
 
 **Kapanış kanıtı:** Checkout ücreti siparişte sabit; tek sipariş için yinelenen gönderi önleniyor; gerçek test gönderisi takip ediliyor.
 
 **Bağımlılıklar:** KAR-04, TIC-02.
 
-**03.11 kanıt:** [TST-245](../../test/2026-11-03/TST-245-surat-shipment-delivery.md), [erişim 403](../../Entegrasyonlar/01-Surat-Kargo/ERISIM-KONTROLU-2026-11-03.md). Bu task tamamen kapanmadı.
+**03.11 kanıt:** [TST-245](../../test/2026-11-03/TST-245-surat-shipment-delivery.md), [güncel erişim kanıtı](../../Entegrasyonlar/01-Surat-Kargo/ERISIM-KONTROLU-2026-11-03.md). Bu task tamamen kapanmadı.
 
 ### WEB-03
 

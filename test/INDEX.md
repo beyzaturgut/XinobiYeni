@@ -353,3 +353,5 @@
 - 03.11.2026 · [TST-244 Sürat kalıcı gönderi/admin API](2026-11-03/TST-244-surat-persistent-admin-api.md) — 26 odaklı PASS; tam API 540 PASS / 29 SKIP / 0 FAIL; sözleşme/TS/Dart PASS. Gerçek çağrı ve SQL kabulü yok.
 
 - 03.11.2026 · [TST-245 Sürat ekran/etiket/takip teslimi](2026-11-03/TST-245-surat-shipment-delivery.md) — 38 odaklı, tam API 552 PASS / 29 SKIP / 0 FAIL; admin 20/20, Flutter 283, web 2/2 PASS. Gerçek salt okunur test erişimi 403; canlı kabul açık.
+
+- 03.11.2026 · [TST-246 Sürat erişim/ön kontrol](2026-11-03/TST-246-surat-preflight-access.md) — .NET test takip HTTP 200 / Sipariş bulunamadı.; önceki 403 genel blokaj değil. 51 odaklı PASS, tam API 565 PASS / 29 SKIP / 0 FAIL. Gerçek gönderi yok.

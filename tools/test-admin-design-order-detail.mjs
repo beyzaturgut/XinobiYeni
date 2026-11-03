@@ -48,7 +48,7 @@ try {
   assert.equal(await dialog.getByRole('button', { name: /hazırlanmaya başla/i }).isDisabled(), true)
   assert.equal(await f.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false)
   await dialog.getByRole('button', { name: 'Tasarım yönetimine dön' }).focus(); await f.page.keyboard.press('Enter')
-  await f.page.getByRole('region', { name: 'Tasarım ve baskı operasyonları' }).waitFor()
+  await f.page.getByRole('region', { name: 'Tasarımlar ve sipariş bağlantıları' }).waitFor()
   await f.page.goForward(); await dialog.getByRole('heading', { name: 'OLD-ORDER' }).waitFor()
   await f.page.reload(); await dialog.getByRole('heading', { name: 'OLD-ORDER' }).waitFor()
   await f.page.keyboard.press('Escape'); await dialog.waitFor({ state: 'hidden' }); assert.equal(new URL(f.page.url()).searchParams.has('orderId'), false)

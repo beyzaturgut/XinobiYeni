@@ -6,6 +6,8 @@ Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş 
 
 **Bu fazın işi:** Ana sorumluluk KIS-03/KIS-07; SIP-TAS-01...09. KIS-01/05/06 üretim hedefleri kapsam dışı; tamamlandı sayılmaz. KIS-02 görsel maske doğruluğu, KIS-04 genel editör kapsamı ve KIS-08 fiyat/dosya teslim kabulü sürer.
 
+**03.11 SIP-TAS-01 uygulaması:** Admin sipariş detayında kişiselleştirilmiş her satır için “Sipariş tasarım detayı” alanı eklendi. Alanda sipariş/ürün/SKU/varyant/renk/tasarım/konfigürasyon/revizyon, okunur kayıtlı yerleşim ve ayrı üç görsel kartı var. Ham desen dosya doğrulanınca önizlenir ve mevcut korumalı uçla indirilir. Ürün kaynak görseli ve giydirilmiş önizleme için açıkça “İndirme hazır değil” yazar. Eksik alanlar “Bu siparişte kaydedilmemiş” olarak gösterilir. Fiziksel profil/kalibrasyon/ölçüm ekranı tasarım ekranından kaldırıldı (API/veri korunur); menü “Tasarımlar”. Sipariş/kargo/iptal/iade işlemleri ve tasarımdan siparişe geçiş korundu. Sipariş penceresinde etiket kontrastı ve %200 yazı taşması da düzeltildi. Admin lint/TypeScript/derleme ve izole Chrome regresyonları PASS. [TST-207](../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md). KIS-07 açık: SIP-TAS-02…09 yapılmadı; rol/PM kabulü verilmedi.
+
 
 **30.10 admin görsel/durum uygulaması:** 16 modül ortak tablo, kontrol, hata/başarı ve pencere odağı dilinde denetlendi; başarısız yazmada taslak, içerik/yüzey yetkileri, eksik sayaç ve yüklenme ayrımları düzeltildi. [Modül/bulgu/açık iş matrisi](../design/admin-consistency-audit-2026-10-30.md), [TST-188](../test/2026-10-30/TST-188-admin-consistency.md). Gerçek SQL/operasyon/sağlayıcı/handoff kabulü açık; faz onayı verilmedi.
 
@@ -13,7 +15,7 @@ Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş 
 
 ## Güncel durum - 03.11.2026 (önceki uygulama temeli korunur)
 
-**Durum:** Planlandı - sade sipariş tasarım detayı, kayıtlı yerleşim ve üç görsel teslimi. Üretime hazırlık kapsam dışı; uygulama başlamadı. Plan kaynak kesiti `main / e89c649`; önceki uygulama kayıtları aşağıda korunur; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
+**Durum:** Planlandı - sade sipariş tasarım detayı, kayıtlı yerleşim ve üç görsel teslimi. Üretime hazırlık kapsam dışı; SIP-TAS-01 ekran sadeleştirmesi uygulandı (TST-207), SIP-TAS-02…09 başlamadı. Plan kaynak kesiti `main / e89c649`; önceki uygulama kayıtları aşağıda korunur; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
 
 **Yapılan son işler:** 42bee88: ürün/renk/yüz bazlı mm-DPI-taşma-renk-format, boş ölçülü taslak, kanıtlı onay/kaldırma ve geçmiş; düzlemsel mm/DPI/korunan bölge ölçümü ve fiziksel kalibrasyon SVG. Yeni yerleşim/sipariş profil kopyası ve SHA alır. Gerçek SKU profili oluşturulmadı; productionReady=false.
 
@@ -31,7 +33,7 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 | [KIS-04](../docs/tasks/project-closure-2026-10-30.md#kis-04) - Kaynak kapsamdaki editör araçlarını tamamla | Yapılmadı - kapanış açık | Onaylı kapsamın metin/font/şekil/katman-kilit/şablon/çoklu yüz araçları ve font lisansı kabulü eksik. Bu karar genel editör araçlarını iptal etmez; sade sipariş tasarım detayının önkoşulu da değildir. |
 | [KIS-05](../docs/tasks/project-closure-2026-10-30.md#kis-05) - Değişmez üretim sürümü ve insan onayı ekle | Kapsam dışı - 03.11.2026 kararı | Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı. |
 | [KIS-06](../docs/tasks/project-closure-2026-10-30.md#kis-06) - Baskı render kuyruğunu uygula | Kapsam dışı - 03.11.2026 kararı | Bu üretime hazırlık teslimi yeni kapsamda istenmiyor; tamamlandı sayılmaz. Mevcut kod/veri korunur. Sade sipariş tasarım detayı ve dosya indirmeleri KIS-03/KIS-07 altında planlandı. |
-| [KIS-07](../docs/tasks/project-closure-2026-10-30.md#kis-07) - Sipariş tasarım detayını ve ayrı görsel indirmelerini tamamla | Yapılmadı - kapanış açık | SIP-TAS-01...09 planlandı; uygulama, sürüme bağlı dosya koruması, indirmeler ve kabul henüz yapılmadı. |
+| [KIS-07](../docs/tasks/project-closure-2026-10-30.md#kis-07) - Sipariş tasarım detayını ve ayrı görsel indirmelerini tamamla | Yapılmadı - kapanış açık | SIP-TAS-01 uygulandı (03.11, TST-207): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil ekranı panelden kaldırıldı. SIP-TAS-02...09 planlandı; uygulama, sürüme bağlı dosya koruması, indirmeler ve kabul henüz yapılmadı. |
 | [KIS-08](../docs/tasks/project-closure-2026-10-30.md#kis-08) - Kişiselleştirme fiyatı ve sipariş dosya teslimini kabul et | Yapılmadı - kapanış açık | Kişiselleştirme fiyatlandırma/checkout-iade kabulü ve SIP-TAS dosya teslim kabulü açık; fiziksel numune yazılım kapısı olarak beklenmiyor. |
 
 ### Açık alt işler ve özel kabul kayıtları

@@ -37,7 +37,7 @@ async function fixture({ permissions = ['print.read'], list, detail, image, orde
     throw new Error('Unexpected API dependency: ' + path)
   })
   await page.goto(origin + '/?view=print')
-  const section = page.getByRole('region', { name: 'Tasarım ve baskı operasyonları' })
+  const section = page.getByRole('region', { name: 'Tasarımlar ve sipariş bağlantıları' })
   return { page, section, requests, close: async () => { assert.deepEqual(errors, []); if (!permissions.includes('orders.read')) assert.equal(orderReads, 0); await context.close(); passed++ } }
 }
 try {

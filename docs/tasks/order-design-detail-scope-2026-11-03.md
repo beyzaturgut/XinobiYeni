@@ -2,7 +2,7 @@
 
 **MostGate konu/açıklama ve uygulama promptları:** [9 taskın düzenlenebilir dokümanı](order-design-mostgate-prompts-2026-11-03.md) ve [PDF](../../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf). Yalnız doküman hazırlandı; tasklar uygulanmadı.
 
-**Tarih:** 03.11.2026  |  **Durum:** Planlandı; uygulamaya başlanmadı.  |  **Kaynak kesiti:** e89c649
+**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02...09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
 
 Kullanıcının açık kararı: kapsamlı bir üretime hazırlık/üretime gönderme bölümü olmayacak. Panelde siparişe ait kayıtlı editör yerleşimi, desenin ayrı indirilmesi, maskelemede kullanılan ürün görselinin ayrı indirilmesi ve indirilebilir giydirilmiş görsel olacak. Kullanıcı yalnız task/faz planlamasını istedi; kod geliştirmesini durdurdu.
 
@@ -18,11 +18,11 @@ Kullanıcının açık kararı: kapsamlı bir üretime hazırlık/üretime gönd
 
 ## Mevcut temel ve gerçek açıklar
 
-Kaynak okumasında admin tasarım listesi, ilişkili sipariş bağlantısı, sipariş satırında ham desen ve yerleşim alanları mevcut. Sipariş kompozisyonunu koruyan müşteri önizleme yolu var; bu, adminin üç indirmesinin hazır olduğu anlamına gelmez. Siparişe bağlı ürün kaynak görselinin korunması/indirilmesi ve admin kompozisyon erişimi planın açık işleridir. Fiziksel profil ekranı halen kodda bulunuyor; kaldırılması SIP-TAS-01 ile **planlandı**, bu oturumda kaldırılmadı.
+Kaynak okumasında admin tasarım listesi, ilişkili sipariş bağlantısı, sipariş satırında ham desen ve yerleşim alanları mevcut. Sipariş kompozisyonunu koruyan müşteri önizleme yolu var; bu, adminin üç indirmesinin hazır olduğu anlamına gelmez. Siparişe bağlı ürün kaynak görselinin korunması/indirilmesi ve admin kompozisyon erişimi planın açık işleridir. Fiziksel profil ekranı planlama anında kodda bulunuyordu; SIP-TAS-01 uygulamasıyla panel ekranından kaldırıldı (API, veri ve eski kayıtlar korunur).
 
 ## Alt tasklar
 
-Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. Her taskın durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
+Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
 
 ### SIP-TAS-01 - Baskı alanını sipariş tasarım detayına sadeleştir
 
@@ -30,6 +30,7 @@ Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımı
 **Açıklama:** Panelde sipariş/satır odaklı bir tasarım detayı planla. Fiziksel profil/kalibrasyon, üretime gönder, üretim onayı ve hazır/red üretim durumlarını bu ekrandan çıkar. Mevcut sipariş, ödeme ve kargo eylemleri ayrı kalır; eski profil/veri silme işi eklenmez.
 **Kapanış koşulu:** Ürün/SKU/renk, desen, kayıtlı yerleşim ve üç görsel dosyası bir arada; üretime hazırlama eylemi yok.
 **Bağımlılık:** Yok
+**Durum (03.11):** Uygulandı - kabul açık. Sipariş detayında her kişiselleştirilmiş satır için “Sipariş tasarım detayı” alanı: sipariş/ürün/SKU/varyant/renk/tasarım/konfigürasyon/revizyon, kayıtlı yerleşim ve ayrı üç görsel kartı (ham desen önizleme + mevcut korumalı indirme; ürün kaynak görseli ve giydirilmiş önizleme için “İndirme hazır değil” durumu). Fiziksel profil/kalibrasyon ekranı tasarım ekranından kaldırıldı; menü “Tasarımlar”. Eksik alanlar “Bu siparişte kaydedilmemiş” olarak gösterilir. Yeni API/dosya saklama yok. Kanıt: [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md).
 
 ### SIP-TAS-02 - Siparişe bağlı görsel ve revizyon paketini tanımla
 

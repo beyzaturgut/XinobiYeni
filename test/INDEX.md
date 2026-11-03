@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-207 | 03.11.2026 | SIP-TAS-01 admin lint/TypeScript/derleme | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |
+| TST-208 | 03.11.2026 | Sipariş tasarım detayı odaklı Chrome fixture (4 genişlik, axe, %200, dosya durumları) | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |
+| TST-209 | 03.11.2026 | Admin izole regresyonları (15 test dosyası + 4 tools senaryosu) | PASS; toplu runner takılması raporda | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |
+| TST-210 | 03.11.2026 | Sipariş tasarım detayı temsilî ekran görüntüleri | PASS; sentetik veri | ADMIN / VISUAL | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |
 | TST-206 | 03.11.2026 | 9 MostGate konu/açıklama/prompt dokümanı | PASS; 10 sayfa ve metin/görsel QA | DOCUMENT / PDF | [Rapor](2026-11-03/TST-206-mostgate-prompt-document.md) |
 | TST-205 | 03.11.2026 | Sipariş tasarım detayı: 9 alt task/faz kapsam planı | PASS; uygulama yapılmadı | DOCUMENTATION / STATIC | [Rapor](2026-11-03/TST-205-order-design-scope-plan.md) |
 | TST-204 | 03.11.2026 | Genel durum ve 13 ana iş PDF | PASS; 2 sayfa, görsel/metin kontrolü | DOCUMENT / PDF | [Rapor](2026-11-03/TST-204-project-status-pdf.md) |

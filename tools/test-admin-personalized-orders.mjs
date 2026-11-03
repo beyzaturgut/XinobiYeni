@@ -18,7 +18,7 @@ try{
   if(path.endsWith('/state'))return route.fulfill({json:{products:[],prices:{},categories:[],content:{slides:[],xinobiBanner:'',buttonColor:'#000000'}}});
   if(path.endsWith('/orders'))return route.fulfill({json:orders});
   if(path.endsWith('/order-options'))return route.fulfill({json:{carriers:['Test carrier'],returnWindowDays:14}});
-  if(path.endsWith('/design'))return route.fulfill({body:Buffer.from('test-file'),contentType:'image/png',headers:{'Content-Disposition':'attachment; filename="xinobi-AI-0-source.png"'}});
+  if(path.endsWith('/design'))return route.fulfill({body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64'),contentType:'image/png',headers:{'Content-Disposition':'attachment; filename="xinobi-AI-0-source.png"'}});
   return route.fulfill({status:404,json:{title:'Synthetic unavailable'}});
  });
  await page.goto(base+'?view=orders');
@@ -26,15 +26,13 @@ try{
  await list.getByRole('button',{name:'UX-AI detayını aç'}).waitFor();
  for(const [kind,count] of [['personalized',3],['ai',1],['upload',2],['all',4]]){await page.getByRole('combobox',{name:'Kişiselleştirme',exact:true}).selectOption(kind);assert.equal(await list.locator('tbody tr').count(),count)}
  await list.getByRole('button',{name:'UX-AI detayını aç'}).click();
- await page.getByText('Kayıtlı yerleşim ayarları',{exact:true}).click();
- await page.getByText(/SKU: TEST-SKU/).waitFor();
- await page.getByText('Yatay konum (px)',{exact:true}).waitFor();
- const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Ham tasarımı indir',exact:true}).click();
+ const detail=page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'});
+ await detail.getByRole('region',{name:'Sipariş ve ürün bilgileri'}).getByText('TEST-SKU',{exact:true}).waitFor();
+ await detail.getByRole('region',{name:'Kayıtlı yerleşim'}).getByText('Yatay konum (px)',{exact:true}).waitFor();
+ const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Ham deseni indir',exact:true}).click();
  assert.equal((await downloadPromise).suggestedFilename(),'xinobi-AI-0-source.png');
  await page.getByRole('button',{name:'Sipariş detayını kapat'}).click();
  await list.getByRole('button',{name:'UX-OLD detayını aç'}).click();
- const oldDetails=page.locator('details').filter({has:page.getByText('Kayıtlı yerleşim ayarları',{exact:true})});
- if(!await oldDetails.evaluate(el=>el.open))await page.getByText('Kayıtlı yerleşim ayarları',{exact:true}).click();
  await page.getByText(/Bu eski siparişte yerleşim ayarları kaydedilmemiş/).waitFor();
  assert.equal(writes,0);await browser.close();
  console.log('PASS: personalized/AI/upload filters, stored placement/SKU, protected download link, legacy explanation, read-only UI');

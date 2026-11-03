@@ -1,5 +1,7 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+**03.11 SIP-TAS-01 uygulaması:** Admin sipariş detayında kişiselleştirilmiş her satır için “Sipariş tasarım detayı” alanı eklendi. Alanda sipariş/ürün/SKU/varyant/renk/tasarım/konfigürasyon/revizyon, okunur kayıtlı yerleşim ve ayrı üç görsel kartı var. Ham desen dosya doğrulanınca önizlenir ve mevcut korumalı uçla indirilir. Ürün kaynak görseli ve giydirilmiş önizleme için açıkça “İndirme hazır değil” yazar. Eksik alanlar “Bu siparişte kaydedilmemiş” olarak gösterilir. Fiziksel profil/kalibrasyon/ölçüm ekranı tasarım ekranından kaldırıldı (API/veri korunur); menü “Tasarımlar”. Sipariş/kargo/iptal/iade işlemleri ve tasarımdan siparişe geçiş korundu. Sipariş penceresinde etiket kontrastı ve %200 yazı taşması da düzeltildi. Admin lint/TypeScript/derleme ve izole Chrome regresyonları PASS. [TST-207](../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md). SIP-TAS-02…09 yapılmadı; rol/PM kabulü verilmedi.
+
 **03.11 task prompt dokümanı:** SIP-TAS-01...09 için MostGate konusu/açıklaması ve bağımsız uygulama promptları [Markdown](../docs/tasks/order-design-mostgate-prompts-2026-11-03.md) / [PDF](../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf) olarak hazırlandı. Bu doküman çalışmasında uygulama yapılmadı ve MostGate kaydı açılmadı; önceki kapsam ve task durumları değiştirilmedi. [TST-206](../test/2026-11-03/TST-206-mostgate-prompt-document.md).
 
 ## 03.11.2026 - Kapsam kararı: sade sipariş tasarım detayı
@@ -124,7 +126,7 @@ Analizdeki D01–D10 hiçbirine bu plan **müşteri kararı verilmiş** demez. H
 | D01 | Mevcut kod/veri ve yeniden kullanım | Faz01–03 | Kısmi karar · mevcut uygulama kodu yok, sıfırdan yeni geliştirme; private monorepo ve araç zinciri doğrulandı. Mevcut operasyon/veri örneği ve barındırma envanteri bekliyor |
 | D02 | Ürün-varyant-fiyat-stok ana kaynak ve Mikro yazma yönü | Faz04,08,09 | Açık / operasyon + Mikro sahibi |
 | D03 | Sipariş/ödeme, havale, stok rezervasyon, iptal-iade/kargo | Faz05,08,09,11 | Açık / satış-operasyon |
-| D04 | Sipariş yerleşimi ve üç görsel teslimi; fiziksel üretim hazırlığı yok | Faz06,05,02,03,11 | 03.11.2026 kullanıcı kapsam kararı kaydedildi; SIP-TAS-01...09 planlandı, uygulama/kabul açık |
+| D04 | Sipariş yerleşimi ve üç görsel teslimi; fiziksel üretim hazırlığı yok | Faz06,05,02,03,11 | 03.11.2026 kullanıcı kapsam kararı kaydedildi; SIP-TAS-01 uygulandı (TST-207), SIP-TAS-02...09 ve kabul açık |
 | D05 | Ödeme/kargo/SMS/e-posta/AI ve destek erişimleri | Faz05,10,11 | Açık / sağlayıcı hesapları |
 | D06 | Mikro sürüm/API ve üç pazaryeri mağaza/sandbox | Faz08,09 | Açık / entegrasyon sahipleri |
 | D07 | Tekliften toplu siparişe onay ve fiyatlama | Faz07 | Açık / kurumsal satış |

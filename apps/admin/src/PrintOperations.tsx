@@ -1,8 +1,6 @@
 import AdminDialog from './AdminDialog'
 import TableRegion from './TableRegion'
 import { useEffect, useRef, useState } from 'react'
-import PrintProfiles from './PrintProfiles'
-import type {Product} from './commerce'
 import { adminCall } from './admin-api'
 import { commerceApi, commerceRequest } from './commerce'
 import { useAdminSession } from './AdminAccess'
@@ -49,7 +47,7 @@ function DesignOrderReferences({ designId, onOpenOrder }: { designId: string; on
   </section>
 }
 
-export default function PrintOperations({ onOpenOrder, products }: { products:Product[]; notes: Record<string, string>; onNote: (id: string, note: string) => void; onOpenOrder?: (id: string) => void }) {
+export default function PrintOperations({ onOpenOrder }: { onOpenOrder?: (id: string) => void }) {
   const permissions = useAdminSession()?.permissions ?? []
   const canReadOrders = permissions.includes('print.read') && permissions.includes('orders.read')
   const [data, setData] = useState<DesignPage | null>(null), [page, setPage] = useState(1), [reload, setReload] = useState(0)
@@ -87,8 +85,8 @@ export default function PrintOperations({ onOpenOrder, products }: { products:Pr
   }
   const ready = !loading && !error && data !== null
   const rows = ready ? (data.items ?? []).filter(item => [item.id, item.kind, item.productId, item.productName, item.variantId, item.color].join(' ').toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR'))) : []
-  return <section aria-label="Tasarım ve baskı operasyonları">
-    <PrintProfiles products={products}/><p className="panel-notice">Kayıtlı tasarımlar ve fiziksel profil referansları ayrı yönetilir. Tasarımın üretim onayı, baskı render işi ve üretim dosyası indirmesi henüz tamamlanmadı.</p>
+  return <section aria-label="Tasarımlar ve sipariş bağlantıları">
+    <p className="panel-notice">Müşterilerin kaydettiği tasarımlar burada listelenir. Bir siparişe ait desen, kayıtlı yerleşim ve görseller ilgili siparişin “Sipariş tasarım detayı” alanında gösterilir.</p>
     <div className="order-filters"><label>Bu sayfada tasarım ara<input disabled={!ready} value={query} onChange={event => setQuery(event.target.value)} /></label><button disabled={!ready || !query} onClick={() => setQuery('')}>Aramayı temizle</button><button onClick={() => load()}>Yenile</button></div>
     {loading && <p role="status">Tasarım kayıtları yükleniyor…</p>}
     {error && <p role="alert">{error} <button onClick={() => load()}>Tekrar dene</button></p>}

@@ -11,7 +11,7 @@ export const navigationItems: readonly NavigationItem[] = [
   { view:'quotes', label:'Kurumsal teklifler', permission:'quotes.read', owner:'top', category:'Müşteriler', section:'Kurumsal' },
   { view:'pricing', label:'Fiyat ve kampanyalar', permission:'pricing.read', owner:'top', category:'Fiyat ve kampanyalar', section:'Fiyatlandırma' },
   { view:'content', label:'İçerik', permission:'content.read', owner:'top', category:'İçerik', section:'Mağaza içeriği' },
-  { view:'print', label:'Tasarım ve baskı', permission:'print.read', owner:'top', category:'Tasarım', section:'Üretim' },
+  { view:'print', label:'Tasarımlar', permission:'print.read', owner:'top', category:'Tasarım', section:'Sipariş tasarımları' },
   { view:'integrations', label:'Entegrasyon izleme', permission:'integration.read', owner:'top', category:'Entegrasyonlar', section:'Bağlantılar' },
   { view:'dashboard', label:'Operasyon özeti', permission:'reports.read', owner:'side', category:'Raporlar', section:'Operasyon ve takip' },
   { view:'settings', label:'Rol, ayar ve denetim', permission:'settings.read', owner:'top', category:'Ayarlar', section:'Yönetim' },

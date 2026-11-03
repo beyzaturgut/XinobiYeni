@@ -853,8 +853,8 @@
       "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
       "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
       "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
-      "done": "Panelde metadata, korumalı ham görsel, sipariş bağı ve KIS-01 profil/kalibrasyon ekranı var.",
-      "remaining": "SIP-TAS-01...09 planlandı; uygulama, sürüme bağlı dosya koruması, indirmeler ve kabul henüz yapılmadı.",
+      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı.",
+      "remaining": "SIP-TAS-02...09: sürüme bağlı dosya koruması, ürün kaynak görseli/giydirilmiş önizleme indirmeleri, yerleşim tamamlama, yetki/eski kayıt ve kabul açık.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
       "owner": "Admin/Web geliştirici + Backend + UX/QA",
@@ -1907,11 +1907,13 @@
         "id": "SIP-TAS-01",
         "title": "Baskı alanını sipariş tasarım detayına sadeleştir",
         "parents": "KIS-07",
-        "status": "Planlandı - uygulanmadı",
-        "remaining": "Panelde sipariş/satır odaklı bir tasarım detayı planla. Fiziksel profil/kalibrasyon, üretime gönder, üretim onayı ve hazır/red üretim durumlarını bu ekrandan çıkar. Mevcut sipariş, ödeme ve kargo eylemleri ayrı kalır; eski profil/veri silme işi eklenmez.",
+        "status": "Uygulandı - kabul açık",
+        "remaining": "Rol/PM ekran kabulü. Dosya koruma/indirmeler SIP-TAS-02/04/05/06, yerleşim tamamlama SIP-TAS-03, yetki SIP-TAS-07, eski kayıtlar SIP-TAS-08, kabul SIP-TAS-09.",
         "accept": "Ürün/SKU/renk, desen, kayıtlı yerleşim ve üç görsel dosyası bir arada; üretime hazırlama eylemi yok.",
         "deps": "Yok",
-        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+        "done": "03.11: Sipariş detayında satır bazlı sipariş tasarım detayı (ürün/tasarım/yerleşim + ayrı üç görsel kartı); ham desen önizleme/indirme yalnız dosya doğrulanınca; ürün kaynak görseli ve giydirilmiş önizleme için açık “İndirme hazır değil”; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. API/veri değişmedi.",
+        "evidence": "test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md"
       },
       {
         "id": "SIP-TAS-02",

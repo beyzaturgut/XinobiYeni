@@ -30,7 +30,7 @@ try {
     return data ? route.fulfill({ json: data }) : route.fulfill({ status: 503, json: { message: 'İzole UI testi: servis kullanılamıyor.' } })
   })
   const base=process.env.ADMIN_UI_URL || 'http://127.0.0.1:5174/'
-  const headings={customers:'Müşteri yönetimi',dashboard:'Operasyon özeti',orders:'Sipariş yönetimi',catalog:'Katalog ve varyantlar',inventory:'Stok ve depo yönetimi',surfaces:'Ürün yüzeyi inceleme',reviews:'Ürün değerlendirmeleri',pricing:'Fiyat ve kampanya yönetimi',content:'İçerik yönetimi',print:'Tasarım ve baskı operasyonları',integrations:'Entegrasyon izleme',settings:'Rol, ayar ve denetim',ai:'AI yönetimi',quotes:'Kurumsal teklif yönetimi',notifications:'Bildirim kayıtları',audit:'Denetim kaydı'}
+  const headings={customers:'Müşteri yönetimi',dashboard:'Operasyon özeti',orders:'Sipariş yönetimi',catalog:'Katalog ve varyantlar',inventory:'Stok ve depo yönetimi',surfaces:'Ürün yüzeyi inceleme',reviews:'Ürün değerlendirmeleri',pricing:'Fiyat ve kampanya yönetimi',content:'İçerik yönetimi',print:'Tasarımlar ve sipariş bağlantıları',integrations:'Entegrasyon izleme',settings:'Rol, ayar ve denetim',ai:'AI yönetimi',quotes:'Kurumsal teklif yönetimi',notifications:'Bildirim kayıtları',audit:'Denetim kaydı'}
   const sideOrder=sideNavigation.flatMap(group=>group.items.map(item=>item.view))
   assert.deepEqual([...sideOrder].sort(),['audit','dashboard','notifications'])
   const topViews=topNavigation.flatMap(group=>group.links.map(item=>item.view))

@@ -8,7 +8,7 @@ const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/',output=process.env
 const pattern='<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#f4efe6"/><circle cx="70" cy="80" r="44" fill="#d1495b"/><rect x="120" y="36" width="88" height="88" fill="#00798c" transform="rotate(12 164 80)"/></svg>'
 const money={amountMinor:125000,currency:'TRY'}
 const placement={sourceWidth:1024,sourceHeight:1536,surfaceVersion:'c'.repeat(64),x:512.5,y:700,scale:.85,rotation:-12,curvatureStrength:0,mode:'artwork',fillMask:false,bodyAdjustments:{'upper-body':{x:4,y:null,scale:1.1,rotation:0}}}
-const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:2,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE'})}})
+const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:1,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE'})}})
 const order=(id,legacy=false)=>({accountId:'synthetic',customerName:'Synthetic müşteri',customerEmail:'synthetic@example.invalid',order:{id,number:'SYN-'+id,createdAt:'2026-11-03T09:00:00Z',status:'received',address:{title:'Ev',fullName:'Synthetic',phone:'+905321234567',line:'Synthetic adres',district:'Test',city:'Test'},lines:[line(id,legacy),{productId:'P2',variantId:'V2',name:'Kişiselleştirilmemiş ürün',color:'Siyah',quantity:1,unitPrice:money,lineTotal:money}],total:money,history:[],requests:[]}})
 const gate=()=>{let release;const promise=new Promise(resolve=>{release=resolve});return{promise,release}}
 async function fixture({width=1440,design}={}){
@@ -36,8 +36,8 @@ try{
   const product=detail.getByRole('region',{name:'Sipariş ve ürün bilgileri'})
   for(const text of ['SYN-NEW','SYN-SKU-BLUE','V-SYN-BLUE','Mavi','AI tasarımı','CFG-SYN'])await product.getByText(text,{exact:true}).waitFor()
   const layout=detail.getByRole('region',{name:'Kayıtlı yerleşim'})
-  await layout.getByText('Yatay konum (px)',{exact:true}).waitFor();await layout.getByText('upper-body',{exact:true}).waitFor()
-  assert.equal(await layout.getByText('Bu siparişte kaydedilmemiş',{exact:true}).count(),1,'The unsaved body Y value is shown as missing, not zero')
+  await layout.getByText('Yatay konum (desen merkezi)',{exact:true}).waitFor();await layout.getByText('Üst gövde',{exact:true}).waitFor()
+  assert.equal(await layout.locator('dd.order-design-missing').count(),1,'The unsaved body Y value is shown as missing, not zero')
   const raw=card(detail,'Ham desen');await raw.getByRole('img').evaluate(image=>image.decode())
   assert.match(await raw.getByRole('link',{name:'Ham deseni indir'}).getAttribute('href'),/\/orders\/NEW\/lines\/0\/design\?download=true$/)
   for(const name of ['Ürün kaynak görseli','Giydirilmiş önizleme']){

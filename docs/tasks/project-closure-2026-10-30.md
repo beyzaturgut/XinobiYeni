@@ -1171,7 +1171,9 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **SIP-TAS-02 (03.11):** siparişe bağlı üç dosya referansı (SHA-256/tür/bayt), doğrulanmış ürün kaynak görseli kopyası ve okuma bütünlüğü ([TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md)); SQL kabulü açık.
 
-**Yapılmadı / açık kalan:** SIP-TAS-03...09: ürün kaynak görseli ve giydirilmiş önizleme indirmeleri, yerleşim tamamlama, yetki/eski kayıt ve kabul; SIP-TAS-01 rol/PM ekran kabulü.
+**SIP-TAS-03 (03.11):** kayıtlı yerleşimin salt okunur, birimli sunumu ([TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)).
+
+**Yapılmadı / açık kalan:** SIP-TAS-04...09: ürün kaynak görseli ve giydirilmiş önizleme indirmeleri, yetki/eski kayıt ve kabul; SIP-TAS-01 rol/PM ekran kabulü.
 
 **Kapanış kanıtı:** Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.
 
@@ -1206,7 +1208,7 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 | KIS-01-SQL-01 | KIS-03, QA-02 | Revize - planlandı | SIP-TAS-02/09: sipariş yerleşimi ve üç görsel dosyasının sürüm/kalıcılık bağı; fiziksel profil kalibrasyonu değil. |
 | SIP-TAS-01 | KIS-07 | Uygulandı - kabul açık ([TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)) | [Baskı alanını sipariş tasarım detayına sadeleştir](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-02 | KIS-03, KIS-07 | Uygulandı - SQL kabulü açık ([TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md)) | [Siparişe bağlı görsel ve revizyon paketini tanımla](order-design-detail-scope-2026-11-03.md) |
-| SIP-TAS-03 | KIS-03, KIS-07 | Planlandı - uygulanmadı | [Müşterinin kaydettiği yerleşim detaylarını göster](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-03 | KIS-03, KIS-07 | Uygulandı - kabul açık ([TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)) | [Müşterinin kaydettiği yerleşim detaylarını göster](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-04 | KIS-07 | Planlandı - uygulanmadı | [Ham deseni ayrı indir](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-05 | KIS-07 | Planlandı - uygulanmadı | [Maskelemede kullanılan ürün görselini ayrı indir](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-06 | KIS-07 | Planlandı - uygulanmadı | [Giydirilmiş görseli göster ve indir](order-design-detail-scope-2026-11-03.md) |

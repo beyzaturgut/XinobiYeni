@@ -28,7 +28,7 @@ try{
  await list.getByRole('button',{name:'UX-AI detayını aç'}).click();
  const detail=page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'});
  await detail.getByRole('region',{name:'Sipariş ve ürün bilgileri'}).getByText('TEST-SKU',{exact:true}).waitFor();
- await detail.getByRole('region',{name:'Kayıtlı yerleşim'}).getByText('Yatay konum (px)',{exact:true}).waitFor();
+ await detail.getByRole('region',{name:'Kayıtlı yerleşim'}).getByText('Yatay konum (desen merkezi)',{exact:true}).waitFor();
  const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Ham deseni indir',exact:true}).click();
  assert.equal((await downloadPromise).suggestedFilename(),'xinobi-AI-0-source.png');
  await page.getByRole('button',{name:'Sipariş detayını kapat'}).click();

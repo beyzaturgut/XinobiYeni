@@ -853,8 +853,8 @@
       "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
       "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
       "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
-      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar.",
-      "remaining": "SIP-TAS-03...09: ürün kaynak görseli/giydirilmiş önizleme indirmeleri, yerleşim tamamlama, yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
+      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu.",
+      "remaining": "SIP-TAS-04...09: ürün kaynak görseli/giydirilmiş önizleme indirmeleri, yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
       "owner": "Admin/Web geliştirici + Backend + UX/QA",
@@ -1931,11 +1931,13 @@
         "id": "SIP-TAS-03",
         "title": "Müşterinin kaydettiği yerleşim detaylarını göster",
         "parents": "KIS-03, KIS-07",
-        "status": "Planlandı - uygulanmadı",
-        "remaining": "Kayıtlı şemadan kaynak tuval boyutu, yatay/dikey konum, ölçek, döndürme, yerleşim modu, kavis ve varsa gövde/bölge ayarlarını okunabilir sun. Birimleri ve seçili sürümü belirt. Gerçekte saklanmayan mm/DPI, fiziksel ölçü veya üretim uygunluğu hesaplama.",
+        "status": "Uygulandı - kabul açık",
+        "remaining": "Rol/PM ve ekran okuyucu kabulü; gerçek sipariş verisiyle kabul SIP-TAS-09.",
         "accept": "Ekran editörde kaydedilen aynı revizyonu gösteriyor; uygulanmayan/eksik alanlar sıfır gibi sunulmuyor.",
         "deps": "SIP-TAS-02",
-        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+        "done": "03.11: Admin sipariş detayında kayıtlı yerleşim salt okunur; birim/anlam etiketleri, tuvale göre gösterim yüzdesi, gövde/bölge ayarları, revizyon ve desen SHA-256 bağı, gerçek sıfır/eksik ayrımı, desteklenmeyen/eski şema açıklaması. Fixture 320/390/1440 normal ve %200 PASS.",
+        "evidence": "test/2026-11-03/TST-215-sip-tas-03-order-placement.md"
       },
       {
         "id": "SIP-TAS-04",

@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-215 | 03.11.2026 | SIP-TAS-03 admin lint/TypeScript/derleme | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |
+| TST-216 | 03.11.2026 | Kayıtlı yerleşim Chrome fixture (revizyon, tuval, sıfır/eksik, bölge, şema, uzun metin, 320/390/1440 %200) | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |
+| TST-217 | 03.11.2026 | Sipariş/tasarım admin regresyonları (7 dosya) | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |
+| TST-218 | 03.11.2026 | Kayıtlı yerleşim temsilî ekran görüntüleri | PASS; sentetik veri | ADMIN / VISUAL | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |
 | TST-211 | 03.11.2026 | SIP-TAS-02 siparişe bağlı dosya/revizyon fixture testleri (5 yeni + SavedDesign) | PASS 12/12 | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |
 | TST-212 | 03.11.2026 | API tam test paketi | PASS 502, 29 atlandı | API / ISOLATED | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |
 | TST-213 | 03.11.2026 | Sözleşme üretimi/kontrolü + admin/web/Flutter tüketici kontrolleri | PASS | CONTRACT / STATIC | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |

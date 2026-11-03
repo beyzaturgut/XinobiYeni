@@ -16,3 +16,7 @@
 /* The order line grid and note field must not take the cards' or textarea's intrinsic width at 200 % text. */
 .order-dialog .order-lines{grid-template-columns:minmax(0,1fr)}
 .order-dialog label>textarea{box-sizing:border-box;width:100%;min-width:0}
+.order-placement-note{display:block;margin-top:2px;color:#555;font-size:12px}
+.order-placement-owner{font-weight:600}
+.order-placement-raw{margin:0;padding:10px;background:#f6f6f6;border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.order-design-detail [role=status]{color:#1d5b2c}

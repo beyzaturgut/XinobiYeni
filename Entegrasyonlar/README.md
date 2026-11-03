@@ -4,7 +4,7 @@
 
 | Klasör | Kapsam / mevcut kayıt |
 | --- | --- |
-| [Sürat Kargo](01-Surat-Kargo/README.md) | Adaptör + kalıcı gönderi/admin API eklendi; ekran/etiket/takip ve gerçek kabul açık. |
+| [Sürat Kargo](01-Surat-Kargo/README.md) | Test akışı: adaptör, admin, test etiket, takip ve web/mobil okuma uygulandı; gerçek erişim 403 ve canlı kabul açık. |
 | [Mikro muhasebe / ERP](02-Mikro/README.md) | Planlandı; gerçek adaptör ve işletim kabulü açık. |
 | [Trendyol](03-Trendyol/README.md) | Gerçek adaptör ve kanal kabulü açık. |
 | [Hepsiburada](04-Hepsiburada/README.md) | Gerçek adaptör ve kanal kabulü açık. |

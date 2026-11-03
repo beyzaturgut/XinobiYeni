@@ -4,6 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
 import {canCancel,cancelOrder,localPhone,orderOptions,orderStatusText,orderSteps,pendingRequest,refreshOrders,requestStatusText,returnable,useDemoCommerce,type CustomerOrder,type OrderOptions} from '../../../lib/demo-commerce';
 import {money} from '../../../lib/commerce';
+import SuratOrderTracking from '../../../components/surat-order-tracking';
 import OrderProductThumbnail from '../../../components/order-product-thumbnail';
 import styles from './orders.module.css';
 
@@ -42,6 +43,7 @@ function OrderCard({order,options,focused,onCancel}:{order:CustomerOrder;options
   return <section ref={ref} className={styles.orderCard} data-focused={focused} aria-labelledby={`order-${order.id}`}>
     <header><div><h2 id={`order-${order.id}`}>{order.number}</h2><p>{date(order.createdAt)} · <b data-state={order.status}>{orderStatusText(order.status)}</b></p></div><strong>{money(order.total.amountMinor)}</strong></header>
     <Timeline order={order}/>
+    <SuratOrderTracking key={order.id} orderId={order.id}/>
     {order.shipment&&<div className={styles.shipment}><div><small>Kargo firması</small><strong>{order.shipment.carrier}</strong></div><div><small>Takip numarası</small><strong>{order.shipment.trackingNumber}</strong></div><div><small>{order.shipment.deliveredAt?'Teslim':'Kargoya verildi'}</small><strong>{date(order.shipment.deliveredAt??order.shipment.shippedAt)}</strong></div>{order.shipment.trackingUrl?<a href={order.shipment.trackingUrl} target="_blank" rel="noopener noreferrer">Kargom nerede? ↗</a>:<span>Takip numarasıyla kargo firmasının sitesinden sorgulayabilirsin.</span>}</div>}
     {order.requests?.length?<ul className={styles.requests}>{order.requests.map(request=><li key={request.id} data-state={request.status}><strong>{requestStatusText(request)}</strong><span>{request.reason} · {date(request.createdAt)}</span>{request.resolution&&<small>Mağaza notu: {request.resolution}</small>}</li>)}</ul>:null}
     <ul className={styles.orderLines}>{order.lines.map((line,index)=><li key={index}><OrderProductThumbnail key={`${order.id}:${index}:${line.personalization?.configurationId}:${line.personalization?.configurationRevision}`} orderId={order.id} index={index} line={line}/><div><strong>{line.name}</strong><small>{line.color} · {line.quantity} × {money(line.unitPrice.amountMinor)}</small>{line.personalization&&<small>Kişiselleştirilmiş · Tasarım: {line.personalization.name}</small>}</div><span>{money(line.lineTotal.amountMinor)}</span></li>)}</ul>

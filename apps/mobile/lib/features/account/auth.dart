@@ -44,6 +44,7 @@ abstract interface class AccountRepository {
   Future<void> addFavorite(String accessToken, String productId);
   Future<void> deleteFavorite(String accessToken, String productId);
   Future<List<CustomerOrder>> orders(String accessToken);
+  Future<SuratTrackingView?> suratTracking(String accessToken, String orderId);
   Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order);
   Future<CustomerOrder> order(String accessToken, String id);
   Future<OrderOptions> orderOptions(String accessToken);
@@ -181,6 +182,15 @@ class ApiAccountRepository implements AccountRepository {
 
   @override
   Future<List<CustomerOrder>> orders(String accessToken) async => (await _call(() => _api.listMyOrders(headers: _bearer(accessToken)))).toList();
+
+  @override
+  Future<SuratTrackingView?> suratTracking(String accessToken, String orderId) async {
+    try {
+      return (await _api.getMySuratTracking(id: orderId, headers: _bearer(accessToken))).data;
+    } on DioException catch (error) {
+      return _call<Never>(() => Future.error(error));
+    }
+  }
 
   @override
   Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order) => _call(() => _api.placeMyOrder(placeOrder: order, headers: _bearer(accessToken)));

@@ -115,6 +115,7 @@ import 'package:xinobi_api_client/src/model/quote_message.dart';
 import 'package:xinobi_api_client/src/model/quote_offer.dart';
 import 'package:xinobi_api_client/src/model/quote_options.dart';
 import 'package:xinobi_api_client/src/model/readiness_response.dart';
+import 'package:xinobi_api_client/src/model/reconcile_shipment.dart';
 import 'package:xinobi_api_client/src/model/refresh_session.dart';
 import 'package:xinobi_api_client/src/model/register_account.dart';
 import 'package:xinobi_api_client/src/model/register_device.dart';
@@ -135,7 +136,10 @@ import 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
 import 'package:xinobi_api_client/src/model/start_email_change.dart';
 import 'package:xinobi_api_client/src/model/start_password_reset.dart';
 import 'package:xinobi_api_client/src/model/submit_review.dart';
+import 'package:xinobi_api_client/src/model/surat_connection_status.dart';
 import 'package:xinobi_api_client/src/model/surat_shipment_view.dart';
+import 'package:xinobi_api_client/src/model/surat_tracking_item.dart';
+import 'package:xinobi_api_client/src/model/surat_tracking_view.dart';
 import 'package:xinobi_api_client/src/model/track_quote_message.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
@@ -253,6 +257,7 @@ part 'serializers.g.dart';
   QuoteOffer,
   QuoteOptions,
   ReadinessResponse,
+  ReconcileShipment,
   RefreshSession,
   RegisterAccount,
   RegisterDevice,
@@ -273,7 +278,10 @@ part 'serializers.g.dart';
   StartEmailChange,
   StartPasswordReset,
   SubmitReview,
+  SuratConnectionStatus,
   SuratShipmentView,
+  SuratTrackingItem,
+  SuratTrackingView,
   TrackQuoteMessage,
   UpdateMyAccount,
   VariantDetail,
@@ -343,6 +351,10 @@ Serializers serializers = (_$serializers.toBuilder()
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(OrderEvent)]),
         () => ListBuilder<OrderEvent>(),
+      )
+      ..addBuilderFactory(
+        const FullType(BuiltList, [FullType(SuratTrackingItem)]),
+        () => ListBuilder<SuratTrackingItem>(),
       )
       ..addBuilderFactory(
         const FullType(BuiltList, [FullType(MyDesignConfiguration)]),

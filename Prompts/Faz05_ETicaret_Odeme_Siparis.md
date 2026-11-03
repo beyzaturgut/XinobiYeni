@@ -1,5 +1,9 @@
 # Faz05 — B2C satış, müşteri hesabı ve sipariş sonrası işlemler
 
+## 03.11.2026 - Sürat sipariş ekranı, etiket ve takip teslimi
+
+KRG-SUR-01: admin sipariş/entegrasyon ekranı, test Code128 etiketi, kanıtlı uzlaştırma ve kontrollü aynı-ref denemesi, lease/backoff takip işi, müşteri sahiplik kontrollü DTO ve web/Flutter gösterimi eklendi. Ticari sipariş statüsü/ödeme otomatik değiştirilmez. [Kurulum ve kabul kapıları](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Salt okunur gerçek test erişimi HTTP 403; nedeni sağlayıcı teyidi bekliyor. [TST-245](../test/2026-11-03/TST-245-surat-shipment-delivery.md): 38 odaklı; tam API 552 PASS / 29 SKIP / 0 FAIL; admin 20/20, Flutter 283, web 2/2. Gerçek gönderi/Production açılışı/deploy yok. COD/pazaryeri/tarife ve gerçek SQL/cihaz/barkod kabulleri ayrı açık; TIC-08 tamamlandı sayılmaz.
+
 ## 03.11.2026 - Sürat kalıcı gönderi ve admin API
 
 Ortak FeatureDocuments transaction/kilidiyle kalıcı referans, attempt, paket/adres kopyası ve sonuç kaydı; çift istek/yeniden başlatmada write tekrarını engelleme eklendi. GET/POST admin orders/{id}/surat-shipment, sunucu orders.read/write kontrolüyle açık. Canlı mod uygunluk doğrulanmadığından engelli; sipariş statüsü değişmez. Admin ekranı, uzlaştırma, etiket ve polling açık. [TST-244](../test/2026-11-03/TST-244-surat-persistent-admin-api.md): 26 odaklı PASS; tam API 540 PASS / 29 SKIP / 0 FAIL; TS/Dart PASS. [Kurulum/sınırlar](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md).
@@ -57,7 +61,7 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 | [TIC-05](../docs/tasks/project-closure-2026-10-30.md#tic-05) - Ödeme webhook ve mutabakatını kur | Yapılmadı - kapanış açık | Ödeme webhook imzası, olay tekilleştirme, sıra dışı bildirim ve tahsilat-sipariş mutabakatı uçtan uca eksik. |
 | [TIC-06](../docs/tasks/project-closure-2026-10-30.md#tic-06) - Havale ve ödeme bekleyen siparişi tamamla | Yapılmadı - kapanış açık | Havale referansı, son tarih, finans yetkisi, tutar kontrolü ve süresi dolan rezervasyonu bırakma uygulanmalı. |
 | [TIC-07](../docs/tasks/project-closure-2026-10-30.md#tic-07) - İptal ve iadeyi gerçek geri ödemeye bağla | Yapılmadı - kapanış açık | Tam/kısmi gerçek para iadesi, sağlayıcı işlem kimliği, fazla iade önleme ve stokla uzlaştırma tamamlanmadı. |
-| [TIC-08](../docs/tasks/project-closure-2026-10-30.md#tic-08) - Kargo fiyatı ve gönderiyi entegre et | Yapılmadı - kapanış açık | Gerçek taşıyıcı fiyatı, desi/bölge kuralları, etiket/gönderi, takip ve yinelenen gönderi kontrolü kabul edilmedi. |
+| [TIC-08](../docs/tasks/project-closure-2026-10-30.md#tic-08) - Kargo fiyatı ve gönderiyi entegre et | Kısmi - canlı kabul açık | Sürat test kodu/admin/test etiketi/takip ve tekrar koruması uygulandı. Gerçek erişim 403; tarife/bölge, gerçek gönderi/SQL/etiket kabulü ve canlı uygunluk açık. |
 | [WEB-03](../docs/tasks/project-closure-2026-10-30.md#web-03) - Gerçek checkout ve sonuç ekranını tamamla | Yapılmadı - kapanış açık | Gerçek ödeme durumları, fatura/ücret özeti ve sağlayıcı dönüşlerinin checkout/quote üzerinden tamamlanması bekliyor. |
 | [WEB-04](../docs/tasks/project-closure-2026-10-30.md#web-04) - Hesap yaşam döngüsünü gerçek e-postayla kabul et | Yapılmadı - kapanış açık | İzinli gerçek alıcıyla e-posta teslimi, çoklu sekme ve gerçek ortam uçtan uca hesap kabulü bu task için kapanmadı. |
 | [WEB-05](../docs/tasks/project-closure-2026-10-30.md#web-05) - Satış sonrası ve tasarım ekranlarını doğrula | Yapılmadı - kapanış açık | Gerçek hesap ve SQL ile satış sonrası uçtan uca kabul; gerçek geri ödeme durumunun doğru gösterimi açık. |

@@ -1868,6 +1868,46 @@
         }
       }
     },
+    "/api/v1/me/orders/{id}/surat-tracking": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "operationId": "GetMySuratTracking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratTrackingView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -4678,6 +4718,36 @@
         }
       }
     },
+    "/api/v1/admin/shipping/surat/status": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "GetAdminSuratConnectionStatus",
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratConnectionStatus"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/admin/orders/{id}/surat-shipment": {
       "get": {
         "tags": [
@@ -4737,6 +4807,164 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CreateSuratShipment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratShipmentView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orders/{id}/surat-shipment/label": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "GetAdminSuratLabel",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orders/{id}/surat-shipment/tracking": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "GetAdminSuratTracking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratTrackingView"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "RefreshAdminSuratTracking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuratTrackingView"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orders/{id}/surat-shipment/reconcile": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "operationId": "ReconcileAdminSuratShipment",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReconcileShipment"
               }
             }
           },
@@ -8961,6 +9189,21 @@
           }
         }
       },
+      "ReconcileShipment": {
+        "required": [
+          "evidence"
+        ],
+        "type": "object",
+        "properties": {
+          "evidence": {
+            "type": "string"
+          },
+          "resolution": {
+            "type": "string",
+            "default": "registered"
+          }
+        }
+      },
       "RefreshSession": {
         "required": [
           "refreshToken"
@@ -9366,6 +9609,33 @@
           }
         }
       },
+      "SuratConnectionStatus": {
+        "required": [
+          "enabled",
+          "mode",
+          "accountConfigured",
+          "pollingEnabled",
+          "liveOperationsAllowed"
+        ],
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "accountConfigured": {
+            "type": "boolean"
+          },
+          "pollingEnabled": {
+            "type": "boolean"
+          },
+          "liveOperationsAllowed": {
+            "type": "boolean"
+          }
+        }
+      },
       "SuratShipmentView": {
         "required": [
           "reference",
@@ -9395,6 +9665,99 @@
           },
           "message": {
             "type": "string"
+          }
+        }
+      },
+      "SuratTrackingItem": {
+        "required": [
+          "trackingNumber",
+          "statusCode",
+          "state",
+          "providerText",
+          "lastMovementRaw",
+          "deliveredDateRaw"
+        ],
+        "type": "object",
+        "properties": {
+          "trackingNumber": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "statusCode": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "state": {
+            "type": "string"
+          },
+          "providerText": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "lastMovementRaw": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "deliveredDateRaw": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "SuratTrackingView": {
+        "required": [
+          "reference",
+          "registrationState",
+          "environment",
+          "result",
+          "lastAttempt",
+          "lastSuccess",
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "registrationState": {
+            "type": "string"
+          },
+          "environment": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string"
+          },
+          "lastAttempt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "lastSuccess": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuratTrackingItem"
+            }
           }
         }
       },

@@ -108,6 +108,7 @@ doc/QuoteOffer.md
 doc/QuoteOptions.md
 doc/QuotesApi.md
 doc/ReadinessResponse.md
+doc/ReconcileShipment.md
 doc/RefreshSession.md
 doc/RegisterAccount.md
 doc/RegisterDevice.md
@@ -128,7 +129,10 @@ doc/StartAdminPasswordReset.md
 doc/StartEmailChange.md
 doc/StartPasswordReset.md
 doc/SubmitReview.md
+doc/SuratConnectionStatus.md
 doc/SuratShipmentView.md
+doc/SuratTrackingItem.md
+doc/SuratTrackingView.md
 doc/SystemApi.md
 doc/TrackQuoteMessage.md
 doc/UpdateMyAccount.md
@@ -261,6 +265,7 @@ lib/src/model/quote_message.dart
 lib/src/model/quote_offer.dart
 lib/src/model/quote_options.dart
 lib/src/model/readiness_response.dart
+lib/src/model/reconcile_shipment.dart
 lib/src/model/refresh_session.dart
 lib/src/model/register_account.dart
 lib/src/model/register_device.dart
@@ -281,7 +286,10 @@ lib/src/model/start_admin_password_reset.dart
 lib/src/model/start_email_change.dart
 lib/src/model/start_password_reset.dart
 lib/src/model/submit_review.dart
+lib/src/model/surat_connection_status.dart
 lib/src/model/surat_shipment_view.dart
+lib/src/model/surat_tracking_item.dart
+lib/src/model/surat_tracking_view.dart
 lib/src/model/track_quote_message.dart
 lib/src/model/update_my_account.dart
 lib/src/model/variant_detail.dart

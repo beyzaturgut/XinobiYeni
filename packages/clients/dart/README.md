@@ -83,6 +83,7 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**getMyDesignImage**](doc/AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrder**](doc/AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [*AccountApi*](doc/AccountApi.md) | [**getMyOrderLineDesign**](doc/AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
+[*AccountApi*](doc/AccountApi.md) | [**getMySuratTracking**](doc/AccountApi.md#getmysurattracking) | **GET** /api/v1/me/orders/{id}/surat-tracking |
 [*AccountApi*](doc/AccountApi.md) | [**getOrderOptions**](doc/AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [*AccountApi*](doc/AccountApi.md) | [**listMyAddresses**](doc/AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [*AccountApi*](doc/AccountApi.md) | [**listMyDesignConfigurations**](doc/AccountApi.md#listmydesignconfigurations) | **GET** /api/v1/me/design-configurations |
@@ -136,7 +137,10 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**getAdminOrder**](doc/AdminApi.md#getadminorder) | **GET** /api/v1/admin/orders/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminReportSummary**](doc/AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSession**](doc/AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminSuratConnectionStatus**](doc/AdminApi.md#getadminsuratconnectionstatus) | **GET** /api/v1/admin/shipping/surat/status |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminSuratLabel**](doc/AdminApi.md#getadminsuratlabel) | **GET** /api/v1/admin/orders/{id}/surat-shipment/label |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminSuratShipment**](doc/AdminApi.md#getadminsuratshipment) | **GET** /api/v1/admin/orders/{id}/surat-shipment |
+[*AdminApi*](doc/AdminApi.md) | [**getAdminSuratTracking**](doc/AdminApi.md#getadminsurattracking) | **GET** /api/v1/admin/orders/{id}/surat-shipment/tracking |
 [*AdminApi*](doc/AdminApi.md) | [**getPermissionCatalog**](doc/AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [*AdminApi*](doc/AdminApi.md) | [**getPrintProfileRevision**](doc/AdminApi.md#getprintprofilerevision) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision} |
 [*AdminApi*](doc/AdminApi.md) | [**listAdminAudit**](doc/AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
@@ -145,6 +149,8 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**listAdminDesigns**](doc/AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
 [*AdminApi*](doc/AdminApi.md) | [**listPrintProfiles**](doc/AdminApi.md#listprintprofiles) | **GET** /api/v1/admin/print-profiles |
 [*AdminApi*](doc/AdminApi.md) | [**measurePrintPlacement**](doc/AdminApi.md#measureprintplacement) | **POST** /api/v1/admin/print-profiles/{id}/revisions/{revision}/measure |
+[*AdminApi*](doc/AdminApi.md) | [**reconcileAdminSuratShipment**](doc/AdminApi.md#reconcileadminsuratshipment) | **POST** /api/v1/admin/orders/{id}/surat-shipment/reconcile |
+[*AdminApi*](doc/AdminApi.md) | [**refreshAdminSuratTracking**](doc/AdminApi.md#refreshadminsurattracking) | **POST** /api/v1/admin/orders/{id}/surat-shipment/tracking |
 [*AdminApi*](doc/AdminApi.md) | [**retirePrintProfile**](doc/AdminApi.md#retireprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/retire |
 [*AdminApi*](doc/AdminApi.md) | [**savePrintProfileDraft**](doc/AdminApi.md#saveprintprofiledraft) | **POST** /api/v1/admin/print-profiles |
 [*AssistantApi*](doc/AssistantApi.md) | [**getAssistantConfig**](doc/AssistantApi.md#getassistantconfig) | **GET** /api/v1/assistant/config |
@@ -277,6 +283,7 @@ Class | Method | HTTP request | Description
  - [QuoteOffer](doc/QuoteOffer.md)
  - [QuoteOptions](doc/QuoteOptions.md)
  - [ReadinessResponse](doc/ReadinessResponse.md)
+ - [ReconcileShipment](doc/ReconcileShipment.md)
  - [RefreshSession](doc/RefreshSession.md)
  - [RegisterAccount](doc/RegisterAccount.md)
  - [RegisterDevice](doc/RegisterDevice.md)
@@ -297,7 +304,10 @@ Class | Method | HTTP request | Description
  - [StartEmailChange](doc/StartEmailChange.md)
  - [StartPasswordReset](doc/StartPasswordReset.md)
  - [SubmitReview](doc/SubmitReview.md)
+ - [SuratConnectionStatus](doc/SuratConnectionStatus.md)
  - [SuratShipmentView](doc/SuratShipmentView.md)
+ - [SuratTrackingItem](doc/SuratTrackingItem.md)
+ - [SuratTrackingView](doc/SuratTrackingView.md)
  - [TrackQuoteMessage](doc/TrackQuoteMessage.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)

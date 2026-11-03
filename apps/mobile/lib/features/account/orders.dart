@@ -20,6 +20,51 @@ final ordersProvider = FutureProvider.autoDispose<List<CustomerOrder>>((ref) asy
   return await ref.read(authProvider.notifier).withSession((repository, token) => repository.orders(token)) ?? const [];
 });
 
+final suratTrackingProvider = FutureProvider.autoDispose.family<SuratTrackingView?, String>((ref, orderId) async {
+  if (ref.watch(authProvider) is! SignedIn) return null;
+  final result = await ref.read(authProvider.notifier).withSession((repository, token) async => (data: await repository.suratTracking(token, orderId),));
+  return result?.data;
+});
+
+class SuratOrderTracking extends ConsumerWidget {
+  const SuratOrderTracking({super.key, required this.orderId});
+  final String orderId;
+  static String stateText(String state) => switch (state) {
+    'awaiting_acceptance' => 'Şube kabulü bekleniyor',
+    'in_transit' => 'Yolda', 'delivery_branch' => 'Teslimat şubesinde',
+    'out_for_delivery' => 'Dağıtımda', 'delivered' => 'Teslim edildi',
+    'redirecting' => 'Yönlendirmede', 'return_in_progress' => 'İade sürecinde',
+    'return_delivered' => 'İade teslim alındı', _ => 'Kargo durumu teyit ediliyor',
+  };
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final result = ref.watch(suratTrackingProvider(orderId));
+    final text = Theme.of(context).textTheme;
+    return result.when(
+      loading: () => const Padding(padding: EdgeInsets.all(12), child: Text('Kargo takip bilgileri yükleniyor…')),
+      error: (error, stack) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text('Kargo takip bilgileri şu anda alınamıyor.'),
+        TextButton(onPressed: () => ref.invalidate(suratTrackingProvider(orderId)), child: const Text('Takibi tekrar dene')),
+      ]),
+      data: (data) => data == null ? const SizedBox.shrink() : Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Semantics(header: true, child: Text('Sürat Kargo takibi', style: text.titleMedium)),
+          if (data.result == 'unavailable') const Text('Takip servisine ulaşılamadı. Son alınan bilgi gösteriliyor.'),
+          if (data.result == 'not_checked') const Text('Takip bilgisi henüz alınmadı.'),
+          if (data.result == 'awaiting_acceptance') Text(data.items.isEmpty ? 'Şube kabulü veya yeni hareket bekleniyor.' : 'Son sorguda hareket dönmedi; önceki kayıt gösteriliyor.'),
+          if (data.lastSuccess != null) Text('Son güncelleme: ${orderDate(data.lastSuccess!)}'),
+          for (final item in data.items) Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(stateText(item.state)),
+            if (item.trackingNumber != null) SelectableText('Takip no: ${item.trackingNumber}'),
+          ])),
+          TextButton(onPressed: () => ref.invalidate(suratTrackingProvider(orderId)), child: const Text('Takip bilgisini yenile')),
+        ]),
+      ),
+    );
+  }
+}
+
 /// Cancel/return reasons, carriers and the return window, as the server applies them.
 final orderOptionsProvider = FutureProvider.autoDispose<OrderOptions?>((ref) async {
   if (ref.watch(authProvider) is! SignedIn) return null;
@@ -198,6 +243,7 @@ class OrderDetailScreen extends ConsumerWidget {
               Text('${orderDate(order.createdAt)} · ${orderStatusText(order.status)}', style: text.bodySmall),
               const SizedBox(height: 16),
               OrderSteps(order: order),
+              SuratOrderTracking(key: ValueKey(order.id), orderId: order.id),
               if (shipment != null) ...[
                 const SizedBox(height: 16),
                 Container(

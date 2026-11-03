@@ -168,6 +168,8 @@ builder.Services.AddHttpClient<Xinobi.Api.Shipping.ISuratKargoClient, Xinobi.Api
     .ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler { AllowAutoRedirect = false });
 builder.Services.AddSingleton<Xinobi.Api.Shipping.SuratShipmentStore>();
 builder.Services.AddTransient<Xinobi.Api.Shipping.SuratShipmentWorkflow>();
+builder.Services.AddTransient<Xinobi.Api.Shipping.SuratTrackingService>();
+builder.Services.AddHostedService<Xinobi.Api.Shipping.SuratTrackingWorker>();
 builder.Services.AddSingleton<AuditTrail>();
 builder.Services.AddSingleton<NotificationTexts>();
 builder.Services.AddSingleton<INotificationChannelSender, EmailNotificationSender>();

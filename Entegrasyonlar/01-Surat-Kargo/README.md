@@ -8,7 +8,7 @@ Gönderi oluşturma, Code128 etiket, şube kabulünden sonra takip. Tarife/check
 
 ## Mevcut kayıt
 
-Sunucu adaptörü, kalıcı gönderi/deneme ve yetkili admin API eklendi. Admin ekranı/etiket/takip işi ve gerçek kabul açık. Bu klasörün açılması entegrasyonun uygulandığı veya canlıda doğrulandığı anlamına gelmez.
+Adaptör, kalıcı deneme, admin sipariş/entegrasyon ekranı, test Code128 etiketi, uzlaştırma ve takip işi; web/Flutter güvenli takip okuması uygulandı. Gerçek test erişimi 403; canlı kabul kapıları açık. Bu klasörün açılması entegrasyonun uygulandığı veya canlıda doğrulandığı anlamına gelmez.
 
 ## Beklenen bilgiler ve kararlar
 
@@ -39,3 +39,7 @@ Parola, API anahtarı, gerçek müşteri verisi, gizli bilgi içeren ZIP/Postman
 ## İlk kod teslimi
 
 [Sunucu ayarları, desteklenen sözleşme ve kalan işler](SUNUCU-KURULUMU.md). Gerçek hesaplar kurulmadı; sağlayıcıya istek yapılmadı.
+
+## Güncel erişim ve kabul
+
+[Test ortamı salt okunur erişim kontrolü: HTTP 403](ERISIM-KONTROLU-2026-11-03.md). [Uygulanan akış ve canlı kabul kapıları](SUNUCU-KURULUMU.md). Gerçek gönderi oluşturulmadı; Production oluşturma ve canlı etiket kapalı.

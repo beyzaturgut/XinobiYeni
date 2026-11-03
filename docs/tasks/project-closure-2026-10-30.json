@@ -236,11 +236,12 @@
       "work": "Adres/bölge/desi kuralları, ücretsiz kargo eşiği, etiket/gönderi, takip güncellemesi ve taşıyıcı hatalarını bağla.",
       "accept": "Checkout ücreti siparişte sabit; tek sipariş için yinelenen gönderi önleniyor; gerçek test gönderisi takip ediliyor.",
       "deps": "KAR-04, TIC-02",
-      "done": "Adresler ve sipariş gönderi bilgisi için temel ekran/model bulunuyor.",
-      "remaining": "Gerçek taşıyıcı fiyatı, desi/bölge kuralları, etiket/gönderi, takip ve yinelenen gönderi kontrolü kabul edilmedi.",
-      "status": "Yapılmadı - kapanış açık",
+      "done": "03.11: Sürat adaptörü, kalıcı referans/attempt, admin ekranı, test Code128 etiketi, kanıtlı uzlaştırma/tekrar, lease/backoff takip ve web/Flutter müşteri okuması uygulandı; izole regresyonlar kayıtlı.",
+      "remaining": "Gerçek test erişimi HTTP 403; sağlayıcı/IP/hesap teyidi, gerçek SQL/sandbox/şube/okuyucu/cihaz kabulü, onaylı canlı etiket, ödeme/operasyon uygunluğu ve kargo tarife/bölge/checkout ücret kuralları açık. Production oluşturma kapalı.",
+      "status": "Kısmen yapıldı - kapanış açık",
       "phase": "Faz05",
-      "owner": "Backend + DBA + Web/Mobil + finans"
+      "owner": "Backend + DBA + Web/Mobil + finans",
+      "evidence": "test/2026-11-03/TST-245-surat-shipment-delivery.md"
     },
     {
       "id": "WEB-01",
@@ -2047,5 +2048,6 @@
       "SIP-TAS-09"
     ],
     "source_head": "e89c649"
-  }
+  },
+  "last_updated": "2026-11-03"
 }

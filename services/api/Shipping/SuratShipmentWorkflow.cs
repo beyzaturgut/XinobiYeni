@@ -11,6 +11,7 @@ public sealed record SuratShipmentView(string Reference, string State, DateTimeO
     public static SuratShipmentView From(SuratStoredShipment row) => new(row.Reference, row.State, row.StartedAt, row.CompletedAt, row.State switch
     {
         "registered" => "Gönderi kaydı alındı; şube kabulü bekleniyor. Sipariş henüz kargolandı sayılmaz.",
+        "confirmed_not_created" => "Sağlayıcı kaydın oluşmadığını kanıtla teyit etti. Aynı referansla kontrollü yeni deneme yapılabilir.",
         "submitting" => "Gönderim başlatıldı; sonuç kesinleşmeden tekrar gönderilmez. Kesinti yaşandıysa uzlaştırma gerekir.",
         _ => "Sonuç kesinleşmedi; ikinci gönderim engellendi. Sağlayıcıyla uzlaştırma gerekli."
     });
@@ -29,7 +30,7 @@ public sealed class SuratShipmentWorkflow(SuratShipmentStore store, ISuratKargoC
             order.Requests?.Any(r => r.Type == "cancel" && r.Status is OrderRequestStatuses.Requested or OrderRequestStatuses.Approved) == true)
             throw new ProblemException("order_not_shippable", "Siparişin mevcut durumu gönderi oluşturmaya uygun değil.", 409);
         var a = order.Address;
-        var draft = new SuratShipment(a.FullName, a.Line, a.City, a.District, a.Phone, "DRAFT", input.ParcelCount, input.ParcelDesi, input.ParcelKg, input.PaymentType);
+        var draft = new SuratShipment(a.FullName, a.Line, a.City, a.District, a.Phone.StartsWith("+90", StringComparison.Ordinal) ? a.Phone[1..] : a.Phone, "DRAFT", input.ParcelCount, input.ParcelDesi, input.ParcelKg, input.PaymentType);
         try { draft.Validate(); }
         catch (ArgumentException) { throw new ProblemException("invalid_shipment", "Alıcı adresi, telefon, paket ölçüleri ve kargo ödeme tipi kontrol edilmeli."); }
         token.ThrowIfCancellationRequested();

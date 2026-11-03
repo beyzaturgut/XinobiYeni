@@ -290,3 +290,6 @@ export async function saveConfigurationPreview(configuration:MyDesignConfigurati
 }
 
 export const refreshAccountSession=()=>loadSession();
+
+export type SuratTracking={result:string;lastSuccess?:string|null;items:{trackingNumber?:string|null;state:string}[]};
+export async function suratTracking(orderId:string){const value=await signedIn<SuratTracking>(`/me/orders/${encodeURIComponent(orderId)}/surat-tracking`);if(value&&(!Array.isArray(value.items)||!value.items.every(item=>item&&typeof item.state==='string')||typeof value.result!=='string'))throw new Error('Kargo takip yanıtı doğrulanamadı.');return value;}

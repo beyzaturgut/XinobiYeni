@@ -1,4 +1,5 @@
 import AdminDialog from './AdminDialog'
+import SuratShipment from './SuratShipment'
 import TableRegion from './TableRegion'
 import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
@@ -128,6 +129,7 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
           {request.status === 'requested' && <div className="dialog-actions"><button disabled={actionsDisabled||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'approve', resolution: note || null }, request.type === 'cancel' ? 'Sipariş iptal edildi.' : 'İade onaylandı.')}>{request.type === 'cancel' ? 'İptali onayla' : 'İadeyi onayla'}</button><button disabled={actionsDisabled||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'reject', resolution: note || null }, 'Talep reddedildi.')}>Reddet</button></div>}
           {request.status === 'approved' && <div className="dialog-actions"><button disabled={actionsDisabled||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'complete', resolution: note || null }, 'İade tamamlandı.')}>Ürün depoya ulaştı · iadeyi tamamla</button></div>}
         </div>)}
+        <SuratShipment key={order.id} orderId={order.id} canWrite={canWrite} eligible={(order.status==='received'||order.status==='preparing')&&!order.shipment&&!openRequests(order).some(r=>r.type==='cancel')} />
         <label>Not (müşteriye iletilir, isteğe bağlı)<textarea rows={2} maxLength={500} value={note} onChange={event => setNote(event.target.value)} /></label>
         {(order.status === 'received' || order.status === 'preparing') && <form className="catalog-form" onSubmit={event => { event.preventDefault(); void act('/shipment', { carrier, trackingNumber: tracking, trackingUrl: trackingUrl || null }, 'Sipariş kargoya verildi.') }}>
           <h3>Kargoya ver</h3>

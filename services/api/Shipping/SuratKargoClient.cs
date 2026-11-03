@@ -7,6 +7,9 @@ public sealed class SuratKargoOptions
 {
     public bool Enabled { get; set; }
     public bool AllowProduction { get; set; }
+    public bool PollingEnabled { get; set; }
+    public int PollIntervalSeconds { get; set; } = 300;
+    public int TerminalPollIntervalSeconds { get; set; } = 86400;
     public string Mode { get; set; } = "Sandbox";
     public SuratAccount Sandbox { get; set; } = new();
     public SuratAccount Production { get; set; } = new();

@@ -23,7 +23,10 @@ Method | HTTP request | Description
 [**getAdminOrder**](AdminApi.md#getadminorder) | **GET** /api/v1/admin/orders/{id} |
 [**getAdminReportSummary**](AdminApi.md#getadminreportsummary) | **GET** /api/v1/admin/reports/summary |
 [**getAdminSession**](AdminApi.md#getadminsession) | **GET** /api/v1/admin/session |
+[**getAdminSuratConnectionStatus**](AdminApi.md#getadminsuratconnectionstatus) | **GET** /api/v1/admin/shipping/surat/status |
+[**getAdminSuratLabel**](AdminApi.md#getadminsuratlabel) | **GET** /api/v1/admin/orders/{id}/surat-shipment/label |
 [**getAdminSuratShipment**](AdminApi.md#getadminsuratshipment) | **GET** /api/v1/admin/orders/{id}/surat-shipment |
+[**getAdminSuratTracking**](AdminApi.md#getadminsurattracking) | **GET** /api/v1/admin/orders/{id}/surat-shipment/tracking |
 [**getPermissionCatalog**](AdminApi.md#getpermissioncatalog) | **GET** /api/v1/admin/permissions |
 [**getPrintProfileRevision**](AdminApi.md#getprintprofilerevision) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision} |
 [**listAdminAudit**](AdminApi.md#listadminaudit) | **GET** /api/v1/admin/audit |
@@ -32,6 +35,8 @@ Method | HTTP request | Description
 [**listAdminDesigns**](AdminApi.md#listadmindesigns) | **GET** /api/v1/admin/designs |
 [**listPrintProfiles**](AdminApi.md#listprintprofiles) | **GET** /api/v1/admin/print-profiles |
 [**measurePrintPlacement**](AdminApi.md#measureprintplacement) | **POST** /api/v1/admin/print-profiles/{id}/revisions/{revision}/measure |
+[**reconcileAdminSuratShipment**](AdminApi.md#reconcileadminsuratshipment) | **POST** /api/v1/admin/orders/{id}/surat-shipment/reconcile |
+[**refreshAdminSuratTracking**](AdminApi.md#refreshadminsurattracking) | **POST** /api/v1/admin/orders/{id}/surat-shipment/tracking |
 [**retirePrintProfile**](AdminApi.md#retireprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/retire |
 [**savePrintProfileDraft**](AdminApi.md#saveprintprofiledraft) | **POST** /api/v1/admin/print-profiles |
 
@@ -622,6 +627,83 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getAdminSuratConnectionStatus**
+> SuratConnectionStatus getAdminSuratConnectionStatus()
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+
+try {
+    final response = api.getAdminSuratConnectionStatus();
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminSuratConnectionStatus: $e\n');
+}
+```
+
+### Parameters
+This endpoint does not need any parameter.
+
+### Return type
+
+[**SuratConnectionStatus**](SuratConnectionStatus.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAdminSuratLabel**
+> getAdminSuratLabel(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+
+try {
+    api.getAdminSuratLabel(id);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminSuratLabel: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getAdminSuratShipment**
 > SuratShipmentView getAdminSuratShipment(id)
 
@@ -651,6 +733,47 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**SuratShipmentView**](SuratShipmentView.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getAdminSuratTracking**
+> SuratTrackingView getAdminSuratTracking(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+
+try {
+    final response = api.getAdminSuratTracking(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->getAdminSuratTracking: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**SuratTrackingView**](SuratTrackingView.md)
 
 ### Authorization
 
@@ -1005,6 +1128,90 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **reconcileAdminSuratShipment**
+> SuratShipmentView reconcileAdminSuratShipment(id, reconcileShipment)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+final ReconcileShipment reconcileShipment = ; // ReconcileShipment |
+
+try {
+    final response = api.reconcileAdminSuratShipment(id, reconcileShipment);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->reconcileAdminSuratShipment: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **reconcileShipment** | [**ReconcileShipment**](ReconcileShipment.md)|  |
+
+### Return type
+
+[**SuratShipmentView**](SuratShipmentView.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **refreshAdminSuratTracking**
+> SuratTrackingView refreshAdminSuratTracking(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = id_example; // String |
+
+try {
+    final response = api.refreshAdminSuratTracking(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->refreshAdminSuratTracking: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**SuratTrackingView**](SuratTrackingView.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
  - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

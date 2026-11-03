@@ -42,6 +42,8 @@ AuthSession _session(String suffix, AccountProfile profile) => AuthSession((b) =
 
 /// Offline stand-in for /api/v1/auth: one account, password "guclu-parola-1", verification code "123456".
 class FakeAccounts implements AccountRepository {
+  @override
+  Future<SuratTrackingView?> suratTracking(String accessToken, String orderId) async => null;
   final profile = _profile('Ayşe Yılmaz', 'ayse@example.com');
   var refreshCount = 0;
   final revoked = <String>[];

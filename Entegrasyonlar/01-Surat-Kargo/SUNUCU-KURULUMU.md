@@ -1,4 +1,6 @@
-# Sürat Kargo sunucu adaptörü - ilk uygulama
+# Sürat Kargo kurulum ve güncel kabul kaydı
+
+**Güncel durum:** Üçüncü teslimde admin/etiket/takip/uzlaştırma ve müşteri ekranları uygulanmıştır. Aşağıdaki ilk/ikinci teslim başlıkları gelişim geçmişidir; son bölüm geçerli kapsam ve canlı kapıları içerir. [Test erişimi 403](ERISIM-KONTROLU-2026-11-03.md).
 
 03.11.2026. `services/api/Shipping/SuratKargoClient.cs` ve Program.cs kaydı eklendi. Taşıma/sözleşme katmanına kalıcı gönderi/deneme kaydı ve yetkili admin API uçları eklendi. Admin ekranı, etiket ve otomatik takip henüz bağlı değildir. Manuel kargo davranışı değiştirilmedi. Hiçbir gerçek sağlayıcı çağrısı yapılmadı.
 
@@ -49,3 +51,28 @@ HttpClient logları kaldırıldı; uygulama ham istek/yanıt/parola/exception UR
 - TypeScript/Dart sözleşmeleri yeniden üretildi. Bu API müşteriye açık değildir; hassas kaydedilmiş adres veya ham provider cevabı operation DTO'suna konmaz.
 
 Sıradaki işler: admin ekranı ve uzlaştırma; etiket; takip işi ve müşteri DTO; gerçek sandbox/SQL/barkod kabulü; canlı uygunluk ve iptal-gönderim eşzamanlılığı. Yukarıdaki ilk yol haritasının kalıcı kayıt ve API kısmı bu teslimle ilerledi; tüm kalemler tamamlandı sayılmaz.
+
+## Üçüncü kod teslimi: sipariş ekranı, etiket, takip ve müşteri okuması
+
+Bu bölüm önceki teslimlerin “sıradaki” maddelerini günceller; aşağıdaki alanlar artık uygulamada vardır:
+
+- Admin > Entegrasyon izleme > Sürat Kargo: yalnız yapılandırma bayrakları. `GET /api/v1/admin/shipping/surat/status`, orders.read. “Hesap tanımlı” bağlantı testi değildir. Gizli bilgi gösterilmez/düzenlenmez.
+- Admin sipariş detayı > Sürat Kargo: seçili ortam ve eksik ayar açıklaması, gerçek paket/desi/kg/ödeme sorumluluğu, kayıt sonucu, tekrar indirme ve takip sorgusu. Yazma yetkisi, uygun sipariş ve test hesabı gerekir. Test formunda varsayılan/uğraşılmadan doldurulmuş ölçü/fiyat yoktur.
+- `GET .../surat-shipment/label`: kabulü kayıtlı **test** gönderisine bağlı, tekrar üretimi gönderi POST'u yapmayan SVG. 100x150 mm taslak, Code128-B referans, gönderici cari, okunur referans, alıcı ve paket bilgisi. XML kaçışı, Unicode kelime sarma, sığmayan adresi açık hata ile durdurma. TEST ibaresi ve “sevk için kullanılmaz”. %100 ölçekte tarayıcıdan yazdırılabilir; canlı etiket onayı verilmedi.
+- `GET/POST .../surat-shipment/tracking`: kayıtlı veriyi okuma / kontrollü sağlayıcı sorgusu. POST orders.write, GET orders.read. HTTP erişilemiyorsa sonuç bunu açıkça söyler; önceki belge/parça/iade verisi ve onun veri zamanı korunur. Sonraki yanıtta eksik bırakılmış belge de kaybolmaz.
+- `POST .../surat-shipment/reconcile`: zorunlu sağlayıcı kanıtı ve resolution (`registered` veya `not_created`, varsayılan `registered`). İlk 2 dakikadaki aktif gönderim çözülmez. `registered` etikete izin verir. Yalnız `not_created` kanıtından sonra aynı referansla kontrollü yeni deneme açılabilir; önceki attempt/istek/kanıt/personel bilgisi saklanır. Bu uç kendi başına taşıyıcıya yazmaz. Boş takip yokluk kanıtı değildir. Kayıtlı gönderi bu yolla yeniden gönderime açılamaz.
+- Kalıcı takip lease'i 2 dakika; sorgular arasında yapılandırılmış bekleme, hata backoff/jitter ve eski lease sonucunu reddetme. Worker seçili hesaba ait en erken işleri 20'lik gruplarla alır. SQL ortak applock ile birden çok API örneğinde korunur; dosya modu yalnız tek Development API sürecidir.
+- `Shipping__Surat__PollingEnabled=false` varsayılan. `PollIntervalSeconds=300`, `TerminalPollIntervalSeconds=86400` başlangıç ayarı; 30..86400 sınırı. Tüm bilinen belgeler 6/12 olduğunda seyrek takip, diğer durumlarda normal periyot; otomatik terminal kapama/silme yok. Bunlar sağlayıcının onaylı kotası iddiası değildir; etkinleştirmeden önce kota ve takip/saklama politikası teyit edilir. Worker başlangıçta istek yapmaz; ayarlar ayrıca geçerli ve Enabled=true olmalıdır.
+- `GET /api/v1/me/orders/{id}/surat-tracking`: müşteri kendi siparişini okuyabilir; başka sipariş 404. Yalnız Production kayıtları müşteri DTO'suna gider. Parola, gönderici hesap, ham Source, teslim alan kişi veya tam adres paylaşılmaz. Sandbox müşteriden gizlenir. Web ve Flutter sipariş detayına yüklenme/boş/hata/önceki veri/yenileme görünümü eklendi.
+- Siparişin ticari lifecycle'ı taşıyıcı kayıt kabulünde değiştirilmez. Sağlayıcının ayrı fiziksel durumu takip alanında gösterilir; kod 7 teslim sayılmaz, kod 12 iade teslimidir. Saat dilimi teyitsiz ham hareket zamanı UTC sanılmaz; bu sürüm otomatik shipped/delivered/refund veya tekrar bildirim üretmez.
+
+### Canlı kabul için kalan kapılar
+
+1. [Test erişimi 403](ERISIM-KONTROLU-2026-11-03.md): hesap/IP/whitelist nedeninin sağlayıcı tarafından kapatılması. Testte gerçek gönderi, şube kabulü, hareket, hata ve mutabakat senaryoları.
+2. Sürat'in onaylı canlı etiket şablonu, cari barkodu/çoklu koli düzeni ve fiziksel yazıcı/okuyucu testi. Mevcut taslak canlıya açılmaz.
+3. İzole gerçek SQL çoklu süreç/yeniden başlatma kabulü; kaynak koddaki shared applock tasarımı tek başına gerçek SQL kabulü değildir.
+4. Doğrulanmış ödeme/operasyon uygunluğu ve iptal-gönderim transaction sınırı (D03). Bu veri olmadan demo sipariş Production gönderisi oluşturamaz; bu sürümde Production oluşturma bilinçli olarak kapalıdır. Manuel “ödenmiş say” bayrağı eklenmedi.
+5. Sağlayıcı sözleşmesindeki kod7/COD/Dosya-Mi/büyük-küçük harf farkları, kanal borçlandırma ve kota/saat dilimi teyitleri. İlk uygulama yalnız kendi mağaza/normal koli/COD kapalı; pazaryeri, COD ve iade oluşturma bu kabul gelmeden açılmaz. Kargo tarife/checkout ücret hesabı ZIP'te yoktur ve TIC-08'de ayrı açık kalır.
+6. Gerçek Android/iOS ve VoiceOver/TalkBack kabulü; widget testi fiziksel cihaz kabulü değildir. Deployment/APK yapılmadı.
+
+**Durum:** Kendi mağaza test akışı için kod ve arayüzler uygulanmıştır; gerçek sandbox kabulü ve canlı entegrasyon tamamlandı sayılmaz. Erişim engeli ve bu kapılar kapanmadan canlı anahtar/flag etkinleştirilmemelidir.

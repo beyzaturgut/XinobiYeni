@@ -27,6 +27,7 @@ Method | HTTP request | Description
 [**getMyDesignImage**](AccountApi.md#getmydesignimage) | **GET** /api/v1/me/designs/{id}/image |
 [**getMyOrder**](AccountApi.md#getmyorder) | **GET** /api/v1/me/orders/{id} |
 [**getMyOrderLineDesign**](AccountApi.md#getmyorderlinedesign) | **GET** /api/v1/me/orders/{id}/lines/{line}/design |
+[**getMySuratTracking**](AccountApi.md#getmysurattracking) | **GET** /api/v1/me/orders/{id}/surat-tracking |
 [**getOrderOptions**](AccountApi.md#getorderoptions) | **GET** /api/v1/me/order-options |
 [**listMyAddresses**](AccountApi.md#listmyaddresses) | **GET** /api/v1/me/addresses |
 [**listMyDesignConfigurations**](AccountApi.md#listmydesignconfigurations) | **GET** /api/v1/me/design-configurations |
@@ -799,6 +800,47 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/problem+json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **getMySuratTracking**
+> SuratTrackingView getMySuratTracking(id)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAccountApi();
+final String id = id_example; // String |
+
+try {
+    final response = api.getMySuratTracking(id);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AccountApi->getMySuratTracking: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+
+### Return type
+
+[**SuratTrackingView**](SuratTrackingView.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/problem+json, application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

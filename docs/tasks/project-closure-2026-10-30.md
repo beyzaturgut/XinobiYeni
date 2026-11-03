@@ -1,5 +1,7 @@
 # Xinobi - Fazlara işlenmiş tam kapanış listesi / 30.10.2026
 
+**03.11 Sürat güncellemesi:** TIC-08 teknik alt işleri kısmen uygulandı; aşağıdaki TIC-08 kaydı günceldir. Diğer eski kaynak/kapsam paragrafları tarihsel kesittir. Gerçek test erişimi 403, canlı kabul açık.
+
 **03.11 kapsam değişikliği:** [Sipariş tasarım detayı ve 9 alt task](order-design-detail-scope-2026-11-03.md); KIS-01/05/06 yeni kapsam dışında, KIS-07 sipariş detayı/dosyalar olarak revize. 120 ana ID korundu; kod uygulanmadı.
 
 Kaynak kesiti: `main / de99958`. Aynı 120 task kimliği korunur. Önceki PDF durumları, 30 Ekim uygulama kayıtları ve tarihli test raporları birleştirildi; müşteri girdisi ve teknik iş aynı kayıtta ayrı izlenir. [Makine okunur liste](project-closure-2026-10-30.json).
@@ -953,19 +955,21 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### TIC-08
 
-**Kargo fiyatı ve gönderiyi entegre et** — P0 / Geliştirme / **Yapılmadı - kapanış açık**
+**Kargo fiyatı ve gönderiyi entegre et** — P0 / Geliştirme / **Kısmen yapıldı - kapanış açık**
 
 **Önerilen sorumlu:** Backend + DBA + Web/Mobil + finans. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
 **Hedef iş:** Adres/bölge/desi kuralları, ücretsiz kargo eşiği, etiket/gönderi, takip güncellemesi ve taşıyıcı hatalarını bağla.
 
-**Yapıldı / mevcut temel:** Adresler ve sipariş gönderi bilgisi için temel ekran/model bulunuyor.
+**Yapıldı / mevcut temel:** 03.11: Sürat adaptörü, kalıcı referans/attempt, admin ekranı, test Code128 etiketi, kanıtlı uzlaştırma/tekrar, lease/backoff takip ve web/Flutter müşteri okuması uygulandı; izole regresyonlar kayıtlı.
 
-**Yapılmadı / açık kalan:** Gerçek taşıyıcı fiyatı, desi/bölge kuralları, etiket/gönderi, takip ve yinelenen gönderi kontrolü kabul edilmedi.
+**Yapılmadı / açık kalan:** Gerçek test erişimi HTTP 403; sağlayıcı/IP/hesap teyidi, gerçek SQL/sandbox/şube/okuyucu/cihaz kabulü, onaylı canlı etiket, ödeme/operasyon uygunluğu ve kargo tarife/bölge/checkout ücret kuralları açık. Production oluşturma kapalı.
 
 **Kapanış kanıtı:** Checkout ücreti siparişte sabit; tek sipariş için yinelenen gönderi önleniyor; gerçek test gönderisi takip ediliyor.
 
 **Bağımlılıklar:** KAR-04, TIC-02.
+
+**03.11 kanıt:** [TST-245](../../test/2026-11-03/TST-245-surat-shipment-delivery.md), [erişim 403](../../Entegrasyonlar/01-Surat-Kargo/ERISIM-KONTROLU-2026-11-03.md). Bu task tamamen kapanmadı.
 
 ### WEB-03
 

@@ -351,3 +351,5 @@
 - 03.11.2026 · [TST-243 Sürat sunucu adaptörü](2026-11-03/TST-243-surat-server-adapter.md) — 17/17 odaklı, tam API 531 PASS / 29 SKIP / 0 FAIL. Gerçek çağrı yok; kalıcı gönderi/admin/etiket/takip işi açık.
 
 - 03.11.2026 · [TST-244 Sürat kalıcı gönderi/admin API](2026-11-03/TST-244-surat-persistent-admin-api.md) — 26 odaklı PASS; tam API 540 PASS / 29 SKIP / 0 FAIL; sözleşme/TS/Dart PASS. Gerçek çağrı ve SQL kabulü yok.
+
+- 03.11.2026 · [TST-245 Sürat ekran/etiket/takip teslimi](2026-11-03/TST-245-surat-shipment-delivery.md) — 38 odaklı, tam API 552 PASS / 29 SKIP / 0 FAIL; admin 20/20, Flutter 283, web 2/2 PASS. Gerçek salt okunur test erişimi 403; canlı kabul açık.

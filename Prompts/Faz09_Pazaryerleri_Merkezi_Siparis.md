@@ -1,5 +1,9 @@
 # Faz09 — Trendyol, Hepsiburada ve N11 ile merkezi sipariş
 
+## 03.11.2026 - Sürat sipariş ekranı, etiket ve takip teslimi
+
+KRG-SUR-01: admin sipariş/entegrasyon ekranı, test Code128 etiketi, kanıtlı uzlaştırma ve kontrollü aynı-ref denemesi, lease/backoff takip işi, müşteri sahiplik kontrollü DTO ve web/Flutter gösterimi eklendi. Ticari sipariş statüsü/ödeme otomatik değiştirilmez. [Kurulum ve kabul kapıları](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Salt okunur gerçek test erişimi HTTP 403; nedeni sağlayıcı teyidi bekliyor. [TST-245](../test/2026-11-03/TST-245-surat-shipment-delivery.md): 38 odaklı; tam API 552 PASS / 29 SKIP / 0 FAIL; admin 20/20, Flutter 283, web 2/2. Gerçek gönderi/Production açılışı/deploy yok. COD/pazaryeri/tarife ve gerçek SQL/cihaz/barkod kabulleri ayrı açık; TIC-08 tamamlandı sayılmaz.
+
 ## 03.11.2026 - Sürat Kargo entegrasyon hazırlığı (yalnız plan)
 
 KRG-SUR-01 kanal planı: kendi mağazada Pazaryerimi=0 / EntegrasyonFirmasi boş; markette 1 / sağlayıcı onaylı isim ve pazaryerinin gerçek sipariş referansı. Market adı, ödeme borçlandırması ve parçalı gönderi sözleşmesi teyit bekliyor; uygulama başlamadı. [Task, alan eşleştirmesi ve prompt](../docs/tasks/surat-kargo-integration-plan-2026-11-03.md). [PDF](../output/pdf/xinobi-surat-kargo-entegrasyon-task-ve-uygulama-plani-2026-11-03.pdf).

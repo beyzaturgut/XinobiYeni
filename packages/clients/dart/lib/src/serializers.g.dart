@@ -108,6 +108,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(QuoteOffer.serializer)
       ..add(QuoteOptions.serializer)
       ..add(ReadinessResponse.serializer)
+      ..add(ReconcileShipment.serializer)
       ..add(RefreshSession.serializer)
       ..add(RegisterAccount.serializer)
       ..add(RegisterDevice.serializer)
@@ -128,7 +129,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(StartEmailChange.serializer)
       ..add(StartPasswordReset.serializer)
       ..add(SubmitReview.serializer)
+      ..add(SuratConnectionStatus.serializer)
       ..add(SuratShipmentView.serializer)
+      ..add(SuratTrackingItem.serializer)
+      ..add(SuratTrackingView.serializer)
       ..add(TrackQuoteMessage.serializer)
       ..add(UpdateMyAccount.serializer)
       ..add(VariantDetail.serializer)
@@ -269,6 +273,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(SuratTrackingItem)]),
+          () => ListBuilder<SuratTrackingItem>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(VariantDetail)]),
           () => ListBuilder<VariantDetail>())

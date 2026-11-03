@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 03.11.2026 - Sürat sipariş ekranı, etiket ve takip teslimi
+
+KRG-SUR-01: admin sipariş/entegrasyon ekranı, test Code128 etiketi, kanıtlı uzlaştırma ve kontrollü aynı-ref denemesi, lease/backoff takip işi, müşteri sahiplik kontrollü DTO ve web/Flutter gösterimi eklendi. Ticari sipariş statüsü/ödeme otomatik değiştirilmez. [Kurulum ve kabul kapıları](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Salt okunur gerçek test erişimi HTTP 403; nedeni sağlayıcı teyidi bekliyor. [TST-245](../test/2026-11-03/TST-245-surat-shipment-delivery.md): 38 odaklı; tam API 552 PASS / 29 SKIP / 0 FAIL; admin 20/20, Flutter 283, web 2/2. Gerçek gönderi/Production açılışı/deploy yok. COD/pazaryeri/tarife ve gerçek SQL/cihaz/barkod kabulleri ayrı açık; TIC-08 tamamlandı sayılmaz.
+
 ## 03.11.2026 - Sürat kalıcı gönderi ve admin API
 
 Ortak FeatureDocuments transaction/kilidiyle kalıcı referans, attempt, paket/adres kopyası ve sonuç kaydı; çift istek/yeniden başlatmada write tekrarını engelleme eklendi. GET/POST admin orders/{id}/surat-shipment, sunucu orders.read/write kontrolüyle açık. Canlı mod uygunluk doğrulanmadığından engelli; sipariş statüsü değişmez. Admin ekranı, uzlaştırma, etiket ve polling açık. [TST-244](../test/2026-11-03/TST-244-surat-persistent-admin-api.md): 26 odaklı PASS; tam API 540 PASS / 29 SKIP / 0 FAIL; TS/Dart PASS. [Kurulum/sınırlar](../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md).

@@ -8,6 +8,8 @@ export const quote={id:'UI-Q1',code:'UI-QUOTE',company:'İzole firma',contactNam
 export const review={id:'UI-R1',productId:product.id,authorName:'İzole',rating:4,title:'İzole yorum',body:'İzole yorum metni',createdAt:'2026-10-30T00:00:00Z',status:'pending'}
 export const policy={revision:1,systemPrompt:'İzole istem',greeting:'Merhaba',quickReplies:[],dailyAiLimit:0,maxMessagesPerConversation:10,model:'fixture',temperature:0,reason:'Test',createdAt:'2026-10-30T00:00:00Z'}
 export function response(path,empty=false){
+ if(path.endsWith('/shipping/surat/status'))return {enabled:false,mode:'Sandbox',accountConfigured:false,pollingEnabled:false,liveOperationsAllowed:false}
+ if(path.endsWith('/surat-shipment')||path.endsWith('/surat-shipment/tracking'))return null
  if(path.endsWith('/state'))return {...store,products:empty?[]:store.products}
  if(path.endsWith('/admin/reports/summary'))return {fromInclusive:null,untilExclusive:'2026-10-31T00:00:00Z',generatedAt:'2026-10-30T00:00:00Z',timeZone:'UTC',orderCount:empty?0:1,registeredCustomerCount:empty?0:1,orderStatuses:empty?[]:[{status:'received',count:1}]}
  if(path.endsWith('/customers'))return {items:[],page:1,pageSize:20,total:0,totalPages:0}

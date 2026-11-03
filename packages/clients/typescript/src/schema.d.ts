@@ -644,6 +644,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/orders/{id}/surat-tracking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetMySuratTracking"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -1333,6 +1349,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/shipping/surat/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetAdminSuratConnectionStatus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/orders/{id}/surat-shipment": {
         parameters: {
             query?: never;
@@ -1343,6 +1375,54 @@ export interface paths {
         get: operations["GetAdminSuratShipment"];
         put?: never;
         post: operations["CreateAdminSuratShipment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders/{id}/surat-shipment/label": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetAdminSuratLabel"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders/{id}/surat-shipment/tracking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetAdminSuratTracking"];
+        put?: never;
+        post: operations["RefreshAdminSuratTracking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders/{id}/surat-shipment/reconcile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ReconcileAdminSuratShipment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2413,6 +2493,11 @@ export interface components {
             requestId: string;
             checks: components["schemas"]["DependencyHealth"][];
         };
+        ReconcileShipment: {
+            evidence: string;
+            /** @default registered */
+            resolution: string;
+        };
         RefreshSession: {
             refreshToken: string;
         };
@@ -2517,6 +2602,13 @@ export interface components {
             title: null | string;
             body: string;
         };
+        SuratConnectionStatus: {
+            enabled: boolean;
+            mode: string;
+            accountConfigured: boolean;
+            pollingEnabled: boolean;
+            liveOperationsAllowed: boolean;
+        };
         SuratShipmentView: {
             reference: string;
             state: string;
@@ -2525,6 +2617,26 @@ export interface components {
             /** Format: date-time */
             completedAt: null | string;
             message: string;
+        };
+        SuratTrackingItem: {
+            trackingNumber: null | string;
+            /** Format: int32 */
+            statusCode: null | number;
+            state: string;
+            providerText: null | string;
+            lastMovementRaw: null | string;
+            deliveredDateRaw: null | string;
+        };
+        SuratTrackingView: {
+            reference: string;
+            registrationState: string;
+            environment: string;
+            result: string;
+            /** Format: date-time */
+            lastAttempt: null | string;
+            /** Format: date-time */
+            lastSuccess: null | string;
+            items: components["schemas"]["SuratTrackingItem"][];
         };
         TrackQuoteMessage: {
             email: string;
@@ -4133,6 +4245,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetMySuratTracking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratTrackingView"];
+                };
             };
             /** @description Service Unavailable */
             503: {
@@ -6400,6 +6543,35 @@ export interface operations {
             };
         };
     };
+    GetAdminSuratConnectionStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratConnectionStatus"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
     GetAdminSuratShipment: {
         parameters: {
             query?: never;
@@ -6443,6 +6615,125 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CreateSuratShipment"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratShipmentView"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetAdminSuratLabel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    GetAdminSuratTracking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratTrackingView"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    RefreshAdminSuratTracking: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuratTrackingView"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["ProblemDetails"];
+                };
+            };
+        };
+    };
+    ReconcileAdminSuratShipment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReconcileShipment"];
             };
         };
         responses: {

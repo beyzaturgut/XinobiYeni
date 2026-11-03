@@ -49,7 +49,7 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IAccountStore>();
                 services.AddSingleton<IAccountStore>(provider => provider.GetRequiredService<DevFileAccountStore>());
             }
-            foreach (var service in services.Where(x => x.ServiceType == typeof(IHostedService) && x.ImplementationType == typeof(NotificationWorker)).ToArray())
+            foreach (var service in services.Where(x => x.ServiceType == typeof(IHostedService) && (x.ImplementationType == typeof(NotificationWorker) || x.ImplementationType == typeof(Xinobi.Api.Shipping.SuratTrackingWorker))).ToArray())
                 services.Remove(service);
         });
     }

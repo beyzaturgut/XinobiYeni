@@ -124,6 +124,7 @@ public static class AccountEndpoints
         Orders.AdminDesignOrderEndpoints.Map(admin);
         Orders.AdminOrderDetailEndpoints.Map(admin);
         Shipping.SuratShipmentEndpoints.Map(admin);
+        Shipping.SuratShipmentEndpoints.MapOperations(admin, me);
         Orders.AdminOrderPatternEndpoints.Map(admin);
         Orders.AdminOrderPatternEndpoints.MapComposition(admin);
         if (AccountStorage.RateLimited(app.Environment, app.Configuration)) auth.RequireRateLimiting("Account");

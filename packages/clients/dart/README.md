@@ -125,6 +125,7 @@ Class | Method | HTTP request | Description
 [*AdminApi*](doc/AdminApi.md) | [**approvePrintProfile**](doc/AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
+[*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLinePattern**](doc/AdminApi.md#downloadadminorderlinepattern) | **GET** /api/v1/admin/orders/{id}/lines/{line}/pattern | Sipariş satırına kopyalanmış ham deseni özgün baytlarıyla indirir; ürün fotoğrafı veya giydirilmiş önizleme değildir.
 [*AdminApi*](doc/AdminApi.md) | [**downloadPrintCalibration**](doc/AdminApi.md#downloadprintcalibration) | **GET** /api/v1/admin/print-profiles/{id}/revisions/{revision}/calibration.svg |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminCustomer**](doc/AdminApi.md#getadmincustomer) | **GET** /api/v1/admin/customers/{id} |
 [*AdminApi*](doc/AdminApi.md) | [**getAdminDesign**](doc/AdminApi.md#getadmindesign) | **GET** /api/v1/admin/designs/{id} |

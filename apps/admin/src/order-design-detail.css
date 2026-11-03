@@ -8,7 +8,7 @@
 .order-design-detail .order-design-note,.order-design-files article>p:not([role]){color:#555}
 .order-design-detail .order-design-missing,.order-design-files article>p.order-design-missing{color:#6b4e00;font-style:italic}
 .order-design-files{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px}
-.order-design-files article{display:grid;align-content:start;gap:8px;padding:12px;border:1px solid var(--admin-border,#d4d4d4);border-radius:var(--admin-radius,6px);min-width:0}
+.order-design-files article{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:8px;padding:12px;border:1px solid var(--admin-border,#d4d4d4);border-radius:var(--admin-radius,6px);min-width:0}
 .order-design-files img{display:block;width:100%;max-height:220px;object-fit:contain;background:#f1f1f1;border-radius:4px}
 .order-design-actions{display:flex;flex-wrap:wrap;gap:6px 14px}
 .order-design-actions a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
@@ -20,3 +20,5 @@
 .order-placement-owner{font-weight:600}
 .order-placement-raw{margin:0;padding:10px;background:#f6f6f6;border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
 .order-design-detail [role=status]{color:#1d5b2c}
+.order-design-download{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;justify-items:start}
+.order-design-download button{min-height:44px;padding:8px 14px;border:1px solid #222;border-radius:4px;background:#fff;color:#111;font:inherit}

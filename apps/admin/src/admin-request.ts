@@ -11,7 +11,17 @@ export function refreshStaffSession(api: string): Promise<boolean> {
 }
 
 // Panel requests must never rotate or consume the customer's refresh cookie.
-export async function adminRequest<T>(api: string, path: string, method = 'GET', body?: unknown, responseKind: 'json' | 'blob' = 'json'): Promise<T> {
+/** A downloaded file with the name the server gave it in Content-Disposition (empty when it sent none). */
+export type AdminFile = { blob: Blob; fileName: string }
+
+export function fileNameOf(disposition: string | null): string {
+  if (!disposition) return ''
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(disposition)?.[1]
+  if (encoded) { try { return decodeURIComponent(encoded.trim()) } catch { /* fall back to the plain name */ } }
+  return /filename="?([^";]+)"?/i.exec(disposition)?.[1]?.trim() ?? ''
+}
+
+export async function adminRequest<T>(api: string, path: string, method = 'GET', body?: unknown, responseKind: 'json' | 'blob' | 'file' = 'json'): Promise<T> {
   if (!api) throw new Error('Yönetim API adresi yapılandırılmadı.')
   const version = refreshVersion
   const send = () => fetch(api + path, {
@@ -32,5 +42,6 @@ export async function adminRequest<T>(api: string, path: string, method = 'GET',
     const problem = await response.json().catch(() => null)
     throw Object.assign(new Error(response.status === 401 ? 'Oturum doğrulanamadı. Yeniden giriş yapın.' : response.status === 403 ? 'Bu işlem için yetkiniz yok.' : problem?.message || problem?.title || `Yönetim servisi kullanılamıyor (${response.status}).`), { status: response.status, code: problem?.code })
   }
+  if (responseKind === 'file') return { blob: await response.blob(), fileName: fileNameOf(response.headers.get('Content-Disposition')) } as T
   return response.status === 204 ? undefined as T : responseKind === 'blob' ? await response.blob() as T : response.json()
 }

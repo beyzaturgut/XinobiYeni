@@ -86,7 +86,9 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddCors(options => options.AddPolicy("LocalCommerce", policy => policy
         .WithOrigins("http://127.0.0.1:3000", "http://localhost:3000", "http://127.0.0.1:5173", "http://localhost:5173")
         // Credentials let the web session cookie travel to the API; origins stay an explicit allow-list.
-        .AllowAnyHeader().AllowAnyMethod().AllowCredentials()));
+        .AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+        // The panel reads the server-given name of a file download (SIP-TAS-04) across the Development origins.
+        .WithExposedHeaders("Content-Disposition")));
 }
 // ADR-002 Ek B: the test server may open XINOBI U (off by default). Cloudflare credentials come from server environment variables.
 var xinobiUOnTestServer = !builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("XinobiU:Enabled");

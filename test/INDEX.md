@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-219 | 03.11.2026 | SIP-TAS-04 ham desen indirme API fixture (bayt/hash, MIME/ad, satır/revizyon, yetki, silinmiş tasarım, eksik/bozuk dosya) | PASS 8/8 | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-219-sip-tas-04-pattern-download.md) |
+| TST-220 | 03.11.2026 | API tam test paketi | PASS 506, 29 atlandı | API / ISOLATED | [Rapor](2026-11-03/TST-219-sip-tas-04-pattern-download.md) |
+| TST-221 | 03.11.2026 | Sözleşme + admin lint/TS/build + web/Flutter tüketici kontrolleri | PASS; 4 eski lint uyarısı | CONTRACT / STATIC | [Rapor](2026-11-03/TST-219-sip-tas-04-pattern-download.md) |
+| TST-222 | 03.11.2026 | Admin indirme düğmesi Chrome fixture + sipariş/tasarım regresyonları | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-219-sip-tas-04-pattern-download.md) |
 | TST-215 | 03.11.2026 | SIP-TAS-03 admin lint/TypeScript/derleme | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |
 | TST-216 | 03.11.2026 | Kayıtlı yerleşim Chrome fixture (revizyon, tuval, sıfır/eksik, bölge, şema, uzun metin, 320/390/1440 %200) | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |
 | TST-217 | 03.11.2026 | Sipariş/tasarım admin regresyonları (7 dosya) | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-215-sip-tas-03-order-placement.md) |

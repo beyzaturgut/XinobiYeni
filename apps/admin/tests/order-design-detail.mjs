@@ -5,14 +5,15 @@ import {join} from 'node:path'
 const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
 const browser=await chromium.launch({channel:'chrome',headless:true})
 const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/',output=process.env.ADMIN_CONSISTENCY_OUTPUT
+const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64')
 const pattern='<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#f4efe6"/><circle cx="70" cy="80" r="44" fill="#d1495b"/><rect x="120" y="36" width="88" height="88" fill="#00798c" transform="rotate(12 164 80)"/></svg>'
 const money={amountMinor:125000,currency:'TRY'}
 const placement={sourceWidth:1024,sourceHeight:1536,surfaceVersion:'c'.repeat(64),x:512.5,y:700,scale:.85,rotation:-12,curvatureStrength:0,mode:'artwork',fillMask:false,bodyAdjustments:{'upper-body':{x:4,y:null,scale:1.1,rotation:0}}}
 const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:1,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE'})}})
 const order=(id,legacy=false)=>({accountId:'synthetic',customerName:'Synthetic müşteri',customerEmail:'synthetic@example.invalid',order:{id,number:'SYN-'+id,createdAt:'2026-11-03T09:00:00Z',status:'received',address:{title:'Ev',fullName:'Synthetic',phone:'+905321234567',line:'Synthetic adres',district:'Test',city:'Test'},lines:[line(id,legacy),{productId:'P2',variantId:'V2',name:'Kişiselleştirilmemiş ürün',color:'Siyah',quantity:1,unitPrice:money,lineTotal:money}],total:money,history:[],requests:[]}})
 const gate=()=>{let release;const promise=new Promise(resolve=>{release=resolve});return{promise,release}}
-async function fixture({width=1440,design}={}){
- const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],paths=[];let writes=0,designReads=0
+async function fixture({width=1440,design,download}={}){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],paths=[];let writes=0,designReads=0,patternReads=0
  page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push(error.message))
  await page.route('**/api/**',async route=>{
   const request=route.request(),path=new URL(request.url()).pathname;paths.push(path)
@@ -20,13 +21,15 @@ async function fixture({width=1440,design}={}){
   if(path.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Synthetic'},permissions:['orders.read','orders.write','orders.cancel','print.read']}})
   if(path.endsWith('/local-commerce/orders'))return route.fulfill({json:[order('NEW'),order('OLD',true)]})
   if(path.endsWith('/order-options'))return route.fulfill({json:{carriers:['Synthetic kargo'],returnWindowDays:14}})
+  if(path.endsWith('/lines/0/pattern')){patternReads++;const result=await download?.(patternReads);if(result?.status)return route.fulfill({status:result.status,json:{title:'Synthetic pattern error',code:'synthetic'}})
+   return route.fulfill({body:png,contentType:'image/png',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':`attachment; filename=xinobi-SYN-NEW-satir-1-desen-rev3.png; filename*=UTF-8''xinobi-SYN-NEW-satir-1-desen-rev3.png`}})}
   if(path.endsWith('/design')){const result=await design?.(++designReads);if(result?.status)return route.fulfill({status:result.status,json:{title:'Synthetic file error'}})
    return route.fulfill(result?.bytes?{body:result.bytes,contentType:'image/png'}:{body:pattern,contentType:'image/svg+xml'})}
   if(path.endsWith('/admin/designs'))return route.fulfill({json:{items:[],page:1,pageSize:20,total:0,totalPages:0}})
   return route.fulfill({status:503,json:{title:'Synthetic unavailable'}})
  })
  await page.goto(base+'?view=orders')
- return {page,paths,async open(number){await page.getByRole('button',{name:`${number} detayını aç`}).click();return page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'})},
+ return {page,paths,patternReads:()=>patternReads,async open(number){await page.getByRole('button',{name:`${number} detayını aç`}).click();return page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'})},
   close:async()=>{assert.deepEqual(errors,[]);assert.equal(writes,0);await context.close()}}
 }
 const card=(detail,name)=>detail.getByRole('article',{name})
@@ -39,7 +42,7 @@ try{
   await layout.getByText('Yatay konum (desen merkezi)',{exact:true}).waitFor();await layout.getByText('Üst gövde',{exact:true}).waitFor()
   assert.equal(await layout.locator('dd.order-design-missing').count(),1,'The unsaved body Y value is shown as missing, not zero')
   const raw=card(detail,'Ham desen');await raw.getByRole('img').evaluate(image=>image.decode())
-  assert.match(await raw.getByRole('link',{name:'Ham deseni indir'}).getAttribute('href'),/\/orders\/NEW\/lines\/0\/design\?download=true$/)
+  await raw.getByRole('button',{name:'Ham deseni indir'}).waitFor()
   for(const name of ['Ürün kaynak görseli','Giydirilmiş önizleme']){
    const item=card(detail,name);await item.getByText(/İndirme hazır değil\./).waitFor()
    assert.equal(await item.locator('img,a,button').count(),0,`${name} must not offer a file it does not have`)
@@ -51,7 +54,7 @@ try{
   assert.equal(await dialog.evaluate(element=>element.scrollWidth>element.clientWidth),false,`Dialog overflow ${width}`)
   if(width===390){const axe=await new AxeBuilder({page:f.page}).include('dialog[open]').withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();assert.deepEqual(axe.violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>({id:v.id,nodes:v.nodes.slice(0,4).map(n=>n.target.join(' ')+' '+n.any.map(a=>a.message).join(';'))})),[])}
   if(width===320){await f.page.evaluate(()=>{for(const e of document.querySelectorAll('dialog *'))e.style.setProperty('font-size',parseFloat(getComputedStyle(e).fontSize)*2+'px','important')});assert.deepEqual(await dialog.evaluate(element=>{const box=element.getBoundingClientRect();return element.scrollWidth>element.clientWidth+1?[...element.querySelectorAll('*')].filter(e=>e.getBoundingClientRect().width>box.width).slice(-8).map(e=>e.tagName+'.'+e.className+' w'+e.clientWidth+'/'+e.scrollWidth+' '+getComputedStyle(e).whiteSpace+' '+e.textContent.slice(0,30)):[]}),[],'Dialog overflow at 200% text');await f.page.reload();detail=await f.open('SYN-NEW')}
-  await raw.getByRole('link',{name:'Ham deseni indir'}).focus();assert.equal(await raw.getByRole('link',{name:'Ham deseni indir'}).evaluate(link=>link===document.activeElement),true)
+  await raw.getByRole('button',{name:'Ham deseni indir'}).focus();assert.equal(await raw.getByRole('button',{name:'Ham deseni indir'}).evaluate(button=>button===document.activeElement),true)
   if(output)for(const [part,target] of [['top',detail.getByRole('heading',{level:3})],['images',detail.getByRole('heading',{name:'Görseller'})]]){await target.evaluate(element=>element.scrollIntoView({block:'start'}));await f.page.screenshot({path:join(output,`order-design-detail-${width}-${part}.png`)})}
   await f.close()
  }
@@ -66,15 +69,35 @@ try{
   await raw.getByRole('alert').filter({hasText:text}).waitFor()
   assert.equal(await raw.locator('img,a').count(),0,'No preview or download for a file that did not load')
   assert.equal(await raw.getByRole('button',{name:'Deseni tekrar dene'}).count(),retry?1:0)
-  fail=false;if(retry){await raw.getByRole('button',{name:'Deseni tekrar dene'}).click();await raw.getByRole('link',{name:'Ham deseni indir'}).waitFor()}
+  fail=false;if(retry){await raw.getByRole('button',{name:'Deseni tekrar dene'}).click();await raw.getByRole('button',{name:'Ham deseni indir'}).waitFor()}
   await f.close()
  }
  { const slow=gate(),f=await fixture({design:async()=>{await slow.promise;return{}}}),raw=card(await f.open('SYN-NEW'),'Ham desen')
   await raw.getByText('Desen dosyası yükleniyor…').waitFor();assert.equal(await raw.locator('a').count(),0);slow.release();await raw.getByRole('img').waitFor();await f.close() }
+ { const slow=gate(),f=await fixture({download:async()=>{await slow.promise;return{}}}),raw=card(await f.open('SYN-NEW'),'Ham desen')
+  const button=raw.getByRole('button',{name:'Ham deseni indir'});await button.click()
+  await raw.getByRole('status').filter({hasText:'Ham desen indiriliyor…'}).waitFor()
+  assert.equal(await raw.getByRole('button',{name:'Ham desen indiriliyor…'}).isDisabled(),true,'A second click cannot start another download')
+  await raw.getByRole('button',{name:'Ham desen indiriliyor…'}).click({force:true}).catch(()=>{})
+  const downloaded=f.page.waitForEvent('download');slow.release()
+  const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-desen-rev3.png')
+  assert.deepEqual(await (async()=>{const chunks=[];for await(const chunk of await file.createReadStream())chunks.push(chunk);return Buffer.concat(chunks)})(),png,'The downloaded bytes are the served pattern bytes')
+  await raw.getByRole('status').filter({hasText:'Ham desen indirildi: xinobi-SYN-NEW-satir-1-desen-rev3.png'}).waitFor()
+  assert.equal(f.patternReads(),1);assert.ok(f.paths.includes('/api/v1/admin/orders/NEW/lines/0/pattern'),'Resolved by order and line on the staff API')
+  await f.close() }
+ for(const [status,text,retry] of [[404,/desen dosyası bulunamadı; indirilecek dosya yok/,false],[403,/indirme yetkiniz yok/,false],[503,/şu anda indirilemedi/,true]]){
+  let fail=true;const f=await fixture({download:()=>fail?{status}:{}}),raw=card(await f.open('SYN-NEW'),'Ham desen')
+  await raw.getByRole('button',{name:'Ham deseni indir'}).click();await raw.getByRole('alert').filter({hasText:text}).waitFor()
+  assert.equal(await raw.getByRole('status').filter({hasText:'indirildi'}).count(),0,'A failed download is never reported as done')
+  assert.equal(await raw.getByRole('button',{name:'İndirmeyi tekrar dene'}).count(),retry?1:0)
+  assert.equal(await raw.getByRole('button',{name:'Ham deseni indir'}).count(),0)
+  if(retry){fail=false;const downloaded=f.page.waitForEvent('download');await raw.getByRole('button',{name:'İndirmeyi tekrar dene'}).click();await downloaded;await raw.getByRole('status').filter({hasText:'Ham desen indirildi'}).waitFor()}
+  await f.close()
+ }
  { const f=await fixture();await f.page.goto(base+'?view=print')
   await f.page.getByRole('region',{name:'Tasarımlar ve sipariş bağlantıları'}).waitFor()
   assert.equal(await f.page.getByText(/Fiziksel baskı profil|Kalibrasyon|Üretime gönder/i).count(),0)
   assert.equal(f.paths.some(path=>path.includes('print-profiles')),false,'The removed profile screen must not load profile data')
   await f.close() }
- console.log('PASS: order design detail product/placement/three image cards at 4 widths, legacy/missing values, raw file loading/404/403/503/invalid/retry, 390 px axe, 320 px 200 % text, no production controls, existing order actions, no writes')
+ console.log('PASS: order design detail product/placement/three image cards at 4 widths, legacy/missing values, raw file loading/404/403/503/invalid/retry, pattern download name/bytes/lock/404/403/503 retry, 390 px axe, 320 px 200 % text, no production controls, existing order actions, no writes')
 }finally{await browser.close()}

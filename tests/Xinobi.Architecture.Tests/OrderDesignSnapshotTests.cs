@@ -1,7 +1,9 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -257,6 +259,90 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         var mismatch = await Assert.ThrowsAsync<ProblemException>(() => designs.CopyToOrder(saved, "synthetic-order", 0, new string('0', 64)));
         Assert.Equal("design_changed", mismatch.Code);
         Assert.Null(await f.Factory.Services.GetRequiredService<IFileStore>().Open(FileAreas.Designs, SavedDesignStore.OrderFile("synthetic-order", 0)));
+    }
+
+    private sealed class WithoutOrdersRead : IClaimsTransformation
+    {
+        public Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
+        {
+            foreach (var identity in principal.Identities)
+                foreach (var claim in identity.FindAll(PermissionAuthorization.PermissionClaim).Where(c => c.Value == "orders.read").ToArray()) identity.RemoveClaim(claim);
+            return Task.FromResult(principal);
+        }
+    }
+
+    private static string PatternRoute(string orderId, int line) => $"/api/v1/admin/orders/{orderId}/lines/{line}/pattern";
+
+    [Fact]
+    public async Task StaffDownloadsTheOrderedPatternBytesWithItsRealTypeAndName()
+    {
+        using var f = await Start("pattern@example.com");
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, Photo, Mask), 25, 35, 1, 0, 0);
+        var first = await Configure(f, placement);
+        await Configure(f, placement with { X = 90 }, first.Id, 1, NewComposition);
+        // Revision 1 is ordered while revision 2 exists; a second, plain line has no design.
+        var request = new PlaceOrder(f.Address.Id, [new(f.ProductId, f.VariantId, 1, f.Design.Id, first.Id, 1), new(f.ProductId, f.VariantId, 1)], "pattern-request-1");
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(request)));
+        (await Send(f.Client, HttpMethod.Delete, $"/api/v1/me/designs/{f.Design.Id}", f.Token)).EnsureSuccessStatusCode();
+
+        using var download = await f.Staff.GetAsync(PatternRoute(order.Id, 0));
+        Assert.Equal(HttpStatusCode.OK, download.StatusCode);
+        var bytes = await download.Content.ReadAsByteArrayAsync();
+        Assert.Equal(Pattern, bytes);
+        Assert.Equal(order.Lines[0].Personalization!.Files!.Pattern.Sha256, Sha(bytes));
+        Assert.Equal("image/png", download.Content.Headers.ContentType?.MediaType);
+        Assert.Equal("attachment", download.Content.Headers.ContentDisposition?.DispositionType);
+        var number = System.Text.RegularExpressions.Regex.Replace(order.Number, "[^A-Za-z0-9-]+", "-").Trim('-');
+        Assert.Equal($"xinobi-{number}-satir-1-desen-rev1.png", download.Content.Headers.ContentDisposition?.FileNameStar ?? download.Content.Headers.ContentDisposition?.FileName?.Trim('"'));
+        Assert.Equal("nosniff", download.Headers.GetValues("X-Content-Type-Options").Single());
+        Assert.Contains("no-store", download.Headers.CacheControl?.ToString());
+        // The Development panel runs on another origin; it must be allowed to read the server-given file name.
+        using var crossOrigin = new HttpRequestMessage(HttpMethod.Get, PatternRoute(order.Id, 0));
+        crossOrigin.Headers.Add("Origin", "http://127.0.0.1:5173");
+        using var panelDownload = await f.Staff.SendAsync(crossOrigin);
+        Assert.Contains("Content-Disposition", panelDownload.Headers.GetValues("Access-Control-Expose-Headers").Single(), StringComparison.OrdinalIgnoreCase);
+
+        Assert.Equal("order_line_design_not_found", await Code(await f.Staff.GetAsync(PatternRoute(order.Id, 1))));
+        Assert.Equal("order_line_design_not_found", await Code(await f.Staff.GetAsync(PatternRoute(order.Id, 9))));
+        Assert.Equal("order_not_found", await Code(await f.Staff.GetAsync(PatternRoute("missing-order", 0))));
+
+        // A missing copy is reported as missing, a changed copy as unavailable; neither falls back to another file.
+        var files = f.Factory.Services.GetRequiredService<IFileStore>();
+        await files.Save(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0), new MemoryStream([.. Pattern[..^1], 0]), "image/png");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(PatternRoute(order.Id, 0))).StatusCode);
+        await files.Delete(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0));
+        Assert.Equal("order_pattern_not_found", await Code(await f.Staff.GetAsync(PatternRoute(order.Id, 0))));
+    }
+
+    [Fact]
+    public async Task PatternDownloadNeedsStaffWithOrdersReadAndAnOlderOrderHasNoRevisionInItsName()
+    {
+        using var f = await Start("pattern-access@example.com");
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "pattern-legacy-1", null))));
+        var route = PatternRoute(order.Id, 0);
+        Assert.Equal(HttpStatusCode.Unauthorized, (await f.Client.GetAsync(route)).StatusCode);
+        // The owner, or any other customer, is not staff.
+        Assert.Equal(HttpStatusCode.Forbidden, (await Send(f.Client, HttpMethod.Get, route, f.Token)).StatusCode);
+        using var restricted = f.Factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddTransient<IClaimsTransformation, WithoutOrdersRead>()));
+        using var noRead = await TestStaff.Client(restricted);
+        Assert.Equal(HttpStatusCode.Forbidden, (await noRead.GetAsync(route)).StatusCode);
+
+        using var download = await f.Staff.GetAsync(route);
+        Assert.Equal(Pattern, await download.Content.ReadAsByteArrayAsync());
+        Assert.EndsWith("-satir-1-desen.png", download.Content.Headers.ContentDisposition?.FileNameStar ?? download.Content.Headers.ContentDisposition?.FileName?.Trim('"'));
+    }
+
+    [Fact]
+    public async Task ACopyWhoseBytesDisagreeWithTheRecordedTypeIsNotServed()
+    {
+        using var f = await Start("pattern-type@example.com");
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "pattern-type-1", null))));
+        // An older order without file references: a JPEG under a PNG record is refused rather than renamed or served.
+        await f.Factory.Services.GetRequiredService<IFileStore>().Save(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0), new MemoryStream([255, 216, 255, 217]), "image/jpeg");
+        var accounts = f.Factory.Services.GetRequiredService<IAccountStore>();
+        var account = (await accounts.FindByAccessToken(f.Token))!;
+        await accounts.ChangeOrder(account.Id, order.Id, stored => stored with { Lines = [stored.Lines[0] with { Personalization = stored.Lines[0].Personalization! with { Files = null } }] });
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(PatternRoute(order.Id, 0))).StatusCode);
     }
 
     [Fact]

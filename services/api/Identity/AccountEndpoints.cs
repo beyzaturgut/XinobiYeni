@@ -123,6 +123,7 @@ public static class AccountEndpoints
         Print.PrintProfileEndpoints.Map(admin);
         Orders.AdminDesignOrderEndpoints.Map(admin);
         Orders.AdminOrderDetailEndpoints.Map(admin);
+        Orders.AdminOrderPatternEndpoints.Map(admin);
         if (AccountStorage.RateLimited(app.Environment, app.Configuration)) auth.RequireRateLimiting("Account");
         foreach (var group in new[] { auth, me, admin })
         {

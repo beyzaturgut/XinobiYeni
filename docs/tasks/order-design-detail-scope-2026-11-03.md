@@ -2,7 +2,7 @@
 
 **MostGate konu/açıklama ve uygulama promptları:** [9 taskın düzenlenebilir dokümanı](order-design-mostgate-prompts-2026-11-03.md) ve [PDF](../../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf). Yalnız doküman hazırlandı; tasklar uygulanmadı.
 
-**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04...09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
+**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05...09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
 
 Kullanıcının açık kararı: kapsamlı bir üretime hazırlık/üretime gönderme bölümü olmayacak. Panelde siparişe ait kayıtlı editör yerleşimi, desenin ayrı indirilmesi, maskelemede kullanılan ürün görselinin ayrı indirilmesi ve indirilebilir giydirilmiş görsel olacak. Kullanıcı yalnız task/faz planlamasını istedi; kod geliştirmesini durdurdu.
 
@@ -22,7 +22,7 @@ Kaynak okumasında admin tasarım listesi, ilişkili sipariş bağlantısı, sip
 
 ## Alt tasklar
 
-Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01/02/03 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
+Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01/02/03/04 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
 
 ### SIP-TAS-01 - Baskı alanını sipariş tasarım detayına sadeleştir
 
@@ -54,6 +54,7 @@ Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımı
 **Açıklama:** Sipariş satırında korunmuş kullanıcı/AI desenini ürün görselinden ayrı indirilebilir yap. Dosyanın gerçek türünü ve özgün içeriğini koru; giydirilmiş önizlemeyi desen diye verme.
 **Kapanış koşulu:** İndirilen desen doğru sipariş/satır/tasarım sürümüne ait; dosya türü ve adı doğru.
 **Bağımlılık:** SIP-TAS-02
+**Durum (03.11):** Uygulandı - kabul açık. `GET /api/v1/admin/orders/{id}/lines/{line}/pattern` (`orders.read`): sunucu sipariş/satırdan SIP-TAS-02 kopyasını çözer, SHA-256 ve bayttan saptanan MIME ile doğrular, aynı baytları `xinobi-{no}-satir-{n}-desen[-rev{r}].{uzantı}` adıyla attachment verir. Admin Ham desen kartında kilitli “Ham deseni indir” düğmesi; 404/403 açık durum, servis hatasında tekrar dene; yedek içerik yok. Kanıt: [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md).
 
 ### SIP-TAS-05 - Maskelemede kullanılan ürün görselini ayrı indir
 

@@ -18,7 +18,8 @@ try{
   if(path.endsWith('/state'))return route.fulfill({json:{products:[],prices:{},categories:[],content:{slides:[],xinobiBanner:'',buttonColor:'#000000'}}});
   if(path.endsWith('/orders'))return route.fulfill({json:orders});
   if(path.endsWith('/order-options'))return route.fulfill({json:{carriers:['Test carrier'],returnWindowDays:14}});
-  if(path.endsWith('/design'))return route.fulfill({body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64'),contentType:'image/png',headers:{'Content-Disposition':'attachment; filename="xinobi-AI-0-source.png"'}});
+  if(path.endsWith('/lines/0/pattern'))return route.fulfill({body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64'),contentType:'image/png',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':'attachment; filename=xinobi-UX-AI-satir-1-desen-rev2.png'}});
+  if(path.endsWith('/design'))return route.fulfill({body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64'),contentType:'image/png',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':'attachment; filename="xinobi-AI-0-source.png"'}});
   return route.fulfill({status:404,json:{title:'Synthetic unavailable'}});
  });
  await page.goto(base+'?view=orders');
@@ -29,8 +30,8 @@ try{
  const detail=page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'});
  await detail.getByRole('region',{name:'Sipariş ve ürün bilgileri'}).getByText('TEST-SKU',{exact:true}).waitFor();
  await detail.getByRole('region',{name:'Kayıtlı yerleşim'}).getByText('Yatay konum (desen merkezi)',{exact:true}).waitFor();
- const downloadPromise=page.waitForEvent('download');await page.getByRole('link',{name:'Ham deseni indir',exact:true}).click();
- assert.equal((await downloadPromise).suggestedFilename(),'xinobi-AI-0-source.png');
+ const downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Ham deseni indir',exact:true}).click();
+ assert.equal((await downloadPromise).suggestedFilename(),'xinobi-UX-AI-satir-1-desen-rev2.png');
  await page.getByRole('button',{name:'Sipariş detayını kapat'}).click();
  await list.getByRole('button',{name:'UX-OLD detayını aç'}).click();
  await page.getByText(/Bu eski siparişte yerleşim ayarları kaydedilmemiş/).waitFor();

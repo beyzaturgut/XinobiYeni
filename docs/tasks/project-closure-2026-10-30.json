@@ -853,8 +853,8 @@
       "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
       "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
       "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
-      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu.",
-      "remaining": "SIP-TAS-04...09: ürün kaynak görseli/giydirilmiş önizleme indirmeleri, yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
+      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi.",
+      "remaining": "SIP-TAS-05...09: ürün kaynak görseli/giydirilmiş önizleme indirmeleri, yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
       "owner": "Admin/Web geliştirici + Backend + UX/QA",
@@ -1943,11 +1943,13 @@
         "id": "SIP-TAS-04",
         "title": "Ham deseni ayrı indir",
         "parents": "KIS-07",
-        "status": "Planlandı - uygulanmadı",
-        "remaining": "Sipariş satırında korunmuş kullanıcı/AI desenini ürün görselinden ayrı indirilebilir yap. Dosyanın gerçek türünü ve özgün içeriğini koru; giydirilmiş önizlemeyi desen diye verme.",
+        "status": "Uygulandı - kabul açık",
+        "remaining": "Canlı (aynı origin) ve gerçek SQL siparişiyle kabul; kapsamlı erişim kabulü SIP-TAS-07; rol/PM kabulü.",
         "accept": "İndirilen desen doğru sipariş/satır/tasarım sürümüne ait; dosya türü ve adı doğru.",
         "deps": "SIP-TAS-02",
-        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+        "done": "03.11: Yetkili (orders.read) admin ucu siparişe bağlı desen kopyasını sunucuda sipariş/satırdan çözer; bayt, SHA-256 ve gerçek MIME/uzantı doğrulanır; anlaşılır dosya adı; admin kilitli indirme düğmesi ve durumları. İzole API ve Chrome fixture PASS.",
+        "evidence": "test/2026-11-03/TST-219-sip-tas-04-pattern-download.md"
       },
       {
         "id": "SIP-TAS-05",

@@ -81,6 +81,8 @@ import 'package:xinobi_api_client/src/model/money.dart';
 import 'package:xinobi_api_client/src/model/my_design.dart';
 import 'package:xinobi_api_client/src/model/my_design_configuration.dart';
 import 'package:xinobi_api_client/src/model/my_review.dart';
+import 'package:xinobi_api_client/src/model/order_design_file.dart';
+import 'package:xinobi_api_client/src/model/order_design_files.dart';
 import 'package:xinobi_api_client/src/model/order_event.dart';
 import 'package:xinobi_api_client/src/model/order_options.dart';
 import 'package:xinobi_api_client/src/model/order_personalization.dart';
@@ -215,6 +217,8 @@ part 'serializers.g.dart';
   MyDesign,
   MyDesignConfiguration,
   MyReview,
+  OrderDesignFile,
+  OrderDesignFiles,
   OrderEvent,
   OrderOptions,
   OrderPersonalization,

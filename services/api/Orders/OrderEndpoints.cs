@@ -44,7 +44,7 @@ public static class OrderEndpoints
             var order = (await accounts.Orders(Id(user))).FirstOrDefault(item => item.Id == id);
             if (order is null || line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is null)
                 return Results.NotFound();
-            var preview = await designs.OrderPreview(id, line);
+            var preview = await designs.OrderPreview(id, line, order.Lines[line].Personalization!.Files?.Composition);
             return preview is null ? Results.NotFound() : Results.Stream(preview.Content, "image/jpeg");
         }).ExcludeFromDescription();
 
@@ -127,7 +127,7 @@ public static class OrderEndpoints
 
     private static async Task<IResult> DesignImage(CustomerOrder? order, int line, Designs.SavedDesignStore designs, bool download = false) =>
         order is not null && line >= 0 && line < order.Lines.Length && order.Lines[line].Personalization is { } design
-            && await designs.OrderImage(order.Id, line, design.Mime) is { } file
+            && await designs.OrderImage(order.Id, line, design.Mime, design.Files?.Pattern) is { } file
             ? Results.Stream(file.Content, file.ContentType, fileDownloadName: download ? $"xinobi-{order.Id}-{line}-source{(design.Mime == "image/png" ? ".png" : design.Mime == "image/jpeg" ? ".jpg" : ".webp")}" : null)
             : Results.NotFound();
 

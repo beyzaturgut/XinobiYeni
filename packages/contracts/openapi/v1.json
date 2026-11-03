@@ -7247,6 +7247,57 @@
           }
         }
       },
+      "OrderDesignFile": {
+        "required": [
+          "sha256",
+          "mime",
+          "bytes"
+        ],
+        "type": "object",
+        "properties": {
+          "sha256": {
+            "type": "string"
+          },
+          "mime": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "OrderDesignFiles": {
+        "required": [
+          "pattern"
+        ],
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "$ref": "#/components/schemas/OrderDesignFile"
+          },
+          "productSource": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/OrderDesignFile"
+              }
+            ]
+          },
+          "composition": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/OrderDesignFile"
+              }
+            ]
+          }
+        }
+      },
       "OrderEvent": {
         "required": [
           "status",
@@ -7383,6 +7434,16 @@
               },
               {
                 "$ref": "#/components/schemas/PrintSetupSnapshot"
+              }
+            ]
+          },
+          "files": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/OrderDesignFiles"
               }
             ]
           }

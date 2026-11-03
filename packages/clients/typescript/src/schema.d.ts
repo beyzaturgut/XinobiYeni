@@ -2014,6 +2014,17 @@ export interface components {
             createdAt: string;
             moderationNote: null | string;
         };
+        OrderDesignFile: {
+            sha256: string;
+            mime: string;
+            /** Format: int64 */
+            bytes: number;
+        };
+        OrderDesignFiles: {
+            pattern: components["schemas"]["OrderDesignFile"];
+            productSource?: null | components["schemas"]["OrderDesignFile"];
+            composition?: null | components["schemas"]["OrderDesignFile"];
+        };
         OrderEvent: {
             status: string;
             /** Format: date-time */
@@ -2043,6 +2054,7 @@ export interface components {
             sourceSha256?: null | string;
             sku?: null | string;
             printSetup?: null | components["schemas"]["PrintSetupSnapshot"];
+            files?: null | components["schemas"]["OrderDesignFiles"];
         };
         OrderRequest: {
             id: string;

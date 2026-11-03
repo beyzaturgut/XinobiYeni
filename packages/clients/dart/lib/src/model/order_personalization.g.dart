@@ -31,6 +31,8 @@ class _$OrderPersonalization extends OrderPersonalization {
   final String? sku;
   @override
   final PrintSetupSnapshot? printSetup;
+  @override
+  final OrderDesignFiles? files;
 
   factory _$OrderPersonalization(
           [void Function(OrderPersonalizationBuilder)? updates]) =>
@@ -48,7 +50,8 @@ class _$OrderPersonalization extends OrderPersonalization {
       this.configurationRevision,
       this.sourceSha256,
       this.sku,
-      this.printSetup})
+      this.printSetup,
+      this.files})
       : super._();
   @override
   OrderPersonalization rebuild(
@@ -74,7 +77,8 @@ class _$OrderPersonalization extends OrderPersonalization {
         configurationRevision == other.configurationRevision &&
         sourceSha256 == other.sourceSha256 &&
         sku == other.sku &&
-        printSetup == other.printSetup;
+        printSetup == other.printSetup &&
+        files == other.files;
   }
 
   @override
@@ -92,6 +96,7 @@ class _$OrderPersonalization extends OrderPersonalization {
     _$hash = $jc(_$hash, sourceSha256.hashCode);
     _$hash = $jc(_$hash, sku.hashCode);
     _$hash = $jc(_$hash, printSetup.hashCode);
+    _$hash = $jc(_$hash, files.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -110,7 +115,8 @@ class _$OrderPersonalization extends OrderPersonalization {
           ..add('configurationRevision', configurationRevision)
           ..add('sourceSha256', sourceSha256)
           ..add('sku', sku)
-          ..add('printSetup', printSetup))
+          ..add('printSetup', printSetup)
+          ..add('files', files))
         .toString();
   }
 }
@@ -174,6 +180,11 @@ class OrderPersonalizationBuilder
   set printSetup(PrintSetupSnapshotBuilder? printSetup) =>
       _$this._printSetup = printSetup;
 
+  OrderDesignFilesBuilder? _files;
+  OrderDesignFilesBuilder get files =>
+      _$this._files ??= OrderDesignFilesBuilder();
+  set files(OrderDesignFilesBuilder? files) => _$this._files = files;
+
   OrderPersonalizationBuilder() {
     OrderPersonalization._defaults(this);
   }
@@ -193,6 +204,7 @@ class OrderPersonalizationBuilder
       _sourceSha256 = $v.sourceSha256;
       _sku = $v.sku;
       _printSetup = $v.printSetup?.toBuilder();
+      _files = $v.files?.toBuilder();
       _$v = null;
     }
     return this;
@@ -232,6 +244,7 @@ class OrderPersonalizationBuilder
             sourceSha256: sourceSha256,
             sku: sku,
             printSetup: _printSetup?.build(),
+            files: _files?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -241,6 +254,8 @@ class OrderPersonalizationBuilder
 
         _$failedField = 'printSetup';
         _printSetup?.build();
+        _$failedField = 'files';
+        _files?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'OrderPersonalization', _$failedField, e.toString());

@@ -134,6 +134,7 @@ public static class CustomerEndpoints
                 catch (CatalogUnavailableException) { throw new AccountException("catalog_unavailable", "Katalog şu anda kullanılamıyor. Biraz sonra tekrar dene.", StatusCodes.Status503ServiceUnavailable); }
                 var lines = new List<CustomerOrderLine>();
                 var personalized = new List<(int Line, Designs.SavedDesign Design)>();
+                var sources = new Dictionary<int, Designs.SurfaceSourceImage>();
                 foreach (var item in items)
                 {
                     var product = catalog.Detail(item.ProductId);
@@ -157,7 +158,7 @@ public static class CustomerEndpoints
                             var config = await designs.Configuration(id, item.ConfigurationId, item.ConfigurationRevision ?? 0);
                             if (config.DesignId != design.Id || config.ProductId != product.Id || config.VariantId != variant.Id)
                                 throw new AccountException("configuration_variant_mismatch", "Sepetteki yerleşim bu tasarım ve renkle eşleşmiyor.", 409);
-                            await surfaces.Validate(product.Id, variant.Id, config.Placement);
+                            sources[lines.Count] = await surfaces.SourceImage(product.Id, variant.Id, config.Placement);
                             personalization = personalization with { SchemaVersion = config.SchemaVersion, Placement = config.Placement,
                                 ConfigurationId = config.Id, ConfigurationRevision = config.Revision, SourceSha256 = config.SourceSha256, PrintSetup = config.PrintSetup };
                         }
@@ -172,10 +173,14 @@ public static class CustomerEndpoints
                 {
                     foreach (var (line, design) in personalized)
                     {
-                        if (!await designs.CopyToOrder(design, orderId, line))
-                            throw new AccountException("design_not_found", $"{design.Name} tasarımının görseli bulunamadı.", StatusCodes.Status409Conflict);
-                        if (lines[line].Personalization is { ConfigurationId: { } configurationId, ConfigurationRevision: { } revision })
-                            await designs.CopyPreviewToOrder(id, configurationId, revision, orderId, line);
+                        var personalization = lines[line].Personalization!;
+                        var pattern = await designs.CopyToOrder(design, orderId, line, personalization.SourceSha256)
+                            ?? throw new AccountException("design_not_found", $"{design.Name} tasarımının görseli bulunamadı.", StatusCodes.Status409Conflict);
+                        var productSource = sources.TryGetValue(line, out var surface) ? await designs.CopySourceToOrder(surface, orderId, line) : null;
+                        var composition = personalization is { ConfigurationId: { } configurationId, ConfigurationRevision: { } revision }
+                            ? await designs.CopyPreviewToOrder(id, configurationId, revision, orderId, line) : null;
+                        // The references are written only after every copy of the line exists.
+                        lines[line] = lines[line] with { Personalization = personalization with { Files = new(pattern, productSource, composition) } };
                     }
                 }
                 catch

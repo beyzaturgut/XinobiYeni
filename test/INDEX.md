@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-211 | 03.11.2026 | SIP-TAS-02 siparişe bağlı dosya/revizyon fixture testleri (5 yeni + SavedDesign) | PASS 12/12 | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |
+| TST-212 | 03.11.2026 | API tam test paketi | PASS 502, 29 atlandı | API / ISOLATED | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |
+| TST-213 | 03.11.2026 | Sözleşme üretimi/kontrolü + admin/web/Flutter tüketici kontrolleri | PASS | CONTRACT / STATIC | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |
+| TST-214 | 03.11.2026 | SIP-TAS-02 izole SQL kalıcılığı | AÇIK; izole SQL yok | SQL / NOT RUN | [Rapor](2026-11-03/TST-211-sip-tas-02-order-design-files.md) |
 | TST-207 | 03.11.2026 | SIP-TAS-01 admin lint/TypeScript/derleme | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |
 | TST-208 | 03.11.2026 | Sipariş tasarım detayı odaklı Chrome fixture (4 genişlik, axe, %200, dosya durumları) | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |
 | TST-209 | 03.11.2026 | Admin izole regresyonları (15 test dosyası + 4 tools senaryosu) | PASS; toplu runner takılması raporda | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-207-sip-tas-01-order-design-detail.md) |

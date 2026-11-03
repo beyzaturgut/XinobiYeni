@@ -73,6 +73,8 @@ doc/Money.md
 doc/MyDesign.md
 doc/MyDesignConfiguration.md
 doc/MyReview.md
+doc/OrderDesignFile.md
+doc/OrderDesignFiles.md
 doc/OrderEvent.md
 doc/OrderOptions.md
 doc/OrderPersonalization.md
@@ -223,6 +225,8 @@ lib/src/model/money.dart
 lib/src/model/my_design.dart
 lib/src/model/my_design_configuration.dart
 lib/src/model/my_review.dart
+lib/src/model/order_design_file.dart
+lib/src/model/order_design_files.dart
 lib/src/model/order_event.dart
 lib/src/model/order_options.dart
 lib/src/model/order_personalization.dart

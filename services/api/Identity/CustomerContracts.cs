@@ -23,7 +23,15 @@ public record CustomerOrderLine(string ProductId, string VariantId, string Name,
 /// The design printed on a line, copied when the order was placed: deleting or renaming the saved design later does not change
 /// the order. <paramref name="ImageUrl"/> is filled per request (customer or panel address); the image is a representative preview.
 /// </summary>
-public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null, int? SchemaVersion = null, Designs.DesignPlacement? Placement = null, string? ConfigurationId = null, int? ConfigurationRevision = null, string? SourceSha256 = null, string? Sku = null, Print.PrintSetupSnapshot? PrintSetup = null);
+public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null, int? SchemaVersion = null, Designs.DesignPlacement? Placement = null, string? ConfigurationId = null, int? ConfigurationRevision = null, string? SourceSha256 = null, string? Sku = null, Print.PrintSetupSnapshot? PrintSetup = null, OrderDesignFiles? Files = null);
+/// <summary>A file copied into the order when it was placed; its checksum is verified whenever the order's copy is read.</summary>
+public record OrderDesignFile(string Sha256, string Mime, long Bytes);
+/// <summary>
+/// The order line's own copies: the raw <paramref name="Pattern"/>, the product photo the editor masked (<paramref name="ProductSource"/>)
+/// and the composed preview of the ordered placement revision (<paramref name="Composition"/>). Null means the file did not exist when
+/// the order was placed (older orders have no <c>Files</c> at all); nothing is filled in from the current catalogue or design later.
+/// </summary>
+public record OrderDesignFiles(OrderDesignFile Pattern, OrderDesignFile? ProductSource = null, OrderDesignFile? Composition = null);
 /// <summary>
 /// <paramref name="Shipment"/>, <paramref name="History"/> and <paramref name="Requests"/> were added with the order lifecycle;
 /// orders stored before have none.

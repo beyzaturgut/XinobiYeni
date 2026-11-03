@@ -86,6 +86,8 @@ export 'package:xinobi_api_client/src/model/money.dart';
 export 'package:xinobi_api_client/src/model/my_design.dart';
 export 'package:xinobi_api_client/src/model/my_design_configuration.dart';
 export 'package:xinobi_api_client/src/model/my_review.dart';
+export 'package:xinobi_api_client/src/model/order_design_file.dart';
+export 'package:xinobi_api_client/src/model/order_design_files.dart';
 export 'package:xinobi_api_client/src/model/order_event.dart';
 export 'package:xinobi_api_client/src/model/order_options.dart';
 export 'package:xinobi_api_client/src/model/order_personalization.dart';

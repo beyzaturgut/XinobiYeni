@@ -238,6 +238,8 @@ Class | Method | HTTP request | Description
  - [MyDesign](doc/MyDesign.md)
  - [MyDesignConfiguration](doc/MyDesignConfiguration.md)
  - [MyReview](doc/MyReview.md)
+ - [OrderDesignFile](doc/OrderDesignFile.md)
+ - [OrderDesignFiles](doc/OrderDesignFiles.md)
  - [OrderEvent](doc/OrderEvent.md)
  - [OrderOptions](doc/OrderOptions.md)
  - [OrderPersonalization](doc/OrderPersonalization.md)

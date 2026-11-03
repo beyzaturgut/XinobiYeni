@@ -1,3 +1,4 @@
+using System.Security.Cryptography;
 using Xinobi.Api.Infrastructure;
 
 namespace Xinobi.Api.Designs;
@@ -166,35 +167,82 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
     /// <summary>File key of a design copied into an order line; the order owns it, independent of the saved design.</summary>
     public static string OrderFile(string orderId, int line) => $"order-{orderId}-{line}";
 
-    /// <summary>Copies the design image for an order line. Returns false when the saved file is gone.</summary>
-    public async Task<bool> CopyToOrder(SavedDesign design, string orderId, int line)
+    /// <summary>
+    /// Copies the design image for an order line and returns its reference; null when the saved file is gone. A file whose checksum
+    /// differs from the ordered placement's <paramref name="expectedSha256"/> is refused, so an order never binds another revision.
+    /// </summary>
+    public async Task<Identity.OrderDesignFile?> CopyToOrder(SavedDesign design, string orderId, int line, string? expectedSha256 = null)
     {
-        await using var source = await files.Open(FileAreas.Designs, design.File);
-        if (source is null) return false;
-        await files.Save(FileAreas.Designs, OrderFile(orderId, line), source.Content, design.Mime);
-        return true;
+        byte[] bytes;
+        await using (var source = await files.Open(FileAreas.Designs, design.File))
+        {
+            if (source is null) return null;
+            bytes = await ReadAll(source.Content);
+        }
+        var copied = Reference(bytes, design.Mime);
+        if (expectedSha256 is not null && copied.Sha256 != expectedSha256)
+            throw new ProblemException("design_changed", $"{design.Name} tasarımının dosyası kayıtlı yerleşimle eşleşmiyor. Tasarımını yeniden aç.", StatusCodes.Status409Conflict);
+        await files.Save(FileAreas.Designs, OrderFile(orderId, line), new MemoryStream(bytes), design.Mime);
+        return copied;
     }
 
-    public async Task<StoredFile?> OrderImage(string orderId, int line, string mime) =>
-        await files.Open(FileAreas.Designs, OrderFile(orderId, line)) is { } file ? file with { ContentType = mime } : null;
-
-    /// <summary>The composed product preview is retained independently of editable designs.</summary>
-    public async Task CopyPreviewToOrder(string accountId, string configurationId, int revision, string orderId, int line)
+    /// <summary>Keeps the product photo the editor masked; later catalogue photo or mask changes do not reach the order.</summary>
+    public async Task<Identity.OrderDesignFile> CopySourceToOrder(SurfaceSourceImage source, string orderId, int line)
     {
-        await using var preview = await Preview(accountId, configurationId, revision);
-        // Legacy/native clients may not have uploaded a composition. Do not substitute the raw artwork.
-        if (preview is not null)
-            await files.Save(FileAreas.Designs, OrderFile(orderId, line) + "-preview", preview.Content, "image/jpeg");
+        var copied = Reference(source.Bytes, DetectImage(source.Bytes).Mime);
+        await files.Save(FileAreas.Designs, OrderFile(orderId, line) + "-source", new MemoryStream(source.Bytes), copied.Mime);
+        return copied;
     }
 
-    public async Task<StoredFile?> OrderPreview(string orderId, int line) =>
-        await files.Open(FileAreas.Designs, OrderFile(orderId, line) + "-preview") is { } file
-            ? file with { ContentType = "image/jpeg" } : null;
+    /// <summary>The composed product preview is retained independently of editable designs; null when the revision has none.</summary>
+    public async Task<Identity.OrderDesignFile?> CopyPreviewToOrder(string accountId, string configurationId, int revision, string orderId, int line)
+    {
+        byte[] bytes;
+        await using (var preview = await Preview(accountId, configurationId, revision))
+        {
+            // Legacy/native clients may not have uploaded a composition. Do not substitute the raw artwork.
+            if (preview is null) return null;
+            bytes = await ReadAll(preview.Content);
+        }
+        await files.Save(FileAreas.Designs, OrderFile(orderId, line) + "-preview", new MemoryStream(bytes), "image/jpeg");
+        return Reference(bytes, "image/jpeg");
+    }
+
+    public Task<StoredFile?> OrderImage(string orderId, int line, string mime, Identity.OrderDesignFile? expected = null) =>
+        OrderCopy(OrderFile(orderId, line), mime, expected);
+
+    public Task<StoredFile?> OrderPreview(string orderId, int line, Identity.OrderDesignFile? expected = null) =>
+        OrderCopy(OrderFile(orderId, line) + "-preview", "image/jpeg", expected);
+
+    public Task<StoredFile?> OrderSourceImage(string orderId, int line, Identity.OrderDesignFile expected) =>
+        OrderCopy(OrderFile(orderId, line) + "-source", expected.Mime, expected);
+
+    /// <summary>An order's copy; with a recorded reference the bytes must still match it, otherwise the copy is reported unavailable.</summary>
+    private async Task<StoredFile?> OrderCopy(string key, string mime, Identity.OrderDesignFile? expected)
+    {
+        var file = await files.Open(FileAreas.Designs, key);
+        if (file is null || expected is null) return file is null ? null : file with { ContentType = mime };
+        byte[] bytes;
+        await using (file) bytes = await ReadAll(file.Content);
+        if (Reference(bytes, mime) != expected) throw ProblemException.Unavailable("Sipariş tasarım dosyası");
+        return new StoredFile(new MemoryStream(bytes), mime, bytes.Length);
+    }
+
+    private static Identity.OrderDesignFile Reference(byte[] bytes, string mime) =>
+        new(Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant(), mime, bytes.Length);
+
+    private static async Task<byte[]> ReadAll(Stream content)
+    {
+        using var buffer = new MemoryStream();
+        await content.CopyToAsync(buffer);
+        return buffer.ToArray();
+    }
 
     public async Task ForgetOrderImage(string orderId, int line)
     {
         await files.Delete(FileAreas.Designs, OrderFile(orderId, line));
         await files.Delete(FileAreas.Designs, OrderFile(orderId, line) + "-preview");
+        await files.Delete(FileAreas.Designs, OrderFile(orderId, line) + "-source");
     }
 
     public async Task ForgetAccount(string accountId)

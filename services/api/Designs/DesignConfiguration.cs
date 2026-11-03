@@ -22,6 +22,8 @@ public record SaveDesignConfiguration(string VariantId, DesignPlacement Placemen
 public record MyDesignConfiguration(string Id, string DesignId, string ProductId, string VariantId, int Revision, int SchemaVersion,
     DesignPlacement Placement, bool Favorite, string SourceSha256, DateTimeOffset CreatedAt, Print.PrintSetupSnapshot? PrintSetup = null);
 public record SetConfigurationFavorite(bool Favorite);
+/// <summary>The product photo a placement was validated on; <paramref name="Sha256"/> is the surface's recorded source checksum.</summary>
+public sealed record SurfaceSourceImage(string Sha256, byte[] Bytes);
 
 public static class PlacementRules
 {
@@ -44,7 +46,26 @@ public static class PlacementRules
 /// <summary>Validates the exact current photo/mask; never fetches a browser-supplied URL or trusts a client mask checksum.</summary>
 public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvider services, IWebHostEnvironment environment, IConfiguration settings)
 {
-    public async Task Validate(string productId, string variantId, DesignPlacement placement)
+    public async Task Validate(string productId, string variantId, DesignPlacement placement) => await Resolve(productId, variantId, placement);
+
+    /// <summary>
+    /// Validates the placement like <see cref="Validate"/> and returns the exact product photo the editor masked, checked against
+    /// the surface's recorded source checksum, so an order can keep its own copy instead of pointing at the live catalogue photo.
+    /// </summary>
+    public async Task<SurfaceSourceImage> SourceImage(string productId, string variantId, DesignPlacement placement)
+    {
+        var (inputs, read) = await Resolve(productId, variantId, placement);
+        var sha = inputs.GetProperty("source").GetProperty("sha256").GetString() ?? "";
+        byte[] bytes;
+        try { bytes = await read(); }
+        catch (Exception error) when (error is SurfaceException or IOException or InvalidDataException or ArgumentException or UnauthorizedAccessException)
+        { throw new ProblemException("surface_unavailable", "Onaylı ürün yüzeyi doğrulanamadı.", 409); }
+        if (Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant() != sha)
+            throw new ProblemException("surface_changed", "Ürün yüzeyi değişti. Tasarımını güncel yüzeyde yeniden aç.", 409);
+        return new(sha, bytes);
+    }
+
+    private async Task<(JsonElement Inputs, Func<Task<byte[]>> ReadSource)> Resolve(string productId, string variantId, DesignPlacement placement)
     {
         PlacementRules.Validate(placement);
         Xinobi.Api.LocalCommerce.CommerceState state;
@@ -53,12 +74,18 @@ public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvi
         var variant = product?.Variants.FirstOrDefault(v => v.Id == variantId);
         if (variant is null) throw new ProblemException("configuration_variant_mismatch", "Bu ürün veya renk kişiselleştirme için kullanılamıyor.", 409);
         JsonElement? inputs = null;
+        Func<Task<byte[]>>? readSource = null;
         if (variant.ApprovedSurfaceMask is not null && services.GetService<ProductSurfaceWorkspace>() is { } workspace)
         {
             try
             {
                 var bundle = JsonSerializer.SerializeToElement(await workspace.RenderingInputs(productId, variantId));
-                if (bundle.GetProperty("previewAvailable").GetBoolean()) inputs = bundle.GetProperty("inputs");
+                if (bundle.GetProperty("previewAvailable").GetBoolean())
+                {
+                    inputs = bundle.GetProperty("inputs");
+                    var image = variant.Image;
+                    readSource = () => Task.FromResult(workspace.SourceBytes(image!));
+                }
             }
             catch (Exception error) when (error is SurfaceException or IOException or InvalidDataException or ArgumentException) { throw new ProblemException("surface_unavailable", "Onaylı ürün yüzeyi doğrulanamadı.", 409); }
         }
@@ -80,8 +107,9 @@ public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvi
                             && bundle.GetProperty("sourceImage").GetString() == variant.Image)
                         {
                             var published = bundle.GetProperty("inputs");
-                            await VerifyPublishedFiles(root, productId, variantId, published);
+                            var sourcePath = await VerifyPublishedFiles(root, productId, variantId, published);
                             inputs = published.Clone();
+                            readSource = () => File.ReadAllBytesAsync(sourcePath);
                         }
                     }
                     catch (Exception error) when (error is IOException or InvalidDataException or JsonException or KeyNotFoundException or InvalidOperationException or FormatException)
@@ -95,10 +123,12 @@ public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvi
         if (value.GetProperty("surfaceVersion").GetString() != placement.SurfaceVersion
             || placement.SourceWidth != Math.Max(1, (int)(width * ratio)) || placement.SourceHeight != Math.Max(1, (int)(height * ratio)))
             throw new ProblemException("surface_changed", "Ürün yüzeyi değişti. Tasarımını güncel yüzeyde yeniden aç.", 409);
+        return (value, readSource!);
     }
-    private static async Task VerifyPublishedFiles(string root, string product, string variant, JsonElement inputs)
+    /// <summary>Checks every published file of the bundle; returns the verified source photo's path.</summary>
+    private static async Task<string> VerifyPublishedFiles(string root, string product, string variant, JsonElement inputs)
     {
-        string? version = null;
+        string? version = null, source = null;
         foreach (var role in new[] { "source", "mask", "branding" })
         {
             if (role == "branding" && (!inputs.TryGetProperty(role, out var branding) || branding.ValueKind == JsonValueKind.Null)) continue;
@@ -117,7 +147,9 @@ public sealed class DesignSurfaceValidator(ICatalogSource catalog, IServiceProvi
             await using var file = File.OpenRead(path);
             if (Convert.ToHexString(await SHA256.HashDataAsync(file)).ToLowerInvariant() != sha) throw new InvalidDataException("Published media checksum mismatch.");
             if (role == "mask" && sha != inputs.GetProperty("surfaceVersion").GetString()) throw new InvalidDataException("Published mask version mismatch.");
+            if (role == "source") source = path;
         }
+        return source!;
     }
     private static bool Safe(string value) => value.Length is > 0 and <= 128 && value.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_');
 }

@@ -20,5 +20,6 @@ Name | Type | Description | Notes
 **sourceSha256** | **String** |  | [optional]
 **sku** | **String** |  | [optional]
 **printSetup** | [**PrintSetupSnapshot**](PrintSetupSnapshot.md) |  | [optional]
+**files** | [**OrderDesignFiles**](OrderDesignFiles.md) |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

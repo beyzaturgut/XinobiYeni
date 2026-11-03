@@ -5,11 +5,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../catalog/catalog_repository.dart';
+import '../../core/user_facing_error.dart';
 
 /// [code] is the API's stable problem code (e.g. `invalid_credentials`, `email_taken`); [message] is safe to show.
-class AccountException implements Exception {
+class AccountException implements UserFacingException {
   const AccountException(this.code, this.message);
   final String code;
+  @override
   final String message;
   bool get unauthorized => code == 'invalid_refresh_token' || code == 'invalid_token' || code == 'unauthorized';
   @override
@@ -36,6 +38,11 @@ abstract interface class AccountRepository {
   Future<List<CustomerAddress>> addresses(String accessToken);
   Future<CustomerAddress> saveAddress(String accessToken, String? id, SaveCustomerAddress address);
   Future<void> deleteAddress(String accessToken, String id);
+  /// Product ids saved as favourites on the account; the web reads the same list.
+  Future<List<String>> favorites(String accessToken);
+  /// Fails with `product_not_found` when the product is not published.
+  Future<void> addFavorite(String accessToken, String productId);
+  Future<void> deleteFavorite(String accessToken, String productId);
   Future<List<CustomerOrder>> orders(String accessToken);
   Future<CustomerOrder> placeOrder(String accessToken, PlaceOrder order);
   Future<CustomerOrder> order(String accessToken, String id);
@@ -161,6 +168,16 @@ class ApiAccountRepository implements AccountRepository {
 
   @override
   Future<void> deleteAddress(String accessToken, String id) => _empty(() => _api.deleteMyAddress(id: id, headers: _bearer(accessToken)));
+
+  @override
+  Future<List<String>> favorites(String accessToken) async => (await _call(() => _api.listMyFavorites(headers: _bearer(accessToken)))).toList();
+
+  @override
+  Future<void> addFavorite(String accessToken, String productId) =>
+      _empty(() => _api.addMyFavorite(addFavorite: AddFavorite((b) => b.productId = productId), headers: _bearer(accessToken)));
+
+  @override
+  Future<void> deleteFavorite(String accessToken, String productId) => _empty(() => _api.deleteMyFavorite(productId: productId, headers: _bearer(accessToken)));
 
   @override
   Future<List<CustomerOrder>> orders(String accessToken) async => (await _call(() => _api.listMyOrders(headers: _bearer(accessToken)))).toList();
@@ -316,6 +333,9 @@ class AuthController extends Notifier<AuthState> {
       await _adopt(await _refresh(stored));
     } on AccountException catch (error) {
       if (error.unauthorized) await _tokens.clear();
+      state = const SignedOut();
+    } catch (_) {
+      // An unreadable platform keystore (e.g. after a backup restore) must not leave every account screen loading forever.
       state = const SignedOut();
     }
   }

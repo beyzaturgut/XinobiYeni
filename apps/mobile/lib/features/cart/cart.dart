@@ -6,6 +6,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart' hide DesignPlacement;
 
 import '../catalog/catalog_repository.dart';
 import '../personalization/surface_preview.dart';
+import '../../core/user_facing_error.dart';
 
 /// Same shape and limits as the web cart (`xinobi-cart-v1`): variant lines, 1–99 each, at most 100 lines, stored on this device.
 /// [designId]/[designName] make a personalised line with one of the customer's saved designs; the same colour with another design
@@ -40,8 +41,9 @@ class CartLine {
 /// Units of one colour across all its lines; stock limits the colour, not each design.
 int variantUnits(List<CartLine> lines, String variantId) => lines.where((line) => line.variantId == variantId).fold(0, (sum, line) => sum + line.quantity);
 
-class CartException implements Exception {
+class CartException implements UserFacingException {
   const CartException(this.message);
+  @override
   final String message;
   @override
   String toString() => message;

@@ -121,7 +121,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   _TextAction(
                     icon: ref.watch(isFavoriteProvider(detail.id)) ? Icons.favorite : Icons.favorite_border,
                     label: ref.watch(isFavoriteProvider(detail.id)) ? 'Favorilerde' : 'Favorilere ekle',
-                    onPressed: () => ref.read(favoritesProvider.notifier).toggle(detail.id),
+                    onPressed: () => toggleFavorite(context, ref, detail.id),
                   ),
                   _TextAction(
                     icon: Icons.compare_arrows,

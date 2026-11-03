@@ -177,7 +177,8 @@ class OrderDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final orders = ref.watch(ordersProvider);
-    final options = ref.watch(orderOptionsProvider).value;
+    final optionsState = ref.watch(orderOptionsProvider);
+    final options = optionsState.value;
     final text = Theme.of(context).textTheme;
     return Scaffold(
       appBar: accountBar('Sipariş detayı'),
@@ -249,9 +250,10 @@ class OrderDetailScreen extends ConsumerWidget {
                         Text(line.name, style: text.titleMedium),
                         Text('${line.color} · ${line.quantity} × ${formatMoney(line.unitPrice)}', style: text.bodySmall),
                         if (line.personalization != null) Text('Kişiselleştirilmiş · ${line.personalization!.name}', style: text.bodySmall),
+                        // Under the name rather than beside it, so a narrow phone with large text keeps the full amount.
+                        Align(alignment: AlignmentDirectional.centerEnd, child: Text(formatMoney(line.lineTotal), style: text.bodyMedium)),
                       ]),
                     ),
-                    Text(formatMoney(line.lineTotal), style: text.bodyMedium),
                   ]),
                 ),
               const Divider(height: 24),
@@ -264,6 +266,15 @@ class OrderDetailScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               AddressCard(address: order.address, showDefault: false),
               const SizedBox(height: 24),
+              // Without the rules the cancel and return actions would just be missing; say so and offer a retry.
+              if (optionsState.hasError && options == null && order.status != 'cancelled' && order.status != 'returned')
+                Semantics(
+                  liveRegion: true,
+                  child: Row(children: [
+                    Expanded(child: Text('İptal ve iade seçenekleri yüklenemedi.', style: text.bodySmall?.copyWith(color: XinobiTokens.danger))),
+                    TextButton(onPressed: () => ref.invalidate(orderOptionsProvider), child: const Text('Tekrar dene')),
+                  ]),
+                ),
               if (canCancel(order) && options != null)
                 OutlinedButton(
                   onPressed: () => showModalBottomSheet<void>(
@@ -318,7 +329,9 @@ class _CancelOrderSheetState extends ConsumerState<CancelOrderSheet> {
         ..description = description.text.trim().isEmpty ? null : description.text.trim())));
       ref.invalidate(ordersProvider);
       ref.invalidate(inboxProvider);
-      if (mounted) Navigator.of(context).pop();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(widget.order.status == 'preparing' ? 'İptal talebin alındı. Sonucu bildirim ile ileteceğiz.' : 'Siparişin iptal edildi.')));
+      Navigator.of(context).pop();
     } on AccountException catch (e) {
       setState(() => error = e.message);
     } finally {
@@ -406,8 +419,13 @@ class _ReturnRequestScreenState extends ConsumerState<ReturnRequestScreen> {
   @override
   Widget build(BuildContext context) {
     final orders = ref.watch(ordersProvider);
-    final options = ref.watch(orderOptionsProvider).value;
+    final optionsState = ref.watch(orderOptionsProvider);
     final text = Theme.of(context).textTheme;
+    // The return rules come from their own request: without them no "cannot be returned" verdict is shown.
+    if (optionsState case AsyncError(:final error) when !optionsState.isLoading) {
+      return Scaffold(appBar: accountBar('İade talebi'), body: ErrorView(error: error, onRetry: () => ref.invalidate(orderOptionsProvider)));
+    }
+    final options = optionsState.value;
     return Scaffold(
       appBar: accountBar('İade talebi'),
       body: orders.when(
@@ -415,7 +433,8 @@ class _ReturnRequestScreenState extends ConsumerState<ReturnRequestScreen> {
         error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(ordersProvider)),
         data: (items) {
           final order = items.where((item) => item.id == widget.orderId).firstOrNull;
-          if (order == null || options == null) return const LoadingView();
+          if (order == null) return const EmptyView('Sipariş bulunamadı. Siparişlerim listesinden tekrar seç.');
+          if (options == null) return const LoadingView();
           final left = returnable(order, options.returnWindowDays);
           if (left.isEmpty) return const Center(child: Padding(padding: EdgeInsets.all(24), child: Text('Bu sipariş için iade talebi oluşturulamaz.')));
           final chosen = quantities.values.any((count) => count > 0);

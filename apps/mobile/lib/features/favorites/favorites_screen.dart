@@ -8,16 +8,78 @@ import '../../core/formatting.dart';
 import '../../widgets/common.dart';
 import 'favorite_button.dart';
 import 'favorites.dart';
+import '../account/auth.dart';
 import '../designs/design_configurations.dart';
 
 class FavoritesScreen extends ConsumerWidget {
   const FavoritesScreen({super.key});
 
+  Future<void> _clear(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Tüm favoriler çıkarılsın mı?'),
+        content: const Text('Liste hesabından silinir; web ve diğer cihazlarda da boşalır.'),
+        actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Vazgeç')), FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Tümünü temizle'))],
+      ),
+    );
+    if (ok != true) return;
+    try {
+      await ref.read(favoritesProvider.notifier).clear();
+      messenger.showSnackBar(const SnackBar(content: Text('Favori listen temizlendi.')));
+    } on AccountException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authProvider);
     final ids = ref.watch(favoritesProvider);
     final items = ref.watch(favoriteItemsProvider);
     final text = Theme.of(context).textTheme;
+    Widget message(String title, String body, String action, VoidCallback onPressed) => Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Text(title, style: text.titleLarge, textAlign: TextAlign.center),
+              const SizedBox(height: 8),
+              Text(body, textAlign: TextAlign.center),
+              const SizedBox(height: 16),
+              FilledButton(onPressed: onPressed, child: Text(action)),
+            ]),
+          ),
+        );
+    // Signed out, still restoring the session, a failed account list and an empty one are four different answers.
+    final Widget content = switch ((auth, ids)) {
+      (AuthLoading(), _) => const LoadingView(),
+      (SignedOut(), _) => message('Favorilerini görmek için giriş yap.', 'Listen hesabına bağlı olarak saklanır; giriş yaptığın web ve mobil cihazlarda aynı görünür.', 'Giriş yap', () => signInAbove(context, ref)),
+      (_, AsyncError(:final error)) => ErrorView(error: error, onRetry: () => ref.invalidate(favoritesProvider)),
+      (_, AsyncData(value: final list)) when list.isEmpty => message('Favori listen henüz boş.', 'Beğendiğin ürünleri kalp düğmesiyle buraya ekleyebilirsin.', 'Ürünleri keşfet', () => context.go('/urunler')),
+      (_, AsyncData()) => items.when(
+          // Keep the previous list while a toggle reloads it, so removing a row does not flash a spinner.
+          skipLoadingOnReload: true,
+          loading: () => const LoadingView(),
+          error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(favoriteItemsProvider)),
+          data: (items) => RefreshIndicator(
+            onRefresh: () async {
+              ref.invalidate(favoritesProvider);
+              await ref.read(favoriteItemsProvider.future);
+            },
+            child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
+              Row(children: [
+                Expanded(child: Text('${items.length} favori ürün', style: text.titleMedium)),
+                TextButton(onPressed: () => _clear(context, ref), child: const Text('Tümünü temizle')),
+              ]),
+              Text('Favorilerin hesabına kaydedilir; web ve mobilde aynı listeyi görürsün.', style: text.bodySmall),
+              const SizedBox(height: 12),
+              for (final item in items) Padding(padding: const EdgeInsets.only(bottom: 12), child: _FavoriteRow(item: item)),
+            ]),
+          ),
+        ),
+      _ => const LoadingView(),
+    };
     return Scaffold(
       appBar: AppBar(
         backgroundColor: XinobiTokens.header,
@@ -25,37 +87,7 @@ class FavoritesScreen extends ConsumerWidget {
         toolbarHeight: XinobiTokens.headerHeight,
         title: const Text('Favorilerim'),
       ),
-      body: CustomScrollView(slivers: [const SliverToBoxAdapter(child: PersonalizedFavorites()), SliverFillRemaining(child: ids.isEmpty
-          ? Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Favori listen henüz boş.', style: text.titleLarge),
-                  const SizedBox(height: 8),
-                  const Text('Beğendiğin ürünleri kalp düğmesiyle buraya ekleyebilirsin.', textAlign: TextAlign.center),
-                  const SizedBox(height: 16),
-                  FilledButton(onPressed: () => context.go('/urunler'), child: const Text('Ürünleri keşfet')),
-                ]),
-              ),
-            )
-          : items.when(
-              // Keep the previous list while a toggle reloads it, so removing a row does not flash a spinner.
-              skipLoadingOnReload: true,
-              loading: () => const LoadingView(),
-              error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(favoriteItemsProvider)),
-              data: (items) => RefreshIndicator(
-                onRefresh: () => ref.refresh(favoriteItemsProvider.future),
-                child: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
-                  Row(children: [
-                    Expanded(child: Text('${items.length} favori ürün', style: text.titleMedium)),
-                    TextButton(onPressed: () => ref.read(favoritesProvider.notifier).clear(), child: const Text('Tümünü temizle')),
-                  ]),
-                  Text('Bu liste yalnız bu cihazda tutulur.', style: text.bodySmall),
-                  const SizedBox(height: 12),
-                  for (final item in items) Padding(padding: const EdgeInsets.only(bottom: 12), child: _FavoriteRow(item: item)),
-                ]),
-              ),
-            )),]),
+      body: CustomScrollView(slivers: [const SliverToBoxAdapter(child: PersonalizedFavorites()), SliverFillRemaining(child: content)]),
     );
   }
 }

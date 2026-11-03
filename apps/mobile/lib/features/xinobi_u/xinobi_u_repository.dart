@@ -7,6 +7,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../core/ids.dart';
 import '../catalog/catalog_repository.dart';
+import '../../core/user_facing_error.dart';
 
 /// XINOBI U contract (/api/v1/xinobi-u). Generation is a real, metered provider call on the server; the server makes it idempotent.
 abstract interface class XinobiURepository {
@@ -17,9 +18,10 @@ abstract interface class XinobiURepository {
 }
 
 /// [code] is the API's stable problem code (e.g. `daily_limit`, `session_expired`); [message] is safe to show.
-class XinobiUException implements Exception {
+class XinobiUException implements UserFacingException {
   const XinobiUException(this.code, this.message);
   final String code;
+  @override
   final String message;
   bool get sessionGone => code == 'session_expired' || code == 'questionnaire_updated';
   @override

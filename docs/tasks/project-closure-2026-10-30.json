@@ -417,9 +417,9 @@
       "work": "Arama, karşılaştırma, normal/tasarım favorileri, adres, hesap silme, sipariş/iade ve teklif akışlarını web ile karşılaştır.",
       "accept": "Seçilen ürün/rengin bilgisi tutarlı; gerçek hesap favori eşitlemesi doğrulanmış; cihaz sepeti politikası kullanıcıya açık.",
       "deps": "TIC-01, WEB-04, B2B-08",
-      "done": "Katalog/arama/karşılaştırma, hesap/adres/tasarımlar ve sipariş ekranları var; son Flutter paketi 72/72 geçti. de99958 sonrası Flutter ana sayfa düzeni düzeltildi; tam mobil paket 79/79.",
-      "remaining": "Web ile aynı gerçek hesap/favori/teklif ve ticari akış eşliği Android/iOS cihazlarında ayrıca kabul edilmeli.",
-      "status": "Yapılmadı - kapanış açık",
+      "done": "Katalog/arama/karşılaştırma, hesap/adres/tasarımlar ve sipariş ekranları var; son Flutter paketi 72/72 geçti. de99958 sonrası Flutter ana sayfa düzeni düzeltildi; tam mobil paket 79/79. 03.11: favoriler web ile aynı hesap API'sine taşındı; istek durumları/taşmalar düzeltildi (M01–M11); 192 hücre widget matrisi, 280/280 Flutter testi; Android emülatör oturum kapalı ve OS %200 yazı. Kanıt: design/flutter-consistency-audit-2026-11-03.md, test/2026-11-03/TST-196-flutter-web-consistency.md.",
+      "remaining": "Gerçek hesapla Android/iOS cihazda favori/teklif/sipariş eşliği; iOS derleme Bloke (Xcode yok); fiziksel telefon kabulü.",
+      "status": "Kısmen yapıldı",
       "phase": "Faz11",
       "owner": "Mobil geliştirici + QA + yayın sorumlusu"
     },
@@ -1495,7 +1495,7 @@
       "work": "Web/admin/Android/iOS ekran matrisi, hi-fi/handoff, klavye ve VoiceOver/TalkBack tutanaklarını tamamla.",
       "accept": "Creative/UX/Frontend onayı var; otomatik tarama yanında manuel cihaz kanıtı bulunuyor; kritik erişilebilirlik kusuru kalmamış.",
       "deps": "KAR-01",
-      "done": "WEB-07 otomatik tarama, klavye/odak ve %200 metin düzeltmeleri; tarihli test/audit kaydı var. de99958 native Flutter ana sayfa yerleşimi 7 odaklı testle doğrulandı; fiziksel cihaz değil. 30.10 web görsel/durum çalışması: 33 rota × 4 genişlik × 2 metin ölçeği; hesap/katalog/iade/Nobi hata ayrımı, taslak ve modal odak düzeltmeleri. Kanıt: design/web-consistency-audit-2026-10-30.md ve test/2026-10-30/TST-179-web-consistency.md. Gerçek kabul açık.",
+      "done": "WEB-07 otomatik tarama, klavye/odak ve %200 metin düzeltmeleri; tarihli test/audit kaydı var. de99958 native Flutter ana sayfa yerleşimi 7 odaklı testle doğrulandı; fiziksel cihaz değil. 30.10 web görsel/durum çalışması: 33 rota × 4 genişlik × 2 metin ölçeği; hesap/katalog/iade/Nobi hata ayrımı, taslak ve modal odak düzeltmeleri. Kanıt: design/web-consistency-audit-2026-10-30.md ve test/2026-10-30/TST-179-web-consistency.md. Gerçek kabul açık. 03.11 Flutter: 32 rota × 3 genişlik × 1x/2x widget matrisi ve Android emülatör OS %200 yazı kontrolü (design/flutter-consistency-audit-2026-11-03.md).",
       "remaining": "Web/admin/Android/iOS tam matris, gerçek VoiceOver/TalkBack ve Creative/UX/handoff imzaları eksik.",
       "status": "Kısmen yapıldı",
       "phase": "Faz02",
@@ -1763,5 +1763,6 @@
     ]
   },
   "web_consistency_evidence": "design/web-consistency-audit-2026-10-30.md",
-  "admin_consistency_evidence": "design/admin-consistency-audit-2026-10-30.md"
+  "admin_consistency_evidence": "design/admin-consistency-audit-2026-10-30.md",
+  "flutter_consistency_evidence": "design/flutter-consistency-audit-2026-11-03.md"
 }

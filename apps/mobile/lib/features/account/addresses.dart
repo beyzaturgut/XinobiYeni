@@ -88,10 +88,10 @@ class AddressCard extends StatelessWidget {
               ],
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Flexible(child: Text(address.title, style: text.titleMedium)),
+                  // The badge wraps under a long title or large text instead of pushing past the card.
+                  Wrap(spacing: 8, runSpacing: 4, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                    Text(address.title, style: text.titleMedium),
                     if (showDefault && address.isDefault) ...[
-                      const SizedBox(width: 8),
                       DecoratedBox(
                         decoration: BoxDecoration(color: XinobiTokens.ink, borderRadius: BorderRadius.circular(999)),
                         child: Padding(
@@ -160,6 +160,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
   }
 
   Future<void> run(Future<void> Function() action) async {
+    if (busy) return;
     setState(() {
       busy = true;
       error = null;
@@ -175,6 +176,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
 
   Future<void> save() => run(() async {
         final router = GoRouter.of(context);
+        final messenger = ScaffoldMessenger.of(context);
         final address = SaveCustomerAddress((b) => b
           ..title = title.text.trim()
           ..fullName = fullName.text.trim()
@@ -184,17 +186,35 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
           ..line = line.text.trim()
           ..postalCode = postal.text.trim().isEmpty ? null : postal.text.trim()
           ..isDefault = isDefault);
-        await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveAddress(token, widget.addressId, address));
+        // The form and its text stay when the server refuses; success is only shown once the server has saved it.
+        if (await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveAddress(token, widget.addressId, address)) == null) return;
         ref.invalidate(addressesProvider);
+        messenger.showSnackBar(const SnackBar(content: Text('Adres kaydedildi.')));
         router.pop();
       });
 
-  Future<void> delete() => run(() async {
-        final router = GoRouter.of(context);
-        await ref.read(authProvider.notifier).withSession((repository, token) => repository.deleteAddress(token, widget.addressId!));
-        ref.invalidate(addressesProvider);
-        router.pop();
-      });
+  Future<void> delete(String title) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('“$title” silinsin mi?'),
+        content: const Text('Bu adres hesabından kaldırılır. Verilmiş siparişlerdeki teslimat adresi değişmez.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Vazgeç')),
+          FilledButton(style: FilledButton.styleFrom(backgroundColor: XinobiTokens.danger), onPressed: () => Navigator.pop(context, true), child: const Text('Adresi sil')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    await run(() async {
+      final router = GoRouter.of(context);
+      final messenger = ScaffoldMessenger.of(context);
+      await ref.read(authProvider.notifier).withSession((repository, token) => repository.deleteAddress(token, widget.addressId!));
+      ref.invalidate(addressesProvider);
+      messenger.showSnackBar(const SnackBar(content: Text('Adres silindi.')));
+      router.pop();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -205,9 +225,11 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
     return Scaffold(
       appBar: accountBar(editing ? 'Adresi düzenle' : 'Adres ekle'),
       body: editing && existing == null
-          ? addresses.isLoading
-              ? const LoadingView()
-              : const Center(child: Text('Adres bulunamadı.'))
+          ? switch (addresses) {
+              AsyncError(:final error) when !addresses.isLoading => ErrorView(error: error, onRetry: () => ref.invalidate(addressesProvider)),
+              _ when addresses.isLoading => const LoadingView(),
+              _ => const EmptyView('Adres bulunamadı. Adreslerim listesinden tekrar seç.'),
+            }
           : ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
               TextField(controller: title, maxLength: 40, decoration: accountField('Adres başlığı', helper: 'Örn. Ev, İş')),
               const SizedBox(height: 12),
@@ -238,7 +260,7 @@ class _AddressFormScreenState extends ConsumerState<AddressFormScreen> {
                 const SizedBox(height: 8),
                 TextButton(
                   style: TextButton.styleFrom(foregroundColor: XinobiTokens.danger),
-                  onPressed: busy ? null : delete,
+                  onPressed: busy ? null : () => delete(existing?.title ?? 'Adres'),
                   child: const Text('Adresi sil'),
                 ),
               ],

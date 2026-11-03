@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/main.dart';
+import 'package:xinobi_mobile/features/account/auth.dart';
+
+import 'account_test.dart' show MemoryTokens;
 
 Money _try(int minor) => Money((b) => b
   ..amountMinor = minor
@@ -130,7 +133,8 @@ Future<FakeCatalog> pumpApp(WidgetTester tester, {String location = '/', FakeCat
   addTearDown(tester.view.reset);
   await tester.pumpWidget(ProviderScope(
     retry: noAutomaticRetry,
-    overrides: [catalogRepositoryProvider.overrideWithValue(fake)],
+    // Signed out: an empty keystore, since the platform one does not answer in widget tests.
+    overrides: [catalogRepositoryProvider.overrideWithValue(fake), tokenStoreProvider.overrideWithValue(MemoryTokens())],
     child: XinobiApp(initialLocation: location),
   ));
   await tester.pumpAndSettle();

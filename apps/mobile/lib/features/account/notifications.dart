@@ -24,16 +24,33 @@ final unreadNotificationsProvider = Provider.autoDispose<int>((ref) => ref.watch
 String notificationDate(DateTime value) => orderDate(value);
 
 /// /hesap/bildirimler
-class NotificationsScreen extends ConsumerWidget {
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
+  @override
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+}
 
-  Future<void> markRead(WidgetRef ref, List<String>? ids) async {
-    await ref.read(authProvider.notifier).withSession((repository, token) => repository.markRead(token, ids));
-    ref.invalidate(inboxProvider);
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  /// The notification being marked ('all' for every one); one request at a time, like the web.
+  String? busy;
+
+  Future<void> markRead(List<String>? ids) async {
+    if (busy != null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    setState(() => busy = ids?.first ?? 'all');
+    try {
+      await ref.read(authProvider.notifier).withSession((repository, token) => repository.markRead(token, ids));
+      ref.invalidate(inboxProvider);
+      if (ids == null) messenger..hideCurrentSnackBar()..showSnackBar(const SnackBar(content: Text('Tüm bildirimler okundu olarak işaretlendi.')));
+    } on AccountException catch (error) {
+      messenger..hideCurrentSnackBar()..showSnackBar(SnackBar(content: Text(error.message)));
+    } finally {
+      if (mounted) setState(() => busy = null);
+    }
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final inbox = ref.watch(inboxProvider);
     final text = Theme.of(context).textTheme;
     return Scaffold(
@@ -44,15 +61,26 @@ class NotificationsScreen extends ConsumerWidget {
         title: const Text('Bildirimlerim'),
         actions: [
           if ((inbox.value?.unread ?? 0) > 0)
-            TextButton(onPressed: () => markRead(ref, null), style: TextButton.styleFrom(foregroundColor: XinobiTokens.onHeader), child: const Text('Tümünü okundu say')),
+            TextButton(onPressed: busy == null ? () => markRead(null) : null, style: TextButton.styleFrom(foregroundColor: XinobiTokens.onHeader), child: Text(busy == 'all' ? 'İşleniyor…' : 'Tümünü okundu say')),
         ],
       ),
       body: inbox.when(
         loading: () => const LoadingView(),
         error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(inboxProvider)),
         data: (value) {
-          if (value == null) return const Center(child: Text('Bildirimlerini görmek için giriş yap.'));
-          if (value.items.isEmpty) return const EmptyView('Henüz bildirimin yok.');
+          if (value == null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
+                  const Text('Bildirimlerini görmek için giriş yap.', textAlign: TextAlign.center),
+                  const SizedBox(height: 16),
+                  FilledButton(onPressed: () => context.push('/giris'), child: const Text('Giriş yap')),
+                ]),
+              ),
+            );
+          }
+          if (value.items.isEmpty) return const EmptyView('Henüz bildirimin yok. Sipariş, kargo, iptal ve iade gelişmeleri burada gösterilir.');
           return RefreshIndicator(
             onRefresh: () => ref.refresh(inboxProvider.future),
             child: ListView.separated(
@@ -74,7 +102,8 @@ class NotificationsScreen extends ConsumerWidget {
                     isThreeLine: true,
                     trailing: item.read ? null : const Icon(Icons.circle, size: 10, semanticLabel: 'Okunmadı'),
                     onTap: () async {
-                      if (!item.read) unawaited(markRead(ref, [item.id]));
+                      // A failed read mark is reported; the order itself still opens.
+                      if (!item.read) await markRead([item.id]);
                       if (orderId != null && context.mounted) await context.push('/hesap/siparisler/$orderId');
                     },
                   ),

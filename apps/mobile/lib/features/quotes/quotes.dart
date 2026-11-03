@@ -11,10 +11,12 @@ import '../../widgets/common.dart';
 import '../account/account_widgets.dart';
 import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
+import '../../core/user_facing_error.dart';
 
 /// [message] is the API's Turkish problem title, safe to show.
-class QuoteException implements Exception {
+class QuoteException implements UserFacingException {
   const QuoteException(this.message);
+  @override
   final String message;
   @override
   String toString() => message;

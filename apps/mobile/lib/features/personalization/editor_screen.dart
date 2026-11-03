@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart' hide DesignPlacement;
 
 import '../../app/design_tokens.g.dart';
+import '../../core/user_facing_error.dart';
 import '../../widgets/common.dart';
 import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
@@ -151,7 +152,7 @@ class _EditorScreenState extends ConsumerState<EditorScreen> {
       body: ListView(padding: const EdgeInsets.all(XinobiTokens.gutterMobile), children: [
         products.when(
           loading: () => const LinearProgressIndicator(),
-          error: (error, _) => Text(error.toString()),
+          error: (error, _) => Text(userMessage(error)),
           data: (page) => DropdownButtonFormField<String>(
             isExpanded: true,
             initialValue: page.items.any((item) => item.id == productId) ? productId : null,

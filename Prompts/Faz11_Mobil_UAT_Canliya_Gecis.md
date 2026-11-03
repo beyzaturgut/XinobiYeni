@@ -1,5 +1,7 @@
 # Faz11 — iOS/Android, çapraz kanal kabulü ve canlıya geçiş
 
+**03.11 Flutter–web görsel/durum uygulaması:** Flutter ekranları web istek durumlarıyla karşılaştırıldı: favoriler hesap API'sine taşındı, hata/tekrar dene/teyitli başarı/taslak/işlem kilidi eklendi, 192 hücrelik widget matrisi (32 rota × 3 genişlik × 1x/2x) ve Android 14 doğrusal olmayan ölçek testi geçti; 280/280 Flutter testi. Android emülatörde oturum kapalı akışlar ve OS %200 yazı denendi; iOS Bloke (Xcode yok). [Ekran/kusur matrisi](../design/flutter-consistency-audit-2026-11-03.md), [TST-196](../test/2026-11-03/TST-196-flutter-web-consistency.md). Gerçek telefon, oturum açık cihaz akışı, TalkBack/VoiceOver ve handoff kabulü açık; faz onayı/yüzde değiştirilmedi.
+
 ## Güncel durum ve tüm açık işler - 30.10.2026
 
 **Durum:** Devam - Flutter eşliği düzeltildi; kurulum, cihaz, push, mağaza ve final UAT açık. Kaynak kesiti `main / de99958`; [120 task ana listesi](../docs/tasks/project-closure-2026-10-30.md), [30.10 faz denetimi](../docs/tasks/phase-audit-2026-10-30.md). Bu bölüm günceldir; aşağıdaki 27/20/16 Ekim kesitleri tarihsel tutulur. Oran veya rol/PM onayı eklenmedi.
@@ -41,6 +43,7 @@ Aşağıdaki tablo bu fazın ana sorumluluğundaki tüm kapanış tasklarını i
 | Alt iş | Ana task | Durum | Kalan / kanıt |
 |---|---|---|---|
 | MOB-HOME-01 | MOB-06, QA-03 | Yapıldı - teknik | de99958 web düzenine native Flutter eşlik, ürün-kart örtüşmesi giderildi; 7 odaklı/79 tam test. |
+| MOB-PARITY-01 | MOB-06, QA-03 | Kısmen yapıldı | 03.11 Flutter–web durum/tasarım eşliği: hesap favorisi, M01–M11 düzeltmeleri, 280/280 test; Android emülatör oturum kapalı + OS %200; iOS Bloke (Xcode yok), oturum açık cihaz/telefon kabulü açık. [Matris](../design/flutter-consistency-audit-2026-11-03.md). |
 | MOB-HOME-02 | MOB-08, QA-05, OPS-05 | Açık | Yetkili paket/dağıtım adımında güncel uygulamayı telefona kur ve görsel kabulü kaydet. Bu dokümantasyon oturumunda APK/kurulum yapılmaz. |
 
 **Çapraz bağımlılıklar (tekrar sayılmaz):** [WEB-07](../docs/tasks/project-closure-2026-10-30.md#web-07), [KIS-01](../docs/tasks/project-closure-2026-10-30.md#kis-01), [KIS-03](../docs/tasks/project-closure-2026-10-30.md#kis-03), [TIC-04](../docs/tasks/project-closure-2026-10-30.md#tic-04), [TIC-05](../docs/tasks/project-closure-2026-10-30.md#tic-05), [SEC-01](../docs/tasks/project-closure-2026-10-30.md#sec-01), [OPS-01](../docs/tasks/project-closure-2026-10-30.md#ops-01), [OPS-02](../docs/tasks/project-closure-2026-10-30.md#ops-02), [OPS-04](../docs/tasks/project-closure-2026-10-30.md#ops-04), [QA-03](../docs/tasks/project-closure-2026-10-30.md#qa-03), [QA-04](../docs/tasks/project-closure-2026-10-30.md#qa-04).

@@ -2,6 +2,13 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-196 | 03.11.2026 | Flutter analiz | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
+| TST-197 | 03.11.2026 | Flutter 13 istek durumu/favori testi | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
+| TST-198 | 03.11.2026 | Flutter 192 hücre ekran matrisi + doğrusal olmayan ölçek | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
+| TST-199 | 03.11.2026 | Flutter tam paket 280/280 | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
+| TST-200 | 03.11.2026 | Android emülatör oturum kapalı + OS %200 yazı | PASS; sınırlar raporda | ANDROID EMULATOR | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
+| TST-201 | 03.11.2026 | iOS — BLOKE (Xcode/simülatör yok) | BLOKE | iOS / BLOCKED | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
+| TST-202 | 03.11.2026 | Flutter belge/diff/upstream | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
 | TST-188 | 30.10.2026 | Admin 16 modül / 128 görünüm / 16 axe | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
 | TST-189 | 30.10.2026 | Admin 48 giriş durumu / 15 odaklı senaryo | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |
 | TST-190 | 30.10.2026 | Admin 15 mevcut browser regresyonu | PASS; sınırlar/ilk hatalar raporda | ADMIN / ISOLATED / STATIC | [Rapor](2026-10-30/TST-188-admin-consistency.md) |

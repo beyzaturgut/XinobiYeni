@@ -28,7 +28,7 @@ void main() {
     expect(find.byTooltip('Haber ve duyurular'), findsOneWidget);
     await tester.tap(find.byTooltip('Favorilerim'));
     await tester.pumpAndSettle();
-    expect(find.text('Favori listen henüz boş.'), findsOneWidget);
+    expect(find.text('Favorilerini görmek için giriş yap.'), findsOneWidget, reason: 'Favourites belong to the account, as on the web.');
   });
 
   testWidgets('tapping the header logo returns to the home page', (tester) async {

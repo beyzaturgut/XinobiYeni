@@ -22,7 +22,7 @@ class CartScreen extends ConsumerWidget {
       appBar: const XinobiHeader(),
       body: lines.isEmpty
           ? Center(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.all(24),
                 child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Text('Sepetin boş.', style: text.titleLarge),
@@ -125,7 +125,9 @@ class _CartRow extends ConsumerWidget {
             if (item.problemText != null)
               Padding(padding: const EdgeInsets.only(top: 4), child: Text(item.problemText!, style: text.bodySmall?.copyWith(color: XinobiTokens.danger))),
             const SizedBox(height: 6),
-            Row(children: [
+            // Side by side when it fits; with large text "Kaldır" moves under the stepper instead of overflowing.
+            OverflowBar(alignment: MainAxisAlignment.spaceBetween, overflowAlignment: OverflowBarAlignment.end, children: [
+              Row(mainAxisSize: MainAxisSize.min, children: [
               IconButton(
                 tooltip: '$label adedini azalt',
                 onPressed: () => run(() => cart.setLineQuantity(line.key, line.quantity - 1)),
@@ -137,7 +139,7 @@ class _CartRow extends ConsumerWidget {
                 onPressed: canIncrease ? () => run(() => cart.setLineQuantity(line.key, line.quantity + 1)) : null,
                 icon: const Icon(Icons.add),
               ),
-              const Spacer(),
+              ]),
               Semantics(
                 label: '$label sepetten kaldır',
                 button: true,

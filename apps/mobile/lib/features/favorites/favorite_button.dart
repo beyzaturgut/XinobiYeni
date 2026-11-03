@@ -24,7 +24,7 @@ class FavoriteButton extends ConsumerWidget {
       color: color ?? XinobiTokens.ink,
       icon: const Icon(Icons.favorite_border),
       selectedIcon: const Icon(Icons.favorite),
-      onPressed: () => ref.read(favoritesProvider.notifier).toggle(productId),
+      onPressed: () => toggleFavorite(context, ref, productId),
     );
     if (!onImage) return button;
     return DecoratedBox(

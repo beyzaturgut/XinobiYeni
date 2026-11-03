@@ -212,6 +212,8 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### QA-03
 
+**03.11 ek teknik kanıt:** [Flutter 32 rota × 3 genişlik × 2 metin ölçeği matrisi](../../design/flutter-consistency-audit-2026-11-03.md); Android emülatör OS %200 yazı kontrolü. TalkBack/VoiceOver ve iOS açık.
+
 **30.10 ek teknik kanıt:** [33 ekran görsel/durum denetimi](../../design/web-consistency-audit-2026-10-30.md); Chrome/fixture kanıtı manuel ekran okuyucu kabulü değildir.
 
 **Erişilebilirlik ve tasarım teslimini kabul et** — P1 / Doğrulama / **Kısmen yapıldı**
@@ -1801,7 +1803,9 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 ### MOB-06
 
-**Mobil katalog ve hesap eşliğini kabul et** — P1 / Doğrulama / **Yapılmadı - kapanış açık**
+**03.11 ek teknik kanıt:** [Flutter–web eşlik matrisi](../../design/flutter-consistency-audit-2026-11-03.md), [TST-196](../../test/2026-11-03/TST-196-flutter-web-consistency.md). Favoriler web ile aynı hesap API'sinde; 192 hücre widget matrisi ve 280/280 Flutter testi; Android emülatör oturum kapalı/OS %200; iOS Bloke (Xcode yok). Gerçek hesapla cihaz eşitleme kabulü açık.
+
+**Mobil katalog ve hesap eşliğini kabul et** — P1 / Doğrulama / **Kısmen yapıldı**
 
 **Önerilen sorumlu:** Mobil geliştirici + QA + yayın sorumlusu. Atanmış kişi ve hedef tarih: belirlenmedi (UAT-01).
 
@@ -2060,4 +2064,5 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 | Alt iş | Ana task | Durum | Kapanış / kalan |
 |---|---|---|---|
 | MOB-HOME-01 | MOB-06, QA-03 | Yapıldı - teknik | de99958 web düzenine native Flutter eşlik, ürün-kart örtüşmesi giderildi; 7 odaklı/79 tam test. |
+| MOB-PARITY-01 | MOB-06, QA-03 | Kısmen yapıldı | 03.11 Flutter–web durum/tasarım eşliği ve hesap favorisi; 280/280 test, Android emülatör; iOS Bloke, oturum açık cihaz kabulü açık. |
 | MOB-HOME-02 | MOB-08, QA-05, OPS-05 | Açık | Yetkili paket/dağıtım adımında güncel uygulamayı telefona kur ve görsel kabulü kaydet. Bu dokümantasyon oturumunda APK/kurulum yapılmaz. |

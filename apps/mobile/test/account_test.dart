@@ -161,7 +161,33 @@ class FakeAccounts implements AccountRepository {
   }
 
   @override
-  Future<void> deleteAddress(String accessToken, String id) async => savedAddresses.removeWhere((a) => a.id == id);
+  Future<void> deleteAddress(String accessToken, String id) async {
+    if (failDeleteAddress) throw const AccountException('account_unavailable', 'Hesap işlemleri şu anda kullanılamıyor.');
+    savedAddresses.removeWhere((a) => a.id == id);
+  }
+  var failDeleteAddress = false;
+
+  /// The account's favourites; [favoritesFailure] makes every favourite request fail like an unavailable server.
+  final favoriteIds = <String>[];
+  AccountException? favoritesFailure;
+  @override
+  Future<List<String>> favorites(String accessToken) async {
+    if (favoritesFailure != null) throw favoritesFailure!;
+    return [...favoriteIds];
+  }
+
+  @override
+  Future<void> addFavorite(String accessToken, String productId) async {
+    if (favoritesFailure != null) throw favoritesFailure!;
+    if (productId == 'P9') throw const AccountException('product_not_found', 'Ürün bulunamadı.');
+    if (!favoriteIds.contains(productId)) favoriteIds.add(productId);
+  }
+
+  @override
+  Future<void> deleteFavorite(String accessToken, String productId) async {
+    if (favoritesFailure != null) throw favoritesFailure!;
+    favoriteIds.remove(productId);
+  }
 
   final placed = <CustomerOrder>[];
   final requests = <String>[];
@@ -220,8 +246,14 @@ class FakeAccounts implements AccountRepository {
   @override
   Future<CustomerOrder> order(String accessToken, String id) async => placed.firstWhere((o) => o.id == id);
 
+  AccountException? optionsFailure;
   @override
-  Future<OrderOptions> orderOptions(String accessToken) async => OrderOptions((b) => b
+  Future<OrderOptions> orderOptions(String accessToken) async {
+    if (optionsFailure != null) throw optionsFailure!;
+    return _options;
+  }
+
+  OrderOptions get _options => OrderOptions((b) => b
     ..cancelReasons.addAll(['Fikrimi değiştirdim', 'Diğer'])
     ..returnReasons.addAll(['Ürün hasarlı ulaştı', 'Diğer'])
     ..carriers.addAll(['Aras Kargo'])
@@ -276,14 +308,20 @@ class FakeAccounts implements AccountRepository {
     return saved;
   }
 
+  final savedDesigns = <MyDesign>[];
+  AccountException? renameFailure;
   @override
-  Future<List<MyDesign>> designs(String accessToken) async => const [];
+  Future<List<MyDesign>> designs(String accessToken) async => [...savedDesigns];
   @override
   Future<MyDesign> saveDesign(String accessToken, String sessionId) => throw UnimplementedError();
   @override
   Future<MyDesign> uploadDesign(String accessToken, List<int> bytes, String fileName, String productId, String? variantId) => throw UnimplementedError();
   @override
-  Future<MyDesign> renameDesign(String accessToken, String id, String name) => throw UnimplementedError();
+  Future<MyDesign> renameDesign(String accessToken, String id, String name) async {
+    if (renameFailure != null) throw renameFailure!;
+    final index = savedDesigns.indexWhere((design) => design.id == id);
+    return savedDesigns[index] = savedDesigns[index].rebuild((b) => b.name = name);
+  }
   @override
   Future<void> deleteDesign(String accessToken, String id) async {}
   @override
@@ -296,29 +334,31 @@ class FakeAccounts implements AccountRepository {
     ..items.addAll(notifications.reversed)
     ..unread = notifications.where((n) => !n.read).length);
 
+  AccountException? markReadFailure;
   @override
   Future<void> markRead(String accessToken, List<String>? ids) async {
+    if (markReadFailure != null) throw markReadFailure!;
     for (var i = 0; i < notifications.length; i++) {
       if (ids == null || ids.contains(notifications[i].id)) notifications[i] = notifications[i].rebuild((b) => b.read = true);
     }
   }
 }
 
-Future<(FakeAccounts, MemoryTokens)> pumpAccount(WidgetTester tester, {String? storedRefresh, bool keepPreferences = false}) async {
+Future<(FakeAccounts, MemoryTokens)> pumpAccount(WidgetTester tester, {String? storedRefresh, bool keepPreferences = false, String location = '/hesap', CatalogRepository? catalog, FakeAccounts? accounts}) async {
   if (!keepPreferences) SharedPreferences.setMockInitialValues({});
   tester.view.physicalSize = const Size(1170, 2532);
   tester.view.devicePixelRatio = 3;
   addTearDown(tester.view.reset);
-  final accounts = FakeAccounts();
+  accounts ??= FakeAccounts();
   final tokens = MemoryTokens(storedRefresh);
   await tester.pumpWidget(ProviderScope(
     retry: noAutomaticRetry,
     overrides: [
-      catalogRepositoryProvider.overrideWithValue(FakeCatalog()),
+      catalogRepositoryProvider.overrideWithValue(catalog ?? FakeCatalog()),
       accountRepositoryProvider.overrideWithValue(accounts),
       tokenStoreProvider.overrideWithValue(tokens),
     ],
-    child: const XinobiApp(initialLocation: '/hesap'),
+    child: XinobiApp(initialLocation: location),
   ));
   await tester.pumpAndSettle();
   return (accounts, tokens);
@@ -551,12 +591,28 @@ void main() {
     await tester.pumpAndSettle();
     await fillAddress(tester, 'İş');
     expect(accounts.savedAddresses.map((a) => a.isDefault), [true, false]);
+    expect(find.text('Adres kaydedildi.'), findsOneWidget, reason: 'Success is confirmed after the server saved it.');
+    ScaffoldMessenger.of(tester.element(find.text('İş'))).clearSnackBars();
     await tester.tap(find.text('İş'));
     await tester.pumpAndSettle();
     await tester.scrollUntilVisible(find.text('Adresi sil'), 200, scrollable: find.byType(Scrollable).last);
     await tester.tap(find.text('Adresi sil'));
     await tester.pumpAndSettle();
+    expect(find.text('“İş” silinsin mi?'), findsOneWidget, reason: 'Deleting asks first, like the web.');
+    accounts.failDeleteAddress = true;
+    await tester.tap(find.widgetWithText(FilledButton, 'Adresi sil'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hesap işlemleri şu anda kullanılamıyor.'), findsOneWidget);
+    expect(find.text('Adresi düzenle'), findsOneWidget, reason: 'A refused delete keeps the form open.');
+    accounts.failDeleteAddress = false;
+    await tester.ensureVisible(find.text('Adresi sil'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Adresi sil'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Adresi sil'));
+    await tester.pumpAndSettle();
     expect(accounts.savedAddresses.map((a) => a.title), ['Ev']);
+    expect(find.text('Adres silindi.'), findsOneWidget);
   });
 
   testWidgets('the cart becomes a demo order with the chosen address', (tester) async {

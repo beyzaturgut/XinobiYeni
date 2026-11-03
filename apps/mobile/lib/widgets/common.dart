@@ -1,9 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../app/design_tokens.g.dart';
 import '../core/formatting.dart';
+import '../core/user_facing_error.dart';
 import '../features/compare/compare_button.dart';
 import '../features/favorites/favorite_button.dart';
 
@@ -57,10 +60,11 @@ class ErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
+        // Scrolls rather than overflowing when large text makes the message taller than the space.
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text(error.toString(), textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
+            Semantics(liveRegion: true, child: Text(userMessage(error), textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium)),
             const SizedBox(height: 16),
             FilledButton(onPressed: onRetry, child: const Text('Tekrar dene')),
           ]),
@@ -73,7 +77,7 @@ class EmptyView extends StatelessWidget {
   final String message;
   @override
   Widget build(BuildContext context) =>
-      Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(message, textAlign: TextAlign.center)));
+      Center(child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Text(message, textAlign: TextAlign.center)));
 }
 
 class ProductCard extends StatelessWidget {
@@ -157,11 +161,28 @@ class ProductCard extends StatelessWidget {
   }
 }
 
+/// How much the reader's text setting enlarges body-sized text. Android 14+ scales non-linearly (large sizes grow less),
+/// so a block height is multiplied by this factor rather than passed to [TextScaler.scale] as if it were one font size.
+double bodyTextFactor(BuildContext context) => MediaQuery.textScalerOf(context).scale(16) / 16;
+
 /// Two-column product grid sized for phones; switches to three columns on wide screens.
-SliverGrid productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true, Widget Function(BuildContext context, ProductSummary product)? footerBuilder, bool cardInteractive = true, String Function(ProductSummary product)? semanticsLabelBuilder}) => SliverGrid(
-      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 260, mainAxisSpacing: 12, crossAxisSpacing: 12, childAspectRatio: 0.52),
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite, footer: footerBuilder?.call(context, products[index]), cardInteractive: cardInteractive, semanticsLabel: semanticsLabelBuilder?.call(products[index])),
-        childCount: products.length,
-      ),
+/// Each tile is the square photo plus a text block that grows with the reader's text size, so names, prices and the
+/// contextual action stay readable at 200 % instead of overflowing a fixed-ratio tile.
+Widget productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true, Widget Function(BuildContext context, ProductSummary product)? footerBuilder, bool cardInteractive = true, String Function(ProductSummary product)? semanticsLabelBuilder}) => SliverLayoutBuilder(
+      builder: (context, constraints) {
+        const maxTile = 260.0, spacing = 12.0;
+        final columns = (constraints.crossAxisExtent / (maxTile + spacing)).ceil().clamp(1, 6);
+        final width = (constraints.crossAxisExtent - spacing * (columns - 1)) / columns;
+        // 0.52 is the designed phone proportion; larger text adds height rather than clipping the copy.
+        // A contextual footer (e.g. the XINOBI U call to action) can wrap to more lines than price and stock.
+        final textBlock = footerBuilder == null ? 130.0 : 150.0;
+        final height = math.max(width / 0.52, width + 20 + textBlock * bodyTextFactor(context));
+        return SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns, mainAxisSpacing: spacing, crossAxisSpacing: spacing, mainAxisExtent: height),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite, footer: footerBuilder?.call(context, products[index]), cardInteractive: cardInteractive, semanticsLabel: semanticsLabelBuilder?.call(products[index])),
+            childCount: products.length,
+          ),
+        );
+      },
     );

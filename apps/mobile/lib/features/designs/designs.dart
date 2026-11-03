@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -143,13 +144,12 @@ class DesignsScreen extends ConsumerWidget {
   const DesignsScreen({super.key});
 
   Future<void> _rename(BuildContext context, WidgetRef ref, MyDesign design) async {
-    final name = await showDialog<String>(
+    final messenger = ScaffoldMessenger.of(context);
+    final renamed = await showDialog<bool>(
       context: context,
-      builder: (context) => _RenameDesignDialog(name: design.name),
+      builder: (context) => _RenameDesignDialog(design: design),
     );
-    if (name == null || name.isEmpty) return;
-    await ref.read(authProvider.notifier).withSession((repository, token) => repository.renameDesign(token, design.id, name));
-    ref.invalidate(myDesignsProvider);
+    if (renamed == true) messenger.showSnackBar(const SnackBar(content: Text('Tasarım adı güncellendi.')));
   }
 
   Future<void> _delete(BuildContext context, WidgetRef ref, MyDesign design) async {
@@ -160,9 +160,15 @@ class DesignsScreen extends ConsumerWidget {
         actions: [TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Vazgeç')), FilledButton(onPressed: () => Navigator.pop(context, true), child: const Text('Sil'))],
       ),
     );
-    if (ok != true) return;
-    await ref.read(authProvider.notifier).withSession((repository, token) => repository.deleteDesign(token, design.id));
-    ref.invalidate(myDesignsProvider);
+    if (ok != true || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await ref.read(authProvider.notifier).withSession((repository, token) => repository.deleteDesign(token, design.id));
+      ref.invalidate(myDesignsProvider);
+      messenger.showSnackBar(SnackBar(content: Text('“${design.name}” silindi.')));
+    } on AccountException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    }
   }
 
   @override
@@ -177,11 +183,18 @@ class DesignsScreen extends ConsumerWidget {
         error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(myDesignsProvider)),
         data: (items) => items.isEmpty
             ? const EmptyView('Henüz kayıtlı tasarımın yok. XINOBI U sonucunda ya da editörde “Tasarımımı kaydet” dediğinde burada görünür.')
-            : GridView.builder(
+            : LayoutBuilder(builder: (context, constraints) {
+                // Columns of at least 160 px keep the three 48 px actions on one row (one column on a 320 px phone);
+                // the square preview plus both two-line captions and the action row set the height at any text size.
+                const spacing = 12.0, minTile = 160.0, maxTile = 240.0;
+                final available = constraints.maxWidth - 2 * XinobiTokens.gutterMobile;
+                final widest = ((available + spacing) / (maxTile + spacing)).ceil();
+                final narrowest = ((available + spacing) / (minTile + spacing)).floor();
+                final columns = math.max(1, math.min(widest, narrowest));
+                final tile = (available - spacing * (columns - 1)) / columns;
+                return GridView.builder(
                 padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, XinobiTokens.gutterMobile, XinobiTokens.gutterMobile, 96),
-                // Reserve room for both two-line captions and the action row,
-                // including the device's accessibility text scale.
-                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 240, mainAxisSpacing: 12, crossAxisSpacing: 12, mainAxisExtent: 240 + MediaQuery.textScalerOf(context).scale(80) + 64),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns, mainAxisSpacing: spacing, crossAxisSpacing: spacing, mainAxisExtent: tile + 80 * bodyTextFactor(context) + 64),
                 itemCount: items.length,
                 itemBuilder: (context, index) {
                   final design = items[index];
@@ -206,39 +219,82 @@ class DesignsScreen extends ConsumerWidget {
                       Row(children: [
                         IconButton(tooltip: '${design.name} ürün üzerinde dene', icon: const Icon(Icons.view_in_ar_outlined), onPressed: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}')),
                         IconButton(tooltip: '${design.name} tasarımıyla sepete ekle', icon: const Icon(Icons.add_shopping_cart), onPressed: () => context.push('/tasarim-editoru?tasarim=${design.id}&urun=${Uri.encodeQueryComponent(design.productId)}${design.variantId == null ? '' : '&renk=${Uri.encodeQueryComponent(design.variantId!)}'}')),
-                        IconButton(tooltip: '${design.name} yeniden adlandır', icon: const Icon(Icons.edit_outlined), onPressed: () => _rename(context, ref, design)),
-                        IconButton(tooltip: '${design.name} sil', icon: const Icon(Icons.delete_outline), onPressed: () => _delete(context, ref, design)),
+                        // Rename and delete share a menu so each action keeps a 48 px target on a narrow phone.
+                        PopupMenuButton<void Function()>(
+                          tooltip: '${design.name} için diğer işlemler',
+                          icon: const Icon(Icons.more_vert),
+                          onSelected: (action) => action(),
+                          itemBuilder: (_) => [
+                            PopupMenuItem(value: () => _rename(context, ref, design), child: const ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.edit_outlined), title: Text('Yeniden adlandır'))),
+                            PopupMenuItem(value: () => _delete(context, ref, design), child: const ListTile(contentPadding: EdgeInsets.zero, leading: Icon(Icons.delete_outline, color: XinobiTokens.danger), title: Text('Sil'))),
+                          ],
+                        ),
                       ]),
                     ]),
                   );
                 },
-              ),
+              );
+              }),
       ),
     );
   }
 }
 
-class _RenameDesignDialog extends StatefulWidget {
-  const _RenameDesignDialog({required this.name});
-  final String name;
+class _RenameDesignDialog extends ConsumerStatefulWidget {
+  const _RenameDesignDialog({required this.design});
+  final MyDesign design;
   @override
-  State<_RenameDesignDialog> createState() => _RenameDesignDialogState();
+  ConsumerState<_RenameDesignDialog> createState() => _RenameDesignDialogState();
 }
 
-class _RenameDesignDialogState extends State<_RenameDesignDialog> {
-  late final controller = TextEditingController(text: widget.name);
+/// Saves inside the dialog, so a refused name stays editable with the reason under it instead of being lost.
+class _RenameDesignDialogState extends ConsumerState<_RenameDesignDialog> {
+  late final controller = TextEditingController(text: widget.design.name);
+  bool busy = false;
+  String? error;
+
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
   }
+
+  Future<void> save() async {
+    final name = controller.text.trim();
+    if (busy) return;
+    if (name.isEmpty) {
+      setState(() => error = 'Tasarım adı boş olamaz.');
+      return;
+    }
+    if (name == widget.design.name) {
+      Navigator.pop(context, false);
+      return;
+    }
+    setState(() {
+      busy = true;
+      error = null;
+    });
+    try {
+      final saved = await ref.read(authProvider.notifier).withSession((repository, token) => repository.renameDesign(token, widget.design.id, name));
+      ref.invalidate(myDesignsProvider);
+      if (mounted) Navigator.pop(context, saved != null);
+    } on AccountException catch (problem) {
+      if (mounted) setState(() => error = problem.message);
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) => AlertDialog(
     title: const Text('Yeniden adlandır'),
-    content: TextField(controller: controller, maxLength: 60, autofocus: true, decoration: accountField('Tasarım adı')),
+    content: Column(mainAxisSize: MainAxisSize.min, children: [
+      TextField(controller: controller, maxLength: 60, autofocus: true, enabled: !busy, onSubmitted: (_) => save(), decoration: accountField('Tasarım adı')),
+      FormErrorText(error),
+    ]),
     actions: [
-      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Vazgeç')),
-      FilledButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Kaydet')),
+      TextButton(onPressed: busy ? null : () => Navigator.pop(context, false), child: const Text('Vazgeç')),
+      FilledButton(onPressed: busy ? null : save, child: Text(busy ? 'Kaydediliyor…' : 'Kaydet')),
     ],
   );
 }

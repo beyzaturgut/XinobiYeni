@@ -15,9 +15,11 @@ import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
 import '../compare/compare.dart';
 import 'nobi_mark.dart';
+import '../../core/user_facing_error.dart';
 
-class NobiException implements Exception {
+class NobiException implements UserFacingException {
   const NobiException(this.message);
+  @override
   final String message;
   @override
   String toString() => message;

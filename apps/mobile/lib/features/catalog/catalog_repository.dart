@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../core/api_config.dart';
+import '../../core/user_facing_error.dart';
 
 /// Read access to the shared catalog contract (/api/v1/catalog, /api/v1/content). Web and mobile read the same data.
 abstract interface class CatalogRepository {
@@ -45,8 +46,9 @@ class PublishedSurface {
 }
 
 /// User-facing failure; [message] is safe to show, technical details stay out of the UI.
-class CatalogException implements Exception {
+class CatalogException implements UserFacingException {
   const CatalogException(this.message);
+  @override
   final String message;
   static const notFoundMessage = 'Bu ürün artık yayında değil.';
   @override

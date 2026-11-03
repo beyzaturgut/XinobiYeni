@@ -1,5 +1,7 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+**03.11 Flutter eşlik incelemesi:** Kaynak5da96ed; analiz ve280 test PASS, favori iptal/taşıma kaybı P1 ve açılış oturum hatası P2 açık. [TST-203](../test/2026-11-03/TST-203-flutter-parity-review.md). İnceleme yapıldı, kod düzeltmesi veya platform kabulü verilmedi.
+
 **03.11 Flutter–web görsel/durum uygulaması:** Flutter ekranları web istek durumlarıyla karşılaştırıldı: favoriler hesap API'sine taşındı, hata/tekrar dene/teyitli başarı/taslak/işlem kilidi eklendi, 192 hücrelik widget matrisi (32 rota × 3 genişlik × 1x/2x) ve Android 14 doğrusal olmayan ölçek testi geçti; 280/280 Flutter testi. Android emülatörde oturum kapalı akışlar ve OS %200 yazı denendi; iOS Bloke (Xcode yok). [Ekran/kusur matrisi](../design/flutter-consistency-audit-2026-11-03.md), [TST-196](../test/2026-11-03/TST-196-flutter-web-consistency.md). Gerçek telefon, oturum açık cihaz akışı, TalkBack/VoiceOver ve handoff kabulü açık; faz onayı/yüzde değiştirilmedi.
 
 **30.10 admin görsel/durum uygulaması:** 16 modül ortak tablo, kontrol, hata/başarı ve pencere odağı dilinde denetlendi; başarısız yazmada taslak, içerik/yüzey yetkileri, eksik sayaç ve yüklenme ayrımları düzeltildi. [Modül/bulgu/açık iş matrisi](../design/admin-consistency-audit-2026-10-30.md), [TST-188](../test/2026-10-30/TST-188-admin-consistency.md). Gerçek SQL/operasyon/sağlayıcı/handoff kabulü açık; faz onayı verilmedi.

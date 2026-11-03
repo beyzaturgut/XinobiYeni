@@ -1,5 +1,7 @@
 # Flutter–web tasarım ve davranış eşliği — 03.11.2026
 
+**03.11 bağımsız inceleme:** Analiz ve280 test tekrar geçti. Favoride oturum iptalini başarı sayma/taşıma kaybı (P1) ve açılış servis hatasını giriş yok sayma (P2) doğrulandı; henüz düzeltilmedi. [TST-203](../test/2026-11-03/TST-203-flutter-parity-review.md). iOS ve oturum açık cihaz kabulü açık kalır.
+
 Kapsam: yalnız `apps/mobile` (native Flutter). Başlangıç `main / b608d46`; Faz00/02/11, [120 task planı](../docs/tasks/project-closure-2026-10-30.md) (MOB-06, QA-03) ve [web tutarlılık denetimi](web-consistency-audit-2026-10-30.md) (C01–C11) referans alındı. Web/admin/API/hosting/deploy değişmedi; APK yayımlanmadı.
 
 ## Yöntem ve sınırlar

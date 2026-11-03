@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-203 | 03.11.2026 | Flutter eşlik bağımsız inceleme | 280/280 ve analiz PASS; 2 açık bulgu | REVIEW / ISOLATED | [Rapor](2026-11-03/TST-203-flutter-parity-review.md) |
 | TST-196 | 03.11.2026 | Flutter analiz | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
 | TST-197 | 03.11.2026 | Flutter 13 istek durumu/favori testi | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |
 | TST-198 | 03.11.2026 | Flutter 192 hücre ekran matrisi + doğrusal olmayan ölçek | PASS; sınırlar raporda | FLUTTER / WIDGET / STATIC | [Rapor](2026-11-03/TST-196-flutter-web-consistency.md) |

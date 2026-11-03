@@ -23,6 +23,7 @@ type DownloadState = { busy?: boolean; done?: string; error?: string; retry?: bo
 const downloads = {
   pattern: { route: 'pattern', file: 'desen', idle: 'Ham deseni indir', busy: 'Ham desen indiriliyor…', done: 'Ham desen indirildi', missing: 'Bu sipariş satırının desen dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Ham deseni indirme yetkiniz yok.', failed: 'Ham desen şu anda indirilemedi.', what: 'ham desen dosyası' },
   source: { route: 'source', file: 'urun-kaynak', idle: 'Ürün kaynak görselini indir', busy: 'Ürün kaynak görseli indiriliyor…', done: 'Ürün kaynak görseli indirildi', missing: 'Bu sipariş satırının ürün kaynak görseli bulunamadı; indirilecek dosya yok.', forbidden: 'Ürün kaynak görselini indirme yetkiniz yok.', failed: 'Ürün kaynak görseli şu anda indirilemedi.', what: 'ürün kaynak görseli' },
+  composition: { route: 'composition', file: 'giydirilmis-onizleme', idle: 'Giydirilmiş önizlemeyi indir', busy: 'Giydirilmiş önizleme indiriliyor…', done: 'Giydirilmiş önizleme indirildi', missing: 'Bu sipariş satırının giydirilmiş önizleme dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Giydirilmiş önizlemeyi indirme yetkiniz yok.', failed: 'Giydirilmiş önizleme şu anda indirilemedi.', what: 'giydirilmiş temsili önizleme' },
 } as const
 
 /** Downloads one of the order line's own copies from the staff API (resolved on the server by order and line), one request at a time. */
@@ -83,6 +84,28 @@ function RawPattern({ path, name, orderId, orderNumber, index }: { path?: string
   </>
 }
 
+/** Shows the order's own composition from the staff API; the same file the download button returns, never the raw pattern. */
+function CompositionView({ orderId, index, name, revision }: { orderId: string; index: number; name: string; revision?: number | null }) {
+  const [state, setState] = useState<{ url?: string; error?: string; retry?: boolean }>(), [reload, setReload] = useState(0)
+  useEffect(() => {
+    let active = true, url = ''
+    void commerceRequest<AdminFile>(commerceApi.replace(/\/local-commerce\/?$/, ''), `/admin/orders/${encodeURIComponent(orderId)}/lines/${index}/composition`, 'GET', undefined, 'file')
+      .then(file => { if (active) { url = URL.createObjectURL(file.blob); setState({ url }) } })
+      .catch(problem => { if (active) { const status = (problem as { status?: number })?.status
+        setState(status === 404 ? { error: problem instanceof Error ? problem.message : 'Giydirilmiş önizleme dosyası bulunamadı.' }
+          : status === 403 ? { error: 'Giydirilmiş önizlemeyi görme yetkiniz yok.' }
+          : status === 401 ? { error: 'Oturum doğrulanamadı. Yeniden giriş yapın.' }
+          : { retry: true, error: `Giydirilmiş önizleme şu anda alınamadı. ${problem instanceof Error ? problem.message : ''}`.trim() }) } })
+    return () => { active = false; if (url) URL.revokeObjectURL(url) }
+  }, [orderId, index, reload])
+  if (!state) return <p role="status">Giydirilmiş önizleme yükleniyor…</p>
+  if (state.error) return <p role="alert">{state.error}{state.retry && <> <button type="button" onClick={() => { setState(undefined); setReload(value => value + 1) }}>Önizlemeyi tekrar dene</button></>}</p>
+  return <figure className="order-design-figure">
+    <img src={state.url} alt={`${name} için giydirilmiş temsili önizleme${revision ? `, revizyon ${revision}` : ''}`} onError={() => setState({ retry: true, error: 'Giydirilmiş önizleme görüntülenemedi.' })} />
+    <figcaption>Temsilidir: sipariş anındaki {revision ? `${revision}. revizyon ` : ''}yerleşimin dijital önizlemesi. Baskıya hazır dosya değildir.</figcaption>
+  </figure>
+}
+
 /** Order-line design detail: product, design, saved editor placement and three separate images. Read-only; no production actions. */
 export default function OrderDesignDetail({ orderId, orderNumber, line, index }: { orderId: string; orderNumber: string; line: OrderDesignLine; index: number }) {
   const design = line.personalization
@@ -106,7 +129,10 @@ export default function OrderDesignDetail({ orderId, orderNumber, line, index }:
           {design.files?.productSource
             ? <><p>Sipariş anında kopyalandı ({design.files.productSource.mime}, {Math.ceil(design.files.productSource.bytes / 1024).toLocaleString('tr-TR')} KB).</p><FileDownload kind="source" orderId={orderId} orderNumber={orderNumber} index={index} name={design.name} /></>
             : <p className="order-design-missing">{design.placement ? 'Bu sipariş, ürün kaynak görseli kopyası saklanmadan önce verilmiş.' : 'Bu sipariş satırında kayıtlı yerleşim olmadığı için ürün kaynak görseli kopyası yok.'} Güncel katalog fotoğrafı veya başka renk görseli yerine kullanılmaz. İndirme kullanılamıyor.</p>}</article>
-        <article aria-labelledby={`${id}-preview`}><h5 id={`${id}-preview`}>Giydirilmiş önizleme</h5><p>Desenin kayıtlı yerleşimle ürün üstündeki temsili görünümü.</p><p className="order-design-missing">{design.files?.composition ? 'Bu siparişe bağlı giydirilmiş önizleme saklandı; panelde görüntüleme henüz hazır değil.' : 'Bu sipariş için giydirilmiş önizleme kaydı yok.'} Ham desen onun yerine gösterilmez. İndirme hazır değil.</p></article>
+        <article aria-labelledby={`${id}-preview`}><h5 id={`${id}-preview`}>Giydirilmiş önizleme</h5><p>Desenin kayıtlı yerleşimle ürün üstündeki temsili görünümü.</p>
+          {design.files?.composition
+            ? <><CompositionView orderId={orderId} index={index} name={design.name} revision={design.configurationRevision} /><FileDownload kind="composition" orderId={orderId} orderNumber={orderNumber} index={index} name={design.name} /></>
+            : <p className="order-design-missing">{!design.placement ? 'Bu sipariş satırında kayıtlı yerleşim olmadığı için giydirilmiş önizleme yok.' : !design.files ? 'Bu sipariş, giydirilmiş önizleme kopyası saklanmadan önce verilmiş.' : 'Bu yerleşim revizyonu için sipariş anında giydirilmiş önizleme yüklenmemişti.'} Güncel tasarımla yeniden oluşturulmaz; ham desen onun yerine gösterilmez. İndirme kullanılamıyor.</p>}</article>
       </div>
     </section>
   </section>

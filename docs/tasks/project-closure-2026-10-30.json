@@ -853,8 +853,8 @@
       "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
       "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
       "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
-      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi. SIP-TAS-05 (03.11): ürün kaynak görselinin yetkili ayrı indirmesi.",
-      "remaining": "SIP-TAS-06...09: giydirilmiş önizleme indirmesi, yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
+      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi. SIP-TAS-05 (03.11): ürün kaynak görselinin yetkili ayrı indirmesi. SIP-TAS-06 (03.11): giydirilmiş önizlemenin gösterimi ve yetkili indirmesi.",
+      "remaining": "SIP-TAS-07...09: yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
       "owner": "Admin/Web geliştirici + Backend + UX/QA",
@@ -1967,11 +1967,13 @@
         "id": "SIP-TAS-06",
         "title": "Giydirilmiş görseli göster ve indir",
         "parents": "KIS-07",
-        "status": "Planlandı - uygulanmadı",
-        "remaining": "Kayıtlı yerleşimle oluşan ürün üstü kompozisyonu sipariş detayında göster ve ayrı indir. Kaydetme/sipariş akışındaki dijital önizlemeyi sürümüyle koru; üretim dosyası, ICC/DPI renderı veya üretim kuyruğu kurma.",
+        "status": "Uygulandı - kabul açık",
+        "remaining": "Gerçek kompozisyon/SQL siparişi ve canlı ortam kabulü; önceki siparişler SIP-TAS-08; rol/PM kabulü.",
         "accept": "Görünen ve indirilen kompozisyon aynı sipariş revizyonuna ait; temsili önizleme etiketi var, baskıya hazır dosya iddiası yok.",
         "deps": "SIP-TAS-02, SIP-TAS-03",
-        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+        "done": "03.11: Admin kompozisyon ucu (orders.read) siparişe bağlı kopyayı SHA-256/JPEG doğrulamasıyla verir; admin kartında temsili etiketle gösterim ve aynı dosyanın indirmesi; eksik/bozuk/yetki durumları; web kaydı önizlemesiz yerleşim kaydetmez. Revizyon, desen silme, sonraki düzenleme ve tekrar indirme izole fixture ile PASS.",
+        "evidence": "test/2026-11-03/TST-227-sip-tas-06-composition.md"
       },
       {
         "id": "SIP-TAS-07",

@@ -22,3 +22,4 @@
 .order-design-detail [role=status]{color:#1d5b2c}
 .order-design-download{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;justify-items:start}
 .order-design-download button{min-height:44px;padding:8px 14px;border:1px solid #222;border-radius:4px;background:#fff;color:#111;font:inherit}
+.order-design-figure{display:grid;gap:6px;margin:0}.order-design-figure figcaption{color:#555;font-size:12px;line-height:1.4;overflow-wrap:anywhere}

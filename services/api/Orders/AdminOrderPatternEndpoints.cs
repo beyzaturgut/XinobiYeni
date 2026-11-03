@@ -119,6 +119,56 @@ public static partial class AdminOrderPatternEndpoints
         .ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(503);
     }
 
+    /// <summary>
+    /// SIP-TAS-06: the composed product preview copied into the order for its placement revision. It is a representative digital
+    /// preview (JPEG), never a print file; an order without its own copy is not re-composed from the current catalogue or design.
+    /// </summary>
+    public static void MapComposition(RouteGroupBuilder admin)
+    {
+        admin.MapGet("/orders/{id}/lines/{line:int}/composition", async (string id, int line, IAccountStore accounts, SavedDesignStore designs, HttpContext http) =>
+        {
+            var order = await Find(accounts, id);
+            if (line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is not { } design)
+                throw ProblemException.NotFound("order_line_design_not_found", "Bu sipariş satırında tasarım yok.");
+            if (design.Files?.Composition is not { } recorded || design.ConfigurationRevision is not { } revision)
+                throw ProblemException.NotFound("order_composition_not_recorded", design.Placement is null
+                    ? "Bu sipariş satırında kayıtlı yerleşim olmadığı için giydirilmiş önizleme yok."
+                    : design.Files is null
+                        ? "Bu sipariş, giydirilmiş önizleme kopyası saklanmadan önce verilmiş; güncel tasarımla yeniden oluşturulmaz."
+                        : "Bu yerleşim revizyonu için sipariş anında giydirilmiş önizleme yüklenmemişti; ham desen yerine kullanılmaz.");
+            var file = await designs.OrderPreview(order.Id, line, recorded)
+                ?? throw ProblemException.NotFound("order_composition_not_found", "Bu sipariş satırının giydirilmiş önizleme dosyası bulunamadı.");
+            byte[] bytes;
+            await using (file)
+            {
+                using var buffer = new MemoryStream();
+                await file.Content.CopyToAsync(buffer);
+                bytes = buffer.ToArray();
+            }
+            string mime, extension;
+            try { (mime, extension) = SavedDesignStore.DetectImage(bytes); }
+            catch (ProblemException) { throw ProblemException.Unavailable("Sipariş giydirilmiş önizlemesi"); }
+            if (mime != recorded.Mime || mime != "image/jpeg") throw ProblemException.Unavailable("Sipariş giydirilmiş önizlemesi");
+            http.Response.Headers["X-Content-Type-Options"] = "nosniff";
+            http.Response.Headers.CacheControl = "no-store";
+            var number = UnsafeName().Replace(order.Number, "-").Trim('-');
+            return Results.File(bytes, mime, $"xinobi-{(number.Length > 0 ? number : order.Id)}-satir-{line + 1}-giydirilmis-onizleme-rev{revision}{extension}");
+        })
+        .RequirePermission("orders.read").WithProblems().WithName("DownloadAdminOrderLineComposition")
+        .WithSummary("Sipariş anındaki yerleşim revizyonunun giydirilmiş temsili önizlemesi (JPEG); baskıya hazır dosya veya ham desen değildir.")
+        .Produces(200, contentType: "image/jpeg")
+        .AddOpenApiOperationTransformer((operation, _, _) =>
+        {
+            operation.Responses!["200"] = new OpenApiResponse
+            {
+                Description = "Temsili giydirilmiş önizleme (attachment)",
+                Content = new Dictionary<string, OpenApiMediaType> { ["image/jpeg"] = new() { Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "binary" } } }
+            };
+            return Task.CompletedTask;
+        })
+        .ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(503);
+    }
+
     /// <summary>e.g. <c>xinobi-XN-261103-1234-satir-1-urun-kaynak-SKU-101-B.webp</c>: order, 1-based line and the ordered SKU (or variant).</summary>
     public static string SourceFileName(CustomerOrder order, int line, CustomerOrderLine item, string extension)
     {

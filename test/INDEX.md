@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-227 | 03.11.2026 | SIP-TAS-06 kompozisyon API fixture (revizyon/bayt/hash, desen silme, sonraki düzenleme, tekrar indirme, eksik/bozuk, yetki) | PASS 12/12 | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |
+| TST-228 | 03.11.2026 | API tam test paketi | PASS 510, 29 atlandı | API / ISOLATED | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |
+| TST-229 | 03.11.2026 | Sözleşme + admin lint/TS/build + web tsc/eslint + Flutter analiz | PASS; 4 eski lint uyarısı | CONTRACT / STATIC | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |
+| TST-230 | 03.11.2026 | Admin kompozisyon kartı Chrome fixture + regresyonlar; web design-configuration e2e | Admin PASS; web 16/18 (2 kararsız, baseline'da da düşüyor; değişiklikle 2/2 PASS) | ADMIN / WEB E2E | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |
 | TST-223 | 03.11.2026 | SIP-TAS-05 ürün kaynak görseli indirme API fixture (katalog/renk/maske değişimi, bayt/hash, tür, tuval, yetki, eksik kaynak, yol aşımı/keyfi URL) | PASS 10/10 | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-223-sip-tas-05-source-download.md) |
 | TST-224 | 03.11.2026 | API tam test paketi | PASS 508, 29 atlandı | API / ISOLATED | [Rapor](2026-11-03/TST-223-sip-tas-05-source-download.md) |
 | TST-225 | 03.11.2026 | Sözleşme + admin lint/TS/build + web/Flutter tüketici kontrolleri | PASS; 4 eski lint uyarısı | CONTRACT / STATIC | [Rapor](2026-11-03/TST-223-sip-tas-05-source-download.md) |

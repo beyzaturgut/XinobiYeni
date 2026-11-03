@@ -5,16 +5,17 @@ import {join} from 'node:path'
 const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
 const browser=await chromium.launch({channel:'chrome',headless:true})
 const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5174/',output=process.env.ADMIN_CONSISTENCY_OUTPUT
+const jpeg=Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/wAALCAABAAEBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AKp//2Q==','base64')
 const webp=Buffer.from('RIFF\x1a\x00\x00\x00WEBPVP8L','latin1')
 const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aAc0AAAAASUVORK5CYII=','base64')
 const pattern='<svg xmlns="http://www.w3.org/2000/svg" width="240" height="160"><rect width="240" height="160" fill="#f4efe6"/><circle cx="70" cy="80" r="44" fill="#d1495b"/><rect x="120" y="36" width="88" height="88" fill="#00798c" transform="rotate(12 164 80)"/></svg>'
 const money={amountMinor:125000,currency:'TRY'}
 const placement={sourceWidth:1024,sourceHeight:1536,surfaceVersion:'c'.repeat(64),x:512.5,y:700,scale:.85,rotation:-12,curvatureStrength:0,mode:'artwork',fillMask:false,bodyAdjustments:{'upper-body':{x:4,y:null,scale:1.1,rotation:0}}}
-const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:1,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE',files:{pattern:{sha256:'d'.repeat(64),mime:'image/png',bytes:68},productSource:{sha256:'e'.repeat(64),mime:'image/webp',bytes:4096},composition:null}})}})
+const line=(id,legacy)=>({productId:'P-SYN',variantId:'V-SYN-BLUE',name:'Synthetic termos',color:'Mavi',quantity:1,unitPrice:money,lineTotal:money,personalization:{designId:'D-SYN',kind:legacy?'upload':'ai',name:'Synthetic çok uzun adlı müşteri tasarımı ve deseni',imageUrl:`/api/v1/local-commerce/orders/${id}/lines/0/design`,...(legacy?{}:{placement,schemaVersion:1,configurationId:'CFG-SYN',configurationRevision:3,sourceSha256:'d'.repeat(64),sku:'SYN-SKU-BLUE',files:{pattern:{sha256:'d'.repeat(64),mime:'image/png',bytes:68},productSource:{sha256:'e'.repeat(64),mime:'image/webp',bytes:4096},composition:{sha256:'f'.repeat(64),mime:'image/jpeg',bytes:6}}})}})
 const order=(id,legacy=false)=>({accountId:'synthetic',customerName:'Synthetic müşteri',customerEmail:'synthetic@example.invalid',order:{id,number:'SYN-'+id,createdAt:'2026-11-03T09:00:00Z',status:'received',address:{title:'Ev',fullName:'Synthetic',phone:'+905321234567',line:'Synthetic adres',district:'Test',city:'Test'},lines:[line(id,legacy),{productId:'P2',variantId:'V2',name:'Kişiselleştirilmemiş ürün',color:'Siyah',quantity:1,unitPrice:money,lineTotal:money}],total:money,history:[],requests:[]}})
 const gate=()=>{let release;const promise=new Promise(resolve=>{release=resolve});return{promise,release}}
-async function fixture({width=1440,design,download,source}={}){
- const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],paths=[];let writes=0,designReads=0,patternReads=0
+async function fixture({width=1440,design,download,source,composition}={}){
+ const context=await browser.newContext({viewport:{width,height:900}}),page=await context.newPage(),errors=[],paths=[];let writes=0,designReads=0,patternReads=0,compositionReads=0
  page.setDefaultTimeout(10000);page.on('pageerror',error=>errors.push(error.message))
  await page.route('**/api/**',async route=>{
   const request=route.request(),path=new URL(request.url()).pathname;paths.push(path)
@@ -22,6 +23,8 @@ async function fixture({width=1440,design,download,source}={}){
   if(path.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Synthetic'},permissions:['orders.read','orders.write','orders.cancel','print.read']}})
   if(path.endsWith('/local-commerce/orders'))return route.fulfill({json:[order('NEW'),order('OLD',true)]})
   if(path.endsWith('/order-options'))return route.fulfill({json:{carriers:['Synthetic kargo'],returnWindowDays:14}})
+  if(path.endsWith('/lines/0/composition')){compositionReads++;const result=await composition?.(compositionReads);if(result?.status)return route.fulfill({status:result.status,json:{title:result.title??'Synthetic composition error',code:result.code??'synthetic'}})
+   return route.fulfill({body:jpeg,contentType:'image/jpeg',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':'attachment; filename=xinobi-SYN-NEW-satir-1-giydirilmis-onizleme-rev3.jpg'}})}
   if(path.endsWith('/lines/0/source')){const result=await source?.();if(result?.status)return route.fulfill({status:result.status,json:{title:result.title??'Synthetic source error',code:result.code??'synthetic'}})
    return route.fulfill({body:webp,contentType:'image/webp',headers:{'Access-Control-Expose-Headers':'Content-Disposition','Content-Disposition':'attachment; filename=xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp'}})}
   if(path.endsWith('/lines/0/pattern')){patternReads++;const result=await download?.(patternReads);if(result?.status)return route.fulfill({status:result.status,json:{title:'Synthetic pattern error',code:'synthetic'}})
@@ -32,7 +35,7 @@ async function fixture({width=1440,design,download,source}={}){
   return route.fulfill({status:503,json:{title:'Synthetic unavailable'}})
  })
  await page.goto(base+'?view=orders')
- return {page,paths,patternReads:()=>patternReads,async open(number){await page.getByRole('button',{name:`${number} detayını aç`}).click();return page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'})},
+ return {page,paths,patternReads:()=>patternReads,compositionReads:()=>compositionReads,async open(number){await page.getByRole('button',{name:`${number} detayını aç`}).click();return page.getByRole('region',{name:'Sipariş tasarım detayı · 1. satır'})},
   close:async()=>{assert.deepEqual(errors,[]);assert.equal(writes,0);await context.close()}}
 }
 const card=(detail,name)=>detail.getByRole('article',{name})
@@ -48,8 +51,10 @@ try{
   await raw.getByRole('button',{name:'Ham deseni indir'}).waitFor()
   const productSource=card(detail,'Ürün kaynak görseli');await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).waitFor()
   assert.equal(await productSource.locator('img,a').count(),0,'No catalogue photo is shown in place of the order copy')
-  const composed=card(detail,'Giydirilmiş önizleme');await composed.getByText(/İndirme hazır değil\./).waitFor()
-  assert.equal(await composed.locator('img,a,button').count(),0,'Giydirilmiş önizleme must not offer a file it does not have')
+  const composed=card(detail,'Giydirilmiş önizleme');await composed.getByRole('img',{name:/giydirilmiş temsili önizleme, revizyon 3/}).evaluate(image=>image.decode())
+  await composed.getByText('Temsilidir: sipariş anındaki 3. revizyon yerleşimin dijital önizlemesi. Baskıya hazır dosya değildir.').waitFor()
+  await composed.getByRole('button',{name:'Giydirilmiş önizlemeyi indir'}).waitFor()
+  assert.ok(f.paths.includes('/api/v1/admin/orders/NEW/lines/0/composition'),'The view uses the order copy, not the raw pattern route')
   assert.equal(await dialog.getByRole('button',{name:'Hazırlanmaya başla'}).count(),1,'Existing order actions stay')
   await dialog.getByRole('heading',{name:'Kargoya ver'}).waitFor()
   assert.equal(await dialog.locator('button,a').filter({hasText:/üretim|baskıya|kalibrasyon|render|profil/i}).count(),0)
@@ -67,7 +72,26 @@ try{
   assert.equal(await product.getByText('Bu siparişte kaydedilmemiş',{exact:true}).count(),4,'SKU, configuration, revision and schema are missing, not guessed')
   assert.equal(await detail.getByText(/^0$/).count(),0);await card(detail,'Ham desen').getByRole('img').waitFor()
   const oldSource=card(detail,'Ürün kaynak görseli');await oldSource.getByText(/kayıtlı yerleşim olmadığı için ürün kaynak görseli kopyası yok\. Güncel katalog fotoğrafı veya başka renk görseli yerine kullanılmaz\. İndirme kullanılamıyor\./).waitFor()
-  assert.equal(await oldSource.locator('img,a,button').count(),0);await f.close() }
+  assert.equal(await oldSource.locator('img,a,button').count(),0)
+  const oldComposed=card(detail,'Giydirilmiş önizleme');await oldComposed.getByText(/kayıtlı yerleşim olmadığı için giydirilmiş önizleme yok\. Güncel tasarımla yeniden oluşturulmaz; ham desen onun yerine gösterilmez\./).waitFor()
+  assert.equal(await oldComposed.locator('img,a,button').count(),0,'The raw pattern is never shown as the composition');await f.close() }
+ { const f=await fixture(),composed=card(await f.open('SYN-NEW'),'Giydirilmiş önizleme')
+  const shown=await composed.getByRole('img').evaluate(async image=>Array.from(new Uint8Array(await (await fetch(image.src)).arrayBuffer())))
+  for(let attempt=0;attempt<2;attempt++){
+   const downloaded=f.page.waitForEvent('download');await composed.getByRole('button',{name:'Giydirilmiş önizlemeyi indir'}).click()
+   const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-giydirilmis-onizleme-rev3.jpg')
+   const bytes=await (async()=>{const chunks=[];for await(const chunk of await file.createReadStream())chunks.push(chunk);return Buffer.concat(chunks)})()
+   assert.deepEqual(bytes,Buffer.from(shown),'The downloaded file is the shown composition');assert.deepEqual(bytes,jpeg)
+   await composed.getByRole('status').filter({hasText:'Giydirilmiş önizleme indirildi'}).waitFor()
+  }
+  await f.close() }
+ for(const [result,text,retry] of [[{status:404,code:'order_composition_not_recorded',title:'Bu yerleşim revizyonu için sipariş anında giydirilmiş önizleme yüklenmemişti; ham desen yerine kullanılmaz.'},/yüklenmemişti/,false],[{status:403},/görme yetkiniz yok/,false],[{status:503},/şu anda alınamadı/,true]]){
+  let fail=true;const f=await fixture({composition:()=>fail?result:{}}),composed=card(await f.open('SYN-NEW'),'Giydirilmiş önizleme')
+  await composed.getByRole('alert').filter({hasText:text}).waitFor();assert.equal(await composed.getByRole('img').count(),0)
+  assert.equal(await composed.getByRole('button',{name:'Önizlemeyi tekrar dene'}).count(),retry?1:0)
+  if(retry){fail=false;await composed.getByRole('button',{name:'Önizlemeyi tekrar dene'}).click();await composed.getByRole('img').waitFor()}
+  await f.close()
+ }
  { const f=await fixture(),productSource=card(await f.open('SYN-NEW'),'Ürün kaynak görseli')
   const downloaded=f.page.waitForEvent('download');await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).click()
   const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp')
@@ -118,5 +142,5 @@ try{
   assert.equal(await f.page.getByText(/Fiziksel baskı profil|Kalibrasyon|Üretime gönder/i).count(),0)
   assert.equal(f.paths.some(path=>path.includes('print-profiles')),false,'The removed profile screen must not load profile data')
   await f.close() }
- console.log('PASS: order design detail product/placement/three image cards at 4 widths, legacy/missing values, raw file loading/404/403/503/invalid/retry, pattern download name/bytes/lock/404/403/503 retry, product source download/not-recorded/404/403/503 retry, 390 px axe, 320 px 200 % text, no production controls, existing order actions, no writes')
+ console.log('PASS: order design detail product/placement/three image cards at 4 widths, legacy/missing values, raw file loading/404/403/503/invalid/retry, pattern download name/bytes/lock/404/403/503 retry, product source download/not-recorded/404/403/503 retry, composition view+download same bytes/repeat/not-recorded/403/503 retry, 390 px axe, 320 px 200 % text, no production controls, existing order actions, no writes')
 }finally{await browser.close()}

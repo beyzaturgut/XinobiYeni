@@ -34,8 +34,10 @@ function SaveForAccount({source,placement,stacked,previewCanvas}:{source:Source;
     setDesign(saved);
     const variantId=source.variantId??saved.variantId;
     if(placement&&variantId){
+      // An order copies this revision's composition; a placement is never saved without its digital preview.
+      if(!previewCanvas)throw new Error('Ürün önizlemesi henüz hazır değil. Biraz bekleyip tekrar dene.');
       if(!config.current||config.current.variantId!==variantId||JSON.stringify(config.current.placement)!==JSON.stringify(placement))config.current=await saveDesignConfiguration(saved.id,variantId,placement,config.current?.variantId===variantId?config.current:undefined);
-      if(previewCanvas)await saveConfigurationPreview(config.current,previewCanvas);
+      await saveConfigurationPreview(config.current,previewCanvas);
       saveDesignPlacement(saved.id,saved.productId,variantId,placement);
     }
     return saved;

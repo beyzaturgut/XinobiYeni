@@ -139,10 +139,11 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         return new(factory, client, staff, token, design, product.Id, design.VariantId!, product.Variants.First(v => v.Id == design.VariantId).Image!, address);
     }
 
-    private async Task<MyDesignConfiguration> Configure(Fixture f, DesignPlacement placement, string? id = null, int? revision = null, byte[]? preview = null)
+    private async Task<MyDesignConfiguration> Configure(Fixture f, DesignPlacement placement, string? id = null, int? revision = null, byte[]? preview = null, bool withPreview = true)
     {
         var saved = await Read<MyDesignConfiguration>(await Send(f.Client, HttpMethod.Post, $"/api/v1/me/designs/{f.Design.Id}/configurations", f.Token,
             JsonContent.Create(new SaveDesignConfiguration(f.VariantId, placement, id, revision))));
+        if (!withPreview) return saved;
         using var upload = new MultipartFormDataContent { { new ByteArrayContent(preview ?? Composition), "file", "preview.jpg" } };
         (await Send(f.Client, HttpMethod.Put, $"/api/v1/me/design-configurations/{saved.Id}/revisions/{saved.Revision}/preview", f.Token, upload)).EnsureSuccessStatusCode();
         return saved;
@@ -441,6 +442,78 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         using var restricted = f.Factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddTransient<IClaimsTransformation, WithoutOrdersRead>()));
         using var noRead = await TestStaff.Client(restricted);
         Assert.Equal(HttpStatusCode.Forbidden, (await noRead.GetAsync(SourceRoute(order.Id, 0))).StatusCode);
+    }
+
+    private static string CompositionRoute(string orderId, int line) => $"/api/v1/admin/orders/{orderId}/lines/{line}/composition";
+
+    [Fact]
+    public async Task CompositionIsTheOrderedRevisionAfterPatternDeletionAndLaterEdits()
+    {
+        using var f = await Start("composition@example.com");
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, CanvasPhoto(SkiaSharp.SKColors.Red), Mask), 25, 35, 1, 0, 0);
+        var first = await Configure(f, placement);
+        await Configure(f, placement with { X = 60 }, first.Id, 1, NewComposition);
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "composition-request-1", first))));
+        var line = order.Lines[0].Personalization!;
+        Assert.Equal((1, Sha(Composition)), (line.ConfigurationRevision, line.Files!.Composition!.Sha256));
+
+        // After the order: revision 1's editable thumbnail is replaced and the design (pattern) is deleted.
+        using (var replace = new MultipartFormDataContent { { new ByteArrayContent(new byte[] { 255, 216, 255, 1, 217 }), "file", "preview.jpg" } })
+            (await Send(f.Client, HttpMethod.Put, $"/api/v1/me/design-configurations/{first.Id}/revisions/1/preview", f.Token, replace)).EnsureSuccessStatusCode();
+        (await Send(f.Client, HttpMethod.Delete, $"/api/v1/me/designs/{f.Design.Id}", f.Token)).EnsureSuccessStatusCode();
+
+        var number = System.Text.RegularExpressions.Regex.Replace(order.Number, "[^A-Za-z0-9-]+", "-").Trim('-');
+        for (var attempt = 0; attempt < 2; attempt++)
+        {
+            using var download = await f.Staff.GetAsync(CompositionRoute(order.Id, 0));
+            Assert.Equal(HttpStatusCode.OK, download.StatusCode);
+            var bytes = await download.Content.ReadAsByteArrayAsync();
+            Assert.Equal(Composition, bytes);
+            Assert.NotEqual(Pattern, bytes);
+            Assert.Equal(line.Files.Composition.Sha256, Sha(bytes));
+            Assert.Equal("image/jpeg", download.Content.Headers.ContentType?.MediaType);
+            Assert.Equal("attachment", download.Content.Headers.ContentDisposition?.DispositionType);
+            Assert.Equal($"xinobi-{number}-satir-1-giydirilmis-onizleme-rev1.jpg", FileName(download));
+            Assert.Equal("nosniff", download.Headers.GetValues("X-Content-Type-Options").Single());
+        }
+        // The customer's order preview is the same file.
+        Assert.Equal(Composition, await (await Send(f.Client, HttpMethod.Get, $"/api/v1/me/orders/{order.Id}/lines/0/preview", f.Token)).Content.ReadAsByteArrayAsync());
+    }
+
+    [Fact]
+    public async Task MissingOrChangedCompositionsAreExplainedAndNeverReplacedByThePattern()
+    {
+        using var f = await Start("composition-states@example.com");
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, CanvasPhoto(SkiaSharp.SKColors.Green), Mask), 25, 35, 1, 0, 0);
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "composition-states-1", await Configure(f, placement)))));
+        var noPreview = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token,
+            JsonContent.Create(Order(f, "composition-states-2", await Configure(f, placement with { X = 40 }, withPreview: false)))));
+        var legacy = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "composition-states-3", null))));
+        Assert.Null(noPreview.Lines[0].Personalization!.Files!.Composition);
+
+        async Task<string> Reason(string id) { using var response = await f.Staff.GetAsync(CompositionRoute(id, 0)); Assert.Equal("order_composition_not_recorded", await Code(response)); return await response.Content.ReadAsStringAsync(); }
+        Assert.Contains("yerleşim olmadığı", await Reason(legacy.Id));
+        Assert.Contains("yüklenmemişti", await Reason(noPreview.Id));
+        var accounts = f.Factory.Services.GetRequiredService<IAccountStore>();
+        var account = (await accounts.FindByAccessToken(f.Token))!;
+        var files = f.Factory.Services.GetRequiredService<IFileStore>();
+        var key = SavedDesignStore.OrderFile(order.Id, 0) + "-preview";
+
+        await files.Save(FileAreas.Designs, key, new MemoryStream([255, 216, 255, 0, 217]), "image/jpeg");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(CompositionRoute(order.Id, 0))).StatusCode);
+        // The raw pattern under the composition's name is refused as well.
+        await files.Save(FileAreas.Designs, key, new MemoryStream(Pattern), "image/jpeg");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(CompositionRoute(order.Id, 0))).StatusCode);
+        await files.Delete(FileAreas.Designs, key);
+        Assert.Equal("order_composition_not_found", await Code(await f.Staff.GetAsync(CompositionRoute(order.Id, 0))));
+        await accounts.ChangeOrder(account.Id, order.Id, stored => stored with { Lines = [stored.Lines[0] with { Personalization = stored.Lines[0].Personalization! with { Files = null } }] });
+        Assert.Contains("saklanmadan önce", await Reason(order.Id));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, (await f.Client.GetAsync(CompositionRoute(noPreview.Id, 0))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await Send(f.Client, HttpMethod.Get, CompositionRoute(noPreview.Id, 0), f.Token)).StatusCode);
+        using var restricted = f.Factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddTransient<IClaimsTransformation, WithoutOrdersRead>()));
+        using var noRead = await TestStaff.Client(restricted);
+        Assert.Equal(HttpStatusCode.Forbidden, (await noRead.GetAsync(CompositionRoute(noPreview.Id, 0))).StatusCode);
     }
 
     [Fact]

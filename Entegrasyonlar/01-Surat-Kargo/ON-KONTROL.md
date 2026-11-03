@@ -69,3 +69,7 @@ Bu bölüm gerçek Windows sunucusunda henüz çalıştırılmadı; komut ve pak
 ## Şu anki kanıt
 
 03.11.2026'da .NET istemcisiyle test takip metodu **HTTP 200 / Sipariş bulunamadı.** yanıtı verdi. [Sansürlenmiş JSON kanıtı](erisim-on-kontrol-2026-11-03.json). Önceki farklı istemcideki 403 artık genel erişim blokajı olarak sunulmaz. Asıl IIS sunucusunda bu paket henüz çalıştırılmadığından onun egress IP'si/yetkisi doğrulanmadı.
+
+## Paket doğrulaması
+
+Kaynak commit `d9a5639`. SHA-256 ve dosya içerik kontrolü: [TST-247](../../test/2026-11-03/TST-247-surat-preflight-package.md). Paket README nüshası bu ekten önceki aynı kullanım yönergesidir; binary/source değişmedi.

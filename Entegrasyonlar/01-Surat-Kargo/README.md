@@ -45,3 +45,5 @@ Parola, API anahtarı, gerçek müşteri verisi, gizli bilgi içeren ZIP/Postman
 [Güncel test erişimi HTTP 200; önceki 403 tarihsel](ERISIM-KONTROLU-2026-11-03.md). [Uygulanan akış ve canlı kabul kapıları](SUNUCU-KURULUMU.md). Gerçek gönderi oluşturulmadı; Production oluşturma ve canlı etiket kapalı.
 
 [Sunucuda ön kontrol ve taşınabilir paket yönergesi](ON-KONTROL.md).
+
+[Sağlayıcıya iletilecek teyit mesajı](SAGLAYICIYA-MESAJ.md) hazırlanmıştır; gönderilmedi. Ön kontrol paketinin bütünlük ve içerik kontrolü [TST-247](../../test/2026-11-03/TST-247-surat-preflight-package.md) kaydındadır.

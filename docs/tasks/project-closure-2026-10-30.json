@@ -853,8 +853,8 @@
       "work": "SIP-TAS-01...09: sade sipariş satırı detayı, kayıtlı editör yerleşimi, ayrı ham desen/ürün kaynak görseli/giydirilmiş önizleme ve güvenli indirme. Üretime hazırlık/gönderim/onay kuyruğu ekleme.",
       "accept": "Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.",
       "deps": "KIS-03, SEC-07, QA-04; mevcut sipariş okuma izinleri",
-      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi. SIP-TAS-05 (03.11): ürün kaynak görselinin yetkili ayrı indirmesi. SIP-TAS-06 (03.11): giydirilmiş önizlemenin gösterimi ve yetkili indirmesi. SIP-TAS-07 (03.11): dosya erişim yetkisi ve indirme işlem durumları doğrulandı.",
-      "remaining": "SIP-TAS-08/09: yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
+      "done": "Panelde metadata, korumalı ham görsel ve sipariş bağı var. SIP-TAS-01 (03.11): sipariş satırı tasarım detayı ve üç ayrı görsel kartı; fiziksel profil/kalibrasyon ekranı panelden kaldırıldı. SIP-TAS-02 (03.11): siparişe bağlı üç dosya referansı ve doğrulanmış kopyalar. SIP-TAS-03 (03.11): kayıtlı yerleşimin okunur sunumu. SIP-TAS-04 (03.11): ham desenin yetkili ayrı indirmesi. SIP-TAS-05 (03.11): ürün kaynak görselinin yetkili ayrı indirmesi. SIP-TAS-06 (03.11): giydirilmiş önizlemenin gösterimi ve yetkili indirmesi. SIP-TAS-07 (03.11): dosya erişim yetkisi ve indirme işlem durumları doğrulandı. SIP-TAS-08 (03.11): eski/eksik kayıtların dürüst sunumu ve salt okunur envanter.",
+      "remaining": "SIP-TAS-09: yetki/eski kayıt ve kabul; SIP-TAS-02 SQL kabulü açık.",
       "status": "Yapılmadı - kapanış açık",
       "phase": "Faz06",
       "owner": "Admin/Web geliştirici + Backend + UX/QA",
@@ -1991,11 +1991,13 @@
         "id": "SIP-TAS-08",
         "title": "Eski ve eksik sipariş kayıtlarını dürüst ele al",
         "parents": "KIS-03, KIS-07",
-        "status": "Planlandı - uygulanmadı",
-        "remaining": "Eski siparişlerde kayıtlı yerleşim, ürün kopyası veya kompozisyon bulunmayabilir. Kaynak yoksa bunu açık göster; ham deseni kompozisyon diye sunma ve güncel tasarımdan eski yerleşim tahmin etme. Kanıtlanabilen eski veri için güvenli geçiş yaklaşımı belirle.",
+        "status": "Uygulandı - gerçek envanter/karar açık",
+        "remaining": "Gerçek veride dry-run envanteri ve geri doldurma (desen referansı) kararı/onayı; doğrulanmamış eski kompozisyon kararı; SQL/canlı kabul; rol/PM kabulü.",
         "accept": "Eski/eksik kayıtlar ekranı bozmaz; olmayan dosyanın indirmesi kapalı ve nedeni anlaşılır.",
         "deps": "SIP-TAS-02, SIP-TAS-07",
-        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md"
+        "plan": "docs/tasks/order-design-detail-scope-2026-11-03.md",
+        "done": "03.11: Eski/eksik/kısmi kayıt matrisi kart bazında; eski siparişin kendi desen/kompozisyon kopyası doğrulanmamış etiketiyle erişilebilir; saklanmayan dosyalar nedeniyle kapalı; servis hatası eksik kayıt sayılmaz; katalog/tasarım yedeği yok; salt okunur dry-run envanteri ve geri dönüş planı. İzole API ve 7 durumlu Chrome matrisi PASS.",
+        "evidence": "test/2026-11-03/TST-235-sip-tas-08-legacy-records.md"
       },
       {
         "id": "SIP-TAS-09",

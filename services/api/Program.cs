@@ -88,7 +88,7 @@ if (builder.Environment.IsDevelopment())
         // Credentials let the web session cookie travel to the API; origins stay an explicit allow-list.
         .AllowAnyHeader().AllowAnyMethod().AllowCredentials()
         // The panel reads the server-given name of a file download (SIP-TAS-04) across the Development origins.
-        .WithExposedHeaders("Content-Disposition")));
+        .WithExposedHeaders("Content-Disposition", Xinobi.Api.Orders.AdminOrderPatternEndpoints.FileCheckHeader)));
 }
 // ADR-002 Ek B: the test server may open XINOBI U (off by default). Cloudflare credentials come from server environment variables.
 var xinobiUOnTestServer = !builder.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("XinobiU:Enabled");
@@ -238,6 +238,13 @@ if (builder.Configuration.GetValue<bool>("FeatureTransfer:Run"))
 {
     if (!app.Environment.IsDevelopment()) throw new InvalidOperationException("Local feature import requires Development.");
     Environment.ExitCode = await Xinobi.Api.Infrastructure.FeatureTransfer.Run(app.Services, builder.Configuration.GetValue<bool>("FeatureTransfer:Activate"));
+    return;
+}
+
+if (args.Length >= 1 && args[0] == Xinobi.Api.Orders.OrderDesignFilesDryRun.Command)
+{
+    // Read-only inventory of older order design records (SIP-TAS-08); it changes nothing.
+    Environment.ExitCode = await Xinobi.Api.Orders.OrderDesignFilesDryRun.Run(app.Services, Console.Out, Console.Error);
     return;
 }
 

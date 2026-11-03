@@ -13,6 +13,9 @@ namespace Xinobi.Api.Orders;
 /// </summary>
 public static partial class AdminOrderPatternEndpoints
 {
+    /// <summary><c>sha256</c>: the bytes match the checksum recorded with the order; <c>unrecorded</c>: an older order's own copy without one.</summary>
+    public const string FileCheckHeader = "X-Xinobi-File-Check";
+
     public static void Map(RouteGroupBuilder admin)
     {
         admin.MapGet("/orders/{id}/lines/{line:int}/pattern", async (string id, int line, IAccountStore accounts, SavedDesignStore designs, HttpContext http) =>
@@ -35,6 +38,8 @@ public static partial class AdminOrderPatternEndpoints
             catch (ProblemException) { throw ProblemException.Unavailable("Sipariş desen dosyası"); }
             if (mime != design.Mime || design.Files is { } files && files.Pattern.Mime != mime)
                 throw ProblemException.Unavailable("Sipariş desen dosyası");
+            // Orders placed before file references (SIP-TAS-02) still own this copy, but no checksum was recorded to compare.
+            http.Response.Headers[FileCheckHeader] = design.Files is null ? "unrecorded" : "sha256";
             http.Response.Headers["X-Content-Type-Options"] = "nosniff";
             http.Response.Headers.CacheControl = "no-store";
             return Results.File(bytes, mime, FileName(order, line, design, extension));
@@ -95,6 +100,7 @@ public static partial class AdminOrderPatternEndpoints
                 if (DesignSurfaceValidator.EditorCanvas(size.Width, size.Height) != (placement.SourceWidth, placement.SourceHeight))
                     throw ProblemException.Unavailable("Sipariş ürün kaynak görseli");
             }
+            http.Response.Headers[FileCheckHeader] = "sha256";
             http.Response.Headers["X-Content-Type-Options"] = "nosniff";
             http.Response.Headers.CacheControl = "no-store";
             return Results.File(bytes, mime, SourceFileName(order, line, order.Lines[line], extension));
@@ -130,14 +136,20 @@ public static partial class AdminOrderPatternEndpoints
             var order = await Find(accounts, id);
             if (line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is not { } design)
                 throw ProblemException.NotFound("order_line_design_not_found", "Bu sipariş satırında tasarım yok.");
-            if (design.Files?.Composition is not { } recorded || design.ConfigurationRevision is not { } revision)
+            // An order placed before file references may still own the composition copied at order time (same order key, never
+            // rewritten); it is served as unverified. A later order without a recorded composition had none to copy.
+            var legacy = design.Files is null && design.Placement is not null && design.ConfigurationRevision is not null;
+            var recorded = design.Files?.Composition;
+            if (recorded is null && !legacy || design.ConfigurationRevision is not { } revision)
                 throw ProblemException.NotFound("order_composition_not_recorded", design.Placement is null
                     ? "Bu sipariş satırında kayıtlı yerleşim olmadığı için giydirilmiş önizleme yok."
                     : design.Files is null
                         ? "Bu sipariş, giydirilmiş önizleme kopyası saklanmadan önce verilmiş; güncel tasarımla yeniden oluşturulmaz."
                         : "Bu yerleşim revizyonu için sipariş anında giydirilmiş önizleme yüklenmemişti; ham desen yerine kullanılmaz.");
             var file = await designs.OrderPreview(order.Id, line, recorded)
-                ?? throw ProblemException.NotFound("order_composition_not_found", "Bu sipariş satırının giydirilmiş önizleme dosyası bulunamadı.");
+                ?? throw (recorded is null
+                    ? ProblemException.NotFound("order_composition_not_recorded", "Bu sipariş, giydirilmiş önizleme kopyası saklanmadan önce verilmiş ve sipariş anında kopya oluşmamış; güncel tasarımla yeniden oluşturulmaz.")
+                    : ProblemException.NotFound("order_composition_not_found", "Bu sipariş satırının giydirilmiş önizleme dosyası bulunamadı."));
             byte[] bytes;
             await using (file)
             {
@@ -148,7 +160,8 @@ public static partial class AdminOrderPatternEndpoints
             string mime, extension;
             try { (mime, extension) = SavedDesignStore.DetectImage(bytes); }
             catch (ProblemException) { throw ProblemException.Unavailable("Sipariş giydirilmiş önizlemesi"); }
-            if (mime != recorded.Mime || mime != "image/jpeg") throw ProblemException.Unavailable("Sipariş giydirilmiş önizlemesi");
+            if (mime != "image/jpeg" || recorded is not null && mime != recorded.Mime) throw ProblemException.Unavailable("Sipariş giydirilmiş önizlemesi");
+            http.Response.Headers[FileCheckHeader] = recorded is null ? "unrecorded" : "sha256";
             http.Response.Headers["X-Content-Type-Options"] = "nosniff";
             http.Response.Headers.CacheControl = "no-store";
             var number = UnsafeName().Replace(order.Number, "-").Trim('-');

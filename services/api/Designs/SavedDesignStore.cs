@@ -217,6 +217,10 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
     public Task<StoredFile?> OrderSourceImage(string orderId, int line, Identity.OrderDesignFile expected) =>
         OrderCopy(OrderFile(orderId, line) + "-source", expected.Mime, expected);
 
+    /// <summary>The kept product photo without the checksum check, for the read-only record inventory that compares it itself.</summary>
+    public Task<StoredFile?> OrderSourceImageUnchecked(string orderId, int line, string mime) =>
+        OrderCopy(OrderFile(orderId, line) + "-source", mime, null);
+
     /// <summary>An order's copy; with a recorded reference the bytes must still match it, otherwise the copy is reported unavailable.</summary>
     private async Task<StoredFile?> OrderCopy(string key, string mime, Identity.OrderDesignFile? expected)
     {

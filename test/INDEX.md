@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-235 | 03.11.2026 | SIP-TAS-08 eski kayıt API fixture (doğrulanmamış eski kopyalar, saklanmayan dosyalar, 503≠eksik) + salt okunur dry-run envanteri | PASS 15/15; yazma yok | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |
+| TST-236 | 03.11.2026 | API tam paket + sözleşme üretimi (değişiklik yok) | PASS 513, 29 atlandı | API / CONTRACT | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |
+| TST-237 | 03.11.2026 | Admin lint/TS/build | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |
+| TST-238 | 03.11.2026 | Eski/eksik/kısmi kayıt Chrome matrisi (7 durum) + regresyonlar | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-235-sip-tas-08-legacy-records.md) |
 | TST-231 | 03.11.2026 | SIP-TAS-07 dosya erişim matrisi (3 dosya × anonim/müşteri/başka müşteri/izinsiz/MFA'sız/süresi dolmuş; başka sipariş/satır; 404/503; açık medya sızıntısı) | PASS 13/13 | API / ISOLATED SECURITY | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |
 | TST-232 | 03.11.2026 | API tam paket + güvenlik alt kümesi | PASS 511 (29 atlandı); 36/36 | API / ISOLATED | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |
 | TST-233 | 03.11.2026 | Admin lint/TS/build | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |

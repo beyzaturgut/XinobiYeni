@@ -13,6 +13,7 @@ using Xinobi.Api.Designs;
 using Xinobi.Api.EmailVerification;
 using Xinobi.Api.Identity;
 using Xinobi.Api.Infrastructure;
+using Xinobi.Api.Orders;
 
 namespace Xinobi.Architecture.Tests;
 
@@ -609,6 +610,106 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         clock.Offset = AccountRules.AccessTokenLifetime + TimeSpan.FromMinutes(1);
         try { foreach (var kind in expected.Keys) Assert.Equal(HttpStatusCode.Unauthorized, (await staff.GetAsync(Route(order.Id, kind))).StatusCode); }
         finally { clock.Offset = TimeSpan.Zero; }
+    }
+
+    private static async Task<CustomerOrder> MakeLegacy(Fixture f, CustomerOrder order, bool keepComposition = true)
+    {
+        // An order placed before SIP-TAS-02: no file references and no product photo copy; the composition copy may exist.
+        var accounts = f.Factory.Services.GetRequiredService<IAccountStore>();
+        var account = (await accounts.FindByAccessToken(f.Token))!;
+        var files = f.Factory.Services.GetRequiredService<IFileStore>();
+        await files.Delete(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0) + "-source");
+        if (!keepComposition) await files.Delete(FileAreas.Designs, SavedDesignStore.OrderFile(order.Id, 0) + "-preview");
+        return (await accounts.ChangeOrder(account.Id, order.Id, stored => stored with { Lines = [stored.Lines[0] with { Personalization = stored.Lines[0].Personalization! with { Files = null } }] })).Order;
+    }
+
+    [Fact]
+    public async Task OlderOrdersKeepTheirOwnCopiesReachableAndSayWhatWasNeverKept()
+    {
+        using var f = await Start("legacy-files@example.com");
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, CanvasPhoto(SkiaSharp.SKColors.Teal), Mask), 25, 35, 1, 0, 0);
+        var configuration = await Configure(f, placement);
+        var withCopy = await MakeLegacy(f, await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "legacy-files-1", configuration)))));
+        var without = await MakeLegacy(f, await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "legacy-files-2", configuration)))), keepComposition: false);
+        var current = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "legacy-files-3", configuration))));
+        string Route(string id, string kind) => $"/api/v1/admin/orders/{id}/lines/0/{kind}";
+
+        // Each file is judged on its own: the older order's pattern and composition copies stay available, marked unverified.
+        using (var pattern = await f.Staff.GetAsync(Route(withCopy.Id, "pattern")))
+        {
+            Assert.Equal(Pattern, await pattern.Content.ReadAsByteArrayAsync());
+            Assert.Equal("unrecorded", pattern.Headers.GetValues("X-Xinobi-File-Check").Single());
+        }
+        using (var composition = await f.Staff.GetAsync(Route(withCopy.Id, "composition")))
+        {
+            Assert.Equal(Composition, await composition.Content.ReadAsByteArrayAsync());
+            Assert.Equal("unrecorded", composition.Headers.GetValues("X-Xinobi-File-Check").Single());
+        }
+        // Never kept: explained, and no live catalogue photo or re-composition is served instead.
+        using (var source = await f.Staff.GetAsync(Route(withCopy.Id, "source")))
+        {
+            Assert.Equal("order_source_not_recorded", await Code(source));
+            Assert.Contains("saklanmadan önce", await source.Content.ReadAsStringAsync());
+        }
+        using (var none = await f.Staff.GetAsync(Route(without.Id, "composition")))
+        {
+            Assert.Equal("order_composition_not_recorded", await Code(none));
+            Assert.Contains("kopya oluşmamış", await none.Content.ReadAsStringAsync());
+        }
+        // Current orders report a verified copy.
+        foreach (var kind in new[] { "pattern", "source", "composition" })
+            Assert.Equal("sha256", (await f.Staff.GetAsync(Route(current.Id, kind))).Headers.GetValues("X-Xinobi-File-Check").Single());
+        // A storage outage is a 503, not "never kept".
+        recorder.FailOrderReads = true;
+        try { foreach (var kind in new[] { "pattern", "composition" }) Assert.Equal(HttpStatusCode.ServiceUnavailable, (await f.Staff.GetAsync(Route(withCopy.Id, kind))).StatusCode); }
+        finally { recorder.FailOrderReads = false; }
+    }
+
+    [Fact]
+    public async Task DryRunInventoriesOldRecordsProposesOnlyProvenBackfillsAndWritesNothing()
+    {
+        using var f = await Start("dry-run@example.com");
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, CanvasPhoto(SkiaSharp.SKColors.Orange), Mask), 25, 35, 1, 0, 0);
+        var configuration = await Configure(f, placement);
+        var full = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "dry-run-full", configuration))));
+        var legacy = await MakeLegacy(f, await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "dry-run-legacy", configuration)))));
+        var patternOnly = await MakeLegacy(f, await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "dry-run-pattern-only", null)))));
+        var noPreview = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token,
+            JsonContent.Create(Order(f, "dry-run-no-preview", await Configure(f, placement with { X = 50 }, withPreview: false)))));
+        var changed = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(Order(f, "dry-run-changed", configuration))));
+        var files = f.Factory.Services.GetRequiredService<IFileStore>();
+        await files.Save(FileAreas.Designs, SavedDesignStore.OrderFile(changed.Id, 0), new MemoryStream([.. Pattern[..^1], 0]), "image/png");
+
+        var accounts = f.Factory.Services.GetRequiredService<IAccountStore>();
+        var ordersBefore = System.Text.Json.JsonSerializer.Serialize(await accounts.AllOrders());
+        var keysBefore = recorder.OrderKeys.Order().ToArray();
+        var report = await OrderDesignFilesDryRun.Plan(accounts, f.Factory.Services.GetRequiredService<SavedDesignStore>(), TimeProvider.System);
+        Assert.Equal(ordersBefore, System.Text.Json.JsonSerializer.Serialize(await accounts.AllOrders()));
+        Assert.Equal(keysBefore, recorder.OrderKeys.Order().ToArray());
+
+        OrderDesignLineFinding Line(CustomerOrder order) => report.Lines.Single(item => item.OrderId == order.Id);
+        Assert.Equal(("verified", "verified", "verified"), (Line(full).Pattern.Status, Line(full).ProductSource.Status, Line(full).Composition.Status));
+        Assert.Equal(("provable", "record-pattern-reference"), (Line(legacy).Pattern.Status, Line(legacy).Pattern.Proposal));
+        Assert.Equal(("not-kept-for-this-order", (string?)null), (Line(legacy).ProductSource.Status, Line(legacy).ProductSource.Proposal));
+        Assert.Equal(("order-copy-unverified", "decide-unverified-composition"), (Line(legacy).Composition.Status, Line(legacy).Composition.Proposal));
+        Assert.Equal(("unprovable-no-recorded-checksum", "no-placement", "no-placement"), (Line(patternOnly).Pattern.Status, Line(patternOnly).ProductSource.Status, Line(patternOnly).Composition.Status));
+        Assert.Null(Line(patternOnly).Pattern.Proposal);
+        Assert.Equal("not-uploaded-for-revision", Line(noPreview).Composition.Status);
+        Assert.Equal("checksum-mismatch", Line(changed).Pattern.Status);
+        Assert.Equal(1, report.Proposals["record-pattern-reference"]);
+        Assert.Equal(5, report.PersonalisedLines);
+        // The report carries ids and statuses only, never customer details or storage paths.
+        var json = System.Text.Json.JsonSerializer.Serialize(report);
+        Assert.DoesNotContain("dry-run@example.com", json); Assert.DoesNotContain("Test Kullanıcı", json); Assert.DoesNotContain(directory, json); Assert.DoesNotContain(SavedDesignStore.OrderFile(full.Id, 0), json);
+
+        // An unreadable store prints no report at all rather than an empty "nothing to do".
+        recorder.FailOrderReads = true;
+        using var output = new StringWriter(); using var error = new StringWriter();
+        try { Assert.Equal(2, await OrderDesignFilesDryRun.Run(f.Factory.Services, output, error)); }
+        finally { recorder.FailOrderReads = false; }
+        Assert.Equal("", output.ToString());
+        Assert.Equal(0, await OrderDesignFilesDryRun.Run(f.Factory.Services, output, error));
+        Assert.Contains("\"personalisedLines\": 5", output.ToString());
     }
 
     [Fact]

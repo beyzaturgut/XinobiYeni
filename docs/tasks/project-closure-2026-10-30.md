@@ -1181,7 +1181,9 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 
 **SIP-TAS-07 (03.11):** dosya erişim yetkisi ve indirme durumları uçtan uca doğrulandı ([TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md)).
 
-**Yapılmadı / açık kalan:** SIP-TAS-08/09: eski kayıt ve kabul; SIP-TAS-01 rol/PM ekran kabulü.
+**SIP-TAS-08 (03.11):** eski/eksik kayıtların kart bazında dürüst sunumu ve salt okunur dry-run envanteri ([TST-235](../../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md)).
+
+**Yapılmadı / açık kalan:** SIP-TAS-09: kabul; gerçek veride envanter ve geri doldurma kararı; SIP-TAS-01 rol/PM ekran kabulü.
 
 **Kapanış kanıtı:** Doğru sipariş revizyonunun yerleşimi ve üç görseli görülebilir/indirilebilir; kaynak eksikse dürüst durum; yetkisiz erişim yok; üretim işlemi yok.
 
@@ -1221,7 +1223,7 @@ Her taskın bir ana fazı var; ortak görevler fazların Çapraz bağımlılıkl
 | SIP-TAS-05 | KIS-07 | Uygulandı - kabul açık ([TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md)) | [Maskelemede kullanılan ürün görselini ayrı indir](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-06 | KIS-07 | Uygulandı - kabul açık ([TST-227](../../test/2026-11-03/TST-227-sip-tas-06-composition.md)) | [Giydirilmiş görseli göster ve indir](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-07 | SEC-07, KIS-07 | Uygulandı - canlı/SQL kabulü açık ([TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md)) | [Yetki, dosya erişimi ve işlem durumlarını tamamla](order-design-detail-scope-2026-11-03.md) |
-| SIP-TAS-08 | KIS-03, KIS-07 | Planlandı - uygulanmadı | [Eski ve eksik sipariş kayıtlarını dürüst ele al](order-design-detail-scope-2026-11-03.md) |
+| SIP-TAS-08 | KIS-03, KIS-07 | Uygulandı - gerçek envanter/karar açık ([TST-235](../../test/2026-11-03/TST-235-sip-tas-08-legacy-records.md)) | [Eski ve eksik sipariş kayıtlarını dürüst ele al](order-design-detail-scope-2026-11-03.md) |
 | SIP-TAS-09 | KIS-03, KIS-07, QA-03 | Planlandı - uygulanmadı | [Sipariş tasarım detayını test et ve kabul kaydını yaz](order-design-detail-scope-2026-11-03.md) |
 
 ## Faz07 / Kurumsal teklif ve toplu sipariş

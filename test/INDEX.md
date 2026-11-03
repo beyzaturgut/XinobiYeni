@@ -2,6 +2,10 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-231 | 03.11.2026 | SIP-TAS-07 dosya erişim matrisi (3 dosya × anonim/müşteri/başka müşteri/izinsiz/MFA'sız/süresi dolmuş; başka sipariş/satır; 404/503; açık medya sızıntısı) | PASS 13/13 | API / ISOLATED SECURITY | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |
+| TST-232 | 03.11.2026 | API tam paket + güvenlik alt kümesi | PASS 511 (29 atlandı); 36/36 | API / ISOLATED | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |
+| TST-233 | 03.11.2026 | Admin lint/TS/build | PASS; 4 eski uyarı | ADMIN / STATIC | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |
+| TST-234 | 03.11.2026 | Admin indirme durumları 21 Chrome senaryosu (kilit/odak/duyuru/tekrar dene/oturum) + regresyonlar | PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-231-sip-tas-07-file-access.md) |
 | TST-227 | 03.11.2026 | SIP-TAS-06 kompozisyon API fixture (revizyon/bayt/hash, desen silme, sonraki düzenleme, tekrar indirme, eksik/bozuk, yetki) | PASS 12/12 | API / ISOLATED FIXTURE | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |
 | TST-228 | 03.11.2026 | API tam test paketi | PASS 510, 29 atlandı | API / ISOLATED | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |
 | TST-229 | 03.11.2026 | Sözleşme + admin lint/TS/build + web tsc/eslint + Flutter analiz | PASS; 4 eski lint uyarısı | CONTRACT / STATIC | [Rapor](2026-11-03/TST-227-sip-tas-06-composition.md) |

@@ -21,14 +21,16 @@ function Facts({ rows }: { rows: [string, unknown][] }) {
 type DownloadState = { busy?: boolean; done?: string; error?: string; retry?: boolean }
 
 const downloads = {
-  pattern: { route: 'pattern', file: 'desen', idle: 'Ham deseni indir', busy: 'Ham desen indiriliyor…', done: 'Ham desen indirildi', missing: 'Bu sipariş satırının desen dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Ham deseni indirme yetkiniz yok.', failed: 'Ham desen şu anda indirilemedi.', what: 'ham desen dosyası' },
-  source: { route: 'source', file: 'urun-kaynak', idle: 'Ürün kaynak görselini indir', busy: 'Ürün kaynak görseli indiriliyor…', done: 'Ürün kaynak görseli indirildi', missing: 'Bu sipariş satırının ürün kaynak görseli bulunamadı; indirilecek dosya yok.', forbidden: 'Ürün kaynak görselini indirme yetkiniz yok.', failed: 'Ürün kaynak görseli şu anda indirilemedi.', what: 'ürün kaynak görseli' },
-  composition: { route: 'composition', file: 'giydirilmis-onizleme', idle: 'Giydirilmiş önizlemeyi indir', busy: 'Giydirilmiş önizleme indiriliyor…', done: 'Giydirilmiş önizleme indirildi', missing: 'Bu sipariş satırının giydirilmiş önizleme dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Giydirilmiş önizlemeyi indirme yetkiniz yok.', failed: 'Giydirilmiş önizleme şu anda indirilemedi.', what: 'giydirilmiş temsili önizleme' },
+  pattern: { route: 'pattern', file: 'desen', idle: 'Ham deseni indir', busy: 'Ham desen indiriliyor…', done: 'Ham desen', missing: 'Bu sipariş satırının desen dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Ham deseni indirme yetkiniz yok.', failed: 'Ham desen şu anda indirilemedi.', what: 'ham desen dosyası' },
+  source: { route: 'source', file: 'urun-kaynak', idle: 'Ürün kaynak görselini indir', busy: 'Ürün kaynak görseli indiriliyor…', done: 'Ürün kaynak görseli', missing: 'Bu sipariş satırının ürün kaynak görseli bulunamadı; indirilecek dosya yok.', forbidden: 'Ürün kaynak görselini indirme yetkiniz yok.', failed: 'Ürün kaynak görseli şu anda indirilemedi.', what: 'ürün kaynak görseli' },
+  composition: { route: 'composition', file: 'giydirilmis-onizleme', idle: 'Giydirilmiş önizlemeyi indir', busy: 'Giydirilmiş önizleme indiriliyor…', done: 'Giydirilmiş önizleme', missing: 'Bu sipariş satırının giydirilmiş önizleme dosyası bulunamadı; indirilecek dosya yok.', forbidden: 'Giydirilmiş önizlemeyi indirme yetkiniz yok.', failed: 'Giydirilmiş önizleme şu anda indirilemedi.', what: 'giydirilmiş temsili önizleme' },
 } as const
 
 /** Downloads one of the order line's own copies from the staff API (resolved on the server by order and line), one request at a time. */
 function FileDownload({ kind, orderId, orderNumber, index, name }: { kind: keyof typeof downloads; orderId: string; orderNumber: string; index: number; name: string }) {
-  const text = downloads[kind], [state, setState] = useState<DownloadState>({}), running = useRef(false)
+  const text = downloads[kind], [state, setState] = useState<DownloadState>({}), running = useRef(false), message = useRef<HTMLParagraphElement>(null)
+  // A failure that removes the button moves focus to its explanation, so keyboard and screen reader users are not left on nothing.
+  useEffect(() => { if (state.error && !state.retry) message.current?.focus() }, [state])
   async function download() {
     if (running.current) return
     running.current = true; setState({ busy: true })
@@ -51,12 +53,14 @@ function FileDownload({ kind, orderId, orderNumber, index, name }: { kind: keyof
   }
   const described = `${orderId}-${index}-${kind}-download-state`
   return <div className="order-design-download">
-    {!state.error || state.retry ? <button type="button" disabled={state.busy} aria-describedby={described} onClick={() => void download()}>
+    {/* aria-disabled keeps keyboard focus on the button while a download runs; the ref lock refuses repeated requests. */}
+    {!state.error || state.retry ? <button type="button" aria-disabled={state.busy || undefined} aria-describedby={described} onClick={() => void download()}>
       {state.busy ? text.busy : state.retry ? 'İndirmeyi tekrar dene' : text.idle}</button> : null}
     <span id={described} className="admin-sr-only">{`${name} ${text.what}`}</span>
     {state.busy && <p role="status">{text.busy}</p>}
-    {state.done && <p role="status">{text.done}: {state.done}</p>}
-    {state.error && <p role="alert">{state.error}</p>}
+    {/* The page cannot see whether the browser saved the file; it only says the file was handed over. */}
+    {state.done && <p role="status">{text.done} tarayıcıya indirme için verildi: {state.done}. Kaydedildiğini tarayıcının indirmeler listesinden kontrol edin.</p>}
+    {state.error && <p role="alert" ref={message} tabIndex={-1}>{state.error}</p>}
   </div>
 }
 

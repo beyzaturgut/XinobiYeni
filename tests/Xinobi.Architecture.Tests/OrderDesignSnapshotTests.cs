@@ -28,6 +28,14 @@ public sealed class OrderDesignSnapshotTests : IDisposable
     private static readonly byte[] Composition = [255, 216, 255, 217], NewComposition = [255, 216, 255, 0, 217];
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-order-snapshot-test-" + Guid.NewGuid());
     private readonly RecordingFileStore recorder;
+    private readonly MovableClock clock = new();
+
+    /// <summary>Real time plus an offset, so a test can let access tokens expire.</summary>
+    private sealed class MovableClock : TimeProvider
+    {
+        public TimeSpan Offset;
+        public override DateTimeOffset GetUtcNow() => base.GetUtcNow() + Offset;
+    }
 
     public OrderDesignSnapshotTests() => recorder = new(new LocalFileStore(directory));
 
@@ -40,6 +48,7 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<IFileStore>(); services.AddSingleton<IFileStore>(recorder);
+            services.RemoveAll<TimeProvider>(); services.AddSingleton<TimeProvider>(clock);
             services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender>(new PreviewSender());
         });
     });
@@ -49,6 +58,7 @@ public sealed class OrderDesignSnapshotTests : IDisposable
     {
         public readonly HashSet<string> OrderKeys = [];
         public string? FailSuffix;
+        public bool FailOrderReads;
         public async Task Save(string area, string key, Stream content, string contentType, CancellationToken cancellationToken = default)
         {
             if (FailSuffix is not null && key.StartsWith("order-", StringComparison.Ordinal) && key.EndsWith(FailSuffix, StringComparison.Ordinal))
@@ -56,7 +66,8 @@ public sealed class OrderDesignSnapshotTests : IDisposable
             await inner.Save(area, key, content, contentType, cancellationToken);
             if (key.StartsWith("order-", StringComparison.Ordinal)) lock (OrderKeys) OrderKeys.Add(key);
         }
-        public Task<StoredFile?> Open(string area, string key, CancellationToken cancellationToken = default) => inner.Open(area, key, cancellationToken);
+        public Task<StoredFile?> Open(string area, string key, CancellationToken cancellationToken = default) =>
+            FailOrderReads && key.StartsWith("order-", StringComparison.Ordinal) ? throw ProblemException.Unavailable("Dosya deposu") : inner.Open(area, key, cancellationToken);
         public async Task Delete(string area, string key, CancellationToken cancellationToken = default)
         {
             await inner.Delete(area, key, cancellationToken);
@@ -514,6 +525,90 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         using var restricted = f.Factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddTransient<IClaimsTransformation, WithoutOrdersRead>()));
         using var noRead = await TestStaff.Client(restricted);
         Assert.Equal(HttpStatusCode.Forbidden, (await noRead.GetAsync(CompositionRoute(noPreview.Id, 0))).StatusCode);
+    }
+
+    private static async Task<HttpClient> StaffClient(WebApplicationFactory<Program> factory, bool mfa)
+    {
+        var accounts = factory.Services.GetRequiredService<IAccountStore>();
+        var account = await accounts.Register("Synthetic staff", $"staff-{Guid.NewGuid():N}@example.invalid", "synthetic-test-password");
+        await accounts.AssignRole(account.Email, Roles.Admin);
+        var tokens = await accounts.IssueTokens(account.Id);
+        if (mfa) await factory.Services.GetRequiredService<AdminMfa>().Grant(account.Id, tokens);
+        var client = factory.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
+        return client;
+    }
+
+    [Fact]
+    public async Task EveryOrderDesignFileIsGuardedOnTheServerForEachCallerAndOrderLine()
+    {
+        using var f = await Start("access-owner@example.com");
+        var photo = CanvasPhoto(SkiaSharp.SKColors.Purple);
+        var placement = new DesignPlacement(100, 100, await Publish(f.ProductId, f.VariantId, f.SourceImage, photo, Mask), 25, 35, 1, 0, 0);
+        var configuration = await Configure(f, placement);
+        var request = new PlaceOrder(f.Address.Id, [new(f.ProductId, f.VariantId, 1, f.Design.Id, configuration.Id, configuration.Revision), new(f.ProductId, f.VariantId, 1)], "access-request-1");
+        var order = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token, JsonContent.Create(request)));
+        // A second order of the same shopper with another composition: ids decide which copy is returned, never a client path.
+        var other = await Read<CustomerOrder>(await Send(f.Client, HttpMethod.Post, "/api/v1/me/orders", f.Token,
+            JsonContent.Create(Order(f, "access-request-2", await Configure(f, placement with { X = 70 }, configuration.Id, 1, NewComposition)))));
+        var expected = new Dictionary<string, byte[]> { ["pattern"] = Pattern, ["source"] = photo, ["composition"] = Composition };
+        string Route(string id, string kind, int line = 0) => $"/api/v1/admin/orders/{id}/lines/{line}/{kind}";
+
+        var challenge = await Read<AccountEmailVerification>(await f.Client.PostAsJsonAsync("/api/v1/auth/email-verification", new StartAccountEmailVerification("access-other@example.com")));
+        var otherCustomer = (await Read<AuthSession>(await f.Client.PostAsJsonAsync("/api/v1/auth/register",
+            new RegisterAccount("Başka Müşteri", "access-other@example.com", "guclu-parola-1", challenge.VerificationId, challenge.PreviewCode!)))).AccessToken;
+        using var noMfa = await StaffClient(f.Factory, mfa: false);
+        using var staff = await StaffClient(f.Factory, mfa: true);
+        using var restricted = f.Factory.WithWebHostBuilder(builder => builder.ConfigureServices(services => services.AddTransient<IClaimsTransformation, WithoutOrdersRead>()));
+        using var noRead = await TestStaff.Client(restricted);
+
+        foreach (var (kind, bytes) in expected)
+        {
+            var route = Route(order.Id, kind);
+            Assert.Equal(HttpStatusCode.Unauthorized, (await f.Client.GetAsync(route)).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await Send(f.Client, HttpMethod.Get, route, f.Token)).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await Send(f.Client, HttpMethod.Get, route, otherCustomer)).StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, (await noRead.GetAsync(route)).StatusCode);
+            Assert.Equal(HttpStatusCode.Unauthorized, (await noMfa.GetAsync(route)).StatusCode);
+            using var allowed = await staff.GetAsync(route);
+            Assert.Equal(bytes, await allowed.Content.ReadAsByteArrayAsync());
+            Assert.Contains("no-store", allowed.Headers.CacheControl?.ToString());
+            // The other order's id returns that order's own copy; a plain line and unknown lines/orders are 404 with safe bodies.
+            if (kind == "composition") Assert.Equal(NewComposition, await (await staff.GetAsync(Route(other.Id, kind))).Content.ReadAsByteArrayAsync());
+            foreach (var missing in new[] { Route(order.Id, kind, 1), Route(order.Id, kind, 7), Route("unknown-order", kind) })
+            {
+                using var response = await staff.GetAsync(missing);
+                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+                var body = await response.Content.ReadAsStringAsync();
+                Assert.DoesNotContain("order-", body); Assert.DoesNotContain(directory, body); Assert.DoesNotContain("designs/files", body);
+            }
+        }
+        // The customer's own routes stay owner-only.
+        foreach (var kind in new[] { "design", "preview" })
+        {
+            var route = $"/api/v1/me/orders/{order.Id}/lines/0/{kind}";
+            Assert.Equal(HttpStatusCode.OK, (await Send(f.Client, HttpMethod.Get, route, f.Token)).StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, (await Send(f.Client, HttpMethod.Get, route, otherCustomer)).StatusCode);
+            Assert.Equal(HttpStatusCode.Unauthorized, (await f.Client.GetAsync(route)).StatusCode);
+        }
+        // The public catalogue media route never reaches order copies.
+        foreach (var name in new[] { SavedDesignStore.OrderFile(order.Id, 0), SavedDesignStore.OrderFile(order.Id, 0) + "-source", order.Id + ".png" })
+            Assert.Equal(HttpStatusCode.NotFound, (await f.Client.GetAsync("/api/v1/local-commerce/media/" + name)).StatusCode);
+
+        // Storage outage: 503 with the shared problem code, never a fallback file.
+        recorder.FailOrderReads = true;
+        foreach (var kind in expected.Keys)
+        {
+            using var response = await staff.GetAsync(Route(order.Id, kind));
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+            Assert.Equal("feature_unavailable", await Code(response));
+        }
+        recorder.FailOrderReads = false;
+
+        // An expired staff session is refused for every file.
+        clock.Offset = AccountRules.AccessTokenLifetime + TimeSpan.FromMinutes(1);
+        try { foreach (var kind in expected.Keys) Assert.Equal(HttpStatusCode.Unauthorized, (await staff.GetAsync(Route(order.Id, kind))).StatusCode); }
+        finally { clock.Offset = TimeSpan.Zero; }
     }
 
     [Fact]

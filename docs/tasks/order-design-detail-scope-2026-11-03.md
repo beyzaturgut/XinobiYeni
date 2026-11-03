@@ -2,7 +2,7 @@
 
 **MostGate konu/açıklama ve uygulama promptları:** [9 taskın düzenlenebilir dokümanı](order-design-mostgate-prompts-2026-11-03.md) ve [PDF](../../output/pdf/xinobi-siparis-tasarim-mostgate-tasklar-ve-promptlar-2026-11-03.pdf). Yalnız doküman hazırlandı; tasklar uygulanmadı.
 
-**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05 uygulandı (03.11, [TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md)); SIP-TAS-06 uygulandı (03.11, [TST-227](../../test/2026-11-03/TST-227-sip-tas-06-composition.md)); SIP-TAS-07...09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
+**Tarih:** 03.11.2026  |  **Durum:** SIP-TAS-01 uygulandı (03.11, [TST-207](../../test/2026-11-03/TST-207-sip-tas-01-order-design-detail.md)); SIP-TAS-02 uygulandı (03.11, [TST-211](../../test/2026-11-03/TST-211-sip-tas-02-order-design-files.md), SQL kabulü açık); SIP-TAS-03 uygulandı (03.11, [TST-215](../../test/2026-11-03/TST-215-sip-tas-03-order-placement.md)); SIP-TAS-04 uygulandı (03.11, [TST-219](../../test/2026-11-03/TST-219-sip-tas-04-pattern-download.md)); SIP-TAS-05 uygulandı (03.11, [TST-223](../../test/2026-11-03/TST-223-sip-tas-05-source-download.md)); SIP-TAS-06 uygulandı (03.11, [TST-227](../../test/2026-11-03/TST-227-sip-tas-06-composition.md)); SIP-TAS-07 uygulandı (03.11, [TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md)); SIP-TAS-08/09 planlandı, uygulanmadı.  |  **Kaynak kesiti:** e89c649
 
 Kullanıcının açık kararı: kapsamlı bir üretime hazırlık/üretime gönderme bölümü olmayacak. Panelde siparişe ait kayıtlı editör yerleşimi, desenin ayrı indirilmesi, maskelemede kullanılan ürün görselinin ayrı indirilmesi ve indirilebilir giydirilmiş görsel olacak. Kullanıcı yalnız task/faz planlamasını istedi; kod geliştirmesini durdurdu.
 
@@ -22,7 +22,7 @@ Kaynak okumasında admin tasarım listesi, ilişkili sipariş bağlantısı, sip
 
 ## Alt tasklar
 
-Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01…06 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
+Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımıdır. Mevcut 120 ana taska dokuz yeni ana task eklenmez. SIP-TAS-01…07 dışındaki taskların durumu **Planlandı - uygulanmadı**. Kişi ve hedef tarih atanmadı; aşağıdakiler önerilen faz sorumluluğudur.
 
 ### SIP-TAS-01 - Baskı alanını sipariş tasarım detayına sadeleştir
 
@@ -78,6 +78,7 @@ Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımı
 **Açıklama:** Admin sipariş okuma/dosya erişimi izinlerini sunucuda doğrula. Yüklenme, indirme sürüyor, eksik dosya, yetki yok, servis hatası ve yeniden denemeyi ayır; istemciden verilen keyfi dosya URL/kimliklerini güvenilir sayma.
 **Kapanış koşulu:** Yetkisiz kullanıcı dosya alamıyor; erişim denetimi sipariş/satır bağına göre; hata veya eksik kayıt başarı görünmüyor.
 **Bağımlılık:** SIP-TAS-04, SIP-TAS-05, SIP-TAS-06
+**Durum (03.11):** Uygulandı - canlı/SQL kabulü açık. Üç dosya ucu ve müşteri/panel/açık medya yolları uçtan uca denetlendi: personel+MFA+`orders.read` her istekte, dosya saklı sipariş/satır referansından; anonim/müşteri/başka müşteri/izinsiz/MFA'sız/süresi dolmuş, başka sipariş/satır, 404/503 ve sızıntı izole testte PASS. Admin indirmesi `aria-disabled` kilit + odak koruma, hata açıklamasına odak, 503/bağlantı için tekrar dene; başarı yalnız “tarayıcıya verildi” der. Okuma (indirme) audit kaydı mevcut yaklaşım gereği yok; ayrı karar açık. Kanıt: [TST-231](../../test/2026-11-03/TST-231-sip-tas-07-file-access.md).
 
 ### SIP-TAS-08 - Eski ve eksik sipariş kayıtlarını dürüst ele al
 

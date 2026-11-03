@@ -82,7 +82,7 @@ try{
    const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-giydirilmis-onizleme-rev3.jpg')
    const bytes=await (async()=>{const chunks=[];for await(const chunk of await file.createReadStream())chunks.push(chunk);return Buffer.concat(chunks)})()
    assert.deepEqual(bytes,Buffer.from(shown),'The downloaded file is the shown composition');assert.deepEqual(bytes,jpeg)
-   await composed.getByRole('status').filter({hasText:'Giydirilmiş önizleme indirildi'}).waitFor()
+   await composed.getByRole('status').filter({hasText:'Giydirilmiş önizleme tarayıcıya indirme için verildi'}).waitFor()
   }
   await f.close() }
  for(const [result,text,retry] of [[{status:404,code:'order_composition_not_recorded',title:'Bu yerleşim revizyonu için sipariş anında giydirilmiş önizleme yüklenmemişti; ham desen yerine kullanılmaz.'},/yüklenmemişti/,false],[{status:403},/görme yetkiniz yok/,false],[{status:503},/şu anda alınamadı/,true]]){
@@ -96,12 +96,12 @@ try{
   const downloaded=f.page.waitForEvent('download');await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).click()
   const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp')
   assert.deepEqual(await (async()=>{const chunks=[];for await(const chunk of await file.createReadStream())chunks.push(chunk);return Buffer.concat(chunks)})(),webp)
-  await productSource.getByRole('status').filter({hasText:'Ürün kaynak görseli indirildi: xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp'}).waitFor()
+  await productSource.getByRole('status').filter({hasText:'Ürün kaynak görseli tarayıcıya indirme için verildi: xinobi-SYN-NEW-satir-1-urun-kaynak-SYN-SKU-BLUE.webp'}).waitFor()
   assert.ok(f.paths.includes('/api/v1/admin/orders/NEW/lines/0/source'));await f.close() }
  for(const [result,text,retry] of [[{status:404,code:'order_source_not_recorded',title:'Bu sipariş, ürün kaynak görseli kopyası saklanmadan önce verilmiş; güncel katalog fotoğrafı yerine kullanılmaz.'},/saklanmadan önce verilmiş/,false],[{status:404},/ürün kaynak görseli bulunamadı; indirilecek dosya yok/,false],[{status:403},/ürün kaynak görselini indirme yetkiniz yok/i,false],[{status:503},/Ürün kaynak görseli şu anda indirilemedi/,true]]){
   let fail=true;const f=await fixture({source:()=>fail?result:{}}),productSource=card(await f.open('SYN-NEW'),'Ürün kaynak görseli')
   await productSource.getByRole('button',{name:'Ürün kaynak görselini indir'}).click();await productSource.getByRole('alert').filter({hasText:text}).waitFor()
-  assert.equal(await productSource.getByRole('status').filter({hasText:'indirildi'}).count(),0)
+  assert.equal(await productSource.getByRole('status').filter({hasText:'verildi'}).count(),0)
   assert.equal(await productSource.getByRole('button',{name:'İndirmeyi tekrar dene'}).count(),retry?1:0)
   if(retry){fail=false;const downloaded=f.page.waitForEvent('download');await productSource.getByRole('button',{name:'İndirmeyi tekrar dene'}).click();await downloaded}
   await f.close()
@@ -120,21 +120,22 @@ try{
  { const slow=gate(),f=await fixture({download:async()=>{await slow.promise;return{}}}),raw=card(await f.open('SYN-NEW'),'Ham desen')
   const button=raw.getByRole('button',{name:'Ham deseni indir'});await button.click()
   await raw.getByRole('status').filter({hasText:'Ham desen indiriliyor…'}).waitFor()
-  assert.equal(await raw.getByRole('button',{name:'Ham desen indiriliyor…'}).isDisabled(),true,'A second click cannot start another download')
-  await raw.getByRole('button',{name:'Ham desen indiriliyor…'}).click({force:true}).catch(()=>{})
+  const busy=raw.getByRole('button',{name:'Ham desen indiriliyor…'})
+  assert.equal(await busy.getAttribute('aria-disabled'),'true','The running download is marked unavailable without losing focus')
+  await busy.click({force:true});await busy.click({force:true})
   const downloaded=f.page.waitForEvent('download');slow.release()
   const file=await downloaded;assert.equal(file.suggestedFilename(),'xinobi-SYN-NEW-satir-1-desen-rev3.png')
   assert.deepEqual(await (async()=>{const chunks=[];for await(const chunk of await file.createReadStream())chunks.push(chunk);return Buffer.concat(chunks)})(),png,'The downloaded bytes are the served pattern bytes')
-  await raw.getByRole('status').filter({hasText:'Ham desen indirildi: xinobi-SYN-NEW-satir-1-desen-rev3.png'}).waitFor()
+  await raw.getByRole('status').filter({hasText:'Ham desen tarayıcıya indirme için verildi: xinobi-SYN-NEW-satir-1-desen-rev3.png'}).waitFor()
   assert.equal(f.patternReads(),1);assert.ok(f.paths.includes('/api/v1/admin/orders/NEW/lines/0/pattern'),'Resolved by order and line on the staff API')
   await f.close() }
  for(const [status,text,retry] of [[404,/desen dosyası bulunamadı; indirilecek dosya yok/,false],[403,/indirme yetkiniz yok/,false],[503,/şu anda indirilemedi/,true]]){
   let fail=true;const f=await fixture({download:()=>fail?{status}:{}}),raw=card(await f.open('SYN-NEW'),'Ham desen')
   await raw.getByRole('button',{name:'Ham deseni indir'}).click();await raw.getByRole('alert').filter({hasText:text}).waitFor()
-  assert.equal(await raw.getByRole('status').filter({hasText:'indirildi'}).count(),0,'A failed download is never reported as done')
+  assert.equal(await raw.getByRole('status').filter({hasText:'verildi'}).count(),0,'A failed download is never reported as done')
   assert.equal(await raw.getByRole('button',{name:'İndirmeyi tekrar dene'}).count(),retry?1:0)
   assert.equal(await raw.getByRole('button',{name:'Ham deseni indir'}).count(),0)
-  if(retry){fail=false;const downloaded=f.page.waitForEvent('download');await raw.getByRole('button',{name:'İndirmeyi tekrar dene'}).click();await downloaded;await raw.getByRole('status').filter({hasText:'Ham desen indirildi'}).waitFor()}
+  if(retry){fail=false;const downloaded=f.page.waitForEvent('download');await raw.getByRole('button',{name:'İndirmeyi tekrar dene'}).click();await downloaded;await raw.getByRole('status').filter({hasText:'Ham desen tarayıcıya indirme için verildi'}).waitFor()}
   await f.close()
  }
  { const f=await fixture();await f.page.goto(base+'?view=print')

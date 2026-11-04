@@ -5,7 +5,7 @@ const tag=process.argv[2];
 if(!/^xinobi-[a-f0-9]{7}$/.test(tag||''))throw new Error('Usage: node tools/publish-release.mjs xinobi-<7 character commit>');
 const token=process.env.GITHUB_TOKEN;
 if(!token)throw new Error('Set GITHUB_TOKEN in this terminal (repository Contents: write). Never put it in source or arguments.');
-const repository='beyzaturgut/XinobiYeni';
+const repository='mostidea/xinobi_new';
 const dir=`paketler/releases/${tag}`;
 const files=await Promise.all(['xinobi.zip','xinobi.zip.sha256','deploy-release.ps1'].map(async name=>({name,bytes:await readFile(`${dir}/${name}`)})));
 const digest=createHash('sha256').update(files[0].bytes).digest('hex');

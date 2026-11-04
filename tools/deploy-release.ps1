@@ -100,7 +100,7 @@ try {
         } catch { throw "Pre-deploy health check failed at $url. No application files were changed. Check the URL and current service first." }
     }
 
-    $releaseInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/beyzaturgut/XinobiYeni/releases/tags/$Release" -Headers $headers
+    $releaseInfo = Invoke-RestMethod -Uri "https://api.github.com/repos/mostidea/xinobi_new/releases/tags/$Release" -Headers $headers
     foreach ($name in @('xinobi.zip','xinobi.zip.sha256')) {
         $asset = @($releaseInfo.assets | Where-Object { $_.name -eq $name })
         if ($asset.Count -ne 1) { throw "Release asset missing or ambiguous: $name" }

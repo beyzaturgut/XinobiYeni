@@ -145,3 +145,13 @@ Kurtarma hatasinda diger havuzlarin baslatilmasi da denenir; asil hata ekrana ya
 `ROLLED_BACK` sonrasi HTTP kontrollerini tekrar yap. Bu davranislar IIS ve ag cagrilari
 mock edilerek `pwsh -NoProfile -File tools/deploy-release.test.ps1` ile test edilir;
 gercek Windows/IIS dogrulamasi ayrica gereklidir.
+
+## 04.11.2026: GitHub repo geçişi
+
+Aktif kaynak ve yeni release hedefi `mostidea/xinobi_new` reposudur. Mevcut commitler,
+branch ve tag geçmişi kimlikleri korunarak aktarılmıştır. Önceki GitHub Releases
+kayıtları ve ek dosyaları Git push ile taşınmaz; geçmiş yayın bağlantıları eski repoda kalır.
+Yeni release için Mac token’ının yeni repoda Contents: write, sunucudaki token’ın
+Contents: read erişimi olmalıdır. Sunucudaki `C:\XinobiDeploy\tools\deploy-release.ps1`
+dosyasını yeni repo hedefini içeren güncel araçla değiştir. Bu repo geçişi IIS site
+adlarını veya çalışan yayını değiştirmez; yeni release/deploy yapılmış sayılmaz.

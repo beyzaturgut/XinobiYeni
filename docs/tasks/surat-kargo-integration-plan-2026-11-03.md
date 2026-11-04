@@ -1,5 +1,9 @@
 # Xinobi | Sürat Kargo entegrasyon planı
 
+## 04.11.2026 - Güncel güvenilirlik teslimi
+
+Atomik sipariş rezervasyonuyla iptal/manuel sevk yarışı ve aynı parçanın takip yanıtı geçmişinin kaybı düzeltildi. [Açık matrisi, güncel testler ve sonraki uçtan uca kabul senaryoları](../../test/2026-11-04/TST-248-surat-hardening.md). Tam API 572 PASS / 29 SKIP / 0 FAIL; Release ve admin kontrolü başarılı. Gerçek tahsilat/operasyon kanıtı modelde yok; Production oluşturma kapalı. Rezervasyon otomatik bırakılmaz; gerçek SQL/IIS/sağlayıcı/etiket kabulü açık. Aşağıdaki tarihli teslimler geçmiş kesitlerdir.
+
 ## Güncel teslim - 03.11.2026
 
 Admin sipariş/entegrasyon ekranı, test Code128 etiketi, kanıtlı uzlaştırma, kontrollü tekrar, kalıcı takip işi ve web/Flutter müşteri gösterimi eklendi. [Güncel .NET test takip erişimi HTTP 200; önceki 403 tarihsel](../../Entegrasyonlar/01-Surat-Kargo/ERISIM-KONTROLU-2026-11-03.md); canlı kabul tamamlanmadı. Ayrıntılı güncel durum ve bağımlılıklar [sunucu kurulum kaydında](../../Entegrasyonlar/01-Surat-Kargo/SUNUCU-KURULUMU.md). Alt bölümlerdeki başlangıç planı ve PDF tarihsel plan sürümüdür.

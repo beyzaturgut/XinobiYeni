@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 04.11.2026 - Sürat iptal yarışı ve takip geçmişi
+
+KRG-SUR-01 / TIC-08: admin gönderiminden önce atomik sipariş rezervasyonu; müşteri/panel iptali ve manuel sevk çakışmasının engellenmesi; aynı parça için eski sağlayıcı yanıtlarının kalıcı arşivi eklendi. Sipariş/ödeme statüsü değiştirilmez. Gerçek tahsilat/operasyon verisi olmayan demo modelinde Production oluşturma kapalı kalır. [TST-248](../test/2026-11-04/TST-248-surat-hardening.md): nihai API 572 PASS / 29 SKIP / 0 FAIL, Release 0 uyarı/hata; admin build/lint (4 mevcut uyarı) ve altı Chrome senaryosu PASS. Rezervasyon otomatik bırakılmaz; eski denemelere rezervasyon uydurulmaz. Sağlayıcı/etiket/fiziksel kabul, IIS erişimi ve gerçek SQL çoklu süreç kabulü açık. Güncel açık matrisi ve sonraki uçtan uca senaryolar raporda; gerçek sağlayıcı çağrısı, deploy ve APK yok. Entegrasyon tamamen tamamlandı sayılmaz.
+
 ## 03.11.2026 - Sürat gerçek takip erişimi ve bağımsız ön kontrol
 
 .NET istemcisiyle test takip metodu HTTP 200 / `Sipariş bulunamadı.` / boş Gonderiler yanıtladı. Önceki istemcinin 403 sonucu genel IP/hesap blokajı sayılmaz. Bu dar yanıt AwaitingAcceptance olarak düzeltildi; diğer hatalar ayrılır ve boş sonuç tekrar gönderime izin vermez. [Sunucu ön kontrol komutu/paket yönergesi](../Entegrasyonlar/01-Surat-Kargo/ON-KONTROL.md), [sansürlenmiş kanıt](../Entegrasyonlar/01-Surat-Kargo/erisim-on-kontrol-2026-11-03.json). [TST-246](../test/2026-11-03/TST-246-surat-preflight-access.md): 51 odaklı PASS; tam API 565 PASS / 29 SKIP / 0 FAIL. [TST-247](../test/2026-11-03/TST-247-surat-preflight-package.md): ayrı klasörde çalışabilen ön kontrol ZIP paketi bütünlük/secret/smoke kontrolünden geçti; paket Git dışında. Gerçek gönderi, asıl IIS egress/erişim, etiket/SQL/cihaz ve canlı uygunluk kabulleri açık.

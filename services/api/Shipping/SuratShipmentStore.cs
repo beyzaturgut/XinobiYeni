@@ -99,10 +99,14 @@ public sealed class SuratShipmentStore(FeatureDocuments documents)
             !string.IsNullOrWhiteSpace(d.TrackingNumber) ? "tracking:" + d.TrackingNumber : "raw:" + Hash(d.Source.GetRawText());
         var docs = result.State == SuratTrackingState.Available
             ? result.Documents.Concat(previous).GroupBy(Key).Select(g => g.First()).ToArray() : previous;
+        // Keep every distinct provider document version, including omitted movements on
+        // later responses for the same parcel. Never expose this raw archive in public DTOs.
+        var history = (row.Tracking?.History ?? []).Concat(previous).Concat(result.Documents)
+            .DistinctBy(d => JsonSerializer.Serialize(d)).ToArray();
         var effectiveInterval = docs.Length > 0 && docs.All(d => d.StatusCode is 6 or 12) ? terminalInterval ?? interval : interval;
         var delay = Math.Min(86400, effectiveInterval * Math.Pow(2, failures));
         var snapshot = new SuratTrackingSnapshot(result.State switch { SuratTrackingState.Available => "available", SuratTrackingState.AwaitingAcceptance => "awaiting_acceptance", _ => "unavailable" },
-            now, result.State == SuratTrackingState.Available ? now : row.Tracking?.LastSuccess, now.AddSeconds(delay + Random.Shared.Next(0, 15)), failures, docs);
+            now, result.State == SuratTrackingState.Available ? now : row.Tracking?.LastSuccess, now.AddSeconds(delay + Random.Shared.Next(0, 15)), failures, docs, history);
         row = row with { Tracking = snapshot, TrackingLease = null };
         state.Shipments[index] = row;
         return row;

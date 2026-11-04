@@ -27,7 +27,13 @@ public static class SuratShipmentEndpoints
         }).RequirePermission("orders.read").WithProblems().WithName("GetAdminSuratShipment");
         admin.MapPost("/orders/{id}/surat-shipment", async (string id, CreateSuratShipment input, IAccountStore accounts,
             IWebHostEnvironment environment, SuratShipmentWorkflow workflow, ClaimsPrincipal user, CancellationToken token) =>
-                await workflow.Create(await Order(id, accounts, environment), input, user.FindFirstValue(ClaimTypes.NameIdentifier)!, token))
+            {
+                var current = await Order(id, accounts, environment);
+                workflow.Validate(current, input);
+                token.ThrowIfCancellationRequested();
+                var reserved = await accounts.ChangeOrder(null, id, order => SuratShipmentWorkflow.Reserve(order, input, DateTimeOffset.UtcNow));
+                return await workflow.Create(reserved.Order, input, user.FindFirstValue(ClaimTypes.NameIdentifier)!, token);
+            })
             .RequirePermission("orders.write").WithProblems().WithName("CreateAdminSuratShipment");
     }
 

@@ -21,18 +21,9 @@ public sealed class SuratShipmentWorkflow(SuratShipmentStore store, ISuratKargoC
 {
     public async Task<SuratShipmentView> Create(CustomerOrder order, CreateSuratShipment input, string actorId, CancellationToken token)
     {
+        Validate(order, input);
         var settings = options.Value;
-        try { settings.Resolve(); }
-        catch (SuratConfigurationException) { throw ProblemException.Unavailable("Sürat Kargo bağlantısı"); }
-        // Orders currently have no verified payment/fulfilment eligibility. Never turn a demo into a real shipment.
-        if (settings.Mode != "Sandbox") throw new ProblemException("shipment_eligibility_unconfirmed", "Canlı gönderim için doğrulanmış ödeme ve operasyon uygunluğu henüz tanımlanmadı.", 409);
-        if (order.Status is not (OrderStatuses.Received or OrderStatuses.Preparing) || order.Shipment is not null ||
-            order.Requests?.Any(r => r.Type == "cancel" && r.Status is OrderRequestStatuses.Requested or OrderRequestStatuses.Approved) == true)
-            throw new ProblemException("order_not_shippable", "Siparişin mevcut durumu gönderi oluşturmaya uygun değil.", 409);
-        var a = order.Address;
-        var draft = new SuratShipment(a.FullName, a.Line, a.City, a.District, a.Phone.StartsWith("+90", StringComparison.Ordinal) ? a.Phone[1..] : a.Phone, "DRAFT", input.ParcelCount, input.ParcelDesi, input.ParcelKg, input.PaymentType);
-        try { draft.Validate(); }
-        catch (ArgumentException) { throw new ProblemException("invalid_shipment", "Alıcı adresi, telefon, paket ölçüleri ve kargo ödeme tipi kontrol edilmeli."); }
+        var draft = Draft(order, input);
         token.ThrowIfCancellationRequested();
         var claim = await store.Claim(order.Id, settings.Mode, settings.Sandbox.Username, actorId, draft, clock.GetUtcNow());
         if (!claim.IsNew) return SuratShipmentView.From(claim.Shipment);
@@ -41,4 +32,35 @@ public sealed class SuratShipmentWorkflow(SuratShipmentStore store, ISuratKargoC
         var saved = await store.Complete(claim.Shipment, result.State, clock.GetUtcNow());
         return SuratShipmentView.From(saved);
     }
+    // Called inside ChangeOrder's account transaction before any provider write. A durable
+    // reservation survives process death and cannot silently expire after an uncertain write.
+    public const string Reservation = "surat_submission_reserved";
+    public static CustomerOrder Reserve(CustomerOrder order, CreateSuratShipment input, DateTimeOffset now)
+    {
+        ValidateOrder(order, input);
+        return order.History?.Any(e => e.Actor == Reservation) == true ? order : order with
+        { History = [.. Xinobi.Api.Orders.OrderLifecycle.HistoryOf(order), new OrderEvent(order.Status, now, Reservation, "Sürat test gönderimi; iptal öncesi sağlayıcı uzlaştırması gerekir.")] };
+    }
+    public void Validate(CustomerOrder order, CreateSuratShipment input)
+    {
+        try { options.Value.Resolve(); }
+        catch (SuratConfigurationException) { throw ProblemException.Unavailable("Sürat Kargo bağlantısı"); }
+        if (options.Value.Mode != "Sandbox") throw new ProblemException("shipment_eligibility_unconfirmed", "Canlı gönderim için doğrulanmış ödeme ve operasyon uygunluğu henüz tanımlanmadı.", 409);
+        ValidateOrder(order, input);
+    }
+    private static void ValidateOrder(CustomerOrder order, CreateSuratShipment input)
+    {
+        if (order.Status is not (OrderStatuses.Received or OrderStatuses.Preparing) || order.Shipment is not null ||
+            order.Requests?.Any(r => r.Type == "cancel" && r.Status is OrderRequestStatuses.Requested or OrderRequestStatuses.Approved) == true)
+            throw new ProblemException("order_not_shippable", "Siparişin mevcut durumu gönderi oluşturmaya uygun değil.", 409);
+        var draft = Draft(order, input);
+        try { draft.Validate(); }
+        catch (ArgumentException) { throw new ProblemException("invalid_shipment", "Alıcı adresi, telefon, paket ölçüleri ve kargo ödeme tipi kontrol edilmeli."); }
+    }
+    private static SuratShipment Draft(CustomerOrder order, CreateSuratShipment input)
+    {
+        var a = order.Address;
+        return new(a.FullName, a.Line, a.City, a.District, a.Phone.StartsWith("+90", StringComparison.Ordinal) ? a.Phone[1..] : a.Phone, "DRAFT", input.ParcelCount, input.ParcelDesi, input.ParcelKg, input.PaymentType);
+    }
+
 }

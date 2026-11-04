@@ -64,6 +64,8 @@ public sealed class SuratOperationsTests : IDisposable
         var a=SuratLabel.Render(row);var b=SuratLabel.Render(row);Assert.Equal(a,b);
         var xml=XDocument.Parse(Encoding.UTF8.GetString(a));Assert.Equal("100mm",xml.Root!.Attribute("width")!.Value);
         Assert.Contains("Test &lt;alıcı&gt;",Encoding.UTF8.GetString(a));Assert.Contains("TEST - SEVK",Encoding.UTF8.GetString(a));
+        Assert.Contains("Cari: " + row.SenderCode, Encoding.UTF8.GetString(a));
+        Assert.Contains("Referans: " + row.Reference, Encoding.UTF8.GetString(a));
         Assert.Equal(104,SuratLabel.Symbols(row.Reference)[0]);Assert.Equal(106,SuratLabel.Symbols(row.Reference)[^1]);
         Assert.Throws<ArgumentException>(()=>SuratLabel.Symbols("özel"));
         Assert.Throws<ProblemException>(()=>SuratLabel.Render(row with { Environment="Production" }));
@@ -154,6 +156,19 @@ public sealed class SuratOperationsTests : IDisposable
         Assert.NotEqual(claim.Shipment.AttemptId,retry.Shipment.AttemptId);Assert.Single(retry.Shipment.PreviousAttempts!);
         Assert.NotNull(retry.Shipment.PreviousAttempts![0].Evidence);
         Assert.False((await store.Claim("retry-order","Sandbox","1111111111","staff",Draft with {Adet=2},Now.AddMinutes(4))).IsNew);
+    }
+    [Fact] public async Task Repeated_parcel_responses_archive_all_movement_versions()
+    {
+        using var f = Factory(); var store = f.Services.GetRequiredService<SuratShipmentStore>(); var row = await Registered(store);
+        var first = await store.ClaimTracking(row.OrderId,"Sandbox","1111111111",Now);
+        row = await store.CompleteTracking(row,first.Lease!,Tracking("same-parcel",3),Now,300);
+        var second = await store.ClaimTracking(row.OrderId,"Sandbox","1111111111",Now.AddMinutes(6));
+        row = await store.CompleteTracking(row,second.Lease!,Tracking("same-parcel",7),Now.AddMinutes(6),300);
+        Assert.Single(row.Tracking!.Documents);
+        Assert.Equal("needs_review", row.Tracking.Documents[0].NormalizedState);
+        Assert.Equal(2,row.Tracking.History!.Length);
+        Assert.Contains(row.Tracking.History,d=>d.StatusCode==3);
+        Assert.Contains(row.Tracking.History,d=>d.StatusCode==7);
     }
     private sealed class FixtureCarrier : ISuratKargoClient
     {

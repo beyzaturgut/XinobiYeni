@@ -1,5 +1,11 @@
 # Sürat Kargo kurulum ve güncel kabul kaydı
 
+## 04.11.2026 - Güncel güvenilirlik durumu
+
+[Doğrulama, açık matrisi ve uçtan uca görev](../../test/2026-11-04/TST-248-surat-hardening.md). Yeni admin gönderimi siparişin atomik ChangeOrder kilidinde kalıcı rezervasyon alır; iptal önceyse göndermez, rezervasyon önceyse iptal ve manuel sevk 409. Ticari status aynı kalır. Rezervasyon timeout/restart veya not_created teyidinde otomatik kaldırılmaz; eski denemelere geriye dönük eklenmez. Sağlayıcı kaydının silindiği/geri çekildiği varsayılmaz. Aynı parçanın tekrarlanan raw takip yanıtları kalıcı History arşivinde saklanır; müşteriye verilmez.
+
+Nihai API 572 PASS / 29 SKIP / 0 FAIL; Release 0 uyarı/hata; admin TypeScript/build/lint ve altı Chrome senaryosu PASS. Gerçek sağlayıcı çağrısı yapılmadı. Geçmiş HTTP 200 erişim kanıtı Windows/IIS kabulü değildir. Modelde doğrulanmış ödeme/operasyon uygunluğu olmadığı için canlı oluşturma hâlâ kapalıdır. Gerçek SQL çoklu süreç, sandbox gönderi/şube kabulü ve fiziksel/onaylı etiket kapıları açık; aşağıdaki önceki teslimlerdeki yarış sınırı bu yeni rezervasyon kapsamıyla daraltılmıştır.
+
 **Güncel durum:** Üçüncü teslimde admin/etiket/takip/uzlaştırma ve müşteri ekranları uygulanmıştır. Aşağıdaki ilk/ikinci teslim başlıkları gelişim geçmişidir; son bölüm geçerli kapsam ve canlı kapıları içerir. [Güncel test erişimi HTTP 200; önceki 403 tarihsel](ERISIM-KONTROLU-2026-11-03.md).
 
 03.11.2026. `services/api/Shipping/SuratKargoClient.cs` ve Program.cs kaydı eklendi. Taşıma/sözleşme katmanına kalıcı gönderi/deneme kaydı ve yetkili admin API uçları eklendi. Admin ekranı, etiket ve otomatik takip henüz bağlı değildir. Manuel kargo davranışı değiştirilmedi. Hiçbir gerçek sağlayıcı çağrısı yapılmadı.

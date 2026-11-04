@@ -51,6 +51,22 @@ public class SuratKargoTests
         var h=new Handler(_=>throw new TaskCanceledException("URI may contain credentials"));
         Assert.Equal(SuratCreateState.ReconciliationRequired,(await Client(h).CreateAsync(Shipment)).State);Assert.Equal(1,h.Calls);
     }
+    [Theory]
+    [InlineData(401)] [InlineData(403)] [InlineData(500)]
+    public async Task Http_errors_never_retry_or_become_success(int status)
+    {
+        var h = new Handler(_ => Task.FromResult(new HttpResponseMessage((HttpStatusCode)status)));
+        Assert.Equal(SuratCreateState.ReconciliationRequired, (await Client(h).CreateAsync(Shipment)).State);
+        Assert.Equal(SuratTrackingState.Unavailable, (await Client(h).TrackAsync("TEST-ORDER-1")).State);
+        Assert.Equal(2, h.Calls);
+    }
+    [Fact] public async Task Connection_failure_is_uncertain_and_never_leaks_exception()
+    {
+        var h = new Handler(_ => throw new HttpRequestException("fixture-sensitive-uri"));
+        Assert.Equal(SuratCreateState.ReconciliationRequired, (await Client(h).CreateAsync(Shipment)).State);
+        Assert.Equal(SuratTrackingState.Unavailable, (await Client(h).TrackAsync("TEST-ORDER-1")).State);
+        Assert.Equal(2, h.Calls);
+    }
     [Fact] public async Task Missing_weight_blocks_write()
     {
         var h=new Handler(_=>Task.FromResult(Response("Tamam")));

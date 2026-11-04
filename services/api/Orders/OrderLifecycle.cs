@@ -43,6 +43,7 @@ public static class OrderLifecycle
     /// </summary>
     public static CustomerOrder Cancel(CustomerOrder order, CancelMyOrder request, DateTimeOffset now)
     {
+        RequireNoCarrierReservation(order);
         var reason = Reason(request.Reason, CancelReasons);
         var description = Description(request.Description);
         if (Pending(order, "cancel") is not null) throw new ProblemException("request_pending", "Bu sipariş için iptal talebin zaten değerlendiriliyor.", StatusCodes.Status409Conflict);
@@ -97,6 +98,7 @@ public static class OrderLifecycle
     /// <summary>Panel status change: preparing, delivered or cancelled. Shipping goes through <see cref="Ship"/>.</summary>
     public static CustomerOrder SetStatus(CustomerOrder order, string status, string? note, DateTimeOffset now)
     {
+        if (status == OrderStatuses.Cancelled) RequireNoCarrierReservation(order);
         var allowed = (order.Status, status) switch
         {
             (OrderStatuses.Received, OrderStatuses.Preparing) => true,
@@ -114,6 +116,7 @@ public static class OrderLifecycle
 
     public static CustomerOrder Ship(CustomerOrder order, string? carrier, string? trackingNumber, string? trackingUrl, DateTimeOffset now)
     {
+        RequireNoCarrierReservation(order);
         if (order.Status is not (OrderStatuses.Received or OrderStatuses.Preparing))
             throw new ProblemException("invalid_transition", "Yalnız alınan veya hazırlanan sipariş kargoya verilebilir.", StatusCodes.Status409Conflict);
         if (Pending(order, "cancel") is not null)
@@ -151,6 +154,7 @@ public static class OrderLifecycle
         var next = order with { Requests = [.. order.Requests!.Select(item => item.Id == requestId ? item with { Status = status, DecidedAt = now, Resolution = note } : item)] };
         if (request.Type == "cancel" && status == OrderRequestStatuses.Completed)
         {
+            RequireNoCarrierReservation(order);
             if (order.Status is not (OrderStatuses.Received or OrderStatuses.Preparing))
                 throw new ProblemException("invalid_transition", "Kargoya verilen sipariş iptal edilemez.", StatusCodes.Status409Conflict);
             next = Move(next, OrderStatuses.Cancelled, "panel", note ?? request.Reason, now);
@@ -175,6 +179,12 @@ public static class OrderLifecycle
         var text = note?.Trim();
         if (string.IsNullOrEmpty(text)) return null;
         return text.Length <= 500 && !text.Any(char.IsControl) ? text : throw new ProblemException("invalid_note", "Not en fazla 500 karakter olabilir.");
+    }
+
+    private static void RequireNoCarrierReservation(CustomerOrder order)
+    {
+        if (order.History?.Any(e => e.Actor == Xinobi.Api.Shipping.SuratShipmentWorkflow.Reservation) == true)
+            throw new ProblemException("shipment_reconciliation_required", "Gönderi denemesi var; iptal öncesi taşıyıcı kaydı ve operasyon uzlaştırılmalı.", 409);
     }
 
     private static string NewId() => Guid.NewGuid().ToString("N");

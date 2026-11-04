@@ -1,5 +1,9 @@
 # Xinobi | Sürat Kargo entegrasyon planı
 
+## 04.11.2026 - Uçtan uca test sonucu
+
+[Senaryo matrisi ve gerçek/izole ayrımı](../../test/2026-11-04/TST-249-surat-end-to-end.md): API 589 geçti / 29 atlandı / 0 başarısız; API Release, admin lint/build ve 8 tarayıcı fixture senaryosu, web derlemesi/2 takip testi ve bağımsız yazılımsal Code128 doğrulaması geçti. Hata sonrası formun gizlenmesi ve boş takip belgesinin başarı sayılması düzeltildi; güvenli FailureKind yalnız sunucu kaydında tutulur, ham hata istemciye gitmez. Onaylı test alıcı/paket kaydı ve yerel güvenli test hesabı yok; gerçek gönderi/takip zinciri çalıştırılamadı. Kimliksiz ana adresler 302 yanıtladı, takip isteği gönderilmedi. Canlı korumalar açık kaldı (Production oluşturma kapalı); IIS/SQL çoklu süreç ve fiziksel şube kabulü açık. Deploy/APK yapılmadı.
+
 ## 04.11.2026 - Güncel güvenilirlik teslimi
 
 Atomik sipariş rezervasyonuyla iptal/manuel sevk yarışı ve aynı parçanın takip yanıtı geçmişinin kaybı düzeltildi. [Açık matrisi, güncel testler ve sonraki uçtan uca kabul senaryoları](../../test/2026-11-04/TST-248-surat-hardening.md). Tam API 572 PASS / 29 SKIP / 0 FAIL; Release ve admin kontrolü başarılı. Gerçek tahsilat/operasyon kanıtı modelde yok; Production oluşturma kapalı. Rezervasyon otomatik bırakılmaz; gerçek SQL/IIS/sağlayıcı/etiket kabulü açık. Aşağıdaki tarihli teslimler geçmiş kesitlerdir.

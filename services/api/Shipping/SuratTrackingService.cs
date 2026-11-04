@@ -4,7 +4,7 @@ using Xinobi.Api.Infrastructure;
 namespace Xinobi.Api.Shipping;
 
 public sealed record SuratTrackingSnapshot(string Result, DateTimeOffset? LastAttempt, DateTimeOffset? LastSuccess,
-    DateTimeOffset NextAttempt, int Failures, SuratTrackingDocument[] Documents, SuratTrackingDocument[]? History = null);
+    DateTimeOffset NextAttempt, int Failures, SuratTrackingDocument[] Documents, SuratTrackingDocument[]? History = null, string? FailureKind = null);
 public sealed record SuratTrackingLease(string Token, DateTimeOffset Until);
 public sealed record SuratTrackingItem(string? TrackingNumber, int? StatusCode, string State, string? ProviderText,
     string? LastMovementRaw, string? DeliveredDateRaw);

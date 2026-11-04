@@ -1,0 +1,41 @@
+{
+  "checkedAtUtc": "2026-11-04T07:55:59.688598+00:00",
+  "scope": "this_process_host_read_only",
+  "createdShipment": false,
+  "sandboxAccountConfigured": false,
+  "probes": [
+    {
+      "target": "sandbox_edge",
+      "endpoint": "https://api02.suratkargo.com.tr/",
+      "httpStatus": 302,
+      "result": "redirect_blocked",
+      "cloudflareHeader": true,
+      "accessDeniedMarker": false,
+      "providerIsError": null,
+      "shipmentCount": null,
+      "egressIp": null
+    },
+    {
+      "target": "production_edge",
+      "endpoint": "https://api01.suratkargo.com.tr/",
+      "httpStatus": 302,
+      "result": "redirect_blocked",
+      "cloudflareHeader": true,
+      "accessDeniedMarker": false,
+      "providerIsError": null,
+      "shipmentCount": null,
+      "egressIp": null
+    },
+    {
+      "target": "sandbox_read_only_tracking",
+      "endpoint": "https://api02.suratkargo.com.tr/api/KargoTakipHareketDetayi",
+      "httpStatus": null,
+      "result": "not_configured",
+      "cloudflareHeader": false,
+      "accessDeniedMarker": false,
+      "providerIsError": null,
+      "shipmentCount": null,
+      "egressIp": null
+    }
+  ]
+}

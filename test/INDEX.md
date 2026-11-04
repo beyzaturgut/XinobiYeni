@@ -359,3 +359,5 @@
 - 03.11.2026 · [TST-247 Sürat ön kontrol paketi](2026-11-03/TST-247-surat-preflight-package.md) — Windows dağıtımı için 41 dosyalı paket; secret dışlama/manifest/CRC ve ayrı klasör .NET smoke PASS. Gerçek Windows sunucu kabulü ve deploy yok.
 
 - 04.11.2026 · [TST-248 Sürat güvenilirlik ve iptal yarışı](2026-11-04/TST-248-surat-hardening.md) — Atomik sipariş rezervasyonu, iptal/manuel sevk koruması ve takip belge sürüm arşivi; API 572 PASS / 29 SKIP / 0 FAIL, Release ve admin build/lint, altı Chrome senaryosu PASS. Gerçek gönderi/IIS/SQL/fiziksel kabul açık; canlı oluşturma kapalı.
+
+- 04.11.2026 · [TST-249 Sürat uçtan uca test](2026-11-04/TST-249-surat-end-to-end.md) — Gerçek API/adaptör + sahte sağlayıcı; form/hatalı belge/hata sınıfları düzeltildi. API 589 geçti / 29 atlandı / 0 başarısız, Release/admin build/lint, 8 admin ve 2 web Chrome testi, yazılımsal Code128 geçti. Gerçek gönderi/takip, IIS ve fiziksel kabul çalıştırılamadı; onaylı veri/test hesabı yok.

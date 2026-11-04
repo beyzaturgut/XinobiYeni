@@ -90,6 +90,27 @@ public class SuratKargoTests
     [InlineData("{}",SuratTrackingState.Unavailable)] [InlineData("not json",SuratTrackingState.Unavailable)]
     public async Task Tracking_separates_empty_and_failure(string reply,SuratTrackingState expected)
     { var h=new Handler(_=>Task.FromResult(Response(reply)));Assert.Equal(expected,(await Client(h).TrackAsync("TEST-ORDER-1")).State); }
+    [Theory]
+    [InlineData(401,"authentication_or_access")]
+    [InlineData(403,"authentication_or_access")]
+    [InlineData(500,"provider_http")]
+    public async Task Tracking_HTTP_failures_are_classified_without_provider_content(int status,string reason)
+    {
+        var h = new Handler(_=>Task.FromResult(new HttpResponseMessage((HttpStatusCode)status)));
+        var result = await Client(h).TrackAsync("TEST-ORDER-1");
+        Assert.Equal(SuratTrackingState.Unavailable,result.State); Assert.Equal(reason,result.FailureKind);
+    }
+    [Theory]
+    [InlineData("""{"IsError":false,"Gonderiler":[{}]}""","invalid_response")]
+    [InlineData("""{"IsError":false,"Gonderiler":[null]}""","invalid_response")]
+    [InlineData("""{"IsError":true,"Gonderiler":[]}""","provider_error")]
+    [InlineData("broken", "invalid_response")]
+    public async Task Invalid_or_provider_error_tracking_never_becomes_available(string body,string reason)
+    {
+        var h = new Handler(_=>Task.FromResult(Response(body)));
+        var result = await Client(h).TrackAsync("TEST-ORDER-1");
+        Assert.Equal(SuratTrackingState.Unavailable,result.State); Assert.Equal(reason,result.FailureKind);
+    }
     [Fact] public async Task Production_requires_explicit_gate_and_uses_separate_account()
     {
         var h=new Handler(async r=> {

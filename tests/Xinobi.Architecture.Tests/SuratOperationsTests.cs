@@ -33,10 +33,23 @@ public sealed class SuratOperationsTests : IDisposable
         Assert.Equal("available", row.Tracking!.Result);
         Assert.Null((await store.ClaimTracking(row.OrderId, "Sandbox", "1111111111", Now.AddSeconds(10))).Lease);
         var next = await store.ClaimTracking(row.OrderId, "Sandbox", "1111111111", Now.AddMinutes(6));
-        row = await store.CompleteTracking(row, next.Lease!, new(SuratTrackingState.Unavailable, []), Now.AddMinutes(6), 300);
-        Assert.Equal("unavailable", row.Tracking!.Result); Assert.Equal(Now, row.Tracking.LastSuccess);
+        row = await store.CompleteTracking(row, next.Lease!, new(SuratTrackingState.Unavailable, [], "provider_http"), Now.AddMinutes(6), 300);
+        Assert.Equal("unavailable", row.Tracking!.Result); Assert.Equal("provider_http", row.Tracking.FailureKind); Assert.Equal(Now, row.Tracking.LastSuccess);
         Assert.Single(row.Tracking.Documents); Assert.True(row.Tracking.NextAttempt > Now.AddMinutes(15));
         Assert.Equal("1234567890123456789", row.Tracking.Documents[0].Id);
+    }
+    [Fact] public async Task Worker_due_selection_filters_pending_account_environment_and_backoff()
+    {
+        using var f=Factory();var store=f.Services.GetRequiredService<SuratShipmentStore>();var row=await Registered(store);
+        await store.Claim("pending", "Sandbox", "1111111111", "staff", Draft, Now);
+        Assert.Single(await store.DueTracking("Sandbox",Now,"1111111111"));
+        Assert.Empty(await store.DueTracking("Production",Now,"1111111111"));
+        Assert.Empty(await store.DueTracking("Sandbox",Now,"another-account"));
+        var lease=await store.ClaimTracking(row.OrderId,"Sandbox","1111111111",Now);
+        Assert.Empty(await store.DueTracking("Sandbox",Now,"1111111111"));
+        row=await store.CompleteTracking(row,lease.Lease!,new(SuratTrackingState.Unavailable,[],"connection_failure"),Now,300);
+        Assert.Empty(await store.DueTracking("Sandbox",Now.AddSeconds(599),"1111111111"));
+        Assert.Single(await store.DueTracking("Sandbox",row.Tracking!.NextAttempt,"1111111111"));
     }
     [Fact] public async Task Expired_worker_cannot_overwrite_new_result_and_changed_account_is_blocked()
     {

@@ -64,7 +64,7 @@ public sealed record SuratShipment(
 public enum SuratCreateState { Registered, ReconciliationRequired }
 public sealed record SuratCreateResult(SuratCreateState State);
 public enum SuratTrackingState { Available, AwaitingAcceptance, Unavailable }
-public sealed record SuratTrackingResult(SuratTrackingState State, SuratTrackingDocument[] Documents);
+public sealed record SuratTrackingResult(SuratTrackingState State, SuratTrackingDocument[] Documents, string? FailureKind = null);
 public sealed record SuratTrackingDocument(string? Id, int? StatusCode, string? StatusText,
     string? TrackingNumber, string? LastMovementRaw, string? DeliveredDateRaw, string NormalizedState, JsonElement Source);
 
@@ -117,16 +117,19 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
                 "&Sifre=" + Uri.EscapeDataString(account.Password) + "&WebSiparisKodu=" + Uri.EscapeDataString(reference);
             using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(host, path));
             using var response = await http.SendAsync(request, cancellationToken);
-            if (!response.IsSuccessStatusCode) return new(SuratTrackingState.Unavailable, []);
+            if (!response.IsSuccessStatusCode) return new(SuratTrackingState.Unavailable, [], response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden ? "authentication_or_access" : "provider_http");
             using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancellationToken));
             var root = json.RootElement;
             if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("IsError", out var error) ||
                 !root.TryGetProperty("Gonderiler", out var docs) || docs.ValueKind != JsonValueKind.Array)
-                return new(SuratTrackingState.Unavailable, []);
+                return new(SuratTrackingState.Unavailable, [], "invalid_response");
             // Observed read-only sandbox contract: an unaccepted/unknown reference is an IsError=true response.
             // Exact message AND empty documents only; never classify auth/general errors or partial data as empty.
             if (IsReferenceNotFound(root)) return new(SuratTrackingState.AwaitingAcceptance, []);
-            if (error.ValueKind != JsonValueKind.False) return new(SuratTrackingState.Unavailable, []);
+            if (error.ValueKind != JsonValueKind.False) return new(SuratTrackingState.Unavailable, [], "provider_error");
+            if (docs.EnumerateArray().Any(d => d.ValueKind != JsonValueKind.Object ||
+                (Value(d, "KargoObjId") is null && Value(d, "KargoTakipNo") is null && Value(d, "KargonunDurumuSayi") is null)))
+                return new(SuratTrackingState.Unavailable, [], "invalid_response");
             var documents = docs.EnumerateArray().Select(d =>
             {
                 int? code = int.TryParse(Value(d, "KargonunDurumuSayi"), out var n) ? n : null;
@@ -136,7 +139,8 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
             return new(documents.Length == 0 ? SuratTrackingState.AwaitingAcceptance : SuratTrackingState.Available, documents);
         }
         catch (Exception e) when (e is HttpRequestException or OperationCanceledException or IOException or JsonException or InvalidOperationException)
-        { return new(SuratTrackingState.Unavailable, []); }
+        { return new(SuratTrackingState.Unavailable, [], e switch
+            { OperationCanceledException => "timeout_or_cancelled", HttpRequestException or IOException => "connection_failure", _ => "invalid_response" }); }
     }
 
     public static bool IsReferenceNotFound(JsonElement root) => root.ValueKind == JsonValueKind.Object &&

@@ -106,7 +106,7 @@ public sealed class SuratShipmentStore(FeatureDocuments documents)
         var effectiveInterval = docs.Length > 0 && docs.All(d => d.StatusCode is 6 or 12) ? terminalInterval ?? interval : interval;
         var delay = Math.Min(86400, effectiveInterval * Math.Pow(2, failures));
         var snapshot = new SuratTrackingSnapshot(result.State switch { SuratTrackingState.Available => "available", SuratTrackingState.AwaitingAcceptance => "awaiting_acceptance", _ => "unavailable" },
-            now, result.State == SuratTrackingState.Available ? now : row.Tracking?.LastSuccess, now.AddSeconds(delay + Random.Shared.Next(0, 15)), failures, docs, history);
+            now, result.State == SuratTrackingState.Available ? now : row.Tracking?.LastSuccess, now.AddSeconds(delay + Random.Shared.Next(0, 15)), failures, docs, history, result.FailureKind);
         row = row with { Tracking = snapshot, TrackingLease = null };
         state.Shipments[index] = row;
         return row;

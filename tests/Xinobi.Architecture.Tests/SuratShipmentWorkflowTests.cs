@@ -96,6 +96,9 @@ public sealed class SuratShipmentWorkflowTests : IDisposable
         var path = "/api/v1/admin/orders/" + Guid.NewGuid().ToString("N") + "/surat-shipment";
         Assert.Equal(HttpStatusCode.Forbidden, (await http.GetAsync(path)).StatusCode);
         Assert.Equal(HttpStatusCode.Forbidden, (await http.PostAsync(path, System.Net.Http.Json.JsonContent.Create(Input))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await http.PostAsync(path + "/reconcile", System.Net.Http.Json.JsonContent.Create(new { evidence = "Synthetic", resolution = "registered" }))).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await http.GetAsync(path + "/label")).StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, (await http.PostAsync(path + "/tracking", System.Net.Http.Json.JsonContent.Create(new { }))).StatusCode);
     }
     [Fact] public async Task Staff_gets_real_not_found_and_invalid_id_errors()
     {

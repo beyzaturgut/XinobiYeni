@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 04.11.2026 - Sürat uçtan uca test (TST-249)
+
+Gerçek API/adaptör/depo zinciri bellek içi sağlayıcıyla ve admin/müşteri ekranları sahte API ile test edildi. Formun hata sonrası kaybolması ve boş takip belgesinin başarı sayılması düzeltildi; güvenli hata neden sınıfları kalıcı kayda eklendi. Nihai API 589 geçti / 29 atlandı / 0 başarısız; API Release 0 uyarı/hata, admin lint/build ve 8 Chrome fixture senaryosu, web üretim derlemesi ve 2 takip testi, bağımsız yazılımsal Code128 okuma geçti. [Senaryo bazlı sonuç ve bağımlılıklar](../test/2026-11-04/TST-249-surat-end-to-end.md). Onaylı test alıcı/paket verisi ve güvenli yerel test hesabı yok: gerçek gönderi/takip zinciri çalıştırılamadı. Yeni gerçek ön kontrol yalnız kimliksiz edge 302; Windows/IIS sonucu değildir. Production koruması korunuyor; gerçek SQL çoklu süreç ve fiziksel barkod/şube kabulü açık. Deploy/APK yok; TIC-08 kısmen yapıldı.
+
 ## 04.11.2026 - Sürat iptal yarışı ve takip geçmişi
 
 KRG-SUR-01 / TIC-08: admin gönderiminden önce atomik sipariş rezervasyonu; müşteri/panel iptali ve manuel sevk çakışmasının engellenmesi; aynı parça için eski sağlayıcı yanıtlarının kalıcı arşivi eklendi. Sipariş/ödeme statüsü değiştirilmez. Gerçek tahsilat/operasyon verisi olmayan demo modelinde Production oluşturma kapalı kalır. [TST-248](../test/2026-11-04/TST-248-surat-hardening.md): nihai API 572 PASS / 29 SKIP / 0 FAIL, Release 0 uyarı/hata; admin build/lint (4 mevcut uyarı) ve altı Chrome senaryosu PASS. Rezervasyon otomatik bırakılmaz; eski denemelere rezervasyon uydurulmaz. Sağlayıcı/etiket/fiziksel kabul, IIS erişimi ve gerçek SQL çoklu süreç kabulü açık. Güncel açık matrisi ve sonraki uçtan uca senaryolar raporda; gerçek sağlayıcı çağrısı, deploy ve APK yok. Entegrasyon tamamen tamamlandı sayılmaz.

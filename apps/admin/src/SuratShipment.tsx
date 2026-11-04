@@ -28,14 +28,15 @@ export default function SuratShipment({orderId,canWrite,eligible}:{orderId:strin
   {connection&&<p>Ortam: {connection.mode==='Sandbox'?'TEST':'Canlı'} · Bağlantı: {connection.enabled&&connection.accountConfigured?'Ayarlar tanımlı; gerçek kabul ayrıca gerekli':'Kapalı veya hesap ayarı eksik'} · Otomatik takip: {connection.pollingEnabled?'Açık':'Kapalı'}</p>}
   {loading&&<p role="status">Kargo kaydı yükleniyor…</p>}
   {error&&<p role="alert">{error}</p>}
+  {error&&connection&&(!registration||registration.state==='confirmed_not_created')&&<p>Form değerleri korundu. Önce kargo kaydını yenileyin; sonuç belirsizse yeniden gönderim yapmayın.</p>}
   <button type="button" disabled={busy||loading} onClick={()=>{setLoading(true);setError('');setVersion(v=>v+1)}}>Kargo kaydını yenile</button>
-  {!loading&&!error&&connection?.mode==='Sandbox'&&(!registration||registration.state==='confirmed_not_created')&&<><p>{registration?'Yokluğu sağlayıcı tarafından teyit edilmiş kayıt için aynı referans korunarak yeni deneme yapılır.':'Bu ortamda gönderi kaydı yok.'}</p><form className="catalog-form" onSubmit={e=>{e.preventDefault();void run(async()=>{const r=await adminCall<Registration>(path,{parcelCount:Number(parcels),parcelDesi:Number(desi),parcelKg:Number(kg),paymentType:Number(payer)});if(mounted.current){setRegistration(registrationValue(r));setNotice(r.message)}})}}>
+  {!loading&&connection?.mode==='Sandbox'&&(!registration||registration.state==='confirmed_not_created')&&<><p>{error?'Kayıt durumu doğrulanamadı; önce kargo kaydını yenileyin.':registration?'Yokluğu sağlayıcı tarafından teyit edilmiş kayıt için aynı referans korunarak yeni deneme yapılır.':'Bu ortamda gönderi kaydı yok.'}</p><form className="catalog-form" onSubmit={e=>{e.preventDefault();void run(async()=>{const r=await adminCall<Registration>(path,{parcelCount:Number(parcels),parcelDesi:Number(desi),parcelKg:Number(kg),paymentType:Number(payer)});if(mounted.current){setRegistration(registrationValue(r));setNotice(r.message)}})}}>
    <label>Paket sayısı<input type="number" min="1" step="1" required value={parcels} onChange={e=>setParcels(e.target.value)}/></label>
    <label>Tek paketin desisi<input type="number" min="0.001" step="any" required value={desi} onChange={e=>setDesi(e.target.value)}/></label>
    <label>Tek paketin ağırlığı (kg)<input type="number" min="0.001" step="any" required value={kg} onChange={e=>setKg(e.target.value)}/></label>
    <label>Kargo ücretini ödeyen<select required value={payer} onChange={e=>setPayer(e.target.value)}><option value="">Sözleşmeye göre seçin</option><option value="1">Gönderici (peşin)</option><option value="2">Alıcı</option></select></label>
    <p>Yalnız eş ölçülü koli, adrese/karayolu ve kapıda tahsilatsız çıkış desteklenir. Eksik ölçüleri tahmin etmeyin.</p>
-   <button disabled={busy||!canWrite||!eligible||!connection?.enabled||!connection.accountConfigured||connection.mode!=='Sandbox'}>Test ortamında gönderi oluştur</button>
+   <button disabled={busy||!!error||!canWrite||!eligible||!connection?.enabled||!connection.accountConfigured||connection.mode!=='Sandbox'}>Test ortamında gönderi oluştur</button>
    {(!canWrite||!eligible)&&<p>Gönderi oluşturmak için uygun sipariş durumu ve orders.write yetkisi gerekli.</p>}
   </form></>}
   {!loading&&registration&&<><p><strong>Gönderi referansı: </strong><span style={{overflowWrap:'anywhere'}}>{registration.reference}</span></p><p role="status">{registration.message}</p>

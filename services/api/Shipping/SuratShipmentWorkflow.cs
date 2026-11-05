@@ -29,7 +29,7 @@ public sealed class SuratShipmentWorkflow(SuratShipmentStore store, ISuratKargoC
         if (!claim.IsNew) return SuratShipmentView.From(claim.Shipment);
         // Persisted before network I/O. No automatic retries, including after crash between send and complete.
         var result = await client.CreateAsync(claim.Shipment.Request, token);
-        var saved = await store.Complete(claim.Shipment, result.State, clock.GetUtcNow());
+        var saved = await store.Complete(claim.Shipment, result.State, clock.GetUtcNow(), result.Diagnostic);
         return SuratShipmentView.From(saved);
     }
     // Called inside ChangeOrder's account transaction before any provider write. A durable

@@ -25,7 +25,7 @@ public sealed class SuratShipmentWorkflowTests : IDisposable
         {
             Interlocked.Increment(ref Calls); if (BeforeSend is not null) await BeforeSend(s);
             Started.TrySetResult(); if (Release is not null) await Release.Task;
-            return new(Ambiguous ? SuratCreateState.ReconciliationRequired : SuratCreateState.Registered);
+            return new(Ambiguous ? SuratCreateState.ReconciliationRequired : SuratCreateState.Registered, new(Ambiguous ? "timeout_or_cancelled" : "accepted", Ambiguous ? null : 200));
         }
         public Task<SuratTrackingResult> TrackAsync(string reference, CancellationToken token = default) => throw new NotSupportedException();
     }
@@ -44,6 +44,7 @@ public sealed class SuratShipmentWorkflowTests : IDisposable
         Assert.Equal("submitting", duplicate.State); Assert.Equal(1, client.Calls);
         client.Release.SetResult(); var result = await first;
         Assert.Equal(duplicate.Reference, result.Reference); Assert.Equal("registered", result.State);
+        Assert.Equal(new SuratCreateDiagnostic("accepted", 200), (await store.Find(order.Id, "Sandbox"))!.CreateDiagnostic);
         Assert.Null(order.Shipment); Assert.Equal(OrderStatuses.Received, order.Status);
     }
     [Fact] public async Task Restart_keeps_ambiguous_attempt_and_never_retries()

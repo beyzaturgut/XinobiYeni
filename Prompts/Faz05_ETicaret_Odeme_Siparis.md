@@ -199,3 +199,6 @@ Her kutu gerçek inceleme tamamlandıktan sonra kişi/tarih/kanıt bağlantısı
 ## 05.11.2026 — Sürat Swagger uyumu
 
 Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSON bu türlere düzeltildi. Kalıcı/public model korunur. 75 izole Sürat testi geçti; eski belirsiz deneme yeniden gönderilmedi. Eski create yanıtı saklanmadığı için kesin neden yok; Sürat kayıt teyidi, güvenli create teşhis kaydı ve gerçek kabul açık. Ayrıntı: `test/2026-11-05/TST-250-surat-live-schema.md`. Deploy yok.
+
+
+05.11.2026 — TST-251: Gönderim sonucu için güvenli HTTP durum/kategori kaydı ve attempt geçmişi eklendi; public DTO/otomatik retry davranışı korunur. Eski belirsiz kayıtlara geriye dönük teşhis üretilemez. Ayrıntı: `test/2026-11-05/TST-251-surat-create-diagnostics.md`. Gerçek gönderim/deploy yok.

@@ -363,3 +363,6 @@
 - 04.11.2026 · [TST-249 Sürat uçtan uca test](2026-11-04/TST-249-surat-end-to-end.md) — Gerçek API/adaptör + sahte sağlayıcı; form/hatalı belge/hata sınıfları düzeltildi. API 589 geçti / 29 atlandı / 0 başarısız, Release/admin build/lint, 8 admin ve 2 web Chrome testi, yazılımsal Code128 geçti. Gerçek gönderi/takip, IIS ve fiziksel kabul çalıştırılamadı; onaylı veri/test hesabı yok.
 
 - 05.11.2026 · [TST-250 Sürat güncel Swagger](2026-11-05/TST-250-surat-live-schema.md) — Iademi boolean ve desi/kg string wire düzeltmesi; 75 izole PASS. Eski denemenin nedeni kesin değil; yeniden gerçek gönderim/deploy yok.
+
+
+05.11.2026 — TST-251: Gönderim sonucu için güvenli HTTP durum/kategori kaydı ve attempt geçmişi eklendi; public DTO/otomatik retry davranışı korunur. Eski belirsiz kayıtlara geriye dönük teşhis üretilemez. Ayrıntı: `test/2026-11-05/TST-251-surat-create-diagnostics.md`. Gerçek gönderim/deploy yok.

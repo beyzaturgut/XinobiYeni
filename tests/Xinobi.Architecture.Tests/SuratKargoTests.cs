@@ -49,10 +49,27 @@ public class SuratKargoTests
         var h = new Handler(_ => Task.FromResult(Response("Tamam")));
         await Assert.ThrowsAsync<SuratConfigurationException>(() => Client(h,enabled,mode,live).CreateAsync(Shipment));Assert.Equal(0,h.Calls);
     }
+    [Theory]
+    [InlineData(200, "accepted", "Tamam")]
+    [InlineData(200, "unrecognized_response", "private recipient and password")]
+    [InlineData(200, "invalid_response", "\"broken")]
+    [InlineData(403, "authentication_or_access", "private denied body")]
+    [InlineData(500, "provider_http", "private server body")]
+    public async Task Create_diagnostics_only_contain_safe_class_and_status(int status, string kind, string body)
+    {
+        var h = new Handler(_ => Task.FromResult(new HttpResponseMessage((HttpStatusCode)status) { Content = new StringContent(body) }));
+        var result = await Client(h).CreateAsync(Shipment);
+        Assert.Equal(new SuratCreateDiagnostic(kind, status), result.Diagnostic);
+        Assert.DoesNotContain("private", JsonSerializer.Serialize(result));
+        Assert.Equal(1, h.Calls);
+    }
+
     [Fact] public async Task Timeout_is_uncertain_not_retried()
     {
         var h=new Handler(_=>throw new TaskCanceledException("URI may contain credentials"));
-        Assert.Equal(SuratCreateState.ReconciliationRequired,(await Client(h).CreateAsync(Shipment)).State);Assert.Equal(1,h.Calls);
+        var result = await Client(h).CreateAsync(Shipment);
+        Assert.Equal(SuratCreateState.ReconciliationRequired,result.State);
+        Assert.Equal(new SuratCreateDiagnostic("timeout_or_cancelled"), result.Diagnostic);Assert.Equal(1,h.Calls);
     }
     [Theory]
     [InlineData(401)] [InlineData(403)] [InlineData(500)]

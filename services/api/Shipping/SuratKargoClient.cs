@@ -62,7 +62,9 @@ public sealed record SuratShipment(
 }
 
 public enum SuratCreateState { Registered, ReconciliationRequired }
-public sealed record SuratCreateResult(SuratCreateState State);
+// Only generated categories and HTTP numbers: never provider text, URLs, headers or exception messages.
+public sealed record SuratCreateDiagnostic(string Kind, int? HttpStatus = null);
+public sealed record SuratCreateResult(SuratCreateState State, SuratCreateDiagnostic? Diagnostic = null);
 public enum SuratTrackingState { Available, AwaitingAcceptance, Unavailable }
 public sealed record SuratTrackingResult(SuratTrackingState State, SuratTrackingDocument[] Documents, string? FailureKind = null);
 public sealed record SuratTrackingDocument(string? Id, int? StatusCode, string? StatusText,
@@ -100,20 +102,25 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
                 } }, options: Wire)
             };
             using var response = await http.SendAsync(request, cancellationToken);
-            if (!response.IsSuccessStatusCode) return new(SuratCreateState.ReconciliationRequired);
+            if (!response.IsSuccessStatusCode) return new(SuratCreateState.ReconciliationRequired,
+                new(response.StatusCode is System.Net.HttpStatusCode.Unauthorized or System.Net.HttpStatusCode.Forbidden
+                    ? "authentication_or_access" : "provider_http", (int)response.StatusCode));
             var body = (await response.Content.ReadAsStringAsync(cancellationToken)).Trim();
             // Some REST hosts JSON-encode their string return; reject every other structure.
             if (body.StartsWith('"'))
             {
                 try { body = JsonSerializer.Deserialize<string>(body)?.Trim() ?? ""; }
-                catch (JsonException) { return new(SuratCreateState.ReconciliationRequired); }
+                catch (JsonException) { return new(SuratCreateState.ReconciliationRequired, new("invalid_response", (int)response.StatusCode)); }
             }
-            return new(body is "Tamam" or "Kayıt Edildi" ? SuratCreateState.Registered : SuratCreateState.ReconciliationRequired);
+            return body is "Tamam" or "Kayıt Edildi"
+                ? new(SuratCreateState.Registered, new("accepted", (int)response.StatusCode))
+                : new(SuratCreateState.ReconciliationRequired, new("unrecognized_response", (int)response.StatusCode));
         }
         catch (Exception e) when (e is HttpRequestException or OperationCanceledException or IOException)
         {
             // The carrier may have committed before disconnect/cancellation. No exception URI/body escapes.
-            return new(SuratCreateState.ReconciliationRequired);
+            return new(SuratCreateState.ReconciliationRequired,
+                new(e is OperationCanceledException ? "timeout_or_cancelled" : "connection_failure"));
         }
     }
 

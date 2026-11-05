@@ -23,6 +23,31 @@ public sealed class SuratOperationsTests : IDisposable
         using var doc = System.Text.Json.JsonDocument.Parse("{\"Hareketler\":[{\"Aciklama\":\"Test\"}]}");
         return new(SuratTrackingState.Available, [new(id, code, "Test durum", "TEST-TRACK", "03/11/2026", null, SuratKargoClient.Normalize(code), doc.RootElement.Clone())]);
     }
+    [Fact] public async Task Create_diagnostic_survives_restart_and_is_archived_on_controlled_retry()
+    {
+        var id = Guid.NewGuid().ToString("N");
+        var diagnostic = new SuratCreateDiagnostic("authentication_or_access", 403);
+        using (var f = Factory())
+        {
+            var store = f.Services.GetRequiredService<SuratShipmentStore>();
+            var claim = await store.Claim(id, "Sandbox", "1111111111", "fixture-staff", Draft, Now);
+            await store.Complete(claim.Shipment, SuratCreateState.ReconciliationRequired, Now, diagnostic);
+        }
+        using (var f = Factory())
+        {
+            var store = f.Services.GetRequiredService<SuratShipmentStore>();
+            var row = (await store.Find(id, "Sandbox"))!;
+            Assert.Equal(diagnostic, row.CreateDiagnostic);
+            Assert.DoesNotContain("authentication_or_access", System.Text.Json.JsonSerializer.Serialize(SuratShipmentView.From(row)));
+            await store.Reconcile(id, "Sandbox", "fixture-staff", "Fixture provider confirmed absent", Now.AddMinutes(3), "not_created");
+            var retry = await store.Claim(id, "Sandbox", "1111111111", "fixture-staff", Draft, Now.AddMinutes(4));
+            Assert.Null(retry.Shipment.CreateDiagnostic);
+            Assert.Equal(diagnostic, Assert.Single(retry.Shipment.PreviousAttempts!).CreateDiagnostic);
+            // An obsolete completion must not overwrite a newer attempt or its diagnostic.
+            await Assert.ThrowsAsync<ProblemException>(() => store.Complete(row, SuratCreateState.Registered, Now.AddMinutes(5), new("accepted", 200)));
+        }
+    }
+
     [Fact] public async Task Tracking_failure_preserves_last_success_and_shared_lease_throttles_queries()
     {
         using var f = Factory(); var store = f.Services.GetRequiredService<SuratShipmentStore>(); var row = await Registered(store);

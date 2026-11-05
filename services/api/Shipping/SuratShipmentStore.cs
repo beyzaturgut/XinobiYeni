@@ -6,12 +6,12 @@ using Xinobi.Api.Infrastructure;
 namespace Xinobi.Api.Shipping;
 
 public sealed record SuratShipmentAttempt(string AttemptId, string State, DateTimeOffset StartedAt, DateTimeOffset? CompletedAt,
-    string ActorId, SuratShipment Request, string? Evidence, string? ReconciledBy);
+    string ActorId, SuratShipment Request, string? Evidence, string? ReconciledBy, SuratCreateDiagnostic? CreateDiagnostic = null);
 
 public sealed record SuratStoredShipment(string OrderId, string Environment, string AccountFingerprint,
     string Reference, string AttemptId, string RequestFingerprint, string State, DateTimeOffset StartedAt,
     DateTimeOffset? CompletedAt, string ActorId, SuratShipment Request, string? SenderCode = null, SuratTrackingSnapshot? Tracking = null,
-    SuratTrackingLease? TrackingLease = null, string? ReconciliationEvidence = null, string? ReconciledBy = null, SuratShipmentAttempt[]? PreviousAttempts = null);
+    SuratTrackingLease? TrackingLease = null, string? ReconciliationEvidence = null, string? ReconciledBy = null, SuratShipmentAttempt[]? PreviousAttempts = null, SuratCreateDiagnostic? CreateDiagnostic = null);
 public sealed class SuratShipmentState
 {
     public List<SuratStoredShipment> Shipments { get; set; } = [];
@@ -41,10 +41,10 @@ public sealed class SuratShipmentStore(FeatureDocuments documents)
                 var corrected = draft with { OzelKargoTakipNo = existing.Reference };
                 corrected.Validate();
                 var old = new SuratShipmentAttempt(existing.AttemptId, existing.State, existing.StartedAt, existing.CompletedAt,
-                    existing.ActorId, existing.Request, existing.ReconciliationEvidence, existing.ReconciledBy);
+                    existing.ActorId, existing.Request, existing.ReconciliationEvidence, existing.ReconciledBy, existing.CreateDiagnostic);
                 var retry = existing with { AttemptId = Guid.NewGuid().ToString("N"), RequestFingerprint = fingerprint, State = "submitting",
                     StartedAt = now, CompletedAt = null, ActorId = actorId, Request = corrected, TrackingLease = null,
-                    ReconciliationEvidence = null, ReconciledBy = null, PreviousAttempts = [.. existing.PreviousAttempts ?? [], old] };
+                    ReconciliationEvidence = null, ReconciledBy = null, CreateDiagnostic = null, PreviousAttempts = [.. existing.PreviousAttempts ?? [], old] };
                 state.Shipments[state.Shipments.IndexOf(existing)] = retry;
                 return new SuratShipmentClaim(retry, true);
             }
@@ -58,13 +58,13 @@ public sealed class SuratShipmentStore(FeatureDocuments documents)
         });
     }
 
-    public Task<SuratStoredShipment> Complete(SuratStoredShipment claim, SuratCreateState result, DateTimeOffset now) => store.Update(state =>
+    public Task<SuratStoredShipment> Complete(SuratStoredShipment claim, SuratCreateState result, DateTimeOffset now, SuratCreateDiagnostic? diagnostic = null) => store.Update(state =>
     {
         var index = state.Shipments.FindIndex(s => s.AttemptId == claim.AttemptId && s.OrderId == claim.OrderId && s.Environment == claim.Environment);
         if (index < 0) throw ProblemException.Unavailable("Kargo denemesi");
         var row = state.Shipments[index];
         if (row.State != "submitting") return row;
-        row = row with { State = result == SuratCreateState.Registered ? "registered" : "reconciliation_required", CompletedAt = now };
+        row = row with { State = result == SuratCreateState.Registered ? "registered" : "reconciliation_required", CompletedAt = now, CreateDiagnostic = diagnostic };
         state.Shipments[index] = row;
         return row;
     });

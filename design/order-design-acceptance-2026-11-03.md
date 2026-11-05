@@ -82,3 +82,8 @@ Görseller: [test/2026-11-03/order-design-acceptance/](../test/2026-11-03/order-
 | Personel indirmelerinin denetim kaydına (audit) yazılması | Mevcut yaklaşım yalnız değişiklikleri kaydediyor. | SEC-07 kararı; gerekirse ayrı task. |
 | Mobil (Flutter) kaynaklı siparişlerde önizleme yüklemesi | Flutter bu seri kapsamında değil, incelenmedi. | Mobilden verilen kişiselleştirilmiş siparişte `Files.Composition` dolu mu kontrol edilir (Faz11). |
 | Kararsız web e2e testi | Testin kendisi kararsız. | Testte canvas karşılaştırması sayfa geçişinden önce bitecek şekilde düzeltilir. |
+
+
+## 05.11.2026 — SIP-TAS-01…09 güncel regresyon
+
+[TST-252](../test/2026-11-05/TST-252-order-design-regression.md): 36 API PASS / 1 SQL SKIP / 0 FAIL; beş admin tarayıcı paketi, 21 dosya durumu ve 7 eski kayıt senaryosu, dört genişlik/%200 metin, admin build/lint geçti (4 eski lint uyarısı). Yeni uygulama kusuru bulunmadı; kod/veri değiştirilmedi. SQL/IIS/manuel cihaz ve PM kabulü açık; deploy yapılmadı.

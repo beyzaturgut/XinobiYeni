@@ -127,3 +127,8 @@ Bu 9 satır KIS-03/KIS-07 ve çapraz güvenlik/kabul işlerinin alt kırılımı
 Eski faz planları, KIS-01 geliştirmesi ve test raporları silinmez; bu tarihli karar yeni kapsamda önceliklidir. Kapsam dışı tasklar tamamlandı sayılmaz. Önce hazırlanmış [genel durum PDF'i](../../output/pdf/xinobi-proje-durumu-2026-11-03.pdf) bu karardan önceki üretim kapsamını içerir; bu yeni karar için güncel kaynak değildir. Kullanıcı yeni PDF istemediği için yeniden üretilmedi.
 
 **Bu oturum:** Yalnız task ve faz dokümantasyonu. API/UI/Flutter kodu, veri, şema, endpoint, ekran, release, deployment veya APK değişmedi. Uygulama testleri çalıştırılmadı; doküman doğrulaması [TST-205](../../test/2026-11-03/TST-205-order-design-scope-plan.md).
+
+
+## 05.11.2026 — SIP-TAS-01…09 güncel regresyon
+
+[TST-252](../../test/2026-11-05/TST-252-order-design-regression.md): 36 API PASS / 1 SQL SKIP / 0 FAIL; beş admin tarayıcı paketi, 21 dosya durumu ve 7 eski kayıt senaryosu, dört genişlik/%200 metin, admin build/lint geçti (4 eski lint uyarısı). Yeni uygulama kusuru bulunmadı; kod/veri değiştirilmedi. SQL/IIS/manuel cihaz ve PM kabulü açık; deploy yapılmadı.

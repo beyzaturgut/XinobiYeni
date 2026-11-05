@@ -189,3 +189,8 @@ Her imza Faz00 içinde tarih, gerçek kişi, kanıt bağlantısı, açık bulgu 
 - [ ] Sr. Full Stack Developer — web/panel/API/sepet/çıktı uçtan uca akışı ve mobil sözleşme uyumunu onayladı.
 - [ ] Web Designer (ek zorunlu rol) — XINOBI U iki giriş yolu (beş soru / kendi görseli), "Temsilidir" etiketi ve önizleme etkileşiminin onaylı tasarıma uygunluğunu onayladı.
 - [ ] Proje Yöneticisi — **zorunlu nihai onay**; altı inceleme, D04 üretim kararı, gerçek baskı örneği ve kabul kanıtlarını Faz00'a işleyerek fazı kapattı.
+
+
+## 05.11.2026 — SIP-TAS-01…09 güncel regresyon
+
+[TST-252](../test/2026-11-05/TST-252-order-design-regression.md): 36 API PASS / 1 SQL SKIP / 0 FAIL; beş admin tarayıcı paketi, 21 dosya durumu ve 7 eski kayıt senaryosu, dört genişlik/%200 metin, admin build/lint geçti (4 eski lint uyarısı). Yeni uygulama kusuru bulunmadı; kod/veri değiştirilmedi. SQL/IIS/manuel cihaz ve PM kabulü açık; deploy yapılmadı.

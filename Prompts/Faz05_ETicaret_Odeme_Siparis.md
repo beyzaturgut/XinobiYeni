@@ -202,3 +202,8 @@ Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSO
 
 
 05.11.2026 — TST-251: Gönderim sonucu için güvenli HTTP durum/kategori kaydı ve attempt geçmişi eklendi; public DTO/otomatik retry davranışı korunur. Eski belirsiz kayıtlara geriye dönük teşhis üretilemez. Ayrıntı: `test/2026-11-05/TST-251-surat-create-diagnostics.md`. Gerçek gönderim/deploy yok.
+
+
+## 05.11.2026 — Yayın öncesi birleşik regresyon
+
+[TST-255](../test/2026-11-05/TST-255-pre-release-regression.md): API 595 PASS / 29 SKIP / 0 FAIL; admin 21/21 dosya + ayrıca üretim profilinde MFA/login/logout testi PASS; web 24/24 e2e, lint/tip ve üretim derlemeleri PASS. Yerel yazılım engeli bulunmadı. Sürat gerçek kabulü, ödeme/sevk uygunluğu, SQL çoklu süreç, IIS/SMTP/cihaz/PM ve yeni repo sunucu erişimi raporda açık. Canlı Sürat kapalı; deploy/paket yayını yapılmadı.

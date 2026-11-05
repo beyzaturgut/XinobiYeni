@@ -191,3 +191,8 @@ Her rol `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` karar/inceleme kaydına `Faz0
 ## 05.11.2026 — UI/UX bulguları düzeltme turu
 
 [TST-254](../test/2026-11-05/TST-254-admin-ux-fixes.md): ADM-UX-01…07 için taslak/ayrılma ve busy koruması, kritik işlem özeti/onayı, tarafsız manuel teyit, readonly alanlar, dürüst etiket handoff mesajı ve ortak form düzeni uygulandı. Gerçek veri/sağlayıcı/deploy yok. SQL/IIS/manuel cihaz ve PM kabulü açık. Nihai test sonuçları raporda.
+
+
+## 05.11.2026 — Yayın öncesi birleşik regresyon
+
+[TST-255](../test/2026-11-05/TST-255-pre-release-regression.md): API 595 PASS / 29 SKIP / 0 FAIL; admin 21/21 dosya + ayrıca üretim profilinde MFA/login/logout testi PASS; web 24/24 e2e, lint/tip ve üretim derlemeleri PASS. Yerel yazılım engeli bulunmadı. Sürat gerçek kabulü, ödeme/sevk uygunluğu, SQL çoklu süreç, IIS/SMTP/cihaz/PM ve yeni repo sunucu erişimi raporda açık. Canlı Sürat kapalı; deploy/paket yayını yapılmadı.

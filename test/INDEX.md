@@ -389,3 +389,5 @@
 
 
 05.11.2026 — [DEPLOY-017 release doğrulaması](../deployments/DEPLOY-017-validated-release-published.md): birleşik ZIP SHA256/CRC/commit, gizli ayar dışlama, gerçek arşiv admininde sentetik MFA/login/logout PASS; GitHub 3 asset digest eşleşti. Önceki canlı ortam GET smoke PASS; yeni IIS kurulumu değil.
+
+- 05.11.2026 · [TST-256 sekme simgeleri](2026-11-05/TST-256-brand-tab-icons.md): web Xinobi logo/admin marka favicon, üretim yolları/build ve 16/32/128 px görsel kontrol PASS. Deploy yok.

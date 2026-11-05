@@ -195,3 +195,7 @@ Her kutu gerçek inceleme tamamlandıktan sonra kişi/tarih/kanıt bağlantısı
 - [ ] **Proje Yöneticisi — zorunlu nihai onay:** tüm rollerin bulguları, müşteri kararları, kabul kanıtı ve Faz00 tamam; açık kritik engel yok.
 
 **Not:** Kullanıcının talep ettiği ekip yedi kişidir: PM, İş Analisti, Creative Designer, Sr. Frontend, Sr. Backend, DB Admin, Sr. Full Stack. UI/UX ayrı sekizinci kişi varsayılmaz; Creative Designer tasarımı teslim eder, Frontend'in görevlendirilmiş UI/UX sorumluluğu ayrıca incelenir.
+
+## 05.11.2026 — Sürat Swagger uyumu
+
+Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSON bu türlere düzeltildi. Kalıcı/public model korunur. 75 izole Sürat testi geçti; eski belirsiz deneme yeniden gönderilmedi. Eski create yanıtı saklanmadığı için kesin neden yok; Sürat kayıt teyidi, güvenli create teşhis kaydı ve gerçek kabul açık. Ayrıntı: `test/2026-11-05/TST-250-surat-live-schema.md`. Deploy yok.

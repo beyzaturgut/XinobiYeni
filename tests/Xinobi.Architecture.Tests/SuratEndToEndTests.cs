@@ -77,8 +77,8 @@ public sealed class SuratEndToEndTests : IDisposable
                 Assert.Equal(order.Address.Line, g.GetProperty("AliciAdresi").GetString());
                 Assert.Equal(order.Address.City, g.GetProperty("Il").GetString()); Assert.Equal(order.Address.District, g.GetProperty("Ilce").GetString());
                 Assert.Equal("905550000000", g.GetProperty("TelefonCep").GetString());
-                Assert.Equal(2, g.GetProperty("Adet").GetInt32()); Assert.Equal(3.5m, g.GetProperty("BirimDesi").GetDecimal());
-                Assert.Equal(2.25m, g.GetProperty("BirimKg").GetDecimal()); Assert.Equal(2, g.GetProperty("OdemeTipi").GetInt32());
+                Assert.Equal(2, g.GetProperty("Adet").GetInt32()); Assert.Equal("3.5", g.GetProperty("BirimDesi").GetString());
+                Assert.Equal("2.25", g.GetProperty("BirimKg").GetString()); Assert.Equal(2, g.GetProperty("OdemeTipi").GetInt32());
                 Assert.Equal(0, g.GetProperty("Pazaryerimi").GetInt32()); Assert.Equal("", g.GetProperty("EntegrasyonFirmasi").GetString());
                 return Reply(accepted);
             }

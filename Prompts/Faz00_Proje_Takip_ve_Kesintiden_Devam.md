@@ -718,3 +718,7 @@ Kullanıcının ekran görüntüsündeki eski üst üste kart düzeni, mobil web
 120 kapanış taskı Faz01-11 arasında tek ana fazla eşlendi; Faz00 anlık durum/12 faz özeti yenilendi. Müşteri/veri/erişim girdileri, teknik geliştirme ve gerçek kabul işleri ayrıldı; ortak bağımlılıklar task sayısını artırmadan bağlandı. Admin gerçek posta teslimi, 23 ürün/fiyat, WEB-07 cihaz/a11y, KIS-01 ölçü/numune/SQL ve Flutter paket/telefon kurulumu özel alt kayıtlarla açık. [Ana liste](../docs/tasks/project-closure-2026-10-30.md), [denetim/16 commit](../docs/tasks/phase-audit-2026-10-30.md).
 
 [TST-175-178](../test/2026-10-30/TST-175-phase-closure-sync.md): 120/120 görev, 272 yeni yerel link/anchor, tarihsel içerik/rol kabul koruması ve diff/upstream PASS. Yeni uygulama testi, SQL yazımı, sağlayıcı, APK veya deployment yapılmadı; faz/PM onayı ve yüzde üretilmedi.
+
+## 05.11.2026 — Sürat Swagger uyumu
+
+Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSON bu türlere düzeltildi. Kalıcı/public model korunur. 75 izole Sürat testi geçti; eski belirsiz deneme yeniden gönderilmedi. Eski create yanıtı saklanmadığı için kesin neden yok; Sürat kayıt teyidi, güvenli create teşhis kaydı ve gerçek kabul açık. Ayrıntı: `test/2026-11-05/TST-250-surat-live-schema.md`. Deploy yok.

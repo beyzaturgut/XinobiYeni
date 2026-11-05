@@ -87,7 +87,17 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
         {
             using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(host, "api/GonderiyiKargoyaGonder"))
             {
-                Content = JsonContent.Create(new { KullaniciAdi = account.Username, Sifre = account.Password, Gonderi = shipment }, options: Wire)
+                // The current provider OpenAPI differs from the old PDF: weights are strings and Iademi is boolean.
+                // Keep the domain/persisted model numeric; adapt only the outbound wire contract.
+                Content = JsonContent.Create(new { KullaniciAdi = account.Username, Sifre = account.Password, Gonderi = new
+                {
+                    shipment.KisiKurum, shipment.AliciAdresi, shipment.Il, shipment.Ilce, shipment.TelefonCep,
+                    shipment.OzelKargoTakipNo, shipment.Adet,
+                    BirimDesi = shipment.BirimDesi.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    BirimKg = shipment.BirimKg.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    shipment.OdemeTipi, shipment.KargoTuru, shipment.TasimaSekli, shipment.TeslimSekli,
+                    shipment.GonderiSekli, Iademi = false, shipment.Pazaryerimi, shipment.EntegrasyonFirmasi
+                } }, options: Wire)
             };
             using var response = await http.SendAsync(request, cancellationToken);
             if (!response.IsSuccessStatusCode) return new(SuratCreateState.ReconciliationRequired);

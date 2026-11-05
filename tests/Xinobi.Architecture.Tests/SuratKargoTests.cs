@@ -32,6 +32,9 @@ public class SuratKargoTests
             using var j = JsonDocument.Parse(await r.Content!.ReadAsStringAsync());
             var g = j.RootElement.GetProperty("Gonderi");
             Assert.Equal(0, g.GetProperty("Pazaryerimi").GetInt32());
+            Assert.Equal(JsonValueKind.False, g.GetProperty("Iademi").ValueKind);
+            Assert.Equal(JsonValueKind.String, g.GetProperty("BirimDesi").ValueKind);
+            Assert.Equal(JsonValueKind.String, g.GetProperty("BirimKg").ValueKind);
             Assert.Equal("", g.GetProperty("EntegrasyonFirmasi").GetString());
             Assert.Equal("TEST-ORDER-1", g.GetProperty("OzelKargoTakipNo").GetString());
             Assert.False(g.TryGetProperty("KapidanOdemeTutari", out _));

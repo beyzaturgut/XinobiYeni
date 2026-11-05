@@ -90,3 +90,7 @@ Bu bölüm önceki teslimlerin “sıradaki” maddelerini günceller; aşağıd
 ## Ön kontrol ve boş kayıt sözleşmesi
 
 `--surat-preflight` komutu API/SQL/worker başlatmadan çalışır. [Sunucu yönergesi](ON-KONTROL.md). Test metodundan gelen HTTP 200 / IsError=true / tam `Sipariş bulunamadı.` / boş Gonderiler yanıtı AwaitingAcceptance olur; diğer IsError yanıtları veya kısmi belge sonuçları servis hatası olarak kalır. Bu yanıt otomatik yeni gönderim, kayıt yokluğu kanıtı ya da canlı kabul değildir.
+
+## 05.11.2026 — Sürat Swagger uyumu
+
+Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSON bu türlere düzeltildi. Kalıcı/public model korunur. 75 izole Sürat testi geçti; eski belirsiz deneme yeniden gönderilmedi. Eski create yanıtı saklanmadığı için kesin neden yok; Sürat kayıt teyidi, güvenli create teşhis kaydı ve gerçek kabul açık. Ayrıntı: `test/2026-11-05/TST-250-surat-live-schema.md`. Deploy yok.

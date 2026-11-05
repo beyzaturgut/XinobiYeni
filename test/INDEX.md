@@ -361,3 +361,5 @@
 - 04.11.2026 · [TST-248 Sürat güvenilirlik ve iptal yarışı](2026-11-04/TST-248-surat-hardening.md) — Atomik sipariş rezervasyonu, iptal/manuel sevk koruması ve takip belge sürüm arşivi; API 572 PASS / 29 SKIP / 0 FAIL, Release ve admin build/lint, altı Chrome senaryosu PASS. Gerçek gönderi/IIS/SQL/fiziksel kabul açık; canlı oluşturma kapalı.
 
 - 04.11.2026 · [TST-249 Sürat uçtan uca test](2026-11-04/TST-249-surat-end-to-end.md) — Gerçek API/adaptör + sahte sağlayıcı; form/hatalı belge/hata sınıfları düzeltildi. API 589 geçti / 29 atlandı / 0 başarısız, Release/admin build/lint, 8 admin ve 2 web Chrome testi, yazılımsal Code128 geçti. Gerçek gönderi/takip, IIS ve fiziksel kabul çalıştırılamadı; onaylı veri/test hesabı yok.
+
+- 05.11.2026 · [TST-250 Sürat güncel Swagger](2026-11-05/TST-250-surat-live-schema.md) — Iademi boolean ve desi/kg string wire düzeltmesi; 75 izole PASS. Eski denemenin nedeni kesin değil; yeniden gerçek gönderim/deploy yok.

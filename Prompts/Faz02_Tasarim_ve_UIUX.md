@@ -186,3 +186,8 @@ Her rol `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` karar/inceleme kaydına `Faz0
 ## 05.11.2026 — Sipariş, tasarım dosyaları ve kargo UI/UX denetimi
 
 [Öncelikli bulgular](../design/admin-ux-audit-2026-11-05.md), [TST-253](../test/2026-11-05/TST-253-admin-ux-audit.md): 20/20 izole test paketi PASS. Taslak kaybı, kritik işlem onayı ve varsayılan manuel teyit P1; readonly alanlar/etiket mesajı/busy kapanışı/form tutarlılığı P2. Denetim tamam; düzeltme ve PM/cihaz/IIS kabulü açık. Uygulama değişmedi/deploy yok.
+
+
+## 05.11.2026 — UI/UX bulguları düzeltme turu
+
+[TST-254](../test/2026-11-05/TST-254-admin-ux-fixes.md): ADM-UX-01…07 için taslak/ayrılma ve busy koruması, kritik işlem özeti/onayı, tarafsız manuel teyit, readonly alanlar, dürüst etiket handoff mesajı ve ortak form düzeni uygulandı. Gerçek veri/sağlayıcı/deploy yok. SQL/IIS/manuel cihaz ve PM kabulü açık. Nihai test sonuçları raporda.

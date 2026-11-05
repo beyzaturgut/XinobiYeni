@@ -1,7 +1,7 @@
 import AdminDialog from './AdminDialog'
 import SuratShipment from './SuratShipment'
 import TableRegion from './TableRegion'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest } from './commerce'
 import {useAdminSession} from './AdminAccess'
 import { adminCall } from './admin-api'
@@ -29,6 +29,10 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
   const permissions=useAdminSession()?.permissions??[]
   const canWrite=permissions.includes('orders.write'),canCancel=permissions.includes('orders.cancel')
   const writing=useRef(false)
+  const shippingActivity=useRef({dirty:false,busy:false})
+  const [shippingBusy,setShippingBusy]=useState(false)
+  const [closeBlocked,setCloseBlocked]=useState(false)
+  const onShippingActivity=useCallback((activity:{dirty:boolean;busy:boolean})=>{shippingActivity.current=activity;setShippingBusy(activity.busy)},[])
   const orderVersion=useRef(0), optionsVersion=useRef(0), refreshButton=useRef<HTMLButtonElement>(null)
   const [items, setItems] = useState<StaffOrder[]>([]), [options, setOptions] = useState<Options | null>(null)
   const [designFilter,setDesignFilter]=useState('all')
@@ -84,25 +88,40 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
   const load = () => {orderVersion.current++;setLoading(true);setError('');setReload(value => value + 1);if(requestedOrderId)retryDirect()}
   const retryOptions = () => {optionsVersion.current++;setOptions(null);setOptionsLoading(true);setOptionsError('');setOptionsReload(value => value + 1)}
   const ready = !loading && !error
-  const actionsDisabled = busy || !ready || directLoading || Boolean(directError)
+  const actionsDisabled = busy || shippingBusy || !ready || directLoading || Boolean(directError)
   const selected = requestedOrderId ? (canRead && direct?.id === requestedOrderId ? direct.data ?? null : null) : items.find(item => item.order.id === selectedId) ?? null
   const filtered = items.filter(({ order, customerName, customerEmail }) =>
     (designFilter==='all'||order.lines.some(line=>designFilter==='personalized'?Boolean(line.personalization):line.personalization?.kind===designFilter)) &&
     (status === 'Tümü' || (status === 'Açık talep' ? openRequests(order).length > 0 : statusText[order.status] === status)) &&
     `${order.number} ${customerName} ${customerEmail} ${order.lines.map(line => line.name).join(' ')}`.toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
   async function act(route: string, body: unknown, done: string) {
-    if (!selected || writing.current || !ready || (route === '/shipment' && (optionsLoading || optionsError || !options)) || !(route.startsWith('/requests/')?canCancel:canWrite)) return
+    if (!selected || writing.current || shippingActivity.current.busy || !ready || (route === '/shipment' && (optionsLoading || optionsError || !options)) || !(route.startsWith('/requests/')?canCancel:canWrite)) return
+    const summary = route === '/shipment'
+      ? `${selected.order.number}: ${carrier} · Takip: ${tracking}\n${done}` : `${selected.order.number}\n${done}`
+    if (!window.confirm(`${summary}\n${note ? 'Müşteriye iletilecek not: '+note+'\n' : ''}Bu işlemi onaylıyor musunuz?`)) return
     writing.current=true
     setBusy(true); setNotice('');setActionError('')
     try {
       await commerceRequest(commerceApi, `/orders/${encodeURIComponent(selected.order.id)}${route}`, 'POST', body)
-      load(); setNotice(done + ' Bildirim kuyruğa alındı; teslim durumu bildirim kayıtlarından izlenir.'); setNote('')
+      load(); setNotice(done + ' Bildirim kuyruğa alındı; teslim durumu bildirim kayıtlarından izlenir.'); setNote(''); if(route==='/shipment'){setCarrier('');setTracking('');setTrackingUrl('')}
     } catch (e) { setActionError(e instanceof Error ? e.message : 'İşlem yapılamadı.') }
     finally { writing.current=false;setBusy(false) }
   }
-  function open(id: string, button: HTMLButtonElement) { onClearRequested?.(); trigger.current = button; setSelectedId(id); setNotice('');setActionError(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
+  function open(id: string, button: HTMLButtonElement) { onClearRequested?.(); trigger.current = button; setSelectedId(id);setCloseBlocked(false); setNotice('');setActionError(''); setCarrier(''); setTracking(''); setTrackingUrl(''); setNote(''); dialog.current?.showModal() }
   function restoreFocus() { (trigger.current?.isConnected ? trigger.current : refreshButton.current)?.focus() }
-  function close() { directVersion.current++; onClearRequested?.(); dialog.current?.close(); restoreFocus() }
+  function mayLeave() {
+    if (writing.current || shippingActivity.current.busy) {
+      setCloseBlocked(true); return false
+    }
+    return !(note || carrier || tracking || trackingUrl || shippingActivity.current.dirty) || window.confirm('Kaydedilmemiş sipariş veya kargo bilgileri var. Değişiklikleri bırakıp ayrılmak istiyor musunuz?')
+  }
+  useEffect(()=>{
+    const navigate=(event:Event)=>{if(dialog.current?.open && !mayLeave())event.preventDefault()}
+    const unload=(event:BeforeUnloadEvent)=>{if(writing.current || shippingActivity.current.busy || note || carrier || tracking || trackingUrl || shippingActivity.current.dirty){event.preventDefault();event.returnValue=''}}
+    window.addEventListener('xinobi:before-navigation',navigate);window.addEventListener('beforeunload',unload)
+    return()=>{window.removeEventListener('xinobi:before-navigation',navigate);window.removeEventListener('beforeunload',unload)}
+  })
+  function close() { if(!mayLeave())return; directVersion.current++; onClearRequested?.(); dialog.current?.close(); setSelectedId(null);setNote('');setCarrier('');setTracking('');setTrackingUrl('');restoreFocus() }
   const order = selected?.order
   return <section aria-label="Sipariş listesi">
     <div className="order-filters"><label>Sipariş veya müşteri ara<input value={query} onChange={event => setQuery(event.target.value)} placeholder="Sipariş no, müşteri, e-posta, ürün" /></label><label htmlFor="order-status">Durum<select id="order-status" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Açık talep', ...Object.values(statusText)].map(item => <option key={item}>{item}</option>)}</select></label><label>Kişiselleştirme<select value={designFilter} onChange={e=>setDesignFilter(e.target.value)}>{[['all','Tümü'],['personalized','Kişiselleştirilmiş'],['ai','AI'],['upload','Yüklenen görsel']].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><button onClick={() => { setQuery(''); setStatus('Tümü');setDesignFilter('all') }}>Filtreleri temizle</button><button ref={refreshButton} onClick={load}>Yenile</button></div>
@@ -118,6 +137,7 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
       <header className="dialog-heading"><h2 id="order-detail-title">{order?.number ?? 'Sipariş'}</h2><button onClick={close} aria-label="Sipariş detayını kapat">×</button></header>
       {requestedOrderId && <div className="dialog-body">{directLoading && <p role="status">Sipariş detayı yükleniyor…</p>}{directError && <p role="alert">{directError} <button onClick={retryDirect}>Sipariş detayını tekrar dene</button></p>}{onBackToDesign && <button onClick={onBackToDesign}>Tasarım yönetimine dön</button>}</div>}
       {selected && order && <div className="dialog-body">
+        {closeBlocked&&(busy||shippingBusy)&&<p role="alert">İşlem sürüyor. Sonuç gelene kadar sipariş detayını açık tutun.</p>}
         {loading && <p role="status">Siparişler yükleniyor; işlemler geçici olarak kapalı.</p>}
         {optionsLoading && <p role="status">Sipariş seçenekleri yükleniyor…</p>}
         {error && <p role="alert">{error} <button onClick={load}>Siparişleri tekrar dene</button></p>}
@@ -129,19 +149,19 @@ export default function Orders({ requestedOrderId = '', onClearRequested, onBack
           {request.status === 'requested' && <div className="dialog-actions"><button disabled={actionsDisabled||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'approve', resolution: note || null }, request.type === 'cancel' ? 'Sipariş iptal edildi.' : 'İade onaylandı.')}>{request.type === 'cancel' ? 'İptali onayla' : 'İadeyi onayla'}</button><button disabled={actionsDisabled||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'reject', resolution: note || null }, 'Talep reddedildi.')}>Reddet</button></div>}
           {request.status === 'approved' && <div className="dialog-actions"><button disabled={actionsDisabled||!canCancel} onClick={() => void act(`/requests/${request.id}`, { decision: 'complete', resolution: note || null }, 'İade tamamlandı.')}>Ürün depoya ulaştı · iadeyi tamamla</button></div>}
         </div>)}
-        <SuratShipment key={order.id} orderId={order.id} canWrite={canWrite} eligible={(order.status==='received'||order.status==='preparing')&&!order.shipment&&!openRequests(order).some(r=>r.type==='cancel')} />
-        <label>Not (müşteriye iletilir, isteğe bağlı)<textarea rows={2} maxLength={500} value={note} onChange={event => setNote(event.target.value)} /></label>
+        <SuratShipment key={order.id} orderId={order.id} orderNumber={order.number} recipient={order.address.fullName} onActivityChange={onShippingActivity} canWrite={canWrite&&!busy} eligible={(order.status==='received'||order.status==='preparing')&&!order.shipment&&!openRequests(order).some(r=>r.type==='cancel')} />
+        <p>Not tek başına kaydedilmez; onayladığınız sipariş durum veya talep işlemiyle müşteriye iletilir.</p><label>Not (müşteriye iletilir, isteğe bağlı)<textarea disabled={busy} rows={2} maxLength={500} value={note} onChange={event => setNote(event.target.value)} /></label>
         {(order.status === 'received' || order.status === 'preparing') && <form className="catalog-form" onSubmit={event => { event.preventDefault(); void act('/shipment', { carrier, trackingNumber: tracking, trackingUrl: trackingUrl || null }, 'Sipariş kargoya verildi.') }}>
           <h3>Kargoya ver</h3>
-          <label>Kargo firması<select required value={carrier} onChange={event => setCarrier(event.target.value)}><option value="">Seç</option>{options?.carriers.map(item => <option key={item}>{item}</option>)}</select></label>
+          <fieldset disabled={busy||shippingBusy||!canWrite}><legend>Manuel kargo bilgileri</legend><label>Kargo firması<select required value={carrier} onChange={event => setCarrier(event.target.value)}><option value="">Seç</option>{options?.carriers.map(item => <option key={item}>{item}</option>)}</select></label>
           <label>Takip numarası<input required value={tracking} onChange={event => setTracking(event.target.value)} maxLength={40} /></label>
           <label>Takip bağlantısı (isteğe bağlı, https://)<input type="url" value={trackingUrl} onChange={event => setTrackingUrl(event.target.value)} maxLength={500} /></label>
-          <button disabled={actionsDisabled||!canWrite||optionsLoading||Boolean(optionsError)||!options}>Kargoya verildi olarak işaretle</button>
+          </fieldset><button disabled={actionsDisabled||!canWrite||optionsLoading||Boolean(optionsError)||!options}>Kargoya verildi olarak işaretle</button>
         </form>}
         <div className="dialog-actions">
           {order.status === 'received' && <button disabled={actionsDisabled||!canWrite} onClick={() => void act('/status', { status: 'preparing', note: note || null }, 'Sipariş hazırlanıyor.')}>Hazırlanmaya başla</button>}
           {order.status === 'shipped' && <button disabled={actionsDisabled||!canWrite} onClick={() => void act('/status', { status: 'delivered', note: note || null }, 'Sipariş teslim edildi.')}>Teslim edildi</button>}
-          {(order.status === 'received' || order.status === 'preparing') && <button disabled={actionsDisabled||!canWrite||!canCancel} onClick={() => { if (window.confirm(`${order.number} iptal edilsin mi?`)) void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.') }}>Siparişi iptal et</button>}
+          {(order.status === 'received' || order.status === 'preparing') && <button disabled={actionsDisabled||!canWrite||!canCancel} onClick={() => void act('/status', { status: 'cancelled', note: note || null }, 'Sipariş iptal edildi.')}>Siparişi iptal et</button>}
         </div>
         {actionError && <p role="alert">{actionError}</p>}{notice && <p role="status">{notice}</p>}
         <h3>Geçmiş</h3>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { commerceApi, commerceRequest, type CommerceState, type Product } from './commerce'
 import ContentEditor from './ContentEditor'
 import Dashboard from './Dashboard'
@@ -32,9 +32,11 @@ export default function App() {
 
   const [view, setView] = useState<View>(()=>initialView(location.search,can))
   const [requestedOrderId, setRequestedOrderId] = useState(()=>new URLSearchParams(location.search).get('orderId')||'')
-  useEffect(()=>{const url=new URL(location.href);url.searchParams.set('view',view);history.replaceState(history.state,'',url)},[view])
+  const currentUrl=useRef(location.href)
+  const mayNavigate=()=>window.dispatchEvent(new Event('xinobi:before-navigation',{cancelable:true}))
+  useEffect(()=>{const url=new URL(location.href);url.searchParams.set('view',view);history.replaceState(history.state,'',url);currentUrl.current=url.href},[view,requestedOrderId])
   useEffect(()=>{
-    const restore=()=>{setRequestedOrderId(new URLSearchParams(location.search).get('orderId')||'');setView(initialView(location.search,permission=>session?.permissions.includes(permission)??(import.meta.env.DEV&&import.meta.env.VITE_ADMIN_ACCESS==='off')))}
+    const restore=()=>{if(!mayNavigate()){history.replaceState(history.state,'',currentUrl.current);return}currentUrl.current=location.href;setRequestedOrderId(new URLSearchParams(location.search).get('orderId')||'');setView(initialView(location.search,permission=>session?.permissions.includes(permission)??(import.meta.env.DEV&&import.meta.env.VITE_ADMIN_ACCESS==='off')))}
     window.addEventListener('popstate',restore);return()=>window.removeEventListener('popstate',restore)
   },[session])
   const [products, setProducts] = useState<Product[]>([])
@@ -65,11 +67,11 @@ export default function App() {
   }
   const saveProduct = (product: Product) => persist(`/products/${encodeURIComponent(product.id)}`, 'PUT', product)
   function navigate(next:View){
-    if(!can(viewPermission[next])||next===view)return
+    if(!can(viewPermission[next])||next===view||!mayNavigate())return
     const url=new URL(location.href);url.searchParams.set('view',next);url.searchParams.delete('orderId');history.pushState(null,'',url);setRequestedOrderId('');setView(next)
   }
   function openDesignOrder(id:string){
-    if(!can('print.read')||!can('orders.read'))return
+    if(!can('print.read')||!can('orders.read')||!mayNavigate())return
     const url=new URL(location.href);url.searchParams.set('view','orders');url.searchParams.set('orderId',id)
     history.pushState({fromDesign:true},'',url);setRequestedOrderId(id);setView('orders')
   }

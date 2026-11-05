@@ -12,7 +12,7 @@ const registration={reference,state:'registered',message:'Gönderi kaydı alınd
 const order={accountId:'fixture',customerName:'Fixture',customerEmail:'fixture@example.invalid',order:{id:'ORDA',number:'SEC-SURAT',createdAt:'2026-11-03T09:00:00Z',status:'received',address:{title:'Test',fullName:'Test alıcı',phone:'+905550000000',line:'Test adres',district:'Test',city:'Test'},total:money,lines:[{productId:'P',variantId:'V',name:'Test ürün',color:'Test',quantity:1,unitPrice:money,lineTotal:money}],history:[],requests:[]}}
 async function fixture({write=true,existing=null,configured=true,malformed=false,createError=false,awaiting=false,delayed=false}={}){
  const context=await browser.newContext({viewport:{width:390,height:900}}),page=await context.newPage();let creates=0,labels=0,refreshes=0;let current=existing
- const failures=[];page.on('pageerror',e=>failures.push(e.message))
+ page.on('dialog',d=>d.accept());const failures=[];page.on('pageerror',e=>failures.push(e.message))
  await page.route('**/api/**',async route=>{
   const req=route.request(),path=new URL(req.url()).pathname,post=req.method()==='POST'
   if(path.endsWith('/admin/session'))return route.fulfill({json:{account:{name:'Test'},permissions:write?['orders.read','orders.write','integration.read']:['orders.read','integration.read']}})

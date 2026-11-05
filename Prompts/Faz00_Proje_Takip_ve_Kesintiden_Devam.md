@@ -735,3 +735,8 @@ Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSO
 ## 05.11.2026 — Admin UI/UX denetimi
 
 [TST-253](../test/2026-11-05/TST-253-admin-ux-audit.md): 20/20 izole admin test dosyası PASS; 64 responsive matris satırı, 48 boş/hata/yetki durumu. Sipariş/kargo odaklı denetimde 3 P1 ve 4 P2 bulgu; taslak kaybı, kritik onaylar ve varsayılan sağlayıcı teyidi öncelikli. Bu teslim denetim/önceliklendirme; uygulama düzeltmesi yapılmadı, gerçek veri/deploy yok. Rapor: `design/admin-ux-audit-2026-11-05.md`.
+
+
+## 05.11.2026 — UI/UX bulguları düzeltme turu
+
+[TST-254](../test/2026-11-05/TST-254-admin-ux-fixes.md): ADM-UX-01…07 için taslak/ayrılma ve busy koruması, kritik işlem özeti/onayı, tarafsız manuel teyit, readonly alanlar, dürüst etiket handoff mesajı ve ortak form düzeni uygulandı. Gerçek veri/sağlayıcı/deploy yok. SQL/IIS/manuel cihaz ve PM kabulü açık. Nihai test sonuçları raporda.

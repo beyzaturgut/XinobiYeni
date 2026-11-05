@@ -37,3 +37,8 @@ P1: sonraki düzeltme turunda önce ele alınmalı. P2: kullanım ve geri bildir
 5. Odaklı düzeltme regresyonu → yayın öncesi teknik kontroller → ayrıca yetkili deploy → canlı smoke ve PM kabulü.
 
 İlgili test kanıtı: test/2026-11-05/TST-253-admin-ux-audit.md. Gerçek işletme işlemlerine ve yeni üretim/baskı akışına geçilmedi.
+
+
+## 05.11.2026 — UI/UX bulguları düzeltme turu
+
+[TST-254](../test/2026-11-05/TST-254-admin-ux-fixes.md): ADM-UX-01…07 için taslak/ayrılma ve busy koruması, kritik işlem özeti/onayı, tarafsız manuel teyit, readonly alanlar, dürüst etiket handoff mesajı ve ortak form düzeni uygulandı. Gerçek veri/sağlayıcı/deploy yok. SQL/IIS/manuel cihaz ve PM kabulü açık. Nihai test sonuçları raporda.

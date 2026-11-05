@@ -730,3 +730,8 @@ Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSO
 ## 05.11.2026 — SIP-TAS-01…09 güncel regresyon
 
 [TST-252](../test/2026-11-05/TST-252-order-design-regression.md): 36 API PASS / 1 SQL SKIP / 0 FAIL; beş admin tarayıcı paketi, 21 dosya durumu ve 7 eski kayıt senaryosu, dört genişlik/%200 metin, admin build/lint geçti (4 eski lint uyarısı). Yeni uygulama kusuru bulunmadı; kod/veri değiştirilmedi. SQL/IIS/manuel cihaz ve PM kabulü açık; deploy yapılmadı.
+
+
+## 05.11.2026 — Admin UI/UX denetimi
+
+[TST-253](../test/2026-11-05/TST-253-admin-ux-audit.md): 20/20 izole admin test dosyası PASS; 64 responsive matris satırı, 48 boş/hata/yetki durumu. Sipariş/kargo odaklı denetimde 3 P1 ve 4 P2 bulgu; taslak kaybı, kritik onaylar ve varsayılan sağlayıcı teyidi öncelikli. Bu teslim denetim/önceliklendirme; uygulama düzeltmesi yapılmadı, gerçek veri/deploy yok. Rapor: `design/admin-ux-audit-2026-11-05.md`.

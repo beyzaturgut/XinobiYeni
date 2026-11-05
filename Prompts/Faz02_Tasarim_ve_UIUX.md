@@ -181,3 +181,8 @@ Her rol `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` karar/inceleme kaydına `Faz0
 | Proje Yöneticisi — son kapı | Altı inceleme, kaynak kapsamı, karar/blokaj ve teslim kanıtı tamam mı? | Bekliyor |
 
 **Kapanış:** Yedi satırın her biri kayıtlı `ONAY`, açık kararların ilgili uygulamayı bloke edip etmediği belirlenmiş ve PM ayrıca `Faz02 = TAMAMLANDI` olarak Faz00'ı güncellemişse sonraki bağımlı geliştirmeye geç. Gerçek Xinobi marka/onay veya yasal metin kararı gerekiyorsa ilgili iş sahibi ayrıca doğrular.
+
+
+## 05.11.2026 — Sipariş, tasarım dosyaları ve kargo UI/UX denetimi
+
+[Öncelikli bulgular](../design/admin-ux-audit-2026-11-05.md), [TST-253](../test/2026-11-05/TST-253-admin-ux-audit.md): 20/20 izole test paketi PASS. Taslak kaybı, kritik işlem onayı ve varsayılan manuel teyit P1; readonly alanlar/etiket mesajı/busy kapanışı/form tutarlılığı P2. Denetim tamam; düzeltme ve PM/cihaz/IIS kabulü açık. Uygulama değişmedi/deploy yok.

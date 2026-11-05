@@ -1,0 +1,21 @@
+[
+  {
+    "id": "UX-01",
+    "noteAfterReopen": "",
+    "confirmations": 0
+  },
+  {
+    "id": "UX-02",
+    "providerWrites": 1,
+    "confirmations": 0
+  },
+  {
+    "id": "UX-03",
+    "readonlyPackageFieldEditable": true,
+    "submitDisabled": true
+  },
+  {
+    "id": "UX-04",
+    "defaultResolution": "registered"
+  }
+]

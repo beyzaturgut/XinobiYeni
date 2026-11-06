@@ -162,6 +162,7 @@ builder.Services.TryAddSingleton<IVerificationEmailSender, UnavailableSecurityEm
 builder.Services.AddSingleton<AdminPasswordRecovery>();
 // Feature stores are registered everywhere so the contract lists the routes; outside Development they need Features:StorageProvider=SqlServer, else 503.
 builder.Services.AddSingleton<Xinobi.Api.Infrastructure.FeatureDocuments>();
+builder.Services.AddSingleton<Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore>();
 // Product media and customer designs: a local folder (Development data directory, or Storage:LocalRoot on a server); otherwise 503.
 builder.Services.AddSingleton<Xinobi.Api.Infrastructure.IFileStore>(services =>
     Xinobi.Api.Infrastructure.FileStorage.LocalRoot(builder.Environment, builder.Configuration) is { } fileRoot

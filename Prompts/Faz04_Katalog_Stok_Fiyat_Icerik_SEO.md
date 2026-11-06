@@ -182,3 +182,8 @@ Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizal
 ## 06.11.2026 — KIS-TEK-01 teknik model teslimi
 
 [ADR-005](../docs/decisions/ADR-005-personalization-single-source.md): ürün başına tek profil, değişmez kaynak/yüzey sürümü ve açık fulfillmentVariantId bağı tanımlandı. SKU/fiyat/stok aynı ürünün seçilen ticari varyantından; ilk varyant/fiyat fallback’i yok. Doğrudan kaynak yükleme, sabit tuval olmadan gerçek ölçü, maske eşliği ve üç sipariş dosyası korunumu tanımlandı. Teknik tanım tamam; işletmenin gerçek ürün/SKU ve fiyat kapsamı kabulü bekliyor, task tamamen kapalı değil. Task 02–12 başlanmadı. Kod/veri/deploy değişmedi.
+
+
+## 06.11.2026 — KIS-TEK-03 admin tek kaynak yönetimi
+
+Katalogda bağımsız kaynak seç/yükle/kaydet/indir alanı; renk/HEX bağımsızlığı, değişmez kaynak kopyası, revizyon çakışması, kaynak yok/hata/yetki/stale/başarı, taslak/ayrılma/çıkış koruması eklendi. Yeni kaynak mağazadaki önizlemeye henüz bağlanmıyor; maske ve web/Flutter/checkout 05–10’da, fotoğraf promptunu kaldırma 04’te açık. [Runbook](../docs/runbooks/personalization-source-management.md), [TST-258](../test/2026-11-06/TST-258-personalization-source-management.md). API 601 PASS/29 SKIP/0 FAIL; admin seri 23/23 paket, yeni alan responsive/klavye/axe PASS. Gerçek veri değişmedi; yerel servisler yenilendi; deploy/APK yok.

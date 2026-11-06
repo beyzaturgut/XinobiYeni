@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Yalnız inceleme ve planlama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03…12 açık. Uygulama, veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03 uygulandı; KIS-TEK-04…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -67,7 +67,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Kaynak yok, yükleniyor, hata, yetkisizlik, eski kaynak ve başarı ayrı görünür. Renk/HEX eksikliği kişiselleştirme kaynağı tanımlamayı engellemez. Kaynak değişimi eski sipariş dosyalarını yenilemez.
 
-**Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** 01,02 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** 01,02 · **Durum:** Uygulandı ve izole doğrulandı (06.11.2026).
+
+**Teslim:** [Kaynak yönetimi](../runbooks/personalization-source-management.md), [TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md). Yeni kaynak hazırlığı ayrı saklanır; gerçek ürün seçimi yapılmadı. Maske onayı ve web/Flutter geçişi 05–10 kapsamında açık; fotoğraf promptunu kaldırma 04 kapsamında açık.
 
 ### KIS-TEK-04 — Fotoğraf üretim promptunu kaldırma ve doğrudan kaynak yükleme
 

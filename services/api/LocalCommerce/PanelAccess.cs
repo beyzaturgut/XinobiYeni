@@ -15,7 +15,7 @@ public static class PanelAccess
 
     private static readonly Dictionary<string, string> Resources = new(StringComparer.Ordinal)
     {
-        ["state"] = "catalog", ["products"] = "catalog", ["categories"] = "catalog", ["surfaces"] = "catalog",
+        ["personalization-sources"] = "catalog", ["state"] = "catalog", ["products"] = "catalog", ["categories"] = "catalog", ["surfaces"] = "catalog",
         ["prices"] = "pricing", ["inventory"] = "inventory",
         ["content"] = "content", ["announcements"] = "content", ["reviews"] = "content",
         ["media"] = "media",

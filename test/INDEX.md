@@ -396,3 +396,8 @@
 ## 06.11.2026 — KIS-TEK-02
 
 [TST-257 — kişiselleştirme geçiş planı](2026-11-06/TST-257-personalization-migration-plan.md): salt okunur SQL envanteri, 7 ürün/boş kaynak-SKU seçimi, 526 dosya değişmezliği, tekrar çalışma eşliği, published 24/24 ve fixture 32/32 hash PASS. Sipariş manifestli 6 dosya PASS; yerel eksikler/asıl sunucu/restore/apply ayrı açık. Gerçek veriye yazma/deploy yok.
+
+
+## 06.11.2026 — KIS-TEK-03
+
+[TST-258 — admin tek kaynak yönetimi](2026-11-06/TST-258-personalization-source-management.md): API 601 PASS / 29 SKIP / 0 FAIL; admin seri 23/23 paket, kaynak alanı responsive/klavye/axe PASS; lint 0 hata/4 eski uyarı, TS/üretim build PASS. Immutable kaynak kopyası, revizyon, hata/yetki/stale ve taslak korumaları uygulandı. Gerçek veri/migration/deploy/APK yok; maske/müşteri akışı sonraki tasklar.

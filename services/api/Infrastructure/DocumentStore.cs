@@ -43,7 +43,7 @@ public sealed class FeatureDocuments(IWebHostEnvironment environment, IConfigura
 {
     public const string Marker = "features-sql.enabled";
     /// <summary>Every feature document, by its file under the data directory. The SQL name is the file name without extension.</summary>
-    public static readonly string[] Files = ["notifications/notifications.json", "reviews/reviews.json", "quotes/quotes.json", "designs/designs.json", "assistant/assistant.json", "print/print-profiles.json", "shipping/surat-shipments.json"];
+    public static readonly string[] Files = ["notifications/notifications.json", "reviews/reviews.json", "quotes/quotes.json", "designs/designs.json", "personalization/personalization-profiles.json", "assistant/assistant.json", "print/print-profiles.json", "shipping/surat-shipments.json"];
 
     public string? DataDirectory { get; } = environment.IsDevelopment()
         ? configuration["LocalCommerce:DataDirectory"] ?? Path.Combine(environment.ContentRootPath, "App_Data", "local-commerce")
@@ -54,15 +54,15 @@ public sealed class FeatureDocuments(IWebHostEnvironment environment, IConfigura
 
     public static string Name(string relativePath) => Path.GetFileNameWithoutExtension(relativePath);
 
-    public DocumentStore<T> Open<T>(string relativePath, Func<T> empty, string feature) where T : class =>
-        new(this, scopes, relativePath, empty, feature);
+    public DocumentStore<T> Open<T>(string relativePath, Func<T> empty, string feature, bool rejectNull = false) where T : class =>
+        new(this, scopes, relativePath, empty, feature, rejectNull);
 }
 
 /// <summary>
 /// One feature's state as a single JSON document: a file with an in-process lock and atomic replace (Development), or a row of
 /// <c>ops.FeatureDocuments</c> replaced in a transaction under an application lock, so several API processes stay consistent.
 /// </summary>
-public sealed class DocumentStore<T>(FeatureDocuments documents, IServiceScopeFactory scopes, string relativePath, Func<T> empty, string feature) where T : class
+public sealed class DocumentStore<T>(FeatureDocuments documents, IServiceScopeFactory scopes, string relativePath, Func<T> empty, string feature, bool rejectNull = false) where T : class
 {
     internal static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
     private readonly SemaphoreSlim gate = new(1, 1);
@@ -72,7 +72,7 @@ public sealed class DocumentStore<T>(FeatureDocuments documents, IServiceScopeFa
     public string Folder => Path.GetDirectoryName(FilePath)!;
     private string FilePath => Path.Combine(documents.DataDirectory ?? throw ProblemException.Unavailable(feature), relativePath);
 
-    private T Parse(string? json) => json is null ? empty() : JsonSerializer.Deserialize<T>(json, JsonOptions) ?? empty();
+    private T Parse(string? json) => json is null ? empty() : JsonSerializer.Deserialize<T>(json, JsonOptions) ?? (rejectNull ? throw ProblemException.Unavailable(feature) : empty());
 
     private async Task<T> ReadFile() => Parse(File.Exists(FilePath) ? await File.ReadAllTextAsync(FilePath) : null);
 

@@ -1,6 +1,7 @@
 import AdminDialog from './AdminDialog'
 import TableRegion from './TableRegion'
 import CatalogPhotoPrompt from './features/catalog/CatalogPhotoPrompt'
+import PersonalizationSource from './features/catalog/PersonalizationSource'
 import { hexForColour, knownColours } from './features/catalog/colour-palette'
 import { useMemo, useRef, useState, type FormEvent } from 'react'
 import { parseDecimal } from './pricing-model'
@@ -62,6 +63,7 @@ export default function Catalog({ products, prices, onPrice, categories = [], on
     {filtered.length===0&&<p role="status">{products.length?'Filtrelere uygun ürün yok.':'Katalogda ürün yok.'}</p>}
     <div className="catalog-summary">{[['Toplam ürün', products.length], ['Aktif', products.filter(product => product.active).length], ['Pasif', products.filter(product => !product.active).length], ['Stoksuz ürün', products.filter(product => product.variants.every(variant => variant.stock === 0)).length]].map(([label, value]) => <div key={label}><span>{label}</span><strong>{value}</strong></div>)}</div>
     <div className="order-filters"><label>Ürün veya SKU ara<input value={query} onChange={event => setQuery(event.target.value)} /></label><label>Kategori<select aria-label="Kategori filtresi" value={category} onChange={event => setCategory(event.target.value)}>{['Tümü', ...categories].map(item => <option key={item}>{item}</option>)}</select></label><label>Durum<select aria-label="Ürün durum filtresi" value={status} onChange={event => setStatus(event.target.value)}>{['Tümü', 'Aktif', 'Pasif', 'Stoksuz'].map(item => <option key={item}>{item}</option>)}</select></label><button onClick={() => { setQuery(''); setCategory('Tümü'); setStatus('Tümü') }}>Filtreleri temizle</button><button disabled={!canWrite} onClick={event => openCategories(event.currentTarget)}>Yeni kategori</button><button disabled={!canWrite} onClick={event => open({ id: `DEMO-${randomCommerceId()}`, name: '', category: categories[0] ?? '', active: false, description: '', seoTitle: '', variants: [] }, event.currentTarget)}>Yeni ürün</button></div>
+    <PersonalizationSource products={products}/>
     <details className="catalog-photo-prompt-launcher"><summary>XINOBI U · Katalog görseli promptu</summary>
       <label>Prompt hazırlanacak ürün<select value={products.some(product => product.id === promptProductId) ? promptProductId : products[0]?.id ?? ''} onChange={event => setPromptProductId(event.target.value)}>{products.map(product => <option key={product.id} value={product.id}>{product.name}</option>)}</select></label>
       {(() => { const product = products.find(item => item.id === promptProductId) ?? products[0]; return product ? <CatalogPhotoPrompt key={product.id} product={product} /> : <p>Yeni ürün ekleyip Medya bölümünden promptu hazırlayabilirsin.</p> })()}

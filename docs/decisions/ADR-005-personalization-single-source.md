@@ -112,3 +112,7 @@ Bunlar henüz alınmış sayılmaz; gerçek SKU ataması, katalog/stok/fiyat de�
 ## 06.11.2026 — KIS-TEK-02 alan anlamı düzeltmesi
 
 Kaynak kodun ayrıntılı incelemesi: mevcut MyDesignConfiguration.SourceSha256, SaveConfiguration içinde **müşterinin desen dosyasından** hesaplanıyor; ürün fotoğrafı hash’i değil. Yukarıdaki hedef modelde ürün kaynağı sourceSha256 ile desen patternSha256 ayrı tutulacak. Eski SourceSha256 alanı ve sipariş değeri ürün fotoğrafı hash’i olarak dönüştürülmeyecek. ProductSource dosyasının hash’i mevcut sipariş manifestinde ayrıca bulunur. [Geçiş planı](../reports/personalization-migration-plan-2026-11-06.md).
+
+## 06.11.2026 — KIS-TEK-03 uygulama kaydı
+
+[Admin kaynak yönetimi](../runbooks/personalization-source-management.md) yeni personalization-profiles belgesinde schemaVersion=1/profiles[productId]/profileRevision/sources[] ile kaynak hazırlığını uyguladı. Bu, yukarıdaki hedef modelin kaynak alt kümesidir; ticari bağ, maske ve müşteri sözleşmesi henüz tamamlanmadı. Renklerden bağımsız kaydetme, gerçek ölçü/hash, immutable kaynak kopyası, revizyon çakışması ve eski siparişleri koruma mevcut. Gerçek veri taşınmadı.

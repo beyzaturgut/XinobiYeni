@@ -219,3 +219,8 @@ Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizal
 ## 06.11.2026 — KIS-TEK-02 salt okunur envanter ve geçiş planı
 
 [Envanter/plan](../docs/reports/personalization-migration-plan-2026-11-06.md): SQL 24 ürün/79 varyant/39 tasarım/19 revizyon; 7 kişiselleştirilebilir ürünün kaynak ve SKU seçimleri boş bırakıldı. 2 taslak ve 8 published önizleme güncel varyantlardan kopuk. 28 tasarım dosyası yerelde yok; IIS kaybı diye yorumlanmaz. Manifestli 2 sipariş satırında 6 dosya hash/boyut PASS; 7 legacy satır korunur. Eski SourceSha256 desen hash’idir; ürün kaynağı hash’ine dönüştürülmeyecek. Task 02 planlama tamam; seçim, restore/apply ve IIS karşı kontrolü yapılmadı. Gerçek veriye yazma/deploy yok.
+
+
+## 06.11.2026 — KIS-TEK-03 admin tek kaynak yönetimi
+
+Katalogda bağımsız kaynak seç/yükle/kaydet/indir alanı; renk/HEX bağımsızlığı, değişmez kaynak kopyası, revizyon çakışması, kaynak yok/hata/yetki/stale/başarı, taslak/ayrılma/çıkış koruması eklendi. Yeni kaynak mağazadaki önizlemeye henüz bağlanmıyor; maske ve web/Flutter/checkout 05–10’da, fotoğraf promptunu kaldırma 04’te açık. [Runbook](../docs/runbooks/personalization-source-management.md), [TST-258](../test/2026-11-06/TST-258-personalization-source-management.md). API 601 PASS/29 SKIP/0 FAIL; admin seri 23/23 paket, yeni alan responsive/klavye/axe PASS. Gerçek veri değişmedi; yerel servisler yenilendi; deploy/APK yok.

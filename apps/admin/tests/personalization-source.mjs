@@ -1,0 +1,121 @@
+// All API/media requests are synthetic and intercepted. No real account or catalogue writes.
+import assert from 'node:assert/strict'
+import {createRequire} from 'node:module'
+import {readFileSync} from 'node:fs'
+import {mkdir} from 'node:fs/promises'
+import {createHash} from 'node:crypto'
+import {mockPanel,permissions,store,product as original} from './consistency-fixtures.mjs'
+const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
+const browser=await chromium.launch({channel:'chrome',headless:true})
+const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5173/'
+const output=process.env.ADMIN_CONSISTENCY_OUTPUT||'/tmp/xinobi-source-ui'
+await mkdir(output,{recursive:true})
+const bytes=readFileSync(new URL('../public/assets/banners/slider-1.png',import.meta.url))
+const sha=createHash('sha256').update(bytes).digest('hex'),image='/api/v1/local-commerce/media/'+'a'.repeat(32)+'.png'
+const asset={image,sha256:sha,mime:'image/png',bytes:bytes.length,width:73,height:41}
+const product={...original,personalizable:true,variants:[{...original.variants[0],color:'',hex:'',image}]}
+const other={...product,id:'UI-P2',name:'İkinci izole ürün',variants:[]}
+async function fixture({write=true,mode='none',holdSave=false}={}){
+ const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage()
+ let current={productId:product.id,revision:0,status:'none',source:null,surfaceStatus:'none'},writes=0,uploads=0,failure=false,malformed=false
+ let releaseSave;const saveGate=new Promise(resolve=>{releaseSave=resolve})
+ let releaseLoad;const gate=new Promise(resolve=>{releaseLoad=resolve})
+ await mockPanel(page,{permissions:[...permissions.filter(p=>p!=='catalog.write'),...(write?['catalog.write','media.write']:[])],handler:async(route,path)=>{
+  const req=route.request()
+  if(path.endsWith('/state')){await route.fulfill({json:{...store,products:[product,other]}});return true}
+  if(path.includes('/local-commerce/media/')){await route.fulfill({contentType:'image/png',body:bytes});return true}
+  if(path.endsWith('/local-commerce/media')&&req.method()==='POST'){uploads++;await route.fulfill({json:{src:'/api/v1/local-commerce/media/'+'c'.repeat(32)+'.png'}});return true}
+  if(path.includes('/personalization-sources/')){
+   if(path.endsWith('/candidate')){await route.fulfill({json:{...asset,image:new URL(req.url()).searchParams.get('image')}});return true}
+   if(req.method()==='PUT'){
+    writes++;if(holdSave)await saveGate
+    assert.equal(req.postDataJSON().expectedRevision,current.revision)
+    assert.equal(req.postDataJSON().sourceSha256,sha)
+    if(failure){await route.fulfill({status:503,json:{message:'İzole kayıt hatası'}});return true}
+    if(malformed){await route.fulfill({json:{}});return true}
+    current={...current,revision:current.revision+1,status:'ready',source:asset,surfaceStatus:'pending'}
+    await route.fulfill({json:current});return true
+   }
+   if(mode==='loading')await gate
+   if(mode==='error'){await route.fulfill({status:503,json:{message:'İzole kaynak servisi hatası'}});return true}
+   if(mode==='denied'){await route.fulfill({status:403,json:{}});return true}
+   if(mode==='malformed'){await route.fulfill({json:[]});return true}
+   if(mode==='stale')current={...current,revision:1,status:'stale',source:asset,surfaceStatus:'pending'}
+   await route.fulfill({json:current});return true
+  }
+  return false
+ }})
+ await page.goto(base+'?view=catalog')
+ await page.locator('.personalization-source summary').click()
+ return {page,get writes(){return writes},get uploads(){return uploads},setMode:value=>{mode=value},releaseLoad,releaseSave,fail:value=>{failure=value},malformed:value=>{malformed=value}}
+}
+try{
+ const f=await fixture({mode:'loading'}),p=f.page
+ await p.getByText('Kaynak fotoğraf yükleniyor…',{exact:true}).waitFor();f.setMode('none');f.releaseLoad()
+ await p.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor()
+ await p.getByLabel('Mevcut katalog fotoğrafını kullan').selectOption(image)
+ await p.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ p.once('dialog',d=>d.dismiss());await p.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click();assert.equal(f.writes,0)
+ p.once('dialog',d=>d.dismiss());await p.getByLabel('Kaynak fotoğrafı yönetilecek ürün').selectOption(other.id)
+ assert.equal(await p.getByLabel('Kaynak fotoğrafı yönetilecek ürün').inputValue(),product.id)
+ p.once('dialog',d=>d.dismiss());assert.equal(await p.evaluate(()=>window.dispatchEvent(new Event('xinobi:before-navigation',{cancelable:true}))),false)
+ p.once('dialog',d=>d.dismiss());await p.getByRole('button',{name:'Çıkış yap',exact:true}).click();assert.equal(f.writes,0)
+ f.fail(true);p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click()
+ await p.getByRole('alert').filter({hasText:'İzole kayıt hatası'}).waitFor()
+ await p.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor();assert.equal(f.writes,1)
+ f.fail(false);f.malformed(true);p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click()
+ await p.getByRole('alert').filter({hasText:'geçerli durum bilgisi'}).waitFor();assert.equal(f.writes,2)
+ f.malformed(false);p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click()
+ await p.getByText('Kaynak fotoğraf kaydedildi. Bu kaynak için maske onayı bekleniyor; eski sipariş dosyaları korunuyor.',{exact:true}).waitFor();assert.equal(f.writes,3)
+ assert.equal(await p.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).isDisabled(),true)
+ assert.equal(await p.evaluate(()=>window.dispatchEvent(new Event('xinobi:before-navigation',{cancelable:true}))),true)
+ const scan=await new AxeBuilder({page:p}).include('.personalization-source').withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze()
+ assert.deepEqual(scan.violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>v.id),[])
+ await p.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).focus();await p.keyboard.press('Tab')
+ assert.equal(await p.getByRole('button',{name:'Güncel kaydı yükle',exact:true}).evaluate(e=>e===document.activeElement),true)
+ const download=p.waitForEvent('download');await p.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).click();await download
+ await p.getByText('Kaynak fotoğraf indirme için tarayıcıya verildi.',{exact:true}).waitFor()
+ for(const width of [320,390,768,1440]){
+  await p.setViewportSize({width,height:1000})
+  assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Viewport overflow '+width)
+ }
+ await p.setViewportSize({width:320,height:1100});await p.addStyleTag({content:'html{font-size:200%}.personalization-source{font-size:200%}'})
+ assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'200% text overflow')
+ await p.screenshot({path:output+'/single-source-320-2x.png',fullPage:true})
+ await p.close()
+ for(const mode of ['error','denied','malformed']){
+  const x=await fixture({mode}),page=x.page
+  await page.locator('.personalization-source [role=alert]').waitFor()
+  assert.equal(await page.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).count(),0)
+  x.setMode('none');await page.getByRole('button',{name:'Güncel kaydı yükle',exact:true}).click()
+  await page.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor();assert.equal(x.writes,0);await page.close()
+ }
+ const readonly=await fixture({write:false,mode:'stale'})
+ await readonly.page.getByText(/Kayıtlı kaynak dosya değişmiş/).waitFor()
+ assert.equal(await readonly.page.getByLabel('Mevcut katalog fotoğrafını kullan').isDisabled(),true)
+ assert.equal(await readonly.page.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).isDisabled(),true)
+ assert.equal(readonly.writes,0);await readonly.page.close()
+ const repair=await fixture({mode:'stale'})
+ await repair.page.getByText(/Kayıtlı kaynak dosya değişmiş/).waitFor()
+ await repair.page.getByLabel('Tek kaynak fotoğraf yükle').setInputFiles({name:'same-bytes-repair.png',mimeType:'image/png',buffer:bytes})
+ await repair.page.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ assert.equal(await repair.page.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).isEnabled(),true)
+ await repair.page.close()
+ const busyFixture=await fixture({holdSave:true}),bp=busyFixture.page
+ await bp.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor()
+ await bp.getByLabel('Mevcut katalog fotoğrafını kullan').selectOption(image)
+ await bp.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ bp.once('dialog',d=>d.accept());await bp.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click()
+ await bp.getByText('Kaynak işlemi sürüyor; tamamlanmasını bekleyin.',{exact:true}).waitFor()
+ assert.equal(await bp.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).isDisabled(),true)
+ assert.equal(await bp.evaluate(()=>window.dispatchEvent(new Event('xinobi:before-navigation',{cancelable:true}))),false)
+ assert.equal(busyFixture.writes,1);busyFixture.releaseSave()
+ await bp.getByText('Kaynak fotoğraf kaydedildi. Bu kaynak için maske onayı bekleniyor; eski sipariş dosyaları korunuyor.',{exact:true}).waitFor();await bp.close()
+ const upload=await fixture()
+ await upload.page.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor()
+ await upload.page.getByLabel('Tek kaynak fotoğraf yükle').setInputFiles({name:'any-size.png',mimeType:'image/png',buffer:bytes})
+ await upload.page.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ assert.equal(upload.uploads,1);assert.equal(upload.writes,0)
+ await upload.page.screenshot({path:output+'/single-source-1440.png',fullPage:true});await upload.page.close()
+ console.log('PASS single-source load/empty/error/denied/stale/success, malformed success, confirmations/dirty guard, raw upload, download, responsive + 200%')
+}finally{await browser.close()}

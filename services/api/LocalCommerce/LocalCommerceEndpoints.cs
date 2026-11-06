@@ -62,6 +62,9 @@ public static class LocalCommerceEndpoints
         var group = app.Environment.IsDevelopment() ? PanelGroup(app)
             : app.Configuration.GetValue<bool>("AdminCatalog:Enabled") ? CreatePanelGroup(app, development: false) : null;
         if (group is null) return;
+        group.MapGet("/personalization-sources/{productId}", async (string productId, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.Get(productId)));
+        group.MapGet("/personalization-sources/{productId}/candidate", async (string productId, string image, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.Candidate(productId, image)));
+        group.MapPut("/personalization-sources/{productId}", async (string productId, Xinobi.Api.Features.ProductSurfaces.SavePersonalizationSource request, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.Save(productId, request)));
         // The local storefront reads the catalog from here in Development; it holds no personal data.
         var stateEndpoint = group.MapGet("/state", async (HttpContext http, LocalCommerceStore store) =>
         {

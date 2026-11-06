@@ -1,186 +1,128 @@
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
+import {createPortal} from 'react-dom'
 import {useAdminSession} from '../../AdminAccess'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
-import { commerceApi, mediaUrl } from '../../commerce'
-import { refreshAdminSession } from '../../admin-api'
+import {commerceApi,commerceRequest,mediaUrl} from '../../commerce'
 import MaskPrompt from './MaskPrompt'
-import { sourceChecksum } from './source-checksum'
+import {sourceChecksum} from './source-checksum'
 import './surface-masks.css'
 
-// Admin masking for every product colour (/api/v1/local-commerce/surfaces): upload a WebP mask, check it, approve it for same-placement colours.
-type Status = 'none' | 'draft' | 'approved' | 'stale'
-type Summary = { productId: string; productName: string; variantId: string; color: string; image: string; status: Status; draftUpdatedAt: string | null }
-type Draft = { image: string; method: string; updatedAt: string }
-type Color = { variantId: string; color: string; image: string; width: number; height: number }
-type Detail = { productId: string; productName: string; variantId: string; color: string; image: string; width: number; height: number; status: Status; approvedMask: string | null; draft: Draft | null; colors: Color[]; sourceSha256: string }
+type Status='none'|'draft'|'approved'|'stale'
+type Source={image:string;sha256:string;mime:string;bytes:number;width:number;height:number}
+type Mask={id:string;image:string;sha256:string;method:string;sourceRevision:number;sourceSha256:string}
+type Detail={productId:string;productName:string;profileRevision:number;sourceRevision:number;sourceStatus:'none'|'ready'|'stale';source:Source|null;status:Status;draft:Mask|null;approved:Mask|null}
+type Activity={dirty:boolean;busy:boolean}
+const root='/surfaces/products'
+const asset=(path:string)=>path.startsWith('/api/v1/local-commerce/')?commerceApi.replace(/\/api\/v1\/local-commerce\/?$/,'')+path:mediaUrl(path,commerceApi,'http://127.0.0.1:3000')
+const text:Record<Status,string>={none:'Maske yok',draft:'Taslak',approved:'Onaylı',stale:'Eski kaynak'}
+const problem=(value:unknown)=>value instanceof Error?value.message:'Maske işlemi tamamlanamadı.'
+function checked(value:Detail):Detail{
+ if(!value||typeof value.productId!=='string'||typeof value.productName!=='string'||!Number.isInteger(value.profileRevision)||!Number.isInteger(value.sourceRevision)||!['none','ready','stale'].includes(value.sourceStatus)||!Object.hasOwn(text,value.status)||value.sourceStatus!=='none'&&(!value.source||value.source.width<1||value.source.height<1||!/^[a-f0-9]{64}$/.test(value.source.sha256)))throw new Error('Yüzey servisinden geçerli kayıt alınamadı.')
+ if(value.profileRevision<0||value.sourceRevision<0||value.sourceStatus==='none'&&value.source!==null||value.draft===undefined||value.approved===undefined||value.status==='draft'&&!value.draft||value.status==='approved'&&!value.approved)throw new Error('Yüzey kaydının kaynak/maske durumu doğrulanamadı.')
+ for(const mask of [value.draft,value.approved])if(mask&&(typeof mask.id!=='string'||!mask.id||typeof mask.image!=='string'||!mask.image.startsWith('/api/v1/local-commerce/surfaces/products/')||!/^[a-f0-9]{64}$/.test(mask.sha256)||mask.sourceRevision!==value.sourceRevision||mask.sourceSha256!==value.source?.sha256))throw new Error('Maske bu kaynağa ait değil veya doğrulanamadı.')
+ return value
+}
+function list(value:Detail[]):Detail[]{if(!Array.isArray(value))throw new Error('Ürün yüzeyleri listesi okunamadı.');return value.map(checked)}
 
-const root = `${commerceApi}/surfaces`
-const asset = (path: string) => mediaUrl(path, commerceApi, 'http://127.0.0.1:3000')
-const statusText: Record<Status, string> = { none: 'Maske yok', draft: 'Taslak', approved: 'Onaylı', stale: 'Eski fotoğraf' }
-const methodText: Record<string, string> = { 'webp-alpha': 'WebP (şeffaflık)', 'webp-luminance': 'WebP (siyah-beyaz)', 'png-alpha': 'Şeffaflık', 'png-luminance': 'Siyah-beyaz', approved: 'Onaylı maske' }
-
-async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
-  const send = () => fetch(root + path, { method, credentials: 'include', headers: body === undefined ? { 'X-Xinobi-Csrf': '1' } : { 'Content-Type': 'application/json', 'X-Xinobi-Csrf': '1' }, body: body === undefined ? undefined : JSON.stringify(body) })
-  let response = await send()
-  if (response.status === 401 && await refreshAdminSession()) response = await send()
-  if (response.status === 401) throw new Error('Yönetici oturumun sona erdi. Paneli başka sekmede açıp yeniden giriş yap; ardından burada tekrar dene.')
-  if (response.status === 403) throw new Error('Bu hesapla ürün yüzeyini değiştirme yetkin yok.')
-  const payload = await response.json().catch(() => ({}))
-  if (!response.ok) throw new Error(payload.message || `Yüzey servisi hata verdi (${response.status}).`)
-  return payload as T
+export default function SurfaceMasks(){
+ const [items,setItems]=useState<Detail[]>([]),[selected,setSelected]=useState(''),[filter,setFilter]=useState('all'),[query,setQuery]=useState('')
+ const [loading,setLoading]=useState(true),[error,setError]=useState(''),[side,setSide]=useState<HTMLDivElement|null>(null)
+ const activity=useRef<Activity>({dirty:false,busy:false})
+ const onActivity=useCallback((next:Activity)=>{activity.current=next},[])
+ const refresh=useCallback(async()=>{
+  setLoading(true);setError('')
+  try{setItems(list(await commerceRequest<Detail[]>(commerceApi,root)))}catch(error){setError(problem(error))}finally{setLoading(false)}
+ },[])
+ useEffect(()=>{let active=true;async function initial(){try{const value=list(await commerceRequest<Detail[]>(commerceApi,root));if(active)setItems(value)}catch(error){if(active)setError(problem(error))}finally{if(active)setLoading(false)}}void initial();return()=>{active=false}},[])
+ const shown=(loading||error?[]:items).filter(item=>(filter==='all'||item.status===filter)&&item.productName.toLocaleLowerCase('tr').includes(query.toLocaleLowerCase('tr')))
+ const counts=(status:string)=>items.filter(item=>item.status===status).length
+ function select(id:string){if(activity.current.busy||activity.current.dirty&&!window.confirm('Kaydedilmemiş maske veya prompt değişikliği silinsin mi?'))return;setSelected(id)}
+ return <section className="surface-masks" aria-label="Ürün yüzey maskeleri">
+  <div className="surface-side"><aside className="surface-list">
+   <p className="surface-intro">Her XINOBI U ürünü tek kaynak fotoğrafla çalışır. Kaynağı katalogda kaydet, WebP maskeyi bu fotoğraf üzerinde kontrol edip onayla.</p>
+   <label>Ürün ara<input value={query} onChange={event=>setQuery(event.target.value)}/></label>
+   <div className="surface-filters" role="group" aria-label="Durum filtresi">{['all','none','draft','approved','stale'].map(status=><button key={status} aria-pressed={filter===status} onClick={()=>setFilter(status)}>{status==='all'?`Tümü${loading||error?'':` (${items.length})`}`:`${text[status as Status]}${loading||error?'':` (${counts(status)})`}`}</button>)}</div>
+   {loading&&<p role="status">Ürün yüzeyleri yükleniyor…</p>}{error&&<p role="alert" className="surface-error">{error} <button onClick={()=>void refresh()}>Tekrar dene</button></p>}
+   {!loading&&!error&&!shown.length&&<p className="surface-empty">Listelenecek XINOBI U ürünü yok.</p>}
+   {shown.map(item=><button key={item.productId} className="surface-row" aria-current={selected===item.productId?'true':undefined} onClick={()=>select(item.productId)}>
+    {item.source?<img src={asset(item.source.image)} alt=""/>:<span aria-hidden="true">—</span>}<span>{item.productName}</span><em data-status={item.status}>{item.sourceStatus==='none'?'Kaynak yok':text[item.status]}</em></button>)}
+  </aside><div ref={setSide} className="surface-side-tools"/></div>
+  {selected?<Editor key={selected} side={side} productId={selected} onChanged={refresh} onActivity={onActivity}/>:<p className="surface-empty">Soldan bir ürün seç.</p>}
+ </section>
 }
 
-async function loadAlpha(url: string, width: number, height: number) {
-  const image = new Image(); image.crossOrigin = url.includes('/surfaces/') ? 'use-credentials' : 'anonymous'; image.src = url; await image.decode()
-  if (image.naturalWidth !== width || image.naturalHeight !== height) throw new Error('Maske fotoğrafla aynı boyutta değil.')
-  const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height
-  const context = canvas.getContext('2d', { willReadFrequently: true })!
-  context.drawImage(image, 0, 0)
-  return context.getImageData(0, 0, width, height)
-}
-
-export default function SurfaceMasks() {
-  const [items, setItems] = useState<Summary[]>([]), [filter, setFilter] = useState<'all' | Status>('all'), [query, setQuery] = useState('')
-  const [selected, setSelected] = useState<{ productId: string; variantId: string } | null>(null)
-  const [loading,setLoading]=useState(true)
-  const [error, setError] = useState(''), [sideSlot, setSideSlot] = useState<HTMLDivElement | null>(null)
-  const refresh = useCallback(async () => { setLoading(true);setError('');try { setItems(await request<Summary[]>('')); setError('') } catch (problem) { setError(problem instanceof Error ? problem.message : 'Liste yüklenemedi.') }finally{setLoading(false)} }, [])
-  useEffect(() => { void refresh() }, [refresh])
-  const shown = (loading||error?[]:items).filter(item => (filter === 'all' || item.status === filter) && (`${item.productName} ${item.color}`).toLocaleLowerCase('tr-TR').includes(query.toLocaleLowerCase('tr-TR')))
-  const groups = shown.reduce<Record<string, Summary[]>>((all, item) => ({ ...all, [item.productId]: [...(all[item.productId] ?? []), item] }), {})
-  const counts = items.reduce<Record<Status, number>>((all, item) => ({ ...all, [item.status]: all[item.status] + 1 }), { none: 0, draft: 0, approved: 0, stale: 0 })
-  return <section className="surface-masks" aria-label="Ürün yüzey maskeleri">
-    <div className="surface-side"><aside className="surface-list">
-      <p className="surface-intro">Yalnız XINOBI U işaretli ürünler listelenir. Referans renkte WebP maske yükle; aynı tuvalde ve aynı konumda çekilmiş renklere tek onayla uygula.</p>
-      <label>Ürün veya renk ara<input value={query} onChange={event => setQuery(event.target.value)} /></label>
-      <div className="surface-filters" role="group" aria-label="Durum filtresi">{(['all', 'none', 'draft', 'approved', 'stale'] as const).map(value => <button key={value} aria-pressed={filter === value} onClick={() => setFilter(value)}>{value === 'all' ? `Tümü${loading||error?'':` (${items.length})`}` : `${statusText[value]}${loading||error?'':` (${counts[value]})`}`}</button>)}</div>
-      {loading&&<p role="status">Ürün yüzeyleri yükleniyor…</p>}{error && <p role="alert" className="surface-error">{error} <button onClick={()=>void refresh()}>Tekrar dene</button></p>}
-      {!loading && !error && shown.length === 0 && <p className="surface-empty">Listelenecek XINOBI U ürünü veya rengi yok.</p>}
-      {Object.entries(groups).map(([productId, variants]) => <div key={productId} className="surface-group"><strong>{variants[0].productName}</strong>
-        {variants.map(item => <button key={item.variantId} className="surface-row" aria-current={selected?.variantId === item.variantId ? 'true' : undefined} onClick={() => setSelected({ productId, variantId: item.variantId })}>
-          <img src={asset(item.image)} alt="" /><span>{item.color}</span><em data-status={item.status}>{statusText[item.status]}</em></button>)}
-      </div>)}
-    </aside><div ref={setSideSlot} className="surface-side-tools" /></div>
-    {selected ? <SurfaceEditor key={selected.variantId} productId={selected.productId} variantId={selected.variantId} onChanged={refresh} side={sideSlot} /> : <p className="surface-empty">Soldan bir ürün rengi seç.</p>}
-  </section>
-}
-
-/** <c>side</c>: the slot under the product list that holds the source download and the mask prompt. */
-function SurfaceEditor({ productId, variantId, onChanged, side }: { productId: string; variantId: string; onChanged: () => void; side: HTMLElement | null }) {
-  const canWrite=useAdminSession()?.permissions.includes('catalog.write')??false
-  const path = `/${encodeURIComponent(productId)}/${encodeURIComponent(variantId)}`
-  const [detail, setDetail] = useState<Detail | null>(null), [busy, setBusy] = useState(''), [error, setError] = useState(''), [notice, setNotice] = useState('')
-  const [base, setBase] = useState<ImageData | null>(null), [showing, setShowing] = useState<'draft' | 'approved'>('draft')
-  const canvas = useRef<HTMLCanvasElement>(null)
-  const [webpMode, setWebpMode] = useState('alpha'), [webpFile, setWebpFile] = useState<File | null>(null)
-  const [patternPreview, setPatternPreview] = useState(false), [previewColor, setPreviewColor] = useState(variantId)
-  const [colors, setColors] = useState<string[]>([variantId]), [samePlacement, setSamePlacement] = useState(false)
-
-  const busyRef = useRef(false)
-  const run = useCallback(async (label: string, action: () => Promise<Detail>, done?: string) => {
-    if (busyRef.current || (done && !canWrite)) return
-    busyRef.current = true
-    setBusy(label); setError(''); setNotice(''); setShowing('draft')
-    try { setDetail(await action()); setSamePlacement(false); if (done) setNotice(done); onChanged() }
-    catch (problem) { setError(problem instanceof Error ? problem.message : 'İşlem tamamlanamadı.') }
-    finally { busyRef.current = false; setBusy('') }
-  }, [onChanged,canWrite])
-  useEffect(() => { void run('Yükleniyor…', () => request<Detail>(path)) }, [path, run])
-
-  // The mask on show: the draft when there is one (or the admin chose it), otherwise the approved mask.
-  const view = detail?.draft && (showing === 'draft' || !detail.approvedMask) ? 'draft' : detail?.approvedMask ? 'approved' : null
-  const maskUrl = !detail || !view ? null : view === 'draft' ? `${root}${path}/draft.webp?v=${encodeURIComponent(detail.draft!.updatedAt)}` : asset(detail.approvedMask!)
-  useEffect(() => {
-    let cancelled = false
-    if (!detail) return
-    if (!maskUrl) { setBase(new ImageData(detail.width, detail.height)); return }
-    loadAlpha(maskUrl, detail.width, detail.height).then(data => { if (!cancelled) setBase(data) }).catch(() => { if (!cancelled) setError('Maske yüklenemedi.') })
-    return () => { cancelled = true }
-  }, [maskUrl, detail])
-
-  // Pink (or sample pattern) overlay of the mask; the photo itself is never altered.
-  const overlay = useMemo(() => {
-    if (!base || !detail) return null
-    const data = new Uint8ClampedArray(base.data)
-    for (let i = 0; i < data.length; i += 4) { const tile = Math.max(8, Math.round(detail.width / 24))
-      const light = (Math.floor((i / 4 % detail.width) / tile) + Math.floor(Math.floor(i / 4 / detail.width) / tile)) % 2 === 0
-      data[i] = patternPreview ? light ? 250 : 30 : 220; data[i + 1] = patternPreview ? light ? 200 : 90 : 40; data[i + 2] = patternPreview ? light ? 90 : 160 : 130; data[i + 3] = Math.round(data[i + 3] * (patternPreview ? .85 : .5)) }
-    return new ImageData(data, detail.width, detail.height)
-  }, [base, detail, patternPreview])
-  useEffect(() => { if (overlay && canvas.current) canvas.current.getContext('2d')!.putImageData(overlay, 0, 0) }, [overlay])
-
-  async function downloadSource() {
-    if (!detail || busyRef.current) return
-    busyRef.current = true; setBusy('Kaynak fotoğraf indiriliyor…'); setError('')
-    try {
-      const response = await fetch(asset(detail.image), { credentials: 'include', cache: 'no-store' })
-      if (!response.ok) throw new Error('Kaynak fotoğraf indirilemedi.')
-      const blob = await response.blob()
-      if (await sourceChecksum(await blob.arrayBuffer()) !== detail.sourceSha256)
-        throw new Error('Kaynak fotoğraf değişti; ürünü yeniden seçin.')
-      const url = URL.createObjectURL(blob), link = document.createElement('a')
-      const extension = blob.type.includes('webp') ? 'webp' : blob.type.includes('png') ? 'png' : 'jpg'
-      link.href = url; link.download = `maske-kaynagi-${detail.width}x${detail.height}.${extension}`
-      document.body.append(link); link.click(); link.remove()
-      setTimeout(() => URL.revokeObjectURL(url), 10000)
-      setNotice('Panelde kullanılan kaynak fotoğraf indirildi. Maskeyi bu tuval üzerinde, kırpmadan ve ürünü taşımadan hazırlayın.')
-    } catch (problem) { setError(problem instanceof Error ? problem.message : 'Kaynak fotoğraf indirilemedi.') }
-    finally { busyRef.current = false; setBusy('') }
+function Editor({productId,side,onChanged,onActivity}:{productId:string;side:HTMLElement|null;onChanged:()=>void;onActivity:(value:Activity)=>void}){
+ const canWrite=useAdminSession()?.permissions.includes('catalog.write')??false
+ const path=root+'/'+encodeURIComponent(productId)
+ const [detail,setDetail]=useState<Detail|null>(null),[busy,setBusy]=useState('Yükleniyor…'),[error,setError]=useState(''),[notice,setNotice]=useState('')
+ const [file,setFile]=useState<File|null>(null),[mode,setMode]=useState('alpha'),[pattern,setPattern]=useState(false),[showDraft,setShowDraft]=useState(true),[promptEdited,setPromptEdited]=useState(false)
+ const [pixels,setPixels]=useState<ImageData|null>(null),[decodedKey,setDecodedKey]=useState(''),[loadedSource,setLoadedSource]=useState(''),[sourceAttempt,setSourceAttempt]=useState(0)
+ const input=useRef<HTMLInputElement>(null),canvas=useRef<HTMLCanvasElement>(null),lock=useRef(false),alive=useRef(true),current=useRef<Activity>({dirty:false,busy:true})
+ useEffect(()=>{alive.current=true;return()=>{alive.current=false;onActivity({dirty:false,busy:false})}},[onActivity])
+ useEffect(()=>{const value={dirty:!!file||promptEdited,busy:!!busy};current.current=value;onActivity(value)},[file,promptEdited,busy,onActivity])
+ useEffect(()=>{const navigate=(event:Event)=>{if(current.current.busy||current.current.dirty&&!window.confirm('Kaydedilmemiş maske veya prompt değişikliği silinsin mi?'))event.preventDefault()};const unload=(event:BeforeUnloadEvent)=>{if(current.current.busy||current.current.dirty){event.preventDefault();event.returnValue=''}};window.addEventListener('xinobi:before-navigation',navigate);window.addEventListener('beforeunload',unload);return()=>{window.removeEventListener('xinobi:before-navigation',navigate);window.removeEventListener('beforeunload',unload)}},[])
+ useEffect(()=>{let active=true;lock.current=true;async function initial(){try{const value=checked(await commerceRequest<Detail>(commerceApi,path));if(active)setDetail(value)}catch(error){if(active)setError(problem(error))}finally{if(active){lock.current=false;setBusy('')}}}void initial();return()=>{active=false}},[path])
+ async function run(action:()=>Promise<Detail>,success='',reset=false,accept?:(value:Detail)=>boolean){
+  if(lock.current||success&&!canWrite)return
+  lock.current=true;setBusy('İşlem sürüyor…');setError('');setNotice('')
+  try{const value=checked(await action());if(value.productId!==productId)throw new Error('Yüzey kaydı başka ürüne ait.');if(success&&(value.sourceRevision!==detail?.sourceRevision||accept&&!accept(value))){if(alive.current){setDetail(value);onChanged()}throw new Error('Kaynak veya maske sonucu değişti; güncel kaydı inceleyin.')}if(alive.current){const changed=value.sourceRevision!==detail?.sourceRevision;setDetail(value);if(reset||changed){setFile(null);if(input.current)input.current.value=''};if(changed)setPromptEdited(false);setShowDraft(true);if(reset&&!success){setLoadedSource('');setSourceAttempt(n=>n+1)}if(success)setNotice(success);onChanged()}}
+  catch(error){if(alive.current)setError(problem(error))}finally{lock.current=false;if(alive.current)setBusy('')}
+ }
+ const source=detail?.source,mask=detail&&(showDraft?detail.draft??detail.approved:detail.approved??detail.draft)
+ const sourceKey=source?source.sha256+':'+detail?.sourceRevision:''
+ const photoReady=!!sourceKey&&loadedSource===sourceKey
+ const maskKey=mask&&source?mask.id+':'+source.sha256:''
+ const maskReady=!!maskKey&&decodedKey===maskKey&&!!pixels
+ useEffect(()=>{
+  let active=true
+  async function decode(){
+   if(!mask||!source)return
+   try{
+    const blob=await commerceRequest<Blob>(commerceApi,mask.image.replace(/^\/api\/v1\/local-commerce/,''),'GET',undefined,'blob');if(await sourceChecksum(await blob.arrayBuffer())!==mask.sha256)throw new Error('Maske dosyası doğrulanamadı.')
+    const url=URL.createObjectURL(blob)
+    try{const image=new Image();image.src=url;await image.decode();if(image.naturalWidth!==source.width||image.naturalHeight!==source.height)throw new Error('Maske kaynak fotoğrafla aynı boyutta değil.')
+     const preview=document.createElement('canvas');preview.width=source.width;preview.height=source.height;const context=preview.getContext('2d',{willReadFrequently:true});if(!context)throw new Error('Maske önizlemesi açılamadı.');context.drawImage(image,0,0);const data=context.getImageData(0,0,source.width,source.height);if(active){setPixels(data);setDecodedKey(mask.id+':'+source.sha256)}}finally{URL.revokeObjectURL(url)}
+   }catch(error){if(active){setPixels(null);setDecodedKey('');setError(problem(error))}}
   }
-
-  if (!detail) return <div className="surface-editor"><p role={error?"alert":"status"}>{busy || error}</p>{error&&<button onClick={()=>void run('Yükleniyor…',()=>request<Detail>(path))}>Yüzeyi tekrar dene</button>}</div>
-  const previewed = detail.colors.find(color => color.variantId === previewColor)
-  return <div className="surface-editor">
-    <header><div><h2>{detail.productName}</h2><p>{detail.color} · {detail.width}×{detail.height} px · <em data-status={detail.status}>{statusText[detail.status]}</em></p></div>
-      {detail.draft && detail.approvedMask && <div className="surface-toggle" role="group" aria-label="Gösterilen maske"><button aria-pressed={view === 'draft'} onClick={() => setShowing('draft')}>Taslak</button><button aria-pressed={view === 'approved'} onClick={() => setShowing('approved')}>Onaylı</button></div>}</header>
-    {side && createPortal(<>
-      <button type="button" className="surface-source-download" disabled={!!busy} onClick={() => void downloadSource()}>Maskeleme için kaynak fotoğrafı indir</button>
-      <MaskPrompt key={detail.sourceSha256} source={{ productName: detail.productName, color: detail.color, productId, variantId, width: detail.width, height: detail.height, sourceSha256: detail.sourceSha256 }} disabled={!!busy} />
-    </>, side)}
-    {detail.status === 'stale' && <p className="surface-warning">Bu rengin fotoğrafı onaydan sonra değişti; eski maske vitrinde kullanılmıyor. Yeni fotoğraf için maskeyi yeniden hazırla.</p>}
-    {previewColor !== variantId && <p role="status">Ortak maskeyi {previewed?.color} fotoğrafında inceliyorsun. Maske kenarları bu renkte de ürünle örtüşmeli.</p>}
-    <div className="surface-workspace">
-      <div className="surface-stage">
-        <img src={asset(previewed?.image ?? detail.image)} alt={`${detail.productName}, ${previewed?.color ?? detail.color}`} draggable={false} />
-        <canvas ref={canvas} width={detail.width} height={detail.height} aria-hidden="true" />
-        {busy && <div className="surface-busy" role="status">{busy}</div>}
-      </div>
-      <div className="surface-tools">
-        <div className="surface-panel">
-          <h3>WebP maske yükle</h3>{!canWrite&&<p role="status">Maske işlemleri salt okunur. Değişiklik için katalog yazma yetkisi gerekir.</p>}<p>Fotoğrafla aynı boyutta ({detail.width}×{detail.height}) WebP seç. Şeffaf maskede dolu alanlar, siyah-beyaz maskede beyaz alanlar desen alır.</p>
-          <label>Maske WebP dosyası<input type="file" accept="image/webp,.webp" disabled={!!busy||!canWrite} onChange={event => setWebpFile(event.target.files?.[0] ?? null)} /></label>
-          <label>WebP maske türü<select value={webpMode} disabled={!!busy} onChange={event => setWebpMode(event.target.value)}><option value="alpha">Şeffaf WebP — dolu alanları kullan</option><option value="luminance">Siyah-beyaz — beyaz alanları kullan</option></select></label>
-          <button className="primary" disabled={!!busy || !canWrite || !webpFile} onClick={() => void run('WebP yükleniyor…', async () => {
-            if (!/\.webp$/i.test(webpFile!.name) || (webpFile!.type && webpFile!.type !== 'image/webp')) throw new Error('Yalnız WebP maske dosyası yükleyebilirsin.')
-            if (webpFile!.size > 8 * 1024 * 1024) throw new Error('WebP en fazla 8 MB olabilir.')
-            const webpBase64 = await new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result).split(',')[1]); reader.onerror = () => reject(new Error('Dosya okunamadı.')); reader.readAsDataURL(webpFile!) })
-            return request<Detail>(`${path}/mask`, 'POST', { image: detail.image, sourceSha256: detail.sourceSha256, webpBase64, mode: webpMode })
-          }, 'WebP taslağı hazır. Ürün üzerinde kontrol edip renklerde onaylayabilirsin.')}>WebP maskeyi taslağa yükle</button>
-        </div>
-        <div className="surface-panel">
-          <label><input type="checkbox" checked={patternPreview} onChange={event => setPatternPreview(event.target.checked)} />Maske içinde örnek desen göster</label>
-          <label>Önizleme rengi<select value={previewColor} disabled={!!busy} onChange={event => setPreviewColor(event.target.value)}>{detail.colors.filter(color => color.width === detail.width && color.height === detail.height).map(color => <option key={color.variantId} value={color.variantId}>{color.color}</option>)}</select></label>
-          <p>Örnek desen yalnızca maskenin kapladığı alanı gösterir. Fiziksel baskı çıktısı değildir.</p>
-          <h3>Ortak maske uygulanacak renkler</h3>
-          <p>Her rengi Önizleme renginden açıp kontrol et. Yalnız referansla aynı boyutta ve aynı konumda çekilmiş renkler seçilebilir. Seçilen renklerin mevcut maskeleri güncellenir.</p>
-          {detail.colors.map(color => {
-            const compatible = color.width === detail.width && color.height === detail.height
-            return <label key={color.variantId}><input type="checkbox" checked={colors.includes(color.variantId)} disabled={!!busy || color.variantId === variantId || !compatible} onChange={event => setColors(current => event.target.checked ? [...current, color.variantId] : current.filter(id => id !== color.variantId))} />
-              <img src={asset(color.image)} alt="" width={48} height={64} style={{ objectFit: 'contain' }} />{color.color}{!compatible && ' · Görsel boyutu farklı / okunamadı'}</label>
-          })}
-          <label><input type="checkbox" checked={samePlacement} disabled={!!busy} onChange={event => setSamePlacement(event.target.checked)} />Seçtiğim her rengi kontrol ettim; ürün aynı konumda, maske kenarları ile logo/kulp alanları doğru.</label>
-          <button className="approve" disabled={!!busy || !canWrite || !detail.draft || !samePlacement} onClick={() => run('Renklere uygulanıyor…', () => request<Detail>(`${path}/approval/colors`, 'POST', { colors: detail.colors.filter(color => colors.includes(color.variantId)), samePlacementConfirmed: samePlacement, expectedDraftUpdatedAt: detail.draft!.updatedAt }), 'Ortak maske seçilen renklerde onaylandı.')}>Seçilen renklerde onayla</button>
-        </div>
-        {detail.draft && <a className="surface-mask-download" href={`${root}${path}/draft.webp?v=${encodeURIComponent(detail.draft.updatedAt)}`} download="surface-mask.webp" target="_blank" rel="noreferrer">Taslak WebP maskeyi aç / indir</a>}
-        {detail.draft && <dl className="surface-facts"><dt>Taslak</dt><dd>{methodText[detail.draft.method] ?? detail.draft.method}</dd></dl>}
-        {error && <p role="alert" className="surface-error">{error}</p>}
-        {notice && <p role="status" className="surface-ok">{notice}</p>}
-        <div className="surface-decisions">
-          <button className="approve" disabled={!!busy || !canWrite || !detail.draft} onClick={() => run('Onaylanıyor…', () => request<Detail>(`${path}/approval`, 'POST'), 'Maske onaylandı. Müşteri tasarımı bu renkte yalnız bu bölgeye uygulanır.')}>Taslağı onayla</button>
-          {detail.draft && <button disabled={!!busy||!canWrite} onClick={() => run('Siliniyor…', () => request<Detail>(`${path}/draft`, 'DELETE'), 'Taslak silindi.')}>Taslağı sil</button>}
-          {(detail.status === 'approved' || detail.status === 'stale') && <button className="danger" disabled={!!busy||!canWrite} onClick={() => { if (window.confirm('Onaylı maske kaldırılsın mı? Vitrin bu renkte genel önizlemeye döner.')) void run('Kaldırılıyor…', () => request<Detail>(`${path}/approval`, 'DELETE'), 'Onay kaldırıldı.') }}>Onayı kaldır</button>}
-        </div>
-      </div>
-    </div>
-  </div>
+  void decode();return()=>{active=false}
+ },[mask,source])
+ const overlay=useMemo(()=>{if(!pixels||!source||!maskReady)return null;const data=new Uint8ClampedArray(pixels.data),tile=Math.max(8,Math.round(source.width/24));for(let i=0;i<data.length;i+=4){const light=(Math.floor(i/4%source.width/tile)+Math.floor(Math.floor(i/4/source.width)/tile))%2===0;data[i]=pattern?(light?250:30):220;data[i+1]=pattern?(light?200:90):40;data[i+2]=pattern?(light?90:160):130;data[i+3]=Math.round(data[i+3]*(pattern?.85:.5))}return new ImageData(data,source.width,source.height)},[pixels,source,pattern,maskReady])
+ useEffect(()=>{const context=canvas.current?.getContext('2d');if(context&&canvas.current){context.clearRect(0,0,canvas.current.width,canvas.current.height);if(overlay)context.putImageData(overlay,0,0)}},[overlay])
+ async function download(){
+  if(!source||lock.current)return
+  lock.current=true;setBusy('Kaynak indiriliyor…');setError('');setNotice('')
+  try{const response=await fetch(asset(source.image),{credentials:'include',cache:'no-store'});if(!response.ok)throw new Error('Kaynak fotoğraf indirilemedi.');const blob=await response.blob();if(await sourceChecksum(await blob.arrayBuffer())!==source.sha256)throw new Error('Kaynak fotoğraf değişti. Güncel kaydı yükleyin.');const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=`maske-kaynagi-${source.width}x${source.height}.${source.mime==='image/jpeg'?'jpg':source.mime==='image/png'?'png':'webp'}`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);setNotice('Kaynak fotoğraf indirme için tarayıcıya verildi.')}catch(error){setError(problem(error))}finally{lock.current=false;setBusy('')}
+ }
+ async function exportDraft(){
+  if(lock.current||!detail?.draft||!source)return
+  lock.current=true;setBusy('WebP indiriliyor…');setError('');setNotice('')
+  try{const blob=await commerceRequest<Blob>(commerceApi,`${path}/draft.webp?sourceRevision=${detail.sourceRevision}&maskId=${encodeURIComponent(detail.draft.id)}`,'GET',undefined,'blob');const head=new Uint8Array(await blob.slice(0,12).arrayBuffer());if(head.length!==12||new TextDecoder().decode(head.subarray(0,4))!=='RIFF'||new TextDecoder().decode(head.subarray(8,12))!=='WEBP')throw new Error('Geçerli WebP dosyası alınamadı.');const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=`surface-mask-${source.width}x${source.height}.webp`;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);setNotice('WebP maske indirme için tarayıcıya verildi.')}catch(error){setError(problem(error))}finally{lock.current=false;setBusy('')}
+ }
+ const action=()=>({expectedRevision:detail!.profileRevision,sourceRevision:detail!.sourceRevision,sourceSha256:source!.sha256,draftId:detail!.draft?.id})
+ const usable=!!source&&detail?.sourceStatus==='ready'
+ return <div className="surface-editor">
+  {detail&&<header><div><h2>{detail.productName}</h2><p>Kaynak sürümü {detail.sourceRevision} · {source?`${source.width}×${source.height} px`:'Kaynak fotoğraf yok'} · {text[detail.status]}</p></div></header>}
+  {detail&&!usable&&<p role="alert" className="surface-warning">{source?'Kaynak fotoğraf değişmiş veya kayıp. Eski maske yeni kaynağa uygulanmaz.':'Bu ürünün tek kaynak fotoğrafı henüz kaydedilmedi.'} <a href="?view=catalog">Katalogdan kaynak fotoğrafı yönet</a></p>}
+  {detail?.status==='stale'&&usable&&<p role="status" className="surface-warning">Kaynak değişti. Önceki maske korunuyor ancak bu fotoğrafa uygulanmıyor. Yeni maske yükleyin.</p>}
+  {usable&&source&&detail&&<>
+   {side&&createPortal(<><button className="surface-source-download" disabled={!!busy} onClick={()=>void download()}>Maskeleme için kaynak fotoğrafı indir</button>
+   <MaskPrompt key={source.sha256+'-'+detail.sourceRevision} source={{productName:detail.productName,productId,sourceRevision:detail.sourceRevision,width:source.width,height:source.height,sourceSha256:source.sha256}} disabled={!!busy} onEdited={()=>setPromptEdited(true)}/></>,side)}
+   <div className="surface-workspace"><div className="surface-stage"><img key={sourceKey+sourceAttempt} src={asset(source.image)} alt={detail.productName} draggable={false} onLoad={()=>setLoadedSource(sourceKey)} onError={()=>{setLoadedSource('');setError('Kaynak fotoğraf önizlemesi açılamadı. Güncel kaydı yükleyip tekrar deneyin.')}}/><canvas key={maskKey+detail.sourceRevision} ref={canvas} width={source.width} height={source.height} aria-hidden="true"/>{busy&&<div role="status" className="surface-busy">{busy}</div>}</div>
+    <div className="surface-tools"><div className="surface-panel"><h3>WebP maske yükle</h3>{!canWrite&&<p role="status">Maske işlemleri salt okunur. Değişiklik için katalog yazma yetkisi gerekir.</p>}
+     <p>Fotoğrafla aynı boyutta ({source.width}×{source.height}) WebP seç. Şeffaf maskede dolu, siyah-beyaz maskede beyaz alanlar desen alır.</p>
+     <label>Maske WebP dosyası<input ref={input} type="file" accept="image/webp,.webp" disabled={!!busy||!canWrite} onChange={event=>setFile(event.target.files?.[0]??null)}/></label>
+     {file&&<p role="status">Seçili dosya: {file.name}</p>}
+     <label>WebP maske türü<select value={mode} disabled={!!busy||!canWrite} onChange={event=>setMode(event.target.value)}><option value="alpha">Şeffaf WebP — dolu alanları kullan</option><option value="luminance">Siyah-beyaz — beyaz alanları kullan</option></select></label>
+     <button className="primary" disabled={!!busy||!canWrite||!file||!photoReady} onClick={()=>void run(async()=>{if(!file||!/\.webp$/i.test(file.name)||file.type&&file.type!=='image/webp'||file.size===0||file.size>8*1024*1024)throw new Error('En fazla 8 MB WebP maske seçin.');const base64=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=()=>reject(new Error('Dosya okunamadı.'));reader.readAsDataURL(file)});return commerceRequest<Detail>(commerceApi,path+'/mask','POST',{...action(),image:source.image,webpBase64:base64,mode})},'Maske taslağı kaydedildi. Kaynak üzerinde inceleyip onaylayın.',true,value=>!!value.draft)}>WebP maskeyi taslağa yükle</button>
+    </div><div className="surface-panel"><label><input type="checkbox" checked={pattern} disabled={!maskReady} onChange={event=>setPattern(event.target.checked)}/>Maske içinde örnek desen göster</label><p>Örnek desen yalnızca maskenin alanını gösterir; fiziksel baskı çıktısı değildir.</p>
+     {detail.draft&&detail.approved&&<div className="surface-toggle" role="group" aria-label="Gösterilen maske"><button aria-pressed={showDraft} onClick={()=>setShowDraft(true)}>Taslak</button><button aria-pressed={!showDraft} onClick={()=>setShowDraft(false)}>Onaylı</button></div>}
+     {detail.draft&&<button className="surface-mask-download" disabled={!!busy} onClick={()=>void exportDraft()}>Taslak WebP maskeyi aç / indir</button>}
+    </div><div className="surface-decisions">
+     <button className="approve" disabled={!!busy||!canWrite||!detail.draft||!maskReady||!photoReady||!showDraft} onClick={()=>{if(window.confirm('Bu kaynak fotoğraf için maske onaylansın mı? Logo, kulp ve sınırları kontrol ettiğinizden emin olun.'))void run(()=>commerceRequest<Detail>(commerceApi,path+'/approval','POST',action()),'Maske bu kaynak için onaylandı. Mağazadaki mevcut önizleme değiştirilmedi.',false,value=>value.approved?.id===detail.draft?.id)}}>Taslağı onayla</button>
+     {detail.draft&&<button disabled={!!busy||!canWrite} onClick={()=>{if(window.confirm('Bu kaynağın taslağı kaldırılsın mı?'))void run(()=>commerceRequest<Detail>(commerceApi,path+'/draft','DELETE',action()),'Taslak kaldırıldı.',false,value=>!value.draft)}}>Taslağı sil</button>}
+     {detail.approved&&<button className="danger" disabled={!!busy||!canWrite} onClick={()=>{if(window.confirm('Bu kaynağın maske onayı kaldırılsın mı? Eski sipariş dosyaları korunur.'))void run(()=>commerceRequest<Detail>(commerceApi,path+'/approval','DELETE',action()),'Onay kaldırıldı.',false,value=>!value.approved)}}>Onayı kaldır</button>}
+    </div></div></div>
+  </>}
+  {busy&&!usable&&<p role="status">{busy}</p>}{error&&<p role="alert" className="surface-error">{error}</p>}{notice&&<p role="status" className="surface-ok">{notice}</p>}
+  <button disabled={!!busy} onClick={()=>{if(current.current.dirty&&!window.confirm('Kaydedilmemiş maske veya prompt değişikliği silinsin mi?'))return;void run(()=>commerceRequest<Detail>(commerceApi,path),'',true)}}>Güncel kaydı yükle</button>
+ </div>
 }

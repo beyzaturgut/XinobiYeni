@@ -44,8 +44,19 @@ public static class ProductSurfaceEndpoints
             http.Response.Headers.CacheControl = "no-store";
             try { return await next(context); }
             catch (SurfaceException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Status); }
+            catch (Xinobi.Api.Infrastructure.ProblemException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Status); }
         });
 
+        // Single-source Admin workspace. Legacy variant reads remain for historical/public consumers until task 06.
+        group.MapGet("/products", async (PersonalizationSourceStore sources) => Results.Ok(await sources.ListMasks()));
+        group.MapGet("/products/{productId}", async (string productId, PersonalizationSourceStore sources) => Results.Ok(await sources.GetMask(productId)));
+        group.MapPost("/products/{productId}/mask", async (string productId, SingleSourceMaskUpload request, PersonalizationSourceStore sources) => Results.Ok(await sources.UploadMask(productId, request)));
+        group.MapPost("/products/{productId}/approval", async (string productId, SingleSourceMaskAction request, PersonalizationSourceStore sources) => Results.Ok(await sources.MaskAction(productId, request, "approve")));
+        group.MapDelete("/products/{productId}/approval", async (string productId, [Microsoft.AspNetCore.Mvc.FromBody] SingleSourceMaskAction request, PersonalizationSourceStore sources) => Results.Ok(await sources.MaskAction(productId, request, "revoke")));
+        group.MapDelete("/products/{productId}/draft", async (string productId, [Microsoft.AspNetCore.Mvc.FromBody] SingleSourceMaskAction request, PersonalizationSourceStore sources) => Results.Ok(await sources.MaskAction(productId, request, "discard")));
+        group.MapGet("/products/{productId}/masks/{maskId}.png", async (string productId, string maskId, PersonalizationSourceStore sources) => Results.File(await sources.MaskImage(productId, maskId), "image/png"));
+        group.MapGet("/products/{productId}/draft.webp", async (string productId, int sourceRevision, string maskId, PersonalizationSourceStore sources) =>
+            Results.File(await sources.DownloadDraft(productId, sourceRevision, maskId), "image/webp", "surface-mask.webp"));
         group.MapGet("", async (ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.List()));
         group.MapGet("/{productId}/{variantId}", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Detail(productId, variantId)));
         group.MapGet("/{productId}/{variantId}/draft.png", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) =>

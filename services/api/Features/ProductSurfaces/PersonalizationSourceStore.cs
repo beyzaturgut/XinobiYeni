@@ -8,12 +8,12 @@ namespace Xinobi.Api.Features.ProductSurfaces;
 
 public sealed record PersonalizationSourceAsset(string Image, string Sha256, string Mime, long Bytes, int Width, int Height);
 public sealed record PersonalizationSourceRevision(int Revision, PersonalizationSourceAsset Asset, DateTimeOffset CreatedAt);
-public sealed record PersonalizationSourceProfile(string ProductId, int ProfileRevision, PersonalizationSourceRevision[] Sources);
-public sealed record PersonalizationSourceView(string ProductId, int Revision, string Status, PersonalizationSourceAsset? Source, string SurfaceStatus);
+public sealed record PersonalizationSourceProfile(string ProductId, int ProfileRevision, PersonalizationSourceRevision[] Sources, PersonalizationMask[]? Masks = null, string? DraftId = null, string? ApprovedId = null);
+public sealed record PersonalizationSourceView(string ProductId, int Revision, string Status, PersonalizationSourceAsset? Source, string SurfaceStatus, int SourceRevision = 0);
 public sealed record SavePersonalizationSource(string Image, string SourceSha256, int ExpectedRevision);
 
 /// <summary>Admin-only source staging. Does not replace variant masks or mutate historical designs/orders.</summary>
-public sealed class PersonalizationSourceStore(FeatureDocuments documents, LocalCommerceStore catalog, IFileStore files,
+public sealed partial class PersonalizationSourceStore(FeatureDocuments documents, LocalCommerceStore catalog, IFileStore files,
     IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
 {
     private sealed record State(int SchemaVersion, Dictionary<string, PersonalizationSourceProfile> Profiles);
@@ -75,10 +75,12 @@ public sealed class PersonalizationSourceStore(FeatureDocuments documents, Local
         try
         {
             var current = (await Inspect(source.Image)).Asset;
-            return new(productId, profile.ProfileRevision, current.Sha256 == source.Sha256 ? "ready" : "stale", source, "pending");
+            var approved = CurrentMask(profile, profile.ApprovedId);
+            if (current.Sha256 == source.Sha256 && approved is not null) await MaskBytes(approved);
+            return new(productId, profile.ProfileRevision, current.Sha256 == source.Sha256 ? "ready" : "stale", source, current.Sha256 == source.Sha256 && approved is not null ? "approved" : "pending", profile.Sources.Last().Revision);
         }
         catch (ProblemException error) when (error.Code is "source_missing" or "invalid_source")
-        { return new(productId, profile.ProfileRevision, "stale", source, "pending"); }
+        { return new(productId, profile.ProfileRevision, "stale", source, "pending", profile.Sources.Last().Revision); }
     }
 
     public async Task<PersonalizationSourceView> Save(string productId, SavePersonalizationSource request)
@@ -103,9 +105,9 @@ public sealed class PersonalizationSourceStore(FeatureDocuments documents, Local
                 throw new ProblemException("source_revision_conflict", "Kaynak başka bir işlemde değişti. Güncel kaydı yükleyip yeniden inceleyin.", 409);
             var revision = (current?.ProfileRevision ?? 0) + 1;
             var history = (current?.Sources ?? []).Append(new PersonalizationSourceRevision(revision, savedAsset, clock.GetUtcNow())).ToArray();
-            state.Profiles[productId] = new(productId, revision, history);
+            state.Profiles[productId] = current is null ? new(productId, revision, history) : current with { ProfileRevision = revision, Sources = history };
             return true;
         });
-        return new(productId, request.ExpectedRevision + 1, "ready", savedAsset, "pending");
+        return new(productId, request.ExpectedRevision + 1, "ready", savedAsset, "pending", request.ExpectedRevision + 1);
     }
 }

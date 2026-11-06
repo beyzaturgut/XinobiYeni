@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03 ve 04 uygulandı; KIS-TEK-05…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04 ve 05 uygulandı; KIS-TEK-06…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -91,7 +91,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Prompt her kaynak için doğru gerçek ölçüyü gösterir; fotoğraf üretimi veya başka renge uygulama istemez. Maske kendi kaynağıyla aynı boyut/koordinattadır; farklı boyutta maske reddedilir. Sabit bir kaynak çözünürlüğü zorunluluğu yoktur. Kaynak değişince ölçü/prompt güncellenir; eski maske yeni kaynağa sessizce uygulanmaz. Çoklu görsel seçimi ve renkler arası hizalama ekranı bulunmaz.
 
-**Faz:** Faz06 · **Öncelik:** P1 · **Bağımlılık:** 01,03,04 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz06 · **Öncelik:** P1 · **Bağımlılık:** 01,03,04 · **Durum:** Admin tek kaynak maskeleme uygulandı ve izole doğrulandı (06.11.2026).
+
+**Teslim:** [Tek kaynak maskeleme](../runbooks/single-source-masking.md), [TST-261](../../test/2026-11-06/TST-261-single-source-masking.md). Renk/toplu onay UI’sı kaldırıldı; tek kaynak sürümüne taslak/onay/indirme çalışır. Eski API yazma rotalarının kapatılması, public yayın/istemci sözleşmesi ve 20 MP decoder bütçesi 06’da açık. Müşteri akışı veya fiziksel baskı kabulü değildir.
 
 ### KIS-TEK-06 — Yüzey API ve yayınlamayı dinamik boyutlu tek kaynağa taşıma
 

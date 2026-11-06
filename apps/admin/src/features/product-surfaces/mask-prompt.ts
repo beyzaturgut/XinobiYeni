@@ -1,5 +1,5 @@
 export type MaskPromptSource = {
-  productName: string; color: string; productId: string; variantId: string;
+  productName: string; color?: string; productId: string; variantId?: string; sourceRevision?: number;
   width: number; height: number; sourceSha256: string;
 }
 
@@ -11,8 +11,7 @@ export function buildMaskPrompt(source: MaskPromptSource, target: string) {
 
 KAYNAK GÖRSELE AİT OTOMATİK BİLGİLER
 Ürün: ${JSON.stringify(source.productName)}
-Seçili renk: ${JSON.stringify(source.color)}
-Ürün / varyant kimliği: ${source.productId} / ${source.variantId}
+${source.variantId ? `Seçili renk: ${JSON.stringify(source.color)}\nÜrün / varyant kimliği: ${source.productId} / ${source.variantId}` : `Ürün kimliği: ${source.productId}\nKaynak sürümü: ${source.sourceRevision}`}
 Kaynak dosyanın piksel genişliği: ${width}
 Kaynak dosyanın piksel yüksekliği: ${height}
 Tam tuval: ${width} × ${height} piksel (genişlik × yükseklik).

@@ -1,5 +1,7 @@
 # WebP ürün yüzey maskesi
 
+> **06.11.2026:** Admin artık ürün başına kaydedilen tek kaynak fotoğrafla çalışır. Güncel adımlar ve yeni ürün bazlı API: [tek kaynak maskeleme](single-source-masking.md). Aşağıdaki renk/varyant ve toplu onay açıklamaları eski akışın tarihsel/uyumluluk kaydıdır; yeni ekranın kullanım talimatı değildir.
+
 Ürün yüzeyleri ekranı yalnız açıkça XINOBI U işaretlenmiş ürünleri listeler.
 
 1. Bir ürün rengi seç, kaynak fotoğrafı indir ve maskeleme promptuyla birlikte kullan.

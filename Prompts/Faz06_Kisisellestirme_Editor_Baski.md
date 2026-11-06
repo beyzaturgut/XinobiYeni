@@ -234,3 +234,8 @@ Katalog ana ekranı ve Medya sekmesindeki fotoğraf üretim promptu; üretici/MA
 ## 06.11.2026 — Kullanıcı isteğiyle KIS-TEK-03/04 tekrar kontrolü
 
 3. task 191c45a, 4. task fc668e7 içinde mevcut. Yeniden incelemede katalog yenilenmesinin kaydedilmemiş kaynak seçimini farklı ürüne geçirip kaybettirebildiği bulundu ve düzeltildi: seçim ürün kimliğine sabitlendi; işaret kaldırılır/silinirse taslak korunur, kayıt kapanır. Yeniden açılınca devam edilir. 4. taskın iki prompt girişi yokluğu ve 5001×3730 PNG tam bayt yükleme/indirmesi yeniden PASS. [TST-260](../test/2026-11-06/TST-260-source-task03-04-recheck.md). Gerçek veri/deploy yok; 5. taska geçilmedi.
+
+
+## 06.11.2026 — KIS-TEK-05 tek kaynak maskeleme
+
+Ürün başına tek kaynak/sürümle maske yükleme, taslak, tek onay, geri alma ve gerçek WebP indirme uygulandı. Renk önizlemesi, ortak renk listesi, aynı konum kutusu ve toplu onay UI’dan kaldırıldı. Promptun maskeleme kuralları korundu; gerçek kaynak boyutu/hash/sürümü kullanılır. Kaynak değişimi eski maskeyi uygulamaz; geçmiş dosyalar korunur. [Runbook](../docs/runbooks/single-source-masking.md), [TST-261](../test/2026-11-06/TST-261-single-source-masking.md). API 607 PASS/29 SKIP; yeni maske tarayıcı paketi ve admin durum regresyonu PASS. Eski yazma rotaları/public yayın/istemci uyumu ve 20 MP bütçe 06’da açık. Gerçek veri/AI/deploy/APK yok.

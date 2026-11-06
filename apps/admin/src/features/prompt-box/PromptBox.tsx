@@ -13,7 +13,7 @@ export default function PromptBox({ title, label, value, rows, copyLabel, disabl
         <span>{title}</span>
         <svg aria-hidden="true" viewBox="0 0 24 24" className="prompt-box-chevron"><path d="m6 9 6 6 6-6" /></svg>
       </summary>
-      <label className="prompt-box-text"><span className="prompt-box-label">{label}</span><textarea ref={textareaRef} value={value} readOnly rows={rows} spellCheck={false} /></label>
+      <label className="prompt-box-text"><span className="prompt-box-label">{label}</span><textarea aria-label={label} ref={textareaRef} value={value} readOnly rows={rows} spellCheck={false} /></label>
     </details>
     <button type="button" className="prompt-box-copy" disabled={disabled} onClick={onCopy}>
       <svg aria-hidden="true" viewBox="0 0 24 24" className="prompt-box-icon"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" /></svg>

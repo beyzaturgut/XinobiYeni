@@ -6,7 +6,7 @@ import {sourceChecksum} from '../product-surfaces/source-checksum'
 import './personalization-source.css'
 
 type Asset={image:string;sha256:string;mime:string;bytes:number;width:number;height:number}
-type View={productId:string;revision:number;status:'none'|'ready'|'stale';source:Asset|null;surfaceStatus:string}
+type View={productId:string;revision:number;status:'none'|'ready'|'stale';source:Asset|null;surfaceStatus:string;sourceRevision?:number}
 type Activity={dirty:boolean;busy:boolean}
 const message=(error:unknown)=>error instanceof Error?error.message:'Kaynak işlemi tamamlanamadı.'
 function asset(value:Asset):Asset{
@@ -127,8 +127,8 @@ function SourceEditor({product,available,onActivity}:{product:Product;available:
   {loading?<p role="status">Kaynak fotoğraf yükleniyor…</p>:!view?<p role="status">Kaynak bilgisi alınamadı.</p>:<>
    {view.status==='none'&&<p role="status">Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.</p>}
    {view.status==='stale'&&<p role="alert">Kayıtlı kaynak dosya değişmiş veya bulunamıyor. Yeni bir kaynak seçip kaydedin; eski kaynak geçerli yüzey olarak kullanılmaz.</p>}
-   {view.source&&<p>Kayıtlı kaynak · Sürüm {view.revision} · {view.source.width} × {view.source.height} px</p>}
-   <p>Bu kaynak için onaylı yüzey henüz yok. Mevcut renk maskeleri otomatik aktarılmaz. Kaynak kaydı mağazadaki önizlemeyi değiştirmez.</p>
+   {view.source&&<p>Kayıtlı kaynak · Sürüm {view.sourceRevision??view.revision} · {view.source.width} × {view.source.height} px</p>}
+   <p>{view.surfaceStatus==='approved'?'Bu kaynağa ait maske onaylı.':'Bu kaynak için maske onayı bekleniyor.'} Mevcut renk maskeleri otomatik aktarılmaz. Kaynak kaydı mağazadaki önizlemeyi değiştirmez.</p>
    {!hasWritePermission&&<p role="status">Salt okunur: kaynak değiştirmek için catalog.write yetkisi gerekli.</p>}
    <fieldset disabled={busy||!canWrite}><legend>Kaynak fotoğraf seçimi</legend>
     <label>Mevcut katalog fotoğrafını kullan<select value={choices.includes(image)?image:''} onChange={e=>{if(e.target.value)void choose(e.target.value)}}>

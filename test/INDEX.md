@@ -411,3 +411,8 @@
 ## 06.11.2026 — KIS-TEK-03/04 yeniden kontrol
 
 [TST-260](2026-11-06/TST-260-source-task03-04-recheck.md): katalog güncellemesinde kaynak taslağının kaybı düzeltildi; ürün sırası/işareti değişiminde koruma, Task 04 prompt yokluğu ve büyük kaynak bayt eşliği PASS. 6 API testi, admin lint/TS/build ve genişletilen izole kaynak tarayıcı paketi PASS. Gerçek veri/deploy yok; Task 05’e başlanmadı.
+
+
+## 06.11.2026 — KIS-TEK-05
+
+[TST-261 — tek kaynak maskeleme](2026-11-06/TST-261-single-source-masking.md): API 607 PASS/29 SKIP/0 FAIL; 12 odaklı kaynak/maske testi; admin seri 24/24 paket ve 15 durum senaryosu PASS. Tek kaynak yükle/onay/geri al/WebP indir, prompt, kaynak değişiminde stale/temiz canvas, readonly ve a11y PASS. Lint 0 hata/1 eski uyarı, admin/API üretim build PASS. Legacy rotalar/public yayın ve 20 MP kapasite 06’da açık. Gerçek veri/AI/deploy/APK yok.

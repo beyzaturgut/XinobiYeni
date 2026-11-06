@@ -3,7 +3,7 @@ import PromptBox from '../prompt-box/PromptBox'
 import { copyPromptText } from '../prompt-box/copy-text'
 import { buildMaskPrompt, defaultMaskTarget, type MaskPromptSource } from './mask-prompt'
 
-export default function MaskPrompt({ source, disabled }: { source: MaskPromptSource; disabled: boolean }) {
+export default function MaskPrompt({ source, disabled, onEdited }: { source: MaskPromptSource; disabled: boolean; onEdited?:()=>void }) {
   const [target, setTarget] = useState(defaultMaskTarget), [copiedText, setCopiedText] = useState(''), [copyError, setCopyError] = useState('')
   const textarea = useRef<HTMLTextAreaElement>(null)
   const prompt = buildMaskPrompt(source, target)
@@ -14,7 +14,7 @@ export default function MaskPrompt({ source, disabled }: { source: MaskPromptSou
   }
   return <section className="surface-panel mask-prompt" aria-label="Yapay zeka için maskeleme promptu">
     <h3>Maskeleme promptu</h3>
-    <label>Maskelenecek yüzey açıklaması<textarea rows={3} maxLength={1200} value={target} disabled={disabled} onChange={event => { setTarget(event.target.value); setCopyError('') }} /></label>
+    <label>Maskelenecek yüzey açıklaması<textarea rows={3} maxLength={1200} value={target} disabled={disabled} onChange={event => { setTarget(event.target.value); setCopyError(''); onEdited?.() }} /></label>
     <PromptBox title={`Hazır prompt · ${source.width}×${source.height} px`} label="Hazır maskeleme promptu" value={prompt} rows={8} textareaRef={textarea}
       copyLabel={copiedText === prompt ? 'Prompt kopyalandı' : 'Promptu kopyala'} disabled={disabled} onCopy={() => void copy()} />
     {copiedText === prompt && <p role="status" className="surface-hint">Prompt panoya kopyalandı. Kaynak görseli de aynı mesaja ekle.</p>}

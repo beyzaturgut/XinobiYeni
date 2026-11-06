@@ -47,7 +47,7 @@ try{
  },{handler:async(route,path)=>{if(path.endsWith('/state')){await route.fulfill({status:503,json:{title:'İzole katalog kesintisi'}});return true}return false}})
  await scenario('surface loading then error never presents zero/empty, retry shows confirmed empty',async({page})=>{
   await page.goto(base+'?view=surfaces');await expect(page.getByRole('status').filter({hasText:'Ürün yüzeyleri yükleniyor'})).toBeVisible();await expect(page.getByRole('button',{name:'Tümü (0)',exact:true})).toHaveCount(0);await expect(page.getByRole('alert').filter({hasText:'İzole yüzey kesintisi'})).toBeVisible();await page.getByRole('button',{name:'Tekrar dene',exact:true}).click();await expect(page.getByRole('button',{name:'Tümü (0)',exact:true})).toBeVisible()
- },{handler:(()=>{let calls=0;return async(route,path)=>{if(path.endsWith('/surfaces')){calls++;await new Promise(r=>setTimeout(r,400));await route.fulfill(calls<=2?{status:503,json:{message:'İzole yüzey kesintisi'}}:{json:[]});return true}return false}})()})
+ },{handler:(()=>{let calls=0;return async(route,path)=>{if(path.endsWith('/surfaces/products')){calls++;await new Promise(r=>setTimeout(r,400));await route.fulfill(calls<=2?{status:503,json:{message:'İzole yüzey kesintisi'}}:{json:[]});return true}return false}})()})
  await scenario('undefined price remains undefined and table keyboard region is reachable',async({page})=>{
   await page.goto(base+'?view=pricing');await expect(page.getByRole('cell',{name:'Tanımlanmadı',exact:true})).toBeVisible();const table=page.getByRole('region',{name:'Kaydırılabilir veri tablosu'});await table.focus();await expect(table).toBeFocused();await page.keyboard.press('ArrowRight');const before=await table.evaluate(e=>e.scrollLeft);assert.ok(before>=0)
  })
@@ -66,9 +66,9 @@ try{
  await scenario('read-only surface detail permits inspection but blocks mask mutations',async({page,writes})=>{
   await page.goto(base+'?view=surfaces');await page.locator('.surface-row').click();await expect(page.getByLabel('Maske WebP dosyası')).toBeDisabled();await expect(page.getByRole('button',{name:'WebP maskeyi taslağa yükle'})).toBeDisabled();assert.equal(writes(),0)
  },{permissions:permissions.filter(p=>!p.endsWith('.write')&&!p.endsWith('.cancel')),handler:async(route,path)=>{
-  const item={productId:'UI-P1',productName:'İzole ürün',variantId:'UI-V1',color:'Siyah',image:'/assets/products/tea-maker-101-red.webp',status:'none',draftUpdatedAt:null};
-  if(path.endsWith('/surfaces')){await route.fulfill({json:[item]});return true}
-  if(path.endsWith('/surfaces/UI-P1/UI-V1')){await route.fulfill({json:{...item,width:100,height:100,approvedMask:null,draft:null,colors:[],sourceSha256:'a'.repeat(64)}});return true}return false
+  const item={productId:'UI-P1',productName:'İzole ürün',profileRevision:1,sourceRevision:1,sourceStatus:'ready',status:'none',source:{image:'/assets/products/tea-maker-101-red.webp',width:100,height:100,sha256:'a'.repeat(64),mime:'image/webp',bytes:100},draft:null,approved:null};
+  if(path.endsWith('/surfaces/products')){await route.fulfill({json:[item]});return true}
+  if(path.endsWith('/surfaces/products/UI-P1')){await route.fulfill({json:item});return true}return false
  }})
  await writeFile(output+'/results.json',JSON.stringify(results,null,2));console.log(results.length+' scenarios passed')
 }finally{await browser.close()}

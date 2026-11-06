@@ -391,3 +391,8 @@
 05.11.2026 — [DEPLOY-017 release doğrulaması](../deployments/DEPLOY-017-validated-release-published.md): birleşik ZIP SHA256/CRC/commit, gizli ayar dışlama, gerçek arşiv admininde sentetik MFA/login/logout PASS; GitHub 3 asset digest eşleşti. Önceki canlı ortam GET smoke PASS; yeni IIS kurulumu değil.
 
 - 05.11.2026 · [TST-256 sekme simgeleri](2026-11-05/TST-256-brand-tab-icons.md): web Xinobi logo/admin marka favicon, üretim yolları/build ve 16/32/128 px görsel kontrol PASS. Deploy yok.
+
+
+## 06.11.2026 — KIS-TEK-02
+
+[TST-257 — kişiselleştirme geçiş planı](2026-11-06/TST-257-personalization-migration-plan.md): salt okunur SQL envanteri, 7 ürün/boş kaynak-SKU seçimi, 526 dosya değişmezliği, tekrar çalışma eşliği, published 24/24 ve fixture 32/32 hash PASS. Sipariş manifestli 6 dosya PASS; yerel eksikler/asıl sunucu/restore/apply ayrı açık. Gerçek veriye yazma/deploy yok.

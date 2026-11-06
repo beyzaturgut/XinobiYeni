@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Yalnız inceleme ve planlama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02…12 açık. Uygulama, veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Yalnız inceleme ve planlama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03…12 açık. Uygulama, veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -55,7 +55,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Geçiş tekrarlanabilir ve önce dry-run çalışır. Belirsiz kaynaklar otomatik seçilmez. Eski siparişler/dosyalar değişmez; eski tasarımlar için okunabilirlik ve yeniden düzenleme politikası ayrılır. Gerçek veri yazımı bu taskın planlama tesliminde yapılmaz.
 
-**Faz:** Faz03 · **Öncelik:** P1 · **Bağımlılık:** 01 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz03 · **Öncelik:** P1 · **Bağımlılık:** 01 · **Durum:** Planlama teslimi tamamlandı; gerçek geçiş yapılmadı.
+
+**Teslim:** [Envanter ve güvenli geçiş planı](../reports/personalization-migration-plan-2026-11-06.md); SQL sorgusu ve tekrarlanabilir salt okunur analiz aracı hazır. Kaynak/SKU seçimi, IIS dosya kabulü ve gerçek restore/apply ayrı açık koşullardır.
 
 ### KIS-TEK-03 — Admin katalog ekranında tek kişiselleştirme kaynağı yönetimi
 

@@ -760,3 +760,8 @@ Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizal
 ## 06.11.2026 — KIS-TEK-01 teknik model teslimi
 
 [ADR-005](../docs/decisions/ADR-005-personalization-single-source.md): ürün başına tek profil, değişmez kaynak/yüzey sürümü ve açık fulfillmentVariantId bağı tanımlandı. SKU/fiyat/stok aynı ürünün seçilen ticari varyantından; ilk varyant/fiyat fallback’i yok. Doğrudan kaynak yükleme, sabit tuval olmadan gerçek ölçü, maske eşliği ve üç sipariş dosyası korunumu tanımlandı. Teknik tanım tamam; işletmenin gerçek ürün/SKU ve fiyat kapsamı kabulü bekliyor, task tamamen kapalı değil. Task 02–12 başlanmadı. Kod/veri/deploy değişmedi.
+
+
+## 06.11.2026 — KIS-TEK-02 salt okunur envanter ve geçiş planı
+
+[Envanter/plan](../docs/reports/personalization-migration-plan-2026-11-06.md): SQL 24 ürün/79 varyant/39 tasarım/19 revizyon; 7 kişiselleştirilebilir ürünün kaynak ve SKU seçimleri boş bırakıldı. 2 taslak ve 8 published önizleme güncel varyantlardan kopuk. 28 tasarım dosyası yerelde yok; IIS kaybı diye yorumlanmaz. Manifestli 2 sipariş satırında 6 dosya hash/boyut PASS; 7 legacy satır korunur. Eski SourceSha256 desen hash’idir; ürün kaynağı hash’ine dönüştürülmeyecek. Task 02 planlama tamam; seçim, restore/apply ve IIS karşı kontrolü yapılmadı. Gerçek veriye yazma/deploy yok.

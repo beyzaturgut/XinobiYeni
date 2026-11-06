@@ -1,0 +1,524 @@
+{
+  "scope": "configured SQL metadata + local filesystem; not IIS filesystem acceptance",
+  "counts": {
+    "products": 24,
+    "variants": 79,
+    "prices": 78,
+    "savedDesigns": 39,
+    "configurations": 19,
+    "orders": 11,
+    "orderLines": 16,
+    "personalizedLines": 9,
+    "localDrafts": 2,
+    "fixtureEntries": 8,
+    "publishedEntries": 8
+  },
+  "products": [
+    {
+      "productId": "DEMO-1a185f98-7ce4-4114-b5bf-78d472833083",
+      "name": "Elektrikli Çay Makinesi 131135",
+      "active": true,
+      "variantCount": 5,
+      "sourceCandidateCount": 5,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "manual_review_required",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-0de6730e-a231-4ab4-a497-9774b602dcfe",
+          "sku": "134",
+          "image": "/api/v1/local-commerce/media/0e4099a6d74447aaaa4a0d40db4742f8.webp",
+          "localSourceSha256": "281c24f5db1b5796ac0673d3043f65b6d665701a1486c020a3cf1a8d004d300a",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-1cf11382-96ba-4520-ae32-c6bbeb0f0000",
+          "sku": "135",
+          "image": "/api/v1/local-commerce/media/c1f8f16cb4ed4b27a7eed8f98229907b.webp",
+          "localSourceSha256": "b613dd0758d93104f014294c2145b23f791137e157895979d6ed10123afd6757",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-359fabd8-f18f-4629-8d85-0377184be296",
+          "sku": "132",
+          "image": "/api/v1/local-commerce/media/9a878564c134498e9c72ea5ce782dacc.webp",
+          "localSourceSha256": "4a4cb8ea9cc7328ba7ea6589db4ec8ffd3b40178d96e14ab2e033a2ba928e3f1",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-951cea33-dcb1-40f1-a993-3687ade80005",
+          "sku": "133",
+          "image": "/api/v1/local-commerce/media/0e0cb26f6ffa473680a3667d6fe7ff6d.webp",
+          "localSourceSha256": "b1b1c64be8ff78bec3a7f66eff8c631c63ecc6b3b933cae893de8392c5cffafb",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-9cd54009-2a53-4784-9ad5-42215a7ef390",
+          "sku": "131",
+          "image": "/api/v1/local-commerce/media/b4e72877858e42c7b10e51da496ccb29.webp",
+          "localSourceSha256": "624be2ec3f2b7413bf6706f81f7c86f5e9e67bdefb1f74335ca4fe091e657af2",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 4,
+      "configurationCount": 3,
+      "personalizedLineCount": 3
+    },
+    {
+      "productId": "DEMO-23b1f3ef-d53a-4af1-a2fd-81975cb782d5",
+      "name": "Otomatik Türk Kahvesi Makinesi 501505",
+      "active": true,
+      "variantCount": 5,
+      "sourceCandidateCount": 5,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "manual_review_required",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-150091f5-9ecd-4c86-ba85-63a9cfc7e656",
+          "sku": "504",
+          "image": "/api/v1/local-commerce/media/d0cd205481c0498d8ee254f8996b258a.webp",
+          "localSourceSha256": "879cbba3b72f044c1c306346fa7b6d7d01acdfb2e30b7a2618e434c6c03808cb",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-35896ab1-ef03-48bb-aae7-32bea95e7b83",
+          "sku": "503",
+          "image": "/api/v1/local-commerce/media/727c065d2b92401884189d7ff29dccbc.webp",
+          "localSourceSha256": "ac586c77ac7b6f48b190ee9cfb22c8b32c5d1d2d026d296cf6853edfbd3550ef",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-510031bb-47ff-4462-b59b-9634e3f9ea56",
+          "sku": "502",
+          "image": "/api/v1/local-commerce/media/393818a9363b43ba9e5642e4fc92a7aa.webp",
+          "localSourceSha256": "dbe3ae74f3503c611bff63e8462ee51bcfe702b8eb52fd314f135ae3708d8ca1",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-57b9db68-b867-4373-a1d9-fb8f8c7b4227",
+          "sku": "501",
+          "image": "/api/v1/local-commerce/media/6b1429543d6747e3b6218250b4df05ce.webp",
+          "localSourceSha256": "fba6f9e84b711c750e51778a7909e21a5715bbd96f119a87fa454206d8165835",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-8f9c70e0-f5ac-4540-82ac-d9680abfabc2",
+          "sku": "505",
+          "image": "/api/v1/local-commerce/media/8984b8067e354e11988048c889828902.webp",
+          "localSourceSha256": "49ec348a737aacb34839daf6c69464990d31382a3acaa31a63d4c4ff19e65025",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 1,
+      "configurationCount": 0,
+      "personalizedLineCount": 0
+    },
+    {
+      "productId": "DEMO-87c4b781-6a2a-4273-b2c4-aeb17199acb2",
+      "name": "Elektrikli Çay Makinesi 136140",
+      "active": true,
+      "variantCount": 5,
+      "sourceCandidateCount": 5,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "manual_review_required",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-15af7ee5-bb6a-4904-9f33-1e64a0073abc",
+          "sku": "140",
+          "image": "/api/v1/local-commerce/media/7ad89357cc164913bd8d1c84f33b2cf8.webp",
+          "localSourceSha256": "5cb331121fdc53203aa74f5a7f0e7647f3eed66f185990df32c5f108b3c75770",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-1bdd09f2-39a5-41dc-8df5-c13ac633a27c",
+          "sku": "138",
+          "image": "/api/v1/local-commerce/media/cbe379e3c6f744e082493bdf5a75cd90.webp",
+          "localSourceSha256": "ed98bed9e02f7b63c8d32263c68d5ff51f52f2e1828386c20c92eaa659784b20",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-27683c68-48be-4203-983d-b3006cf05406",
+          "sku": "137",
+          "image": "/api/v1/local-commerce/media/40fe457f654c48c6b6b41a250370015c.webp",
+          "localSourceSha256": "00613bcef97d2ead0aa25665e9c14bf3af9a43640869ee5d295905d817984e42",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-c760f918-f476-4761-8f5c-13d8fe14d2dd",
+          "sku": "136",
+          "image": "/api/v1/local-commerce/media/0323f6a9d1c844f5bdb0b024a8b265bd.webp",
+          "localSourceSha256": "18f2fef978a91613fecf79830ee45793012b01e6d0436ff45f72e64cb26ac6b8",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-e139161e-6ab7-47cc-a158-4a25d19505ea",
+          "sku": "139",
+          "image": "/api/v1/local-commerce/media/4e2ddb9be6674eb49081eadcbe17ae9a.webp",
+          "localSourceSha256": "0e6f90d640a0c5ea44abeb8fe344911a627cb08b5b63672094c463f2df9ba1bd",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 6,
+      "configurationCount": 3,
+      "personalizedLineCount": 2
+    },
+    {
+      "productId": "DEMO-88f151f0-6c48-4bca-b3c6-78654d163745",
+      "name": "tasarım deneme",
+      "active": true,
+      "variantCount": 1,
+      "sourceCandidateCount": 1,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "single_candidate_requires_explicit_confirmation",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-031b916f-9425-4cb2-9312-f2b87011d38e",
+          "sku": "d4",
+          "image": "/api/v1/local-commerce/media/6bcd7ab54e82471083aa52a78ac5fccd.webp",
+          "localSourceSha256": "be84892e1b95285f0dc5b6b877360e58dbe42f9fcc6dfab72a7177ecadb116d6",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 1,
+      "configurationCount": 1,
+      "personalizedLineCount": 1
+    },
+    {
+      "productId": "DEMO-c442c7a0-e72c-410e-bf7c-ba3a1a3b4d94",
+      "name": "Elektrikli Çay Makinesi 121125",
+      "active": true,
+      "variantCount": 5,
+      "sourceCandidateCount": 5,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "manual_review_required",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-5a74e9d1-5b9f-45d7-b628-c590ba6e27dd",
+          "sku": "125",
+          "image": "/api/v1/local-commerce/media/46a5d94cacf446b59449c02475b5ed73.webp",
+          "localSourceSha256": "3c3c0b113a6b9ed5d9a0d0ba19923f404301728c0618cf5e80e82e2c8252436b",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-795b8b3e-dd95-4ae3-8b73-b383562673bf",
+          "sku": "123",
+          "image": "/api/v1/local-commerce/media/11ea0f231b144eb99e9ad1a7ad421320.webp",
+          "localSourceSha256": "73cd3b1a8573e7e7f5a0fb45765fa432e970d212c71b5f540adce37e40485fbe",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-7c7d114f-aa6d-4bcd-bc98-1afa6134df45",
+          "sku": "124",
+          "image": "/api/v1/local-commerce/media/caa6bb040d904bef9ccab81467970e1a.webp",
+          "localSourceSha256": "bfa7c65c0e576c35bd2c8bc01f9f660a5f9b9f81945da2bdd06313a8f0a72185",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-b165ed7b-aec1-4f1d-8c8c-fa0d9c3f14fc",
+          "sku": "121",
+          "image": "/api/v1/local-commerce/media/9765b3029afc477b834c2dc5541ea86a.webp",
+          "localSourceSha256": "437879a6a9446c804db525832dbd6242c751121289db80fba12c880eba19e5d9",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-b36239e2-79ab-45d3-9f82-d2f5218f42f4",
+          "sku": "122",
+          "image": "/api/v1/local-commerce/media/5770c6efbec94b23b7016c750cd50717.webp",
+          "localSourceSha256": "054b3c1114c3bfbe6ce2f94a25018fa7c1bda2f55aa4ebb60954482c3e442aa8",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 5,
+      "configurationCount": 1,
+      "personalizedLineCount": 2
+    },
+    {
+      "productId": "DEMO-cf5fdee6-3326-425d-8b74-82ed9df546a9",
+      "name": "Elektrikli Çay Makinesi 111115",
+      "active": true,
+      "variantCount": 5,
+      "sourceCandidateCount": 5,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "manual_review_required",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-21aa919f-cda5-4cdf-94ee-728283340e81",
+          "sku": "112",
+          "image": "/api/v1/local-commerce/media/e3d8512bb03043069c78e7d1a97ee893.webp",
+          "localSourceSha256": "2318fc152f35acc69fb33943abdcac2c14964b12ce370cebc1a216724198fc39",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-66548847-3a76-4244-9cbc-a869a8a20540",
+          "sku": "115",
+          "image": "/api/v1/local-commerce/media/175bc140efbd46bc9aad62787dd77712.webp",
+          "localSourceSha256": "bae809f12dc7ddf51d24ab5a7722dcbb796922cdd4b659ca3a8f927c67ce22ef",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-dd7a6869-1266-4349-b86a-92dd6f95b6db",
+          "sku": "111",
+          "image": "/api/v1/local-commerce/media/8924bfca347740c78c8352e29235fd9e.webp",
+          "localSourceSha256": "0ed185a5bf5ab32558a1aa58e044ee1788d5c3864b3e8817a76a6890f0a25cc9",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-f09b9c3a-f13e-4e8e-bd0b-e4a7fac43f08",
+          "sku": "114",
+          "image": "/api/v1/local-commerce/media/6320b056a8a342b7987a29a180442cc6.webp",
+          "localSourceSha256": "adfd584db6a52482d7c66109b16b0e7c8837e0499962942acb36281e8489b74f",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-f9ac902a-2359-4ae5-908d-c72533845e2f",
+          "sku": "113",
+          "image": "/api/v1/local-commerce/media/525d32e54029441aa34a596c504cd34e.webp",
+          "localSourceSha256": "0484e2e0c0c0c936a8bd5102bcc1fd449f35ea39c0803933fc2efe25f346c447",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 5,
+      "configurationCount": 6,
+      "personalizedLineCount": 1
+    },
+    {
+      "productId": "DEMO-d7166090-178f-4c0a-a65f-4d3c89c1ee03",
+      "name": "Elektrikli Çay Makinesi 101105",
+      "active": true,
+      "variantCount": 4,
+      "sourceCandidateCount": 4,
+      "selectedSource": null,
+      "selectedFulfillmentVariant": null,
+      "decision": "manual_review_required",
+      "candidates": [
+        {
+          "variantId": "DEMO-V-00cdd8ea-a296-408f-8bdc-5c040323569d",
+          "sku": "CM 101",
+          "image": "/api/v1/local-commerce/media/851364e6336742498b8f6d94acb18de7.webp",
+          "localSourceSha256": "48efb70e7cad41681868caec9b1578f1693a8eb7762ac4c712e109cab0a858e4",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-4441960f-8073-4f55-beb9-bb1cb916f440",
+          "sku": "CM 104",
+          "image": "/api/v1/local-commerce/media/f0babd68441641d6bb01e674cdaee388.webp",
+          "localSourceSha256": "18d255934bb19003a9d3e40c5347cbbd7017435b4fc950d9d31f5f28ee1ca558",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-52258c6e-b972-4138-aadf-a51f978f3f23",
+          "sku": "CM 103",
+          "image": "/api/v1/local-commerce/media/270c8ce594884c7b8c5117fce646722f.webp",
+          "localSourceSha256": "345c8b18fc68926d9612600359012c7668819e167407d19ed8ef3fc59b2c0f28",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        },
+        {
+          "variantId": "DEMO-V-591b1729-036a-46cf-b71d-bc6fa8c4fcaf",
+          "sku": "CM 105",
+          "image": "/api/v1/local-commerce/media/d2506c40c7624b5ba774e646c8a1bd3f.webp",
+          "localSourceSha256": "b1f3c66c08cf35f26c7c83f9363b3272e940b5bf9d8c00dffe5aef46ba65edaf",
+          "localSourceAvailable": true,
+          "priceDefined": true,
+          "stockPositive": true,
+          "maskState": "approved-link",
+          "localMaskAvailable": true
+        }
+      ],
+      "localDraftCount": 0,
+      "fixtureCount": 0,
+      "publishedCount": 0,
+      "savedDesignCount": 5,
+      "configurationCount": 5,
+      "personalizedLineCount": 0
+    }
+  ],
+  "relations": {
+    "designMissingProduct": 12,
+    "designMissingVariant": 11,
+    "designLocalFileMissing": 28,
+    "configurationMissingDesign": 0,
+    "configurationMissingVariant": 0,
+    "configurationMissingProduct": 0,
+    "configurationProductVariantMismatch": 0,
+    "configurationPatternUnavailableLocally": 8,
+    "configurationPatternHashDiffers": 0,
+    "configurationCurrentMaskUnavailableLocally": 0,
+    "configurationCurrentSurfaceVersionDiffers": 0,
+    "orderMissingConfiguration": 0,
+    "draftMissingVariant": 2,
+    "draftChangedSource": 0,
+    "draftLocalFileMissing": 0,
+    "publishedMissingVariant": 8,
+    "publishedSourceMismatch": 0
+  },
+  "orderFileChecks": {
+    "expected": 6,
+    "verifiedLocal": 6,
+    "missingLocal": 0,
+    "hashMismatchLocal": 0,
+    "legacyNoFileManifest": 7,
+    "completeThreeFileManifest": 2
+  },
+  "draftDetails": [
+    {
+      "productId": "DEMO-ada5b793-37af-44b6-8e99-73492d4b7da6",
+      "variantId": "DEMO-V-d616c2bf-7dd0-4c2f-981e-ebf212fb66a1",
+      "sourceMatches": false,
+      "filePresent": true
+    },
+    {
+      "productId": "DEMO-499cf715-33cd-4144-8c40-2245181e8625",
+      "variantId": "DEMO-V-8eab5252-a5e1-4a99-91f9-708ea13ec4e8",
+      "sourceMatches": false,
+      "filePresent": true
+    }
+  ],
+  "bundleChecks": {
+    "publishedAssetExpected": 24,
+    "publishedAssetVerified": 24,
+    "publishedAssetMissing": 0,
+    "publishedAssetHashMismatch": 0,
+    "fixtureFileExpected": 32,
+    "fixtureFileVerified": 32,
+    "fixtureFileMissingOrMismatch": 0
+  }
+}

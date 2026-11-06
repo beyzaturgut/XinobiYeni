@@ -108,3 +108,7 @@ Bunlar henüz alınmış sayılmaz; gerçek SKU ataması, katalog/stok/fiyat de�
 ## Sonraki tasklara teslim
 
 02: Salt okunur envanter, eşleme şablonu, çakışma/dry-run/rollback. 03: Tek kaynak ve ticari bağ admin yönetimi. 04: Fotoğraf promptunu kaldırıp doğrudan kaynak yükleme. 05/06: Tek maskenin onayı, gerçek boyutlar ve yeni sözleşmeler. 07/08: Renk seçimsiz web/Flutter. 09: Ticari bağ ve revizyonlu checkout. 10: Üç değişmez dosya. 11/12: Doküman ve regresyon.
+
+## 06.11.2026 — KIS-TEK-02 alan anlamı düzeltmesi
+
+Kaynak kodun ayrıntılı incelemesi: mevcut MyDesignConfiguration.SourceSha256, SaveConfiguration içinde **müşterinin desen dosyasından** hesaplanıyor; ürün fotoğrafı hash’i değil. Yukarıdaki hedef modelde ürün kaynağı sourceSha256 ile desen patternSha256 ayrı tutulacak. Eski SourceSha256 alanı ve sipariş değeri ürün fotoğrafı hash’i olarak dönüştürülmeyecek. ProductSource dosyasının hash’i mevcut sipariş manifestinde ayrıca bulunur. [Geçiş planı](../reports/personalization-migration-plan-2026-11-06.md).

@@ -233,3 +233,8 @@ Herhangi bir rol `revizyon` derse görev sahibi düzeltir ve rol tekrar bakar. A
 ## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
 
 Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Güncel revizyon: fotoğraf üretim promptu kaldırılacak; doğrudan yüklenen tek görsel kaynak olacak ve sabit piksel boyutu/en-boy oranı şartı olmayacak. Kaynak indirme ve maskeleme promptu korunacak; prompt boyutu kaynağın gerçek ölçüsünden alınacak, diğer maskeleme kuralları aynen kalacak. Birden fazla görsele aynı maskeyi uygulama/toplu renk onayı kaldırılacak. Maskenin kendi fotoğrafıyla ölçü/koordinat eşliği ve sipariş dosya güvenliği sürecek. Task 01–03 aynı; 04–12 revize edildi. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-02 (06/09 sözleşme etkisi)**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.
+
+
+## 06.11.2026 — KIS-TEK-02 salt okunur envanter ve geçiş planı
+
+[Envanter/plan](../docs/reports/personalization-migration-plan-2026-11-06.md): SQL 24 ürün/79 varyant/39 tasarım/19 revizyon; 7 kişiselleştirilebilir ürünün kaynak ve SKU seçimleri boş bırakıldı. 2 taslak ve 8 published önizleme güncel varyantlardan kopuk. 28 tasarım dosyası yerelde yok; IIS kaybı diye yorumlanmaz. Manifestli 2 sipariş satırında 6 dosya hash/boyut PASS; 7 legacy satır korunur. Eski SourceSha256 desen hash’idir; ürün kaynağı hash’ine dönüştürülmeyecek. Task 02 planlama tamam; seçim, restore/apply ve IIS karşı kontrolü yapılmadı. Gerçek veriye yazma/deploy yok.

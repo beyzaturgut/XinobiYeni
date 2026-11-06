@@ -21,25 +21,29 @@ function readView(value:View,productId:string):View{
 
 export default function PersonalizationSource({products}:{products:Product[]}){
  const eligible=products.filter(p=>p.personalizable===true)
- const [selected,setSelected]=useState('')
+ const [selected,setSelected]=useState<Product|null>(()=>products.find(p=>p.personalizable===true)??null)
  const activity=useRef<Activity>({dirty:false,busy:false})
  const onActivity=useCallback((next:Activity)=>{activity.current=next},[])
- const product=eligible.find(p=>p.id===selected)??eligible[0]
+ const product=selected?(products.find(p=>p.id===selected.id)??selected):eligible[0]
+ const available=!!product&&eligible.some(p=>p.id===product.id)
+ const options=product&&!available?[product,...eligible]:eligible
  function select(id:string){
-  if(activity.current.busy)return
+  const next=eligible.find(p=>p.id===id)
+  if(!next||activity.current.busy)return
   if(activity.current.dirty&&!window.confirm('Kaydedilmemiş kaynak fotoğraf değişikliği silinsin mi?'))return
-  activity.current={dirty:false,busy:false};setSelected(id)
+  activity.current={dirty:false,busy:false};setSelected(next)
  }
- return <details className="personalization-source"><summary>XINOBI U · Tek kaynak fotoğraf</summary>
+ return <details className="personalization-source" onFocusCapture={()=>{if(!selected&&product)setSelected(product)}}><summary>XINOBI U · Tek kaynak fotoğraf</summary>
   <p>Kaynak fotoğraf normal katalog renklerinden ayrı saklanır. Renk veya HEX bilgisi bu alanı kaydetmek için gerekli değildir.</p>
-  {product?<><label>Kaynak fotoğrafı yönetilecek ürün<select value={product.id} onChange={e=>select(e.target.value)}>{eligible.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-   <SourceEditor key={product.id} product={product} onActivity={onActivity}/></>:<p role="status">XINOBI U işaretli ürün yok. Ürünü Genel bilgiler bölümünden kişiselleştirmeye açın.</p>}
+  {product?<><label>Kaynak fotoğrafı yönetilecek ürün<select value={product.id} onChange={e=>select(e.target.value)}>{options.map(p=><option key={p.id} value={p.id}>{p.name}{!eligible.some(item=>item.id===p.id)?' · Kişiselleştirmeye kapalı':''}</option>)}</select></label>
+   {!available&&<p role="alert">Seçili ürün artık katalogda kişiselleştirmeye açık değil. Kaydedilmemiş kaynak seçimi korunuyor. Ürünü tekrar açın veya seçimi iptal ederek başka bir ürün seçin.</p>}
+   <SourceEditor key={product.id} product={product} available={available} onActivity={onActivity}/></>:<p role="status">XINOBI U işaretli ürün yok. Ürünü Genel bilgiler bölümünden kişiselleştirmeye açın.</p>}
  </details>
 }
 
-function SourceEditor({product,onActivity}:{product:Product;onActivity:(value:Activity)=>void}){
+function SourceEditor({product,available,onActivity}:{product:Product;available:boolean;onActivity:(value:Activity)=>void}){
  const permissions=useAdminSession()?.permissions??[]
- const canWrite=permissions.includes('catalog.write'),canUpload=canWrite&&permissions.includes('media.write')
+ const hasWritePermission=permissions.includes('catalog.write'),canWrite=hasWritePermission&&available,canUpload=canWrite&&permissions.includes('media.write')
  const path='/personalization-sources/'+encodeURIComponent(product.id)
  const [view,setView]=useState<View|null>(null),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false)
  const [image,setImage]=useState(''),[candidate,setCandidate]=useState<Asset|null>(null)
@@ -125,7 +129,7 @@ function SourceEditor({product,onActivity}:{product:Product;onActivity:(value:Ac
    {view.status==='stale'&&<p role="alert">Kayıtlı kaynak dosya değişmiş veya bulunamıyor. Yeni bir kaynak seçip kaydedin; eski kaynak geçerli yüzey olarak kullanılmaz.</p>}
    {view.source&&<p>Kayıtlı kaynak · Sürüm {view.revision} · {view.source.width} × {view.source.height} px</p>}
    <p>Bu kaynak için onaylı yüzey henüz yok. Mevcut renk maskeleri otomatik aktarılmaz. Kaynak kaydı mağazadaki önizlemeyi değiştirmez.</p>
-   {!canWrite&&<p role="status">Salt okunur: kaynak değiştirmek için catalog.write yetkisi gerekli.</p>}
+   {!hasWritePermission&&<p role="status">Salt okunur: kaynak değiştirmek için catalog.write yetkisi gerekli.</p>}
    <fieldset disabled={busy||!canWrite}><legend>Kaynak fotoğraf seçimi</legend>
     <label>Mevcut katalog fotoğrafını kullan<select value={choices.includes(image)?image:''} onChange={e=>{if(e.target.value)void choose(e.target.value)}}>
      <option value="">Fotoğraf seçin veya yeni fotoğraf yükleyin</option>{choices.map((src,i)=><option key={src} value={src}>Katalog fotoğrafı {i+1}</option>)}

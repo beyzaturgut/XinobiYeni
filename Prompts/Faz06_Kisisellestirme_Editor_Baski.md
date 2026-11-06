@@ -229,3 +229,8 @@ Katalogda bağımsız kaynak seç/yükle/kaydet/indir alanı; renk/HEX bağıms�
 ## 06.11.2026 — KIS-TEK-04 doğrudan kaynak, fotoğraf üretim promptu kaldırıldı
 
 Katalog ana ekranı ve Medya sekmesindeki fotoğraf üretim promptu; üretici/MASTER/renk/HEX/1333×2000 kodu ve kullanılmayan CSS kaldırıldı. Doğrudan kaynak yükleme/indirme korunur; 5001×3730 PNG bayt karşılaştırması PASS. Maskeleme promptu değişmedi. [TST-259](../test/2026-11-06/TST-259-direct-source-no-photo-prompt.md). Task 04 tamam; yeni kaynağın maske onayı ve çoklu renge uygulama temizliği 05/06’da, müşteri akışı 07–10’da açık. Gerçek veri veya sunucu ayarı değiştirilmedi; deploy/APK yok.
+
+
+## 06.11.2026 — Kullanıcı isteğiyle KIS-TEK-03/04 tekrar kontrolü
+
+3. task 191c45a, 4. task fc668e7 içinde mevcut. Yeniden incelemede katalog yenilenmesinin kaydedilmemiş kaynak seçimini farklı ürüne geçirip kaybettirebildiği bulundu ve düzeltildi: seçim ürün kimliğine sabitlendi; işaret kaldırılır/silinirse taslak korunur, kayıt kapanır. Yeniden açılınca devam edilir. 4. taskın iki prompt girişi yokluğu ve 5001×3730 PNG tam bayt yükleme/indirmesi yeniden PASS. [TST-260](../test/2026-11-06/TST-260-source-task03-04-recheck.md). Gerçek veri/deploy yok; 5. taska geçilmedi.

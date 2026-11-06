@@ -16,6 +16,7 @@ Kaynak fotoğrafı kaydet düğmesi ürün, kaynak değişimi ve eski siparişle
 
 - Yüklenme, kaynak yok, servis/bağlantı hatası, yetkisizlik, eski/kayıp kaynak ve kayıt başarısı ayrı gösterilir. Boş/bozuk API payload’ı başarı sayılmaz.
 - Kaynak değişikliğinde ürün seçimi, modül gezinmesi ve çıkış için vazgeçme onayı; sekme kapatmada beforeunload koruması var. İşlem sürerken ayrılma ve ikinci gönderim engellenir. Hatalı kayıtta seçim korunur.
+- Katalog güncellemesinde ürünlerin sırası değişse de seçili ürün ve kaydedilmemiş fotoğraf korunur. Seçili ürün silinir veya XINOBI U işareti kaldırılırsa taslak kaybolmaz; kayıt/yükleme kapanır, açıklama gösterilir. Ürün tekrar kişiselleştirmeye açılırsa mevcut seçimle devam edilebilir.
 - Önceki kaynak kaybolmuşsa aynı fotoğraf yeniden yüklenerek yeni revizyonla onarılabilir; aynı hash bu onarımı engellemez.
 - catalog.read okur, catalog.write kaynak seçimi/kaydı yapar. Dosya yükleme ayrıca mevcut media.write yetkisini kullanır. Genel katalog formunun renk/HEX/SKU doğrulamaları kaynak formunu engellemez.
 - Kaynak değişikliği designs belgesini, siparişleri, varyant fotoğraflarını, fiyatı veya stoku yazmaz. Eski siparişin üç dosyası yeniden üretilmez.
@@ -36,4 +37,4 @@ Fiziksel SQL migration yok; yeni belge yalnız ilk gerçek kayıt sırasında ol
 
 ## Doğrulama
 
-[TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md), [TST-259](../../test/2026-11-06/TST-259-direct-source-no-photo-prompt.md). Yerel UI/API çalışıyor; deploy/APK yok. Gerçek kaynak seçimi/yüklemesi ve işletme SKU kabulü kullanıcı tarafından ayrıca yapılacak.
+[TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md), [TST-259](../../test/2026-11-06/TST-259-direct-source-no-photo-prompt.md), [3/4 tekrar kontrolü TST-260](../../test/2026-11-06/TST-260-source-task03-04-recheck.md). Yerel UI/API çalışıyor; deploy/APK yok. Gerçek kaynak seçimi/yüklemesi ve işletme SKU kabulü kullanıcı tarafından ayrıca yapılacak.

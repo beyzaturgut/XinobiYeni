@@ -69,7 +69,7 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** 01,02 · **Durum:** Uygulandı ve izole doğrulandı (06.11.2026).
 
-**Teslim:** [Kaynak yönetimi](../runbooks/personalization-source-management.md), [TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md). Yeni kaynak hazırlığı ayrı saklanır; gerçek ürün seçimi yapılmadı. Maske onayı ve web/Flutter geçişi 05–10 kapsamında açık; fotoğraf promptu 04 ile kaldırıldı.
+**Teslim:** [Kaynak yönetimi](../runbooks/personalization-source-management.md), [TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md). **Yeniden kontrol:** [TST-260](../../test/2026-11-06/TST-260-source-task03-04-recheck.md); katalog güncellemesinde ürün/ kaynak taslağının kaybolması düzeltildi, 4. task bağımlılığı tekrar doğrulandı. Yeni kaynak hazırlığı ayrı saklanır; gerçek ürün seçimi yapılmadı. Maske onayı ve web/Flutter geçişi 05–10 kapsamında açık; fotoğraf promptu 04 ile kaldırıldı.
 
 ### KIS-TEK-04 — Fotoğraf üretim promptunu kaldırma ve doğrudan kaynak yükleme
 

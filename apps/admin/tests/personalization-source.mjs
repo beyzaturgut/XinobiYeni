@@ -18,12 +18,16 @@ const other={...product,id:'UI-P2',name:'İkinci izole ürün',variants:[]}
 async function fixture({write=true,mode='none',holdSave=false,sourceBytes=bytes}={}){
  const fixtureAsset=sourceBytes===bytes?asset:{...asset,sha256:createHash('sha256').update(sourceBytes).digest('hex'),bytes:sourceBytes.length,width:sourceBytes.readUInt32BE(16),height:sourceBytes.readUInt32BE(20)}
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage()
+ let catalogueProducts=[product,other],catalogueWrites=0
  let current={productId:product.id,revision:0,status:'none',source:null,surfaceStatus:'none'},writes=0,uploads=0,failure=false,malformed=false
  let releaseSave;const saveGate=new Promise(resolve=>{releaseSave=resolve})
  let releaseLoad;const gate=new Promise(resolve=>{releaseLoad=resolve})
  await mockPanel(page,{permissions:[...permissions.filter(p=>p!=='catalog.write'),...(write?['catalog.write','media.write']:[])],handler:async(route,path)=>{
   const req=route.request()
-  if(path.endsWith('/state')){await route.fulfill({json:{...store,products:[product,other]}});return true}
+  if(path.endsWith('/state')){await route.fulfill({json:{...store,products:catalogueProducts}});return true}
+  if(path.endsWith('/categories')&&req.method()==='POST'){
+   catalogueWrites++;await route.fulfill({json:{...store,products:catalogueProducts,categories:['Test',req.postDataJSON().name]}});return true
+  }
   if(path.includes('/local-commerce/media/')){await route.fulfill({contentType:'image/png',body:sourceBytes});return true}
   if(path.endsWith('/local-commerce/media')&&req.method()==='POST'){
    const contentType=req.headers()['content-type'],boundary=/boundary=(?:"([^"]+)"|([^;]+))/.exec(contentType)
@@ -55,7 +59,7 @@ async function fixture({write=true,mode='none',holdSave=false,sourceBytes=bytes}
  }})
  await page.goto(base+'?view=catalog')
  await page.locator('.personalization-source summary').click()
- return {page,get writes(){return writes},get uploads(){return uploads},setMode:value=>{mode=value},releaseLoad,releaseSave,fail:value=>{failure=value},malformed:value=>{malformed=value}}
+ return {page,setCatalogueProducts:next=>{catalogueProducts=next},get catalogueWrites(){return catalogueWrites},get writes(){return writes},get uploads(){return uploads},setMode:value=>{mode=value},releaseLoad,releaseSave,fail:value=>{failure=value},malformed:value=>{malformed=value}}
 }
 try{
  const f=await fixture({mode:'loading'}),p=f.page
@@ -106,6 +110,37 @@ try{
   x.setMode('none');await page.getByRole('button',{name:'Güncel kaydı yükle',exact:true}).click()
   await page.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor();assert.equal(x.writes,0);await page.close()
  }
+ // A catalogue write refreshes the parent's props while the source form has an unsaved selection.
+ const refresh=await fixture(),rp=refresh.page
+ await rp.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor()
+ await rp.getByLabel('Mevcut katalog fotoğrafını kullan').selectOption(image)
+ await rp.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ async function catalogueRefresh(products,name){
+  refresh.setCatalogueProducts(products)
+  await rp.getByRole('button',{name:'Yeni kategori',exact:true}).click()
+  await rp.getByLabel('Yeni kategori adı',{exact:true}).fill(name)
+  await rp.getByRole('button',{name:'Kategori ekle',exact:true}).click()
+  await rp.getByRole('dialog',{name:'Kategoriler',exact:true}).waitFor({state:'hidden'})
+ }
+ await catalogueRefresh([other,product],'Sıra değişikliği')
+ assert.equal(await rp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').inputValue(),product.id,'Catalogue reordering must not change source product')
+ await rp.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ await catalogueRefresh([other,{...product,personalizable:false}],'İşaret kaldırma')
+ await rp.getByText(/Seçili ürün artık katalogda kişiselleştirmeye açık değil/).waitFor()
+ assert.equal(await rp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').inputValue(),product.id)
+ await rp.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ assert.equal(await rp.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).isDisabled(),true)
+ rp.once('dialog',d=>d.dismiss());await rp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').selectOption(other.id)
+ assert.equal(await rp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').inputValue(),product.id)
+ await catalogueRefresh([other],'Ürünü katalogdan kaldırma')
+ assert.equal(await rp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').inputValue(),product.id)
+ await rp.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ assert.equal(await rp.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).isDisabled(),true)
+ await catalogueRefresh([product,other],'İşareti geri açma')
+ assert.equal(await rp.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).isEnabled(),true)
+ assert.equal(refresh.writes,0,'Parent catalogue refresh must not save a source automatically')
+ assert.equal(refresh.catalogueWrites,4)
+ await rp.close()
  const readonly=await fixture({write:false,mode:'stale'})
  await readonly.page.getByText(/Kayıtlı kaynak dosya değişmiş/).waitFor()
  assert.equal(await readonly.page.getByLabel('Mevcut katalog fotoğrafını kullan').isDisabled(),true)

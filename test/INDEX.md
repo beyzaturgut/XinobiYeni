@@ -406,3 +406,8 @@
 ## 06.11.2026 — KIS-TEK-04
 
 [TST-259 — fotoğraf üretim promptu kaldırıldı](2026-11-06/TST-259-direct-source-no-photo-prompt.md): katalog ve Medya girişleri/kullanılmayan modüller kaldırıldı; kaynak ve katalog tarayıcı senaryoları, 5001×3730 PNG ham yükleme/indirme, 6 odaklı API testi, lint/TS/üretim build PASS. Maskeleme promptu korundu; task 05/06 kapsamı açık. Gerçek veri/deploy/APK yok.
+
+
+## 06.11.2026 — KIS-TEK-03/04 yeniden kontrol
+
+[TST-260](2026-11-06/TST-260-source-task03-04-recheck.md): katalog güncellemesinde kaynak taslağının kaybı düzeltildi; ürün sırası/işareti değişiminde koruma, Task 04 prompt yokluğu ve büyük kaynak bayt eşliği PASS. 6 API testi, admin lint/TS/build ve genişletilen izole kaynak tarayıcı paketi PASS. Gerçek veri/deploy yok; Task 05’e başlanmadı.

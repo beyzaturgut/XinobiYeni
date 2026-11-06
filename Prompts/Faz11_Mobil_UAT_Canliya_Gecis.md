@@ -210,3 +210,8 @@ Faz00'dan son doğrulanmış commit, iOS/Android build numarası ve dağıtım k
 | **Proje Yöneticisi — zorunlu nihai kapı** | **Altı onay, müşteri UAT, tüm D kararları, canlı/mağaza kanıtı ve Faz00; eksikte RED ve düzeltme** | **BEKLİYOR** |
 
 Plan belgesi incelemesi uygulama veya müşteri onayı sayılmaz. Faz11 ve proje ancak gerçek kanıt ve **ayrı PM kararı** ile `Tamamlandı` durumuna geçer.
+
+
+## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
+
+Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Maske kaynağı indirme, fotoğraf üretim promptu ve kaynağa bağlı maskeleme promptu korunur; maskenin kendi fotoğrafıyla örtüşmesi ve sipariş yerleşim/dosya güvenliği sürer. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-08,12**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.

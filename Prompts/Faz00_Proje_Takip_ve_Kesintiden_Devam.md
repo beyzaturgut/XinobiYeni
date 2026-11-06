@@ -750,3 +750,8 @@ Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSO
 ## 05.11.2026 — Doğrulanmış release yayımlandı; IIS bekliyor
 
 [DEPLOY-017](../deployments/DEPLOY-017-validated-release-published.md): `xinobi-d8ea431`, kaynak d8ea43160e9704a90bb756369c2fb5cedb421ae5, yeni özel mostidea/xinobi_new reposunda 3 asset yayımlandı; SHA256/CRC/secret dışlama ve paket admin MFA testi PASS. Yerel prova ayarı/verisi pakete alınmadı. Önceki yayımlanan kaynakla migration farkı yok; DB işlemi yapılmadı. Eski canlı GET smoke 200/anonim admin401. Sunucu erişimi yok; gerçek ayarlar/backup/IIS deployment.json ve sonrası smoke henüz doğrulanmadı. GitHub release, canlı kurulum diye sayılmaz. Yeni repo token/script ve operatör komutu kayıt içinde.
+
+
+## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
+
+Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Maske kaynağı indirme, fotoğraf üretim promptu ve kaynağa bağlı maskeleme promptu korunur; maskenin kendi fotoğrafıyla örtüşmesi ve sipariş yerleşim/dosya güvenliği sürer. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-01–12**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.

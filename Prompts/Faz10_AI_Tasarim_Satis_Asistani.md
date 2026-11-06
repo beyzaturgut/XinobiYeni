@@ -155,3 +155,8 @@ Faz00'a son doğrulanmış commit/test, aktif iş ID/job status, kota rezervasyo
 | **Proje Yöneticisi — zorunlu son kapı** | **Altı inceleme, gerçek servis kanıtı, D05/D08/D10, Creative handoff, müşteri UAT ve Faz00; eksikte RED** | **BEKLİYOR** |
 
 Belge incelemesi gerçek uygulama onayı değildir; bu kutular şimdiden işaretlenmez.
+
+
+## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
+
+Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Maske kaynağı indirme, fotoğraf üretim promptu ve kaynağa bağlı maskeleme promptu korunur; maskenin kendi fotoğrafıyla örtüşmesi ve sipariş yerleşim/dosya güvenliği sürer. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-06,09 (AI oturumu açık kaynak seçimi)**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.

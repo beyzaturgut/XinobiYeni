@@ -228,3 +228,8 @@ Her rol ayrı bir kayıt ekler: `rol | karar: bekliyor/onay/revizyon | kanıt ba
 | Proje Yöneticisi (SON KAPI) | Altı rolün kanıtı, müşteri kararları, riskler ve Faz00 güncel | Bekliyor |
 
 Herhangi bir rol `revizyon` derse görev sahibi düzeltir ve rol tekrar bakar. Altı rolün onayı ve gereken müşteri kararları olmadan PM onay veremez; PM onayı olmadan sonraki fazın bağımlı işi başlamaz. Faz00 karar tablosu gerçek uygulama sırasında doldurulur.
+
+
+## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
+
+Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Maske kaynağı indirme, fotoğraf üretim promptu ve kaynağa bağlı maskeleme promptu korunur; maskenin kendi fotoğrafıyla örtüşmesi ve sipariş yerleşim/dosya güvenliği sürer. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-02 (06/09 sözleşme etkisi)**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.

@@ -199,3 +199,8 @@ Her rol `Faz00_Proje_Takip_ve_Kesintiden_Devam.md` karar/inceleme kaydına `Faz0
 
 
 05.11.2026 — Web ve admin tarayıcı sekme simgeleri Xinobi kimliğine uyarlandı. Web/admin build ve icon görsel kontrolü PASS; TST-256. Henüz deploy edilmedi.
+
+
+## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
+
+Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Maske kaynağı indirme, fotoğraf üretim promptu ve kaynağa bağlı maskeleme promptu korunur; maskenin kendi fotoğrafıyla örtüşmesi ve sipariş yerleşim/dosya güvenliği sürer. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-07 (03/05 ve 08 ile görsel eşlik)**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.

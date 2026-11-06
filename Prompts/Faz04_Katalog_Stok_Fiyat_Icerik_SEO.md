@@ -172,3 +172,8 @@ Her rol kendi kanıtını inceleyip tarih, kişi, bulgu ve çözüm bağlantıs�
 - [ ] Sr. Full Stack Developer — panel→API→web/mobil sözleşme, uçtan uca test ve dağıtımı onayladı.
 - [ ] Web Designer (ek zorunlu rol) — Analiz2 ana sayfa CMS blok sözleşmesi, slider/medya davranışı ve web ekranlarının onaylı tasarıma uygunluğunu onayladı.
 - [ ] Proje Yöneticisi — **zorunlu nihai onay**; altı inceleme, ürün sahibi D02/D10 kararları ve kanıtlar tamamlanınca fazı Faz00'da kapattı.
+
+
+## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
+
+Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Maske kaynağı indirme, fotoğraf üretim promptu ve kaynağa bağlı maskeleme promptu korunur; maskenin kendi fotoğrafıyla örtüşmesi ve sipariş yerleşim/dosya güvenliği sürer. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-01,03,04**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.

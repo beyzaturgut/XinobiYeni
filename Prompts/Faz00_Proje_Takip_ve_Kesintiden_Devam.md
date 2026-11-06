@@ -770,3 +770,8 @@ Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizal
 ## 06.11.2026 — KIS-TEK-03 admin tek kaynak yönetimi
 
 Katalogda bağımsız kaynak seç/yükle/kaydet/indir alanı; renk/HEX bağımsızlığı, değişmez kaynak kopyası, revizyon çakışması, kaynak yok/hata/yetki/stale/başarı, taslak/ayrılma/çıkış koruması eklendi. Yeni kaynak mağazadaki önizlemeye henüz bağlanmıyor; maske ve web/Flutter/checkout 05–10’da, fotoğraf promptunu kaldırma 04’te açık. [Runbook](../docs/runbooks/personalization-source-management.md), [TST-258](../test/2026-11-06/TST-258-personalization-source-management.md). API 601 PASS/29 SKIP/0 FAIL; admin seri 23/23 paket, yeni alan responsive/klavye/axe PASS. Gerçek veri değişmedi; yerel servisler yenilendi; deploy/APK yok.
+
+
+## 06.11.2026 — KIS-TEK-04 doğrudan kaynak, fotoğraf üretim promptu kaldırıldı
+
+Katalog ana ekranı ve Medya sekmesindeki fotoğraf üretim promptu; üretici/MASTER/renk/HEX/1333×2000 kodu ve kullanılmayan CSS kaldırıldı. Doğrudan kaynak yükleme/indirme korunur; 5001×3730 PNG bayt karşılaştırması PASS. Maskeleme promptu değişmedi. [TST-259](../test/2026-11-06/TST-259-direct-source-no-photo-prompt.md). Task 04 tamam; yeni kaynağın maske onayı ve çoklu renge uygulama temizliği 05/06’da, müşteri akışı 07–10’da açık. Gerçek veri veya sunucu ayarı değiştirilmedi; deploy/APK yok.

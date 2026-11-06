@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03 uygulandı; KIS-TEK-04…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03 ve 04 uygulandı; KIS-TEK-05…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -69,7 +69,7 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** 01,02 · **Durum:** Uygulandı ve izole doğrulandı (06.11.2026).
 
-**Teslim:** [Kaynak yönetimi](../runbooks/personalization-source-management.md), [TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md). Yeni kaynak hazırlığı ayrı saklanır; gerçek ürün seçimi yapılmadı. Maske onayı ve web/Flutter geçişi 05–10 kapsamında açık; fotoğraf promptunu kaldırma 04 kapsamında açık.
+**Teslim:** [Kaynak yönetimi](../runbooks/personalization-source-management.md), [TST-258](../../test/2026-11-06/TST-258-personalization-source-management.md). Yeni kaynak hazırlığı ayrı saklanır; gerçek ürün seçimi yapılmadı. Maske onayı ve web/Flutter geçişi 05–10 kapsamında açık; fotoğraf promptu 04 ile kaldırıldı.
 
 ### KIS-TEK-04 — Fotoğraf üretim promptunu kaldırma ve doğrudan kaynak yükleme
 
@@ -79,7 +79,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Farklı boyut/orandaki geçerli görseller yalnız ölçüleri nedeniyle reddedilmez. Ürün fotoğrafı üretim promptu görünmez; maskeleme promptu kalır. İndirilen kaynak, maskeye esas alınan dosyayla aynı hash ve boyuttadır. Normal katalog renkleri bu işlemle silinmez. Format/dosya bütünlüğü ve mevcut güvenli dosya işleme kontrolleri korunur; sabit tuval dayatmasına dönüşmez.
 
-**Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** 01,03 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** 01,03 · **Durum:** Uygulandı ve doğrulandı (06.11.2026).
+
+**Teslim:** [TST-259](../../test/2026-11-06/TST-259-direct-source-no-photo-prompt.md). Fotoğraf üretim promptunun iki girişi ve kullanılmayan modülleri kaldırıldı; 5001×3730 PNG ham yükleme/indirmede birebir korundu. Maskeleme promptu aynen kaldı; yeni kaynağa bağlanması ve toplu renk maskesi temizliği 05/06’da açık.
 
 ### KIS-TEK-05 — Maskeleme ekranını tek görsele indirme ve prompt boyutunu dinamikleştirme
 

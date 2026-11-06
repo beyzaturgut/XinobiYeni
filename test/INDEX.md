@@ -401,3 +401,8 @@
 ## 06.11.2026 — KIS-TEK-03
 
 [TST-258 — admin tek kaynak yönetimi](2026-11-06/TST-258-personalization-source-management.md): API 601 PASS / 29 SKIP / 0 FAIL; admin seri 23/23 paket, kaynak alanı responsive/klavye/axe PASS; lint 0 hata/4 eski uyarı, TS/üretim build PASS. Immutable kaynak kopyası, revizyon, hata/yetki/stale ve taslak korumaları uygulandı. Gerçek veri/migration/deploy/APK yok; maske/müşteri akışı sonraki tasklar.
+
+
+## 06.11.2026 — KIS-TEK-04
+
+[TST-259 — fotoğraf üretim promptu kaldırıldı](2026-11-06/TST-259-direct-source-no-photo-prompt.md): katalog ve Medya girişleri/kullanılmayan modüller kaldırıldı; kaynak ve katalog tarayıcı senaryoları, 5001×3730 PNG ham yükleme/indirme, 6 odaklı API testi, lint/TS/üretim build PASS. Maskeleme promptu korundu; task 05/06 kapsamı açık. Gerçek veri/deploy/APK yok.

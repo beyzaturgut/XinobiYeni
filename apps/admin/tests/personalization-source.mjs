@@ -15,7 +15,8 @@ const sha=createHash('sha256').update(bytes).digest('hex'),image='/api/v1/local-
 const asset={image,sha256:sha,mime:'image/png',bytes:bytes.length,width:73,height:41}
 const product={...original,personalizable:true,variants:[{...original.variants[0],color:'',hex:'',image}]}
 const other={...product,id:'UI-P2',name:'İkinci izole ürün',variants:[]}
-async function fixture({write=true,mode='none',holdSave=false}={}){
+async function fixture({write=true,mode='none',holdSave=false,sourceBytes=bytes}={}){
+ const fixtureAsset=sourceBytes===bytes?asset:{...asset,sha256:createHash('sha256').update(sourceBytes).digest('hex'),bytes:sourceBytes.length,width:sourceBytes.readUInt32BE(16),height:sourceBytes.readUInt32BE(20)}
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage()
  let current={productId:product.id,revision:0,status:'none',source:null,surfaceStatus:'none'},writes=0,uploads=0,failure=false,malformed=false
  let releaseSave;const saveGate=new Promise(resolve=>{releaseSave=resolve})
@@ -23,24 +24,31 @@ async function fixture({write=true,mode='none',holdSave=false}={}){
  await mockPanel(page,{permissions:[...permissions.filter(p=>p!=='catalog.write'),...(write?['catalog.write','media.write']:[])],handler:async(route,path)=>{
   const req=route.request()
   if(path.endsWith('/state')){await route.fulfill({json:{...store,products:[product,other]}});return true}
-  if(path.includes('/local-commerce/media/')){await route.fulfill({contentType:'image/png',body:bytes});return true}
-  if(path.endsWith('/local-commerce/media')&&req.method()==='POST'){uploads++;await route.fulfill({json:{src:'/api/v1/local-commerce/media/'+'c'.repeat(32)+'.png'}});return true}
+  if(path.includes('/local-commerce/media/')){await route.fulfill({contentType:'image/png',body:sourceBytes});return true}
+  if(path.endsWith('/local-commerce/media')&&req.method()==='POST'){
+   const contentType=req.headers()['content-type'],boundary=/boundary=(?:"([^"]+)"|([^;]+))/.exec(contentType)
+   assert.ok(boundary,'Multipart boundary is present')
+   const body=req.postDataBuffer(),start=body.indexOf(Buffer.from('\r\n\r\n'))+4
+   const end=body.indexOf(Buffer.from('\r\n--'+(boundary[1]||boundary[2])),start)
+   assert.ok(start>=4&&end>start,'Multipart contains file bytes')
+   assert.deepEqual(body.subarray(start,end),sourceBytes,'Uploaded source must preserve every byte')
+   uploads++;await route.fulfill({json:{src:'/api/v1/local-commerce/media/'+'c'.repeat(32)+'.png'}});return true}
   if(path.includes('/personalization-sources/')){
-   if(path.endsWith('/candidate')){await route.fulfill({json:{...asset,image:new URL(req.url()).searchParams.get('image')}});return true}
+   if(path.endsWith('/candidate')){await route.fulfill({json:{...fixtureAsset,image:new URL(req.url()).searchParams.get('image')}});return true}
    if(req.method()==='PUT'){
     writes++;if(holdSave)await saveGate
     assert.equal(req.postDataJSON().expectedRevision,current.revision)
-    assert.equal(req.postDataJSON().sourceSha256,sha)
+    assert.equal(req.postDataJSON().sourceSha256,fixtureAsset.sha256)
     if(failure){await route.fulfill({status:503,json:{message:'İzole kayıt hatası'}});return true}
     if(malformed){await route.fulfill({json:{}});return true}
-    current={...current,revision:current.revision+1,status:'ready',source:asset,surfaceStatus:'pending'}
+    current={...current,revision:current.revision+1,status:'ready',source:fixtureAsset,surfaceStatus:'pending'}
     await route.fulfill({json:current});return true
    }
    if(mode==='loading')await gate
    if(mode==='error'){await route.fulfill({status:503,json:{message:'İzole kaynak servisi hatası'}});return true}
    if(mode==='denied'){await route.fulfill({status:403,json:{}});return true}
    if(mode==='malformed'){await route.fulfill({json:[]});return true}
-   if(mode==='stale')current={...current,revision:1,status:'stale',source:asset,surfaceStatus:'pending'}
+   if(mode==='stale')current={...current,revision:1,status:'stale',source:fixtureAsset,surfaceStatus:'pending'}
    await route.fulfill({json:current});return true
   }
   return false
@@ -53,6 +61,13 @@ try{
  const f=await fixture({mode:'loading'}),p=f.page
  await p.getByText('Kaynak fotoğraf yükleniyor…',{exact:true}).waitFor();f.setMode('none');f.releaseLoad()
  await p.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor()
+ assert.equal(await p.getByText('XINOBI U · Katalog görseli promptu',{exact:true}).count(),0)
+ await p.getByRole('button',{name:product.name+' ürününü düzenle',exact:true}).click()
+ await p.getByRole('button',{name:'Medya',exact:true}).click()
+ assert.equal(await p.getByRole('heading',{name:'Orijinal ürün görseli',exact:true}).count(),1,'Normal catalogue media remains')
+ assert.equal(await p.getByText('XINOBI U · Katalog görseli promptu',{exact:true}).count(),0)
+ assert.equal(await p.getByLabel('Hazır katalog görseli promptu',{exact:true}).count(),0)
+ await p.getByRole('button',{name:'Ürün düzenlemeyi kapat',exact:true}).click()
  await p.getByLabel('Mevcut katalog fotoğrafını kullan').selectOption(image)
  await p.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
  p.once('dialog',d=>d.dismiss());await p.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click();assert.equal(f.writes,0)
@@ -73,7 +88,8 @@ try{
  assert.deepEqual(scan.violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>v.id),[])
  await p.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).focus();await p.keyboard.press('Tab')
  assert.equal(await p.getByRole('button',{name:'Güncel kaydı yükle',exact:true}).evaluate(e=>e===document.activeElement),true)
- const download=p.waitForEvent('download');await p.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).click();await download
+ const download=p.waitForEvent('download');await p.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).click();const downloaded=await download
+ assert.deepEqual(readFileSync(await downloaded.path()),bytes,'Downloaded source preserves every byte')
  await p.getByText('Kaynak fotoğraf indirme için tarayıcıya verildi.',{exact:true}).waitFor()
  for(const width of [320,390,768,1440]){
   await p.setViewportSize({width,height:1000})
@@ -117,5 +133,16 @@ try{
  await upload.page.getByText('73 × 41 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
  assert.equal(upload.uploads,1);assert.equal(upload.writes,0)
  await upload.page.screenshot({path:output+'/single-source-1440.png',fullPage:true});await upload.page.close()
- console.log('PASS single-source load/empty/error/denied/stale/success, malformed success, confirmations/dirty guard, raw upload, download, responsive + 200%')
+ const largeBytes=readFileSync(new URL('../../../fixtures/product-surfaces/ec501-metallic-silver/fe618b58-1ced-4edd-9063-6d6c49961e65/mask.png',import.meta.url))
+ const large=await fixture({sourceBytes:largeBytes}),lp=large.page
+ await lp.getByText('Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.',{exact:true}).waitFor()
+ await lp.getByLabel('Tek kaynak fotoğraf yükle').setInputFiles({name:'large-nonstandard-source.png',mimeType:'image/png',buffer:largeBytes})
+ await lp.getByText('5001 × 3730 px · Kaydedilmemiş seçim',{exact:true}).waitFor()
+ lp.once('dialog',d=>d.accept());await lp.getByRole('button',{name:'Kaynak fotoğrafı kaydet',exact:true}).click()
+ await lp.getByText('Kaynak fotoğraf kaydedildi. Bu kaynak için maske onayı bekleniyor; eski sipariş dosyaları korunuyor.',{exact:true}).waitFor()
+ const largeDownload=lp.waitForEvent('download');await lp.getByRole('button',{name:'Kayıtlı kaynak fotoğrafı indir',exact:true}).click()
+ const largeFile=await largeDownload
+ assert.deepEqual(readFileSync(await largeFile.path()),largeBytes,'Large source is not resized/reencoded on upload or download')
+ assert.equal(large.uploads,1);assert.equal(large.writes,1);await lp.close()
+ console.log('PASS single-source load/empty/error/denied/stale/success, malformed success, confirmations/dirty guard, photo generation prompt absent in both locations; exact upload/download bytes, responsive + 200%')
 }finally{await browser.close()}

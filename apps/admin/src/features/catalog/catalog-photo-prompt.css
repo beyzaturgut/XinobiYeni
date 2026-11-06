@@ -1,8 +1,0 @@
-.catalog-photo-prompt-launcher{grid-column:1/-1;min-width:0;margin:8px 0;border:1px solid #ddd;border-radius:6px;background:#fff}
-.catalog-photo-prompt-launcher>summary{padding:9px 12px;cursor:pointer;font-size:13px;font-weight:600}
-.catalog-photo-prompt-launcher[open]>label,.catalog-photo-prompt-launcher[open]>p{display:block;margin:8px 12px;font-size:13px}
-.catalog-photo-prompt-launcher>label select{margin-left:8px;max-width:100%}
-.catalog-photo-prompt{display:grid;gap:10px;align-items:start;box-sizing:border-box;min-width:0;margin:0 12px 12px;padding:12px 14px;border:1px solid #e3e3e3;border-radius:8px;background:#fff;font-size:13px}
-.catalog-photo-prompt .prompt-box textarea{max-height:260px}
-.catalog-photo-prompt h3{margin:0;font-size:15px}
-.catalog-photo-prompt p{margin:0;line-height:1.5;color:#555;font-size:12px}

@@ -1,5 +1,7 @@
 # Aynı hizada renk fotoğrafı üretme istemi
 
+> **06.11.2026 — Tarihsel belge; güncel iş akışı değildir.** KIS-TEK-04 ile fotoğraf üretim promptu admin panelden kaldırıldı. Kişiselleştirme kaynağı doğrudan yüklenir; sabit piksel boyutu ve çoklu renk fotoğrafı üretimi gerekmez. Güncel kullanım: [tek kaynak yönetimi](personalization-source-management.md). Aşağıdaki eski istem yalnız geçmiş kayıt olarak korunur.
+
 Amaç: Elde yalnızca bir ana görsel varken, ürünün bütün renklerini aynı tuvalde, aynı konum ve ölçekte, beyaz arka planlı fotoğraf olarak ürettirmek. Böylece admin panelde tek ortak maske **Seçilen renklerde onayla** ile her renge hizalama gerekmeden uygulanır ([guided-shared-product-mask.md](guided-shared-product-mask.md)).
 
 ## Kullanım

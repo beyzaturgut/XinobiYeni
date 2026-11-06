@@ -91,14 +91,18 @@ public sealed class SuratKargoClient(HttpClient http, Microsoft.Extensions.Optio
             {
                 // The current provider OpenAPI differs from the old PDF: weights are strings and Iademi is boolean.
                 // Keep the domain/persisted model numeric; adapt only the outbound wire contract.
+                // Provider support example supplied 2026-11-06 includes explicit empty strings and non-COD 0/null fields.
                 Content = JsonContent.Create(new { KullaniciAdi = account.Username, Sifre = account.Password, Gonderi = new
                 {
-                    shipment.KisiKurum, shipment.AliciAdresi, shipment.Il, shipment.Ilce, shipment.TelefonCep,
+                    shipment.KisiKurum, SahisBirim = "", shipment.AliciAdresi, shipment.Il, shipment.Ilce,
+                    TelefonEv = "", TelefonIs = "", shipment.TelefonCep, Email = "", AliciKodu = "",
+                    shipment.KargoTuru, shipment.OdemeTipi, IrsaliyeSeriNo = "", IrsaliyeSiraNo = "", ReferansNo = "",
                     shipment.OzelKargoTakipNo, shipment.Adet,
                     BirimDesi = shipment.BirimDesi.ToString(System.Globalization.CultureInfo.InvariantCulture),
                     BirimKg = shipment.BirimKg.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    shipment.OdemeTipi, shipment.KargoTuru, shipment.TasimaSekli, shipment.TeslimSekli,
-                    shipment.GonderiSekli, Iademi = false, shipment.Pazaryerimi, shipment.EntegrasyonFirmasi
+                    KargoIcerigi = "", KapidanOdemeTahsilatTipi = 0, KapidanOdemeTutari = (decimal?)null, EkHizmetler = "",
+                    shipment.TasimaSekli, shipment.TeslimSekli, SevkAdresi = "", shipment.GonderiSekli, TeslimSubeKodu = "",
+                    shipment.Pazaryerimi, shipment.EntegrasyonFirmasi, Iademi = false
                 } }, options: Wire)
             };
             using var response = await http.SendAsync(request, cancellationToken);

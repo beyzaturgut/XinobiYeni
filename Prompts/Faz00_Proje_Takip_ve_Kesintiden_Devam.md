@@ -785,3 +785,8 @@ Katalog ana ekranı ve Medya sekmesindeki fotoğraf üretim promptu; üretici/MA
 ## 06.11.2026 — KIS-TEK-05 tek kaynak maskeleme
 
 Ürün başına tek kaynak/sürümle maske yükleme, taslak, tek onay, geri alma ve gerçek WebP indirme uygulandı. Renk önizlemesi, ortak renk listesi, aynı konum kutusu ve toplu onay UI’dan kaldırıldı. Promptun maskeleme kuralları korundu; gerçek kaynak boyutu/hash/sürümü kullanılır. Kaynak değişimi eski maskeyi uygulamaz; geçmiş dosyalar korunur. [Runbook](../docs/runbooks/single-source-masking.md), [TST-261](../test/2026-11-06/TST-261-single-source-masking.md). API 607 PASS/29 SKIP; yeni maske tarayıcı paketi ve admin durum regresyonu PASS. Eski yazma rotaları/public yayın/istemci uyumu ve 20 MP bütçe 06’da açık. Gerçek veri/AI/deploy/APK yok.
+
+
+## 06.11.2026 — Sürat destek yanıtı ve örnek JSON uyumu
+
+Sağlayıcı iletilen test referanslarıyla kayıt oluşmadığını teyit etti; başarılı kayıtlara taleple prova hareketi ekleyebileceğini bildirdi. Create isteğine örnekteki boş alanlar ve kapıda tahsilatsız 0/null eklendi. [Yanıt/operatör adımları](../Entegrasyonlar/01-Surat-Kargo/SAGLAYICI-YANITI-2026-11-06.md), [TST-262](../test/2026-11-06/TST-262-surat-provider-support-example.md): 82 Sürat testi PASS; gerçek gönderi/mutabakat/e-posta/deploy yok. Eski kök neden kesin değil; gerçek kabul ve hareket testi açık.

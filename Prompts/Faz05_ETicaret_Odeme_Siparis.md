@@ -212,3 +212,8 @@ Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSO
 ## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
 
 Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Güncel revizyon: fotoğraf üretim promptu kaldırılacak; doğrudan yüklenen tek görsel kaynak olacak ve sabit piksel boyutu/en-boy oranı şartı olmayacak. Kaynak indirme ve maskeleme promptu korunacak; prompt boyutu kaynağın gerçek ölçüsünden alınacak, diğer maskeleme kuralları aynen kalacak. Birden fazla görsele aynı maskeyi uygulama/toplu renk onayı kaldırılacak. Maskenin kendi fotoğrafıyla ölçü/koordinat eşliği ve sipariş dosya güvenliği sürecek. Task 01–03 aynı; 04–12 revize edildi. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-09**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.
+
+
+## 06.11.2026 — Sürat destek yanıtı ve örnek JSON uyumu
+
+Sağlayıcı iletilen test referanslarıyla kayıt oluşmadığını teyit etti; başarılı kayıtlara taleple prova hareketi ekleyebileceğini bildirdi. Create isteğine örnekteki boş alanlar ve kapıda tahsilatsız 0/null eklendi. [Yanıt/operatör adımları](../Entegrasyonlar/01-Surat-Kargo/SAGLAYICI-YANITI-2026-11-06.md), [TST-262](../test/2026-11-06/TST-262-surat-provider-support-example.md): 82 Sürat testi PASS; gerçek gönderi/mutabakat/e-posta/deploy yok. Eski kök neden kesin değil; gerçek kabul ve hareket testi açık.

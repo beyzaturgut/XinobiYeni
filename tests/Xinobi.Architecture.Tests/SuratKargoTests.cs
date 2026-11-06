@@ -37,11 +37,44 @@ public class SuratKargoTests
             Assert.Equal(JsonValueKind.String, g.GetProperty("BirimKg").ValueKind);
             Assert.Equal("", g.GetProperty("EntegrasyonFirmasi").GetString());
             Assert.Equal("TEST-ORDER-1", g.GetProperty("OzelKargoTakipNo").GetString());
-            Assert.False(g.TryGetProperty("KapidanOdemeTutari", out _));
+            Assert.Equal(JsonValueKind.Null, g.GetProperty("KapidanOdemeTutari").ValueKind);
+            Assert.Equal(0, g.GetProperty("KapidanOdemeTahsilatTipi").GetInt32());
             return Response(reply);
         });
         Assert.Equal(expected, (await Client(h).CreateAsync(Shipment)).State); Assert.Equal(1, h.Calls);
     }
+    [Fact]
+    public async Task Create_matches_provider_support_example_without_copying_sample_identity_or_reference()
+    {
+        var handler = new Handler(async request =>
+        {
+            using var body = JsonDocument.Parse(await request.Content!.ReadAsStringAsync());
+            Assert.Equal(new[] { "Gonderi", "KullaniciAdi", "Sifre" }, body.RootElement.EnumerateObject().Select(x => x.Name).Order().ToArray());
+            Assert.Equal("fixture-user", body.RootElement.GetProperty("KullaniciAdi").GetString());
+            var g = body.RootElement.GetProperty("Gonderi");
+            var expected = new[] { "KisiKurum", "SahisBirim", "AliciAdresi", "Il", "Ilce", "TelefonEv", "TelefonIs", "TelefonCep", "Email", "AliciKodu", "KargoTuru", "OdemeTipi", "IrsaliyeSeriNo", "IrsaliyeSiraNo", "ReferansNo", "OzelKargoTakipNo", "Adet", "BirimDesi", "BirimKg", "KargoIcerigi", "KapidanOdemeTahsilatTipi", "KapidanOdemeTutari", "EkHizmetler", "TasimaSekli", "TeslimSekli", "SevkAdresi", "GonderiSekli", "TeslimSubeKodu", "Pazaryerimi", "EntegrasyonFirmasi", "Iademi" };
+            Assert.Equal(expected.Order(), g.EnumerateObject().Select(x => x.Name).Order());
+            foreach (var key in new[] { "SahisBirim", "TelefonEv", "TelefonIs", "Email", "AliciKodu", "IrsaliyeSeriNo", "IrsaliyeSiraNo", "ReferansNo", "KargoIcerigi", "EkHizmetler", "SevkAdresi", "TeslimSubeKodu", "EntegrasyonFirmasi" })
+                Assert.Equal("", g.GetProperty(key).GetString());
+            Assert.Equal(0, g.GetProperty("KapidanOdemeTahsilatTipi").GetInt32());
+            Assert.Equal(JsonValueKind.Null, g.GetProperty("KapidanOdemeTutari").ValueKind);
+            Assert.Equal(JsonValueKind.False, g.GetProperty("Iademi").ValueKind);
+            Assert.Equal("2.5", g.GetProperty("BirimDesi").GetString());
+            Assert.Equal("1.25", g.GetProperty("BirimKg").GetString());
+            Assert.Equal(3, g.GetProperty("KargoTuru").GetInt32());
+            Assert.Equal(1, g.GetProperty("OdemeTipi").GetInt32());
+            Assert.Equal(1, g.GetProperty("TasimaSekli").GetInt32());
+            Assert.Equal(1, g.GetProperty("TeslimSekli").GetInt32());
+            Assert.Equal(0, g.GetProperty("GonderiSekli").GetInt32());
+            Assert.Equal(0, g.GetProperty("Pazaryerimi").GetInt32());
+            Assert.Equal("Test alıcı", g.GetProperty("KisiKurum").GetString());
+            Assert.Equal("TEST-ORDER-1", g.GetProperty("OzelKargoTakipNo").GetString());
+            return Response("Tamam");
+        });
+        var result = await Client(handler).CreateAsync(Shipment with { BirimDesi = 2.5m, BirimKg = 1.25m });
+        Assert.Equal(SuratCreateState.Registered, result.State); Assert.Equal(1, handler.Calls);
+    }
+
     [Theory]
     [InlineData(false,"Sandbox",false)] [InlineData(true,"Production",false)] [InlineData(true,"typo",true)]
     public async Task Invalid_configuration_never_sends(bool enabled,string mode,bool live)

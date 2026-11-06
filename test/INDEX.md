@@ -416,3 +416,8 @@
 ## 06.11.2026 — KIS-TEK-05
 
 [TST-261 — tek kaynak maskeleme](2026-11-06/TST-261-single-source-masking.md): API 607 PASS/29 SKIP/0 FAIL; 12 odaklı kaynak/maske testi; admin seri 24/24 paket ve 15 durum senaryosu PASS. Tek kaynak yükle/onay/geri al/WebP indir, prompt, kaynak değişiminde stale/temiz canvas, readonly ve a11y PASS. Lint 0 hata/1 eski uyarı, admin/API üretim build PASS. Legacy rotalar/public yayın ve 20 MP kapasite 06’da açık. Gerçek veri/AI/deploy/APK yok.
+
+
+## 06.11.2026 — Sürat destek örneği
+
+[TST-262](2026-11-06/TST-262-surat-provider-support-example.md): destek JSON’una açık boş alanlar ve COD 0/null uyumu; 82 izole Sürat testi PASS, API Release PASS. Sağlayıcı kayıt yokluğu teyidi ve kontrollü tekrar/hareket adımları belgelendi. Gerçek gönderi, kayıt mutabakatı veya e-posta/deploy yapılmadı; gerçek kabul açık.

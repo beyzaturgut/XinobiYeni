@@ -755,3 +755,8 @@ Güncel prova şemasında Iademi boolean, BirimDesi/BirimKg string; outbound JSO
 ## 06.11.2026 — Kişiselleştirmede tek kaynak fotoğraf/maske planı
 
 Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizalama gerekmiyor. Güncel revizyon: fotoğraf üretim promptu kaldırılacak; doğrudan yüklenen tek görsel kaynak olacak ve sabit piksel boyutu/en-boy oranı şartı olmayacak. Kaynak indirme ve maskeleme promptu korunacak; prompt boyutu kaynağın gerçek ölçüsünden alınacak, diğer maskeleme kuralları aynen kalacak. Birden fazla görsele aynı maskeyi uygulama/toplu renk onayı kaldırılacak. Maskenin kendi fotoğrafıyla ölçü/koordinat eşliği ve sipariş dosya güvenliği sürecek. Task 01–03 aynı; 04–12 revize edildi. [12 tasklık değişiklik planı](../docs/tasks/personalization-single-source-tasks-2026-11-06.md); bu fazla ilişkili tasklar: **KIS-TEK-01–12**. Hepsi açık; yalnız plan hazırlandı, uygulama/veri geçişi/deploy yapılmadı. Normal ürün renkleri ve tarihsel siparişler korunacak.
+
+
+## 06.11.2026 — KIS-TEK-01 teknik model teslimi
+
+[ADR-005](../docs/decisions/ADR-005-personalization-single-source.md): ürün başına tek profil, değişmez kaynak/yüzey sürümü ve açık fulfillmentVariantId bağı tanımlandı. SKU/fiyat/stok aynı ürünün seçilen ticari varyantından; ilk varyant/fiyat fallback’i yok. Doğrudan kaynak yükleme, sabit tuval olmadan gerçek ölçü, maske eşliği ve üç sipariş dosyası korunumu tanımlandı. Teknik tanım tamam; işletmenin gerçek ürün/SKU ve fiyat kapsamı kabulü bekliyor, task tamamen kapalı değil. Task 02–12 başlanmadı. Kod/veri/deploy değişmedi.

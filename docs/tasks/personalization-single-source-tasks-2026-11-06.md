@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Yalnız inceleme ve planlama; 12 taskın tamamı açık. Uygulama, veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Yalnız inceleme ve planlama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02…12 açık. Uygulama, veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -43,7 +43,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Tek kaynak seçimi kalıcıdır ve katalog sırası değişince değişmez. Normal satış renkleri korunur. Desenli ürünün hangi SKU/stok/fiyatla satıldığı bellidir; işletme kararı gerektiren eşlemeler açık listelenir.
 
-**Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** — · **Durum:** Açık / başlanmadı.
+**Faz:** Faz04 · **Öncelik:** P1 · **Bağımlılık:** — · **Durum:** Teknik model tamamlandı; işletmenin ürün bazlı SKU/fiyat/stok eşleme kabulü bekliyor.
+
+**Teslim:** [ADR-005 — veri modeli, ticari bağ, durumlar ve kabul senaryoları](../decisions/ADR-005-personalization-single-source.md). Kaynak kodu veya katalog verisi değiştirilmedi; task bütünüyle kapatılmadı.
 
 ### KIS-TEK-02 — Mevcut kişiselleştirme verilerinin güvenli geçişini planlama
 

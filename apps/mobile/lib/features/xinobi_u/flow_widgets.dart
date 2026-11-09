@@ -80,7 +80,12 @@ class XinobiUSteps extends StatelessWidget {
 
 /// The selected product: photo on the warm grey stage, name and a way back to the product list.
 class FlowProductCard extends StatelessWidget {
-  const FlowProductCard({super.key, required this.name, required this.imageUrl, required this.onOtherProduct});
+  const FlowProductCard({
+    super.key,
+    required this.name,
+    required this.imageUrl,
+    required this.onOtherProduct,
+  });
   final String name;
   final String? imageUrl;
   final VoidCallback onOtherProduct;
@@ -88,32 +93,76 @@ class FlowProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(border: Border.all(color: const Color(0xFFE6E6E6)), borderRadius: BorderRadius.circular(16)),
+      decoration: BoxDecoration(
+        border: Border.all(color: const Color(0xFFE6E6E6)),
+        borderRadius: BorderRadius.circular(16),
+      ),
       clipBehavior: Clip.antiAlias,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Container(
-          height: 150,
-          color: flowStage,
-          padding: const EdgeInsets.all(12),
-          // Modulating by the stage colour drops the photo's white background (like the web's mix-blend-mode) and keeps transparency.
-          child: imageUrl == null
-              ? null
-              : ColorFiltered(colorFilter: const ColorFilter.mode(flowStage, BlendMode.modulate), child: RemoteImage(imageUrl, label: name)),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
-          child: Row(children: [
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('SEÇTİĞİN ÜRÜN', style: inter(11, weight: 600, letterSpacing: .12, color: flowMuted)),
-                const SizedBox(height: 2),
-                Text(name, style: inter(16, weight: 600, color: flowInk)),
-              ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            height: 150,
+            color: flowStage,
+            padding: const EdgeInsets.all(12),
+            // Modulating by the stage colour drops the photo's white background (like the web's mix-blend-mode) and keeps transparency.
+            child: imageUrl == null
+                ? null
+                : ColorFiltered(
+                    colorFilter: const ColorFilter.mode(
+                      flowStage,
+                      BlendMode.modulate,
+                    ),
+                    child: RemoteImage(imageUrl, label: name, cacheWidth: 1000),
+                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final nameBlock = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'SEÇTİĞİN ÜRÜN',
+                      style: inter(
+                        11,
+                        weight: 600,
+                        letterSpacing: .12,
+                        color: flowMuted,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(name, style: inter(16, weight: 600, color: flowInk)),
+                  ],
+                );
+                final change = TextButton(
+                  onPressed: onOtherProduct,
+                  child: Text(
+                    'Başka ürün seç →',
+                    style: inter(13, weight: 500, color: flowInk),
+                  ),
+                );
+                return constraints.maxWidth < 320 ||
+                        bodyTextFactor(context) > 1.3
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          nameBlock,
+                          Align(alignment: Alignment.centerLeft, child: change),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Expanded(child: nameBlock),
+                          change,
+                        ],
+                      );
+              },
             ),
-            TextButton(onPressed: onOtherProduct, child: Text('Başka ürün seç →', style: inter(13, weight: 500, color: flowInk))),
-          ]),
-        ),
-      ]),
+          ),
+        ],
+      ),
     );
   }
 }

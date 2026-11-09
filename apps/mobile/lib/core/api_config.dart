@@ -48,22 +48,20 @@ Uri? xinobiMobilePreviewUri({
 /// Opens the shared local-artwork upload and placement steps with an exact catalog identity; [pattern] opens the pattern upload.
 Uri? xinobiOwnImageUri({
   required String productId,
-  required String variantId,
+   String ?variantId,
   bool pattern = false,
   String override = const String.fromEnvironment('XINOBI_WEB_PREVIEW_URL'),
 }) {
   final base = xinobiMobilePreviewUri(override: override);
   final identifier = RegExp(r'^[A-Za-z0-9_-]{1,128}$');
   if (base == null ||
-      !identifier.hasMatch(productId) ||
-      !identifier.hasMatch(variantId)) {
+      !identifier.hasMatch(productId) ) {
     return null;
   }
   return base.replace(
     path: '/xinobi-u/kendi-gorselin/',
     queryParameters: {
       'product': productId,
-      'variant': variantId,
       if (pattern) 'mode': 'pattern',
       'mobile': '1',
     },

@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06 ve 07 uygulandı; KIS-TEK-08…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07 ve 08 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-09…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -127,7 +127,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Android ve iOS sonuçları ayrı kaydedilir. Renk seçmeden akış tamamlanabilir; farklı kaynak boyutları/oranları bozulmadan görüntülenir ve web ile aynı yerleşim verisini üretir. Yüklenme/boş/hata/başarı ve ağ kesintisinde form korunur. Otomatik/widget testi gerçek cihaz kabulü olarak sunulmaz.
 
-**Faz:** Faz11 · **Öncelik:** P1 · **Bağımlılık:** 06,07 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz11 · **Öncelik:** P1 · **Bağımlılık:** 06,07 · **Durum:** Flutter kod geçişi ve otomatik kabul tamamlandı (09.11.2026); Android/iOS gerçek cihaz kabulü açık.
+
+**Teslim:** [Mobil tek kaynak rehberi](../runbooks/single-source-mobile.md), [TST-265](../../test/2026-11-09/TST-265-single-source-mobile.md); Android/iOS ayrı sonuç kayıtları rehberde. 298 Flutter testi PASS, analiz temiz. Renk istemeyen yönlendirme, sürümlü ürün yüzeyi/oturum ve web ile aynı renderer kullanılır. Yeni kaydet/sepet 09 kapsamında kapalı; fiziksel WebView/galeri/ekran okuyucu ve cihaz kabulü 12/UAT ile açık izlenir.
 
 ### KIS-TEK-09 — Tasarım revizyonu, sepet ve checkout bağlarını güncelleme
 

@@ -61,9 +61,9 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
             final query = state.uri.queryParameters;
             if (query['tasarim'] == null) {
               if (query['urun'] == null) { return const XinobiUScreen(editorEntry: true); }
-              return XinobiUMethodScreen(productId: query['urun']!, variantId: query['renk']);
+              return XinobiUMethodScreen(key: ValueKey(state.uri.toString()),productId: query['urun']!, variantId: query['renk']);
             }
-            return XinobiMobilePreviewScreen(productId: query['urun'], variantId: query['renk'], designId: query['tasarim'], configurationId: query['configuration'], revision: int.tryParse(query['revision'] ?? ''), cartLine: query['line']);
+            return XinobiMobilePreviewScreen(key: ValueKey(state.uri.toString()),productId: query['urun'], variantId: query['renk'], designId: query['tasarim'], configurationId: query['configuration'], revision: int.tryParse(query['revision'] ?? ''), cartLine: query['line']);
           },
         ),
         GoRoute(path: '/giris', builder: (context, state) => const SignInScreen()),
@@ -85,21 +85,21 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(
           path: '/xinobi-u/renk',
           builder: (context, state) => XinobiUMethodScreen(
-            productId: state.uri.queryParameters['urun'] ?? '',
+            key: ValueKey(state.uri.toString()),productId: state.uri.queryParameters['urun'] ?? '',
             variantId: state.uri.queryParameters['renk'],
           ),
         ),
         GoRoute(
           path: '/xinobi-u/anket',
           builder: (context, state) => QuestionnaireScreen(
-            productId: state.uri.queryParameters['urun'] ?? '',
+            key: ValueKey(state.uri.toString()),productId: state.uri.queryParameters['urun'] ?? '',
             variantId: state.uri.queryParameters['renk'],
           ),
         ),
         GoRoute(
           path: '/xinobi-u/kendi-gorselin',
           builder: (context, state) => XinobiMobilePreviewScreen(
-            productId: state.uri.queryParameters['urun'],
+            key: ValueKey(state.uri.toString()),productId: state.uri.queryParameters['urun'],
             variantId: state.uri.queryParameters['renk'],
             pattern: state.uri.queryParameters['mod'] == 'desen',
           ),
@@ -107,7 +107,7 @@ GoRouter buildRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(
           path: '/xinobi-u/mobil-onizleme',
           builder: (context, state) => XinobiMobilePreviewScreen(
-            sessionId: state.uri.queryParameters['session'],
+            key: ValueKey(state.uri.toString()),sessionId: state.uri.queryParameters['session'],
           ),
         ),
       ],

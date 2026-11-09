@@ -18,8 +18,8 @@ void main() {
       expect(uri?.path, '/xinobi-u/kendi-gorselin/');
       expect(uri?.queryParameters, {
         'product': 'P1',
-        'variant': 'V2',
-        'mobile': '1',
+
+        'mobile': '1'
       });
       expect(
         xinobiOwnImageUri(
@@ -27,7 +27,7 @@ void main() {
           variantId: '',
           override: 'https://web.test',
         ),
-        isNull,
+        isNotNull,
       );
       expect(
         xinobiOwnImageUri(

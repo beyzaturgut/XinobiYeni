@@ -38,6 +38,19 @@ VariantDetail _variant(String id, String color, String hex, {int? price, require
   ..maxQuantity = status == 'out_of_stock' ? 0 : (remaining ?? 8));
 
 class FakeCatalog implements CatalogRepository {
+  @override
+  Future<SingleSourceSurface?> singleSourceSurface(String productId) async =>
+      SingleSourceSurface(
+        productId: productId,
+        surfaceId: 'source-1-mask-${'a' * 32}',
+        sourceRevision: 1,
+        width: 317,
+        height: 213,
+        sourceSha256: 'a' * 64,
+        maskSha256: 'b' * 64,
+        sourceUrl: 'https://example.invalid/source.png',
+        maskUrl: 'https://example.invalid/mask.png',
+      );
   int homeCalls = 0;
   bool failHome = false;
   final queries = <ProductQuery>[];

@@ -17,9 +17,7 @@ const _methods = [
   (method: DesignMethod.pattern, title: 'Kendi desenini yükle', description: 'Desenin, ürünün onaylı kişiselleştirme alanının tamamına uygulanır.', cta: 'Desen yükle', icon: Icons.grid_view_outlined),
 ];
 
-/// XINOBI U step 2 (design "Yöntem seçimi"): how the design is made. The colour is chosen later, on the placement
-/// preview; the flow starts from the requested colour when it has its own accepted surface, otherwise from the first
-/// colour that has one. Another colour's mask is never borrowed.
+/// Product-level method selection; the historical colour parameter is ignored for new surfaces.
 class XinobiUMethodScreen extends ConsumerStatefulWidget {
   const XinobiUMethodScreen({super.key, required this.productId, this.variantId});
 
@@ -36,18 +34,19 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
   DesignMethod _method = DesignMethod.image;
   bool _opening = false;
 
-  void _open(ProductDetail detail, VariantDetail start) {
+  void _open(ProductDetail detail) {
     if (_opening) return;
     setState(() => _opening = true);
-    final identity = 'urun=${Uri.encodeQueryComponent(detail.id)}&renk=${Uri.encodeQueryComponent(start.id)}';
+    final identity = 'urun=${Uri.encodeQueryComponent(detail.id)}';
     final location = switch (_method) {
       DesignMethod.ask => '/xinobi-u/anket?$identity',
       DesignMethod.image => '/xinobi-u/kendi-gorselin?$identity',
       DesignMethod.pattern => '/xinobi-u/kendi-gorselin?$identity&mod=desen',
     };
     context.push(location).whenComplete(() {
-      if (mounted) setState(() => _opening = false);
-    });
+      if (mounted) {
+        ref.invalidate(singleSourceSurfaceProvider(detail.id));setState(() => _opening = false);
+    }});
   }
 
   @override
@@ -63,70 +62,92 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
       body: state.when(
         loading: () => const LoadingView(),
         error: (error, _) => ErrorView(error: error, onRetry: () => ref.invalidate(productProvider(widget.productId))),
-        data: (detail) => _body(context, detail),
+        data: (detail) => detail.personalizable
+            ? _body(context, detail)
+            : const EmptyView('Bu ürün kişiselleştirmeye açık değil.'),
       ),
       // The action stays pinned above the system navigation like other app steps; the app bar handles going back.
-      bottomNavigationBar: state.asData?.value == null ? null : _action(state.asData!.value),
+      bottomNavigationBar: state.asData?.value.personalizable != true ? null : _action(state.asData!.value),
     );
   }
 
-  ({List<VariantDetail> variants, VariantDetail? start, bool settled, bool failed}) _readiness(ProductDetail detail) {
-    final variants = detail.variants.toList();
-    // Each colour is ready with a catalogue mask or an accepted development surface.
-    final checks = {
-      for (final variant in variants)
-        variant.id: variant.surfaceMaskUrl?.isNotEmpty == true
-            ? const AsyncValue<bool?>.data(true)
-            : ref.watch(acceptedSurfaceProvider((productId: detail.id, variantId: variant.id))),
-    };
-    bool ready(VariantDetail variant) => checks[variant.id]?.asData?.value == true;
-    final requested = variants.where((variant) => variant.id == widget.variantId).firstOrNull;
-    final settled = checks.values.every((check) => check.hasValue || check.hasError);
-    final failed = checks.values.any((check) => check.hasError || (check.hasValue && check.asData?.value == null));
-    final start = requested != null && ready(requested) ? requested : settled ? variants.where(ready).firstOrNull : null;
-    return (variants: variants, start: start, settled: settled, failed: failed);
-  }
+
 
   Widget _action(ProductDetail detail) {
-    final (:variants, :start, :settled, :failed) = _readiness(detail);
+    final surface = ref.watch(singleSourceSurfaceProvider(detail.id));
+    final start = surface.asData?.value;
+    final settled = !surface.isLoading, failed = surface.hasError;
     final chosen = _methods.firstWhere((item) => item.method == _method);
     return SafeArea(
       child: Container(
-        padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 10, XinobiTokens.gutterMobile, 10),
-        decoration: const BoxDecoration(color: XinobiTokens.surface, border: Border(top: BorderSide(color: flowLine))),
+        padding: const EdgeInsets.fromLTRB(
+          XinobiTokens.gutterMobile,
+          10,
+          XinobiTokens.gutterMobile,
+          10,
+        ),
+        decoration: const BoxDecoration(
+          color: XinobiTokens.surface,
+          border: Border(top: BorderSide(color: flowLine)),
+        ),
         child: FilledButton(
           style: flowPrimaryButton,
-          onPressed: start != null && !_opening
-              ? () => _open(detail, start)
+          onPressed: detail.personalizable && start != null && !_opening
+              ? () => _open(detail)
               : settled && failed
-                  ? () {
-                      for (final variant in variants) {
-                        ref.invalidate(acceptedSurfaceProvider((productId: detail.id, variantId: variant.id)));
-                      }
-                    }
-                  : null,
-          child: Text(start != null ? '${chosen.cta} →' : settled && failed ? 'Tekrar dene' : !settled ? 'Kontrol ediliyor…' : 'Kişiselleştirme kullanılamıyor'),
+              ? () {
+                  ref.invalidate(singleSourceSurfaceProvider(detail.id));
+                }
+              : null,
+          child: Text(
+            start != null
+                ? '${chosen.cta} →'
+                : settled && failed
+                ? 'Tekrar dene'
+                : !settled
+                ? 'Kontrol ediliyor…'
+                : 'Kişiselleştirme kullanılamıyor',
+          ),
         ),
       ),
     );
   }
 
   Widget _body(BuildContext context, ProductDetail detail) {
-    final (:variants, :start, :settled, :failed) = _readiness(detail);
-    final shown = variants.where((variant) => variant.id == widget.variantId).firstOrNull ?? (variants.isEmpty ? null : variants.first);
-    final image = shown?.imageUrl ?? detail.imageUrl;
+    final surface = ref.watch(singleSourceSurfaceProvider(detail.id));
+    final start = surface.asData?.value;
+    final settled = !surface.isLoading, failed = surface.hasError;
+    final image = start?.sourceUrl;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 14, XinobiTokens.gutterMobile, 16),
+      padding: const EdgeInsets.fromLTRB(
+        XinobiTokens.gutterMobile,
+        14,
+        XinobiTokens.gutterMobile,
+        16,
+      ),
       children: [
         const XinobiUSteps(current: 1),
         const SizedBox(height: 16),
-        FlowProductCard(name: detail.name, imageUrl: image, onOtherProduct: () => context.go('/xinobi-u')),
+        FlowProductCard(
+          name: detail.name,
+          imageUrl: image,
+          onOtherProduct: () => context.go('/xinobi-u'),
+        ),
         const SizedBox(height: 20),
         const FlowKicker('XINOBI U · ADIM 2 / 4'),
-        Semantics(header: true, child: Text('Tasarımını nasıl oluşturmak istersin?', style: flowTitle)),
+        Semantics(
+          header: true,
+          child: Text(
+            'Tasarımını nasıl oluşturmak istersin?',
+            style: flowTitle,
+          ),
+        ),
         const SizedBox(height: 6),
-        Text('Bir yöntem seç. Ürün rengini ve yerleşimi bir sonraki adımda, önizleme üzerinde ayarlayabilirsin.', style: inter(14, height: 1.45, color: flowBody)),
+        Text(
+          'Bir yöntem seç. Yerleşimini ürünün onaylı tek fotoğrafı üzerinde ayarlayabilirsin.',
+          style: inter(14, height: 1.45, color: flowBody),
+        ),
         const SizedBox(height: 16),
         Text('Tasarım yöntemi', style: inter(13, weight: 500)),
         const SizedBox(height: 8),
@@ -146,7 +167,11 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
           Semantics(
             liveRegion: true,
             child: Text(
-              !settled ? 'Kontrol ediliyor…' : failed ? 'Kişiselleştirme şu anda doğrulanamıyor. Tekrar dene.' : 'Bu ürün için kişiselleştirme henüz kullanılamıyor.',
+              !settled
+                  ? 'Kontrol ediliyor…'
+                  : failed
+                  ? 'Kişiselleştirme şu anda doğrulanamıyor. Tekrar dene.'
+                  : 'Bu ürünün onaylı kişiselleştirme yüzeyi henüz hazır değil.',
               style: inter(13, color: flowBody),
             ),
           ),
@@ -154,6 +179,7 @@ class _XinobiUMethodScreenState extends ConsumerState<XinobiUMethodScreen> {
       ],
     );
   }
+
 }
 
 class _MethodCard extends StatelessWidget {

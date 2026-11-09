@@ -136,7 +136,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 ]),
                 if (detail.personalizable && variants.isNotEmpty) ...[
                   const SizedBox(height: 12),
-                  _PersonalizeCard(onOpen: () => context.push('/xinobi-u/renk?urun=${Uri.encodeQueryComponent(detail.id)}&renk=${Uri.encodeQueryComponent(selected.id)}')),
+                  _PersonalizeCard(onOpen: () => context.push('/xinobi-u/renk?urun=${Uri.encodeQueryComponent(detail.id)}',)),
                 ],
                 const SizedBox(height: 16),
                 const Divider(height: 1, color: Color(0xFFE6E6E6)),
@@ -284,7 +284,7 @@ class _PersonalizeCard extends StatelessWidget {
         const FlowKicker('XINOBI U'),
         Text('Kendine özel tasarla', style: inter(17, weight: 600, color: flowInk)),
         const SizedBox(height: 4),
-        Text('Seçtiğin rengin üzerine kendi görselini, desenini ya da birkaç soruyla sana özel bir tasarım uygula.', style: inter(13, height: 1.5, color: flowBody)),
+        Text('Ürünün onaylı fotoğrafı üzerinde kendi görselini, desenini ya da sana özel AI tasarımını dene.', style: inter(13, height: 1.5, color: flowBody)),
         const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,

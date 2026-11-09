@@ -1,6 +1,4 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,8 +10,6 @@ import 'package:xinobi_mobile/features/account/auth.dart';
 import 'package:xinobi_mobile/features/assistant/nobi.dart';
 import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/features/designs/designs.dart';
-import 'package:xinobi_mobile/features/personalization/editor_screen.dart';
-import 'package:xinobi_mobile/features/personalization/surface_preview.dart';
 import 'package:xinobi_mobile/features/quotes/quotes.dart';
 import 'package:xinobi_mobile/main.dart';
 
@@ -140,7 +136,7 @@ void main() {
     OfflineNobi? nobi,
     OfflineDesigns? designs,
     FakeCatalog? catalog,
-    Uint8List? image,
+
   }) async {
     SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(
@@ -153,10 +149,7 @@ void main() {
           tokenStoreProvider.overrideWithValue(
             MemoryTokens(designs == null ? null : 'refresh-initial'),
           ),
-          designImageProvider.overrideWith((ref, path) async => null),
-          if (image != null)
-            galleryPickerProvider.overrideWithValue(
-              () async => (bytes: image, name: 'device-test.png'),
+          designImageProvider.overrideWith((ref, path) async => null
             ),
           if (nobi != null) nobiRepositoryProvider.overrideWithValue(nobi),
           quoteOptionsProvider.overrideWith(
@@ -221,99 +214,19 @@ void main() {
     expect(find.textContaining('Henüz kayıtlı tasarımın yok.'), findsOneWidget);
   });
 
-  testWidgets('Editor blocks preview when a variant has no approved mask', (
-    tester,
+  testWidgets('Editor entry opens product-level method selection without a colour picker', (
+    tester
   ) async {
     await open(tester, '/tasarim-editoru?urun=P1&renk=V1');
-    expect(find.text('Tasarım editörü'), findsOneWidget);
-    expect(
-      find.text('Bu renk için onaylı tasarım yüzeyi yok; başka bir renk seç.'),
+    expect(find.text('Tasarımını nasıl oluşturmak istersin?'),
       findsOneWidget,
     );
     expect(
-      find.text(
-        'Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.',
+      find.bySemanticsLabel(
+        'Lacivert rengini seç'
       ),
-      findsOneWidget,
-    );
-  });
-
-  testWidgets(
-    'Approved editor places, rotates, covers and saves a gallery image',
-    (tester) async {
-      final recorder = ui.PictureRecorder();
-      Canvas(recorder).drawRect(
-        const Rect.fromLTWH(0, 0, 8, 8),
-        Paint()..color = Colors.white,
-      );
-      final picture = recorder.endRecording();
-      final raster = await picture.toImage(8, 8);
-      final bytes = (await raster.toByteData(format: ui.ImageByteFormat.png))!
-          .buffer
-          .asUint8List();
-      raster.dispose();
-      picture.dispose();
-      final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
-      server.listen((request) {
-        request.response.headers.contentType = ContentType('image', 'png');
-        request.response.add(bytes);
-        request.response.close();
-      });
-      addTearDown(() => server.close(force: true));
-      final designs = OfflineDesigns();
-      await open(
-        tester,
-        '/tasarim-editoru?urun=P1&renk=V1',
-        designs: designs,
-        catalog: ApprovedCatalog('http://127.0.0.1:${server.port}/fixture.png'),
-        image: bytes,
-      );
-      await tester.tap(find.text('Galeriden seç'));
-      await tester.pumpAndSettle();
-      final preview = find.byType(SurfacePreview);
-      expect(preview, findsOneWidget);
-      expect(
-        find.byWidgetPredicate(
-          (w) => w is CustomPaint && w.painter is SurfacePainter,
-        ),
-        findsOneWidget,
-      );
-      await tester.ensureVisible(preview);
-      await tester.timedDrag(
-        preview,
-        const Offset(80, 40),
-        const Duration(milliseconds: 500),
-      );
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<SurfacePreview>(preview).placement.offset,
-        isNot(Offset.zero),
-      );
-      final size = find.byType(Slider).first;
-      await tester.ensureVisible(size);
-      await tester.drag(size, const Offset(30, 0));
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<SurfacePreview>(preview).placement.scale,
-        isNot(0.4),
-      );
-      final rotation = find.byType(Slider).last;
-      await tester.ensureVisible(rotation);
-      await tester.drag(rotation, const Offset(30, 0));
-      await tester.pumpAndSettle();
-      expect(
-        tester.widget<SurfacePreview>(preview).placement.rotation,
-        isNot(0),
-      );
-      await tester.ensureVisible(find.text('Yüzeyi kapla'));
-      await tester.tap(find.text('Yüzeyi kapla'));
-      await tester.pumpAndSettle();
-      expect(tester.widget<SurfacePreview>(preview).placement.cover, isTrue);
-      await tester.ensureVisible(find.text('Tasarımımı kaydet'));
-      await tester.tap(find.text('Tasarımımı kaydet'));
-      await tester.pumpAndSettle();
-      expect(designs.saved.last.name, 'device-test.png');
-      expect(find.text('Tasarım hesabına kaydedildi.'), findsOneWidget);
+      findsNothing);
+      expect(find.text('Görsel yükle →'), findsOneWidget);
     },
   );
 }

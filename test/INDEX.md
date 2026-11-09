@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-265 | 09.11.2026 | KIS-TEK-08 Flutter ürün yüzeyi, renk bağımsız akış/sürüm cache, Android/iOS hedef temaları | PASS 298/298; analiz temiz; gerçek cihaz açık | FLUTTER / ISOLATED WIDGET | [Rapor](2026-11-09/TST-265-single-source-mobile.md) |
 | TST-264 | 09.11.2026 | KIS-TEK-07 web tek kaynak: yöntem/yükleme/AI/önizleme, gerçek koordinatlar, responsive/%200/axe | PASS 16/16 + odaklı geri dönüş; lint/TS/build PASS | WEB / ISOLATED BROWSER | [Rapor](2026-11-09/TST-264-single-source-web.md) |
 | TST-263 | 09.11.2026 | KIS-TEK-06 tek kaynak yayın, eski yazma uçlarının kaldırılması, RAM bütçesi, TS/Dart ve manifest | PASS API 615 / SKIP 29 / FAIL 0; Dart 10; tools 5 | API / CONTRACT / ISOLATED | [Rapor](2026-11-09/TST-263-single-source-publication.md) |
 | TST-239 | 03.11.2026 | SIP-TAS-09 API kabul: kimlik/yerleşim/üç dosya eşliği düzenleme, silme, katalog/maske değişimi ve dosya deposu restart sonrası | PASS 16/16 | API / ISOLATED ACCEPTANCE | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |

@@ -58,8 +58,7 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
       widget.previewUri ??
           (widget.designId != null ? xinobiSavedDesignUri(designId: widget.designId!, variantId: widget.variantId, configurationId: widget.configurationId, revision: widget.revision, line: widget.cartLine) : ownImage
               ? xinobiOwnImageUri(
-                  productId: widget.productId ?? '',
-                  variantId: widget.variantId ?? '',
+                  productId: widget.productId  ?? '',
                   pattern: widget.pattern,
                 )
               : xinobiMobilePreviewUri(sessionId: widget.sessionId)),
@@ -68,7 +67,7 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
 
   void _createController(Uri? uri) {
     if (uri == null) {
-      _error = 'Mobil önizleme adresi yapılandırılmamış. APK için XINOBI_WEB_PREVIEW_URL verin.';
+      _error = 'Mobil önizleme şu anda kullanılamıyor. Lütfen daha sonra yeniden deneyin.';
       return;
     }
     _trustedUri = uri;
@@ -192,7 +191,7 @@ class _XinobiMobilePreviewScreenState extends ConsumerState<XinobiMobilePreviewS
     if (controller == null) {
       if (mounted) {
         setState(
-          () => _error = 'Mobil önizleme adresi yapılandırılmamış. APK için XINOBI_WEB_PREVIEW_URL verin.',
+          () => _error = 'Mobil önizleme şu anda kullanılamıyor. Lütfen daha sonra yeniden deneyin.',
         );
       }
       return;

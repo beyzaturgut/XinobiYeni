@@ -6,10 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 
 import '../../core/api_config.dart';
+import 'single_source_surface.dart';
 import '../../core/user_facing_error.dart';
+export 'single_source_surface.dart';
 
 /// Read access to the shared catalog contract (/api/v1/catalog, /api/v1/content). Web and mobile read the same data.
 abstract interface class CatalogRepository {
+  Future<SingleSourceSurface?> singleSourceSurface(String productId);
   Future<HomeContent> home();
   Future<CategoryList> categories();
   Future<ProductPage> products(ProductQuery query);
@@ -57,15 +60,40 @@ class CatalogException implements UserFacingException {
 
 class ApiCatalogRepository implements CatalogRepository {
   ApiCatalogRepository(XinobiApiClient client)
-      : _catalog = client.getCatalogApi(),
+      : _singleSource = client.getProductSurfacesApi(),
+        _apiBase = Uri.parse(client.dio.options.baseUrl),
+        _catalog = client.getCatalogApi(),
         _content = client.getContentApi(),
         _preview = Dio(BaseOptions(connectTimeout: const Duration(seconds: 5), receiveTimeout: const Duration(seconds: 10)));
+
+  final ProductSurfacesApi _singleSource;
+  final Uri _apiBase;
 
   final CatalogApi _catalog;
   final ContentApi _content;
   final Dio _preview;
   // The contract caps pageSize at 100; paging UI follows when catalogs grow past it.
   static const pageSize = 100;
+
+  @override
+  Future<SingleSourceSurface?> singleSourceSurface(String productId) async {
+    try {
+      final value = (await _singleSource.getSingleSourceRenderingInputs(
+        productId: productId,
+      )).data;
+      if (value == null) throw const FormatException('Empty surface');
+      return SingleSourceSurface.fromContract(value, productId, _apiBase);
+    } on DioException catch (error) {
+      if (error.response?.statusCode == 404) return null;
+      throw const CatalogException(
+        'Ürün yüzeyi yüklenemedi. Bağlantınızı kontrol edip yeniden deneyin.',
+      );
+    } on FormatException {
+      throw const CatalogException(
+        'Ürün yüzeyi doğrulanamadı. Yeniden deneyin.',
+      );
+    }
+  }
 
   @override
   Future<HomeContent> home() => _call(() => _content.getHomeContent());
@@ -188,3 +216,9 @@ final publishedSurfaceProvider = FutureProvider.family<PublishedSurface?, ({Stri
     return null;
   }
 });
+/// Product-only fetch key; disposed on route exit so stale approvals are not cached across visits.
+/// Media/answers use SingleSourceSurface.cacheKey, including source revision and both file hashes.
+final singleSourceSurfaceProvider = FutureProvider.autoDispose
+    .family<SingleSourceSurface?, String>(
+      (ref, id) => ref.watch(catalogRepositoryProvider).singleSourceSurface(id),
+    );

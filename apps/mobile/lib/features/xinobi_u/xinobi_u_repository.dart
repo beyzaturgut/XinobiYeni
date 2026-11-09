@@ -56,8 +56,11 @@ class ApiXinobiURepository implements XinobiURepository {
         id: id,
         xinobiUGenerationRequest: XinobiUGenerationRequest((b) => b.answers.addAll(answers.entries.map((entry) => XinobiUAnswer((a) => a
           ..questionId = entry.key
-          ..optionId = entry.value)))),
-      ));
+          ..optionId = entry.value,),
+      ),
+            ),
+          ),
+        ),);
 
   Future<T> _call<T>(Future<Response<T>> Function() request) async {
     try {
@@ -96,6 +99,21 @@ class XinobiULocalStore {
   Future<void> rememberSession(String productId, String? variantId, String sessionId) async =>
       (await _prefs).setString('xinobi-u-session:$productId:${variantId ?? ''}', sessionId);
   Future<void> forgetSession(String productId, String? variantId) async => (await _prefs).remove('xinobi-u-session:$productId:${variantId ?? ''}');
+
+  // Separate namespace: old variant sessions are readable through their historical callers, never auto-migrated.
+  String _surfaceKey(String productId, String surfaceKey) =>
+      'xinobi-u-single-session:${jsonEncode([productId, surfaceKey])}';
+  Future<String?> surfaceSession(String productId, String surfaceKey) async =>
+      (await _prefs).getString(_surfaceKey(productId, surfaceKey));
+  Future<void> rememberSurfaceSession(
+    String productId,
+    String surfaceKey,
+    String id,
+  ) async => (await _prefs).setString(_surfaceKey(productId, surfaceKey), id);
+  Future<void> forgetSurfaceSession(
+    String productId,
+    String surfaceKey,
+  ) async => (await _prefs).remove(_surfaceKey(productId, surfaceKey));
 
   Future<Map<String, String>> answers(String sessionId) async {
     final raw = (await _prefs).getString('xinobi-u-answers:$sessionId');

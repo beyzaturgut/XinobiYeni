@@ -5,14 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xinobi_api_client/xinobi_api_client.dart';
 import 'package:xinobi_mobile/app/theme.dart';
-import 'package:xinobi_mobile/features/account/account_screen.dart';
-import 'package:xinobi_mobile/features/account/auth.dart';
-import 'package:xinobi_mobile/features/catalog/catalog_repository.dart';
+import  'package:xinobi_mobile/features/catalog/catalog_repository.dart';
 import 'package:xinobi_mobile/features/xinobi_u/questionnaire_screen.dart';
 import 'package:xinobi_mobile/features/xinobi_u/xinobi_u_repository.dart';
 import 'package:xinobi_mobile/main.dart';
 
-import 'account_test.dart' show FakeAccounts, MemoryTokens;
+import 'app_test.dart' show FakeCatalog;
 
 const _axes = ['Doğa', 'Ruh hâli', 'Renk', 'Yoğunluk', 'Tarz'];
 
@@ -114,7 +112,9 @@ Future<void> pumpQuestionnaire(WidgetTester tester, FakeXinobiU fake) async {
   addTearDown(tester.view.reset);
   await tester.pumpWidget(ProviderScope(
     retry: noAutomaticRetry,
-    overrides: [xinobiURepositoryProvider.overrideWithValue(fake), productProvider('P1').overrideWith((ref) async => _product())],
+    overrides: [xinobiURepositoryProvider.overrideWithValue(fake), productProvider('P1').overrideWith((ref) async => _product()),
+        singleSourceSurfaceProvider('P1')
+            .overrideWith((_) => FakeCatalog().singleSourceSurface('P1')),],
     child: MaterialApp(
       theme: buildTheme(),
       home: const QuestionnaireScreen(productId: 'P1', variantId: 'V1', pollInterval: Duration(milliseconds: 10)),
@@ -149,7 +149,8 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(retry: noAutomaticRetry, overrides: [
       xinobiURepositoryProvider.overrideWithValue(fake), productProvider('P1').overrideWith((ref) async => _product()),
-    ], child: MaterialApp.router(theme: buildTheme(), routerConfig: router)));
+    singleSourceSurfaceProvider('P1')
+              .overrideWith((_) => FakeCatalog().singleSourceSurface('P1')),], child: MaterialApp.router(theme: buildTheme(), routerConfig: router)));
     await tester.pumpAndSettle();
     await answerAll(tester);
     await tester.tap(find.text('AI ile tasarımımı oluştur ✦'));
@@ -160,11 +161,11 @@ void main() {
     expect(fake.generateCalls, 1);
     // The raw result has no shopping action: cart and favourites live on the product preview.
     expect(find.textContaining('Sepete'), findsNothing);
-    expect(find.text('Kaydetmek için giriş yap'), findsOneWidget);
-    await tester.ensureVisible(find.text('Kendi görselimle dene'));
+    expect(find.textContaining('Tasarım kaydı ve sepete ekleme şu anda kullanılamıyor',), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Kendi görselimle dene'), 180);
     await tester.tap(find.text('Kendi görselimle dene'));
     await tester.pumpAndSettle();
-    expect(find.text('Own P1 V1'), findsOneWidget, reason: 'The own-image flow continues with the same product and colour.');
+    expect(find.text('Own P1 null'), findsOneWidget, reason: 'The own-image flow continues with only product identity.',);
     router.pop();
     await tester.pumpAndSettle();
     ScaffoldMessenger.of(tester.element(find.text('Üründe önizle ve yerleştir →'))).showSnackBar(
@@ -207,7 +208,7 @@ void main() {
     expect(find.text('İşte sana özel yorum.'), findsOneWidget);
     expect(find.textContaining('Temsilidir.'), findsOneWidget);
     expect(fake.generateCalls, 1);
-    expect(fake.lastVariant, 'V1', reason: 'The selected colour is sent with the session.');
+    expect(fake.lastVariant, isNull, reason: 'New AI sessions do not choose a sale colour.',);
   });
 
   testWidgets('restarting the app resumes the same questionnaire and answers', (tester) async {
@@ -233,17 +234,23 @@ void main() {
     expect(find.text('Birlikte şekillenen beş tercih.'), findsOneWidget);
   });
 
-  testWidgets('a finished design is not reopened; the product starts new questions', (tester) async {
+  testWidgets('a finished design resumes as on web until an explicit restart', (tester) async {
     final fake = FakeXinobiU();
     fake.sessions['done'] = _session('done', status: 'ready', answers: {for (var i = 0; i < 5; i++) 'q$i': 'q$i-o0'});
-    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:V1': 'done'});
+    await XinobiULocalStore(SharedPreferences.getInstance())
+        .rememberSurfaceSession(
+          'P1',
+          (await FakeCatalog().singleSourceSurface('P1'))!.cacheKey, 'done',);
     await pumpQuestionnaire(tester, fake);
-    expect(fake.created, 1);
-    expect(find.text('Soru 1 / 5'), findsOneWidget);
+    expect(fake.created, 0);
+    expect(find.text('İşte sana özel yorum.'), findsOneWidget);
   });
 
   testWidgets('an expired stored session starts a new questionnaire', (tester) async {
-    SharedPreferences.setMockInitialValues({'xinobi-u-session:P1:V1': 'old'});
+    await XinobiULocalStore(SharedPreferences.getInstance())
+        .rememberSurfaceSession(
+          'P1',
+          (await FakeCatalog().singleSourceSurface('P1'))!.cacheKey, 'old',);
     final fake = FakeXinobiU()..expired.add('old');
     await pumpQuestionnaire(tester, fake);
     expect(fake.created, 1);
@@ -263,42 +270,16 @@ void main() {
     expect(find.text('Soru 1 / 5'), findsOneWidget);
   });
 
-  testWidgets('signing in from the result returns to the same result; cancelling keeps it too', (tester) async {
+  testWidgets('raw result keeps new-source save gated without a false success', (tester) async {
     final fake = FakeXinobiU();
-    final router = GoRouter(initialLocation: '/questions', routes: [
-      GoRoute(path: '/questions', builder: (_, _) => const QuestionnaireScreen(productId: 'P1', variantId: 'V1', pollInterval: Duration(milliseconds: 10))),
-      GoRoute(path: '/giris', builder: (_, _) => const SignInScreen()),
-    ]);
-    addTearDown(router.dispose);
-    tester.view.physicalSize = const Size(1170, 2532);
-    tester.view.devicePixelRatio = 3;
-    addTearDown(tester.view.reset);
-    await tester.pumpWidget(ProviderScope(retry: noAutomaticRetry, overrides: [
-      xinobiURepositoryProvider.overrideWithValue(fake),
-      productProvider('P1').overrideWith((ref) async => _product()),
-      accountRepositoryProvider.overrideWithValue(FakeAccounts()),
-      tokenStoreProvider.overrideWithValue(MemoryTokens()),
-    ], child: MaterialApp.router(theme: buildTheme(), routerConfig: router)));
-    await tester.pumpAndSettle();
+    await pumpQuestionnaire(tester, fake);
     await answerAll(tester);
     await tester.tap(find.text('AI ile tasarımımı oluştur ✦'));
     await tester.pumpAndSettle();
-    await tester.pump(const Duration(seconds: 10));
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('Kaydetmek için giriş yap'));
-    await tester.pumpAndSettle();
-    expect(find.text('Hesabına giriş yap'), findsOneWidget);
-    router.pop();
-    await tester.pumpAndSettle();
-    expect(find.text('İşte sana özel yorum.'), findsOneWidget, reason: 'Cancelling returns to the result.');
-    await tester.tap(find.text('Kaydetmek için giriş yap'));
-    await tester.pumpAndSettle();
-    await tester.enterText(find.widgetWithText(TextField, 'E-posta'), 'ayse@example.com');
-    await tester.enterText(find.widgetWithText(TextField, 'Parola'), 'guclu-parola-1');
-    await tester.tap(find.widgetWithText(FilledButton, 'Giriş yap'));
-    await tester.pumpAndSettle();
-    expect(find.text('İşte sana özel yorum.'), findsOneWidget, reason: 'A successful sign-in returns to the same result.');
-    expect(find.text('Tasarımımı kaydet'), findsOneWidget);
+
+    expect(find.text('İşte sana özel yorum.'), findsOneWidget);
+    expect(find.textContaining('Tasarım kaydı ve sepete ekleme şu anda kullanılamıyor',), findsOneWidget, );
+    expect(find.text('Tasarımımı kaydet'), findsNothing);
     expect(fake.generateCalls, 1);
   });
 }

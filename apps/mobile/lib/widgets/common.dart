@@ -81,8 +81,12 @@ class EmptyView extends StatelessWidget {
 }
 
 class ProductCard extends StatelessWidget {
-  const ProductCard({super.key, required this.product, this.onTap, this.showFavorite = true, this.footer, this.cardInteractive = true, this.semanticsLabel});
+  const ProductCard({super.key, required this.product, this.onTap, this.showFavorite = true, this.footer, this.cardInteractive = true, this.semanticsLabel,
+    this.image,
+    this.showColors = true,});
   final ProductSummary product;
+  final Widget? image;
+  final bool showColors;
   final bool showFavorite;
   /// Defaults to the product detail page.
   final VoidCallback? onTap;
@@ -119,8 +123,8 @@ class ProductCard extends StatelessWidget {
             AspectRatio(
               aspectRatio: 1,
               child: Stack(children: [
-                Positioned.fill(child: RemoteImage(product.imageUrl)),
-                if (product.colorCount > 1)
+                Positioned.fill(child: image ?? RemoteImage(product.imageUrl)),
+                if (showColors && product.colorCount > 1)
                   Positioned(
                     left: 8,
                     top: 8,
@@ -168,7 +172,8 @@ double bodyTextFactor(BuildContext context) => MediaQuery.textScalerOf(context).
 /// Two-column product grid sized for phones; switches to three columns on wide screens.
 /// Each tile is the square photo plus a text block that grows with the reader's text size, so names, prices and the
 /// contextual action stay readable at 200 % instead of overflowing a fixed-ratio tile.
-Widget productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true, Widget Function(BuildContext context, ProductSummary product)? footerBuilder, bool cardInteractive = true, String Function(ProductSummary product)? semanticsLabelBuilder}) => SliverLayoutBuilder(
+Widget productGrid(List<ProductSummary> products, {void Function(ProductSummary product)? onTap, bool showFavorite = true, Widget Function(BuildContext context, ProductSummary product)? footerBuilder, bool cardInteractive = true, String Function(ProductSummary product)? semanticsLabelBuilder,
+  Widget Function(BuildContext, ProductSummary)? cardBuilder,}) => SliverLayoutBuilder(
       builder: (context, constraints) {
         const maxTile = 260.0, spacing = 12.0;
         final columns = (constraints.crossAxisExtent / (maxTile + spacing)).ceil().clamp(1, 6);
@@ -180,7 +185,7 @@ Widget productGrid(List<ProductSummary> products, {void Function(ProductSummary 
         return SliverGrid(
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns, mainAxisSpacing: spacing, crossAxisSpacing: spacing, mainAxisExtent: height),
           delegate: SliverChildBuilderDelegate(
-            (context, index) => ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite, footer: footerBuilder?.call(context, products[index]), cardInteractive: cardInteractive, semanticsLabel: semanticsLabelBuilder?.call(products[index])),
+            (context, index) => cardBuilder?.call(context, products[index]) ?? ProductCard(product: products[index], onTap: onTap == null ? null : () => onTap(products[index]), showFavorite: showFavorite, footer: footerBuilder?.call(context, products[index]), cardInteractive: cardInteractive, semanticsLabel: semanticsLabelBuilder?.call(products[index])),
             childCount: products.length,
           ),
         );

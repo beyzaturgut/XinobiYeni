@@ -8,9 +8,7 @@ import 'package:xinobi_api_client/xinobi_api_client.dart';
 import '../../app/design_tokens.g.dart';
 import '../../app/theme.dart';
 import '../../widgets/common.dart';
-import '../account/auth.dart';
 import '../catalog/catalog_repository.dart';
-import '../designs/designs.dart';
 import 'flow_widgets.dart';
 import 'xinobi_u_repository.dart';
 
@@ -41,6 +39,8 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   String? message;
   bool busy = false;
   bool slow = false;
+  int _startGeneration = 0;
+  SingleSourceSurface? surface;
   Timer? poller;
   DateTime? waitingSince;
 
@@ -56,71 +56,74 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   @override
   void dispose() {
     poller?.cancel();
+    _startGeneration++;
     super.dispose();
   }
 
   Future<void> _start({bool fresh = false}) async {
     poller?.cancel();
+    waitingSince = null;
     setState(() {
       phase = _Phase.loading;
+      busy = false;
       message = null;
       slow = false;
     });
-    final variantId = widget.variantId;
-    if (variantId == null || variantId.isEmpty) {
-      setState(() {
-        phase = _Phase.error;
-        message = 'Önce ürününü ve rengini seçmelisin.';
-      });
-      return;
-    }
+    final ticket = ++_startGeneration;
+
     try {
       final detail = await ref.read(productProvider(widget.productId).future);
-      final selectedVariant = detail.variants.where((variant) => variant.id == variantId).firstOrNull;
-      final remoteReady = selectedVariant == null || selectedVariant.surfaceMaskUrl?.isNotEmpty == true
-          ? true
-          : await ref.read(acceptedSurfaceProvider((productId: widget.productId, variantId: variantId)).future);
-      if (selectedVariant == null || selectedVariant.imageUrl == null || remoteReady != true) {
-        setState(() {
-          phase = _Phase.error;
-          message = remoteReady == false ? 'Bu renk için onaylı ürün önizlemesi bulunmuyor.' : 'Bu rengin önizleme uygunluğu doğrulanamadı.';
-        });
-        return;
+      if (!mounted || ticket != _startGeneration) return;
+      final approved = await ref.read(
+        singleSourceSurfaceProvider(widget.productId).future,
+      );
+      if (!mounted || ticket != _startGeneration) return;
+      if (!detail.personalizable || approved == null) {
+        throw const CatalogException(
+          'Bu ürünün onaylı kişiselleştirme yüzeyi henüz hazır değil.',
+        );
       }
-      final existing = fresh ? null : await store.sessionFor(widget.productId, variantId);
+      surface = approved;
+
+      final existing = fresh
+          ? null
+          : await store.surfaceSession(widget.productId, approved.cacheKey);
       XinobiUSession? current;
       if (existing != null) {
         try {
           current = await repository.session(existing);
-          // A finished design is not reopened from the product card: the user gets new questions (web rule).
-          // Unfinished questionnaires resume and running jobs keep polling.
-          if (current.status == 'ready' || current.status == 'failed') current = null;
         } on XinobiUException catch (error) {
           if (!error.sessionGone) rethrow;
-          await store.forgetSession(widget.productId, variantId);
+          await store.forgetSurfaceSession(widget.productId, approved.cacheKey);
         }
       }
-      current ??= await repository.createSession(productId: widget.productId, variantId: variantId);
-      if (current.product.id != widget.productId || current.variant.id != variantId) {
+      if (!mounted || ticket != _startGeneration) return;
+      current ??= await repository.createSession(productId: widget.productId);
+      if (!mounted || ticket != _startGeneration) return;
+      if (current.product.id != widget.productId) {
         setState(() {
           phase = _Phase.error;
-          message = 'Seçilen ürün ve renk doğrulanamadı.';
+          message = 'Seçilen ürün doğrulanamadı.';
         });
         return;
       }
-      await store.rememberSession(widget.productId, variantId, current.id);
+      await store.rememberSurfaceSession(
+        widget.productId,
+        approved.cacheKey,
+        current.id,
+      );
       final saved = await store.answers(current.id);
-      if (!mounted) return;
+      if (!mounted || ticket != _startGeneration) return;
       _apply(current, restoredAnswers: saved);
     } on XinobiUException catch (error) {
-      if (mounted) {
+      if (mounted && ticket == _startGeneration) {
         setState(() {
           phase = _Phase.error;
           message = error.message;
         });
       }
     } on CatalogException catch (error) {
-      if (mounted) {
+      if (mounted && ticket == _startGeneration) {
         setState(() {
           phase = _Phase.error;
           message = error.message;
@@ -129,14 +132,38 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
     }
   }
 
+  @override
+  void didUpdateWidget(QuestionnaireScreen old) {
+    super.didUpdateWidget(old);
+    if (old.productId != widget.productId) {
+      _start();
+    }
+  }
+
   void _apply(XinobiUSession next, {Map<String, String>? restoredAnswers}) {
+    if (next.product.id != widget.productId) {
+      setState(() {
+        phase = _Phase.error;
+        message = 'Seçilen ürün doğrulanamadı.';
+      });
+      return;
+    }
     setState(() {
       session = next;
-      if (restoredAnswers != null) answers = {...restoredAnswers, for (final answer in next.answers) answer.questionId: answer.optionId};
+      if (restoredAnswers != null) {
+        answers = {
+          ...restoredAnswers,
+          for (final answer in next.answers) answer.questionId: answer.optionId,
+        };
+      }
       switch (next.status) {
         case 'questionnaire':
-          phase = answers.length == next.questions.length ? _Phase.review : _Phase.questions;
-          step = next.questions.indexWhere((question) => !answers.containsKey(question.id)).clamp(0, next.questions.length - 1);
+          phase = answers.length == next.questions.length
+              ? _Phase.review
+              : _Phase.questions;
+          step = next.questions
+              .indexWhere((question) => !answers.containsKey(question.id))
+              .clamp(0, next.questions.length - 1);
         case 'queued' || 'running':
           phase = _Phase.generating;
           _poll();
@@ -152,12 +179,12 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   void _poll() {
     poller?.cancel();
     waitingSince ??= DateTime.now();
-    poller = Timer(widget.pollInterval, () async {
+    final ticket = _startGeneration;poller = Timer(widget.pollInterval, () async {
       final current = session;
       if (current == null || !mounted) return;
       try {
         final next = await repository.session(current.id);
-        if (!mounted) return;
+        if (!mounted || ticket != _startGeneration) return;
         if (next.status == 'queued' || next.status == 'running') {
           if (DateTime.now().difference(waitingSince!) > _maxWait) {
             setState(() => slow = true);
@@ -171,7 +198,7 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
         }
       } on XinobiUException {
         // A dropped poll is retried on the next tick; the job itself keeps running on the server.
-        if (mounted) _poll();
+        if (mounted&& ticket == _startGeneration) _poll();
       }
     });
   }
@@ -198,13 +225,14 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
       busy = true;
       message = null;
     });
+    final ticket = _startGeneration;
     try {
       final next = await repository.generate(session!.id, answers);
-      if (!mounted) return;
+      if (!mounted || ticket != _startGeneration) return;
       busy = false;
       _apply(next);
     } on XinobiUException catch (error) {
-      if (!mounted) return;
+      if (!mounted || ticket != _startGeneration) return;
       setState(() {
         busy = false;
         message = error.message;
@@ -215,7 +243,7 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final inQuestions = phase == _Phase.questions && step > 0;
+    ref.watch(singleSourceSurfaceProvider(widget.productId));final inQuestions = phase == _Phase.questions && step > 0;
     return PopScope(
       // System back steps through the questions before leaving the flow.
       canPop: !inQuestions && phase != _Phase.review,
@@ -293,7 +321,9 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
       case _Phase.loading:
         return const LoadingView();
       case _Phase.error:
-        return _Message(message: message ?? 'Bir sorun oluştu.', action: 'Yeni anket başlat', onAction: () => _start(fresh: true));
+        return _Message(message: message ?? 'Bir sorun oluştu.', action: 'Tekrar dene', onAction: () {
+            ref.invalidate(singleSourceSurfaceProvider(widget.productId)); _start();
+          },);
       case _Phase.failed:
         return _Message(message: message!, action: 'Yeni anket başlat', onAction: () => _start(fresh: true));
       case _Phase.questions:
@@ -301,7 +331,15 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
         final selected = answers[question.id];
         return Column(
           children: [
-            LinearProgressIndicator(value: (step + 1) / current.questions.length, color: XinobiTokens.ink, backgroundColor: XinobiTokens.line),
+            if (surface != null)
+              SizedBox(
+                height: 80,
+                child: RemoteImage(
+                  surface!.sourceUrl,
+                  label: current.product.name,
+                  cacheWidth: 300,
+                ),
+              ),LinearProgressIndicator(value: (step + 1) / current.questions.length, color: XinobiTokens.ink, backgroundColor: XinobiTokens.line),
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.all(XinobiTokens.gutterMobile),
@@ -378,60 +416,14 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
   }
 }
 
-class _Result extends ConsumerStatefulWidget {
+class _Result extends StatelessWidget {
   const _Result({required this.session, required this.onRestart});
   final XinobiUSession session;
   final VoidCallback onRestart;
   @override
-  ConsumerState<_Result> createState() => _ResultState();
-}
 
-class _ResultState extends ConsumerState<_Result> {
-  bool saving = false;
-  MyDesign? saved;
-
-  /// K-21: copies the raw design into the account so it outlives the session. Cart and favourites belong to the
-  /// product preview, where the design is placed on the chosen colour.
-  Future<void> _save() async {
-    if (saved != null || saving) return;
-    final messenger = ScaffoldMessenger.of(context);
-    setState(() => saving = true);
-    try {
-      final design = await ref.read(authProvider.notifier).withSession((repository, token) => repository.saveDesign(token, widget.session.id));
-      ref.invalidate(myDesignsProvider);
-      if (mounted) {
-        setState(() => saved = design);
-        messenger.showSnackBar(
-          SnackBar(
-            showCloseIcon: true,
-            content: const Text('Tasarım hesabına kaydedildi.'),
-            action: SnackBarAction(label: 'Tasarımlarım', onPressed: () => context.push('/hesap/tasarimlarim')),
-          ),
-        );
-      }
-    } on AccountException catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text(error.message)));
-    } finally {
-      if (mounted) setState(() => saving = false);
-    }
-  }
-
-  /// Signs in above the result and returns to it, so the generated design is not left behind.
-  Future<void> _signIn() async {
-    final subscription = ref.listenManual(authProvider, (previous, next) {
-      if (next is SignedIn && mounted && context.canPop()) context.pop();
-    });
-    try {
-      await context.push('/giris');
-    } finally {
-      subscription.close();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final session = widget.session;
-    final identity = 'urun=${Uri.encodeQueryComponent(session.product.id)}&renk=${Uri.encodeQueryComponent(session.variant.id)}';
+    final  identity = 'urun=${Uri.encodeQueryComponent(session.product.id)}';
     return ListView(
       padding: const EdgeInsets.fromLTRB(XinobiTokens.gutterMobile, 14, XinobiTokens.gutterMobile, 16),
       children: [
@@ -452,27 +444,14 @@ class _ResultState extends ConsumerState<_Result> {
         // K-12: the "Temsilidir" notice is permanent, readable text.
         Text('Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.', style: inter(12, height: 1.4, color: flowMuted)),
         const SizedBox(height: 10),
-        Text('Rengi ve yerleşimi üründe ayarla; sepete ve favorilere oradan ekleyebilirsin.', style: inter(14, height: 1.45, color: flowBody)),
+        Text('Yerleşimini ürünün onaylı tek fotoğrafı üzerinde ayarlayabilirsin.', style: inter(14, height: 1.45, color: flowBody)),
         const SizedBox(height: 16),
-        if (ref.watch(authProvider) is SignedIn)
-          OutlinedButton(
-            style: flowSecondaryButton,
-            onPressed: saving || saved != null ? null : _save,
-            child: Text(
-              saved != null
-                  ? 'Tasarımlarım’a kaydedildi'
-                  : saving
-                  ? 'Kaydediliyor…'
-                  : 'Tasarımımı kaydet',
-            ),
-          )
-        else
-          OutlinedButton(style: flowSecondaryButton, onPressed: _signIn, child: const Text('Kaydetmek için giriş yap')),
+        Semantics (liveRegion: true, child: const Text(singleSourceSavePending)),
         const SizedBox(height: 8),
         OutlinedButton(style: flowSecondaryButton, onPressed: () => context.push('/xinobi-u/kendi-gorselin?$identity'), child: const Text('Kendi görselimle dene')),
         const SizedBox(height: 4),
         TextButton(
-          onPressed: widget.onRestart,
+          onPressed: onRestart,
           child: Text('Yeni anket başlat', style: inter(14, weight: 500, color: flowInk)),
         ),
       ],

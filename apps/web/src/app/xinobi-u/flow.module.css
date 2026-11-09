@@ -94,3 +94,6 @@
   .kicker{display:none}
   .methods{margin-top:10px}
 }
+
+/* Text enlargement: actions may wrap without clipping their labels. */
+.primary,.secondary{height:auto;min-height:48px;padding-block:12px;white-space:normal;overflow-wrap:anywhere}

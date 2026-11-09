@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05 ve 06 uygulandı; KIS-TEK-07…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06 ve 07 uygulandı; KIS-TEK-08…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -115,7 +115,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Yeni ve eski bağlantılar, geri/ileri, yenileme, tasarım açma ve yeniden deneme kontrol edilir. Bir önceki ürünün görseli/durumu taşınmaz. Yatay, dikey ve kare kaynakta maske/desen yerleşimi aynı kaynak koordinatlarını kullanır; görüntüleme ölçeği kayıtlı yerleşimi değiştirmez. 320/390/768/1440 px ve %200 metinde akış kullanılabilir.
 
-**Faz:** Faz02 · **Öncelik:** P1 · **Bağımlılık:** 06 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz02 · **Öncelik:** P1 · **Bağımlılık:** 06 · **Durum:** Web ekran geçişi uygulandı ve izole doğrulandı (09.11.2026).
+
+**Teslim:** [Web tek kaynak rehberi](../runbooks/single-source-web.md), [TST-264](../../test/2026-11-09/TST-264-single-source-web.md). Ürün bazlı API, renk bağımsız yöntem/yükleme/AI önizleme, gerçek boyutlu koordinatlar ve bounded çizim; 16 tarayıcı senaryosu PASS. Yeni yüzeyin kayıt/sepet ve ticari SKU/revizyon bağı 09 kapsamında henüz açık; yanlış SKU ile yazma yerine açık geçiş mesajı gösterilir. Geçmiş kayıtlar otomatik dönüştürülmez.
 
 ### KIS-TEK-08 — Flutter kişiselleştirme akışını tek kaynak modeline eşleme
 

@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import type { MouseEvent } from 'react';
-import { useCommerce, commerceApi, mediaUrl } from '../../../lib/commerce';
-import { sessionKey } from '../../../lib/design-studio';
-import { startingVariant, useAcceptedVariants } from '../../../features/product-personalization/accepted-variants';
+import { useCommerce } from '../../../lib/commerce';
+import { useProductSurface } from '../../../features/product-personalization/single-source';
 import StudioHeader from '../studio-header';
 import FlowSteps from '../flow-steps';
 import studioStyles from '../studio.module.css';
@@ -31,35 +30,33 @@ function MethodIcon({ method }: { method: Method }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>;
 }
 
-// Step 2: how the design is made. The colour is chosen later, on the placement preview.
+// Keep the historical /renk URL as a method-selection entry; it no longer selects a colour.
 function MethodSelection() {
-  const params = useSearchParams();
-  const id = params.get('product') || '';
+  const params=useSearchParams();
+  return <MethodForProduct key={params.get('product')||''} id={params.get('product')||''}/>;
+}
+function MethodForProduct({id}:{id:string}) {
   const { state, error, retry: reloadCatalog } = useCommerce();
-  // The product page hands over its selected colour; otherwise the last choice for this product is used.
-  const [requested, setRequested] = useState(() => params.get('variant') || (typeof window === 'undefined' ? '' : sessionStorage.getItem(`xinobi-u-selected-variant:${id}`) || ''));
   const [method, setMethod] = useState<Method>('image');
   const [retry, setRetry] = useState(0);
   const [navigating, setNavigating] = useState(false);
   const product = state?.products.find(item => item.id === id && isPersonalizable(item));
-  const accepted = useAcceptedVariants(product, retry);
+  const accepted = useProductSurface(product?.id||'', retry);
 
   if (error || !state) return <main className={studioStyles.main}>{error?<div role="alert"><p>{error}</p><button type="button" onClick={reloadCatalog}>Ürünü yeniden yükle</button></div>:<p role="status">Ürün yükleniyor…</p>}</main>;
   if (!product) return <main className={studioStyles.main}><p>Bu ürün kişiselleştirmeye açık değil.</p><Link href="/xinobi-u">Ürünleri keşfet</Link></main>;
 
-  const start = accepted.status === 'ready' ? requested ? product.variants.find(variant=>variant.id===requested&&accepted.surfaces[variant.id]) : startingVariant(product, accepted.surfaces) : undefined;
-  const shown = product.variants.find(variant => variant.id === requested) ?? product.variants[0];
-  const image = shown?.image || product.originalImage || product.variants.find(variant => variant.image)?.image;
-  const readiness = accepted.status === 'ready' ? start ? 'ready' : 'unavailable' : accepted.status;
+  const image=accepted.inputs?.source.url;
+  const readiness=accepted.status;
   const chosen = methods.find(item => item.id === method)!;
   const productHref = `/urunler/detay?id=${encodeURIComponent(product.id)}`;
-  const identity = start ? `product=${encodeURIComponent(product.id)}&variant=${encodeURIComponent(start.id)}` : '';
+  const identity = `product=${encodeURIComponent(product.id)}`;
   const continueHref = method === 'ask' ? `/xinobi-u/sorular?${identity}` : `/xinobi-u/kendi-gorselin?${identity}${method === 'pattern' ? '&mode=pattern' : ''}`;
   return <main className={styles.page}>
     <FlowSteps current={1} backHref={productHref} backLabel="Ürüne dön" />
     <div className={styles.layout}>
       <section className={styles.preview} aria-label="Önizleme">
-        <div className={styles.stage}>{image && <Image src={mediaUrl(image, commerceApi)} alt={`${product.name} önizlemesi`} width={600} height={600} />}</div>
+        <div className={styles.stage}>{image && <Image src={image} alt={`${product.name} önizlemesi`} width={600} height={600} />}</div>
         <div className={styles.productCard}>
           <div><p>Seçtiğin ürün</p><h2>{product.name}</h2></div>
           <Link href="/xinobi-u">Başka ürün seç <span aria-hidden="true">→</span></Link>
@@ -68,7 +65,7 @@ function MethodSelection() {
       <section className={styles.choices} aria-label="Seçimler">
         <p className={styles.kicker}>XINOBI U · Adım 2 / 4</p>
         <h1 className={styles.title}>Tasarımını nasıl oluşturmak istersin?</h1>
-        <p className={styles.lead}>Bir yöntem seç. Ürün rengini ve yerleşimi bir sonraki adımda, önizleme üzerinde ayarlayabilirsin.</p>
+        <p className={styles.lead}>Bir yöntem seç. Yerleşimini ürünün onaylı tek fotoğrafı üzerinde ayarlayabilirsin.</p>
         <div className={styles.divider} />
         <fieldset className={styles.methods}>
           <legend>Tasarım yöntemi</legend>
@@ -80,18 +77,16 @@ function MethodSelection() {
           </label>)}</div>
         </fieldset>
         <div className={styles.status}>
-          <p role="status" hidden={readiness === 'ready'} data-preview-readiness={readiness} data-product-reference={product.id} data-variant-reference={start?.id}>
-            {readiness === 'loading' ? 'Kontrol ediliyor…' : readiness === 'ready' ? null : readiness === 'error' ? 'Kişiselleştirme şu anda doğrulanamıyor. Tekrar deneyin.' : requested?'Seçtiğin renk şu anda kişiselleştirilemiyor. Devam etmek için uygun bir renk seç.':'Bu ürün için kişiselleştirme henüz kullanılamıyor.'}
+          <p role="status" hidden={readiness === 'ready'} data-preview-readiness={readiness} data-product-reference={product.id}>
+            {readiness === 'loading' ? 'Kontrol ediliyor…' : readiness === 'ready' ? null : readiness === 'error' ? 'Kişiselleştirme şu anda doğrulanamıyor. Tekrar deneyin.' : 'Bu ürünün onaylı kişiselleştirme yüzeyi henüz hazır değil.'}
           </p>
-          {readiness==='unavailable' && accepted.status==='ready' && product.variants.some(variant=>accepted.surfaces[variant.id]) && <fieldset><legend>Kişiselleştirilebilen renkler</legend>{product.variants.filter(variant=>accepted.surfaces[variant.id]).map(variant=><button type="button" key={variant.id} onClick={()=>setRequested(variant.id)}>{variant.color} rengini kullan</button>)}</fieldset>}
+
         </div>
         <div className={styles.actions}>
           <Link className={styles.secondary} href={productHref}>Geri</Link>
-          {start ? <Link className={styles.primary} aria-disabled={navigating} onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+          {readiness==='ready' ? <Link className={styles.primary} aria-disabled={navigating} onClick={(event: MouseEvent<HTMLAnchorElement>) => {
             if (navigating) { event.preventDefault(); return; }
             setNavigating(true);
-            sessionStorage.setItem(`xinobi-u-selected-variant:${product.id}`, start.id);
-            if (method === 'ask') sessionStorage.removeItem(sessionKey(product.id, start.id));
           }} href={continueHref}>{chosen.cta} →</Link> : readiness === 'error' ? <button type="button" className={styles.primary} onClick={() => setRetry(value => value + 1)}>Tekrar dene</button> : <button type="button" className={styles.primary} disabled>{readiness === 'loading' ? 'Kontrol ediliyor…' : 'Kişiselleştirme kullanılamıyor'}</button>}
         </div>
       </section>

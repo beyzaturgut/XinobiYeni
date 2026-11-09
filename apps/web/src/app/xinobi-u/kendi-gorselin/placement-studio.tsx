@@ -19,7 +19,7 @@ const validHex=(hex?:string|null)=>Boolean(hex&&/^#[a-fA-F0-9]{6}$/.test(hex));
 const signed=(value:number,unit:string)=>(value>0?'+':'')+value+' '+unit;
 
 /** Step 4: the uploaded image on the selected colour's accepted surface, with the placement controls of the design. */
-export default function PlacementStudio({product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription,canChange=false,changeLabel='Değiştir'}:{product:Pick<Product,'id'|'name'>;variants:Pick<Variant,'id'|'color'|'hex'>[];surfaces:Record<string,RenderingInputs>;active:Pick<Variant,'id'|'color'|'hex'>;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;canChange?:boolean;changeLabel?:string;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
+export default function PlacementStudio({singleSource=false,product,variants,surfaces,active,onActiveChange,mode,file,patternUrl,source,changeHref,onChange,price,initialPlacement,onDraftChange,onRendered,actions,cover,sourceDescription,canChange=false,changeLabel='Değiştir'}:{singleSource?:boolean;product:Pick<Product,'id'|'name'>;variants:Pick<Variant,'id'|'color'|'hex'>[];surfaces:Record<string,RenderingInputs>;active:Pick<Variant,'id'|'color'|'hex'>;onActiveChange:(id:string)=>void;mode:"pattern"|"artwork";file?:File;initialPlacement?:DesignPlacement;onDraftChange?:(value:DesignPlacement)=>void;onRendered?:(canvas:HTMLCanvasElement)=>void;actions?:ReactNode;cover?:boolean;sourceDescription?:string;canChange?:boolean;changeLabel?:string;patternUrl:string;source:LocalPatternSource;changeHref:string;onChange:()=>void;price?:number}){
  const inputs=surfaces[active.id];
  const fillMask=initialPlacement?.fillMask??cover??mode==='pattern';
  const renderKey=JSON.stringify([inputs.source.url,inputs.mask.url,patternUrl,mode,fillMask]);
@@ -85,8 +85,8 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
     </div>
    </div>
    <div className={styles.canvasStage}>
-    <div className={styles.zoom} style={{transform:`scale(${zoom/100})`}}>
-     <ProductPatternPreview onRendered={rendered} surfaceTreatment={inputs.surfaceTreatment} surfaceInkExposureStops={inputs.surfaceInkExposureStops} sourceWidth={inputs.width} sourceHeight={inputs.height} assetWidth={inputs.assetWidth??inputs.width} assetHeight={inputs.assetHeight??inputs.height} productSrc={inputs.source.url} designableMaskSrc={inputs.mask.url} brandingOverlaySrc={inputs.branding?.url} patternSrc={patternUrl} placementMode={mode} fillMask={fillMask} onArtworkMove={mode==='artwork'?(x,y)=>change('drag',{x,y}):undefined} patternTransform={patternTransform} bodyPlacementAdjustments={patternBodyAdjustments} curvatureStrength={curvatureStrength} alt={`${product.name}, ${active.color}, tasarımlı ürün önizlemesi`}>
+    <div className={`${styles.zoom} ${singleSource?styles.singleZoom:''}`} style={{transform:`scale(${zoom/100})`}}>
+     <ProductPatternPreview previewPixelBudget={singleSource?2_000_000:undefined} onRendered={rendered} surfaceTreatment={inputs.surfaceTreatment} surfaceInkExposureStops={inputs.surfaceInkExposureStops} sourceWidth={inputs.width} sourceHeight={inputs.height} assetWidth={inputs.assetWidth??inputs.width} assetHeight={inputs.assetHeight??inputs.height} productSrc={inputs.source.url} designableMaskSrc={inputs.mask.url} brandingOverlaySrc={inputs.branding?.url} patternSrc={patternUrl} placementMode={mode} fillMask={fillMask} onArtworkMove={mode==='artwork'?(x,y)=>change('drag',{x,y}):undefined} patternTransform={patternTransform} bodyPlacementAdjustments={patternBodyAdjustments} curvatureStrength={curvatureStrength} alt={singleSource?`${product.name}, tasarımlı ürün önizlemesi`:`${product.name}, ${active.color}, tasarımlı ürün önizlemesi`}>
       {/* eslint-disable-next-line @next/next/no-img-element -- generated data URL */}
       {showArea&&outline&&<img className={styles.printArea} src={outline} alt=""/>}
      </ProductPatternPreview>
@@ -95,7 +95,7 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
    <div className={styles.canvasNotes}><span>Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.</span><span aria-live="polite">{notice||(app?'Kaydedene kadar değişiklikler yalnızca bu ekranda tutulur.':'Değişiklikler yalnızca bu tarayıcı oturumunda tutulur.')}</span></div>
   </section>
   <aside className={styles.settings} aria-label="Tasarım ayarları">
-   {variants.length>0&&<fieldset className={styles.colours} aria-busy={switching}>
+   {!singleSource&&variants.length>0&&<fieldset className={styles.colours} aria-busy={switching}>
     <legend>Ürün rengi: <strong>{active.color}</strong></legend>
     <div>{variants.map(variant=><button type="button" key={variant.id} title={variant.color} aria-label={`${variant.color} rengini seç`} aria-pressed={variant.id===active.id} disabled={switching} className={validHex(variant.hex)?undefined:styles.noHex} style={validHex(variant.hex)?{background:variant.hex!}:undefined} onClick={()=>void selectColour(variant.id)}/>)}</div>
     {switching&&<p role="status">Renk hazırlanıyor…</p>}
@@ -115,8 +115,8 @@ export default function PlacementStudio({product,variants,surfaces,active,onActi
     </div>)}</div>
    </section>
    <div className={styles.checkout}>
-    <div><span className={styles.printCheck}><i aria-hidden="true"/>Baskı kontrolü: Bekliyor</span><span className={styles.price}>{money(price)}</span></div>
-    <fieldset className={styles.checkoutActions} disabled={!previewCanvas||switching}>{actions??(file&&<SaveDesignButton key={patternUrl} stacked previewCanvas={previewCanvas} placement={placement} source={{file,productId:product.id,variantId:active.id}}/>)}</fieldset>
+    <div><span className={styles.printCheck}><i aria-hidden="true"/>Baskı kontrolü: Bekliyor</span>{!singleSource&&<span className={styles.price}>{money(price)}</span>}</div>
+    <fieldset className={styles.checkoutActions} disabled={!previewCanvas||switching}>{actions??(!singleSource&&file&&<SaveDesignButton key={patternUrl} stacked previewCanvas={previewCanvas} placement={placement} source={{file,productId:product.id,variantId:active.id}}/>)}</fieldset>
    </div>
   </aside>
  </div>;

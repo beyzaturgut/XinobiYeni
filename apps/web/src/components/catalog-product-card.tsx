@@ -13,6 +13,7 @@ export type CatalogProductCardData = {
   swatch: string;
   image: StaticImageData | string;
   colorCount?: number;
+  hideColors?: boolean;
   tall?: boolean;
 };
 
@@ -30,7 +31,7 @@ function Media({ product }: { product: CatalogProductCardData }) {
   return <div className={styles.media}>
     {(product.colorCount || 0) > 1 && <span className={styles.multiColorBadge}>◉ {product.colorCount} renk</span>}
     <span className={styles.demoBadge}>Xinobi</span>
-    {product.image ? <Image className={product.tall ? styles.tallImage : ""} src={product.image} width={600} height={600} alt={`${product.name}, ${product.color}`} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /> : <span>Görsel yok</span>}
+    {product.image ? <Image className={product.tall ? styles.tallImage : ""} src={product.image} width={600} height={600} alt={[product.name,product.color].filter(Boolean).join(', ')} sizes="(max-width: 640px) 92vw, (max-width: 1024px) 45vw, 32vw" /> : <span>Görsel yok</span>}
   </div>;
 }
 
@@ -38,7 +39,7 @@ function Details({ product, action }: Pick<CatalogProductCardProps, "product" | 
   return <div className={styles.cardBody}>
     <p>{product.family}</p>
     <h2>{product.name}</h2>
-    <div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{(product.colorCount || 0) > 1 ? `${product.colorCount} renk seçeneği` : product.color}</span></div>
+    {!product.hideColors&&<div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{(product.colorCount || 0) > 1 ? `${product.colorCount} renk seçeneği` : product.color}</span></div>}
     <div className={styles.cardFooter}>{action}</div>
   </div>;
 }
@@ -50,7 +51,7 @@ function InteractiveContent({ product, cardHref, actionHref, action }: Required<
       <Link className={styles.cardIdentityLink} href={cardHref}>
         <p>{product.family}</p>
         <h2>{product.name}</h2>
-        <div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{(product.colorCount || 0) > 1 ? `${product.colorCount} renk seçeneği` : product.color}</span></div>
+        {!product.hideColors&&<div className={styles.variant}><span style={{ backgroundColor: product.swatch }} /><span>{(product.colorCount || 0) > 1 ? `${product.colorCount} renk seçeneği` : product.color}</span></div>}
       </Link>
       <div className={styles.cardFooter}><Link href={actionHref}>{action}</Link></div>
     </div>

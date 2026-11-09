@@ -1,25 +1,31 @@
 'use client';
 import Link from 'next/link';
+import {useSearchParams} from 'next/navigation';
 import {useEffect,useState} from 'react';
 import {designRequest,studioAsset,type DesignSession} from '../../../lib/design-studio';
 import AcceptedSurfaceEditor from '../../urunler/cay-makinesi-101/editor/accepted-surface-editor';
 import styles from '../studio.module.css';
 export default function ProductPreview(){
+ const params=useSearchParams();
+ return <ProductPreviewSession key={params.toString()} product={params.get('product')} requestedSession={params.get('session')}/>;
+}
+function ProductPreviewSession({product,requestedSession}:{product:string|null;requestedSession:string|null}){
  const [session,setSession]=useState<DesignSession|null>(null),[error,setError]=useState('');
  useEffect(()=>{
-  let active=true;const id=sessionStorage.getItem('xinobi-u-selected-session');
+  let active=true;const id=requestedSession||sessionStorage.getItem('xinobi-u-selected-session');
   if(!id){Promise.resolve().then(()=>{if(active)setError('Önce bir ürün seçip tasarımını oluştur.')});return()=>{active=false}}
   designRequest<DesignSession>('/sessions/'+encodeURIComponent(id)).then(value=>{
+   if(product&&value.product.id!==product)throw Error('Wrong product');
    if(value.status!=='ready'||!value.imageUrl||!/^\/api\/v1\/design-studio\/sessions\/[a-f0-9]+\/image$/.test(value.imageUrl))throw new Error('Tamamlanmış bir tasarım gerekli.');
    if(active)setSession(value);
   }).catch(()=>{if(active)setError('Tasarım önizlemesi yüklenemedi.')});
   return()=>{active=false};
- },[]);
+ },[product,requestedSession]);
  if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/xinobi-u">Ürününü seç ↗</Link></main>;
  if(!session)return <main className={styles.main}><p role="status">Tasarımın yükleniyor…</p></main>;
  return <><header className={styles.previewTop}>
   <div className={styles.previewTopText}>
-   <Link className={styles.backLink} href={"/xinobi-u/sorular?product="+encodeURIComponent(session.product.id)+"&variant="+encodeURIComponent(session.variant.id)}><span aria-hidden="true">←</span>Tasarımıma dön</Link>
+   <Link className={styles.backLink} href={"/xinobi-u/sorular?"+new URLSearchParams({product:session.product.id,session:session.id})}><span aria-hidden="true">←</span>Tasarımıma dön</Link>
    <p className={styles.kicker}>XINOBI U · Ürün önizlemesi</p>
    <p className={styles.previewTitle}>{session.product.name}</p>
    <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p>

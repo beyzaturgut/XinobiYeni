@@ -186,3 +186,12 @@
 .libraryGrid button:disabled{opacity:.6;cursor:wait}
 .libraryGrid button>span:last-child{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .libraryThumb{width:100%;aspect-ratio:1;border-radius:6px;overflow:hidden;background:#f3f3f1}
+
+/* Bounded drawing bitmap; the source-coordinate placement and aspect ratio remain unchanged. */
+.canvasStage{container-type:size}
+.singleZoom{width:100%;height:88%;align-items:center}
+.singleZoom>div{flex:none;width:min(96cqw,calc(88cqh * var(--source-aspect)));height:auto;max-width:100%}
+
+/* Enlarged labels must grow their own controls, not overlap the next slider. */
+.quick button{height:auto;min-height:34px;padding:6px 8px;white-space:normal;overflow-wrap:anywhere}
+.fileSummary a{height:auto;min-height:34px;padding-block:6px;white-space:normal}

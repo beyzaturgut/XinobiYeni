@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import styles from "./product-pattern-preview.module.css";
 import { deriveProductLighting, shadePattern } from "./product-lighting";
 import { DEFAULT_CURVATURE_STRENGTH, deriveBodySurface, warpPattern } from "./product-surface-warp";
@@ -24,6 +24,7 @@ type ProductPatternPreviewProps = {
   surfaceTreatment?: "legacy" | "metallic-ink";
   surfaceInkExposureStops?: number;
   onRendered?: (canvas: HTMLCanvasElement) => void;
+  previewPixelBudget?: number;
   sourceWidth?: number;
   sourceHeight?: number;
   assetWidth?: number;
@@ -101,16 +102,21 @@ type RenderAssets = {
   surface: ReturnType<typeof deriveBodySurface>;
 };
 
-export default function ProductPatternPreview({ errorFallback, onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", fillMask = false, transparentProduct = false, children, onArtworkMove, patternTransform, bodyPlacementAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
-  const SOURCE_WIDTH = sourceWidth, SOURCE_HEIGHT = sourceHeight;
+export default function ProductPatternPreview({ previewPixelBudget, errorFallback, onRendered, surfaceTreatment = "legacy", surfaceInkExposureStops, sourceWidth = 1066, sourceHeight = 1600, assetWidth = sourceWidth, assetHeight = sourceHeight, productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode = "pattern", fillMask = false, transparentProduct = false, children, onArtworkMove: sourceMove, patternTransform: sourceTransform, bodyPlacementAdjustments: sourceAdjustments, curvatureStrength = DEFAULT_CURVATURE_STRENGTH, alt }: ProductPatternPreviewProps) {
+  const factor=previewPixelBudget ? Math.min(1,Math.sqrt(previewPixelBudget/(sourceWidth*sourceHeight)),2048/Math.max(sourceWidth,sourceHeight)) : 1;
+  const SOURCE_WIDTH = Math.max(1,Math.floor(sourceWidth*factor)), SOURCE_HEIGHT = Math.max(1,Math.floor(sourceHeight*factor));
+  const sx=SOURCE_WIDTH/sourceWidth,sy=SOURCE_HEIGHT/sourceHeight;
+  const patternTransform={...sourceTransform,x:sourceTransform.x*sx,y:sourceTransform.y*sy};
+  const bodyPlacementAdjustments=useMemo(()=>sourceAdjustments?Object.fromEntries(Object.entries(sourceAdjustments).map(([id,value])=>[id,value?{...value,x:(value.x??0)*sx,y:(value.y??0)*sy}:value])):undefined,[sourceAdjustments,sx,sy]);
+  const onArtworkMove=sourceMove?((x:number,y:number)=>sourceMove(x/sx,y/sy)):undefined;
   const ASSET_WIDTH = assetWidth, ASSET_HEIGHT = assetHeight;
-  const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000;
-  const centerX = sourceWidth / 2, centerY = sourceHeight * (fillMask ? .5 : .65);
+  const dimensionsValid = Number.isInteger(sourceWidth) && Number.isInteger(sourceHeight) && sourceWidth > 0 && sourceHeight > 0 && (previewPixelBudget ? Number.isSafeInteger(sourceWidth*sourceHeight) : sourceWidth <= 6000 && sourceHeight <= 6000 && sourceWidth * sourceHeight <= 20000000);
+  const centerX = SOURCE_WIDTH / 2, centerY = SOURCE_HEIGHT * (fillMask ? .5 : .65);
   const drag = useRef<{pointerId:number; startX:number; startY:number; x:number; y:number} | null>(null);
   const [cursor,setCursor] = useState<"auto" | "grab" | "grabbing">("auto");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const effectiveSurfaceInkExposureStops = placementMode === "pattern" ? surfaceInkExposureStops : undefined;
-  const assetKey = JSON.stringify([productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight, assetWidth, assetHeight, surfaceTreatment, effectiveSurfaceInkExposureStops]);
+  const assetKey = JSON.stringify([SOURCE_WIDTH,SOURCE_HEIGHT,productSrc, designableMaskSrc, brandingOverlaySrc, patternSrc, placementMode, sourceWidth, sourceHeight, assetWidth, assetHeight, surfaceTreatment, effectiveSurfaceInkExposureStops]);
   const [result, setResult] = useState<{ assetKey: string; status: "ready" | "error"; assets?: RenderAssets } | null>(null);
   const { x, y, scale, rotation } = patternTransform;
   const validBodyAdjustments = Object.values(bodyPlacementAdjustments ?? {}).every((adjustment) => !adjustment || [adjustment.x ?? 0, adjustment.y ?? 0, adjustment.scale ?? 1, adjustment.rotation ?? 0].every(Number.isFinite) && (adjustment.scale ?? 1) > 0);
@@ -121,6 +127,7 @@ export default function ProductPatternPreview({ errorFallback, onRendered, surfa
     let cancelled = false;
     async function render() {
       try {
+        if(!dimensionsValid)throw Error("Invalid dimensions");
         // Decode the original assets one at a time and retain only aligned preview-sized
         // canvases. Large accepted catalog images can otherwise keep three 25+ MP
         // bitmaps alive together and exhaust browser image-decoder memory.

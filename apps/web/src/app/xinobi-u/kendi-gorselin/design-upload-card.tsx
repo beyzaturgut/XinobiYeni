@@ -45,11 +45,11 @@ export default function DesignUploadCard({mode,onModeChange,local,existing,onRem
  </>;
 }
 
-export function DesignUploadAside({product,image,allowProductChange=true}:{product?:Product;image?:string|null;allowProductChange?:boolean}){return (
+export function DesignUploadAside({product,image,allowProductChange=true,singleSource=false}:{product?:Product;image?:string|null;allowProductChange?:boolean;singleSource?:boolean}){return (
    <aside className={styles.aside} aria-label="Seçtiğin ürün">
     {product&&<div className={styles.productCard}>
      <div className={styles.productImage}>{image&&<Image src={mediaUrl(image,commerceApi)} alt={product.name} width={400} height={400}/>}</div>
-     <div className={styles.productText}><p className={styles.productKicker}>Seçtiğin ürün</p><p className={styles.productName}>{product.name}</p><p>Rengi ve görselin yerleşimini bir sonraki adımda önizleme üzerinde ayarlayacaksın.</p>{allowProductChange&&<Link href="/xinobi-u">Başka ürün seç <span aria-hidden="true">→</span></Link>}</div>
+     <div className={styles.productText}><p className={styles.productKicker}>Seçtiğin ürün</p><p className={styles.productName}>{product.name}</p><p>{singleSource?'Görselin yerleşimini ürünün onaylı fotoğrafı üzerinde ayarlayacaksın.':'Rengi ve görselin yerleşimini bir sonraki adımda önizleme üzerinde ayarlayacaksın.'}</p>{allowProductChange&&<Link href="/xinobi-u">Başka ürün seç <span aria-hidden="true">→</span></Link>}</div>
     </div>}
     <div className={styles.tips}><p>İyi bir sonuç için</p><ul><li>Net ve yüksek çözünürlüklü bir görsel seç.</li><li>Önemli öğeleri görselin ortasına yakın tut.</li><li>Desenlerde kenarları birbirine uyan, tekrar eden görseller daha iyi sonuç verir.</li></ul></div>
    </aside>
@@ -67,6 +67,7 @@ function SavedDesignPicker({productId,onPick,onClose}:{productId:string;onPick:(
   catch{setError('Tasarım açılamadı. Yeniden dene.')}finally{setOpening('')}
  }
  return <section className={styles.library} aria-label="Tasarımlarım">
+  <p>Kayıtlı tasarımın görselini yeni yerleşimde kullanırsın; önceki yerleşim bu adımda aktarılmaz.</p>
   <div className={styles.libraryHead}><p>Tasarımlarım</p><button type="button" onClick={onClose}>Kapat</button></div>
   {error?<p role="alert" className={flow.error}>{error} {!designs&&<button type="button" onClick={()=>setAttempt(value=>value+1)}>Tekrar dene</button>}</p>:null}
   {!designs&&!error&&<p role="status">Tasarımların yükleniyor…</p>}

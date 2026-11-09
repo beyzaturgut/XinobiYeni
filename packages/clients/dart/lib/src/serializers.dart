@@ -130,6 +130,8 @@ import 'package:xinobi_api_client/src/model/save_design_configuration.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/save_print_profile.dart';
 import 'package:xinobi_api_client/src/model/set_configuration_favorite.dart';
+import 'package:xinobi_api_client/src/model/single_source_publication.dart';
+import 'package:xinobi_api_client/src/model/single_source_rendering_inputs.dart';
 import 'package:xinobi_api_client/src/model/staff_order.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
 import 'package:xinobi_api_client/src/model/start_admin_password_reset.dart';
@@ -140,6 +142,7 @@ import 'package:xinobi_api_client/src/model/surat_connection_status.dart';
 import 'package:xinobi_api_client/src/model/surat_shipment_view.dart';
 import 'package:xinobi_api_client/src/model/surat_tracking_item.dart';
 import 'package:xinobi_api_client/src/model/surat_tracking_view.dart';
+import 'package:xinobi_api_client/src/model/surface_media.dart';
 import 'package:xinobi_api_client/src/model/track_quote_message.dart';
 import 'package:xinobi_api_client/src/model/update_my_account.dart';
 import 'package:xinobi_api_client/src/model/variant_detail.dart';
@@ -272,6 +275,8 @@ part 'serializers.g.dart';
   SaveDesignFromSession,
   SavePrintProfile,
   SetConfigurationFavorite,
+  SingleSourcePublication,
+  SingleSourceRenderingInputs,
   StaffOrder,
   StartAccountEmailVerification,
   StartAdminPasswordReset,
@@ -282,6 +287,7 @@ part 'serializers.g.dart';
   SuratShipmentView,
   SuratTrackingItem,
   SuratTrackingView,
+  SurfaceMedia,
   TrackQuoteMessage,
   UpdateMyAccount,
   VariantDetail,

@@ -3,6 +3,8 @@ import {createHash} from 'node:crypto';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 
+// Historical variant fixture publisher only. New single-source releases use export-single-source-previews.mjs
+// and runtime /api/v1/product-surfaces; never infer a source from these variants.
 // Publish only the existing reviewed visual prototypes; this does not approve physical printing or edit SQL.
 export async function publishProductPreviews(root,publicDir,state){
  const fixture=path.join(root,'fixtures/product-surfaces/xinobi-u-accepted');

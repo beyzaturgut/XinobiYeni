@@ -17,10 +17,9 @@ public sealed record ValidatedAlignedMask(SourceMediaIdentity Source, MaskMetada
     }
 }
 
-public sealed class AlignedImageInspector
+public sealed class AlignedImageInspector(long maxPixels = 20_000_000)
 {
     private const int MaxEncodedBytes = 32 * 1024 * 1024;
-    private const long MaxPixels = 20_000_000;
 
     public SourceMediaIdentity InspectSource(ReadOnlySpan<byte> encoded, string mediaVersionReference)
     {
@@ -65,13 +64,13 @@ public sealed class AlignedImageInspector
 
     private static string Checksum(ReadOnlySpan<byte> encoded) => Convert.ToHexString(SHA256.HashData(encoded)).ToLowerInvariant();
 
-    private static SKBitmap Decode(ReadOnlySpan<byte> encoded)
+    private SKBitmap Decode(ReadOnlySpan<byte> encoded)
     {
         if (encoded.Length == 0 || encoded.Length > MaxEncodedBytes) throw new InvalidDataException("Encoded image size is invalid.");
         using var data = SKData.CreateCopy(encoded.ToArray());
         using var codec = SKCodec.Create(data) ?? throw new InvalidDataException("Image cannot be decoded.");
         var info = codec.Info;
-        if (info.Width <= 0 || info.Height <= 0 || (long)info.Width * info.Height > MaxPixels)
+        if (info.Width <= 0 || info.Height <= 0 || (long)info.Width * info.Height > maxPixels)
             throw new InvalidDataException("Decoded image dimensions exceed validation limits.");
         var bitmap = new SKBitmap(new SKImageInfo(info.Width, info.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
         if (codec.GetPixels(bitmap.Info, bitmap.GetPixels()) != SKCodecResult.Success)

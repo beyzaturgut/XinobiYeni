@@ -790,3 +790,7 @@ Katalog ana ekranı ve Medya sekmesindeki fotoğraf üretim promptu; üretici/MA
 ## 06.11.2026 — Sürat destek yanıtı ve örnek JSON uyumu
 
 Sağlayıcı iletilen test referanslarıyla kayıt oluşmadığını teyit etti; başarılı kayıtlara taleple prova hareketi ekleyebileceğini bildirdi. Create isteğine örnekteki boş alanlar ve kapıda tahsilatsız 0/null eklendi. [Yanıt/operatör adımları](../Entegrasyonlar/01-Surat-Kargo/SAGLAYICI-YANITI-2026-11-06.md), [TST-262](../test/2026-11-06/TST-262-surat-provider-support-example.md): 82 Sürat testi PASS; gerçek gönderi/mutabakat/e-posta/deploy yok. Eski kök neden kesin değil; gerçek kabul ve hareket testi açık.
+
+## 09.11.2026 — KIS-TEK-06 tek kaynak yayın API
+
+Ürün bazlı güncel kaynak/onay yayın ucu, sürüm/hash kontrollü dosyalar ve gerçek boyut metadata'sı uygulandı. Eski renk/toplu onay yazma yolları 410; tarihsel GET ve dosyalar korunur. Tek kaynak maske işleme sabit 20 MP yerine ayarlanabilir RAM bütçesi kullanır; otomatik küçültme yok. OpenAPI/TS/Dart ve salt okunur yayın manifest aracı hazır. API 615 PASS / 29 SKIP / 0 FAIL; Dart 10, tools 5; Release 0 hata/uyarı. [TST-263](../test/2026-11-09/TST-263-single-source-publication.md), [rehber](../docs/runbooks/single-source-publication.md). KIS-TEK-07–12, gerçek kaynak/SKU eşlemesi ve veri geçişi açık; deploy/APK yapılmadı. Kullanıcı talimatıyla bundan sonraki doğrulanmış commitler iki repoda aynı geçmişle tutulur: mostidea/xinobi_new ve beyzaturgut/XinobiYeni.

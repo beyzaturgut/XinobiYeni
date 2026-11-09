@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-263 | 09.11.2026 | KIS-TEK-06 tek kaynak yayın, eski yazma uçlarının kaldırılması, RAM bütçesi, TS/Dart ve manifest | PASS API 615 / SKIP 29 / FAIL 0; Dart 10; tools 5 | API / CONTRACT / ISOLATED | [Rapor](2026-11-09/TST-263-single-source-publication.md) |
 | TST-239 | 03.11.2026 | SIP-TAS-09 API kabul: kimlik/yerleşim/üç dosya eşliği düzenleme, silme, katalog/maske değişimi ve dosya deposu restart sonrası | PASS 16/16 | API / ISOLATED ACCEPTANCE | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |
 | TST-240 | 03.11.2026 | API tam paket + Release derleme + sözleşme | PASS 514 (29 atlandı; 17 SQL) | API / CONTRACT | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |
 | TST-241 | 03.11.2026 | Admin ekran kabulü 320/390/768/1440 × normal/%200, axe, klavye/odak/duyuru, üretim eylemi yok | PASS (1 tek seferlik taşma ölçümü raporda) | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-03/TST-239-sip-tas-09-order-design-acceptance.md) |

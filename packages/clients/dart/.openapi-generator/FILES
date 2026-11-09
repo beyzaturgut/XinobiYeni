@@ -97,6 +97,7 @@ doc/ProductDetail.md
 doc/ProductPage.md
 doc/ProductSpec.md
 doc/ProductSummary.md
+doc/ProductSurfacesApi.md
 doc/PublicReview.md
 doc/Quote.md
 doc/QuoteDecision.md
@@ -123,6 +124,8 @@ doc/SaveDesignConfiguration.md
 doc/SaveDesignFromSession.md
 doc/SavePrintProfile.md
 doc/SetConfigurationFavorite.md
+doc/SingleSourcePublication.md
+doc/SingleSourceRenderingInputs.md
 doc/StaffOrder.md
 doc/StartAccountEmailVerification.md
 doc/StartAdminPasswordReset.md
@@ -133,6 +136,7 @@ doc/SuratConnectionStatus.md
 doc/SuratShipmentView.md
 doc/SuratTrackingItem.md
 doc/SuratTrackingView.md
+doc/SurfaceMedia.md
 doc/SystemApi.md
 doc/TrackQuoteMessage.md
 doc/UpdateMyAccount.md
@@ -153,6 +157,7 @@ lib/src/api/admin_api.dart
 lib/src/api/assistant_api.dart
 lib/src/api/catalog_api.dart
 lib/src/api/content_api.dart
+lib/src/api/product_surfaces_api.dart
 lib/src/api/quotes_api.dart
 lib/src/api/system_api.dart
 lib/src/api/xinobi_u_api.dart
@@ -280,6 +285,8 @@ lib/src/model/save_design_configuration.dart
 lib/src/model/save_design_from_session.dart
 lib/src/model/save_print_profile.dart
 lib/src/model/set_configuration_favorite.dart
+lib/src/model/single_source_publication.dart
+lib/src/model/single_source_rendering_inputs.dart
 lib/src/model/staff_order.dart
 lib/src/model/start_account_email_verification.dart
 lib/src/model/start_admin_password_reset.dart
@@ -290,6 +297,7 @@ lib/src/model/surat_connection_status.dart
 lib/src/model/surat_shipment_view.dart
 lib/src/model/surat_tracking_item.dart
 lib/src/model/surat_tracking_view.dart
+lib/src/model/surface_media.dart
 lib/src/model/track_quote_message.dart
 lib/src/model/update_my_account.dart
 lib/src/model/variant_detail.dart

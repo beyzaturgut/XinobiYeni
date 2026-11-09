@@ -128,4 +128,99 @@ public sealed class SingleSourceMaskTests
         Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.GetAsync(Item)).StatusCode);
         Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.PostAsJsonAsync(Item + "/approval", Action(draft))).StatusCode);
     }
+
+    private const string Public = "/api/v1/product-surfaces/" + Product + "/rendering-inputs";
+
+    [Theory]
+    [InlineData(113, 67)]
+    [InlineData(67, 113)]
+    [InlineData(71, 71)]
+    public async Task OnlyApprovedSingleSourcePublishesOriginalDimensionsAndExactBytes(int width, int height)
+    {
+        using var factory = Factory(); using var staff = await TestStaff.Client(factory); using var visitor = factory.CreateClient();
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(Public)).StatusCode);
+        var source = await Source(factory, staff, width, height);
+        var draft = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(source, Image(width, height, true))));
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(Public)).StatusCode);
+        var approved = await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(draft)));
+        var response = await visitor.GetAsync(Public); response.EnsureSuccessStatusCode();
+        Assert.Equal("no-store", response.Headers.CacheControl!.ToString());
+        var bundle = (await response.Content.ReadFromJsonAsync<SingleSourcePublication>())!;
+        Assert.Equal("single-source-preview", bundle.Scope); Assert.Equal(Product, bundle.ProductReference);
+        Assert.Equal((width,height), (bundle.Inputs.Width,bundle.Inputs.Height));
+        Assert.Equal(approved.SourceRevision, bundle.SourceRevision);
+        Assert.Equal(approved.Source!.Sha256, bundle.Inputs.SourceMediaVersion);
+        Assert.Equal(approved.Approved!.Sha256, bundle.Inputs.SurfaceVersion);
+        Assert.Equal(await staff.GetByteArrayAsync(approved.Source.Image), await visitor.GetByteArrayAsync(bundle.Inputs.Source.Url));
+        Assert.Equal(await staff.GetByteArrayAsync(approved.Approved.Image), await visitor.GetByteArrayAsync(bundle.Inputs.Mask.Url));
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(bundle.Inputs.Mask.Url.Replace("v=", "v=0"))).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(bundle.Inputs.Mask.Url.Replace(Product, "other-product"))).StatusCode);
+        // A newer draft never replaces the approved publication before explicit approval.
+        await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(approved, Image(width, height, true))));
+        Assert.Equal(bundle.SurfaceId, (await visitor.GetFromJsonAsync<SingleSourcePublication>(Public))!.SurfaceId);
+    }
+
+    [Fact]
+    public async Task RevokedOrStaleMediaIsNotPublicButHistoricalStaffFilesRemainUnchanged()
+    {
+        using var factory = Factory(); using var staff = await TestStaff.Client(factory); using var visitor = factory.CreateClient();
+        var source = await Source(factory, staff);
+        var draft = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(source, Image(113, 67, true))));
+        var approved = await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(draft)));
+        var bundle = (await visitor.GetFromJsonAsync<SingleSourcePublication>(Public))!;
+        var bytes = await staff.GetByteArrayAsync(approved.Approved!.Image);
+        var revoked = await Ok(await Delete(staff, Item + "/approval", Action(approved)));
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(Public)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(bundle.Inputs.Mask.Url)).StatusCode);
+        Assert.Equal(bytes, await staff.GetByteArrayAsync(approved.Approved.Image));
+        var again = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(revoked, Image(113,67,true))));
+        await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(again)));
+        bundle = (await visitor.GetFromJsonAsync<SingleSourcePublication>(Public))!;
+        await Source(factory, staff, 71,93);
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(Public)).StatusCode);
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(bundle.Inputs.Source.Url)).StatusCode);
+        Assert.Equal(bytes, await staff.GetByteArrayAsync(approved.Approved.Image));
+    }
+
+    [Fact]
+    public async Task InactiveProductOrCorruptApprovedAssetsCannotPublishOrFallBackToVariant()
+    {
+        using var factory = Factory(); using var staff = await TestStaff.Client(factory); using var visitor = factory.CreateClient();
+        var source = await Source(factory, staff);
+        var draft = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(source, Image(113,67,true))));
+        var approved = await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(draft)));
+        var catalog = factory.Services.GetRequiredService<LocalCommerceStore>();
+        foreach (var enabled in new[] { false, true })
+        {
+            await catalog.Update(state => state with { Products = [..state.Products.Select(p => p.Id == Product ? p with { Active = enabled } : p)] });
+            Assert.Equal(enabled ? HttpStatusCode.OK : HttpStatusCode.NotFound, (await visitor.GetAsync(Public)).StatusCode);
+        }
+        await factory.Services.GetRequiredService<IFileStore>().Save(FileAreas.Designs, "surface-mask-" + approved.Approved!.Id + ".png", new MemoryStream([1,2,3]), "image/png");
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await visitor.GetAsync(Public)).StatusCode);
+    }
+
+    [Fact]
+    public async Task MemoryBudgetIsExplicitAndDoesNotResizeOrReplaceSource()
+    {
+        using var factory = Factory().WithWebHostBuilder(builder => builder.ConfigureAppConfiguration((_, config) =>
+            config.AddInMemoryCollection(new Dictionary<string,string?> { ["ProductSurfaces:MaskProcessingMemoryMiB"] = "16" })));
+        using var staff = await TestStaff.Client(factory);
+        var source = await Source(factory, staff, 1100,1100);
+        var response = await staff.PostAsJsonAsync(Item + "/mask", Upload(source, Image(1100,1100,true)));
+        Assert.Equal(HttpStatusCode.RequestEntityTooLarge, response.StatusCode);
+        Assert.Contains("mask_processing_capacity", await response.Content.ReadAsStringAsync());
+        Assert.Equal(source.Source, (await Ok(await staff.GetAsync(Item))).Source);
+    }
+
+    [Fact]
+    public async Task SourceLargerThanOldTwentyMegapixelLimitKeepsItsActualCanvas()
+    {
+        using var factory = Factory(); using var staff = await TestStaff.Client(factory);
+        var source = await Source(factory, staff, 5001,4000);
+        var draft = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(source, Image(5001,4000,true))));
+        await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(draft)));
+        using var visitor = factory.CreateClient();
+        var bundle = (await visitor.GetFromJsonAsync<SingleSourcePublication>(Public))!;
+        Assert.Equal((5001,4000), (bundle.Inputs.Width,bundle.Inputs.Height));
+    }
 }

@@ -5,6 +5,83 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/v1/product-surfaces/{productId}/rendering-inputs": {
+      "get": {
+        "tags": [
+          "ProductSurfaces"
+        ],
+        "operationId": "GetSingleSourceRenderingInputs",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleSourcePublication"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/product-surfaces/{productId}/{surfaceId}/{role}": {
+      "get": {
+        "tags": [
+          "ProductSurfaces"
+        ],
+        "operationId": "GetSingleSourceSurfaceMedia",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "surfaceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "role",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/v1/catalog/categories": {
       "get": {
         "tags": [
@@ -9504,6 +9581,86 @@
           }
         }
       },
+      "SingleSourcePublication": {
+        "required": [
+          "schemaVersion",
+          "scope",
+          "productReference",
+          "surfaceId",
+          "sourceRevision",
+          "inputs"
+        ],
+        "type": "object",
+        "properties": {
+          "schemaVersion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "productReference": {
+            "type": "string"
+          },
+          "surfaceId": {
+            "type": "string"
+          },
+          "sourceRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inputs": {
+            "$ref": "#/components/schemas/SingleSourceRenderingInputs"
+          }
+        }
+      },
+      "SingleSourceRenderingInputs": {
+        "required": [
+          "surfaceVersion",
+          "sourceMediaVersion",
+          "width",
+          "height",
+          "source",
+          "mask"
+        ],
+        "type": "object",
+        "properties": {
+          "surfaceVersion": {
+            "type": "string"
+          },
+          "sourceMediaVersion": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "source": {
+            "$ref": "#/components/schemas/SurfaceMedia"
+          },
+          "mask": {
+            "$ref": "#/components/schemas/SurfaceMedia"
+          },
+          "brandingRequired": {
+            "type": "boolean",
+            "default": false
+          },
+          "branding": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SurfaceMedia"
+              }
+            ]
+          }
+        }
+      },
       "StaffOrder": {
         "required": [
           "order",
@@ -9758,6 +9915,21 @@
             "items": {
               "$ref": "#/components/schemas/SuratTrackingItem"
             }
+          }
+        }
+      },
+      "SurfaceMedia": {
+        "required": [
+          "url",
+          "sha256"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string"
           }
         }
       },
@@ -10083,6 +10255,9 @@
     }
   },
   "tags": [
+    {
+      "name": "ProductSurfaces"
+    },
     {
       "name": "Catalog"
     },

@@ -8,7 +8,7 @@ namespace Xinobi.Api.Infrastructure.MaskProcessing;
 /// <summary>Local, deterministic WebP mask import; normalized to RGBA PNG for the renderer. No inference or external calls.</summary>
 public static class ManualSurfaceMasks
 {
-    public static byte[] Webp(byte[] bytes, string mode, SourceMediaIdentity source)
+    public static byte[] Webp(byte[] bytes, string mode, SourceMediaIdentity source, long maxPixels = 20_000_000)
     {
         if (bytes.Length > 8 * 1024 * 1024 || bytes.Length < 12 || !bytes.AsSpan(0, 4).SequenceEqual("RIFF"u8) || !bytes.AsSpan(8, 4).SequenceEqual("WEBP"u8) || mode is not ("alpha" or "luminance"))
             throw new SurfaceException("invalid_mask_webp", "Yalnız en fazla 8 MB WebP yükleyin ve maske türünü seçin.");
@@ -18,6 +18,8 @@ public static class ManualSurfaceMasks
             throw new SurfaceException("invalid_mask_webp", "Tek kareli WebP maske gerekli; animasyon kabul edilmez.");
         if (codec.Info.Width != source.Width || codec.Info.Height != source.Height)
             throw new SurfaceException("mask_dimensions_mismatch", $"WebP tam {source.Width}×{source.Height} piksel olmalı; otomatik esnetme yapılmaz.");
+        if ((long)source.Width * source.Height > maxPixels)
+            throw new SurfaceException("mask_processing_capacity", "Maske işleme bellek bütçesini aşıyor; kaynak küçültülmedi.", 413);
         using var bitmap = new SKBitmap(new SKImageInfo(source.Width, source.Height, SKColorType.Rgba8888, SKAlphaType.Unpremul));
         if (codec.GetPixels(bitmap.Info, bitmap.GetPixels()) != SKCodecResult.Success)
             throw new SurfaceException("invalid_mask_webp", "WebP okunamadı.");
@@ -29,7 +31,7 @@ public static class ManualSurfaceMasks
             pixels[i] = inside ? SKColors.White : SKColors.Transparent;
         }
         bitmap.Pixels = pixels;
-        return Encode(bitmap, source);
+        return Encode(bitmap, source, maxPixels);
     }
 
     // Existing drafts remain canonical RGBA PNG; exports are real lossless WebP.
@@ -42,11 +44,11 @@ public static class ManualSurfaceMasks
         return encoded.ToArray();
     }
 
-    private static byte[] Encode(SKBitmap bitmap, SourceMediaIdentity source)
+    private static byte[] Encode(SKBitmap bitmap, SourceMediaIdentity source, long maxPixels)
     {
         using var png = bitmap.Encode(SKEncodedImageFormat.Png, 100);
         var bytes = png.ToArray();
-        try { new AlignedImageInspector().ValidateMask(bytes, "dev:manual-surface-mask", source, source); }
+        try { new AlignedImageInspector(maxPixels).ValidateMask(bytes, "dev:manual-surface-mask", source, source); }
         catch (InvalidDataException) { throw new SurfaceException("mask_empty_or_full", "Maske boş ya da tamamen dolu olamaz. Şeffaf WebP veya siyah-beyaz maske seçimini kontrol edin."); }
         return bytes;
     }

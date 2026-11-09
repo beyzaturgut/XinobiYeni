@@ -14,3 +14,10 @@ The project owner wants completed changes committed and pushed regularly.
 - Fetch and check remote history before pushing. Do not force-push, rewrite shared history, or discard another contributor's work.
 - Never commit API tokens, real environment files, appsettings.Local.json, local commerce records/uploads, dependencies, or generated build output.
 - A GitHub push is not authorization to introduce a new deployment workflow or change hosting settings.
+
+## Git mirrors (owner instruction, 09.11.2026)
+
+- Continue both repositories with the same commits: `mostidea/xinobi_new` (`origin`) and `beyzaturgut/XinobiYeni` (`previous-origin`).
+- Before pushing, fetch and inspect both histories. Fast-forward only; if either diverges, preserve its changes and resolve before synchronizing.
+- Push validated work to both main branches and verify that both remote tips equal the local commit. Report any partial failure; a push to one repository is not synchronization.
+- This does not authorize deployment or duplicate releases in the historical repository.

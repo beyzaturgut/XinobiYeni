@@ -165,6 +165,8 @@ Class | Method | HTTP request | Description
 [*CatalogApi*](doc/CatalogApi.md) | [**listReviewSummaries**](doc/CatalogApi.md#listreviewsummaries) | **GET** /api/v1/catalog/review-summaries |
 [*ContentApi*](doc/ContentApi.md) | [**getHomeContent**](doc/ContentApi.md#gethomecontent) | **GET** /api/v1/content/home |
 [*ContentApi*](doc/ContentApi.md) | [**listAnnouncements**](doc/ContentApi.md#listannouncements) | **GET** /api/v1/content/announcements |
+[*ProductSurfacesApi*](doc/ProductSurfacesApi.md) | [**getSingleSourceRenderingInputs**](doc/ProductSurfacesApi.md#getsinglesourcerenderinginputs) | **GET** /api/v1/product-surfaces/{productId}/rendering-inputs |
+[*ProductSurfacesApi*](doc/ProductSurfacesApi.md) | [**getSingleSourceSurfaceMedia**](doc/ProductSurfacesApi.md#getsinglesourcesurfacemedia) | **GET** /api/v1/product-surfaces/{productId}/{surfaceId}/{role} |
 [*QuotesApi*](doc/QuotesApi.md) | [**createQuote**](doc/QuotesApi.md#createquote) | **POST** /api/v1/quotes |
 [*QuotesApi*](doc/QuotesApi.md) | [**decideQuote**](doc/QuotesApi.md#decidequote) | **POST** /api/v1/quotes/{code}/decision |
 [*QuotesApi*](doc/QuotesApi.md) | [**getQuoteOptions**](doc/QuotesApi.md#getquoteoptions) | **GET** /api/v1/quotes/options |
@@ -298,6 +300,8 @@ Class | Method | HTTP request | Description
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
  - [SavePrintProfile](doc/SavePrintProfile.md)
  - [SetConfigurationFavorite](doc/SetConfigurationFavorite.md)
+ - [SingleSourcePublication](doc/SingleSourcePublication.md)
+ - [SingleSourceRenderingInputs](doc/SingleSourceRenderingInputs.md)
  - [StaffOrder](doc/StaffOrder.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)
  - [StartAdminPasswordReset](doc/StartAdminPasswordReset.md)
@@ -308,6 +312,7 @@ Class | Method | HTTP request | Description
  - [SuratShipmentView](doc/SuratShipmentView.md)
  - [SuratTrackingItem](doc/SuratTrackingItem.md)
  - [SuratTrackingView](doc/SuratTrackingView.md)
+ - [SurfaceMedia](doc/SurfaceMedia.md)
  - [TrackQuoteMessage](doc/TrackQuoteMessage.md)
  - [UpdateMyAccount](doc/UpdateMyAccount.md)
  - [VariantDetail](doc/VariantDetail.md)

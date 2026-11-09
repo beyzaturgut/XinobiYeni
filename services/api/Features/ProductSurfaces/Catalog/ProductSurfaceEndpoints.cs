@@ -4,7 +4,7 @@ using Xinobi.Api.LocalCommerce;
 namespace Xinobi.Api.Features.ProductSurfaces.Catalog;
 
 /// <summary>
-/// Admin surface masking for every product variant, under /api/v1/local-commerce/surfaces with the staff catalog permissions
+/// Single-source admin masking and read-only historical variants, under /api/v1/local-commerce/surfaces with the staff catalog permissions
 /// (<see cref="PanelAccess"/>). Development: loopback and the local panel/web origins (ADR-003), opted in with
 /// <c>ProductSurfaces:ExperimentalCatalogWorkspace:Enabled</c>. Elsewhere: only with the SQL admin catalog
 /// (<c>AdminCatalog:Enabled</c>), the same same-origin and HTTPS rules as the rest of that panel group, and
@@ -47,7 +47,7 @@ public static class ProductSurfaceEndpoints
             catch (Xinobi.Api.Infrastructure.ProblemException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Status); }
         });
 
-        // Single-source Admin workspace. Legacy variant reads remain for historical/public consumers until task 06.
+        // Single-source Admin workspace. Legacy variant reads remain for historical consumers; writes are retired.
         group.MapGet("/products", async (PersonalizationSourceStore sources) => Results.Ok(await sources.ListMasks()));
         group.MapGet("/products/{productId}", async (string productId, PersonalizationSourceStore sources) => Results.Ok(await sources.GetMask(productId)));
         group.MapPost("/products/{productId}/mask", async (string productId, SingleSourceMaskUpload request, PersonalizationSourceStore sources) => Results.Ok(await sources.UploadMask(productId, request)));
@@ -63,10 +63,10 @@ public static class ProductSurfaceEndpoints
             Results.File(await surfaces.DraftMask(productId, variantId), "image/png"));
         group.MapGet("/{productId}/{variantId}/draft.webp", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) =>
             Results.File(Xinobi.Api.Infrastructure.MaskProcessing.ManualSurfaceMasks.ExportWebp(await surfaces.DraftMask(productId, variantId)), "image/webp"));
-        group.MapPost("/{productId}/{variantId}/mask", async (string productId, string variantId, SurfaceWebpRequest request, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.ImportWebp(productId, variantId, request)));
-        group.MapPost("/{productId}/{variantId}/approval", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Approve(productId, variantId)));
-        group.MapPost("/{productId}/{variantId}/approval/colors", async (string productId, string variantId, SurfaceApprovalRequest request, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.ApproveColors(productId, variantId, request)));
-        group.MapDelete("/{productId}/{variantId}/approval", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Revoke(productId, variantId)));
-        group.MapDelete("/{productId}/{variantId}/draft", async (string productId, string variantId, ProductSurfaceWorkspace surfaces) => Results.Ok(await surfaces.Discard(productId, variantId)));
+        // Historical variant records are read-only. Never re-enable shared-mask writes for compatibility.
+        foreach (var route in new[] { "/{productId}/{variantId}/mask", "/{productId}/{variantId}/approval", "/{productId}/{variantId}/approval/colors" })
+            group.MapPost(route, () => Results.Json(new { code = "variant_surface_retired", message = "Renk bazlı maske işlemi kaldırıldı. Ürünün tek kaynak yüzeyini kullanın." }, statusCode: 410));
+        foreach (var route in new[] { "/{productId}/{variantId}/approval", "/{productId}/{variantId}/draft" })
+            group.MapDelete(route, () => Results.Json(new { code = "variant_surface_retired", message = "Eski yüzey kaydı salt okunurdur." }, statusCode: 410));
     }
 }

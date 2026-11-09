@@ -71,7 +71,18 @@ public sealed partial class PersonalizationSourceStore
         return bytes;
     }
 
+    // Bound peak bitmap allocations, rather than imposing a source canvas or resolution.
+    private static readonly SemaphoreSlim MaskProcessing = new(1, 1);
+    private long MaskPixelBudget => Math.Clamp(configuration.GetValue<long>("ProductSurfaces:MaskProcessingMemoryMiB", 512), 16, 1024) * 1024 * 1024 / 16;
+
     public async Task<SingleSourceMaskDetail> UploadMask(string productId, SingleSourceMaskUpload request)
+    {
+        await MaskProcessing.WaitAsync();
+        try { return await UploadMaskCore(productId, request); }
+        finally { MaskProcessing.Release(); }
+    }
+
+    private async Task<SingleSourceMaskDetail> UploadMaskCore(string productId, SingleSourceMaskUpload request)
     {
         await Product(productId);
         var action = new SingleSourceMaskAction(request.SourceSha256, request.SourceRevision, request.ExpectedRevision);
@@ -80,14 +91,14 @@ public sealed partial class PersonalizationSourceStore
             throw new ProblemException("source_changed", "Kaynak fotoğraf değişti; güncel kaydı yükleyin.", 409);
         if (string.IsNullOrWhiteSpace(request.WebpBase64) || request.WebpBase64.Length > 12 * 1024 * 1024)
             throw new ProblemException("invalid_mask_webp", "En fazla 8 MB WebP maske yükleyin.");
-        // Existing decoder budget; this is not a required canvas size and never resizes the original source.
-        if ((long)source.Width * source.Height > 20_000_000)
+        // Resource budget only: no required size, aspect ratio, crop or working copy.
+        if ((long)source.Width * source.Height > MaskPixelBudget)
             throw new ProblemException("mask_processing_capacity", "Kaynak korunuyor; bu maskenin çözülmesi mevcut işleme kapasitesini aşıyor. Otomatik küçültme yapılmadı.", 413);
         byte[] encoded;
         try { encoded = Convert.FromBase64String(request.WebpBase64); }
         catch (FormatException) { throw new ProblemException("invalid_mask_webp", "WebP aktarımı okunamadı."); }
         var identity = new SourceMediaIdentity("personalization:" + productId, source.Sha256, source.Width, source.Height);
-        var bytes = ManualSurfaceMasks.Webp(encoded, request.Mode, identity);
+        var bytes = ManualSurfaceMasks.Webp(encoded, request.Mode, identity, MaskPixelBudget);
         var id = Guid.NewGuid().ToString("N"); var key = "surface-mask-" + id + ".png";
         await files.Save(FileAreas.Designs, key, new MemoryStream(bytes), "image/png");
         var mask = new PersonalizationMask(id, request.SourceRevision, source.Sha256, MaskUrl(productId, id),

@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04 ve 05 uygulandı; KIS-TEK-06…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05 ve 06 uygulandı; KIS-TEK-07…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -103,7 +103,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Kaynak farklı oran/boyutta olabilir; maske o kaynağın gerçek ölçüsüyle doğrulanır. Onay yalnız seçili tek yüzeyi etkiler. Başka ürüne/görsele toplu uygulama yapılamaz. Anonim erişim yalnız aktif/onaylı yüzeyi sunar. Eski bağlantılar/kayıtlar yanlış kaynağa sessizce yönlendirilmez; uyumluluk politikası belgelenir.
 
-**Faz:** Faz06 · **Öncelik:** P1 · **Bağımlılık:** 01,02,04,05 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz06 · **Öncelik:** P1 · **Bağımlılık:** 01,02,04,05 · **Durum:** Uygulandı ve izole doğrulandı (09.11.2026).
+
+**Teslim:** [Tek kaynak yayın API/sözleşme/araç rehberi](../runbooks/single-source-publication.md), [TST-263](../../test/2026-11-09/TST-263-single-source-publication.md). Güncel aktif/onaylı yüzey gerçek ölçülerle sunulur; eski renk yazma uçları 410, geçmiş okumalar korunur. 20 MP sabit sınırı tek kaynak maske akışında RAM bütçesine geçirildi. Web/Flutter ve sipariş tüketici geçişi 07–10 kapsamında açık.
 
 ### KIS-TEK-07 — Web kişiselleştirme akışından zorunlu renk seçimini kaldırma
 

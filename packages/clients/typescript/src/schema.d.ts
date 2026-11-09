@@ -4,6 +4,38 @@
  */
 
 export interface paths {
+    "/api/v1/product-surfaces/{productId}/rendering-inputs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetSingleSourceRenderingInputs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/product-surfaces/{productId}/{surfaceId}/{role}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetSingleSourceSurfaceMedia"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/catalog/categories": {
         parameters: {
             query?: never;
@@ -2574,6 +2606,29 @@ export interface components {
         SetConfigurationFavorite: {
             favorite: boolean;
         };
+        SingleSourcePublication: {
+            /** Format: int32 */
+            schemaVersion: number;
+            scope: string;
+            productReference: string;
+            surfaceId: string;
+            /** Format: int32 */
+            sourceRevision: number;
+            inputs: components["schemas"]["SingleSourceRenderingInputs"];
+        };
+        SingleSourceRenderingInputs: {
+            surfaceVersion: string;
+            sourceMediaVersion: string;
+            /** Format: int32 */
+            width: number;
+            /** Format: int32 */
+            height: number;
+            source: components["schemas"]["SurfaceMedia"];
+            mask: components["schemas"]["SurfaceMedia"];
+            /** @default false */
+            brandingRequired: boolean;
+            branding?: null | components["schemas"]["SurfaceMedia"];
+        };
         StaffOrder: {
             order: components["schemas"]["CustomerOrder"];
             accountId: string;
@@ -2637,6 +2692,10 @@ export interface components {
             /** Format: date-time */
             lastSuccess: null | string;
             items: components["schemas"]["SuratTrackingItem"][];
+        };
+        SurfaceMedia: {
+            url: string;
+            sha256: string;
         };
         TrackQuoteMessage: {
             email: string;
@@ -2721,6 +2780,52 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    GetSingleSourceRenderingInputs: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SingleSourcePublication"];
+                };
+            };
+        };
+    };
+    GetSingleSourceSurfaceMedia: {
+        parameters: {
+            query: {
+                v: string;
+            };
+            header?: never;
+            path: {
+                productId: string;
+                surfaceId: string;
+                role: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ListCatalogCategories: {
         parameters: {
             query?: never;

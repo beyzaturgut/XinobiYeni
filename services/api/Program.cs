@@ -319,6 +319,7 @@ app.UseMiddleware<AdminAuditMiddleware>();
 app.UseAuthorization();
 app.MapLocalCommerce();
 Xinobi.Api.Features.ProductSurfaces.Catalog.ProductSurfaceEndpoints.MapProductSurfaces(app);
+Xinobi.Api.Features.ProductSurfaces.SingleSourcePublicationEndpoints.MapSingleSourcePublication(app);
 app.MapEmailVerification();
 app.MapDesignStudio();
 app.MapCatalog();

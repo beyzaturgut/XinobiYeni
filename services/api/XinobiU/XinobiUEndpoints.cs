@@ -8,7 +8,7 @@ namespace Xinobi.Api.XinobiU;
 
 // Public XINOBI U contract for web and mobile. `ClientId` is a random per-install (or per-browser) UUID; no personal data is collected.
 public record XinobiUStatus(bool GenerationAvailable, string QuestionBankVersion, int QuestionCount);
-/// <summary>Omit <c>VariantId</c> to let the server pick the product's first photographed variant (colour does not affect the design).</summary>
+/// <summary>Omit VariantId to use the approved single product source.</summary>
 public record CreateXinobiUSession(string ProductId, string? VariantId, string ClientId);
 public record XinobiUAnswer(string QuestionId, string OptionId);
 public record XinobiUGenerationRequest(XinobiUAnswer[] Answers);
@@ -21,7 +21,7 @@ public record XinobiUSession(
     string Status,
     DateTimeOffset ExpiresAt,
     XinobiUProduct Product,
-    XinobiUVariant Variant,
+    XinobiUVariant? Variant,
     string QuestionBankVersion,
     XinobiUQuestion[] Questions,
     XinobiUAnswer[] Answers,
@@ -119,7 +119,7 @@ public static class XinobiUEndpoints
         return new XinobiUSession(
             session.Id, session.Status, session.ExpiresAt,
             new XinobiUProduct(session.Product.Id, session.Product.Name, session.Product.Category),
-            new XinobiUVariant(session.Variant.Id, session.Variant.Color, session.Variant.Hex, Url(session.Variant.Image)),
+            session.Variant is { } variant ? new XinobiUVariant(variant.Id, variant.Color, variant.Hex, Url(variant.Image)) : null,
             session.BankVersion,
             session.Questions.Select(question => new XinobiUQuestion(question.Id, question.Axis, question.AxisLabel, question.Text,
                 question.Options.Select(option => new XinobiUOption(option.Id, option.Label)).ToArray())).ToArray(),

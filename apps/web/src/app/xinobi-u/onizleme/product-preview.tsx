@@ -30,5 +30,5 @@ function ProductPreviewSession({product,requestedSession}:{product:string|null;r
    <p className={styles.previewTitle}>{session.product.name}</p>
    <p className={styles.note}>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p>
   </div>
- </header><AcceptedSurfaceEditor xinobiPreview designId={session.id} commerceProduct={session.product.id} commerceVariant={session.variant.id} patternSrc={studioAsset(session.imageUrl!)}/></>;
+ </header><AcceptedSurfaceEditor xinobiPreview designId={session.id} commerceProduct={session.product.id} commerceVariant={session.variant?.id} patternSrc={studioAsset(session.imageUrl!)}/></>;
 }

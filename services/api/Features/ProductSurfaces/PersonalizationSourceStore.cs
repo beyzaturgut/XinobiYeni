@@ -8,12 +8,12 @@ namespace Xinobi.Api.Features.ProductSurfaces;
 
 public sealed record PersonalizationSourceAsset(string Image, string Sha256, string Mime, long Bytes, int Width, int Height);
 public sealed record PersonalizationSourceRevision(int Revision, PersonalizationSourceAsset Asset, DateTimeOffset CreatedAt);
-public sealed record PersonalizationSourceProfile(string ProductId, int ProfileRevision, PersonalizationSourceRevision[] Sources, PersonalizationMask[]? Masks = null, string? DraftId = null, string? ApprovedId = null);
+public sealed record PersonalizationSourceProfile(string ProductId, int ProfileRevision, PersonalizationSourceRevision[] Sources, PersonalizationMask[]? Masks = null, string? DraftId = null, string? ApprovedId = null, string? FulfillmentVariantId = null);
 public sealed record PersonalizationSourceView(string ProductId, int Revision, string Status, PersonalizationSourceAsset? Source, string SurfaceStatus, int SourceRevision = 0);
 public sealed record SavePersonalizationSource(string Image, string SourceSha256, int ExpectedRevision);
 
 /// <summary>Admin-only source staging. Does not replace variant masks or mutate historical designs/orders.</summary>
-public sealed partial class PersonalizationSourceStore(FeatureDocuments documents, LocalCommerceStore catalog, IFileStore files,
+public sealed partial class PersonalizationSourceStore(FeatureDocuments documents, Xinobi.Api.Catalog.ICatalogSource catalog, IFileStore files,
     IWebHostEnvironment environment, IConfiguration configuration, TimeProvider clock)
 {
     private sealed record State(int SchemaVersion, Dictionary<string, PersonalizationSourceProfile> Profiles);
@@ -28,7 +28,7 @@ public sealed partial class PersonalizationSourceStore(FeatureDocuments document
 
     private async Task Product(string productId)
     {
-        var product = (await catalog.Read()).Products.SingleOrDefault(p => p.Id == productId);
+        var product = (await catalog.ReadAsync()).Products.SingleOrDefault(p => p.Id == productId);
         if (product is null) throw ProblemException.NotFound("product_not_found", "Ürün bulunamadı.");
         if (product.Personalizable != true) throw new ProblemException("personalization_not_available", "Bu ürün XINOBI U için işaretli değil.", 409);
     }

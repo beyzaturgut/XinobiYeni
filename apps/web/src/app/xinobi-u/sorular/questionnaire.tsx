@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { browserId, designRequest, rememberSession, studioAsset, type DesignSession } from '../../../lib/design-studio';
 import PersonalizationMethods from '../../../components/personalization-methods';
 
-import {currentProductSurface,surfaceSavePending,type ProductSurface} from '../../../features/product-personalization/single-source';
+import {currentProductSurface,type ProductSurface} from '../../../features/product-personalization/single-source';
 import styles from '../studio.module.css';
 
 function questionnaireError(error: unknown, fallback: string): string {
@@ -49,7 +49,7 @@ function QuestionnaireSession() {
     starting.current ??= load();
     starting.current.then(data => {
       if (!active) return;
-      if (data.product.id !== product || Boolean(variant && data.variant.id !== variant)) throw new Error('Seçilen ürün doğrulanamadı.');
+      if (data.product.id !== product || Boolean(variant && data.variant?.id !== variant)) throw new Error('Seçilen ürün doğrulanamadı.');
       // Also remember it under the requested key (variant may be empty) so a reload resumes the same questionnaire.
       rememberSession(data); sessionStorage.setItem(storageKey, data.id); setSession(data);
       const saved = data.answers.length ? Object.fromEntries(data.answers.map(answer => [answer.questionId, answer.optionId])) : JSON.parse(sessionStorage.getItem(`xinobi-u-answers:${data.id}`) || '{}');
@@ -66,7 +66,7 @@ function QuestionnaireSession() {
     const refresh = async () => {
       try {
         const data = await designRequest<DesignSession>(`/sessions/${sessionId}`);
-        if (data.product.id !== product || Boolean(variant && data.variant.id !== variant)) throw new Error('Seçilen ürün doğrulanamadı.');
+        if (data.product.id !== product || Boolean(variant && data.variant?.id !== variant)) throw new Error('Seçilen ürün doğrulanamadı.');
         if (active) { setSession(data); setError(''); }
       }
       catch (error) { if (active) setError(questionnaireError(error, 'Bağlantı kesildi. Aynı üretim durumu yeniden kontrol ediliyor.')); }
@@ -86,7 +86,7 @@ function QuestionnaireSession() {
     setBusy(true); setError('');
     try {
       const data = await designRequest<DesignSession>(`/sessions/${session.id}/generation`, 'POST', { answers: session.questions.map(question => ({ questionId: question.id, optionId: answers[question.id] })) });
-      if (data.product.id !== product || Boolean(variant && data.variant.id !== variant)) throw new Error('Seçilen ürün doğrulanamadı.');
+      if (data.product.id !== product || Boolean(variant && data.variant?.id !== variant)) throw new Error('Seçilen ürün doğrulanamadı.');
       setSession(data); rememberSession(data);
     }
     catch (error) { setError(questionnaireError(error, 'Üretim başlatılamadı. Tekrar deneyin.')); }
@@ -100,7 +100,7 @@ function QuestionnaireSession() {
   return <main className={styles.main}><PersonalizationMethods product={product} variant={variant} mode="ai"/><div className={styles.questionLayout}><aside className={styles.selection}><div className={styles.selectionImage}><Image src={inputs!.source.url} alt={session.product.name} width={500} height={600} /></div><p className={styles.kicker}>Seçtiğin ürün</p><h2>{session.product.name}</h2><Link href="/xinobi-u">Başka ürün seç ↗</Link></aside><section className={styles.questionPanel} aria-live="polite">
     {status === 'questionnaire' && step >= 5 && <button className={styles.freshQuestions} onClick={restart} disabled={busy}>Yeni sorular seç ↻</button>}
     {error && <p className={styles.error} role="alert">{error}</p>}
-    {generating ? <div className={styles.result}><p className={styles.kicker}>Tercihlerin tasarıma dönüşüyor</p><h1>Tasarımın hazırlanıyor.</h1><div className={styles.loader} /><p>Bu işlem biraz sürebilir. Sayfayı yenilesen de aynı üretime devam edebilirsin.</p></div> : status === 'failed' ? <div className={styles.result}><h1>Tasarım tamamlanamadı.</h1><p role="alert">Tasarım oluşturulamadı. Lütfen tekrar dene.</p><button className={styles.primary} onClick={restart}>Yeni bir tasarım yolculuğu başlat</button></div> : status === 'ready' && session.imageUrl ? <div className={styles.result}><p className={styles.kicker}>Senin cevapların. Senin tasarımın.</p><h1>İşte sana özel yorum.</h1><div className={styles.artworkFrame}><Image className={styles.artwork} src={studioAsset(session.imageUrl)} alt="Yanıtlarına göre AI ile oluşturulan tasarım" width={800} height={800} unoptimized /><span className={styles.representative}>Temsilidir</span></div><p>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><p role="status">{surfaceSavePending}</p><button className={styles.primary} onClick={() => { rememberSession(session); router.push('/xinobi-u/onizleme?'+new URLSearchParams({product,session:session.id})); }}>Üründe gelişmiş önizlemeyi aç</button><button className={styles.secondary} onClick={restart}>Yeni anket başlat</button></div> : step < 5 ? <>
+    {generating ? <div className={styles.result}><p className={styles.kicker}>Tercihlerin tasarıma dönüşüyor</p><h1>Tasarımın hazırlanıyor.</h1><div className={styles.loader} /><p>Bu işlem biraz sürebilir. Sayfayı yenilesen de aynı üretime devam edebilirsin.</p></div> : status === 'failed' ? <div className={styles.result}><h1>Tasarım tamamlanamadı.</h1><p role="alert">Tasarım oluşturulamadı. Lütfen tekrar dene.</p><button className={styles.primary} onClick={restart}>Yeni bir tasarım yolculuğu başlat</button></div> : status === 'ready' && session.imageUrl ? <div className={styles.result}><p className={styles.kicker}>Senin cevapların. Senin tasarımın.</p><h1>İşte sana özel yorum.</h1><div className={styles.artworkFrame}><Image className={styles.artwork} src={studioAsset(session.imageUrl)} alt="Yanıtlarına göre AI ile oluşturulan tasarım" width={800} height={800} unoptimized /><span className={styles.representative}>Temsilidir</span></div><p>Temsilidir. Dijital önizlemedir; baskı ölçüsü ve renk onayı değildir.</p><p>Üründe yerleştirdikten sonra tasarımını kaydedebilir veya sepete ekleyebilirsin.</p><button className={styles.primary} onClick={() => { rememberSession(session); router.push('/xinobi-u/onizleme?'+new URLSearchParams({product,session:session.id})); }}>Üründe gelişmiş önizlemeyi aç</button><button className={styles.secondary} onClick={restart}>Yeni anket başlat</button></div> : step < 5 ? <>
       <div className={styles.progress}><span>Soru {step + 1} / 5 · {question.axisLabel}</span><button className={styles.freshQuestionsInline} onClick={restart} disabled={busy}>Yeni sorular seç ↻</button></div><div className={styles.progressBar}><span style={{ width: `${(step + 1) * 20}%` }} /></div>
       <fieldset className={styles.question}><legend><h1 ref={heading} tabIndex={-1}>{question.text}</h1></legend><div className={styles.options}>{question.options.map((option, index) => <label key={option.id} className={answers[question.id] === option.id ? styles.chosen : ''}><input type="radio" name={question.id} checked={answers[question.id] === option.id} onChange={() => choose(question.id, option.id)} /><span>{String.fromCharCode(65 + index)}</span><strong>{option.label}</strong><i aria-hidden="true">{answers[question.id] === option.id ? '✓' : '+'}</i></label>)}</div></fieldset>
       <div className={styles.navigation}><button className={styles.secondary} onClick={() => navigateStep(step - 1)} disabled={step === 0}>← Geri</button><button className={styles.primary} onClick={() => navigateStep(step + 1)} disabled={!answers[question.id]}> {step === 4 ? 'Tercihlerimi gör' : 'Devam et'} →</button></div><p className={styles.note}>Doğa, ruh hâli, renk, görsel yoğunluk ve tarz. Her yolculukta yeni sorular, yeni olasılıklar.</p>

@@ -446,7 +446,7 @@ class _Result extends StatelessWidget {
         const SizedBox(height: 10),
         Text('Yerleşimini ürünün onaylı tek fotoğrafı üzerinde ayarlayabilirsin.', style: inter(14, height: 1.45, color: flowBody)),
         const SizedBox(height: 16),
-        Semantics (liveRegion: true, child: const Text(singleSourceSavePending)),
+        Semantics (liveRegion: true, child: const Text(singleSourcePlacementHint)),
         const SizedBox(height: 8),
         OutlinedButton(style: flowSecondaryButton, onPressed: () => context.push('/xinobi-u/kendi-gorselin?$identity'), child: const Text('Kendi görselimle dene')),
         const SizedBox(height: 4),

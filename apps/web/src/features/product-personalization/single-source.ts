@@ -50,4 +50,3 @@ export function useProductSurface(product:string,retry=0){
  if(state?.key!==key)return {status:'loading' as const,inputs:null};
  return {status:state.status==='error'?'error' as const:state.inputs?'ready' as const:'unavailable' as const,inputs:state.inputs};
 }
-export const surfaceSavePending='Tasarım kaydı ve sepete ekleme şu anda kullanılamıyor. Önizlemede yerleşimini deneyebilirsin.';

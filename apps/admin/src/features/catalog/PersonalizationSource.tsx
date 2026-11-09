@@ -3,6 +3,7 @@ import type {Product} from '../../commerce'
 import {commerceApi,commerceRequest,mediaUrl} from '../../commerce'
 import {useAdminSession} from '../../AdminAccess'
 import {sourceChecksum} from '../product-surfaces/source-checksum'
+import FulfillmentBinding from './FulfillmentBinding'
 import './personalization-source.css'
 
 type Asset={image:string;sha256:string;mime:string;bytes:number;width:number;height:number}
@@ -48,22 +49,24 @@ function SourceEditor({product,available,onActivity}:{product:Product;available:
  const [view,setView]=useState<View|null>(null),[loading,setLoading]=useState(true),[busy,setBusy]=useState(false)
  const [image,setImage]=useState(''),[candidate,setCandidate]=useState<Asset|null>(null)
  const [error,setError]=useState(''),[notice,setNotice]=useState('')
+ const [bindingActivity,setBindingActivity]=useState<Activity>({dirty:false,busy:false})
  const lock=useRef(false),alive=useRef(true)
  const dirty=!!view&&!!image&&(candidate?(candidate.sha256!==view.source?.sha256||(view.status==='stale'&&image!==view.source?.image)):image!==view.source?.image)
  const current=useRef({dirty,busy})
- useEffect(()=>{current.current={dirty,busy}},[dirty,busy])
+ const bindingChanged=useCallback((next:Activity)=>{const combined={dirty:dirty||next.dirty,busy:busy||next.busy};current.current=combined;onActivity(combined);setBindingActivity(next)},[onActivity,dirty,busy])
+ useEffect(()=>{current.current={dirty:dirty||bindingActivity.dirty,busy:busy||bindingActivity.busy}},[dirty,busy,bindingActivity])
  const choices=[...new Set([product.originalImage,...product.variants.map(v=>v.image)].filter((s):s is string=>!!s))]
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;onActivity({dirty:false,busy:false})}},[onActivity])
- useEffect(()=>{onActivity({dirty,busy})},[dirty,busy,onActivity])
+ useEffect(()=>{onActivity({dirty:dirty||bindingActivity.dirty,busy:busy||bindingActivity.busy})},[dirty,busy,bindingActivity,onActivity])
  useEffect(()=>{
   const navigate=(event:Event)=>{if(current.current.busy||(current.current.dirty&&!window.confirm('Kaydedilmemiş kaynak fotoğraf değişikliği silinsin mi?')))event.preventDefault()}
   const unload=(event:BeforeUnloadEvent)=>{if(current.current.dirty||current.current.busy){event.preventDefault();event.returnValue=''}}
   window.addEventListener('xinobi:before-navigation',navigate);window.addEventListener('beforeunload',unload)
   return()=>{window.removeEventListener('xinobi:before-navigation',navigate);window.removeEventListener('beforeunload',unload)}
  },[])
- const load=useCallback(async()=>{
+ const load=useCallback(async(force=false)=>{
   if(lock.current)return
-  if(current.current.dirty&&!window.confirm('Kaydedilmemiş kaynak fotoğraf değişikliği silinsin mi?'))return
+  if(!force&&current.current.dirty&&!window.confirm('Kaydedilmemiş kaynak fotoğraf değişikliği silinsin mi?'))return
   lock.current=true;setLoading(true);setError('');setNotice('')
   try{const value=readView(await commerceRequest<View>(commerceApi,path),product.id);if(alive.current){setView(value);setImage(value.source?.image??'');setCandidate(value.source)}}
   catch(problem){if(alive.current)setError(message(problem))}
@@ -125,12 +128,13 @@ function SourceEditor({product,available,onActivity}:{product:Product;available:
  }
  return <section aria-label="Tek kişiselleştirme kaynağı" aria-busy={busy||loading}>
   {loading?<p role="status">Kaynak fotoğraf yükleniyor…</p>:!view?<p role="status">Kaynak bilgisi alınamadı.</p>:<>
+   <FulfillmentBinding key={view.revision} product={product} revision={view.revision} canWrite={canWrite&&!busy&&!dirty} onSaved={()=>{setBindingActivity({dirty:false,busy:false});void load(true).then(()=>setNotice('Satış SKU’su kaydedildi. Eski siparişler korunuyor.'))}} onActivity={bindingChanged}/>
    {view.status==='none'&&<p role="status">Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.</p>}
    {view.status==='stale'&&<p role="alert">Kayıtlı kaynak dosya değişmiş veya bulunamıyor. Yeni bir kaynak seçip kaydedin; eski kaynak geçerli yüzey olarak kullanılmaz.</p>}
    {view.source&&<p>Kayıtlı kaynak · Sürüm {view.sourceRevision??view.revision} · {view.source.width} × {view.source.height} px</p>}
    <p>{view.surfaceStatus==='approved'?'Bu kaynağa ait maske onaylı.':'Bu kaynak için maske onayı bekleniyor.'} Mevcut renk maskeleri otomatik aktarılmaz. Kaynak kaydı mağazadaki önizlemeyi değiştirmez.</p>
    {!hasWritePermission&&<p role="status">Salt okunur: kaynak değiştirmek için catalog.write yetkisi gerekli.</p>}
-   <fieldset disabled={busy||!canWrite}><legend>Kaynak fotoğraf seçimi</legend>
+   <fieldset disabled={busy||!canWrite||bindingActivity.dirty||bindingActivity.busy}><legend>Kaynak fotoğraf seçimi</legend>
     <label>Mevcut katalog fotoğrafını kullan<select value={choices.includes(image)?image:''} onChange={e=>{if(e.target.value)void choose(e.target.value)}}>
      <option value="">Fotoğraf seçin veya yeni fotoğraf yükleyin</option>{choices.map((src,i)=><option key={src} value={src}>Katalog fotoğrafı {i+1}</option>)}
     </select></label>
@@ -139,7 +143,7 @@ function SourceEditor({product,available,onActivity}:{product:Product;available:
     <p>Sabit piksel boyutu veya en-boy oranı gerekmez. Yüklenen dosya kırpılmaz veya küçültülmez. PNG, JPEG, WebP; en fazla 25 MB.</p>
    </fieldset>
    {candidate&&<figure><img src={mediaUrl(candidate.image,commerceApi,'http://127.0.0.1:3000')} alt={`${product.name} kişiselleştirme kaynağı`}/><figcaption>{candidate.width} × {candidate.height} px{dirty?' · Kaydedilmemiş seçim':''}</figcaption></figure>}
-   <div className="source-actions"><button type="button" disabled={busy||!canWrite||!dirty||!candidate} onClick={()=>void save()}>Kaynak fotoğrafı kaydet</button>
+   <div className="source-actions"><button type="button" disabled={busy||!canWrite||!dirty||!candidate||bindingActivity.dirty||bindingActivity.busy} onClick={()=>void save()}>Kaynak fotoğrafı kaydet</button>
     <button type="button" disabled={busy||!dirty} onClick={()=>{setImage(view.source?.image??'');setCandidate(view.source);setError('');setNotice('Kaydedilmemiş kaynak seçimi kaldırıldı.')}}>Seçimden vazgeç</button>
     {view.source&&<button type="button" disabled={busy||view.status==='stale'} onClick={()=>void download()}>Kayıtlı kaynak fotoğrafı indir</button>}</div>
   </>}

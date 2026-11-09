@@ -65,6 +65,8 @@ public static class LocalCommerceEndpoints
         group.MapGet("/personalization-sources/{productId}", async (string productId, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.Get(productId)));
         group.MapGet("/personalization-sources/{productId}/candidate", async (string productId, string image, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.Candidate(productId, image)));
         group.MapPut("/personalization-sources/{productId}", async (string productId, Xinobi.Api.Features.ProductSurfaces.SavePersonalizationSource request, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.Save(productId, request)));
+        group.MapGet("/personalization-sources/{productId}/fulfillment", async (string productId, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(new { variantId = await sources.FulfillmentVariant(productId) }));
+        group.MapPut("/personalization-sources/{productId}/fulfillment", async (string productId, Xinobi.Api.Features.ProductSurfaces.SaveFulfillmentBinding request, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => Results.Ok(await sources.SetFulfillment(productId, request)));
         // The local storefront reads the catalog from here in Development; it holds no personal data.
         var stateEndpoint = group.MapGet("/state", async (HttpContext http, LocalCommerceStore store) =>
         {
@@ -127,10 +129,13 @@ public static class LocalCommerceEndpoints
             catch (KeyNotFoundException error) { return Results.NotFound(new { message = error.Message }); }
             catch (ArgumentException error) { return Results.Conflict(new { message = error.Message }); }
         });
-        group.MapPut("/products/{id}", async (string id, CommerceProduct product, HttpContext http, LocalCommerceStore store) =>
+        group.MapPut("/products/{id}", async (string id, CommerceProduct product, HttpContext http, LocalCommerceStore store, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) =>
         {
             if (!ValidSpecs(product.Specs))
                 return Results.BadRequest(new { message = $"Teknik özellikler: en fazla {MaxSpecs} satır, ad 1–60 ve değer 1–200 karakter, aynı ad iki kez kullanılamaz." });
+            var boundVariant = await sources.FulfillmentVariant(id);
+            if (boundVariant is not null && product.Variants is not null && !product.Variants.Any(v => v.Id == boundVariant))
+                throw new Xinobi.Api.Infrastructure.ProblemException("commercial_variant_in_use", "Bu SKU kişiselleştirmede kullanılıyor; önce ticari eşlemeyi kaldırın.", 409);
             product = product with { Specs = product.Specs?.Select(spec => new ProductSpec(spec.Name.Trim(), spec.Value.Trim())).ToArray() };
             if (id != product.Id || string.IsNullOrWhiteSpace(id) || id.Length > 128 || string.IsNullOrWhiteSpace(product.Name) || product.Name.Length > 120 || product.Description is null || product.SeoTitle is null || product.Variants is null || !ValidMedia(product.OriginalImage ?? "") ||
                 product.Gallery is { } gallery && (gallery.Length > MaxGalleryImages || gallery.Any(image => string.IsNullOrEmpty(image) || !ValidMedia(image))) ||
@@ -156,7 +161,9 @@ public static class LocalCommerceEndpoints
             }
             catch (ArgumentException error) { return Results.BadRequest(new { message = error.Message }); }
         });
-        group.MapDelete("/products/{id}", async (string id, HttpContext http, LocalCommerceStore store) => Results.Ok(await store.Update(state =>
+        group.MapDelete("/products/{id}", async (string id, HttpContext http, LocalCommerceStore store, Xinobi.Api.Features.ProductSurfaces.PersonalizationSourceStore sources) => {
+        if (await sources.FulfillmentVariant(id) is not null) throw new Xinobi.Api.Infrastructure.ProblemException("commercial_variant_in_use", "Önce kişiselleştirme ticari eşlemesini kaldırın.", 409);
+        return Results.Ok(await store.Update(state =>
         {
             RequireStockPermission(http, state.Products.FirstOrDefault(p => p.Id == id)?.Variants ?? [], []);
             return state with
@@ -164,7 +171,7 @@ public static class LocalCommerceEndpoints
                 Products = state.Products.Where(p => p.Id != id).ToArray(),
                 Prices = state.Prices.Where(pair => !state.Products.Where(p => p.Id == id).SelectMany(p => p.Variants).Any(v => v.Id == pair.Key)).ToDictionary()
             };
-        })));
+        })); });
         group.MapPut("/inventory/{id}", async (string id, StockUpdate request, LocalCommerceStore store) =>
         {
             if (request.Stock < 0) return Results.BadRequest(new { message = "Stok sıfır veya pozitif tam sayı olmalı." });

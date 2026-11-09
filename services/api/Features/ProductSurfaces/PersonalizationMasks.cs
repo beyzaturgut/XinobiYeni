@@ -32,7 +32,7 @@ public sealed partial class PersonalizationSourceStore
 
     public async Task<SingleSourceMaskDetail[]> ListMasks()
     {
-        var products = (await catalog.Read()).Products.Where(p => p.Personalizable == true).ToArray();
+        var products = (await catalog.ReadAsync()).Products.Where(p => p.Personalizable == true).ToArray();
         var state = await store.Read(); Validate(state);
         var result = new List<SingleSourceMaskDetail>();
         foreach (var product in products) result.Add(await MaskDetail(product.Id, product.Name, state));
@@ -42,7 +42,7 @@ public sealed partial class PersonalizationSourceStore
     public async Task<SingleSourceMaskDetail> GetMask(string productId)
     {
         await Product(productId);
-        var name = (await catalog.Read()).Products.Single(p => p.Id == productId).Name;
+        var name = (await catalog.ReadAsync()).Products.Single(p => p.Id == productId).Name;
         var state = await store.Read(); Validate(state);
         return await MaskDetail(productId, name, state);
     }

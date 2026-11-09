@@ -130,7 +130,9 @@ import 'package:xinobi_api_client/src/model/save_design_configuration.dart';
 import 'package:xinobi_api_client/src/model/save_design_from_session.dart';
 import 'package:xinobi_api_client/src/model/save_print_profile.dart';
 import 'package:xinobi_api_client/src/model/set_configuration_favorite.dart';
+import 'package:xinobi_api_client/src/model/single_source_binding.dart';
 import 'package:xinobi_api_client/src/model/single_source_publication.dart';
+import 'package:xinobi_api_client/src/model/single_source_purchase.dart';
 import 'package:xinobi_api_client/src/model/single_source_rendering_inputs.dart';
 import 'package:xinobi_api_client/src/model/staff_order.dart';
 import 'package:xinobi_api_client/src/model/start_account_email_verification.dart';
@@ -275,7 +277,9 @@ part 'serializers.g.dart';
   SaveDesignFromSession,
   SavePrintProfile,
   SetConfigurationFavorite,
+  SingleSourceBinding,
   SingleSourcePublication,
+  SingleSourcePurchase,
   SingleSourceRenderingInputs,
   StaffOrder,
   StartAccountEmailVerification,

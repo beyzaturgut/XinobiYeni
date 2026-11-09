@@ -16,7 +16,7 @@ public sealed partial class PersonalizationSourceStore
 
     private async Task<(PersonalizationSourceAsset Source, byte[] SourceBytes, PersonalizationMask Mask, byte[] MaskBytes)> Published(string productId)
     {
-        var product = (await catalog.Read()).Products.SingleOrDefault(p => p.Id == productId);
+        var product = (await catalog.ReadAsync()).Products.SingleOrDefault(p => p.Id == productId);
         if (product is null || !product.Active || product.Personalizable != true)
             throw ProblemException.NotFound("surface_not_available", "Onaylı ürün yüzeyi bulunamadı.");
         var state = await store.Read(); Validate(state);
@@ -67,6 +67,8 @@ public static class SingleSourcePublicationEndpoints
             try { return await next(context); }
             catch (ProblemException error) { return Results.Json(new { code = error.Code, message = error.Message }, statusCode: error.Status); }
         });
+        group.MapGet("/{productId}/purchase", async (string productId, PersonalizationSourceStore sources) => TypedResults.Ok(await sources.Purchase(productId)))
+            .WithName("GetSingleSourcePurchase");
         group.MapGet("/{productId}/rendering-inputs", async (string productId, PersonalizationSourceStore sources) =>
             TypedResults.Ok(await sources.RenderingInputs(productId)))
             .WithName("GetSingleSourceRenderingInputs").Produces<SingleSourcePublication>();

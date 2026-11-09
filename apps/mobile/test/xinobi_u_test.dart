@@ -161,8 +161,10 @@ void main() {
     expect(fake.generateCalls, 1);
     // The raw result has no shopping action: cart and favourites live on the product preview.
     expect(find.textContaining('Sepete'), findsNothing);
-    expect(find.textContaining('Tasarım kaydı ve sepete ekleme şu anda kullanılamıyor',), findsOneWidget);
+    expect(find.textContaining('Üründe yerleştirdikten sonra tasarımını kaydedebilir veya sepete ekleyebilirsin.',), findsOneWidget);
     await tester.scrollUntilVisible(find.text('Kendi görselimle dene'), 180);
+    await tester.ensureVisible(find.text('Kendi görselimle dene'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Kendi görselimle dene'));
     await tester.pumpAndSettle();
     expect(find.text('Own P1 null'), findsOneWidget, reason: 'The own-image flow continues with only product identity.',);
@@ -270,7 +272,7 @@ void main() {
     expect(find.text('Soru 1 / 5'), findsOneWidget);
   });
 
-  testWidgets('raw result keeps new-source save gated without a false success', (tester) async {
+  testWidgets('raw result directs saving to validated product placement without a false success', (tester) async {
     final fake = FakeXinobiU();
     await pumpQuestionnaire(tester, fake);
     await answerAll(tester);
@@ -278,7 +280,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('İşte sana özel yorum.'), findsOneWidget);
-    expect(find.textContaining('Tasarım kaydı ve sepete ekleme şu anda kullanılamıyor',), findsOneWidget, );
+    expect(find.textContaining('Üründe yerleştirdikten sonra tasarımını kaydedebilir veya sepete ekleyebilirsin.',), findsOneWidget, );
     expect(find.text('Tasarımımı kaydet'), findsNothing);
     expect(fake.generateCalls, 1);
   });

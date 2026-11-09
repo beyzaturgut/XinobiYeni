@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs'
 import {mkdir} from 'node:fs/promises'
 import {createHash} from 'node:crypto'
 import {mockPanel,permissions,store,product as original} from './consistency-fixtures.mjs'
-const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
+const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium,expect}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
 const browser=await chromium.launch({channel:'chrome',headless:true})
 const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5173/'
 const output=process.env.ADMIN_CONSISTENCY_OUTPUT||'/tmp/xinobi-source-ui'
@@ -20,6 +20,8 @@ async function fixture({write=true,mode='none',holdSave=false,sourceBytes=bytes}
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage()
  let catalogueProducts=[product,other],catalogueWrites=0
  let current={productId:product.id,revision:0,status:'none',source:null,surfaceStatus:'none'},writes=0,uploads=0,failure=false,malformed=false
+ let fulfillment=null,fulfillmentWrites=0;
+ if(mode==='ready')current={...current,revision:1,status:'ready',source:fixtureAsset,surfaceStatus:'pending'}
  let releaseSave;const saveGate=new Promise(resolve=>{releaseSave=resolve})
  let releaseLoad;const gate=new Promise(resolve=>{releaseLoad=resolve})
  await mockPanel(page,{permissions:[...permissions.filter(p=>p!=='catalog.write'),...(write?['catalog.write','media.write']:[])],handler:async(route,path)=>{
@@ -37,6 +39,10 @@ async function fixture({write=true,mode='none',holdSave=false,sourceBytes=bytes}
    assert.ok(start>=4&&end>start,'Multipart contains file bytes')
    assert.deepEqual(body.subarray(start,end),sourceBytes,'Uploaded source must preserve every byte')
    uploads++;await route.fulfill({json:{src:'/api/v1/local-commerce/media/'+'c'.repeat(32)+'.png'}});return true}
+  if(path.endsWith('/fulfillment')){
+   if(req.method()==='PUT'){fulfillmentWrites++;const body=req.postDataJSON();assert.equal(body.expectedRevision,current.revision);if(failure){await route.fulfill({status:503,json:{message:'İzole SKU kayıt hatası'}});return true}fulfillment=body.variantId;current={...current,revision:current.revision+1};await route.fulfill({json:{status:'saved',profileRevision:current.revision,variantId:fulfillment}});return true}
+   await route.fulfill({json:{variantId:fulfillment}});return true
+  }
   if(path.includes('/personalization-sources/')){
    if(path.endsWith('/candidate')){await route.fulfill({json:{...fixtureAsset,image:new URL(req.url()).searchParams.get('image')}});return true}
    if(req.method()==='PUT'){
@@ -59,7 +65,7 @@ async function fixture({write=true,mode='none',holdSave=false,sourceBytes=bytes}
  }})
  await page.goto(base+'?view=catalog')
  await page.locator('.personalization-source summary').click()
- return {page,setCatalogueProducts:next=>{catalogueProducts=next},get catalogueWrites(){return catalogueWrites},get writes(){return writes},get uploads(){return uploads},setMode:value=>{mode=value},releaseLoad,releaseSave,fail:value=>{failure=value},malformed:value=>{malformed=value}}
+ return {page,setCatalogueProducts:next=>{catalogueProducts=next},get fulfillmentWrites(){return fulfillmentWrites},get catalogueWrites(){return catalogueWrites},get writes(){return writes},get uploads(){return uploads},setMode:value=>{mode=value},releaseLoad,releaseSave,fail:value=>{failure=value},malformed:value=>{malformed=value}}
 }
 try{
  const f=await fixture({mode:'loading'}),p=f.page
@@ -179,5 +185,17 @@ try{
  const largeFile=await largeDownload
  assert.deepEqual(readFileSync(await largeFile.path()),largeBytes,'Large source is not resized/reencoded on upload or download')
  assert.equal(large.uploads,1);assert.equal(large.writes,1);await lp.close()
+ const mapping=await fixture({mode:'ready'}),mp=mapping.page
+ const selectSku=mp.getByLabel('Ticari SKU',{exact:true});await selectSku.waitFor().catch(async error=>{console.error(await mp.locator('.personalization-source').innerText());await mp.screenshot({path:output+'/task09-mapping-diagnostic.png',fullPage:true});throw error});await selectSku.selectOption(product.variants[0].id)
+ mp.once('dialog',d=>d.dismiss());await mp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').selectOption(other.id)
+ assert.equal(await mp.getByLabel('Kaynak fotoğrafı yönetilecek ürün').inputValue(),product.id,'Dirty SKU selection protects product switch')
+ mapping.fail(true);mp.once('dialog',d=>d.accept());await mp.getByRole('button',{name:'Satış SKU’sunu kaydet',exact:true}).click()
+ await mp.getByRole('alert').filter({hasText:'İzole SKU kayıt hatası'}).waitFor();await expect(selectSku).toHaveValue(product.variants[0].id)
+ mapping.fail(false);mp.once('dialog',d=>d.accept());await mp.getByRole('button',{name:'Satış SKU’sunu kaydet',exact:true}).click()
+ await mp.getByText('Satış SKU’su kaydedildi. Eski siparişler korunuyor.',{exact:true}).waitFor();assert.equal(mapping.fulfillmentWrites,2)
+ await expect(selectSku).toHaveValue(product.variants[0].id)
+ await mp.screenshot({path:output+'/task09-fulfillment-mapping.png',fullPage:true});await mp.close()
+ const mappingReadonly=await fixture({mode:'ready',write:false});assert.equal(await mappingReadonly.page.getByLabel('Ticari SKU',{exact:true}).isDisabled(),true);await mappingReadonly.page.close()
+ console.log('PASS explicit SKU mapping, dirty product switch guard, failed form preservation, verified save, read-only mapping')
  console.log('PASS single-source load/empty/error/denied/stale/success, malformed success, confirmations/dirty guard, photo generation prompt absent in both locations; exact upload/download bytes, responsive + 200%')
 }finally{await browser.close()}

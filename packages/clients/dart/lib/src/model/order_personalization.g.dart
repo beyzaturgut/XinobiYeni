@@ -33,6 +33,8 @@ class _$OrderPersonalization extends OrderPersonalization {
   final PrintSetupSnapshot? printSetup;
   @override
   final OrderDesignFiles? files;
+  @override
+  final SingleSourceBinding? surfaceBinding;
 
   factory _$OrderPersonalization(
           [void Function(OrderPersonalizationBuilder)? updates]) =>
@@ -51,7 +53,8 @@ class _$OrderPersonalization extends OrderPersonalization {
       this.sourceSha256,
       this.sku,
       this.printSetup,
-      this.files})
+      this.files,
+      this.surfaceBinding})
       : super._();
   @override
   OrderPersonalization rebuild(
@@ -78,7 +81,8 @@ class _$OrderPersonalization extends OrderPersonalization {
         sourceSha256 == other.sourceSha256 &&
         sku == other.sku &&
         printSetup == other.printSetup &&
-        files == other.files;
+        files == other.files &&
+        surfaceBinding == other.surfaceBinding;
   }
 
   @override
@@ -97,6 +101,7 @@ class _$OrderPersonalization extends OrderPersonalization {
     _$hash = $jc(_$hash, sku.hashCode);
     _$hash = $jc(_$hash, printSetup.hashCode);
     _$hash = $jc(_$hash, files.hashCode);
+    _$hash = $jc(_$hash, surfaceBinding.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -116,7 +121,8 @@ class _$OrderPersonalization extends OrderPersonalization {
           ..add('sourceSha256', sourceSha256)
           ..add('sku', sku)
           ..add('printSetup', printSetup)
-          ..add('files', files))
+          ..add('files', files)
+          ..add('surfaceBinding', surfaceBinding))
         .toString();
   }
 }
@@ -185,6 +191,12 @@ class OrderPersonalizationBuilder
       _$this._files ??= OrderDesignFilesBuilder();
   set files(OrderDesignFilesBuilder? files) => _$this._files = files;
 
+  SingleSourceBindingBuilder? _surfaceBinding;
+  SingleSourceBindingBuilder get surfaceBinding =>
+      _$this._surfaceBinding ??= SingleSourceBindingBuilder();
+  set surfaceBinding(SingleSourceBindingBuilder? surfaceBinding) =>
+      _$this._surfaceBinding = surfaceBinding;
+
   OrderPersonalizationBuilder() {
     OrderPersonalization._defaults(this);
   }
@@ -205,6 +217,7 @@ class OrderPersonalizationBuilder
       _sku = $v.sku;
       _printSetup = $v.printSetup?.toBuilder();
       _files = $v.files?.toBuilder();
+      _surfaceBinding = $v.surfaceBinding?.toBuilder();
       _$v = null;
     }
     return this;
@@ -245,6 +258,7 @@ class OrderPersonalizationBuilder
             sku: sku,
             printSetup: _printSetup?.build(),
             files: _files?.build(),
+            surfaceBinding: _surfaceBinding?.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -256,6 +270,8 @@ class OrderPersonalizationBuilder
         _printSetup?.build();
         _$failedField = 'files';
         _files?.build();
+        _$failedField = 'surfaceBinding';
+        _surfaceBinding?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'OrderPersonalization', _$failedField, e.toString());

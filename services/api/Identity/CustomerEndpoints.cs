@@ -122,7 +122,7 @@ public static class CustomerEndpoints
             .WithName("ListMyOrders");
 
         me.MapPost("/orders", async Task<Results<Created<CustomerOrder>, ProblemHttpResult>> (PlaceOrder request, ClaimsPrincipal user, HttpContext http, IAccountStore accounts,
-                ICatalogSource source, NotificationCenter notifications, Designs.SavedDesignStore designs, Designs.DesignSurfaceValidator surfaces, IConfiguration configuration, IWebHostEnvironment environment) =>
+                ICatalogSource source, NotificationCenter notifications, Designs.SavedDesignStore designs, Designs.DesignSurfaceValidator surfaces, Features.ProductSurfaces.PersonalizationSourceStore productSources, IConfiguration configuration, IWebHostEnvironment environment) =>
             {
                 var id = Id(user);
                 if (request.ClientRequestId is not { Length: >= 8 and <= 80 }) throw new AccountException("invalid_request", "Sipariş isteği tanımlanamadı. Tekrar dene.");
@@ -151,6 +151,8 @@ public static class CustomerEndpoints
                             throw new AccountException("personalization_not_available", $"{product.Name} kişiselleştirilemiyor. Sepetini kontrol et.", StatusCodes.Status409Conflict);
                         if (design.ProductId != product.Id)
                             throw new AccountException("design_product_mismatch", $"\"{design.Name}\" tasarımı başka bir ürün için hazırlandı.", StatusCodes.Status409Conflict);
+                        if (item.ConfigurationId is null && (design.VariantId is null || await productSources.HasSourceProfile(product.Id)))
+                            throw new AccountException("configuration_required", "Tasarımını güncel üründe yerleştirip yeniden sepete ekle.", 409);
                         personalized.Add((lines.Count, design));
                         personalization = new OrderPersonalization(design.Id, design.Kind, design.Name, design.Mime, Sku: variant.Sku);
                         if (item.ConfigurationId is not null)
@@ -158,9 +160,13 @@ public static class CustomerEndpoints
                             var config = await designs.Configuration(id, item.ConfigurationId, item.ConfigurationRevision ?? 0);
                             if (config.DesignId != design.Id || config.ProductId != product.Id || config.VariantId != variant.Id)
                                 throw new AccountException("configuration_variant_mismatch", "Sepetteki yerleşim bu tasarım ve renkle eşleşmiyor.", 409);
-                            sources[lines.Count] = await surfaces.SourceImage(product.Id, variant.Id, config.Placement);
+                            if (config.SurfaceBinding is null && await productSources.HasSourceProfile(product.Id))
+                                throw new AccountException("surface_binding_required", "Bu ürün tek kaynak modeline geçti. Tasarımını güncel kaynakta yeniden yerleştir.", 409);
+                            sources[lines.Count] = config.SurfaceBinding is { } binding
+                                ? await productSources.ValidateSelection(product.Id, variant.Id, config.Placement, binding)
+                                : await surfaces.SourceImage(product.Id, variant.Id, config.Placement);
                             personalization = personalization with { SchemaVersion = config.SchemaVersion, Placement = config.Placement,
-                                ConfigurationId = config.Id, ConfigurationRevision = config.Revision, SourceSha256 = config.SourceSha256, PrintSetup = config.PrintSetup };
+                                ConfigurationId = config.Id, ConfigurationRevision = config.Revision, SourceSha256 = config.SourceSha256, PrintSetup = config.PrintSetup, SurfaceBinding = config.SurfaceBinding };
                         }
                     }
                     lines.Add(new CustomerOrderLine(product.Id, variant.Id, product.Name, variant.Color, variant.ImageUrl ?? product.ImageUrl, variant.Price,
@@ -179,6 +185,8 @@ public static class CustomerEndpoints
                         var productSource = sources.TryGetValue(line, out var surface) ? await designs.CopySourceToOrder(surface, orderId, line) : null;
                         var composition = personalization is { ConfigurationId: { } configurationId, ConfigurationRevision: { } revision }
                             ? await designs.CopyPreviewToOrder(id, configurationId, revision, orderId, line) : null;
+                        if (personalization.SurfaceBinding is not null && (productSource is null || composition is null))
+                            throw new AccountException("configuration_preview_missing", "Tasarım önizlemesi eksik. Tasarımı yeniden kaydedip sepete ekle.", 409);
                         // The references are written only after every copy of the line exists.
                         lines[line] = lines[line] with { Personalization = personalization with { Files = new(pattern, productSource, composition) } };
                     }

@@ -9,9 +9,51 @@ All URIs are relative to *http://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**getSingleSourcePurchase**](ProductSurfacesApi.md#getsinglesourcepurchase) | **GET** /api/v1/product-surfaces/{productId}/purchase |
 [**getSingleSourceRenderingInputs**](ProductSurfacesApi.md#getsinglesourcerenderinginputs) | **GET** /api/v1/product-surfaces/{productId}/rendering-inputs |
 [**getSingleSourceSurfaceMedia**](ProductSurfacesApi.md#getsinglesourcesurfacemedia) | **GET** /api/v1/product-surfaces/{productId}/{surfaceId}/{role} |
 
+
+# **getSingleSourcePurchase**
+> SingleSourcePurchase getSingleSourcePurchase(productId)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getProductSurfacesApi();
+final String productId = productId_example; // String |
+
+try {
+    final response = api.getSingleSourcePurchase(productId);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling ProductSurfacesApi->getSingleSourcePurchase: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **productId** | **String**|  |
+
+### Return type
+
+[**SingleSourcePurchase**](SingleSourcePurchase.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getSingleSourceRenderingInputs**
 > SingleSourcePublication getSingleSourceRenderingInputs(productId)

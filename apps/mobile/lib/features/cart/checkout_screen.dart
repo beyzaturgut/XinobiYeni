@@ -135,7 +135,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         Padding(
           padding: const EdgeInsets.only(bottom: 6),
           child: Row(children: [
-            Expanded(child: Text('${item.product?.name ?? 'Ürün'}${item.variant == null ? '' : ' · ${item.variant!.color}'}${item.line.designName == null ? '' : ' · Tasarım: ${item.line.designName}'} × ${item.line.quantity}', style: text.bodyMedium)),
+            Expanded(child: Text('${item.product?.name ?? 'Ürün'}${item.variant == null || item.line.designId != null ? '' : ' · ${item.variant!.color}'}${item.line.designName == null ? '' : ' · Tasarım: ${item.line.designName}'} × ${item.line.quantity}', style: text.bodyMedium)),
             Text(item.problem == CartProblem.none ? formatMoney(Money((b) => b
               ..amountMinor = item.lineTotalMinor
               ..currency = 'TRY')) : 'Satın alınamaz', style: text.bodyMedium?.copyWith(color: item.problem == CartProblem.none ? null : XinobiTokens.danger)),

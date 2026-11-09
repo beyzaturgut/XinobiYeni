@@ -7,11 +7,12 @@ using Xinobi.Api.LocalCommerce;
 
 namespace Xinobi.Api.DesignStudio;
 
-/// <summary><c>VariantId</c> is optional: the pattern covers the body, so colour no longer matters and the first variant with a photo is used for the preview.</summary>
+/// <summary>Without VariantId use the explicitly approved product source; never select the first colour.</summary>
 public record CreateDesignSession(string ProductId, string? VariantId, string BrowserId);
 public record GenerateDesignRequest(DesignAnswer[] Answers);
-public record DesignSession(string Id, string BrowserId, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt, CommerceProduct Product, CommerceVariant Variant, string BankVersion, SessionQuestion[] Questions)
+public record DesignSession(string Id, string BrowserId, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt, CommerceProduct Product, CommerceVariant? Variant, string BankVersion, SessionQuestion[] Questions)
 {
+    public string? ProductSurfaceId { get; set; }
     public string Status { get; set; } = "questionnaire";
     public DesignAnswer[] Answers { get; set; } = [];
     public string? GenerationPrompt { get; set; }
@@ -29,13 +30,13 @@ public record DesignSession(string Id, string BrowserId, DateTimeOffset CreatedA
 }
 public record BrowserQuestionHistory(string[] Questions, Dictionary<string, string> Labels);
 public record DesignDiskState(Dictionary<string, DesignSession> Sessions, Dictionary<string, BrowserQuestionHistory> History);
-public record SessionView(string Id, string Status, DateTimeOffset ExpiresAt, CommerceProduct Product, CommerceVariant Variant, string BankVersion, SessionQuestion[] Questions, DesignAnswer[] Answers, string? ImageUrl, string? ErrorCode, string? ErrorMessage);
+public record SessionView(string Id, string Status, DateTimeOffset ExpiresAt, CommerceProduct Product, CommerceVariant? Variant, string BankVersion, SessionQuestion[] Questions, DesignAnswer[] Answers, string? ImageUrl, string? ErrorCode, string? ErrorMessage);
 
 /// <summary>
 /// Products come from the active catalogue source (the local store in Development, the published snapshot on the test server).
 /// Sessions and images live in <c>DesignStudio:DataDirectory</c>, by default <c>design-studio</c> under the local commerce data directory.
 /// </summary>
-public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank, IImageGenerationProvider provider, IConfiguration configuration, IWebHostEnvironment environment)
+public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank, IImageGenerationProvider provider, IConfiguration configuration, IWebHostEnvironment environment, Features.ProductSurfaces.PersonalizationSourceStore sources)
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
@@ -60,9 +61,14 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
         if (!Guid.TryParse(request.BrowserId, out _)) throw new ArgumentException("Geçerli bir tarayıcı oturumu gerekli.");
         var products = await catalog.ReadAsync();
         var product = products.Products.SingleOrDefault(p => p.Id == request.ProductId && Eligible(p)) ?? throw new ArgumentException("Bu ürün kişiselleştirmeye açık değil.");
-        var variant = (string.IsNullOrWhiteSpace(request.VariantId)
-            ? product.Variants.FirstOrDefault(v => !string.IsNullOrWhiteSpace(v.Image))
-            : product.Variants.SingleOrDefault(v => v.Id == request.VariantId && !string.IsNullOrWhiteSpace(v.Image)))
+        CommerceVariant? variant = null;
+        string? surfaceId = null;
+        if (string.IsNullOrWhiteSpace(request.VariantId))
+        {
+            try { surfaceId = (await sources.RenderingInputs(product.Id)).SurfaceId; }
+            catch (Infrastructure.ProblemException) { throw new ArgumentException("Bu ürünün onaylı tek kaynağı hazır değil."); }
+        }
+        else variant = product.Variants.SingleOrDefault(v => v.Id == request.VariantId && !string.IsNullOrWhiteSpace(v.Image))
             ?? throw new ArgumentException("Bu ürün için geçerli bir ürün görseli yok.");
         await gate.WaitAsync();
         try
@@ -80,6 +86,7 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
                 if (all.Count(id => bank.Data.Questions.Any(q => q.Id == id && q.Axis == axis.Id)) >= 100) all = all.Where(id => !bank.Data.Questions.Any(q => q.Id == id && q.Axis == axis.Id)).Concat(questions.Where(q => q.Axis == axis.Id).Select(q => q.Id)).Distinct().ToArray();
             state.History[request.BrowserId] = history with { Questions = all };
             var session = new DesignSession(Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant(), request.BrowserId, now, now.AddHours(24), product, variant, bank.Data.Version, questions);
+            session.ProductSurfaceId = surfaceId;
             state.Sessions[session.Id] = session;
             await SaveCore(state);
             return View(session);
@@ -133,12 +140,17 @@ public sealed class DesignSessionStore(ICatalogSource catalog, QuestionBank bank
             }
             if (session.BankVersion != bank.Data.Version) throw new DesignProviderException("questionnaire_updated", "Soru havuzu güncellendi. Yeni bir anket başlatın.");
             if (!provider.IsConfigured) throw new DesignProviderException("provider_not_configured", "Cloudflare bağlantısı henüz yapılandırılmadı. Yanıtlarınız korunuyor.");
-            if (!current.Products.Any(p => p.Id == session.Product.Id && Eligible(p) && p.Variants.Any(v => v.Id == session.Variant.Id))) throw new ArgumentException("Seçilen ürün artık kişiselleştirmeye açık değil.");
+            if (!current.Products.Any(p => p.Id == session.Product.Id && Eligible(p) && (session.Variant is null || p.Variants.Any(v => v.Id == session.Variant.Id)))) throw new ArgumentException("Seçilen ürün artık kişiselleştirmeye açık değil.");
             var limit = Math.Clamp(configuration.GetValue("DesignStudio:DailyGenerationLimit", 30), 1, 100);
             if (!(environment.IsDevelopment() && configuration.GetValue<bool>("DesignStudio:DisableGenerationLimit")) && state.Sessions.Values.Count(s => s.StartedAt?.UtcDateTime.Date == DateTime.UtcNow.Date || s.Status == "queued") >= limit)
                 throw new DesignProviderException("daily_limit", "Bugünkü görsel üretim sınırına ulaşıldı.");
             session.GenerationPrompt = prompt;
             session.GenerationPromptVersion = DesignArtDirection.Version;
+            if (session.ProductSurfaceId is { } selectedSurface)
+            {
+                try { if ((await sources.RenderingInputs(session.Product.Id)).SurfaceId != selectedSurface) throw new ArgumentException("Ürün kaynağı değişti; yeni bir oturum açın."); }
+                catch (Infrastructure.ProblemException) { throw new ArgumentException("Ürün kaynağı değişti; yeni bir oturum açın."); }
+            }
             session.Answers = request.Answers; session.RequestHash = hash; session.Status = "queued";
             await SaveCore(state);
             await Queue.Writer.WriteAsync(id);

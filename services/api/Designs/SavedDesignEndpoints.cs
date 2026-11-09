@@ -16,11 +16,15 @@ public static class SavedDesignEndpoints
 
         me.MapGet("/design-configurations", async (ClaimsPrincipal user, SavedDesignStore designs) => TypedResults.Ok(await designs.Configurations(Id(user))))
             .WithName("ListMyDesignConfigurations");
-        me.MapPost("/designs/{id}/configurations", async (string id, SaveDesignConfiguration request, ClaimsPrincipal user, SavedDesignStore designs, DesignSurfaceValidator surfaces, Print.PrintProfileStore profiles) =>
+        me.MapPost("/designs/{id}/configurations", async (string id, SaveDesignConfiguration request, ClaimsPrincipal user, SavedDesignStore designs, DesignSurfaceValidator surfaces, Print.PrintProfileStore profiles, Features.ProductSurfaces.PersonalizationSourceStore sources) =>
         {
             var design = await designs.Find(Id(user), id) ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
-            await surfaces.Validate(design.ProductId, request.VariantId, request.Placement);
-            var printSetup = await profiles.Setup(design.ProductId, request.VariantId, request.Placement);
+            if (request.SurfaceBinding is null && await sources.HasSourceProfile(design.ProductId))
+                throw new ProblemException("surface_binding_required", "Tasarımı güncel tek kaynakta yeniden yerleştirin.", 409);
+            if (request.SurfaceBinding is { } binding) await sources.ValidateSelection(design.ProductId, request.VariantId, request.Placement, binding);
+            else await surfaces.Validate(design.ProductId, request.VariantId, request.Placement);
+            // Legacy print setup is colour/canvas based; no inferred setup for the new source model.
+            var printSetup = request.SurfaceBinding is null ? await profiles.Setup(design.ProductId, request.VariantId, request.Placement) : null;
             return TypedResults.Ok(await designs.SaveConfiguration(Id(user), id, request, printSetup));
         }).WithName("SaveMyDesignConfiguration");
         me.MapGet("/design-configurations/{id}/revisions/{revision:int}", async (string id, int revision, ClaimsPrincipal user, SavedDesignStore designs) =>
@@ -50,7 +54,7 @@ public static class SavedDesignEndpoints
                 var profile = session.Questions.Select(question => $"{question.AxisLabel}: {question.Options.FirstOrDefault(option => session.Answers.Any(answer => answer.QuestionId == question.Id && answer.OptionId == option.Id))?.Label}")
                     .Where(line => !line.EndsWith(": ", StringComparison.Ordinal)).ToArray();
                 var name = SavedDesignStore.CleanName(request.Name, $"{session.Product.Name} · XINOBI U");
-                var saved = await designs.Add(Id(user), "ai", name, session.Product.Id, session.Product.Name, session.Variant.Id, session.Variant.Color, profile, await File.ReadAllBytesAsync(asset.Path));
+                var saved = await designs.Add(Id(user), "ai", name, session.Product.Id, session.Product.Name, session.Variant?.Id, session.Variant?.Color, profile, await File.ReadAllBytesAsync(asset.Path));
                 return TypedResults.Created($"/api/v1/me/designs/{saved.Id}", saved);
             })
             .WithName("SaveMyDesign")

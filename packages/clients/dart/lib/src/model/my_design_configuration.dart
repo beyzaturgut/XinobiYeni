@@ -4,6 +4,7 @@
 
 // ignore_for_file: unused_element
 import 'package:xinobi_api_client/src/model/design_placement.dart';
+import 'package:xinobi_api_client/src/model/single_source_binding.dart';
 import 'package:xinobi_api_client/src/model/print_setup_snapshot.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -24,6 +25,7 @@ part 'my_design_configuration.g.dart';
 /// * [sourceSha256]
 /// * [createdAt]
 /// * [printSetup]
+/// * [surfaceBinding]
 @BuiltValue()
 abstract class MyDesignConfiguration implements Built<MyDesignConfiguration, MyDesignConfigurationBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -58,6 +60,9 @@ abstract class MyDesignConfiguration implements Built<MyDesignConfiguration, MyD
 
   @BuiltValueField(wireName: r'printSetup')
   PrintSetupSnapshot? get printSetup;
+
+  @BuiltValueField(wireName: r'surfaceBinding')
+  SingleSourceBinding? get surfaceBinding;
 
   MyDesignConfiguration._();
 
@@ -137,6 +142,13 @@ class _$MyDesignConfigurationSerializer implements PrimitiveSerializer<MyDesignC
       yield serializers.serialize(
         object.printSetup,
         specifiedType: const FullType.nullable(PrintSetupSnapshot),
+      );
+    }
+    if (object.surfaceBinding != null) {
+      yield r'surfaceBinding';
+      yield serializers.serialize(
+        object.surfaceBinding,
+        specifiedType: const FullType.nullable(SingleSourceBinding),
       );
     }
   }
@@ -239,6 +251,14 @@ class _$MyDesignConfigurationSerializer implements PrimitiveSerializer<MyDesignC
           ) as PrintSetupSnapshot?;
           if (valueDes == null) continue;
           result.printSetup.replace(valueDes);
+          break;
+        case r'surfaceBinding':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(SingleSourceBinding),
+          ) as SingleSourceBinding?;
+          if (valueDes == null) continue;
+          result.surfaceBinding.replace(valueDes);
           break;
         default:
           unhandled.add(key);

@@ -72,5 +72,5 @@ class SingleSourceSurface {
   }
 }
 
-const singleSourceSavePending =
-    'Tasarım kaydı ve sepete ekleme şu anda kullanılamıyor. Önizlemede yerleşimini deneyebilirsin.';
+const singleSourcePlacementHint =
+    'Üründe yerleştirdikten sonra tasarımını kaydedebilir veya sepete ekleyebilirsin.';

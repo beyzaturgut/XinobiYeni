@@ -92,7 +92,7 @@ export default function PlacementStudio({singleSource=false,product,variants,sur
      </ProductPatternPreview>
     </div>
    </div>
-   <div className={styles.canvasNotes}><span>Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.</span><span aria-live="polite">{notice||(app?'Kaydedene kadar değişiklikler yalnızca bu ekranda tutulur.':'Değişiklikler yalnızca bu tarayıcı oturumunda tutulur.')}</span></div>
+   <div className={styles.canvasNotes}><span>Temsili dijital önizleme. Baskı konumu, ölçüsü ve renk tonu üretimde doğrulanır.</span><span aria-live="polite">{notice||(singleSource?'Yerleşim, kaydetme işlemi başarıyla tamamlandığında hesabında saklanır.':app?'Kaydedene kadar değişiklikler yalnızca bu ekranda tutulur.':'Değişiklikler yalnızca bu tarayıcı oturumunda tutulur.')}</span></div>
   </section>
   <aside className={styles.settings} aria-label="Tasarım ayarları">
    {!singleSource&&variants.length>0&&<fieldset className={styles.colours} aria-busy={switching}>
@@ -115,7 +115,7 @@ export default function PlacementStudio({singleSource=false,product,variants,sur
     </div>)}</div>
    </section>
    <div className={styles.checkout}>
-    <div><span className={styles.printCheck}><i aria-hidden="true"/>Baskı kontrolü: Bekliyor</span>{!singleSource&&<span className={styles.price}>{money(price)}</span>}</div>
+    <div><span className={styles.printCheck}><i aria-hidden="true"/>Baskı kontrolü: Bekliyor</span>{(!singleSource||price!==undefined)&&<span className={styles.price}>{money(price)}</span>}</div>
     <fieldset className={styles.checkoutActions} disabled={!previewCanvas||switching}>{actions??(!singleSource&&file&&<SaveDesignButton key={patternUrl} stacked previewCanvas={previewCanvas} placement={placement} source={{file,productId:product.id,variantId:active.id}}/>)}</fieldset>
    </div>
   </aside>

@@ -5,6 +5,36 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/v1/product-surfaces/{productId}/purchase": {
+      "get": {
+        "tags": [
+          "ProductSurfaces"
+        ],
+        "operationId": "GetSingleSourcePurchase",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SingleSourcePurchase"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/product-surfaces/{productId}/rendering-inputs": {
       "get": {
         "tags": [
@@ -7884,6 +7914,16 @@
                 "$ref": "#/components/schemas/PrintSetupSnapshot"
               }
             ]
+          },
+          "surfaceBinding": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SingleSourceBinding"
+              }
+            ]
           }
         }
       },
@@ -8131,6 +8171,16 @@
               },
               {
                 "$ref": "#/components/schemas/OrderDesignFiles"
+              }
+            ]
+          },
+          "surfaceBinding": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SingleSourceBinding"
               }
             ]
           }
@@ -9523,6 +9573,16 @@
           "favorite": {
             "type": "boolean",
             "default": false
+          },
+          "surfaceBinding": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SingleSourceBinding"
+              }
+            ]
           }
         }
       },
@@ -9581,6 +9641,53 @@
           }
         }
       },
+      "SingleSourceBinding": {
+        "required": [
+          "productId",
+          "profileRevision",
+          "sourceRevision",
+          "surfaceId",
+          "productSourceSha256",
+          "maskSha256",
+          "width",
+          "height",
+          "fulfillmentVariantId"
+        ],
+        "type": "object",
+        "properties": {
+          "productId": {
+            "type": "string"
+          },
+          "profileRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sourceRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "surfaceId": {
+            "type": "string"
+          },
+          "productSourceSha256": {
+            "type": "string"
+          },
+          "maskSha256": {
+            "type": "string"
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "height": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fulfillmentVariantId": {
+            "type": "string"
+          }
+        }
+      },
       "SingleSourcePublication": {
         "required": [
           "schemaVersion",
@@ -9611,6 +9718,63 @@
           },
           "inputs": {
             "$ref": "#/components/schemas/SingleSourceRenderingInputs"
+          }
+        }
+      },
+      "SingleSourcePurchase": {
+        "required": [
+          "status",
+          "profileRevision",
+          "variantId",
+          "sku",
+          "priceMinor",
+          "stock",
+          "binding"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "profileRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "variantId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "sku": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "priceMinor": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int64"
+          },
+          "stock": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "binding": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/SingleSourceBinding"
+              }
+            ]
           }
         }
       },
@@ -10166,7 +10330,14 @@
             "$ref": "#/components/schemas/XinobiUProduct"
           },
           "variant": {
-            "$ref": "#/components/schemas/XinobiUVariant"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/XinobiUVariant"
+              }
+            ]
           },
           "questionBankVersion": {
             "type": "string"

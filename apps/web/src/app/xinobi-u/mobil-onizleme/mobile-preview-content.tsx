@@ -20,7 +20,7 @@ type MobilePreviewContentProps = {
 };
 
 type LoadState = 'loading' | 'ready' | 'error';
-type ResolvedSession = { sessionId: string; productId: string; variantId: string; patternSrc: string };
+type ResolvedSession = { sessionId: string; productId: string; variantId?: string; patternSrc: string };
 const ENTITY_ID = /^[A-Za-z0-9_-]{1,160}$/;
 
 /**
@@ -58,7 +58,7 @@ export default function MobilePreviewContent({ demoProductId, demoVariantId, dem
       .then((session) => {
         const productId = session.product?.id;
         const variantId = session.variant?.id;
-        if (typeof productId !== 'string' || !ENTITY_ID.test(productId) || typeof variantId !== 'string' || !ENTITY_ID.test(variantId)) {
+        if (typeof productId !== 'string' || !ENTITY_ID.test(productId) || (variantId !== undefined && !ENTITY_ID.test(variantId))) {
           throw new Error('unsupported_product');
         }
         if (session.status !== 'ready' || !session.imageUrl) {

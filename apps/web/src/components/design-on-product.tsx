@@ -15,7 +15,7 @@ export default function DesignOnProduct(props:Props){
  if(!user)return <span className={props.className}>Tasarımını görmek için giriş yap.</span>;
  const key=[user.id,props.productId,props.variantId,props.designPath,props.configurationId,props.configurationRevision].join(':');
  const fallback=<ComposedDesign key={key} {...props}/>;
- return props.configurationId&&props.configurationRevision?<PrivateDesignImage key={key} path={configurationPreviewPath(props.configurationId,props.configurationRevision)} alt={props.alt} className={props.className} fit="contain" fallback={fallback}/>:fallback;
+ return props.configurationId&&props.configurationRevision?<PrivateDesignImage key={key} path={configurationPreviewPath(props.configurationId,props.configurationRevision)} alt={props.alt} className={props.className} fit="contain" fallback={<PrivateDesignImage path={props.designPath} alt={props.alt} className={props.className}/>}/>:fallback;
 }
 function ComposedDesign({productId,variantId,designPath,kind,alt,className,placement}:Props){
   const [inputs,setInputs]=useState<RenderingInputs|null|undefined>(undefined),[src,setSrc]=useState<string|null>(null);

@@ -10,7 +10,7 @@ export function validDesignPlacement(value: unknown): value is DesignPlacement {
   if (!value || typeof value !== 'object') return false;
   const item=value as DesignPlacement;
   if (![item.sourceWidth,item.sourceHeight,item.x,item.y,item.scale,item.rotation,item.curvatureStrength].every(Number.isFinite)
-    || item.sourceWidth<=0 || item.sourceHeight<=0 || item.sourceWidth>6000 || item.sourceHeight>6000
+    || item.sourceWidth<=0 || item.sourceHeight<=0
     || item.scale<=0 || item.scale>10 || item.curvatureStrength<0 || item.curvatureStrength>1
     || typeof item.surfaceVersion!=='string' || !/^[a-f0-9]{64}$/.test(item.surfaceVersion)) return false;
   if(item.fillMask!==undefined&&typeof item.fillMask!=='boolean')return false;

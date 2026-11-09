@@ -165,6 +165,7 @@ Class | Method | HTTP request | Description
 [*CatalogApi*](doc/CatalogApi.md) | [**listReviewSummaries**](doc/CatalogApi.md#listreviewsummaries) | **GET** /api/v1/catalog/review-summaries |
 [*ContentApi*](doc/ContentApi.md) | [**getHomeContent**](doc/ContentApi.md#gethomecontent) | **GET** /api/v1/content/home |
 [*ContentApi*](doc/ContentApi.md) | [**listAnnouncements**](doc/ContentApi.md#listannouncements) | **GET** /api/v1/content/announcements |
+[*ProductSurfacesApi*](doc/ProductSurfacesApi.md) | [**getSingleSourcePurchase**](doc/ProductSurfacesApi.md#getsinglesourcepurchase) | **GET** /api/v1/product-surfaces/{productId}/purchase |
 [*ProductSurfacesApi*](doc/ProductSurfacesApi.md) | [**getSingleSourceRenderingInputs**](doc/ProductSurfacesApi.md#getsinglesourcerenderinginputs) | **GET** /api/v1/product-surfaces/{productId}/rendering-inputs |
 [*ProductSurfacesApi*](doc/ProductSurfacesApi.md) | [**getSingleSourceSurfaceMedia**](doc/ProductSurfacesApi.md#getsinglesourcesurfacemedia) | **GET** /api/v1/product-surfaces/{productId}/{surfaceId}/{role} |
 [*QuotesApi*](doc/QuotesApi.md) | [**createQuote**](doc/QuotesApi.md#createquote) | **POST** /api/v1/quotes |
@@ -300,7 +301,9 @@ Class | Method | HTTP request | Description
  - [SaveDesignFromSession](doc/SaveDesignFromSession.md)
  - [SavePrintProfile](doc/SavePrintProfile.md)
  - [SetConfigurationFavorite](doc/SetConfigurationFavorite.md)
+ - [SingleSourceBinding](doc/SingleSourceBinding.md)
  - [SingleSourcePublication](doc/SingleSourcePublication.md)
+ - [SingleSourcePurchase](doc/SingleSourcePurchase.md)
  - [SingleSourceRenderingInputs](doc/SingleSourceRenderingInputs.md)
  - [StaffOrder](doc/StaffOrder.md)
  - [StartAccountEmailVerification](doc/StartAccountEmailVerification.md)

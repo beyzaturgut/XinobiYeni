@@ -42,7 +42,7 @@ abstract class XinobiUSession implements Built<XinobiUSession, XinobiUSessionBui
   XinobiUProduct get product;
 
   @BuiltValueField(wireName: r'variant')
-  XinobiUVariant get variant;
+  XinobiUVariant? get variant;
 
   @BuiltValueField(wireName: r'questionBankVersion')
   String get questionBankVersion;
@@ -106,9 +106,9 @@ class _$XinobiUSessionSerializer implements PrimitiveSerializer<XinobiUSession> 
       specifiedType: const FullType(XinobiUProduct),
     );
     yield r'variant';
-    yield serializers.serialize(
+    yield object.variant == null ? null : serializers.serialize(
       object.variant,
-      specifiedType: const FullType(XinobiUVariant),
+      specifiedType: const FullType.nullable(XinobiUVariant),
     );
     yield r'questionBankVersion';
     yield serializers.serialize(
@@ -194,8 +194,9 @@ class _$XinobiUSessionSerializer implements PrimitiveSerializer<XinobiUSession> 
         case r'variant':
           final valueDes = serializers.deserialize(
             value,
-            specifiedType: const FullType(XinobiUVariant),
-          ) as XinobiUVariant;
+            specifiedType: const FullType.nullable(XinobiUVariant),
+          ) as XinobiUVariant?;
+          if (valueDes == null) continue;
           result.variant.replace(valueDes);
           break;
         case r'questionBankVersion':

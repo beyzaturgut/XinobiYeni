@@ -273,10 +273,11 @@ export async function confirmPasswordReset(email:string,verificationId:string,co
   await call('/auth/password-reset/confirm',{method:'POST',body:JSON.stringify({email:email.trim().toLowerCase(),verificationId,verificationCode:code.trim(),newPassword})});
 }
 
-export type MyDesignConfiguration={id:string;designId:string;productId:string;variantId:string;revision:number;schemaVersion:number;placement:DesignPlacement;favorite:boolean;sourceSha256:string;createdAt:string};
+export type SurfaceBinding={productId:string;profileRevision:number;sourceRevision:number;surfaceId:string;productSourceSha256:string;maskSha256:string;width:number;height:number;fulfillmentVariantId:string};
+export type MyDesignConfiguration={surfaceBinding?:SurfaceBinding|null;id:string;designId:string;productId:string;variantId:string;revision:number;schemaVersion:number;placement:DesignPlacement;favorite:boolean;sourceSha256:string;createdAt:string};
 export async function myDesignConfigurations(){return (await signedIn<MyDesignConfiguration[]>('/me/design-configurations'))??[]}
-export async function saveDesignConfiguration(designId:string,variantId:string,placement:DesignPlacement,existing?:MyDesignConfiguration,favorite=existing?.favorite??false){
- return (await signedIn<MyDesignConfiguration>(`/me/designs/${encodeURIComponent(designId)}/configurations`,{method:'POST',body:JSON.stringify({variantId,placement,configurationId:existing?.id??null,expectedRevision:existing?.revision??null,favorite})}))!;
+export async function saveDesignConfiguration(designId:string,variantId:string,placement:DesignPlacement,existing?:MyDesignConfiguration,favorite=existing?.favorite??false,surfaceBinding?:SurfaceBinding){
+ return (await signedIn<MyDesignConfiguration>(`/me/designs/${encodeURIComponent(designId)}/configurations`,{method:'POST',body:JSON.stringify({variantId,placement,configurationId:existing?.id??null,expectedRevision:existing?.revision??null,favorite,surfaceBinding:surfaceBinding??null})}))!;
 }
 export async function setDesignConfigurationFavorite(id:string,favorite:boolean){await signedIn(`/me/design-configurations/${encodeURIComponent(id)}/favorite`,{method:'PUT',body:JSON.stringify({favorite})})}
 

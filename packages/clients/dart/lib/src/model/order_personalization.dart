@@ -5,6 +5,7 @@
 // ignore_for_file: unused_element
 import 'package:xinobi_api_client/src/model/order_design_files.dart';
 import 'package:xinobi_api_client/src/model/design_placement.dart';
+import 'package:xinobi_api_client/src/model/single_source_binding.dart';
 import 'package:xinobi_api_client/src/model/print_setup_snapshot.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
@@ -27,6 +28,7 @@ part 'order_personalization.g.dart';
 /// * [sku]
 /// * [printSetup]
 /// * [files]
+/// * [surfaceBinding]
 @BuiltValue()
 abstract class OrderPersonalization implements Built<OrderPersonalization, OrderPersonalizationBuilder> {
   @BuiltValueField(wireName: r'designId')
@@ -67,6 +69,9 @@ abstract class OrderPersonalization implements Built<OrderPersonalization, Order
 
   @BuiltValueField(wireName: r'files')
   OrderDesignFiles? get files;
+
+  @BuiltValueField(wireName: r'surfaceBinding')
+  SingleSourceBinding? get surfaceBinding;
 
   OrderPersonalization._();
 
@@ -172,6 +177,13 @@ class _$OrderPersonalizationSerializer implements PrimitiveSerializer<OrderPerso
       yield serializers.serialize(
         object.files,
         specifiedType: const FullType.nullable(OrderDesignFiles),
+      );
+    }
+    if (object.surfaceBinding != null) {
+      yield r'surfaceBinding';
+      yield serializers.serialize(
+        object.surfaceBinding,
+        specifiedType: const FullType.nullable(SingleSourceBinding),
       );
     }
   }
@@ -296,6 +308,14 @@ class _$OrderPersonalizationSerializer implements PrimitiveSerializer<OrderPerso
           ) as OrderDesignFiles?;
           if (valueDes == null) continue;
           result.files.replace(valueDes);
+          break;
+        case r'surfaceBinding':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(SingleSourceBinding),
+          ) as SingleSourceBinding?;
+          if (valueDes == null) continue;
+          result.surfaceBinding.replace(valueDes);
           break;
         default:
           unhandled.add(key);

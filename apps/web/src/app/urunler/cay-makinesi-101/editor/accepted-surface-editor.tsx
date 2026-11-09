@@ -3,8 +3,8 @@
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {useProductSurface,surfaceSavePending} from "../../../../features/product-personalization/single-source";
-import PlacementStudio from "../../../xinobi-u/kendi-gorselin/placement-studio";
+import {useProductSurface} from "../../../../features/product-personalization/single-source";
+import SingleSourceStudio from "../../../../features/product-personalization/single-source-studio";
 import LocalPatternPreview from "../../../../features/product-personalization/local-pattern-preview";
 import { loadAcceptedSurface, type RenderingInputs } from "../../../../features/product-personalization/rendering/accepted-surface-api";
 import styles from "./editor.module.css";
@@ -50,7 +50,7 @@ function SelectionLink(){
 export function ProductSelectionLink(){
   return <Suspense fallback={<Link href="/xinobi-u">Ürün seçimine dön</Link>}><SelectionLink/></Suspense>;
 }
-function XinobiVariantPreview({productId,patternSrc,designId}:{productId:string;sessionVariantId:string;patternSrc?:string;unavailableMessage?:string;designId?:string}){
+function XinobiVariantPreview({productId,patternSrc,designId}:{productId:string;sessionVariantId?:string;patternSrc?:string;unavailableMessage?:string;designId?:string}){
  const [product,setProduct]=useState<Product>();
  const [catalogError,setCatalogError]=useState(false);
  const [retry,setRetry]=useState(0);
@@ -64,13 +64,13 @@ function XinobiVariantPreview({productId,patternSrc,designId}:{productId:string;
  if(surface.status==='error'||catalogError)return <PreviewStatus error>Önizleme yüklenemedi. <button type="button" onClick={()=>setRetry(value=>value+1)}>Tekrar dene</button></PreviewStatus>;
  if(surface.status==='unavailable')return <PreviewStatus>{previewUnavailableMessage}</PreviewStatus>;
  if(!product||!surface.inputs)return <PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>;
- const inputs=surface.inputs,selected={id:inputs.surfaceId,color:''};
- return <PlacementStudio key={inputs.surfaceId} singleSource product={product} variants={[]} surfaces={{[selected.id]:inputs}} active={selected} onActiveChange={()=>{}}
+ const inputs=surface.inputs;
+ return <SingleSourceStudio key={inputs.surfaceId} inputs={inputs} saveSource={{sessionId:designId??'',productId}} product={product}
   mode="pattern" cover={false} patternUrl={patternSrc??"/assets/personalization/sample-pattern.png"} source={{name:'AI tasarımı',type:'',size:0}}
   sourceDescription="AI ile oluşturuldu" canChange={Boolean(designId)} changeLabel="Görsel yükle" changeHref={href} onChange={()=>router.push(href)}
-  actions={<p role="status">{surfaceSavePending}</p>}/>;
+  />;
 }
 export default function AcceptedSurfaceEditor({ commerceProduct, commerceVariant, patternSrc, unavailableMessage, xinobiPreview = false, designId }: { commerceProduct?: string; commerceVariant?: string; patternSrc?: string; unavailableMessage?: string; xinobiPreview?: boolean; designId?: string } = {}) {
-  if (xinobiPreview && commerceProduct && commerceVariant) return <XinobiVariantPreview key={commerceProduct+':'+commerceVariant+':'+(designId ?? '')} designId={designId} productId={commerceProduct} sessionVariantId={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage}/>;
+  if (xinobiPreview && commerceProduct) return <XinobiVariantPreview key={commerceProduct+':'+commerceVariant+':'+(designId ?? '')} designId={designId} productId={commerceProduct} sessionVariantId={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage}/>;
   return <Suspense fallback={<PreviewStatus>Ürün önizlemesi yükleniyor…</PreviewStatus>}>{commerceProduct && commerceVariant ? <AcceptedSurfaceLoader key={commerceProduct+":"+commerceVariant} commerceProduct={commerceProduct} variant={commerceVariant} patternSrc={patternSrc} unavailableMessage={unavailableMessage} /> : <AcceptedSurfaceRoute />}</Suspense>;
 }

@@ -124,7 +124,9 @@ doc/SaveDesignConfiguration.md
 doc/SaveDesignFromSession.md
 doc/SavePrintProfile.md
 doc/SetConfigurationFavorite.md
+doc/SingleSourceBinding.md
 doc/SingleSourcePublication.md
+doc/SingleSourcePurchase.md
 doc/SingleSourceRenderingInputs.md
 doc/StaffOrder.md
 doc/StartAccountEmailVerification.md
@@ -285,7 +287,9 @@ lib/src/model/save_design_configuration.dart
 lib/src/model/save_design_from_session.dart
 lib/src/model/save_print_profile.dart
 lib/src/model/set_configuration_favorite.dart
+lib/src/model/single_source_binding.dart
 lib/src/model/single_source_publication.dart
+lib/src/model/single_source_purchase.dart
 lib/src/model/single_source_rendering_inputs.dart
 lib/src/model/staff_order.dart
 lib/src/model/start_account_email_verification.dart

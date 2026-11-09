@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/v1/product-surfaces/{productId}/purchase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["GetSingleSourcePurchase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/product-surfaces/{productId}/rendering-inputs": {
         parameters: {
             query?: never;
@@ -2190,6 +2206,7 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
             printSetup?: null | components["schemas"]["PrintSetupSnapshot"];
+            surfaceBinding?: null | components["schemas"]["SingleSourceBinding"];
         };
         MyReview: {
             id: string;
@@ -2244,6 +2261,7 @@ export interface components {
             sku?: null | string;
             printSetup?: null | components["schemas"]["PrintSetupSnapshot"];
             files?: null | components["schemas"]["OrderDesignFiles"];
+            surfaceBinding?: null | components["schemas"]["SingleSourceBinding"];
         };
         OrderRequest: {
             id: string;
@@ -2592,6 +2610,7 @@ export interface components {
             expectedRevision?: null | number;
             /** @default false */
             favorite: boolean;
+            surfaceBinding?: null | components["schemas"]["SingleSourceBinding"];
         };
         SaveDesignFromSession: {
             sessionId: string;
@@ -2606,6 +2625,21 @@ export interface components {
         SetConfigurationFavorite: {
             favorite: boolean;
         };
+        SingleSourceBinding: {
+            productId: string;
+            /** Format: int32 */
+            profileRevision: number;
+            /** Format: int32 */
+            sourceRevision: number;
+            surfaceId: string;
+            productSourceSha256: string;
+            maskSha256: string;
+            /** Format: int32 */
+            width: number;
+            /** Format: int32 */
+            height: number;
+            fulfillmentVariantId: string;
+        };
         SingleSourcePublication: {
             /** Format: int32 */
             schemaVersion: number;
@@ -2615,6 +2649,18 @@ export interface components {
             /** Format: int32 */
             sourceRevision: number;
             inputs: components["schemas"]["SingleSourceRenderingInputs"];
+        };
+        SingleSourcePurchase: {
+            status: string;
+            /** Format: int32 */
+            profileRevision: number;
+            variantId: null | string;
+            sku: null | string;
+            /** Format: int64 */
+            priceMinor: null | number;
+            /** Format: int32 */
+            stock: null | number;
+            binding: null | components["schemas"]["SingleSourceBinding"];
         };
         SingleSourceRenderingInputs: {
             surfaceVersion: string;
@@ -2751,7 +2797,7 @@ export interface components {
             /** Format: date-time */
             expiresAt: string;
             product: components["schemas"]["XinobiUProduct"];
-            variant: components["schemas"]["XinobiUVariant"];
+            variant: null | components["schemas"]["XinobiUVariant"];
             questionBankVersion: string;
             questions: components["schemas"]["XinobiUQuestion"][];
             answers: components["schemas"]["XinobiUAnswer"][];
@@ -2780,6 +2826,28 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    GetSingleSourcePurchase: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SingleSourcePurchase"];
+                };
+            };
+        };
+    };
     GetSingleSourceRenderingInputs: {
         parameters: {
             query?: never;

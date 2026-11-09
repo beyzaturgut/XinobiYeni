@@ -16,7 +16,7 @@ class _$XinobiUSession extends XinobiUSession {
   @override
   final XinobiUProduct product;
   @override
-  final XinobiUVariant variant;
+  final XinobiUVariant? variant;
   @override
   final String questionBankVersion;
   @override
@@ -38,7 +38,7 @@ class _$XinobiUSession extends XinobiUSession {
       required this.status,
       required this.expiresAt,
       required this.product,
-      required this.variant,
+      this.variant,
       required this.questionBankVersion,
       required this.questions,
       required this.answers,
@@ -171,7 +171,7 @@ class XinobiUSessionBuilder
       _status = $v.status;
       _expiresAt = $v.expiresAt;
       _product = $v.product.toBuilder();
-      _variant = $v.variant.toBuilder();
+      _variant = $v.variant?.toBuilder();
       _questionBankVersion = $v.questionBankVersion;
       _questions = $v.questions.toBuilder();
       _answers = $v.answers.toBuilder();
@@ -208,7 +208,7 @@ class XinobiUSessionBuilder
             expiresAt: BuiltValueNullFieldError.checkNotNull(
                 expiresAt, r'XinobiUSession', 'expiresAt'),
             product: product.build(),
-            variant: variant.build(),
+            variant: _variant?.build(),
             questionBankVersion: BuiltValueNullFieldError.checkNotNull(
                 questionBankVersion, r'XinobiUSession', 'questionBankVersion'),
             questions: questions.build(),
@@ -223,7 +223,7 @@ class XinobiUSessionBuilder
         _$failedField = 'product';
         product.build();
         _$failedField = 'variant';
-        variant.build();
+        _variant?.build();
 
         _$failedField = 'questions';
         questions.build();

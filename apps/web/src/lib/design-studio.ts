@@ -3,7 +3,7 @@ import { commerceApi, randomCommerceId } from './commerce';
 import type { Product, Variant } from '../../../../packages/commerce/client';
 export type Question = { id: string; axis: string; axisLabel: string; text: string; options: { id: string; label: string }[] };
 export type Answer = { questionId: string; optionId: string };
-export type DesignSession = { id: string; status: 'questionnaire' | 'queued' | 'running' | 'ready' | 'failed'; expiresAt: string; product: Product; variant: Variant; bankVersion: string; questions: Question[]; answers: Answer[]; imageUrl: string | null; errorCode: string | null; errorMessage: string | null };
+export type DesignSession = { id: string; status: 'questionnaire' | 'queued' | 'running' | 'ready' | 'failed'; expiresAt: string; product: Product; variant: Variant|null; bankVersion: string; questions: Question[]; answers: Answer[]; imageUrl: string | null; errorCode: string | null; errorMessage: string | null };
 // The static test-server package reads the catalogue from a snapshot, so the design API is configured on its own (ADR-002 Ek B).
 export const designApi = process.env.NEXT_PUBLIC_DESIGN_API_URL || commerceApi.replace(/\/local-commerce\/?$/, '/design-studio');
 export async function designRequest<T>(route: string, method = 'GET', body?: unknown): Promise<T> {
@@ -22,6 +22,6 @@ export function browserId() {
 }
 export function sessionKey(product: string, variant: string) { return `xinobi-u-session:${product}:${variant}`; }
 export function rememberSession(session: DesignSession) {
-  sessionStorage.setItem(sessionKey(session.product.id, session.variant.id), session.id);
+  sessionStorage.setItem(sessionKey(session.product.id, session.variant?.id??''), session.id);
   sessionStorage.setItem('xinobi-u-selected-session', session.id);
 }

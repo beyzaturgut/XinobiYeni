@@ -23,7 +23,7 @@ public record CustomerOrderLine(string ProductId, string VariantId, string Name,
 /// The design printed on a line, copied when the order was placed: deleting or renaming the saved design later does not change
 /// the order. <paramref name="ImageUrl"/> is filled per request (customer or panel address); the image is a representative preview.
 /// </summary>
-public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null, int? SchemaVersion = null, Designs.DesignPlacement? Placement = null, string? ConfigurationId = null, int? ConfigurationRevision = null, string? SourceSha256 = null, string? Sku = null, Print.PrintSetupSnapshot? PrintSetup = null, OrderDesignFiles? Files = null);
+public record OrderPersonalization(string DesignId, string Kind, string Name, string Mime, string? ImageUrl = null, int? SchemaVersion = null, Designs.DesignPlacement? Placement = null, string? ConfigurationId = null, int? ConfigurationRevision = null, string? SourceSha256 = null, string? Sku = null, Print.PrintSetupSnapshot? PrintSetup = null, OrderDesignFiles? Files = null, Features.ProductSurfaces.SingleSourceBinding? SurfaceBinding = null);
 /// <summary>A file copied into the order when it was placed; its checksum is verified whenever the order's copy is read.</summary>
 public record OrderDesignFile(string Sha256, string Mime, long Bytes);
 /// <summary>

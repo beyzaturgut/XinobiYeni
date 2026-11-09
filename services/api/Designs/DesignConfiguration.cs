@@ -17,26 +17,27 @@ public record DesignPlacement(int SourceWidth, int SourceHeight, string SurfaceV
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] Dictionary<string, BodyPlacement>? BodyAdjustments = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Mode = null,
     [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] bool? FillMask = null);
-public record SaveDesignConfiguration(string VariantId, DesignPlacement Placement, string? ConfigurationId = null, int? ExpectedRevision = null, bool Favorite = false);
+public record SaveDesignConfiguration(string VariantId, DesignPlacement Placement, string? ConfigurationId = null, int? ExpectedRevision = null, bool Favorite = false, Features.ProductSurfaces.SingleSourceBinding? SurfaceBinding = null);
 /// <summary>Immutable revision of a customer's product/variant placement. SchemaVersion describes placement, not the mask.</summary>
 public record MyDesignConfiguration(string Id, string DesignId, string ProductId, string VariantId, int Revision, int SchemaVersion,
-    DesignPlacement Placement, bool Favorite, string SourceSha256, DateTimeOffset CreatedAt, Print.PrintSetupSnapshot? PrintSetup = null);
+    DesignPlacement Placement, bool Favorite, string SourceSha256, DateTimeOffset CreatedAt, Print.PrintSetupSnapshot? PrintSetup = null, Features.ProductSurfaces.SingleSourceBinding? SurfaceBinding = null);
 public record SetConfigurationFavorite(bool Favorite);
 /// <summary>The product photo a placement was validated on; <paramref name="Sha256"/> is the surface's recorded source checksum.</summary>
 public sealed record SurfaceSourceImage(string Sha256, byte[] Bytes);
 
 public static class PlacementRules
 {
-    public static DesignPlacement Validate(DesignPlacement? p)
+    public static DesignPlacement Validate(DesignPlacement? p, bool singleSource = false)
     {
         static bool Bound(double value, double min, double max) => double.IsFinite(value) && value >= min && value <= max;
-        if (p is null || p.SourceWidth is < 1 or > 6000 || p.SourceHeight is < 1 or > 6000
+        var coordinateLimit = singleSource && p is not null ? Math.Max(60000d, Math.Max(p.SourceWidth, p.SourceHeight) * 10d) : 60000d;
+        if (p is null || p.SourceWidth < 1 || p.SourceHeight < 1 || (!singleSource && (p.SourceWidth > 6000 || p.SourceHeight > 6000))
             || p.SurfaceVersion is null || !System.Text.RegularExpressions.Regex.IsMatch(p.SurfaceVersion, "^[a-f0-9]{64}$")
-            || !Bound(p.X, -60000, 60000) || !Bound(p.Y, -60000, 60000) || !Bound(p.Scale, .000001, 10)
+            || !Bound(p.X, -coordinateLimit, coordinateLimit) || !Bound(p.Y, -coordinateLimit, coordinateLimit) || !Bound(p.Scale, .000001, 10)
             || !Bound(p.Rotation, -3600, 3600) || !Bound(p.CurvatureStrength, 0, 1)
             || p.Mode is not (null or "pattern" or "artwork") || p.BodyAdjustments is { Count: > 2 }
             || p.BodyAdjustments?.Any(pair => pair.Key is not ("upper-body" or "lower-body") || pair.Value is null
-                || pair.Value.X is { } x && !Bound(x, -60000, 60000) || pair.Value.Y is { } y && !Bound(y, -60000, 60000)
+                || pair.Value.X is { } x && !Bound(x, -coordinateLimit, coordinateLimit) || pair.Value.Y is { } y && !Bound(y, -coordinateLimit, coordinateLimit)
                 || pair.Value.Scale is { } s && !Bound(s, .000001, 10) || pair.Value.Rotation is { } r && !Bound(r, -3600, 3600)) == true)
             throw new ProblemException("invalid_placement", "Tasarım yerleşim değerlerini kontrol et.");
         return p;
@@ -171,7 +172,7 @@ public sealed partial class SavedDesignStore
             ?? throw ProblemException.NotFound("configuration_not_found", "Tasarım yerleşimi bulunamadı.");
     public async Task<MyDesignConfiguration> SaveConfiguration(string accountId, string designId, SaveDesignConfiguration request, Print.PrintSetupSnapshot? printSetup = null)
     {
-        PlacementRules.Validate(request.Placement);
+        PlacementRules.Validate(request.Placement, request.SurfaceBinding is not null);
         var design = await Find(accountId, designId) ?? throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
         await using var image = await Image(accountId, designId) ?? throw ProblemException.NotFound("design_not_found", "Tasarım dosyası bulunamadı.");
         var sha = Convert.ToHexString(await SHA256.HashDataAsync(image.Content)).ToLowerInvariant();
@@ -180,11 +181,12 @@ public sealed partial class SavedDesignStore
             if (!state.Designs.Any(d => d.Id == designId && d.AccountId == accountId)) throw ProblemException.NotFound("design_not_found", "Tasarım bulunamadı.");
             var existing = request.ConfigurationId is null ? null : state.Configurations.Where(c => c.AccountId == accountId && c.Value.Id == request.ConfigurationId).MaxBy(c => c.Value.Revision)?.Value;
             if (request.ConfigurationId is not null && existing is null) throw ProblemException.NotFound("configuration_not_found", "Tasarım yerleşimi bulunamadı.");
-            if (existing is not null && (existing.ProductId != design.ProductId || existing.Revision != request.ExpectedRevision))
+            if (existing is not null && (existing.ProductId != design.ProductId || (existing.SurfaceBinding is not null && existing.DesignId != designId) || existing.Revision != request.ExpectedRevision
+                || (existing.SurfaceBinding is null) != (request.SurfaceBinding is null)))
                 throw new ProblemException("configuration_changed", "Yerleşim başka bir işlemde değişti. Yeniden aç.", 409);
             if (state.Configurations.Count(c => c.AccountId == accountId) >= 1000) throw new ProblemException("configuration_limit", "Yerleşim kayıt sınırına ulaşıldı.", 409);
             var saved = new MyDesignConfiguration(existing?.Id ?? Guid.NewGuid().ToString("N"), designId, design.ProductId, request.VariantId,
-                (existing?.Revision ?? 0) + 1, 1, request.Placement, request.Favorite, sha, clock.GetUtcNow(), printSetup);
+                (existing?.Revision ?? 0) + 1, request.SurfaceBinding is null ? 1 : 2, request.Placement, request.Favorite, sha, clock.GetUtcNow(), printSetup, request.SurfaceBinding);
             state.Configurations.Add(new(accountId, saved)); return saved;
         });
     }

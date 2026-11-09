@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07 ve 08 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-09…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08 ve 09 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-10…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -139,7 +139,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Aynı ürünün farklı tasarımları yanlış birleştirilmez; revizyon ve yanlış ürün/yüzey hataları reddedilir. Kaynak değişmişse yeniden yerleştirme istenir. Eski tasarım otomatik dönüştürülmez. Fiyat/stok uydurulmaz ve sunucu onayı olmadan başarı gösterilmez.
 
-**Faz:** Faz05 · **Öncelik:** P1 · **Bağımlılık:** 01,06,07,08 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz05 · **Öncelik:** P1 · **Bağımlılık:** 01,06,07,08 · **Durum:** Teknik uygulama ve izole kabul tamamlandı (09.11.2026); işletmenin gerçek SKU eşlemesi ve cihaz kabulü açık.
+
+**Teslim:** [Kayıt/sepet/checkout rehberi](../runbooks/single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). Admin açık ticari SKU seçimi, schema-2 kaynak/revizyon bağı, güvenli favori/sepet/checkout ve nullable AI oturumu uygulandı. API 618 PASS/29 SKIP; web 19/19 ve 2 odaklı, admin kaynak/SKU matrisi PASS; Flutter 298, Dart 12. Kaynak değişimi açık yeniden yerleştirme ister; eski kayıtlar otomatik taşınmadı. Gerçek ürün/SKU ataması, deploy/APK yapılmadı; sırada 10 vardır.
 
 ### KIS-TEK-10 — Sipariş baskı detayını ve üç dosyanın geçmiş bütünlüğünü koruma
 

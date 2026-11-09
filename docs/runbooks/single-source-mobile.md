@@ -1,5 +1,7 @@
 # Flutter tek kaynak kişiselleştirme
 
+> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). Gerçek cihaz kabulü ve task 10–12 açıktır.
+
 09.11.2026 · KIS-TEK-08 · Kod geçişi/otomatik kabul tamam; Android/iOS gerçek cihaz kabulü açık.
 
 ## Uygulanan akış

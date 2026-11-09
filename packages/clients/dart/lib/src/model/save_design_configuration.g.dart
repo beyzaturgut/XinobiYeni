@@ -17,6 +17,8 @@ class _$SaveDesignConfiguration extends SaveDesignConfiguration {
   final int? expectedRevision;
   @override
   final bool? favorite;
+  @override
+  final SingleSourceBinding? surfaceBinding;
 
   factory _$SaveDesignConfiguration(
           [void Function(SaveDesignConfigurationBuilder)? updates]) =>
@@ -27,7 +29,8 @@ class _$SaveDesignConfiguration extends SaveDesignConfiguration {
       required this.placement,
       this.configurationId,
       this.expectedRevision,
-      this.favorite})
+      this.favorite,
+      this.surfaceBinding})
       : super._();
   @override
   SaveDesignConfiguration rebuild(
@@ -46,7 +49,8 @@ class _$SaveDesignConfiguration extends SaveDesignConfiguration {
         placement == other.placement &&
         configurationId == other.configurationId &&
         expectedRevision == other.expectedRevision &&
-        favorite == other.favorite;
+        favorite == other.favorite &&
+        surfaceBinding == other.surfaceBinding;
   }
 
   @override
@@ -57,6 +61,7 @@ class _$SaveDesignConfiguration extends SaveDesignConfiguration {
     _$hash = $jc(_$hash, configurationId.hashCode);
     _$hash = $jc(_$hash, expectedRevision.hashCode);
     _$hash = $jc(_$hash, favorite.hashCode);
+    _$hash = $jc(_$hash, surfaceBinding.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -68,7 +73,8 @@ class _$SaveDesignConfiguration extends SaveDesignConfiguration {
           ..add('placement', placement)
           ..add('configurationId', configurationId)
           ..add('expectedRevision', expectedRevision)
-          ..add('favorite', favorite))
+          ..add('favorite', favorite)
+          ..add('surfaceBinding', surfaceBinding))
         .toString();
   }
 }
@@ -102,6 +108,12 @@ class SaveDesignConfigurationBuilder
   bool? get favorite => _$this._favorite;
   set favorite(bool? favorite) => _$this._favorite = favorite;
 
+  SingleSourceBindingBuilder? _surfaceBinding;
+  SingleSourceBindingBuilder get surfaceBinding =>
+      _$this._surfaceBinding ??= SingleSourceBindingBuilder();
+  set surfaceBinding(SingleSourceBindingBuilder? surfaceBinding) =>
+      _$this._surfaceBinding = surfaceBinding;
+
   SaveDesignConfigurationBuilder() {
     SaveDesignConfiguration._defaults(this);
   }
@@ -114,6 +126,7 @@ class SaveDesignConfigurationBuilder
       _configurationId = $v.configurationId;
       _expectedRevision = $v.expectedRevision;
       _favorite = $v.favorite;
+      _surfaceBinding = $v.surfaceBinding?.toBuilder();
       _$v = null;
     }
     return this;
@@ -143,12 +156,16 @@ class SaveDesignConfigurationBuilder
             configurationId: configurationId,
             expectedRevision: expectedRevision,
             favorite: favorite,
+            surfaceBinding: _surfaceBinding?.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
         _$failedField = 'placement';
         placement.build();
+
+        _$failedField = 'surfaceBinding';
+        _surfaceBinding?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'SaveDesignConfiguration', _$failedField, e.toString());

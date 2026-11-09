@@ -88,7 +88,7 @@ class _CartRow extends ConsumerWidget {
     final variant = item.variant;
     final name = item.product?.name ?? 'Ürün';
     // Distinguishes two colours of the same product for screen readers.
-    final label = variant == null ? name : '$name ${variant.color}';
+    final label = line.designId != null ? '$name ${line.designName ?? 'Kişiselleştirilmiş'}' : variant == null ? name : '$name ${variant.color}';
     final canIncrease = variant != null && line.quantity < maxLineQuantity && variantUnits(ref.watch(cartProvider), line.variantId) < variant.maxQuantity.clamp(0, maxLineQuantity);
     Future<void> run(Future<void> Function() action) async {
       try {
@@ -114,7 +114,7 @@ class _CartRow extends ConsumerWidget {
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(name, style: text.titleMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
-            if (variant != null) Text(variant.color, style: text.bodySmall),
+            if (variant != null && line.designId == null) Text(variant.color, style: text.bodySmall),
             if (line.designId != null)
               Padding(
                 padding: const EdgeInsets.only(top: 6),

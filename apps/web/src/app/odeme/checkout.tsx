@@ -35,5 +35,5 @@ export default function Checkout(){
     </form>}
     {error&&<p role="alert">{error}</p>}
   </section>
-  <aside className={styles.summary}><h2>Sipariş özeti</h2>{state&&!catalogError&&rows.map(row=><p key={cartLineKey(row)}>{row.product?.name||'Ürün bulunamadı'} · {row.variant?.color}{row.designName?` · Tasarım: ${row.designName}`:''} × {row.quantity}</p>)}<p>Toplam: {valid?money(total):'Sepeti kontrol et'}</p><button form="demo-checkout" type="submit" disabled={!user||!valid||!address||busy||addressesLoading||!!addressesError}>{busy?'Kaydediliyor…':'Ödemeyi tamamla'}</button><p><Link href="/sepet">Sepete dön →</Link></p></aside></div>;
+  <aside className={styles.summary}><h2>Sipariş özeti</h2>{state&&!catalogError&&rows.map(row=><p key={cartLineKey(row)}>{row.product?.name||'Ürün bulunamadı'}{!row.designId&&row.variant?.color?` · ${row.variant.color}`:''}{row.designName?` · Tasarım: ${row.designName}`:''} × {row.quantity}</p>)}<p>Toplam: {valid?money(total):'Sepeti kontrol et'}</p><button form="demo-checkout" type="submit" disabled={!user||!valid||!address||busy||addressesLoading||!!addressesError}>{busy?'Kaydediliyor…':'Ödemeyi tamamla'}</button><p><Link href="/sepet">Sepete dön →</Link></p></aside></div>;
 }

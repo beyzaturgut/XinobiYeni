@@ -1,5 +1,7 @@
 'use client';
 import Link from 'next/link';
+import {useProductSurface} from '../../../../features/product-personalization/single-source';
+import SingleSourceStudio from '../../../../features/product-personalization/single-source-studio';
 import PlacementStudio from '../../../xinobi-u/kendi-gorselin/placement-studio';
 import DesignAccountAccess from '../../../../components/design-account-access';
 import {useCallback,useEffect,useRef,useState} from 'react';
@@ -24,9 +26,10 @@ export default function SavedDesignPreview(){
  return <Loader key={user.id+':'+params.toString()} id={params.get('id')??''} variant={params.get('variant')??''} configuration={params.get('configuration')??''} revision={Number(params.get('revision'))||undefined} target={params.get('line')??''} feedback={params.get('saved')??''}/>;
 }
 function Loader({id,variant,configuration,revision,target,feedback}:{feedback:string;id:string;variant:string;configuration:string;revision?:number;target:string}){
+ const [newPlacement,setNewPlacement]=useState(false);
  const [data,setData]=useState<{design:MyDesign;src:string;config?:MyDesignConfiguration}>(),[error,setError]=useState('');
  useEffect(()=>{let active=true,url:string|undefined;
-  Promise.all([myDesigns(),configuration?(revision?getDesignConfiguration(configuration,revision):myDesignConfigurations().then(list=>list.find(item=>item.id===configuration))):Promise.resolve(undefined)]).then(async([list,config])=>{
+  Promise.all([myDesigns(),configuration?(revision?getDesignConfiguration(configuration,revision):myDesignConfigurations().then(list=>list.find(item=>item.id===configuration))):myDesignConfigurations().then(list=>list.filter(item=>item.designId===id&&item.surfaceBinding).sort((a,b)=>b.createdAt.localeCompare(a.createdAt))[0])]).then(async([list,config])=>{
    const design=list.find(item=>item.id===id);if(!design)throw new Error('Tasarım silinmiş veya bu hesaba ait değil.');
    if(configuration&&(!config||config.designId!==id))throw new Error('Tasarım yerleşimi bulunamadı.');
    url=await designImageUrl(design);if(active)setData({design,src:url,config});else URL.revokeObjectURL(url);
@@ -34,7 +37,8 @@ function Loader({id,variant,configuration,revision,target,feedback}:{feedback:st
  },[id,configuration,revision]);
  if(error)return <main className={styles.main}><p role="alert">{error}</p><Link href="/sepet">Sepete dön</Link></main>;
  if(!data)return <main className={styles.main}><p role="status">Tasarım yükleniyor…</p></main>;
- return <Editor {...data} variant={variant} target={target} feedback={feedback}/>;
+ if(data.config?.surfaceBinding||newPlacement)return <SingleSourceSaved design={data.design} src={data.src} config={data.config?.surfaceBinding?data.config:undefined} target={data.config?.surfaceBinding?target:''}/>;
+ return <><p><button type="button" onClick={()=>setNewPlacement(true)}>Güncel tek kaynakta yeni yerleşim oluştur</button></p><Editor {...data} variant={variant} target={target} feedback={feedback}/></>;
 }
 function Editor({design,src,config:initial,variant:requested,target,feedback}:{design:MyDesign;src:string;config?:MyDesignConfiguration;variant:string;target:string;feedback:string}){
  const router=useRouter(),{state}=useCommerce(),cart=useCart();
@@ -110,3 +114,11 @@ function Editor({design,src,config:initial,variant:requested,target,feedback}:{d
  </main>;
 }
 function paramsMobile(){return typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('mobile')==='1'}
+
+function SingleSourceSaved({design,src,config,target}:{design:MyDesign;src:string;config?:MyDesignConfiguration;target:string}){
+ const surface=useProductSurface(design.productId);const {state}=useCommerce();
+ const product=state?.products.find(item=>item.id===design.productId);
+ if(surface.status==='loading'||!state)return <main><p role="status">Ürün yüzeyi yükleniyor…</p></main>;
+ if(!product||!surface.inputs)return <main><p role="alert">Güncel ürün yüzeyi alınamadı. Kayıtlı tasarımınız korunuyor.</p><Link href="/hesap/tasarimlarim">Tasarımlarıma dön</Link></main>;
+ return <main className={flow.page}><h1>{design.name}</h1><Link href="/hesap/tasarimlarim">Tasarımlarıma dön</Link><SingleSourceStudio inputs={surface.inputs} product={product} saveSource={{saved:design,variantId:config?.variantId??''}} configuration={config} cartTarget={target||undefined} mode={config?.placement.mode??(design.kind==='upload'?'artwork':'pattern')} patternUrl={src} source={{name:design.name,type:'',size:0}} changeHref="/xinobi-u" onChange={()=>{}}/></main>;
+}

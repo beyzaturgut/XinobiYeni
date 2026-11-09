@@ -4,10 +4,10 @@ import {Suspense,useEffect,useState} from "react";
 import {useSearchParams} from "next/navigation";
 import {useCommerce} from "../../../lib/commerce";
 import {useLocalPatternFile} from "../../../features/product-personalization/use-local-pattern-file";
-import {useProductSurface,surfaceSavePending} from "../../../features/product-personalization/single-source";
+import {useProductSurface} from "../../../features/product-personalization/single-source";
 import FlowSteps from "../flow-steps";
 import DesignUploadCard,{DesignUploadAside} from './design-upload-card';
-import PlacementStudio from "./placement-studio";
+import SingleSourceStudio from "../../../features/product-personalization/single-source-studio";
 import flow from "../flow.module.css";
 import styles from "./own-image.module.css";
 
@@ -43,7 +43,7 @@ function Flow({product,initialMode,embedded}:{product:string;variant:string;init
   <div className={styles.placementHead}>
    <div><p className={flow.kicker}>XINOBI U · Adım 4 / 4</p><h1 className={`${flow.title} ${styles.placementTitle}`}>Tasarımını yerleştir</h1></div>
   </div>
-  <PlacementStudio key={inputs!.surfaceId} singleSource product={selected!} variants={[]} surfaces={{[active.id]:inputs!}} active={active} onActiveChange={()=>{}} mode={mode} file={local.file} patternUrl={local.url} source={local.source} changeHref={href()} onChange={backToUpload} actions={<p role="status">{surfaceSavePending}</p>}/>
+  <SingleSourceStudio key={inputs!.surfaceId} inputs={inputs!} saveSource={{file:local.file!,productId:selected!.id,variantId:null}} product={selected!} mode={mode} file={local.file} patternUrl={local.url} source={local.source} changeHref={href()} onChange={backToUpload}/>
  </main>;
  const image=inputs?.source.url;
  return <main className={flow.page} data-product-reference={product} data-surface-reference={inputs?.surfaceId}>

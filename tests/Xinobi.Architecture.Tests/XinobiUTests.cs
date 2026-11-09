@@ -79,7 +79,7 @@ public sealed class XinobiUTests : IDisposable
 
         Assert.Equal(500, (await client.GetFromJsonAsync<XinobiUStatus>(Root + "/status"))!.QuestionCount);
         var session = await Create(client);
-        Assert.StartsWith("http://web.test:8014/assets/", session.Variant.ImageUrl);
+        Assert.StartsWith("http://web.test:8014/assets/", session.Variant!.ImageUrl);
         (await client.PostAsJsonAsync(Root + $"/sessions/{session.Id}/generation", FirstOptions(session))).EnsureSuccessStatusCode();
         XinobiUSession current = session;
         for (var attempt = 0; attempt < 100 && current.Status != XinobiUSessionStatuses.Ready; attempt++)
@@ -114,23 +114,24 @@ public sealed class XinobiUTests : IDisposable
         Assert.Equal(XinobiUSessionStatuses.Questionnaire, session.Status);
         Assert.Equal(5, session.Questions.Length);
         Assert.All(session.Questions, question => Assert.Equal(4, question.Options.Length));
-        Assert.Equal("DEMO-V101-B", session.Variant.Id);
-        Assert.StartsWith("http://localhost:3000/assets/", session.Variant.ImageUrl);
+        Assert.Equal("DEMO-V101-B", session.Variant!.Id);
+        Assert.StartsWith("http://localhost:3000/assets/", session.Variant!.ImageUrl);
         Assert.Null(session.ImageUrl);
         Assert.Equal(session.Id, (await client.GetFromJsonAsync<XinobiUSession>(Root + "/sessions/" + session.Id))!.Id);
     }
 
     [Fact]
-    public async Task SessionWithoutColourUsesTheFirstPhotographedVariant()
+    public async Task SessionWithoutColourRequiresExplicitApprovedProductSource()
     {
         using var factory = Factory();
         using var client = factory.CreateClient();
+        await SingleSourcePurchaseTests.Prepare(factory);
         foreach (var variant in new string?[] { null, "" })
         {
             var response = await client.PostAsJsonAsync(Root + "/sessions", new CreateXinobiUSession("DEMO-P101", variant, Guid.NewGuid().ToString()));
             response.EnsureSuccessStatusCode();
             var session = (await response.Content.ReadFromJsonAsync<XinobiUSession>())!;
-            Assert.Equal("DEMO-V101-B", session.Variant.Id);
+            Assert.Null(session.Variant);
             Assert.Equal(5, session.Questions.Length);
         }
         var unknown = await client.PostAsJsonAsync(Root + "/sessions", new CreateXinobiUSession("DEMO-P101", "missing", Guid.NewGuid().ToString()));

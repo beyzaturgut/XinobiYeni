@@ -84,7 +84,7 @@ public sealed class DesignStudioTests : IDisposable
         foreach (var result in await Task.WhenAll(requests)) result.EnsureSuccessStatusCode();
         var ready = await WaitReady(client, session);
         Assert.Equal(1, provider.Calls);
-        Assert.Equal(session.Variant.Id, ready.Variant.Id);
+        Assert.Equal(session.Variant!.Id, ready.Variant!.Id);
         var bank = factory.Services.GetRequiredService<QuestionBank>();
         Assert.Equal(bank.BuildPrompt(session.Questions, Answers(session).Answers), provider.LastPrompt);
         Assert.Contains("Art direction:", provider.LastPrompt!);

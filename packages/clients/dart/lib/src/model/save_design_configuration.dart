@@ -4,6 +4,7 @@
 
 // ignore_for_file: unused_element
 import 'package:xinobi_api_client/src/model/design_placement.dart';
+import 'package:xinobi_api_client/src/model/single_source_binding.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 
@@ -17,6 +18,7 @@ part 'save_design_configuration.g.dart';
 /// * [configurationId]
 /// * [expectedRevision]
 /// * [favorite]
+/// * [surfaceBinding]
 @BuiltValue()
 abstract class SaveDesignConfiguration implements Built<SaveDesignConfiguration, SaveDesignConfigurationBuilder> {
   @BuiltValueField(wireName: r'variantId')
@@ -33,6 +35,9 @@ abstract class SaveDesignConfiguration implements Built<SaveDesignConfiguration,
 
   @BuiltValueField(wireName: r'favorite')
   bool? get favorite;
+
+  @BuiltValueField(wireName: r'surfaceBinding')
+  SingleSourceBinding? get surfaceBinding;
 
   SaveDesignConfiguration._();
 
@@ -87,6 +92,13 @@ class _$SaveDesignConfigurationSerializer implements PrimitiveSerializer<SaveDes
       yield serializers.serialize(
         object.favorite,
         specifiedType: const FullType(bool),
+      );
+    }
+    if (object.surfaceBinding != null) {
+      yield r'surfaceBinding';
+      yield serializers.serialize(
+        object.surfaceBinding,
+        specifiedType: const FullType.nullable(SingleSourceBinding),
       );
     }
   }
@@ -149,6 +161,14 @@ class _$SaveDesignConfigurationSerializer implements PrimitiveSerializer<SaveDes
           ) as bool?;
           if (valueDes == null) continue;
           result.favorite = valueDes;
+          break;
+        case r'surfaceBinding':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(SingleSourceBinding),
+          ) as SingleSourceBinding?;
+          if (valueDes == null) continue;
+          result.surfaceBinding.replace(valueDes);
           break;
         default:
           unhandled.add(key);

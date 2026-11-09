@@ -180,9 +180,9 @@ public static class CustomerEndpoints
                     foreach (var (line, design) in personalized)
                     {
                         var personalization = lines[line].Personalization!;
-                        var pattern = await designs.CopyToOrder(design, orderId, line, personalization.SourceSha256)
+                        var pattern = await designs.CopyToOrder(design, orderId, line, personalization.SourceSha256, personalization.SurfaceBinding is not null)
                             ?? throw new AccountException("design_not_found", $"{design.Name} tasarımının görseli bulunamadı.", StatusCodes.Status409Conflict);
-                        var productSource = sources.TryGetValue(line, out var surface) ? await designs.CopySourceToOrder(surface, orderId, line) : null;
+                        var productSource = sources.TryGetValue(line, out var surface) ? await designs.CopySourceToOrder(surface, orderId, line, personalization.SurfaceBinding is not null) : null;
                         var composition = personalization is { ConfigurationId: { } configurationId, ConfigurationRevision: { } revision }
                             ? await designs.CopyPreviewToOrder(id, configurationId, revision, orderId, line) : null;
                         if (personalization.SurfaceBinding is not null && (productSource is null || composition is null))

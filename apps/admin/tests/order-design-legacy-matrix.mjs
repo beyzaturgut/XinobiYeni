@@ -17,7 +17,7 @@ const records={
  BEFORE_NO_COPY:{...config},
  NO_PREVIEW:{...config,files:{pattern:ref('a','image/png'),productSource:ref('c','image/png'),composition:null}},
  NO_SOURCE:{...config,files:{pattern:ref('a','image/png'),productSource:null,composition:ref('d','image/jpeg')}},
- SCHEMA_TWO:{...config,schemaVersion:2,files:{pattern:ref('a','image/png'),productSource:ref('c','image/png'),composition:ref('d','image/jpeg')}},
+ FUTURE_SCHEMA:{...config,schemaVersion:99,files:{pattern:ref('a','image/png'),productSource:ref('c','image/png'),composition:ref('d','image/jpeg')}},
  OUTAGE:{...config,files:{pattern:ref('a','image/png'),productSource:ref('c','image/png'),composition:ref('d','image/jpeg')}},
 }
 const staffOrder=key=>({accountId:'synthetic',customerName:'Synthetic',customerEmail:'synthetic@example.invalid',order:{id:key,number:'OLD-'+key,createdAt:'2026-10-01T09:00:00Z',status:'delivered',
@@ -93,8 +93,8 @@ try{
   await none(f.card('Ürün kaynak görseli'),/Bu sipariş satırı için ürün kaynak görseli kopyası kaydedilmemiş/)
   await downloads(f.card('Giydirilmiş önizleme'),'Giydirilmiş önizlemeyi indir','xinobi-OLD-NO_SOURCE-satir-1-giydirilmis-onizleme-rev2.jpg')
   await f.close();checked++ }
- { const f=await open('SCHEMA_TWO')
-  await f.detail.getByRole('region',{name:'Kayıtlı yerleşim'}).getByText(/2\. şema sürümüyle kaydedilmiş; bu ekran yalnız 1\. sürümü yorumlar/).waitFor()
+ { const f=await open('FUTURE_SCHEMA')
+  await f.detail.getByRole('region',{name:'Kayıtlı yerleşim'}).getByText(/99\. şema sürümüyle kaydedilmiş; bu ekran 1 ve 2\. sürümleri yorumlar/).waitFor()
   for(const [card,label] of [['Ham desen','Ham deseni indir'],['Ürün kaynak görseli','Ürün kaynak görselini indir'],['Giydirilmiş önizleme','Giydirilmiş önizlemeyi indir']])
    await f.card(card).getByRole('button',{name:label}).waitFor()
   await f.close();checked++ }

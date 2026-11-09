@@ -36,6 +36,117 @@ CustomerOrderLine orderLine() => CustomerOrderLine(
 );
 
 void main() {
+  for (final failure in [false, true]) {
+    testWidgets('legacy manifest requires its own snapshot (error=$failure)', (
+      tester,
+    ) async {
+      final line = orderLine().rebuild(
+        (b) => b.personalization
+          ..schemaVersion = 1
+          ..files = OrderDesignFiles(
+            (f) => f.pattern
+              ..sha256 = 'a' * 64
+              ..mime = 'image/png'
+              ..bytes = 10,
+          ).toBuilder(),
+      );
+      var fallback = 0;
+      await tester.pumpWidget(
+        ProviderScope(
+          retry: (_, _) => null,
+          overrides: [
+            designImageProvider(orderPreviewPath('order', 0))
+                .overrideWith((_) async {
+                  if (failure) {
+                    throw const AccountException('unavailable', 'Unavailable');
+                  }
+                  return null;
+                }),
+            designImageProvider(configurationPreviewPath('config', 1))
+                .overrideWith((_) async {
+                  fallback++;
+                  return preview;
+                }),
+          ],
+          child: MaterialApp(
+            home: Scaffold(
+              body: SizedBox(
+                width: 250,
+                height: 250,
+                child: OrderProductImage(
+                  orderId: 'order',
+                  index: 0,
+                  line: line,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(Image), findsNothing);
+      expect(fallback, 0);
+      expect(
+        find.textContaining('Güncel ürün veya tasarımla değiştirilmez.'),
+        findsOneWidget,
+      );
+    });
+    testWidgets(
+      'schema-2 missing snapshot never reads live product or configuration (error=$failure)',
+      (tester) async {
+        final line = orderLine().rebuild(
+          (b) => b.personalization.schemaVersion = 2,
+        );
+        var fallbacks = 0;
+        await tester.pumpWidget(
+          ProviderScope(
+            retry: (_, _) => null,
+            overrides: [
+              designImageProvider(orderPreviewPath('order', 0)).overrideWith((
+                _,
+              ) async {
+                if (failure) {
+                  throw const AccountException('unavailable', 'Unavailable');
+                }
+                return null;
+              }),
+              designImageProvider(configurationPreviewPath('config', 1))
+                  .overrideWith((_) async {
+                    fallbacks++;
+                    return preview;
+                  }),
+              productProvider('P1').overrideWith((_) async {
+                fallbacks++;
+                throw const CatalogException('Must not load current product');
+              }),
+            ],
+            child: MaterialApp(
+              home: Scaffold(
+                body: SizedBox(
+                  width: 250,
+                  height: 250,
+                  child: OrderProductImage(
+                    orderId: 'order',
+                    index: 0,
+                    line: line,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.text(
+            'Siparişteki tasarım önizlemesi alınamadı. Güncel ürün veya tasarımla değiştirilmez.',
+          ),
+          findsOneWidget,
+        );
+        expect(find.byType(Image), findsNothing);
+        expect(fallbacks, 0);
+      },
+    );
+  }
   testWidgets(
     'order thumbnail and zoom viewer use the composed product snapshot',
     (tester) async {

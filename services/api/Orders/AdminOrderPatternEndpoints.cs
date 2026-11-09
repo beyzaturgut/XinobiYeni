@@ -23,6 +23,7 @@ public static partial class AdminOrderPatternEndpoints
             var order = await Find(accounts, id);
             if (line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is not { } design)
                 throw ProblemException.NotFound("order_line_design_not_found", "Bu sipariş satırında tasarım yok.");
+            OrderSnapshotIntegrity.Validate(order.Lines[line]);
             var file = await designs.OrderImage(order.Id, line, design.Mime, design.Files?.Pattern)
                 ?? throw ProblemException.NotFound("order_pattern_not_found", "Bu sipariş satırının desen dosyası bulunamadı.");
             byte[] bytes;
@@ -70,6 +71,7 @@ public static partial class AdminOrderPatternEndpoints
             var order = await Find(accounts, id);
             if (line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is not { } design)
                 throw ProblemException.NotFound("order_line_design_not_found", "Bu sipariş satırında tasarım yok.");
+            OrderSnapshotIntegrity.Validate(order.Lines[line]);
             if (design.Files?.ProductSource is not { } recorded)
                 throw ProblemException.NotFound("order_source_not_recorded", design.Placement is null
                     ? "Bu sipariş satırında kayıtlı yerleşim olmadığı için ürün kaynak görseli kopyası yok."
@@ -93,11 +95,14 @@ public static partial class AdminOrderPatternEndpoints
                 (int Width, int Height) size;
                 try
                 {
-                    var identity = new Infrastructure.MediaValidation.AlignedImageInspector().InspectSource(bytes, "order:" + order.Id + ":" + line);
-                    size = (identity.Width, identity.Height);
+                    // These are the retained, checksummed bytes. Read the original canvas without imposing today's decode budget on history.
+                    var identity = OrderImageIntegrity.Inspect(bytes);
+                    if (identity.Mime != recorded.Mime) throw new InvalidDataException("Image type mismatch.");
+                    size = OrderSnapshotIntegrity.SingleSource(order.Lines[line])
+                        ? (identity.Width, identity.Height) : DesignSurfaceValidator.EditorCanvas(identity.Width, identity.Height);
                 }
                 catch (Exception error) when (error is InvalidDataException or ArgumentException) { throw ProblemException.Unavailable("Sipariş ürün kaynak görseli"); }
-                if (DesignSurfaceValidator.EditorCanvas(size.Width, size.Height) != (placement.SourceWidth, placement.SourceHeight))
+                if (size != (placement.SourceWidth, placement.SourceHeight))
                     throw ProblemException.Unavailable("Sipariş ürün kaynak görseli");
             }
             http.Response.Headers[FileCheckHeader] = "sha256";
@@ -136,6 +141,7 @@ public static partial class AdminOrderPatternEndpoints
             var order = await Find(accounts, id);
             if (line < 0 || line >= order.Lines.Length || order.Lines[line].Personalization is not { } design)
                 throw ProblemException.NotFound("order_line_design_not_found", "Bu sipariş satırında tasarım yok.");
+            OrderSnapshotIntegrity.Validate(order.Lines[line]);
             // An order placed before file references may still own the composition copied at order time (same order key, never
             // rewritten); it is served as unverified. A later order without a recorded composition had none to copy.
             var legacy = design.Files is null && design.Placement is not null && design.ConfigurationRevision is not null;

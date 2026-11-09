@@ -15,7 +15,7 @@ public record MyDesign(string Id, string Kind, string Name, string ProductId, st
 public record SaveDesignFromSession(string SessionId, string? Name);
 public record RenameDesign(string Name);
 
-public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileStore files, TimeProvider clock)
+public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileStore files, TimeProvider clock, IConfiguration? configuration = null)
 {
     public const int MaxPerAccount = 50;
     public const long MaxUploadBytes = 8 * 1024 * 1024;
@@ -171,7 +171,7 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
     /// Copies the design image for an order line and returns its reference; null when the saved file is gone. A file whose checksum
     /// differs from the ordered placement's <paramref name="expectedSha256"/> is refused, so an order never binds another revision.
     /// </summary>
-    public async Task<Identity.OrderDesignFile?> CopyToOrder(SavedDesign design, string orderId, int line, string? expectedSha256 = null)
+    public async Task<Identity.OrderDesignFile?> CopyToOrder(SavedDesign design, string orderId, int line, string? expectedSha256 = null, bool singleSource = false)
     {
         byte[] bytes;
         await using (var source = await files.Open(FileAreas.Designs, design.File))
@@ -179,6 +179,7 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
             if (source is null) return null;
             bytes = await ReadAll(source.Content);
         }
+        if (singleSource) ValidateOrderImage(bytes, design.Mime);
         var copied = Reference(bytes, design.Mime);
         if (expectedSha256 is not null && copied.Sha256 != expectedSha256)
             throw new ProblemException("design_changed", $"{design.Name} tasarımının dosyası kayıtlı yerleşimle eşleşmiyor. Tasarımını yeniden aç.", StatusCodes.Status409Conflict);
@@ -187,8 +188,9 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
     }
 
     /// <summary>Keeps the product photo the editor masked; later catalogue photo or mask changes do not reach the order.</summary>
-    public async Task<Identity.OrderDesignFile> CopySourceToOrder(SurfaceSourceImage source, string orderId, int line)
+    public async Task<Identity.OrderDesignFile> CopySourceToOrder(SurfaceSourceImage source, string orderId, int line, bool singleSource = false)
     {
+        if (singleSource) ValidateOrderImage(source.Bytes, DetectImage(source.Bytes).Mime);
         var copied = Reference(source.Bytes, DetectImage(source.Bytes).Mime);
         await files.Save(FileAreas.Designs, OrderFile(orderId, line) + "-source", new MemoryStream(source.Bytes), copied.Mime);
         return copied;
@@ -204,15 +206,16 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
             if (preview is null) return null;
             bytes = await ReadAll(preview.Content);
         }
+        ValidateOrderImage(bytes, "image/jpeg");
         await files.Save(FileAreas.Designs, OrderFile(orderId, line) + "-preview", new MemoryStream(bytes), "image/jpeg");
         return Reference(bytes, "image/jpeg");
     }
 
     public Task<StoredFile?> OrderImage(string orderId, int line, string mime, Identity.OrderDesignFile? expected = null) =>
-        OrderCopy(OrderFile(orderId, line), mime, expected);
+        CheckedOrderCopy(OrderFile(orderId, line), mime, expected);
 
     public Task<StoredFile?> OrderPreview(string orderId, int line, Identity.OrderDesignFile? expected = null) =>
-        OrderCopy(OrderFile(orderId, line) + "-preview", "image/jpeg", expected);
+        CheckedOrderCopy(OrderFile(orderId, line) + "-preview", "image/jpeg", expected);
 
     public Task<StoredFile?> OrderSourceImage(string orderId, int line, Identity.OrderDesignFile expected) =>
         OrderCopy(OrderFile(orderId, line) + "-source", expected.Mime, expected);
@@ -227,9 +230,40 @@ public sealed partial class SavedDesignStore(FeatureDocuments documents, IFileSt
         var file = await files.Open(FileAreas.Designs, key);
         if (file is null || expected is null) return file is null ? null : file with { ContentType = mime };
         byte[] bytes;
-        await using (file) bytes = await ReadAll(file.Content);
+        await using (file)
+        {
+            if (file.Length != expected.Bytes || file.Length is < 1 or > 32 * 1024 * 1024) throw ProblemException.Unavailable("Sipariş tasarım dosyası");
+            bytes = await ReadAll(file.Content);
+        }
         if (Reference(bytes, mime) != expected) throw ProblemException.Unavailable("Sipariş tasarım dosyası");
+        try { if (Orders.OrderImageIntegrity.Inspect(bytes).Mime != expected.Mime) throw new InvalidDataException("Image type mismatch."); }
+        catch (InvalidDataException) { throw ProblemException.Unavailable("Sipariş tasarım dosyası"); }
         return new StoredFile(new MemoryStream(bytes), mime, bytes.Length);
+    }
+
+    private async Task<StoredFile?> CheckedOrderCopy(string key, string mime, Identity.OrderDesignFile? expected)
+    {
+        var file = await OrderCopy(key, mime, expected);
+        if (file is null || expected is not null) return file;
+        byte[] bytes;
+        await using (file)
+        {
+            if (file.Length is < 1 or > 32 * 1024 * 1024) throw ProblemException.Unavailable("Sipariş tasarım dosyası");
+            bytes = await ReadAll(file.Content);
+        }
+        try { if (Orders.OrderImageIntegrity.Inspect(bytes).Mime != mime) throw new InvalidDataException("Image type mismatch."); }
+        catch (InvalidDataException) { throw ProblemException.Unavailable("Sipariş tasarım dosyası"); }
+        return new StoredFile(new MemoryStream(bytes), mime, bytes.Length);
+    }
+
+    private void ValidateOrderImage(byte[] bytes, string mime)
+    {
+        try
+        {
+            if (Orders.OrderImageIntegrity.Inspect(bytes, decode: true, Orders.OrderImageIntegrity.PixelBudget(configuration)).Mime != mime)
+                throw new InvalidDataException("Image type mismatch.");
+        }
+        catch (InvalidDataException) { throw new ProblemException("invalid_order_image", "Sipariş görseli doğrulanamadı; tasarımı yeniden kaydedin.", 409); }
     }
 
     private static Identity.OrderDesignFile Reference(byte[] bytes, string mime) =>

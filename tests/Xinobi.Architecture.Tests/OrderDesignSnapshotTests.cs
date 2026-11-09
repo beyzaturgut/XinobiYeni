@@ -26,7 +26,7 @@ public sealed class OrderDesignSnapshotTests : IDisposable
     private static readonly byte[] Pattern = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aWQAAAABJRU5ErkJggg==");
     // Distinct bytes for the product photo and mask, so a test can tell every file apart (PNG detection only reads the header).
     private static readonly byte[] Photo = [.. Pattern, 1, 1], NewPhoto = [.. Pattern, 2, 2], Mask = [.. Pattern, 3], NewMask = [.. Pattern, 4];
-    private static readonly byte[] Composition = [255, 216, 255, 217], NewComposition = [255, 216, 255, 0, 217];
+    private static readonly byte[] Composition = SingleSourceOrderFilesTests.Jpeg(), NewComposition = SingleSourceOrderFilesTests.Jpeg(true);
     private readonly string directory = Path.Combine(Path.GetTempPath(), "xinobi-order-snapshot-test-" + Guid.NewGuid());
     private readonly RecordingFileStore recorder;
     private readonly MovableClock clock = new();
@@ -470,7 +470,7 @@ public sealed class OrderDesignSnapshotTests : IDisposable
         Assert.Equal((1, Sha(Composition)), (line.ConfigurationRevision, line.Files!.Composition!.Sha256));
 
         // After the order: revision 1's editable thumbnail is replaced and the design (pattern) is deleted.
-        using (var replace = new MultipartFormDataContent { { new ByteArrayContent(new byte[] { 255, 216, 255, 1, 217 }), "file", "preview.jpg" } })
+        using (var replace = new MultipartFormDataContent { { new ByteArrayContent(NewComposition), "file", "preview.jpg" } })
             (await Send(f.Client, HttpMethod.Put, $"/api/v1/me/design-configurations/{first.Id}/revisions/1/preview", f.Token, replace)).EnsureSuccessStatusCode();
         (await Send(f.Client, HttpMethod.Delete, $"/api/v1/me/designs/{f.Design.Id}", f.Token)).EnsureSuccessStatusCode();
 
@@ -752,7 +752,7 @@ public sealed class OrderDesignSnapshotTests : IDisposable
 
         // Later edits: rename, revision 3, new catalogue photo and mask, colour image change, design deleted.
         (await Send(f.Client, HttpMethod.Patch, $"/api/v1/me/designs/{f.Design.Id}", f.Token, JsonContent.Create(new RenameDesign("Yeniden adlandırıldı")))).EnsureSuccessStatusCode();
-        await Configure(f, placement with { X = 10 }, first.Id, 2, [255, 216, 255, 9, 217]);
+        await Configure(f, placement with { X = 10 }, first.Id, 2, NewComposition);
         await Publish(f.ProductId, f.VariantId, f.SourceImage, CanvasPhoto(SkiaSharp.SKColors.Yellow), NewMask);
         var product = state.Products.Single(p => p.Id == f.ProductId);
         (await f.Staff.PutAsJsonAsync("/api/v1/local-commerce/products/" + product.Id, product with

@@ -24,6 +24,17 @@ class OrderProductImage extends ConsumerWidget {
   final int index;
   final CustomerOrderLine line;
 
+  bool get _snapshotOnly =>
+      line.personalization?.schemaVersion == 2 ||
+      line.personalization?.files != null;
+  Widget _missingSnapshot() => const Center(
+    child: Text(
+      'Siparişteki tasarım önizlemesi alınamadı. Güncel ürün veya tasarımla değiştirilmez.',
+      textAlign: TextAlign.center,
+    ),
+  );
+  Widget _fallback() =>
+      _snapshotOnly ? _missingSnapshot() : _LegacyOrderProduct(line: line);
   Widget _composition(WidgetRef ref) {
     final personalization = line.personalization;
     if (personalization == null) {
@@ -40,13 +51,14 @@ class OrderProductImage extends ConsumerWidget {
               image: image,
               fit: BoxFit.contain,
               semanticLabel: '${line.name}, tasarladığın ürün',
-              errorBuilder: (_, _, _) => _LegacyOrderProduct(line: line),
+              errorBuilder: (_, _, _) => _fallback(),
             ),
       error: (_, _) => _olderPreview(ref),
     );
   }
 
   Widget _olderPreview(WidgetRef ref) {
+    if (_snapshotOnly) return _missingSnapshot();
     final personalization = line.personalization!;
     if (personalization.configurationId != null &&
         personalization.configurationRevision != null) {
@@ -66,9 +78,9 @@ class OrderProductImage extends ConsumerWidget {
                 image: image,
                 fit: BoxFit.contain,
                 semanticLabel: '${line.name}, tasarladığın ürün',
-                errorBuilder: (_, _, _) => _LegacyOrderProduct(line: line),
+                errorBuilder: (_, _, _) => _fallback(),
               ),
-        error: (_, _) => _LegacyOrderProduct(line: line),
+        error: (_, _) => _fallback(),
       );
     }
     return _LegacyOrderProduct(line: line);

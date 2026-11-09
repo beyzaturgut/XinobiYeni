@@ -294,7 +294,7 @@ class OrderDetailScreen extends ConsumerWidget {
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(line.name, style: text.titleMedium),
-                        Text('${line.color} · ${line.quantity} × ${formatMoney(line.unitPrice)}', style: text.bodySmall),
+                        Text('${line.personalization?.schemaVersion == 2 ? '' : '${line.color} · '}${line.quantity} × ${formatMoney(line.unitPrice)}', style: text.bodySmall),
                         if (line.personalization != null) Text('Kişiselleştirilmiş · ${line.personalization!.name}', style: text.bodySmall),
                         // Under the name rather than beside it, so a narrow phone with large text keeps the full amount.
                         Align(alignment: AlignmentDirectional.centerEnd, child: Text(formatMoney(line.lineTotal), style: text.bodyMedium)),
@@ -496,7 +496,7 @@ class _ReturnRequestScreenState extends ConsumerState<ReturnRequestScreen> {
                 onChanged: (value) => setState(() => quantities[line.variantId] = value == true ? 1 : 0),
                 title: Text(line.name),
                 subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${line.color} · iade edilebilir: ${left[line.variantId]}'),
+                  Text('${line.personalization?.schemaVersion == 2 ? line.name : line.color} · iade edilebilir: ${left[line.variantId]}'),
                   if ((quantities[line.variantId] ?? 0) > 0 && left[line.variantId]! > 1)
                     DropdownButton<int>(
                       value: quantities[line.variantId],

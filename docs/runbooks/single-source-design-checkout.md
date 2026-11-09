@@ -32,3 +32,7 @@ AI null variant oturumu ürünün onaylı tek kaynağını gerektirir ve ticari 
 FeatureDocument `personalization/personalization-profiles.json` şema 1 korunur; optional FulfillmentVariantId ve artan ProfileRevision eklenir. Configuration schema 2 alanları optional SurfaceBinding ile eski kayıtlardan ayrılır. SQL DDL değişikliği yok; gerçek veri geçişi yapılmadı. Geri dönüş önce veri/dosya yedeği ve task 02 planıyla değerlendirilir. Schema-2 üreten sürümden önceki istemciye dönmek bu yeni kayıtları legacy'ye çevirmek değildir; eski istemci yeni kayıtları doğru işleyemez. Web/API/admin/Flutter uyumlu sürümle yayınlanmalıdır.
 
 [Doğrulama / açık kapılar](../../test/2026-11-09/TST-266-single-source-design-checkout.md). Gerçek cihaz/IIS/çoklu süreç SQL ve task 10–12 açık; deploy/APK yapılmadı.
+
+## 09.11.2026 — Sipariş teslimi güncellemesi
+
+KIS-TEK-10 teknik uygulama/izole kabul tamamlandı. Schema-2 yerleşim ve yüzey bağı, ayrı üç dosya, immutable geçmiş ve manifestli siparişlerde snapshot-only müşteri önizlemesi [güncel rehberde](single-source-order-files.md), [TST-267'de](../../test/2026-11-09/TST-267-single-source-order-files.md). Gerçek SQL/IIS/cihaz/iş sahibi kabulü açıktır.

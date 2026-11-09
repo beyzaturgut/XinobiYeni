@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08 ve 09 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-10…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08, 09 ve 10 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-11…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -151,7 +151,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Üç dosya ayrı ve doğru sipariş/satır/revizyon için iner. İndirilen maskeleme ürün fotoğrafı yüklenen kaynak dosyasıdır; yerleşim gerçek kaynak ölçülerine göre gösterilir, sabit çözünürlüğe zorlanmaz. Ürün kaynağı katalogda değişse de eski siparişin dosya hashleri/yerleşimi değişmez. Eksik, bozuk ve yetkisiz dosya doğru hatayı verir. Üretime hazırlama veya sevk operasyonu eklenmez.
 
-**Faz:** Faz06 · **Öncelik:** P1 · **Bağımlılık:** 02,06,09 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz06 · **Öncelik:** P1 · **Bağımlılık:** 02,06,09 · **Durum:** Teknik uygulama ve izole kabul tamamlandı (09.11.2026); gerçek SQL/IIS/iş sahibi ve cihaz kabulü açık.
+
+**Teslim:** [Sipariş yüzeyi / üç dosya rehberi](../runbooks/single-source-order-files.md), [TST-267 ve SIP-TAS-01…09 matrisi](../../test/2026-11-09/TST-267-single-source-order-files.md). Şema-2 yerleşim/yüzey, ham ölçü ve ayrı değişmez dosyalar; yeni satırda renk gizleme, legacy rengi koruma, bozuk JPEG ve dosya bütünlüğü kontrolleri, manifestli siparişte başka önizlemeye fallback yapmama. API 623 PASS/29 SKIP; yeni admin matrisi ve 5 eski paket PASS; web 7, Flutter 302. Gerçek veri geçişi/backfill/deploy/APK yapılmadı; sırada 11 var.
 
 ### KIS-TEK-11 — Bağlı dokümanları, araçları ve eski renk/hizalama kurallarını temizleme
 

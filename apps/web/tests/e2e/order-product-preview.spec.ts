@@ -2,6 +2,7 @@ import {readFileSync} from 'node:fs';
 import {test,expect} from '@playwright/test';
 import {mockStore} from './fixtures';
 const image=readFileSync('public/assets/products/tea-maker-101-blue.webp');
+test.beforeEach(async({page,baseURL})=>{const origin=new URL(baseURL!).origin;await page.context().route('**/*',route=>{const url=new URL(route.request().url());return url.origin===origin&&!url.pathname.startsWith('/api/')?route.continue():route.abort()})});
 for(const width of [390,1440])for(const fallback of [false,true])test(`order composition and zoom at ${width}, saved revision fallback=${fallback}`,async({page})=>{
  await page.setViewportSize({width,height:900});
  const {order}=await mockStore(page,{signedIn:true});
@@ -58,4 +59,29 @@ for(const width of [390,1440])for(const fallback of [false,true])test(`order com
  await thumbnail.click();await expect(page.getByRole('dialog').locator('[data-zoom]')).toHaveAttribute('data-zoom','1');
  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);
  expect(requested).toEqual(fallback?['order','revision']:['order']);expect(raw).toBe(false);
+});
+
+for(const status of [404,503])test(`schema-2 order missing snapshot ${status} never uses configuration or live catalogue photo`,async({page})=>{
+ const {order}=await mockStore(page,{signedIn:true});
+ order.lines[0].color='YENİ-SİPARİŞTE-GİZLİ';
+ order.lines[0].personalization={designId:'new-design',kind:'upload',name:'Yeni desen',mime:'image/png',schemaVersion:2,configurationId:'new-config',configurationRevision:1};
+ let fallback=0;
+ await page.route('**/api/v1/me/orders/*/lines/*/preview',route=>route.fulfill({status,json:{code:'snapshot_unavailable'}}));
+ await page.route('**/api/v1/me/design-configurations/**',route=>{fallback++;return route.fulfill({body:image,contentType:'image/webp'})});
+ await page.addLocatorHandler(page.getByRole('button',{name:'Çerez tercih panelini kapat'}),async button=>{await button.click()});
+ await page.goto('/hesap/siparisler/');
+ const thumbnail=page.getByRole('button',{name:/ürün önizlemesini büyüt/}).first();
+ await expect(thumbnail.getByText('Tasarım önizlemesi mevcut değil')).toBeVisible();await expect(thumbnail.locator('img')).toHaveCount(0);
+ await expect(page.getByText(/YENİ-SİPARİŞTE-GİZLİ/)).toHaveCount(0);expect(fallback).toBe(0);
+ await thumbnail.click();await expect(page.getByRole('dialog').locator('img')).toHaveCount(0);
+});
+
+test('legacy order with a file manifest cannot replace a missing order copy with a live saved preview',async({page})=>{
+ const {order}=await mockStore(page,{signedIn:true});
+ order.lines[0].personalization={designId:'legacy-with-files',kind:'upload',name:'Eski kayıt',mime:'image/png',schemaVersion:1,configurationId:'old-config',configurationRevision:1,files:{pattern:{sha256:'a'.repeat(64),mime:'image/png',bytes:10},productSource:null,composition:{sha256:'b'.repeat(64),mime:'image/jpeg',bytes:10}}};
+ let requests=0;await page.route('**/api/v1/me/orders/*/lines/*/preview',route=>route.fulfill({status:404}));
+ await page.route('**/api/v1/me/design-configurations/**',route=>{requests++;return route.fulfill({body:image,contentType:'image/webp'})});
+ await page.addLocatorHandler(page.getByRole('button',{name:'Çerez tercih panelini kapat'}),async button=>{await button.click()});
+ await page.goto('/hesap/siparisler/');const button=page.getByRole('button',{name:/ürün önizlemesini büyüt/}).first();
+ await expect(button.getByText('Tasarım önizlemesi mevcut değil')).toBeVisible();await expect(button.locator('img')).toHaveCount(0);expect(requests).toBe(0);
 });

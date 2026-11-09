@@ -1,5 +1,6 @@
 'use client';
 import {useSyncExternalStore} from 'react';
+import type {components} from '../../../../packages/clients/typescript/src/schema';
 import type {DesignPlacement} from './design-placement';
 import {isNativeCommerce,nativeAccountResponse} from './native-commerce';
 import {commerceApi} from './commerce';
@@ -11,7 +12,7 @@ export type DemoUser={id:string;name:string;email:string;createdAt?:string;phone
 export type Money={amountMinor:number;currency:string};
 export type CustomerAddress={id:string;title:string;fullName:string;phone:string;city:string;district:string;line:string;postalCode?:string|null;isDefault:boolean};
 export type AddressInput=Omit<CustomerAddress,'id'>;
-export type OrderPersonalization={designId:string;kind:'ai'|'upload';name:string;mime:string;imageUrl?:string|null;schemaVersion?:number|null;placement?:DesignPlacement|null;configurationId?:string|null;configurationRevision?:number|null;sourceSha256?:string|null;sku?:string|null};
+export type OrderPersonalization={files?:components['schemas']['OrderDesignFiles']|null;surfaceBinding?:SurfaceBinding|null;designId:string;kind:'ai'|'upload';name:string;mime:string;imageUrl?:string|null;schemaVersion?:number|null;placement?:DesignPlacement|null;configurationId?:string|null;configurationRevision?:number|null;sourceSha256?:string|null;sku?:string|null};
 export type OrderLine={productId:string;variantId:string;name:string;color:string;imageUrl?:string|null;unitPrice:Money;quantity:number;lineTotal:Money;personalization?:OrderPersonalization|null};
 export type OrderShipment={carrier:string;trackingNumber:string;trackingUrl?:string|null;shippedAt:string;deliveredAt?:string|null};
 export type OrderEvent={status:string;at:string;actor:string;note?:string|null};

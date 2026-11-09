@@ -196,6 +196,8 @@ public sealed partial class SavedDesignStore
         var value = await Configuration(accountId, id, revision);
         if (bytes.Length is 0 or > 2 * 1024 * 1024 || DetectImage(bytes).Mime != "image/jpeg")
             throw new ProblemException("invalid_preview", "Tasarım önizlemesi hazırlanamadı.");
+        try { ValidateOrderImage(bytes, "image/jpeg"); }
+        catch (ProblemException) { throw new ProblemException("invalid_preview", "Geçerli bir giydirilmiş JPEG önizleme gerekli."); }
         await files.Save(FileAreas.Designs, PreviewFile(value), new MemoryStream(bytes), "image/jpeg");
         // A design can be deleted while its thumbnail is being uploaded.
         try { await Configuration(accountId, id, revision); }

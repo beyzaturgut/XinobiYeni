@@ -6,7 +6,7 @@ import type { AdminFile } from './admin-request'
 import './order-design-detail.css'
 
 type DesignPlacement = components['schemas']['DesignPlacement']
-export type OrderPersonalization = { designId: string; kind: 'ai' | 'upload'; name: string; imageUrl?: string | null; placement?: DesignPlacement | null; schemaVersion?: number | null; configurationId?: string | null; configurationRevision?: number | null; sourceSha256?: string | null; sku?: string | null; files?: components['schemas']['OrderDesignFiles'] | null }
+export type OrderPersonalization = { surfaceBinding?: components['schemas']['SingleSourceBinding'] | null; designId: string; kind: 'ai' | 'upload'; name: string; imageUrl?: string | null; placement?: DesignPlacement | null; schemaVersion?: number | null; configurationId?: string | null; configurationRevision?: number | null; sourceSha256?: string | null; sku?: string | null; files?: components['schemas']['OrderDesignFiles'] | null }
 export type OrderDesignLine = { productId: string; variantId: string; name: string; color: string; personalization?: OrderPersonalization | null }
 
 /** Design files on order lines are served by the panel API with the staff session cookie. */
@@ -117,25 +117,29 @@ function CompositionView({ orderId, orderNumber, index, name, revision }: { orde
 }
 
 /** Order-line design detail: product, design, saved editor placement and three separate images. Read-only; no production actions. */
-export default function OrderDesignDetail({ orderId, orderNumber, line, index }: { orderId: string; orderNumber: string; line: OrderDesignLine; index: number }) {
+export default function OrderDesignDetail(props: { orderId: string; orderNumber: string; line: OrderDesignLine; index: number }) {
+  return <Detail key={`${props.orderId}:${props.index}:${props.line.personalization?.configurationId}:${props.line.personalization?.configurationRevision}`} {...props}/>
+}
+function Detail({ orderId, orderNumber, line, index }: { orderId: string; orderNumber: string; line: OrderDesignLine; index: number }) {
   const design = line.personalization
   if (!design) return null
+  const singleSource = design.schemaVersion === 2
   const id = `order-design-${index}`
-  return <section className="order-design-detail" aria-labelledby={id}>
+  return <section className="order-design-detail" data-source-model={singleSource?'single':'legacy'} aria-labelledby={id}>
     <h3 id={id}>Sipariş tasarım detayı · {index + 1}. satır</h3>
     <p className="order-design-note">Müşterinin sipariş anında kaydettiği bilgilerdir. Fiziksel baskı ölçüsü, baskıya uygunluk veya üretim onayı içermez.</p>
     <section aria-label="Sipariş ve ürün bilgileri"><h4>Sipariş ve ürün</h4>
-      <Facts rows={[['Sipariş numarası', orderNumber], ['Ürün', `${line.name} (${line.productId})`], ['SKU', design.sku], ['Varyant', line.variantId], ['Renk', line.color], ['Tasarım adı', design.name], ['Tasarım kimliği', design.designId], ['Tasarım türü', design.kind === 'ai' ? 'AI tasarımı' : 'Müşteri görseli'], ['Konfigürasyon', design.configurationId], ['Konfigürasyon revizyonu', design.configurationRevision], ['Kayıt şeması', design.schemaVersion]]} />
+      <Facts rows={[['Sipariş numarası', orderNumber], ['Ürün', `${line.name} (${line.productId})`], ['SKU', design.sku], ...(singleSource ? [['Ticari stok referansı', line.variantId] as [string, unknown]] : [['Varyant', line.variantId], ['Renk', line.color]] as [string, unknown][]), ['Tasarım adı', design.name], ['Tasarım kimliği', design.designId], ['Tasarım türü', design.kind === 'ai' ? 'AI tasarımı' : 'Müşteri görseli'], ['Konfigürasyon', design.configurationId], ['Konfigürasyon revizyonu', design.configurationRevision], ['Kayıt şeması', design.schemaVersion]]} />
     </section>
     <section aria-label="Kayıtlı yerleşim"><h4>Kayıtlı yerleşim</h4>
       <OrderPlacement orderNumber={orderNumber} index={index} placement={design.placement} schemaVersion={design.schemaVersion} configurationId={design.configurationId}
-        configurationRevision={design.configurationRevision} sourceSha256={design.sourceSha256} files={design.files} />
+        configurationRevision={design.configurationRevision} sourceSha256={design.sourceSha256} files={design.files} surfaceBinding={design.surfaceBinding} productId={line.productId} variantId={line.variantId} />
       <Facts rows={[['Yerleşimin desen özeti (SHA-256)', design.sourceSha256]]} />
     </section>
     <section aria-label="Tasarım görselleri"><h4>Görseller</h4>
       <div className="order-design-files">
         <article aria-labelledby={`${id}-raw`}><h5 id={`${id}-raw`}>Ham desen</h5><p>Müşterinin yüklediği veya AI ile üretilen özgün dosya; ürün üstüne giydirilmemiştir.</p><RawPattern path={design.imageUrl} name={design.name} orderId={orderId} orderNumber={orderNumber} index={index} unverified={!design.files} /></article>
-        <article aria-labelledby={`${id}-source`}><h5 id={`${id}-source`}>Ürün kaynak görseli</h5><p>Editörde maskelemenin uygulandığı ürün ve renk fotoğrafı; desen uygulanmamıştır, maske dosyası değildir.</p>
+        <article aria-labelledby={`${id}-source`}><h5 id={`${id}-source`}>Ürün kaynak görseli</h5><p>{singleSource?'Müşterinin yerleşimi kaydettiği tek ürün fotoğrafının sipariş anındaki kopyası; desen uygulanmamıştır, alfa maske dosyası değildir.':'Editörde maskelemenin uygulandığı ürün ve renk fotoğrafı; desen uygulanmamıştır, maske dosyası değildir.'}</p>
           {design.files?.productSource
             ? <><p>Sipariş anında kopyalandı ({design.files.productSource.mime}, {Math.ceil(design.files.productSource.bytes / 1024).toLocaleString('tr-TR')} KB).</p><FileDownload kind="source" orderId={orderId} orderNumber={orderNumber} index={index} name={design.name} /></>
             : <p className="order-design-missing">{design.placement && !design.files ? 'Bu sipariş, ürün kaynak görseli kopyası saklanmadan önce verilmiş.' : design.placement ? 'Bu sipariş satırı için ürün kaynak görseli kopyası kaydedilmemiş.' : 'Bu sipariş satırında kayıtlı yerleşim olmadığı için ürün kaynak görseli kopyası yok.'} Güncel katalog fotoğrafı veya başka renk görseli yerine kullanılmaz. İndirme kullanılamıyor.</p>}</article>

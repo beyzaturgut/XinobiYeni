@@ -90,8 +90,8 @@ public sealed class SavedDesignTests : IDisposable
         Assert.Equal("configuration_changed", (await Assert.ThrowsAsync<ProblemException>(() => store.SaveConfiguration("owner", otherProduct.Id, new("red", placement, first.Id, 2)))).Code);
         Assert.Equal("configuration_changed", (await Assert.ThrowsAsync<ProblemException>(() => store.SaveConfiguration("owner", original.Id, new("blue", placement, first.Id, 1)))).Code);
         Assert.Equal("design_not_found", (await Assert.ThrowsAsync<ProblemException>(() => store.SaveConfiguration("other", replacement.Id, new("red", placement, first.Id, 2)))).Code);
-        await store.SavePreview("owner", first.Id, 1, [255, 216, 255, 217]);
-        await store.SavePreview("owner", next.Id, 2, [255, 216, 255, 217]);
+        await store.SavePreview("owner", first.Id, 1, SingleSourceOrderFilesTests.Jpeg());
+        await store.SavePreview("owner", next.Id, 2, SingleSourceOrderFilesTests.Jpeg());
         // Removing the old upload leaves the replacement and its current favorite intact.
         Assert.True(await store.Delete("owner", original.Id));
         Assert.Equal(next, Assert.Single(await store.Configurations("owner")));
@@ -254,7 +254,7 @@ public sealed class SavedDesignTests : IDisposable
         Assert.Equal(1, first.Revision); Assert.Equal(64, first.SourceSha256.Length);
         Assert.Equal("reference-ready",first.PrintSetup!.Status);Assert.Equal(printApproved.Revision,first.PrintSetup.Profiles.Single().Revision);Assert.False(first.PrintSetup.ProductionReady);
         var previewRoute = $"/api/v1/me/design-configurations/{first.Id}/revisions/1/preview";
-        byte[] jpegPreview = [255, 216, 255, 217];
+        byte[] jpegPreview = SingleSourceOrderFilesTests.Jpeg();
         using var previewUpload = new MultipartFormDataContent { { new ByteArrayContent(jpegPreview), "file", "preview.jpg" } };
         (await Send(client, HttpMethod.Put, previewRoute, token, previewUpload)).EnsureSuccessStatusCode();
         Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
@@ -276,7 +276,7 @@ public sealed class SavedDesignTests : IDisposable
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(orderPreview)).StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, orderPreview.Replace("/0/", "/99/"), token)).StatusCode);
         // Even replacing the editable thumbnail cannot change the composition copied into an order.
-        using var replacementPreview = new MultipartFormDataContent { { new ByteArrayContent(new byte[] {255, 216, 255, 0, 217}), "file", "preview.jpg" } };
+        using var replacementPreview = new MultipartFormDataContent { { new ByteArrayContent(SingleSourceOrderFilesTests.Jpeg(true)), "file", "preview.jpg" } };
         (await Send(client, HttpMethod.Put, previewRoute, token, replacementPreview)).EnsureSuccessStatusCode();
         Assert.Equal(jpegPreview, await (await Send(client, HttpMethod.Get, orderPreview, token)).Content.ReadAsByteArrayAsync());
 
@@ -292,7 +292,7 @@ public sealed class SavedDesignTests : IDisposable
         var second = await Read<MyDesignConfiguration>(secondResponse);
         Assert.Equal(2, second.Revision);
         Assert.Equal(HttpStatusCode.NotFound, (await Send(client, HttpMethod.Get, previewRoute.Replace("/1/", "/2/"), token)).StatusCode);
-        Assert.Equal(new byte[] {255, 216, 255, 0, 217}, await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
+        Assert.Equal(SingleSourceOrderFilesTests.Jpeg(true), await (await Send(client, HttpMethod.Get, previewRoute, token)).Content.ReadAsByteArrayAsync());
         Assert.Equal("configuration_changed", await Code(await Send(client, HttpMethod.Post, route, token,
             JsonContent.Create(new SaveDesignConfiguration(design.VariantId!, placement, first.Id, 1)))));
         var old = await Read<MyDesignConfiguration>(await Send(client, HttpMethod.Get, $"/api/v1/me/design-configurations/{first.Id}/revisions/1", token));

@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-267 | 09.11.2026 | KIS-TEK-10 schema-2 sipariş yüzeyi, üç dosya geçmişi, büyük kaynak, bozuk/eksik/yetkisiz dosya, müşteri snapshot | API 623 PASS/29 SKIP; admin yeni + 5 paket; web 7; Flutter 302 | ISOLATED API/BROWSER/WIDGET | [Rapor](2026-11-09/TST-267-single-source-order-files.md) |
 | TST-266 | 09.11.2026 | KIS-TEK-09 açık SKU/yüzey bağı, schema-2 kayıt, favori/sepet/checkout, nullable AI | API 618 PASS/29 SKIP; web 19 + 2 odaklı; admin PASS; Flutter 298; Dart 12 | ISOLATED API/BROWSER/WIDGET/CONTRACT | [Rapor](2026-11-09/TST-266-single-source-design-checkout.md) |
 | TST-265 | 09.11.2026 | KIS-TEK-08 Flutter ürün yüzeyi, renk bağımsız akış/sürüm cache, Android/iOS hedef temaları | PASS 298/298; analiz temiz; gerçek cihaz açık | FLUTTER / ISOLATED WIDGET | [Rapor](2026-11-09/TST-265-single-source-mobile.md) |
 | TST-264 | 09.11.2026 | KIS-TEK-07 web tek kaynak: yöntem/yükleme/AI/önizleme, gerçek koordinatlar, responsive/%200/axe | PASS 16/16 + odaklı geri dönüş; lint/TS/build PASS | WEB / ISOLATED BROWSER | [Rapor](2026-11-09/TST-264-single-source-web.md) |

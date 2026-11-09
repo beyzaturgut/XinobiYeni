@@ -16,7 +16,7 @@ const orders={
  // Another canvas size, unsaved mode/fill/schema, no regions and a pattern file of another revision.
  CANVAS:{schemaVersion:null,configurationId:'CFG-B',configurationRevision:2,sourceSha256:sha,files:{pattern:file(other),productSource:null,composition:null},
   placement:{sourceWidth:500,sourceHeight:800,surfaceVersion:'e'.repeat(64),x:250,y:800,scale:2.5,rotation:-30,curvatureStrength:.75}},
- V2:{schemaVersion:2,configurationId:'CFG-C',configurationRevision:1,sourceSha256:sha,placement:{sourceWidth:10,sourceHeight:10,surfaceVersion:'f'.repeat(64),x:1,y:1,scale:1,rotation:0,curvatureStrength:0,futureField:'yorumlanmaz'}},
+ FUTURE:{schemaVersion:99,configurationId:'CFG-C',configurationRevision:1,sourceSha256:sha,placement:{sourceWidth:10,sourceHeight:10,surfaceVersion:'f'.repeat(64),x:1,y:1,scale:1,rotation:0,curvatureStrength:0,futureField:'yorumlanmaz'}},
  LEGACY:{},
 }
 const staffOrder=key=>({accountId:'synthetic',customerName:'Synthetic',customerEmail:'synthetic@example.invalid',order:{id:key,number:'PLC-'+key,createdAt:'2026-11-03T09:00:00Z',status:'received',
@@ -70,8 +70,8 @@ try{
   await layout.getByText('Bölgeye özel ayar kaydedilmemiş; ana yerleşim tüm yüzeye uygulanır.').waitFor()
   await layout.getByRole('alert').filter({hasText:'eşleşmiyor'}).waitFor()
   await close() }
- { const {layout,close}=await open('V2')
-  await layout.getByText(/2\. şema sürümüyle kaydedilmiş; bu ekran yalnız 1\. sürümü yorumlar\. Kayıt değiştirilmedi/).waitFor()
+ { const {layout,close}=await open('FUTURE')
+  await layout.getByText(/99\. şema sürümüyle kaydedilmiş; bu ekran 1 ve 2\. sürümleri yorumlar\. Kayıt değiştirilmedi/).waitFor()
   assert.match(await layout.locator('pre').innerText(),/"futureField": "yorumlanmaz"/)
   assert.equal(await layout.getByText('Yatay konum (desen merkezi)').count(),0,'Unsupported schema values are not interpreted')
   await close() }

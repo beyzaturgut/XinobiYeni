@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08, 09, 10 ve 11 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08, 09, 10 ve 11 uygulandı; KIS-TEK-12 yazılımsal birleşik kabul/regresyon tamamlandı (10.11.2026). Android/iOS gerçek cihaz, SQL/IIS/restore ve iş sahibi kabulü açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -175,7 +175,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** API ve TS/Dart sözleşme testleri, web/admin lint-tip-üretim derlemesi, odaklı tarayıcı ve Flutter testleri raporlanır. Android/iOS gerçek cihaz ve gerekiyorsa SQL kabulü ayrı kayıtlıdır. Gerçek müşteri/sipariş verisi değiştirilmez; uygulama testlerinden sonra yayın ayrı task/izin kapsamıdır.
 
-**Faz:** Faz11 · **Öncelik:** P1 · **Bağımlılık:** 01–11 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz11 · **Öncelik:** P1 · **Bağımlılık:** 01–11 · **Durum:** Yazılımsal birleşik kabul ve izole regresyon tamamlandı (10.11.2026); gerçek cihaz/SQL/IIS/restore ve iş sahibi kabulü açık.
+
+**Teslim:** [Kabul/tekrar rehberi](../runbooks/single-source-acceptance.md), [TST-269 ve kapsam matrisi](../../test/2026-11-10/TST-269-single-source-acceptance.md), [Android](../reports/single-source-acceptance-android-2026-11-10.md), [iOS](../reports/single-source-acceptance-ios-2026-11-10.md). Yeni HTTP zinciri dört gerçek kaynak boyutuyla yükle→onay→revizyon→demo sipariş→üç değişmez dosya akışını doğrular. API 627 PASS/29 SKIP; web 19+7, Flutter 302, Dart 12, araçlar 5 PASS; admin 24 paket + genel matris tekli tekrar PASS. İlk genel matris beklemesi ve tekrar sonucu raporda ayrıdır. Lint/tip/üretim derlemeleri PASS; eski admin lint uyarısı korunur. Gerçek veri/sağlayıcı işlemi, deploy/release/APK yapılmadı. Bu durum canlı veya fiziksel cihaz kabulü değildir.
 
 ## Açık kararlar ve kapsam sınırı
 

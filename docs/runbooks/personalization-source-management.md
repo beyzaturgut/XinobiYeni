@@ -1,6 +1,6 @@
 # Admin — tek kişiselleştirme kaynağı yönetimi
 
-> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–12 teknik uygulama/izole kabul tamamlandı; gerçek cihaz/SQL/IIS/iş sahibi kabulü açıktır. [Son kabul kaydı](single-source-acceptance.md). Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
 
 
 06.11.2026 · KIS-TEK-03 ve KIS-TEK-04 uygulandı. [Hedef model](../decisions/ADR-005-personalization-single-source.md), [task planı](../tasks/personalization-single-source-tasks-2026-11-06.md).

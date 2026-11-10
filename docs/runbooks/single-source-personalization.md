@@ -1,6 +1,6 @@
 # Tek kaynak kişiselleştirme — güncel kullanım rehberi
 
-10.11.2026 · KIS-TEK-11 · Yeni iş akışının giriş noktası. Teknik uygulama 03–11 tamam; uçtan uca regresyon task 12 ve gerçek ortam kabulü ayrı açıktır.
+10.11.2026 · KIS-TEK-11 · Yeni iş akışının giriş noktası. Teknik uygulama 03–11 ve 12 yazılımsal birleşik regresyon tamam; gerçek cihaz/SQL/IIS/iş sahibi kabulü ayrı açıktır. [Sonuçlar ve tekrar adımları](single-source-acceptance.md).
 
 ## Kaynağı ve maskeyi hazırlama
 
@@ -52,4 +52,4 @@ Eski varyant okuma rotaları yalnız kendi tarihsel kayıtlarını okur. Eski ma
 
 Normal katalog renk/HEX/galeri araçları korunur. Ticari SKU, fiyat/stok ve normal alışveriş davranışları değişmez. Kargo entegrasyonu, sağlayıcı test/canlı ayarları ve ödeme bu taskta değiştirilmez. 23 ürün içeriği ve SKU 117 fiyatı açık kalır.
 
-Gerçek kaynak/SKU seçimi ve veri taşıma yapılmadı. Task 12 birleşik regresyon; Android/iOS gerçek cihaz, VoiceOver/TalkBack, SQL çoklu süreç/IIS, yedek/restore ve iş sahibi kabulü ayrı izlenir. Otomatik test bunların yerine geçmez. Deploy, release veya APK bu task kapsamında değildir.
+Gerçek kaynak/SKU seçimi ve veri taşıma yapılmadı. [Task 12 yazılımsal birleşik regresyonu](single-source-acceptance.md) tamamlandı; Android/iOS gerçek cihaz, VoiceOver/TalkBack, SQL çoklu süreç/IIS, yedek/restore ve iş sahibi kabulü ayrı izlenir. Otomatik test bunların yerine geçmez. Deploy, release veya APK bu task kapsamında değildir.

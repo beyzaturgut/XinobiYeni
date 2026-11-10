@@ -7,13 +7,15 @@ import {mockPanel} from './consistency-fixtures.mjs'
 const require=createRequire(new URL('../../web/package.json',import.meta.url)),{chromium}=require('@playwright/test'),AxeBuilder=require('@axe-core/playwright').default
 const base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5173/',output=process.env.ADMIN_CONSISTENCY_OUTPUT||'/tmp/xinobi-admin-consistency'
 await mkdir(output,{recursive:true})
+console.log('matrix: launching isolated browser')
 const browser=await chromium.launch({channel:'chrome',headless:true}),matrix=[],issues=[]
 try{
  for(const width of [320,390,768,1440]){
+  console.log('matrix: starting width',width)
   const context=await browser.newContext({viewport:{width,height:1000}}),page=await context.newPage();page.setDefaultTimeout(10000);await mockPanel(page)
   const errors=[];page.on('pageerror',e=>errors.push(e.message))
   for(const {view}of navigationItems){
-   await page.goto(base+'?view='+view);await page.locator('#panel-main>.page-heading').waitFor();await page.waitForTimeout(180)
+   console.log('matrix:',width,view);await page.goto(base+'?view='+view);await page.locator('#panel-main>.page-heading').waitFor();await page.waitForTimeout(180)
    const scan=()=>page.evaluate(()=>({overflow:document.documentElement.scrollWidth>innerWidth+1,offenders:[...document.querySelectorAll('body *')].filter(e=>{const x=e.getBoundingClientRect();return x.width&&(x.right>innerWidth+1||x.left< -1)&&!e.closest('.table-scroll,[hidden],dialog:not([open])')}).slice(0,5).map(e=>({tag:e.tagName,cls:e.className,text:e.textContent.slice(0,60)}))}))
    const normal=await scan();let axe=[]
    if(width===390){const a=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();axe=a.violations.filter(v=>['critical','serious'].includes(v.impact)).map(v=>({id:v.id,targets:v.nodes.map(n=>n.target)}));if(axe.length)issues.push({view,width,axe})}

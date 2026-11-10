@@ -1,6 +1,6 @@
 # Tek kaynak yüzey API ve yayın sözleşmesi
 
-> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–12 teknik uygulama/izole kabul tamamlandı; gerçek cihaz/SQL/IIS/iş sahibi kabulü açıktır. [Son kabul kaydı](single-source-acceptance.md). Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
 
 
 09.11.2026 · KIS-TEK-06 · Teknik uygulama tamamlandı. Web ekran geçişi 07, Flutter 08, tasarım/sepet 09, sipariş dosyaları 10 kapsamındadır. Bu teslim gerçek katalog geçişi veya canlıya yayın değildir.
@@ -45,4 +45,4 @@ Yalnız açıkça verilen ürünleri okur; gerçek veri yazmaz. Kaynak/maske has
 
 ## Kalan kabul
 
-KIS-TEK-07–11 teknik uygulamaları tamam; KIS-TEK-12 birleşik regresyon açıktır. Gerçek ürün kaynağı ve ticari SKU/fiyat/stok eşleme kabulü; yedek/restore ve gerçek veri geçişi; IIS/SQL çoklu süreç, Android/iOS gerçek cihaz ve fiziksel baskı kabulü bu teknik teslimle kapanmaz. Kargo, ödeme ve stok davranışı bu taskta değiştirilmedi. Deploy/APK yapılmadı.
+KIS-TEK-07–12 teknik uygulama/izole regresyon tamam; gerçek ortam kabulü açıktır. Gerçek ürün kaynağı ve ticari SKU/fiyat/stok eşleme kabulü; yedek/restore ve gerçek veri geçişi; IIS/SQL çoklu süreç, Android/iOS gerçek cihaz ve fiziksel baskı kabulü bu teknik teslimle kapanmaz. Kargo, ödeme ve stok davranışı bu taskta değiştirilmedi. Deploy/APK yapılmadı.

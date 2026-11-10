@@ -1,9 +1,9 @@
 # Flutter tek kaynak kişiselleştirme
 
-> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–12 teknik uygulama/izole kabul tamamlandı; gerçek cihaz/SQL/IIS/iş sahibi kabulü açıktır. [Son kabul kaydı](single-source-acceptance.md). Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
 
 
-> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). 10 ile sipariş dosyaları tamamlandı; task 12 ve gerçek cihaz kabulü açıktır.
+> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). 10 ile sipariş dosyaları, 12 ile izole regresyon tamamlandı; gerçek cihaz kabulü açıktır.
 
 09.11.2026 · KIS-TEK-08 · Kod geçişi/otomatik kabul tamam; Android/iOS gerçek cihaz kabulü açık.
 
@@ -35,4 +35,4 @@ Web içi API hatası/tekrar deneme aynı document içindeki dosya ve yerleşimi 
 - Yeni sözleşme, kaynak sürüm anahtarı, 404/503 ayrımı, yanlış ürün/hash/medya reddi, 5001×4000 ve 7001×5 metadata, loading/retry/onaysız ve ekran kapanışı testleri mevcut.
 - Android/iOS platform temalarında 320/390/768 ve %200 metin ayrı test edildi. [Android](../reports/mobile-single-source-android-2026-11-09.md), [iOS](../reports/mobile-single-source-ios-2026-11-09.md), [TST-265](../../test/2026-11-09/TST-265-single-source-mobile.md).
 - Entegrasyon testindeki artık kullanılmayan native galeri scripti ürün bazlı yöntem girişine güncellendi; fiziksel cihazda çalıştırılmadı. Paylaşılan renderer koordinat kabulü web 07 kanıtına dayanır; native WebView/picker gerçek cihaz kabulünün yerine geçmez.
-- 09–11 teknik uygulamaları tamamlandı; sırada 12 birleşik regresyon vardır. 08'in gerçek cihaz kapısı 12/UAT ile açık takip edilir. Deploy/APK/iOS arşivi oluşturulmadı.
+- 09–11 teknik uygulamaları ve 12 izole regresyonu tamamlandı. 08'in gerçek cihaz kapısı 12/UAT ile açık takip edilir. Deploy/APK/iOS arşivi oluşturulmadı.

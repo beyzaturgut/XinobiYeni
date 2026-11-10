@@ -1,6 +1,6 @@
 # Tek kaynak fotoğrafla maskeleme
 
-> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–12 teknik uygulama/izole kabul tamamlandı; gerçek cihaz/SQL/IIS/iş sahibi kabulü açıktır. [Son kabul kaydı](single-source-acceptance.md). Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
 
 
 06.11.2026 · KIS-TEK-05. Admin → **Ürünler → Ürün yüzeyleri**.
@@ -44,4 +44,4 @@ Sabit kaynak tuvali/en-boy oranı yok. Kaynak yükleme 25 MB, maske yükleme 8 M
 
 Eski varyant okuma rotaları kendi tarihsel kaydını sunar; maske/toplu onay yazma uçları 06 ile 410 olarak emekliye ayrıldı. Eski kayıtlar otomatik taşınmadı. Güncel izole maskeleme testi `apps/admin/tests/single-source-mask.mjs`; `tools/test-guided-surface-admin.mjs` tarihsel UI aracıdır.
 
-[TST-261](../../test/2026-11-06/TST-261-single-source-masking.md) yalnız 05 teslimini, [TST-263](../../test/2026-11-09/TST-263-single-source-publication.md) kapasite/yayın geçişini kanıtlar. Task 12 ve gerçek SQL/IIS/cihaz kabulü açıktır. Deploy/APK veya gerçek AI sağlayıcı çağrısı yapılmadı.
+[TST-261](../../test/2026-11-06/TST-261-single-source-masking.md) yalnız 05 teslimini, [TST-263](../../test/2026-11-09/TST-263-single-source-publication.md) kapasite/yayın geçişini kanıtlar. Task 12 izole regresyonu tamamlandı; gerçek SQL/IIS/cihaz kabulü açıktır. Deploy/APK veya gerçek AI sağlayıcı çağrısı yapılmadı.

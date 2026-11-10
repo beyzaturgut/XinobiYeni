@@ -238,3 +238,8 @@ Kullanıcı kararı: desenli ürünler için çoklu renk ve renkler arası hizal
 ## 06.11.2026 — KIS-TEK-02 salt okunur envanter ve geçiş planı
 
 [Envanter/plan](../docs/reports/personalization-migration-plan-2026-11-06.md): SQL 24 ürün/79 varyant/39 tasarım/19 revizyon; 7 kişiselleştirilebilir ürünün kaynak ve SKU seçimleri boş bırakıldı. 2 taslak ve 8 published önizleme güncel varyantlardan kopuk. 28 tasarım dosyası yerelde yok; IIS kaybı diye yorumlanmaz. Manifestli 2 sipariş satırında 6 dosya hash/boyut PASS; 7 legacy satır korunur. Eski SourceSha256 desen hash’idir; ürün kaynağı hash’ine dönüştürülmeyecek. Task 02 planlama tamam; seçim, restore/apply ve IIS karşı kontrolü yapılmadı. Gerçek veriye yazma/deploy yok.
+
+
+## 10.11.2026 — Müşteri hesabı yönetimi
+
+Müşteriler → İncele altında askıya al/yeniden etkinleştir ve ayrı `customers.delete` yetkili hesap silme eklendi. Personel hesapları hedef olamaz; açık onay + silmede SİL, sürüm/işlem kilidi, hata sonrası yeniden okuma ve güvenli audit var. Oturumlar iptal edilir; in-flight checkout da hesap kilidinde aktiflik kontrolünden geçer. Hesap silme `deleted` durumudur; profil, adres, siparişler ve dosyalar korunur, bu ekrandan yeniden açılmaz. [Kullanım ve SQL 0010 önkoşulu](../docs/runbooks/customer-account-management.md), [TST-271](../test/2026-11-10/TST-271-customer-account-management.md). OpenAPI/TS/Dart güncellendi; gerçek SQL migration/çoklu süreç kabulü açık. Yerel File kopyası açık seçilerek çalışır, SQL hatasında fallback yok. Gerçek müşteriye işlem yapılmadı; deploy/APK yok.

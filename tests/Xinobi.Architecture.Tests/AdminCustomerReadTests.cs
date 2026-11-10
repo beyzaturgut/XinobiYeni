@@ -13,7 +13,7 @@ namespace Xinobi.Architecture.Tests;
 public sealed class AdminCustomerReadTests
 {
     [Fact]
-    public async Task StaffMfaPermissionAndSqlAreRequired()
+    public async Task StaffMfaPermissionAndExplicitStorageAreRequired()
     {
         await using var factory = new IsolatedApiFactory();
         using var client = factory.CreateClient();
@@ -29,13 +29,10 @@ public sealed class AdminCustomerReadTests
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens.AccessToken);
         Assert.Equal(HttpStatusCode.Unauthorized, (await client.GetAsync(paths[0])).StatusCode);
         await factory.Services.GetRequiredService<AdminMfa>().Grant(customer.Id, tokens);
-        foreach (var path in paths)
-        {
-            var response = await client.GetAsync(path);
-            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-            Assert.Contains("admin_sql_unavailable", await response.Content.ReadAsStringAsync());
-            Assert.Equal("no-store", response.Headers.CacheControl?.ToString());
-        }
+        var directory = await client.GetAsync(paths[0]);
+        Assert.Equal(HttpStatusCode.OK,directory.StatusCode); // Explicit isolated file accounts, not SQL error fallback.
+        Assert.Equal("no-store",directory.Headers.CacheControl?.ToString());
+        Assert.Equal(HttpStatusCode.NotFound,(await client.GetAsync(paths[1])).StatusCode);
         var authorization = factory.Services.GetRequiredService<IAuthorizationService>();
         var identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "synthetic"),
             new Claim(PermissionAuthorization.AccountKindClaim, AccountKinds.Staff) }, "fixture");

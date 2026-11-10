@@ -32,6 +32,7 @@ public sealed class SavedDesignTests : IDisposable
             services.RemoveAll<IFileStore>(); services.AddSingleton<IFileStore>(new LocalFileStore(directory));
             services.RemoveAll<IVerificationEmailSender>(); services.AddSingleton<IVerificationEmailSender>(new PreviewSender());
             services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(new FakeProvider());
+            services.AddHostedService<DesignGenerationWorker>(); // Explicit fake-provider worker, independent of local offline settings.
         });
     });
 

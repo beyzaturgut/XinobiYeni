@@ -55,6 +55,7 @@ import 'package:xinobi_api_client/src/model/cancel_my_order.dart';
 import 'package:xinobi_api_client/src/model/category_highlight.dart';
 import 'package:xinobi_api_client/src/model/category_item.dart';
 import 'package:xinobi_api_client/src/model/category_list.dart';
+import 'package:xinobi_api_client/src/model/change_customer_access.dart';
 import 'package:xinobi_api_client/src/model/change_my_password.dart';
 import 'package:xinobi_api_client/src/model/complete_admin_password_reset.dart';
 import 'package:xinobi_api_client/src/model/confirm_email_change.dart';
@@ -66,6 +67,7 @@ import 'package:xinobi_api_client/src/model/create_xinobi_u_session.dart';
 import 'package:xinobi_api_client/src/model/customer_address.dart';
 import 'package:xinobi_api_client/src/model/customer_order.dart';
 import 'package:xinobi_api_client/src/model/customer_order_line.dart';
+import 'package:xinobi_api_client/src/model/delete_managed_customer.dart';
 import 'package:xinobi_api_client/src/model/delete_my_account.dart';
 import 'package:xinobi_api_client/src/model/dependency_health.dart';
 import 'package:xinobi_api_client/src/model/design_placement.dart';
@@ -202,6 +204,7 @@ part 'serializers.g.dart';
   CategoryHighlight,
   CategoryItem,
   CategoryList,
+  ChangeCustomerAccess,
   ChangeMyPassword,
   CompleteAdminPasswordReset,
   ConfirmEmailChange,
@@ -213,6 +216,7 @@ part 'serializers.g.dart';
   CustomerAddress,
   CustomerOrder,
   CustomerOrderLine,
+  DeleteManagedCustomer,
   DeleteMyAccount,
   DependencyHealth,
   DesignPlacement,

@@ -24,6 +24,7 @@ public static class PermissionCatalog
         "payments.approve", // bank transfer/EFT confirmation
         "payments.refund",
         "orders.cancel",
+        "customers.delete", // logical account deletion; order history remains intact
         "print.operate", // print operator queue
         "settings.staff", // staff accounts and role assignment
     ];

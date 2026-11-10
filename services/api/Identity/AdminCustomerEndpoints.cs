@@ -5,11 +5,11 @@ using Xinobi.Persistence.Entities;
 
 namespace Xinobi.Api.Identity;
 
-public record AdminCustomerRow(Guid Id, string Name, string Email, string? Phone, string Status, DateTimeOffset CreatedAt, int OrderCount, DateTimeOffset? LastOrderAt);
+public record AdminCustomerRow(Guid Id, string Name, string Email, string? Phone, string Status, DateTimeOffset CreatedAt, int OrderCount, DateTimeOffset? LastOrderAt, string? Version = null);
 public record AdminCustomerPage(AdminCustomerRow[] Items, int Page, int PageSize, int Total, int TotalPages);
 public record AdminCustomerDetails(AdminCustomerRow Customer, int AddressCount, int FavoriteCount);
 
-/// <summary>Masked, SELECT-only customer directory. No account changes or file fallback.</summary>
+/// <summary>Masked customer management; explicit Development file store or SQL, never error fallback.</summary>
 public static class AdminCustomerEndpoints
 {
     public static void Map(RouteGroupBuilder admin)
@@ -19,19 +19,38 @@ public static class AdminCustomerEndpoints
         {
             context.HttpContext.Response.Headers.CacheControl = "no-store";
             var services = context.HttpContext.RequestServices;
-            if (services.GetRequiredService<IAccountStore>() is not SqlAccountStore
-                || !services.GetRequiredService<XinobiDbContext>().Database.IsSqlServer()) return Unavailable();
+            var accounts = services.GetRequiredService<IAccountStore>();
+            if (accounts is not SqlAccountStore && !(accounts is DevFileAccountStore && services.GetRequiredService<IWebHostEnvironment>().IsDevelopment())) return Unavailable();
+            if (accounts is SqlAccountStore && (!services.GetRequiredService<XinobiDbContext>().Database.IsSqlServer()
+                || string.IsNullOrWhiteSpace(services.GetRequiredService<XinobiDbContext>().Database.GetConnectionString()))) return Unavailable();
             try { return await next(context); }
             catch (Exception error) when (error is SqlException or InvalidOperationException { InnerException: SqlException })
             { return Unavailable(); }
         });
-        reads.MapGet("", async (int? page, int? pageSize, string? query, XinobiDbContext db, CancellationToken token) =>
-            await List(db, page ?? 1, pageSize ?? 20, query, token))
+        reads.MapGet("", async (int? page, int? pageSize, string? query, IAccountStore accounts, XinobiDbContext db, CancellationToken token) =>
+            accounts is DevFileAccountStore file ? await file.ListCustomers(page ?? 1,pageSize ?? 20,query) : await List(db, page ?? 1, pageSize ?? 20, query, token))
             .RequirePermission("customers.read").WithName("ListAdminCustomers")
             .Produces<AdminCustomerPage>().ProducesProblem(400).ProducesProblem(401).ProducesProblem(403).ProducesProblem(503);
-        reads.MapGet("/{id:guid}", async (Guid id, XinobiDbContext db, CancellationToken token) => await Details(db, id, token))
+        reads.MapGet("/{id:guid}", async (Guid id, IAccountStore accounts, XinobiDbContext db, CancellationToken token) => accounts is DevFileAccountStore file ? await file.CustomerDetails(id) : await Details(db, id, token))
             .RequirePermission("customers.read").WithName("GetAdminCustomer")
             .Produces<AdminCustomerDetails>().ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(503);
+        reads.MapPost("/{id:guid}/access", async (Guid id, ChangeCustomerAccess request, HttpContext http, IAccountStore accounts) =>
+        {
+            if (request.Status is not (UserStatuses.Active or UserStatuses.Disabled)) throw new AccountException("invalid_customer_status", "Geçersiz hesap işlemi.");
+            return await Manage(accounts,id,request.Status,request.ExpectedVersion,http);
+        }).RequirePermission("customers.read").RequirePermission("customers.write").WithName("ChangeAdminCustomerAccess")
+            .Produces<AdminCustomerDetails>().ProducesProblem(400).ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(409).ProducesProblem(503);
+        reads.MapPost("/{id:guid}/delete", async (Guid id, DeleteManagedCustomer request, HttpContext http, IAccountStore accounts) =>
+            await Manage(accounts,id,UserStatuses.Deleted,request.ExpectedVersion,http))
+            .RequirePermission("customers.read").RequirePermission("customers.delete").WithName("DeleteAdminCustomerAccount")
+            .Produces<AdminCustomerDetails>().ProducesProblem(400).ProducesProblem(401).ProducesProblem(403).ProducesProblem(404).ProducesProblem(409).ProducesProblem(503);
+    }
+
+    private static Task<AdminCustomerDetails> Manage(IAccountStore accounts, Guid id, string status, string version, HttpContext http)
+    {
+        var actor = http.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value;
+        return accounts switch { DevFileAccountStore file => file.ManageCustomer(id,status,version,actor,http.TraceIdentifier),
+            SqlAccountStore sql => sql.ManageCustomer(id,status,version,actor,http.TraceIdentifier), _ => throw new AccountUnavailableException() };
     }
 
     public static IQueryable<User> Customers(XinobiDbContext db) => db.Users.AsNoTracking()
@@ -49,7 +68,7 @@ public static class AdminCustomerEndpoints
     public static IQueryable<AdminCustomerRow> Project(XinobiDbContext db, IQueryable<User> users) => users.Select(user =>
         new AdminCustomerRow(user.Id, user.DisplayName ?? "", user.Email, user.Phone, user.Status, user.CreatedAt,
             db.SalesOrders.Count(order => order.UserId == user.Id),
-            db.SalesOrders.Where(order => order.UserId == user.Id).Max(order => (DateTimeOffset?)order.CreatedAt)));
+            db.SalesOrders.Where(order => order.UserId == user.Id).Max(order => (DateTimeOffset?)order.CreatedAt), Convert.ToBase64String(user.RowVersion)));
 
     public static void Validate(int page, int pageSize, string? query)
     {

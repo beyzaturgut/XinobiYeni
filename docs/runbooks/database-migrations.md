@@ -132,3 +132,8 @@ Mevcut JSON dosyaları okunur, geçersiz JSON varsa hiçbir şey yazılmaz; SQL'
 `0005_OrderLinePersonalization.idempotent.sql` yalnız `sales.OrderLines` tablosuna nullable `PersonalizationJson` kolonu ve `ISJSON` kısıtı ekler; mevcut satırlara dokunmaz. Kayıt, satırdaki tasarımın değişmez kopyasıdır (tasarım kimliği, tür, ad, MIME). Görselin kendisi dosya deposunda `designs/files/order-<siparişId>-<satır>` anahtarıyla siparişe ait kopyadır; kayıtlı tasarım silinse de sipariş değişmez.
 
 **09.10.2026:** XinobiYeniDB'ye `-I` ile uygulandı (o anda siparişler tablosu boştu; ekleme yalnız nullable kolon). İkinci çalıştırma değişiklik yapmadı; 5 geçmiş kaydı. `PersonalisedLinesKeepTheirDesignSnapshot` gerçek SQL'de geçti ve yalnız kendi `.invalid` kayıtlarını yazıp sildi. `0005_OrderLinePersonalization.rollback.sql` kolon ve kısıtı kaldırır; kişiselleştirilmiş sipariş varsa kullanılmaz.
+
+
+## 0010 — Müşteri hesabını kapatma (10.11.2026)
+
+`20261110082212_CustomerAccountDeletion`, identity.Users CK_Users_Status kısıtına `deleted` ekler; sütun/tablo/backfill yok. [İdempotent SQL](../../infra/db/migrations/0010_CustomerAccountDeletion.idempotent.sql), [korumalı rollback](../../infra/db/migrations/0010_CustomerAccountDeletion.rollback.sql). Önkoşul 0009'dur; gerçek SQL'e bu teslimde uygulanmadı. Silinmiş hesap varken rollback hata vererek durur; kayıtlar silinmez veya etkinleştirilmez. [Hesap yönetimi / SQL kabul adımları](customer-account-management.md). Kısıt değişiminin schema kilidi ve tarama etkisi gerçek sunucuda değerlendirilmelidir.

@@ -35,6 +35,7 @@ public static class UserStatuses
     public const string PendingVerification = "pending_verification";
     public const string Active = "active";
     public const string Disabled = "disabled";
+    public const string Deleted = "deleted";
 }
 
 public sealed class Role

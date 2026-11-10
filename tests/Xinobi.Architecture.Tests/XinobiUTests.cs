@@ -22,7 +22,9 @@ public sealed class XinobiUTests : IDisposable
     {
         builder.UseEnvironment(environment);
         builder.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(new Dictionary<string, string?> { ["LocalCommerce:DataDirectory"] = directory }));
-        builder.ConfigureServices(services => { services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider); });
+        builder.ConfigureServices(services => { services.RemoveAll<IImageGenerationProvider>(); services.AddSingleton<IImageGenerationProvider>(provider);
+            if (environment == "Development") services.AddHostedService<DesignGenerationWorker>(); // Fake provider only; no local worker flag dependency.
+        });
     });
 
     private static async Task<XinobiUSession> Create(HttpClient client)

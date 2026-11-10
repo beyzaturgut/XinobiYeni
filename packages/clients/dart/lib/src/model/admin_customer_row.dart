@@ -19,6 +19,7 @@ part 'admin_customer_row.g.dart';
 /// * [createdAt]
 /// * [orderCount]
 /// * [lastOrderAt]
+/// * [version]
 @BuiltValue()
 abstract class AdminCustomerRow implements Built<AdminCustomerRow, AdminCustomerRowBuilder> {
   @BuiltValueField(wireName: r'id')
@@ -44,6 +45,9 @@ abstract class AdminCustomerRow implements Built<AdminCustomerRow, AdminCustomer
 
   @BuiltValueField(wireName: r'lastOrderAt')
   DateTime? get lastOrderAt;
+
+  @BuiltValueField(wireName: r'version')
+  String? get version;
 
   AdminCustomerRow._();
 
@@ -108,6 +112,13 @@ class _$AdminCustomerRowSerializer implements PrimitiveSerializer<AdminCustomerR
       object.lastOrderAt,
       specifiedType: const FullType.nullable(DateTime),
     );
+    if (object.version != null) {
+      yield r'version';
+      yield serializers.serialize(
+        object.version,
+        specifiedType: const FullType.nullable(String),
+      );
+    }
   }
 
   @override
@@ -188,6 +199,14 @@ class _$AdminCustomerRowSerializer implements PrimitiveSerializer<AdminCustomerR
           ) as DateTime?;
           if (valueDes == null) continue;
           result.lastOrderAt = valueDes;
+          break;
+        case r'version':
+          final valueDes = serializers.deserialize(
+            value,
+            specifiedType: const FullType.nullable(String),
+          ) as String?;
+          if (valueDes == null) continue;
+          result.version = valueDes;
           break;
         default:
           unhandled.add(key);

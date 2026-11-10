@@ -46,6 +46,7 @@ doc/CatalogApi.md
 doc/CategoryHighlight.md
 doc/CategoryItem.md
 doc/CategoryList.md
+doc/ChangeCustomerAccess.md
 doc/ChangeMyPassword.md
 doc/CompleteAdminPasswordReset.md
 doc/ConfirmEmailChange.md
@@ -58,6 +59,7 @@ doc/CreateXinobiUSession.md
 doc/CustomerAddress.md
 doc/CustomerOrder.md
 doc/CustomerOrderLine.md
+doc/DeleteManagedCustomer.md
 doc/DeleteMyAccount.md
 doc/DependencyHealth.md
 doc/DesignPlacement.md
@@ -211,6 +213,7 @@ lib/src/model/cancel_my_order.dart
 lib/src/model/category_highlight.dart
 lib/src/model/category_item.dart
 lib/src/model/category_list.dart
+lib/src/model/change_customer_access.dart
 lib/src/model/change_my_password.dart
 lib/src/model/complete_admin_password_reset.dart
 lib/src/model/confirm_email_change.dart
@@ -223,6 +226,7 @@ lib/src/model/customer_address.dart
 lib/src/model/customer_order.dart
 lib/src/model/customer_order_line.dart
 lib/src/model/date.dart
+lib/src/model/delete_managed_customer.dart
 lib/src/model/delete_my_account.dart
 lib/src/model/dependency_health.dart
 lib/src/model/design_placement.dart

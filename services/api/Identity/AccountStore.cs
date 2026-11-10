@@ -15,7 +15,7 @@ public static class AccountKinds
 }
 
 public record AccountRecord(string Id, string Name, string Email, string PasswordHash, DateTimeOffset CreatedAt,
-    string[]? Roles = null, string? Phone = null, string Kind = AccountKinds.Customer)
+    string[]? Roles = null, string? Phone = null, string Kind = AccountKinds.Customer, string Status = "active", string? ManagementVersion = null)
 {
     [System.Text.Json.Serialization.JsonIgnore] public IReadOnlyCollection<string> RoleCodes => Roles ?? [];
 }
@@ -162,7 +162,7 @@ public static class AccountRules
 }
 
 /// <summary>Development-only file store beside the local commerce data (ADR-003). Replaced by <see cref="SqlAccountStore"/> after the import.</summary>
-public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvider clock) : IAccountStore
+public sealed partial class DevFileAccountStore(LocalCommerceStore commerce, TimeProvider clock) : IAccountStore
 {
     private sealed record RefreshEntry(string Hash, string FamilyId, string AccountId, DateTimeOffset ExpiresAt, DateTimeOffset? UsedAt, DateTimeOffset? RevokedAt);
     private sealed record AccessEntry(string Hash, string AccountId, DateTimeOffset ExpiresAt);
@@ -170,7 +170,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
     private sealed record StoredOrder(string AccountId, string RequestId, CustomerOrder Order);
     // Later fields stay nullable so older Development files remain readable.
     private sealed record State(List<AccountRecord> Accounts, List<RefreshEntry> RefreshTokens, List<AccessEntry> AccessTokens,
-        List<StoredAddress>? Addresses = null, List<StoredOrder>? Orders = null, List<AdminInvitationRecord>? AdminInvitations = null, List<StoredFavorite>? Favorites = null);
+        List<StoredAddress>? Addresses = null, List<StoredOrder>? Orders = null, List<AdminInvitationRecord>? AdminInvitations = null, List<StoredFavorite>? Favorites = null, List<CustomerManagementAudit>? CustomerManagementAudits = null);
     private sealed record StoredFavorite(string AccountId, string ProductId, DateTimeOffset CreatedAt);
 
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { WriteIndented = true };
@@ -189,7 +189,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
             {
                 Kind = account.RoleCodes.Count > 0 ? AccountKinds.Staff : AccountKinds.Customer,
             }).ToList(),
-            Addresses = state.Addresses ?? [], Orders = state.Orders ?? [], AdminInvitations = state.AdminInvitations ?? [], Favorites = state.Favorites ?? [],
+            Addresses = state.Addresses ?? [], Orders = state.Orders ?? [], AdminInvitations = state.AdminInvitations ?? [], Favorites = state.Favorites ?? [], CustomerManagementAudits = state.CustomerManagementAudits ?? [],
         };
     }
 
@@ -225,7 +225,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
 
     public Task<AccountRecord?> Login(string email, string password) => Locked(state =>
     {
-        var account = state.Accounts.FirstOrDefault(item => item.Email == email);
+        var account = state.Accounts.FirstOrDefault(item => item.Email == email && item.Status == "active");
         if (account is null)
         {
             hasher.VerifyHashedPassword(null!, dummyHash, password);
@@ -236,6 +236,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
 
     public Task<IssuedTokens> IssueTokens(string accountId, string? credentialStamp = null) => Locked(async state =>
     {
+        if (!state.Accounts.Any(x => x.Id == accountId && x.Status == "active")) throw Invalid();
         if (credentialStamp is not null && !state.Accounts.Any(x => x.Id == accountId && AccountRules.Hash(x.PasswordHash) == credentialStamp))
             throw new AccountException("invalid_mfa", "Giriş doğrulaması geçersiz. Yeniden giriş yap.", 401);
         var tokens = Issue(state, accountId, Guid.NewGuid().ToString("N"));
@@ -267,7 +268,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
             await Write(state);
             throw Invalid();
         }
-        var account = state.Accounts.FirstOrDefault(item => item.Id == entry.AccountId) ?? throw Invalid();
+        var account = state.Accounts.FirstOrDefault(item => item.Id == entry.AccountId && item.Status == "active") ?? throw Invalid();
         state.RefreshTokens[index] = entry with { UsedAt = now };
         var tokens = Issue(state, account.Id, entry.FamilyId);
         await Write(state);
@@ -298,7 +299,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
     {
         var hash = AccountRules.Hash(accessToken);
         var entry = state.AccessTokens.FirstOrDefault(item => item.Hash == hash && item.ExpiresAt > clock.GetUtcNow());
-        return Task.FromResult(entry is null ? null : state.Accounts.FirstOrDefault(account => account.Id == entry.AccountId));
+        return Task.FromResult(entry is null ? null : state.Accounts.FirstOrDefault(account => account.Id == entry.AccountId && account.Status == "active"));
     });
 
     public Task<AccountRecord?> FindById(string accountId) =>
@@ -481,6 +482,7 @@ public sealed class DevFileAccountStore(LocalCommerceStore commerce, TimeProvide
 
     public Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build) => Locked(async state =>
     {
+        if (!state.Accounts.Any(x => x.Id == accountId && x.Status == "active")) throw Invalid();
         if (state.Orders!.FirstOrDefault(entry => entry.AccountId == accountId && entry.RequestId == clientRequestId) is { } existing) return existing.Order;
         if (state.Orders!.Count(entry => entry.AccountId == accountId) >= 200)
             throw new AccountException("order_limit", "Demo sipariş sınırına ulaşıldı.", StatusCodes.Status409Conflict);

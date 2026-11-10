@@ -14,7 +14,7 @@ namespace Xinobi.Api.Identity;
 /// <see cref="DevFileAccountStore"/>. Writes for one account run in a transaction under an application lock on that account,
 /// so concurrent requests across API processes cannot interleave. SQL errors surface as 503, never as a file fallback.
 /// </summary>
-public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider clock) : IAccountStore
+public sealed partial class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider clock) : IAccountStore
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly PasswordHasher<AccountRecord> hasher = new();
@@ -60,7 +60,7 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
     {
         var roles = await db.UserRoles.AsNoTracking().Where(x => x.UserId == user.Id).Join(db.Roles, ur => ur.RoleId, r => r.Id, (_, r) => r.Code).OrderBy(x => x).ToArrayAsync();
         return new AccountRecord(Id(user.Id), user.DisplayName ?? "", user.Email, user.PasswordHash ?? "", user.CreatedAt,
-            roles.Length == 0 ? null : roles, user.Phone, roles.Length == 0 ? AccountKinds.Customer : AccountKinds.Staff);
+            roles.Length == 0 ? null : roles, user.Phone, roles.Length == 0 ? AccountKinds.Customer : AccountKinds.Staff, user.Status);
     }
 
     public Task<AccountRecord> Register(string name, string email, string password) => Run(RegistryLock, async db =>
@@ -93,10 +93,11 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
 
     public Task<IssuedTokens> IssueTokens(string accountId, string? credentialStamp = null) => Run(credentialStamp is null ? Lock(accountId) : RegistryLock, async db =>
     {
+        var current = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Key(accountId) && x.Status == UserStatuses.Active);
+        if (current is null) throw Invalid();
         if (credentialStamp is not null)
         {
-            var current = await db.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == Key(accountId) && x.Status == UserStatuses.Active);
-            if (current is null || AccountRules.Hash(current.PasswordHash ?? "") != credentialStamp)
+            if (AccountRules.Hash(current.PasswordHash ?? "") != credentialStamp)
                 throw new AccountException("invalid_mfa", "Giriş doğrulaması geçersiz. Yeniden giriş yap.", 401);
         }
         var tokens = Issue(db, Key(accountId), Guid.NewGuid());
@@ -141,7 +142,7 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
                 return (null, null);
             }
             var account = await Account(db, entry.UserId);
-            if (account is null) return (null, null);
+            if (account is null || account.Status != UserStatuses.Active) return (null, null);
             entry.UsedAt = now;
             var tokens = Issue(db, entry.UserId, entry.FamilyId);
             await db.SaveChangesAsync();
@@ -170,7 +171,8 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
         var hash = AccountRules.Hash(accessToken);
         var now = clock.GetUtcNow();
         var userId = await db.AccessSessions.AsNoTracking().Where(x => x.TokenHash == hash && x.ExpiresAt > now).Select(x => (Guid?)x.UserId).FirstOrDefaultAsync();
-        return userId is null ? null : await Account(db, userId.Value);
+        var account = userId is null ? null : await Account(db, userId.Value);
+        return account?.Status == UserStatuses.Active ? account : null;
     });
 
     public Task<AccountRecord?> FindById(string accountId) => Run(null, db => Account(db, Key(accountId)));
@@ -442,6 +444,7 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
     public Task<CustomerOrder> PlaceOrder(string accountId, string clientRequestId, Func<CustomerOrder> build) => Run(Lock(accountId), async db =>
     {
         var userId = Key(accountId);
+        if (!await db.Users.AnyAsync(x => x.Id == userId && x.Status == UserStatuses.Active)) throw Invalid();
         if (await db.SalesOrders.AsNoTracking().FirstOrDefaultAsync(x => x.UserId == userId && x.ClientRequestId == clientRequestId) is { } existing)
             return (await Orders(db, db.SalesOrders.Where(x => x.Id == existing.Id))).Single();
         if (await db.SalesOrders.CountAsync(x => x.UserId == userId) >= 200)
@@ -583,7 +586,7 @@ public sealed class SqlAccountStore(IServiceScopeFactory scopes, TimeProvider cl
             db.Users.Add(new User
             {
                 Id = Key(account.Id), Email = account.Email, NormalizedEmail = account.Email, DisplayName = account.Name, Phone = account.Phone,
-                PasswordHash = account.PasswordHash, Kind = account.Kind, Status = UserStatuses.Active,
+                PasswordHash = account.PasswordHash, Kind = account.Kind, Status = account.Status,
                 CreatedAt = account.CreatedAt, UpdatedAt = now,
             });
         }

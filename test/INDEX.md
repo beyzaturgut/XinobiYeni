@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-271 | 10.11.2026 | Müşteri suspend/activate/delete yetkisi, oturum/sipariş/audit ve migration 0010 | API 637 PASS/30 SKIP; admin müşteri+15 durum, TS/Dart 13, Flutter 302 PASS | ISOLATED API / BROWSER / CONTRACT / MODEL | [Rapor](2026-11-10/TST-271-customer-account-management.md) |
 | TST-270 | 10.11.2026 | İptal edilen katalog tek kaynak fotoğraf/SKU bölümünü kaldırma | Admin lint/TS/build ve 3 izole tarayıcı paketi PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-10/TST-270-catalog-source-section-removal.md) |
 | TST-269 | 10.11.2026 | KIS-TEK-12 dört boyutta HTTP kabul zinciri ve tam tek kaynak regresyonu | API 627 PASS/29 SKIP; web 26; Flutter 302; Dart 12; admin 24 + matris tekrar PASS | ISOLATED API / BROWSER / WIDGET / CONTRACT | [Rapor](2026-11-10/TST-269-single-source-acceptance.md) |
 | TST-268 | 10.11.2026 | KIS-TEK-11 güncel rehber, tarihsel araç/belge ayrımı, prompt ve ekran metni temizliği | 5 araç testi, 2 admin paketi, lint/TS/build PASS | DOC / ISOLATED BROWSER / TOOLS | [Rapor](2026-11-10/TST-268-single-source-workflow-cleanup.md) |

@@ -123,7 +123,7 @@ public sealed class XinobiDbContext(DbContextOptions<XinobiDbContext> options) :
             user.ToTable("Users", IdentitySchema, table =>
             {
                 table.HasCheckConstraint("CK_Users_Kind", In("Kind", UserKinds.Customer, UserKinds.Staff));
-                table.HasCheckConstraint("CK_Users_Status", In("Status", UserStatuses.PendingVerification, UserStatuses.Active, UserStatuses.Disabled));
+                table.HasCheckConstraint("CK_Users_Status", In("Status", UserStatuses.PendingVerification, UserStatuses.Active, UserStatuses.Disabled, UserStatuses.Deleted));
             });
             user.Property(x => x.Email).HasMaxLength(320);
             user.Property(x => x.NormalizedEmail).HasMaxLength(320);

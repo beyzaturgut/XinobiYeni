@@ -825,3 +825,8 @@ Admin sipariş detayı schema-2 yüzey/kaynak/profil kimliğini, gerçek ham koo
 ## 10.11.2026 — Kullanıcı kararı: katalog tek kaynak bölümünü kaldırma
 
 Katalogdaki “XINOBI U · Tek kaynak fotoğraf” accordion'u ve yalnız bu alanda kullanılan fotoğraf/SKU yönetimi bileşenleri kaldırıldı; maske ekranının bu alana yönlendirmesi temizlendi. [Kapsam kararı](../docs/decisions/catalog-source-section-removal-2026-11-10.md), [TST-270](../test/2026-11-10/TST-270-catalog-source-section-removal.md). Önceki 03/04/09 UI teslimleri tarihsel kalır; tüm backend modelini veya mevcut profil/maske/tasarım/sipariş dosyalarını silme kararı değildir. Normal katalog renk/medya/fiyat/stok korunur. Alternatif kaynak/SKU ekranı eklenmedi; gerçek veri/geçiş/deploy/APK yok. Yerel geçici süperadmin ayarları Git dışında kalır.
+
+
+## 10.11.2026 — Müşteri hesabı yönetimi
+
+Müşteriler → İncele altında askıya al/yeniden etkinleştir ve ayrı `customers.delete` yetkili hesap silme eklendi. Personel hesapları hedef olamaz; açık onay + silmede SİL, sürüm/işlem kilidi, hata sonrası yeniden okuma ve güvenli audit var. Oturumlar iptal edilir; in-flight checkout da hesap kilidinde aktiflik kontrolünden geçer. Hesap silme `deleted` durumudur; profil, adres, siparişler ve dosyalar korunur, bu ekrandan yeniden açılmaz. [Kullanım ve SQL 0010 önkoşulu](../docs/runbooks/customer-account-management.md), [TST-271](../test/2026-11-10/TST-271-customer-account-management.md). OpenAPI/TS/Dart güncellendi; gerçek SQL migration/çoklu süreç kabulü açık. Yerel File kopyası açık seçilerek çalışır, SQL hatasında fallback yok. Gerçek müşteriye işlem yapılmadı; deploy/APK yok.

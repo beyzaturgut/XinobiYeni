@@ -104,7 +104,8 @@ public sealed class PersistenceModelTests
             "20261012115009_AdminInvitations",
             "20261013072705_CustomerFavorites",
             previous,
-            current
+            current,
+            "20261110082212_CustomerAccountDeletion"
         }, context.Database.GetMigrations());
         var deployed = migrator.GenerateScript(previous, current, MigrationsSqlGenerationOptions.Idempotent);
         Assert.Equal(Normalize(File.ReadAllText(Path.Combine(RepositoryRoot(), "infra/db/migrations/0009_AdminPasswordResetPersistence.idempotent.sql"))), Normalize(deployed));
@@ -116,6 +117,7 @@ public sealed class PersistenceModelTests
     [InlineData("0", "20261013072705_CustomerFavorites", "0007_CustomerFavorites.idempotent.sql")]
     [InlineData("20261013072705_CustomerFavorites", "20261013122941_AdminMfaPersistence", "0008_AdminMfaPersistence.idempotent.sql")]
     [InlineData("20261013122941_AdminMfaPersistence", "20261013123801_AdminPasswordResetPersistence", "0009_AdminPasswordResetPersistence.idempotent.sql")]
+    [InlineData("20261013123801_AdminPasswordResetPersistence", "20261110082212_CustomerAccountDeletion", "0010_CustomerAccountDeletion.idempotent.sql")]
     public void ReviewedDeploymentRangeMatchesMigrations(string from, string to, string file)
     {
         using var context = CreateContext();
@@ -140,7 +142,8 @@ public sealed class PersistenceModelTests
             "20261012115009_AdminInvitations",
             "20261013072705_CustomerFavorites",
             "20261013122941_AdminMfaPersistence",
-            "20261013123801_AdminPasswordResetPersistence"
+            "20261013123801_AdminPasswordResetPersistence",
+            "20261110082212_CustomerAccountDeletion"
         }, context.Database.GetMigrations());
     }
 

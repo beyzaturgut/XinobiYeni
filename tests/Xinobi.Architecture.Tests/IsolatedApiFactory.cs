@@ -46,6 +46,10 @@ public sealed class IsolatedApiFactory : WebApplicationFactory<Program>
                 context.Configuration["Catalog:StorageProvider"] = "File";
                 context.Configuration["Accounts:StorageProvider"] = "File";
                 context.Configuration["Features:StorageProvider"] = "File";
+                // Local offline/hosting recovery settings must never redirect fixture files or jobs into the owner's copy.
+                context.Configuration["Storage:LocalRoot"] = directory;
+                context.Configuration["DesignStudio:DataDirectory"] = Path.Combine(directory, "design-studio");
+                context.Configuration["DesignStudio:ExternalInferenceEnabled"] = "false";
                 services.RemoveAll<IAccountStore>();
                 services.AddSingleton<IAccountStore>(provider => provider.GetRequiredService<DevFileAccountStore>());
             }

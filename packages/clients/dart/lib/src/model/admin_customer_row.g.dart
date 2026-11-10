@@ -23,6 +23,8 @@ class _$AdminCustomerRow extends AdminCustomerRow {
   final int orderCount;
   @override
   final DateTime? lastOrderAt;
+  @override
+  final String? version;
 
   factory _$AdminCustomerRow(
           [void Function(AdminCustomerRowBuilder)? updates]) =>
@@ -36,7 +38,8 @@ class _$AdminCustomerRow extends AdminCustomerRow {
       required this.status,
       required this.createdAt,
       required this.orderCount,
-      this.lastOrderAt})
+      this.lastOrderAt,
+      this.version})
       : super._();
   @override
   AdminCustomerRow rebuild(void Function(AdminCustomerRowBuilder) updates) =>
@@ -57,7 +60,8 @@ class _$AdminCustomerRow extends AdminCustomerRow {
         status == other.status &&
         createdAt == other.createdAt &&
         orderCount == other.orderCount &&
-        lastOrderAt == other.lastOrderAt;
+        lastOrderAt == other.lastOrderAt &&
+        version == other.version;
   }
 
   @override
@@ -71,6 +75,7 @@ class _$AdminCustomerRow extends AdminCustomerRow {
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, orderCount.hashCode);
     _$hash = $jc(_$hash, lastOrderAt.hashCode);
+    _$hash = $jc(_$hash, version.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -85,7 +90,8 @@ class _$AdminCustomerRow extends AdminCustomerRow {
           ..add('status', status)
           ..add('createdAt', createdAt)
           ..add('orderCount', orderCount)
-          ..add('lastOrderAt', lastOrderAt))
+          ..add('lastOrderAt', lastOrderAt)
+          ..add('version', version))
         .toString();
   }
 }
@@ -126,6 +132,10 @@ class AdminCustomerRowBuilder
   DateTime? get lastOrderAt => _$this._lastOrderAt;
   set lastOrderAt(DateTime? lastOrderAt) => _$this._lastOrderAt = lastOrderAt;
 
+  String? _version;
+  String? get version => _$this._version;
+  set version(String? version) => _$this._version = version;
+
   AdminCustomerRowBuilder() {
     AdminCustomerRow._defaults(this);
   }
@@ -141,6 +151,7 @@ class AdminCustomerRowBuilder
       _createdAt = $v.createdAt;
       _orderCount = $v.orderCount;
       _lastOrderAt = $v.lastOrderAt;
+      _version = $v.version;
       _$v = null;
     }
     return this;
@@ -176,6 +187,7 @@ class AdminCustomerRowBuilder
           orderCount: BuiltValueNullFieldError.checkNotNull(
               orderCount, r'AdminCustomerRow', 'orderCount'),
           lastOrderAt: lastOrderAt,
+          version: version,
         );
     replace(_$result);
     return _$result;

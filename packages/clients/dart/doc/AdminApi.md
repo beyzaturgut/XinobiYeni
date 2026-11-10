@@ -11,8 +11,10 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**approvePrintProfile**](AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [**assignAdminRole**](AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
+[**changeAdminCustomerAccess**](AdminApi.md#changeadmincustomeraccess) | **POST** /api/v1/admin/customers/{id}/access |
 [**createAdminInvitation**](AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
 [**createAdminSuratShipment**](AdminApi.md#createadminsuratshipment) | **POST** /api/v1/admin/orders/{id}/surat-shipment |
+[**deleteAdminCustomerAccount**](AdminApi.md#deleteadmincustomeraccount) | **POST** /api/v1/admin/customers/{id}/delete |
 [**downloadAdminOrderLineComposition**](AdminApi.md#downloadadminorderlinecomposition) | **GET** /api/v1/admin/orders/{id}/lines/{line}/composition | Sipariş anındaki yerleşim revizyonunun giydirilmiş temsili önizlemesi (JPEG); baskıya hazır dosya veya ham desen değildir.
 [**downloadAdminOrderLinePattern**](AdminApi.md#downloadadminorderlinepattern) | **GET** /api/v1/admin/orders/{id}/lines/{line}/pattern | Sipariş satırına kopyalanmış ham deseni özgün baytlarıyla indirir; ürün fotoğrafı veya giydirilmiş önizleme değildir.
 [**downloadAdminOrderLineProductSource**](AdminApi.md#downloadadminorderlineproductsource) | **GET** /api/v1/admin/orders/{id}/lines/{line}/source | Editörde maskelenen ürün fotoğrafının sipariş anındaki kopyasını özgün baytlarıyla indirir; desen uygulanmamıştır, maske dosyası değildir.
@@ -125,6 +127,49 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **changeAdminCustomerAccess**
+> AdminCustomerDetails changeAdminCustomerAccess(id, changeCustomerAccess)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final ChangeCustomerAccess changeCustomerAccess = ; // ChangeCustomerAccess |
+
+try {
+    final response = api.changeAdminCustomerAccess(id, changeCustomerAccess);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->changeAdminCustomerAccess: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **changeCustomerAccess** | [**ChangeCustomerAccess**](ChangeCustomerAccess.md)|  |
+
+### Return type
+
+[**AdminCustomerDetails**](AdminCustomerDetails.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **createAdminInvitation**
 > AdminInvitationResponse createAdminInvitation(createAdminInvitation)
 
@@ -197,6 +242,49 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**SuratShipmentView**](SuratShipmentView.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/problem+json, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **deleteAdminCustomerAccount**
+> AdminCustomerDetails deleteAdminCustomerAccount(id, deleteManagedCustomer)
+
+
+
+### Example
+```dart
+import 'package:xinobi_api_client/api.dart';
+
+final api = XinobiApiClient().getAdminApi();
+final String id = 38400000-8cf0-11bd-b23e-10b96e4ef00d; // String |
+final DeleteManagedCustomer deleteManagedCustomer = ; // DeleteManagedCustomer |
+
+try {
+    final response = api.deleteAdminCustomerAccount(id, deleteManagedCustomer);
+    print(response);
+} on DioException catch (e) {
+    print('Exception when calling AdminApi->deleteAdminCustomerAccount: $e\n');
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **String**|  |
+ **deleteManagedCustomer** | [**DeleteManagedCustomer**](DeleteManagedCustomer.md)|  |
+
+### Return type
+
+[**AdminCustomerDetails**](AdminCustomerDetails.md)
 
 ### Authorization
 

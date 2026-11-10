@@ -1271,7 +1271,7 @@ namespace Xinobi.Persistence.Migrations
                         {
                             t.HasCheckConstraint("CK_Users_Kind", "[Kind] IN (N'customer', N'staff')");
 
-                            t.HasCheckConstraint("CK_Users_Status", "[Status] IN (N'pending_verification', N'active', N'disabled')");
+                            t.HasCheckConstraint("CK_Users_Status", "[Status] IN (N'pending_verification', N'active', N'disabled', N'deleted')");
                         });
                 });
 

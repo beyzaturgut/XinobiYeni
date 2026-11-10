@@ -125,8 +125,10 @@ Class | Method | HTTP request | Description
 [*AccountApi*](doc/AccountApi.md) | [**verifyAdminMfa**](doc/AccountApi.md#verifyadminmfa) | **POST** /api/v1/auth/admin/mfa/verify |
 [*AdminApi*](doc/AdminApi.md) | [**approvePrintProfile**](doc/AdminApi.md#approveprintprofile) | **POST** /api/v1/admin/print-profiles/{id}/approve |
 [*AdminApi*](doc/AdminApi.md) | [**assignAdminRole**](doc/AdminApi.md#assignadminrole) | **POST** /api/v1/admin/roles |
+[*AdminApi*](doc/AdminApi.md) | [**changeAdminCustomerAccess**](doc/AdminApi.md#changeadmincustomeraccess) | **POST** /api/v1/admin/customers/{id}/access |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminInvitation**](doc/AdminApi.md#createadmininvitation) | **POST** /api/v1/admin/invitations |
 [*AdminApi*](doc/AdminApi.md) | [**createAdminSuratShipment**](doc/AdminApi.md#createadminsuratshipment) | **POST** /api/v1/admin/orders/{id}/surat-shipment |
+[*AdminApi*](doc/AdminApi.md) | [**deleteAdminCustomerAccount**](doc/AdminApi.md#deleteadmincustomeraccount) | **POST** /api/v1/admin/customers/{id}/delete |
 [*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLineComposition**](doc/AdminApi.md#downloadadminorderlinecomposition) | **GET** /api/v1/admin/orders/{id}/lines/{line}/composition | Sipariş anındaki yerleşim revizyonunun giydirilmiş temsili önizlemesi (JPEG); baskıya hazır dosya veya ham desen değildir.
 [*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLinePattern**](doc/AdminApi.md#downloadadminorderlinepattern) | **GET** /api/v1/admin/orders/{id}/lines/{line}/pattern | Sipariş satırına kopyalanmış ham deseni özgün baytlarıyla indirir; ürün fotoğrafı veya giydirilmiş önizleme değildir.
 [*AdminApi*](doc/AdminApi.md) | [**downloadAdminOrderLineProductSource**](doc/AdminApi.md#downloadadminorderlineproductsource) | **GET** /api/v1/admin/orders/{id}/lines/{line}/source | Editörde maskelenen ürün fotoğrafının sipariş anındaki kopyasını özgün baytlarıyla indirir; desen uygulanmamıştır, maske dosyası değildir.
@@ -226,6 +228,7 @@ Class | Method | HTTP request | Description
  - [CategoryHighlight](doc/CategoryHighlight.md)
  - [CategoryItem](doc/CategoryItem.md)
  - [CategoryList](doc/CategoryList.md)
+ - [ChangeCustomerAccess](doc/ChangeCustomerAccess.md)
  - [ChangeMyPassword](doc/ChangeMyPassword.md)
  - [CompleteAdminPasswordReset](doc/CompleteAdminPasswordReset.md)
  - [ConfirmEmailChange](doc/ConfirmEmailChange.md)
@@ -237,6 +240,7 @@ Class | Method | HTTP request | Description
  - [CustomerAddress](doc/CustomerAddress.md)
  - [CustomerOrder](doc/CustomerOrder.md)
  - [CustomerOrderLine](doc/CustomerOrderLine.md)
+ - [DeleteManagedCustomer](doc/DeleteManagedCustomer.md)
  - [DeleteMyAccount](doc/DeleteMyAccount.md)
  - [DependencyHealth](doc/DependencyHealth.md)
  - [DesignPlacement](doc/DesignPlacement.md)

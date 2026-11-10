@@ -1,5 +1,7 @@
 # Tek kaynak kişiselleştirme — güncel kullanım rehberi
 
+> **10.11.2026 kullanıcı kararı:** Katalogdaki “XINOBI U · Tek kaynak fotoğraf” bölümü ve içindeki fotoğraf/SKU yönetim kontrolleri kaldırıldı. Bu bölümün aşağıdaki eski kullanım adımları tarihsel kalır; mevcut kayıt/API/sipariş dosyaları silinmedi. [Güncel kapsam kararı](../decisions/catalog-source-section-removal-2026-11-10.md).
+
 10.11.2026 · KIS-TEK-11 · Yeni iş akışının giriş noktası. Teknik uygulama 03–11 ve 12 yazılımsal birleşik regresyon tamam; gerçek cihaz/SQL/IIS/iş sahibi kabulü ayrı açıktır. [Sonuçlar ve tekrar adımları](single-source-acceptance.md).
 
 ## Kaynağı ve maskeyi hazırlama

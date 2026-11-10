@@ -38,7 +38,7 @@ export default function SurfaceMasks(){
  function select(id:string){if(activity.current.busy||activity.current.dirty&&!window.confirm('Kaydedilmemiş maske veya prompt değişikliği silinsin mi?'))return;setSelected(id)}
  return <section className="surface-masks" aria-label="Ürün yüzey maskeleri">
   <div className="surface-side"><aside className="surface-list">
-   <p className="surface-intro">Her XINOBI U ürünü tek kaynak fotoğrafla çalışır. Kaynağı katalogda kaydet, WebP maskeyi bu fotoğraf üzerinde kontrol edip onayla.</p>
+   <p className="surface-intro">Ürünün kayıtlı kaynak fotoğrafına ait WebP maskeyi burada kontrol edip onayla.</p>
    <label>Ürün ara<input value={query} onChange={event=>setQuery(event.target.value)}/></label>
    <div className="surface-filters" role="group" aria-label="Durum filtresi">{['all','none','draft','approved','stale'].map(status=><button key={status} aria-pressed={filter===status} onClick={()=>setFilter(status)}>{status==='all'?`Tümü${loading||error?'':` (${items.length})`}`:`${text[status as Status]}${loading||error?'':` (${counts(status)})`}`}</button>)}</div>
    {loading&&<p role="status">Ürün yüzeyleri yükleniyor…</p>}{error&&<p role="alert" className="surface-error">{error} <button onClick={()=>void refresh()}>Tekrar dene</button></p>}
@@ -101,7 +101,7 @@ function Editor({productId,side,onChanged,onActivity}:{productId:string;side:HTM
  const usable=!!source&&detail?.sourceStatus==='ready'
  return <div className="surface-editor">
   {detail&&<header><div><h2>{detail.productName}</h2><p>Kaynak sürümü {detail.sourceRevision} · {source?`${source.width}×${source.height} px`:'Kaynak fotoğraf yok'} · {text[detail.status]}</p></div></header>}
-  {detail&&!usable&&<p role="alert" className="surface-warning">{source?'Kaynak fotoğraf değişmiş veya kayıp. Eski maske yeni kaynağa uygulanmaz.':'Bu ürünün tek kaynak fotoğrafı henüz kaydedilmedi.'} <a href="?view=catalog">Katalogdan kaynak fotoğrafı yönet</a></p>}
+  {detail&&!usable&&<p role="alert" className="surface-warning">{source?'Kaynak fotoğraf değişmiş veya kayıp. Eski maske yeni kaynağa uygulanmaz.':'Bu ürünün tek kaynak fotoğrafı henüz kaydedilmedi.'}</p>}
   {detail?.status==='stale'&&usable&&<p role="status" className="surface-warning">Kaynak değişti. Önceki maske korunuyor ancak bu fotoğrafa uygulanmıyor. Yeni maske yükleyin.</p>}
   {usable&&source&&detail&&<>
    {side&&createPortal(<><button className="surface-source-download" disabled={!!busy} onClick={()=>void download()}>Maskeleme için kaynak fotoğrafı indir</button>

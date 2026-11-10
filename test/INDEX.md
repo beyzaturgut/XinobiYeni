@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-270 | 10.11.2026 | İptal edilen katalog tek kaynak fotoğraf/SKU bölümünü kaldırma | Admin lint/TS/build ve 3 izole tarayıcı paketi PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-10/TST-270-catalog-source-section-removal.md) |
 | TST-269 | 10.11.2026 | KIS-TEK-12 dört boyutta HTTP kabul zinciri ve tam tek kaynak regresyonu | API 627 PASS/29 SKIP; web 26; Flutter 302; Dart 12; admin 24 + matris tekrar PASS | ISOLATED API / BROWSER / WIDGET / CONTRACT | [Rapor](2026-11-10/TST-269-single-source-acceptance.md) |
 | TST-268 | 10.11.2026 | KIS-TEK-11 güncel rehber, tarihsel araç/belge ayrımı, prompt ve ekran metni temizliği | 5 araç testi, 2 admin paketi, lint/TS/build PASS | DOC / ISOLATED BROWSER / TOOLS | [Rapor](2026-11-10/TST-268-single-source-workflow-cleanup.md) |
 | TST-267 | 09.11.2026 | KIS-TEK-10 schema-2 sipariş yüzeyi, üç dosya geçmişi, büyük kaynak, bozuk/eksik/yetkisiz dosya, müşteri snapshot | API 623 PASS/29 SKIP; admin yeni + 5 paket; web 7; Flutter 302 | ISOLATED API/BROWSER/WIDGET | [Rapor](2026-11-09/TST-267-single-source-order-files.md) |

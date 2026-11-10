@@ -1,4 +1,7 @@
-﻿# Development-only local mask editor
+# Development-only local mask editor
+
+> **10.11.2026 — Legacy development tools.** These instructions describe the historical variant/family QA environment, not the current single-source workflow. Start with the [current workflow](../../docs/runbooks/single-source-personalization.md). Do not use these scripts to create a new single-source profile, transfer masks between photos or claim current acceptance. Existing data and compatibility readers remain supported.
+
 
 Start from D:\XinobiYeni-integration:
 

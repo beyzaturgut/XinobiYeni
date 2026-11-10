@@ -50,6 +50,10 @@ try{
  const f=await fixture(),p=f.page
  const prompt=p.getByLabel('Hazır maskeleme promptu',{exact:true});try{await prompt.waitFor({timeout:10000})}catch(error){console.error(await p.locator('body').innerText());await p.screenshot({path:out+'/failure.png',fullPage:true});throw error}
  assert.match(await prompt.inputValue(),/Tam tuval: 113 × 67/);assert.match(await prompt.inputValue(),/Kaynak sürümü: 1/)
+ assert.doesNotMatch(await prompt.inputValue(),/Seçili renk:|Ürün \/ varyant kimliği:|1333 × 2000/)
+ assert.match(await prompt.inputValue(),/Yeni bir ürün fotoğrafı üretme/)
+ assert.match(await prompt.inputValue(),/Logo konturunu güvenilir biçimde ayıramıyorsan/)
+ assert.match(await prompt.inputValue(),/Maske tuvali fotoğraf tuvaliyle birebir aynı: 113 × 67/)
  assert.equal(await p.getByLabel('Önizleme rengi',{exact:true}).count(),0);assert.equal(await p.getByText('Seçilen renklerde onayla',{exact:true}).count(),0)
  const sourceDownload=p.waitForEvent('download');await p.getByRole('button',{name:'Maskeleme için kaynak fotoğrafı indir',exact:true}).click();assert.deepEqual(readFileSync(await (await sourceDownload).path()),f.bytes)
  await p.getByLabel('Maske WebP dosyası').setInputFiles({name:'mask.webp',mimeType:'image/webp',buffer:f.webp})
@@ -63,7 +67,7 @@ try{
  f.failExport(true);await p.getByRole('button',{name:'Taslak WebP maskeyi aç / indir',exact:true}).click();await p.getByRole('alert').filter({hasText:'İzole indirme hatası'}).waitFor()
  f.failExport(false);const exportDownload=p.waitForEvent('download');await p.getByRole('button',{name:'Taslak WebP maskeyi aç / indir',exact:true}).click();assert.deepEqual(readFileSync(await(await exportDownload).path()),f.webp)
  const before=f.writes;p.once('dialog',d=>d.dismiss());await p.getByRole('button',{name:'Taslağı onayla',exact:true}).click();assert.equal(f.writes,before)
- p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Taslağı onayla',exact:true}).click();await p.getByRole('status').filter({hasText:'Maske bu kaynak için onaylandı.'}).waitFor()
+ p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Taslağı onayla',exact:true}).click();await p.getByRole('status').filter({hasText:'Maske bu kaynak için onaylandı.'}).waitFor();await p.getByRole('status').filter({hasText:'Yeni tasarımlar bu onaylı yüzeyi kullanır; eski sipariş dosyaları korunur.'}).waitFor()
  const scan=await new AxeBuilder({page:p}).include('.surface-masks').withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();assert.deepEqual(scan.violations.filter(v=>['serious','critical'].includes(v.impact)).map(v=>v.id),[])
  for(const width of [320,390,768,1440]){await p.setViewportSize({width,height:1000});assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Overflow '+width)}
  await p.evaluate(()=>scrollTo(0,0));await p.waitForTimeout(100)

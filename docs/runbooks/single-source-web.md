@@ -1,8 +1,11 @@
 # Webde tek kaynak kişiselleştirme
 
-> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). Gerçek cihaz kabulü ve task 10–12 açıktır.
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
 
-09.11.2026 · KIS-TEK-07 · Web ekran geçişi uygulandı; tasarım kaydı/sepet bağları KIS-TEK-09 kapsamında açıktır.
+
+> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). 10 ile sipariş dosyaları tamamlandı; task 12 ve gerçek cihaz kabulü açıktır.
+
+09.11.2026 · KIS-TEK-07 · Web ekran geçişi ve KIS-TEK-09 kayıt/sepet bağları uygulandı.
 
 ## Web davranışı
 
@@ -18,17 +21,15 @@
 
 Kaynak metadata'sı, yerleşim kontrolünün x/y aralığı ve dışarı bildirilen yerleşim ham genişlik/yükseklikte kalır. Yeni tek kaynak önizlemesinin geçici canvas'ı en fazla 2 milyon piksel ve en uzun kenarı 2048 olacak şekilde sınırlanır. Bu, kaynak dosyasını veya maskesini yeniden yazmaz; sabit bir yükleme boyutu/en-boy oranı değildir. Renderer x/y ve gövde ofsetlerini geçici piksel ızgarasına, sürükleme geri bildirimini gerçek kaynak koordinatlarına çevirir. Ekran/zoom büyüklüğü yerleşimi değiştirmez. Kaynak ve maske kendi gerçek ölçülerinden farklıysa çizim hata verir. Eski açık varyant önizlemeleri önceki sözleşmesinde kalır.
 
-## Kayıt ve geçmiş tasarımlar: açık bağımlılık
+## Kayıt, geçmiş tasarımlar ve AI
 
-Yeni kaynak kimliğiyle tasarım revizyonu ve ticari SKU/fiyat/stok eşleme sunucu doğrulaması **KIS-TEK-09** işidir. Bu aşamada yeni yüzey kimliği sahte bir variant/SKU olarak eski kayıt uçlarına gönderilmez; fiyat başka renk/ilk varyanttan tahmin edilmez. Yeni önizlemede kaydet/sepete ekle yerine işlevin henüz kullanılamadığı açıkça yazılır. Bu, yeni model için kontrollü geçiş kapısıdır; normal ürün alışverişi ve geçmiş kayıtlı sipariş dosyaları değiştirilmez.
+09 ile schema-2 kayıt/favori/sepet/checkout açık ticari SKU ve güncel yüzey bağıyla uygulandı. Kaynak veya ticari eşleme eksikse satın alma kapalıdır; başka renkten fiyat/SKU alınmaz. Eski tasarım kendi tarihsel verisiyle okunur; güncel tek kaynakta düzenlemek için açık yeni yerleşim oluşturulur. İlk fotoğraflı varyant fallback'i yeni AI oturumundan kaldırıldı; null variant oturumu ürünün tek onaylı kaynağını doğrular.
 
-Kayıtlı tasarımın eski kendi kaynağında okunması/yeniden düzenlenmesi mevcut tarihsel akışında kalır; yeni kaynağa otomatik dönüştürülmez. Yükleme ekranındaki Tasarımlarım seçicisi yalnız desen görselini yeni yerleşimde kullanır; eski yerleşimin aktarılmadığını açıkça bildirir. Eski tasarımların yeni sürüm doğrulaması ve yeniden düzenleme politikası 09'da tamamlanacaktır.
-
-Mevcut AI sunucusunun renk verilmediğinde oturum için ilk fotoğraflı varyantı bulma davranışı bu web taskında değiştirilmemiştir. Sunucudaki bu fallback'in açık ürün kaynağına geçirilmesi 09'da kayıtlıdır. Hiç uygun tarihsel oturum varyantı olmayan bir ürünün AI oturumu bu aşamada sunucudan hata dönebilir; web başka kaynak/renkle bu hatayı gizlemez. Kendi görseli/deseniyle önizleme ürünün tek kaynağıyla çalışır.
+10 ile siparişte kaynak/yerleşim ve üç değişmez dosya doğrulanır; eksik sipariş önizlemesi güncel konfigürasyon veya katalog görseliyle doldurulmaz. [Kayıt ve satın alma](single-source-design-checkout.md), [sipariş dosyaları](single-source-order-files.md).
 
 ## Operatör kontrolü
 
-Ürünün XINOBI U işareti açık olmalı; admin katalogda tek kaynak kaydedilmeli ve tek kaynak maskelemede maske onaylanmış olmalıdır. Bu kayıtlar yoksa web hazır değil gösterir; geçmiş varyant maskelerini otomatik seçmez. Gerçek kaynak/SKU seçimi ve veri geçişi yapılmadı. Flutter native akışı 08'de güncellenecek; paylaşılan web önizlemesini açan WebView yeni web davranışını görür, native kabul yapılmış sayılmaz.
+Ürünün XINOBI U işareti açık, tek kaynak ve bu kaynağa bağlı maske onaylı olmalıdır. Satın alma ayrıca açık ticari SKU/fiyat/stok gerektirir. Flutter kod geçişi 08 ile uygulandı; Android/iOS gerçek cihaz kabulü açıktır. Gerçek kaynak/SKU seçimi ve veri geçişi yapılmadı.
 
 ## Doğrulama
 

@@ -1,4 +1,7 @@
-﻿# Local Tarzını Keşfet preview
+# Local Tarzını Keşfet preview
+
+> **10.11.2026 — Legacy development tools.** These instructions describe the historical variant/family QA environment, not the current single-source workflow. Start with the [current workflow](../docs/runbooks/single-source-personalization.md). Do not use these scripts to create a new single-source profile, transfer masks between photos or claim current acceptance. Existing data and compatibility readers remain supported.
+
 
 Only the opt-in D: Next development preview uses this bridge.
 No questionnaire content, generator, catalog, mask or renderer was changed.

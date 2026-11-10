@@ -1,6 +1,9 @@
 # Flutter tek kaynak kişiselleştirme
 
-> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). Gerçek cihaz kabulü ve task 10–12 açıktır.
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+
+
+> **09.11.2026 / KIS-TEK-09 güncellemesi:** Aşağıdaki 07/08 teslimindeki kayıt/sepet kapısı yeni sürümde tamamlandı. Açık SKU seçimi ve schema-2 doğrulamasıyla kayıt/favori/sepet açılır; eksik eşleme/fiyat/stokta kapalı kalır. AI ilk-renk fallback'i kaldırıldı. [Güncel rehber](single-source-design-checkout.md), [TST-266](../../test/2026-11-09/TST-266-single-source-design-checkout.md). 10 ile sipariş dosyaları tamamlandı; task 12 ve gerçek cihaz kabulü açıktır.
 
 09.11.2026 · KIS-TEK-08 · Kod geçişi/otomatik kabul tamam; Android/iOS gerçek cihaz kabulü açık.
 
@@ -17,9 +20,9 @@
 
 ## Tarihsel kayıt ve kapsam sınırı
 
-`design_configurations.dart` ve geçmiş tasarım/sipariş DTO'ları kendi configuration/revision/variant bağlarını okumaya devam eder; dosyalar veya yerel tarihsel placement anahtarları yeniden yazılmaz. Yeni yüzeyin ticari SKU/fiyat/stok ve revizyon kaydı **KIS-TEK-09**'da tamamlanacaktır. Bu nedenle yeni sonuç/önizlemede kaydet/sepete ekle yerine henüz kullanılamadığı açıkça yazılır; başka renkten fiyat/SKU alınmaz. Eski kayıtların yeni yüzeye edit edilmesi otomatik kabul edilmiş sayılmaz.
+`design_configurations.dart` ve geçmiş tasarım/sipariş DTO'ları kendi configuration/revision/variant bağlarını okur; tarihsel kayıtlar yeniden yazılmaz. 09 ile yeni schema-2 kaydet/favori/sepet ve ticari SKU/fiyat/stok doğrulaması uygulandı. Eksik ticari bağda satın alma kapalıdır; başka renkten fiyat/SKU alınmaz. Eski tasarımın güncel yüzeyde düzenlenmesi açık yeni yerleşim gerektirir.
 
-AI sunucusunun null variant için tarihsel ilk fotoğraflı varyantı seçme iç davranışı 09'da açık kalır; mobil bunu önizleme kaynağı veya ticari SKU yapmaz. Gerçek ürün kaynağı/SKU eşleme ve veri geçişi yapılmadı. WebView'ın hedefi KIS-TEK-06 API ve KIS-TEK-07 web ile eş sürüm olmalıdır; eski canlı web bu kod teslimiyle güncellenmiş sayılmaz.
+Yeni AI null variant oturumu tek ürün kaynağına bağlanır; ilk fotoğraflı varyant fallback'i 09 ile kaldırıldı. 10 ile siparişin kendi önizlemesi kullanılır; manifestli/schema-2 eksik dosyada canlı katalog veya değişmiş konfigürasyona fallback yoktur. Gerçek kaynak/SKU eşleme ve veri geçişi yapılmadı. WebView hedefi API/web ile eş sürüm olmalıdır; eski canlı web bu kod teslimiyle güncellenmiş sayılmaz.
 
 ## Ağ kesintisi ve operatör kabulü
 
@@ -32,4 +35,4 @@ Web içi API hatası/tekrar deneme aynı document içindeki dosya ve yerleşimi 
 - Yeni sözleşme, kaynak sürüm anahtarı, 404/503 ayrımı, yanlış ürün/hash/medya reddi, 5001×4000 ve 7001×5 metadata, loading/retry/onaysız ve ekran kapanışı testleri mevcut.
 - Android/iOS platform temalarında 320/390/768 ve %200 metin ayrı test edildi. [Android](../reports/mobile-single-source-android-2026-11-09.md), [iOS](../reports/mobile-single-source-ios-2026-11-09.md), [TST-265](../../test/2026-11-09/TST-265-single-source-mobile.md).
 - Entegrasyon testindeki artık kullanılmayan native galeri scripti ürün bazlı yöntem girişine güncellendi; fiziksel cihazda çalıştırılmadı. Paylaşılan renderer koordinat kabulü web 07 kanıtına dayanır; native WebView/picker gerçek cihaz kabulünün yerine geçmez.
-- Sonraki kod taskı 09'dur. 08'in gerçek cihaz kapısı 12/UAT ile açık takip edilir. Deploy/APK/iOS arşivi oluşturulmadı.
+- 09–11 teknik uygulamaları tamamlandı; sırada 12 birleşik regresyon vardır. 08'in gerçek cihaz kapısı 12/UAT ile açık takip edilir. Deploy/APK/iOS arşivi oluşturulmadı.

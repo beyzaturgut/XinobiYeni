@@ -1,5 +1,8 @@
 # Kişiselleştirilmiş alışveriş akışı
 
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](../runbooks/single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
+
 İlk tasarım, AI ve sepet/favorilerden dönüş aynı yerleşim stüdyosunu kullanır (geri alma/yineleme, yakınlaştırma, baskı alanı, yerleşim kontrolleri). Ürün/renk görseli güncellenirken doğru önizleme çizilmeden kaydetme ve sepete ekleme açılmaz.
 
 Görsel, desen ve AI sonuçları aynı hesap tasarımı + sürümlü ürün/renk yerleşimi üzerinden sepete ve favorilere gider. Tasarım dosyası tek başına bir sepet önizlemesi değildir. Önizlemedeki konum, ölçek, dönüş, kavis, desen/görsel modu ve yüzey sürümü kayıtla birlikte taşınır.

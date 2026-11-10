@@ -1,4 +1,7 @@
-﻿# Development catalog mask review
+# Development catalog mask review
+
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
 
 No inference occurs on startup, product selection, reads or approval. Real segmentation requires the existing `--roboflow` runtime opt-in and explicit Admin confirmation of image transmission and possible credits. Cloudflare remains separately enabled by `--cloudflare`; its application daily cap stays disabled. Do not restart occupied QA ports automatically.
 

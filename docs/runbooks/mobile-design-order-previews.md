@@ -1,5 +1,8 @@
 # Mobil editör girişi ve sipariş ürün önizlemesi
 
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
+
 Tasarımlarım ekranındaki “Editörde tasarla” düğmesi ürünsüz açıldığında `/tasarim-editoru`
 üzerinde yerel ürün seçimi gösterilir. Sekme kabuğuna redirect yapılmaz. Ürün seçildikten
 sonra mevcut yöntem seçimi ve paylaşılan WebView önizlemesi kullanılır. Kayıtlı tasarım,

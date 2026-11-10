@@ -1,5 +1,8 @@
 # Siparişin tek kaynak yüzeyi ve üç ayrı dosyası
 
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+
+
 09.11.2026 · KIS-TEK-10 teknik uygulama ve izole kabul tamamlandı.
 
 Admin → Siparişler → Sipariş detayı → ilgili satırın **Sipariş tasarım detayı** alanını açın. Schema-2 için ürün/SKU/ticari stok referansı, configuration/revision, yüzey kimliği, kaynak/profil sürümleri, fotoğraf/maske/desen hashleri ve kaydedilmiş gerçek yerleşim gösterilir. Bunlar siparişin kaydıdır; güncel katalogdan doldurulmaz. Yeni satır renk seçimi sunmaz; eski siparişin rengi tarihsel bilgi olarak görünür.

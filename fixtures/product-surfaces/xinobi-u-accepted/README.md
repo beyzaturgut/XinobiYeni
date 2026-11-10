@@ -1,5 +1,8 @@
 # XINOBI U portable accepted fixture package
 
+> **10.11.2026 — Historical variant fixtures only.** This package is not a source of new single-source profiles or commercial SKU mappings. Do not import it into a real catalog as a migration. Its consumers remain for compatibility; see the [current workflow](../../../docs/runbooks/single-source-personalization.md). “Current accepted” below refers to this historical fixture snapshot, not runtime product approval.
+
+
 This package is an exact byte copy of the current accepted records. It does not generate masks or modify acceptance records. It contains CM101 (101/103/104/105), CM121 (121/122/123), and EC501 (501).
 
 ## Safe installation

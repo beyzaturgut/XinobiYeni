@@ -1,5 +1,8 @@
 # Tek kaynak yüzey API ve yayın sözleşmesi
 
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+
+
 09.11.2026 · KIS-TEK-06 · Teknik uygulama tamamlandı. Web ekran geçişi 07, Flutter 08, tasarım/sepet 09, sipariş dosyaları 10 kapsamındadır. Bu teslim gerçek katalog geçişi veya canlıya yayın değildir.
 
 ## Güncel akış
@@ -24,7 +27,7 @@ Kaynak için sabit piksel/en-boy oranı zorunluluğu yoktur. 20 MP sabit kontrol
 
 Eski `/local-commerce/surfaces/{product}/{variant}` liste/detay/taslak GET'leri ve eski `dev/product-surfaces/commerce-mask/.../rendering-inputs` yalnız **kendi tarihsel varyant kaydını** okur; yeni ürün kaynağına yönlendirilmez. Tüm eski maske/approval/approval-colors POST ve approval/draft DELETE yolları personel yetkisinden sonra 410 `variant_surface_retired` döndürür. Payload işlenmez; ortak maske çoğaltma kodu kaldırılmıştır. Eski önizleme dosyaları veya veriler silinmez. Eski medya URL'leri yeni yayın namespace'inin onay geri alma politikasına dönüştürülmüş sayılmaz.
 
-Web/Flutter'ın tarihsel okuyucuları task 07/08'e kadar eski sözleşmelerini kullanır. Bu task onların yeni kullanıcı akışına geçtiği anlamına gelmez. Tasarım/siparişin yeni kimliği kabulü task 09/10'da yapılır; uyumsuz eski kayıt otomatik taşınmaz.
+07/08 ile web/Flutter yeni akışları ürün bazlı sözleşmeye geçti; tarihsel okuyucular yalnız eski kayıt uyumluluğu için korunur. 09/10 kayıt/sipariş bağı ve değişmez dosyaları uygular; uyumsuz eski kayıt otomatik taşınmaz.
 
 ## Sözleşme ve yayın araçları
 
@@ -38,8 +41,8 @@ node tools/export-single-source-previews.mjs http://localhost:5003 /tmp/single-s
 
 Yalnız açıkça verilen ürünleri okur; gerçek veri yazmaz. Kaynak/maske hash, tür, gerçek ölçü ve indirme sonrası güncel onayı doğrular. Eksik/iptal/eski onayda durur; varyant veya paket yedeğine geçmez. Çıktı `single-source-release-audit` kapsamındadır; **offline medya paketi veya kendi başına onay/yayın yetkisi değildir**. Sunucudaki güncel API, geri alma ve ürün kapatma için otorite kalır. Çıktıya kimlik bilgisi veya yönetici verisi konmaz.
 
-`publish-product-previews.mjs` yalnız geçmiş kabul edilmiş varyant fixture'larını paketlemeye devam eder; bunlar yeni tek kaynak profillerinden üretilmiş sayılmaz. Böylece mevcut ekranlar 07/08 tamamlanmadan kırılmaz. Yeni tek kaynağın dosyaları bu tarihsel varyant paketine kopyalanmaz. Standart API deploy'u yeni uçları taşır; gerçek profil/kaynak/SKU seçimi, veri geçişi ve sunucudaki dosyaların hazır olması ayrıca gereklidir.
+`publish-product-previews.mjs` yalnız geçmiş kabul edilmiş varyant fixture'larını paketlemeye devam eder; bunlar yeni tek kaynak profillerinden üretilmiş sayılmaz. Bu araç hâlen dev-local.mjs ve package-iis-preview.mjs tarafından tarihsel önizleme uyumluluğu için çağrılır. Yeni tek kaynağın dosyaları bu tarihsel varyant paketine kopyalanmaz. Standart API deploy'u yeni uçları taşır; gerçek profil/kaynak/SKU seçimi, veri geçişi ve sunucudaki dosyaların hazır olması ayrıca gereklidir.
 
 ## Kalan kabul
 
-KIS-TEK-07–12 açık. Gerçek ürün kaynağı ve ticari SKU/fiyat/stok eşleme kabulü; yedek/restore ve gerçek veri geçişi; IIS/SQL çoklu süreç, Android/iOS gerçek cihaz ve fiziksel baskı kabulü bu teknik teslimle kapanmaz. Kargo, ödeme ve stok davranışı bu taskta değiştirilmedi. Deploy/APK yapılmadı.
+KIS-TEK-07–11 teknik uygulamaları tamam; KIS-TEK-12 birleşik regresyon açıktır. Gerçek ürün kaynağı ve ticari SKU/fiyat/stok eşleme kabulü; yedek/restore ve gerçek veri geçişi; IIS/SQL çoklu süreç, Android/iOS gerçek cihaz ve fiziksel baskı kabulü bu teknik teslimle kapanmaz. Kargo, ödeme ve stok davranışı bu taskta değiştirilmedi. Deploy/APK yapılmadı.

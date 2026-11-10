@@ -101,7 +101,7 @@ function SourceEditor({product,available,onActivity}:{product:Product;available:
  }
  async function save(){
   if(lock.current||!canWrite||!candidate||!view||!dirty)return
-  if(!window.confirm(`${product.name}: kaynak fotoğrafı kaydedilsin mi? Yeni kaynak için maske yeniden hazırlanacak. Eski sipariş dosyaları değişmeyecek. Bu kayıt mağazadaki önizlemeyi değiştirmez.`))return
+  if(!window.confirm(`${product.name}: kaynak fotoğrafı kaydedilsin mi? Yeni kaynak için maske yeniden hazırlanacak. Eski sipariş dosyaları değişmeyecek. Yeni kaynak için maske onaylanana kadar yeni kişiselleştirme önizlemesi kullanılamaz.`))return
   lock.current=true;setBusy(true);setError('');setNotice('')
   try{
    const value=readView(await commerceRequest<View>(commerceApi,path,'PUT',{image,sourceSha256:candidate.sha256,expectedRevision:view.revision}),product.id)
@@ -132,7 +132,7 @@ function SourceEditor({product,available,onActivity}:{product:Product;available:
    {view.status==='none'&&<p role="status">Bu ürün için tek kaynak fotoğraf henüz tanımlanmadı.</p>}
    {view.status==='stale'&&<p role="alert">Kayıtlı kaynak dosya değişmiş veya bulunamıyor. Yeni bir kaynak seçip kaydedin; eski kaynak geçerli yüzey olarak kullanılmaz.</p>}
    {view.source&&<p>Kayıtlı kaynak · Sürüm {view.sourceRevision??view.revision} · {view.source.width} × {view.source.height} px</p>}
-   <p>{view.surfaceStatus==='approved'?'Bu kaynağa ait maske onaylı.':'Bu kaynak için maske onayı bekleniyor.'} Mevcut renk maskeleri otomatik aktarılmaz. Kaynak kaydı mağazadaki önizlemeyi değiştirmez.</p>
+   <p>{view.surfaceStatus==='approved'?'Bu kaynağa ait maske onaylı.':'Bu kaynak için maske onayı bekleniyor.'} Mevcut renk maskeleri otomatik aktarılmaz. Kaynak değişirse maske yeniden onaylanana kadar yeni kişiselleştirme önizlemesi kullanılamaz. Eski sipariş dosyaları korunur.</p>
    {!hasWritePermission&&<p role="status">Salt okunur: kaynak değiştirmek için catalog.write yetkisi gerekli.</p>}
    <fieldset disabled={busy||!canWrite||bindingActivity.dirty||bindingActivity.busy}><legend>Kaynak fotoğraf seçimi</legend>
     <label>Mevcut katalog fotoğrafını kullan<select value={choices.includes(image)?image:''} onChange={e=>{if(e.target.value)void choose(e.target.value)}}>

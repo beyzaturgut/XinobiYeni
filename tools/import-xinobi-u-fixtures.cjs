@@ -208,6 +208,7 @@ function execute(operations) {
 }
 
 function main() {
+  console.warn('LEGACY variant fixture import only; not a single-source migration. See docs/runbooks/single-source-personalization.md.');
   const args = parseArgs(process.argv.slice(2));
   if (args.help) return printHelp();
   const { manifest, fragment } = validateManifest(args.packageRoot);

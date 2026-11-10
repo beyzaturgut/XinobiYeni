@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08, 09 ve 10 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-11…12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
+Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08, 09, 10 ve 11 uygulandı; 08 gerçek cihaz kabulü ve KIS-TEK-12 açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 
 ## Kullanıcı kararı ve korunacak işlevler
 
@@ -163,7 +163,9 @@ Bu inceleme kaynak kodu ve mevcut dokümanlara dayanır; canlı katalog veya ger
 
 **Kabul kriteri:** Yeni iş akışı tek bir güncel kaynaktan izlenir: görsel yükle → kaynağı indir → gerçek ölçülü maskeleme promptunu kullan → WebP maskeyi yükle/incele/onayla. Fotoğraf üretimi veya çoklu görsele uygulama aşaması yoktur. Tarihsel test kanıtı silinmez veya yeni davranışın kanıtı sayılmaz. Paylaşılan normal katalog, fiyat/stok ve kargo entegrasyonu etkileri açıkça kayıtlıdır.
 
-**Faz:** Faz00 · **Öncelik:** P2 · **Bağımlılık:** 03–10 · **Durum:** Açık / başlanmadı.
+**Faz:** Faz00 · **Öncelik:** P2 · **Bağımlılık:** 03–10 · **Durum:** Uygulandı ve odaklı doğrulandı (10.11.2026).
+
+**Teslim:** [Güncel tek kaynak akışı](../runbooks/single-source-personalization.md), [araç/çağıran envanteri](../reports/single-source-workflow-inventory-2026-11-10.md), [TST-268](../../test/2026-11-10/TST-268-single-source-workflow-cleanup.md). Eski fotoğraf üretimi/renk hizalama/aile maskesi yönlendirmeleri tarihsel olarak işaretlendi; kaynak/maske ekranındaki eski önizleme mesajları ve kullanılmayan renk prompt dalı temizlendi. Kullanılan legacy yayınlama/fixture araçları korundu ve ayrıştırıldı. Normal katalog, fiyat/stok ve kargo değişmedi; sırada 12 birleşik regresyon var. Gerçek veri geçişi/deploy/APK yok.
 
 ### KIS-TEK-12 — Tek kaynak kişiselleştirme kabulü ve regresyonunu tamamlama
 

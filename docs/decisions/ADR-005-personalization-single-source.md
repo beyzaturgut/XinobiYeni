@@ -1,5 +1,7 @@
 # ADR-005 — Tek kaynaklı kişiselleştirme ve ticari SKU bağı
 
+> **10.11.2026:** Bu belge hedef model kararı ve tarihli teslim geçmişidir. Güncel uygulama/kullanım: [tek kaynak rehberi](../runbooks/single-source-personalization.md). 03–11 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü ayrı açıktır.
+
 Tarih: 06.11.2026 · Task: KIS-TEK-01 · Durum: Teknik model tanımlandı; uygulama ve ürün bazlı eşleme yapılmadı.
 
 ## Kapsam kararı

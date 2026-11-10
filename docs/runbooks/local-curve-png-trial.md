@@ -1,5 +1,8 @@
 # Yerel eğri / PNG maske denemesi — 16.10.2026
 
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
+
 > **20.10.2026 itibarıyla geçersiz:** admin maskeleme yalnız PNG yüklemesine indirildi; eğri, fırça, Roboflow ve hizalama kaldırıldı. Güncel akış: [TST-133](../../test/2026-10-20/TST-133-png-only-admin-masking.md), renk fotoğrafı üretimi: [colour-photo-generation-prompt.md](colour-photo-generation-prompt.md).
 
 Kullanıcı talimatı: yalnız yerelde dene, push yapma; “geri dön” denirse bu denemeden önceki noktaya dön.

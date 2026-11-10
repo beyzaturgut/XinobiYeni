@@ -1,5 +1,8 @@
 # Tek kaynak fotoğrafla maskeleme
 
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+
+
 06.11.2026 · KIS-TEK-05. Admin → **Ürünler → Ürün yüzeyleri**.
 
 ## Güncel akış
@@ -11,7 +14,7 @@
 5. Pembe kaplama veya örnek desenle kontrol et. Önizleme indirilemez/doğrulanamazsa onay kapalı kalır. Taslak WebP indirmesi gerçek kayıpsız WebP verir; hata yanıtı boş dosya başarısı sayılmaz.
 6. **Taslağı onayla** onayı yalnız bu ürünün kaynak sürümüne işler. Renkler arası önizleme, seçili renk listesi, aynı konum kutusu ve toplu onay yok. Aktif taslak veya onay kaldırılabilir; geçmiş medya dosyaları silinmez.
 
-Maske kaydı/onayı yeni kaynak hazırlığıdır; **mağaza, Flutter veya checkout henüz bu yeni sözleşmeye geçirilmedi.** Mevcut müşteri önizlemesi, eski varyant maskeleri ve sipariş dosyaları değiştirilmez. KIS-TEK-06…10 bu bağlantıları tamamlayacak. Fiziksel baskı/üretim kabulü değildir.
+Maske onayı güncel ürün kaynağının yayın kapısıdır. Mağaza, Flutter, kayıt/sepet ve sipariş dosyaları 06–10 ile tek kaynak sözleşmesini kullanır. Eski varyant kayıtları ve sipariş dosyaları yeniden yazılmaz. Onay fiziksel baskı/üretim kabulü değildir.
 
 ## Kaynak/sürüm güvenliği
 
@@ -37,8 +40,8 @@ Aktif pointer kaldırılması dosyayı fiziksel silmez. SQL+dosya commit atomik 
 
 ## Kapasite ve sonraki işler
 
-Sabit kaynak tuvali/en-boy oranı yok. Kaynak yükleme 25 MB, maske yükleme 8 MB sınırını korur. Mevcut maske decoder/normalizasyon bütçesi **20 MP**; bunu aşan maskeler, kaynak dosyası korunarak açık `mask_processing_capacity` / 413 hatası alır. Yanlış hizalama veya boş maske gibi sunulmaz, otomatik küçültülmez. Bu teknik bütçe, büyük kaynaklar için decoder/publish sözleşmesiyle birlikte KIS-TEK-06’da ele alınacak; sınırsız çözünürlük desteği iddiası yok.
+Sabit kaynak tuvali/en-boy oranı yok. Kaynak yükleme 25 MB, maske yükleme 8 MB sınırını korur. 06 ile tek kaynak decoder'ındaki sabit 20 MP kontrolü RAM bütçesine geçti: `ProductSurfaces:MaskProcessingMemoryMiB` varsayılan 512, aralık 16–1024 MiB; geçici tamponlar 16 bayt/piksel. Bütçe aşımı 413 `mask_processing_capacity`; kaynak korunur, otomatik küçültülmez. [Kapasite sözleşmesi](single-source-publication.md).
 
-Eski varyant bazlı admin/public okuma ve yazma rotaları bu taskta silinmedi. Yeni ekran onları çağırmaz; eski toplu onay rotasının emekliye ayrılması/istemci uyumluluğu **06’da açık**. Eski kayıtlar sessizce yeni profile aktarılmadı. `tools/test-guided-surface-admin.mjs` gibi renk bazlı tarihsel UI araçları yeni kabul testi olarak kullanılmaz; güncel test `apps/admin/tests/single-source-mask.mjs`.
+Eski varyant okuma rotaları kendi tarihsel kaydını sunar; maske/toplu onay yazma uçları 06 ile 410 olarak emekliye ayrıldı. Eski kayıtlar otomatik taşınmadı. Güncel izole maskeleme testi `apps/admin/tests/single-source-mask.mjs`; `tools/test-guided-surface-admin.mjs` tarihsel UI aracıdır.
 
-[TST-261](../../test/2026-11-06/TST-261-single-source-masking.md). Deploy/APK veya gerçek AI sağlayıcı çağrısı yapılmadı.
+[TST-261](../../test/2026-11-06/TST-261-single-source-masking.md) yalnız 05 teslimini, [TST-263](../../test/2026-11-09/TST-263-single-source-publication.md) kapasite/yayın geçişini kanıtlar. Task 12 ve gerçek SQL/IIS/cihaz kabulü açıktır. Deploy/APK veya gerçek AI sağlayıcı çağrısı yapılmadı.

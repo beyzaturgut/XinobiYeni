@@ -1,5 +1,8 @@
 # Admin — tek kişiselleştirme kaynağı yönetimi
 
+> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–10 teknik uygulamaları tamamlandı; 12 ve gerçek ortam kabulü açıktır. Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+
+
 06.11.2026 · KIS-TEK-03 ve KIS-TEK-04 uygulandı. [Hedef model](../decisions/ADR-005-personalization-single-source.md), [task planı](../tasks/personalization-single-source-tasks-2026-11-06.md).
 
 ## Kullanım
@@ -10,7 +13,7 @@ Mevcut katalog fotoğrafını seç veya tek kaynak fotoğraf yükle. Fotoğraf �
 
 Kaynak fotoğrafı kaydet düğmesi ürün, kaynak değişimi ve eski siparişlerin korunmasını açıklayan onay ister. Yalnız sunucu yeni revizyonu ve aynı hash’i doğrularsa başarı gösterilir. Kaynak kaydı mevcut renk fotoğraflarını veya maskelerini güncellemez. Kayıtlı kaynağı indirme bayt SHA doğrulaması yapar; mesaj yalnız tarayıcıya teslim edildiğini söyler.
 
-**Bu aşama kaynak hazırlığıdır.** Kaydedilen tek kaynağın maskesi/onayı [KIS-TEK-05 tek kaynak maskeleme](single-source-masking.md) ile yapılabilir. Mevcut renk maskeleri yeni kaynağa otomatik taşınmaz. Web/Flutter/checkout bağlantısı 06–10’da açık; kaynak/maske kaydı mağazadaki mevcut önizlemeyi değiştirmez. Fulfillment SKU’su otomatik seçilmez.
+**Bu aşama kaynak hazırlığıdır.** Kaydedilen tek kaynağın maskesi/onayı [KIS-TEK-05 tek kaynak maskeleme](single-source-masking.md) ile yapılabilir. Mevcut renk maskeleri yeni kaynağa otomatik taşınmaz. Web/Flutter/checkout bağlantısı 06–10 ile uygulandı. Onaylı güncel kaynak mağazada kullanılır; kaynak değişimi eski tasarımları ve siparişleri yenilemez. Fulfillment SKU’su otomatik seçilmez; açık ticari eşleme gerekir.
 
 ## Durumlar ve korumalar
 
@@ -29,7 +32,7 @@ Giriş/personel/MFA ve mevcut panel origin/HTTPS kurallarıyla:
 - GET `.../{productId}/candidate?image=...`: sadece izinli medya/static fotoğraf yolunun gerçek format/boyut/hash bilgisi; keyfi uzak URL okunmaz.
 - PUT `.../{productId}`: image, sourceSha256, expectedRevision. Yanlış kaynak hash’i veya eski revizyon 409. Yeni fotoğraf ayrı GUID medya nesnesine tam bayt kopyalanır; eski kaynak ezilmez.
 
-Mevcut ops.FeatureDocuments içinde `personalization-profiles` JSON belgesi; Development dosya modunda `personalization/personalization-profiles.json`. schemaVersion=1, profiles[productId] altında profileRevision ve sources[] geçmişi; her kaynak revision/asset/createdAt taşır. KIS-TEK-05 ile opsiyonel masks[] geçmişi, draftId ve approvedId eklendi; sourceRevision ayrıca döner. Ticari bağ ve müşteriye açık renderer sözleşmesi henüz eklenmedi. Sonraki tasklarda bu şema sürümlenerek genişletilecek.
+Mevcut ops.FeatureDocuments içinde `personalization-profiles` JSON belgesi; Development dosya modunda `personalization/personalization-profiles.json`. schemaVersion=1, profiles[productId] altında profileRevision ve sources[] geçmişi; her kaynak revision/asset/createdAt taşır. KIS-TEK-05 ile opsiyonel masks[] geçmişi, draftId ve approvedId eklendi; sourceRevision ayrıca döner. 06 ile ürün bazlı rendering sözleşmesi, 09 ile opsiyonel FulfillmentVariantId ve schema-2 SurfaceBinding uygulandı; belge şeması 1 korunur. Ayrıntılar yayın ve satın alma rehberindedir.
 
 Null/uyumsuz sürümlü/bozuk profil yapısı üzerine kaydetme engellenir; hata boş kaynak olarak gösterilmez. Ortak DocumentStore’a opt-in rejectNull eklendi; diğer özellik belgelerinin davranışı varsayılan olarak değişmedi.
 

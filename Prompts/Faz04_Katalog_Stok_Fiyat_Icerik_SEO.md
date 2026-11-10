@@ -202,3 +202,8 @@ Katalog ana ekranı ve Medya sekmesindeki fotoğraf üretim promptu; üretici/MA
 ## 06.11.2026 — KIS-TEK-05 tek kaynak maskeleme
 
 Ürün başına tek kaynak/sürümle maske yükleme, taslak, tek onay, geri alma ve gerçek WebP indirme uygulandı. Renk önizlemesi, ortak renk listesi, aynı konum kutusu ve toplu onay UI’dan kaldırıldı. Promptun maskeleme kuralları korundu; gerçek kaynak boyutu/hash/sürümü kullanılır. Kaynak değişimi eski maskeyi uygulamaz; geçmiş dosyalar korunur. [Runbook](../docs/runbooks/single-source-masking.md), [TST-261](../test/2026-11-06/TST-261-single-source-masking.md). API 607 PASS/29 SKIP; yeni maske tarayıcı paketi ve admin durum regresyonu PASS. Eski yazma rotaları/public yayın/istemci uyumu ve 20 MP bütçe 06’da açık. Gerçek veri/AI/deploy/APK yok.
+
+
+## 10.11.2026 — KIS-TEK-11 güncel akış ve tarihsel araç temizliği
+
+[Güncel tek kaynak rehberi](../docs/runbooks/single-source-personalization.md) tek giriş noktası oldu; eski fotoğraf üretimi, aile/renk hizalama ve ortak maske belgeleri tarihsel olarak işaretlendi. [Çağıran/araç envanteri](../docs/reports/single-source-workflow-inventory-2026-11-10.md) kullanılan legacy yayınlama/import/QA araçlarının neden korunduğunu kaydeder. Admin kaynak/maske ekranındaki yanıltıcı eski önizleme mesajları ve kullanılmayan renk prompt dalı temizlendi. [TST-268](../test/2026-11-10/TST-268-single-source-workflow-cleanup.md) odaklı doğrulama kaydıdır; 12 birleşik regresyon ve gerçek cihaz/SQL/IIS kabulü açık kalır. Normal katalog, fiyat/stok, kargo/ödeme ve eski dosyalar değiştirilmedi; gerçek veri geçişi, deploy/release/APK yok.

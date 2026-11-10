@@ -1,5 +1,8 @@
 # Elle gösterilen ortak ürün maskesi — geliştirme denemesi
 
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
+
 > **20.10.2026 itibarıyla geçersiz:** admin maskeleme yalnız WebP yüklemesi kullanır; eğri, fırça, Roboflow ve hizalama kaldırıldı. Güncel akış: [WebP maske yükleme](webp-surface-mask-upload.md), renk fotoğrafı üretimi: [colour-photo-generation-prompt.md](colour-photo-generation-prompt.md).
 
 Amaç: Yeni ürünün bir referans renginde kaba boyama yapıp Roboflow SAM3 ile gerçek sınır adayını çıkarmak; aynı konumdaki renk fotoğraflarına tek onayla aynı maskeyi uygulamak.

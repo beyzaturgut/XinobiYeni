@@ -1,5 +1,8 @@
 # Development-only product-family mask geometry
 
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](runbooks/single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
+
 Family geometry is created only by an explicit Admin action from an existing, current accepted mask. Catalog product ID is the family boundary; Admin explicitly confirms exact variant membership in the same physical model. A different catalog product is not eligible.
 
 Storage: catalog-surface-review/family-geometry/{familyId}/{version}/geometry.json and independent upper-body.png / lower-body.png. by-product/{product-id SHA}.json selects the current immutable version. New geometry never updates an accepted variant. Runtime files are not source assets.

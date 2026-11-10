@@ -1,5 +1,8 @@
 # Kontrollü çoklu maske seçimi
 
+> **10.11.2026 — Tarihsel / uyumluluk kaydı.** Aşağıdaki eski adımlar yeni tek kaynak akışının talimatı veya kabul kanıtı değildir. Güncel giriş: [tek kaynak kişiselleştirme](runbooks/single-source-personalization.md). Fotoğraf üretimi, renkler arası hizalama ve çoklu fotoğrafa maske uygulama yeni akışta yoktur. Eski kayıtlar/dosyalar ve test kanıtları korunur; kaldırılmış yazma uçları kullanılmaz.
+
+
 Admin: http://127.0.0.1:5176/ → ürün yüzeyi inceleme → tam ürün/varyant.
 
 Hazır hedeflerden Üst demlik gövdesi, Alt çaydanlık gövdesi veya İki gövde seçilebilir. Manuel hedef diğer ürünler için korunur. İki gövde tek SAM3 concept_segment isteğinde iki metin promptu gönderir; iki doğru gövdenin bulunacağı garanti değildir. Gerçek çağrı yalnızca açık üretim tıklaması ve kredi/üçüncü taraf aktarımı onayıyla başlar; otomatik tekrar yoktur.

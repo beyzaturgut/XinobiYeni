@@ -63,6 +63,7 @@ async function waitReady(service,child,fetcher=fetch){
  const until=Date.now()+90000;while(Date.now()<until){if(child.exitCode!==null&&child.exitCode!==undefined)throw Error(service.name+' exited; inspect its local log');try{const r=await fetcher(service.health,{redirect:'error',signal:AbortSignal.timeout(2000)});if(r.ok)return;}catch{}await new Promise(r=>setTimeout(r,250));}throw Error(service.name+' not ready; inspect its local log');
 }
 async function main(){
+ console.warn('LEGACY variant/family QA only. Current single-source workflow: docs/runbooks/single-source-personalization.md; standard local launcher: node tools/start-local.mjs.');
  const args=process.argv.slice(2);if(args.some(a=>!['--cloudflare','--roboflow','--check','--checkpoint-demo','--catalog-checkpoint'].includes(a)))throw Error('Use node tools/start-xinobi-qa.cjs [--cloudflare] [--check]');
  if(ROOT.toLowerCase()!=='d:\\xinobiyeni-integration')throw Error('Only D:\\XinobiYeni-integration may be used');
  const cloudflare=args.includes('--cloudflare'),checkpoint=args.includes('--catalog-checkpoint')?'catalog':args.includes('--checkpoint-demo'),services=plan(ROOT,cloudflare,args.includes('--roboflow'),checkpoint);

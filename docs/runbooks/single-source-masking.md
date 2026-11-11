@@ -1,14 +1,14 @@
 # Tek kaynak fotoğrafla maskeleme
 
-> **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–12 teknik uygulama/izole kabul tamamlandı; gerçek cihaz/SQL/IIS/iş sahibi kabulü açıktır. [Son kabul kaydı](single-source-acceptance.md). Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.
+> **11.11.2026 kapsam düzeltmesi:** Ayrı kaynak fotoğraf kaydı zorunluluğu kaldırıldı. Ürün yüzeylerinde mevcut katalog fotoğrafı indirilir, prompt kopyalanır, WebP maske yüklenip yalnız bu fotoğraf onaylanır. Başka renkler için onay/kopyalama yoktur. [Güncel karar](../decisions/catalog-photo-mask-workflow-2026-11-11.md).
 
 
 06.11.2026 · KIS-TEK-05. Admin → **Ürünler → Ürün yüzeyleri**.
 
 ## Güncel akış
 
-1. Katalog → XINOBI U · Tek kaynak fotoğraf alanında ürünün fotoğrafını kaydet. Renk seçimi veya aynı konumda ikinci fotoğraf gerekmez. Kaynak yoksa maskeleme ekranı katalog bağlantısı gösterir; ilk renk görseline geri düşmez.
-2. Ürün yüzeyleri ekranında ürünü seç. Ürün başına bir kayıt vardır. Kaynak sürümü, gerçek piksel ölçüsü ve durum görünür.
+1. Ürün yüzeyleri ekranında ürünü aç. Kayıtlı kaynak yoksa mevcut katalog fotoğrafını seç; ayrı “Tek kaynak fotoğraf” kaydı gerekmez. Fotoğraf yoksa normal ürün Medya alanına ekle.
+2. Ürün başına bir maske kaydı vardır. Gerçek piksel ölçüsü ve durum görünür. Kaynak sürümü ilk maske yüklemesine kadar 0, geçerli taslakla 1 olur. Seçim/indirme salt okunurdur.
 3. **Maskeleme için kaynak fotoğrafı indir** ile tam kaynak dosyasını al. İndirme SHA-256 kontrolü yapar; dosya kırpılmaz/küçültülmez. **Maskeleme promptu** bu kaynağın boyut/hash/sürüm bilgisini içerir. Logo, kulp, parça, alfa ve kendi kaynak tuvaline hizalama kuralları öncekiyle aynıdır. Fotoğraf üretimi istenmez.
 4. Kaynakla aynı boyutta, tek kareli WebP maskeyi yükle. Şeffaf veya siyah-beyaz modunu seç; yalnız bu kaynak için taslak oluşur. En fazla 8 MB WebP; yanlış format/boyut/boş/dolu maske reddedilir. Otomatik esnetme yok.
 5. Pembe kaplama veya örnek desenle kontrol et. Önizleme indirilemez/doğrulanamazsa onay kapalı kalır. Taslak WebP indirmesi gerçek kayıpsız WebP verir; hata yanıtı boş dosya başarısı sayılmaz.
@@ -27,8 +27,8 @@ Kaynak değişince eski maske geçmişte kalır; yeni kaynakta gösterilmez/onay
 Mevcut yüzey feature flag’i, personel/MFA/catalog.read-write, origin/HTTPS ve no-store kuralları altında:
 
 - GET `/api/v1/local-commerce/surfaces/products`: ürün başına tek kaynak/maske özeti.
-- GET `.../products/{productId}`: kaynak sürümü, taslak ve onaylı maske.
-- POST `.../{productId}/mask`: image, sourceSha256, sourceRevision, expectedRevision, webpBase64, mode.
+- GET `.../products/{productId}?catalogPhotoId=...`: kayıt yoksa seçilen katalog fotoğrafı; mevcut profilde kayıtlı kaynak sürümü, taslak ve onaylı maske.
+- POST `.../{productId}/mask`: image, sourceSha256, sourceRevision, expectedRevision, webpBase64, mode; ilk katalog fotoğrafı yüklemesinde catalogPhotoId.
 - POST `.../{productId}/approval`: sourceSha256, sourceRevision, expectedRevision, draftId.
 - DELETE `.../{productId}/draft` veya `/approval`: kaynak/sürüm bilgili JSON gövdesi.
 - GET `.../{productId}/masks/{maskId}.png`: bu ürünün geçmiş/güncel maske dosyası; personel catalog.read gerekir.

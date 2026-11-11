@@ -7,8 +7,9 @@ namespace Xinobi.Api.Features.ProductSurfaces;
 
 public sealed record PersonalizationMask(string Id, int SourceRevision, string SourceSha256, string Image, string Sha256, long Bytes, string Method, DateTimeOffset CreatedAt, string StorageArea = "media");
 public sealed record SingleSourceMaskDetail(string ProductId, string ProductName, int ProfileRevision, int SourceRevision, string SourceStatus,
-    PersonalizationSourceAsset? Source, string Status, PersonalizationMask? Draft, PersonalizationMask? Approved);
-public sealed record SingleSourceMaskUpload(string Image, string SourceSha256, int SourceRevision, int ExpectedRevision, string WebpBase64, string Mode);
+    PersonalizationSourceAsset? Source, string Status, PersonalizationMask? Draft, PersonalizationMask? Approved, CatalogMaskPhoto[]? CatalogPhotos = null, string? CatalogPhotoId = null);
+public sealed record SingleSourceMaskUpload(string Image, string SourceSha256, int SourceRevision, int ExpectedRevision, string WebpBase64, string Mode, string? CatalogPhotoId = null);
+public sealed record CatalogMaskPhoto(string Id, string Label, string Image);
 public sealed record SingleSourceMaskAction(string SourceSha256, int SourceRevision, int ExpectedRevision, string? DraftId = null);
 
 public sealed partial class PersonalizationSourceStore
@@ -18,7 +19,7 @@ public sealed partial class PersonalizationSourceStore
 
     private async Task<SingleSourceMaskDetail> MaskDetail(string productId, string name, State state)
     {
-        if (!state.Profiles.TryGetValue(productId, out var profile)) return new(productId, name, 0, 0, "none", null, "none", null, null);
+        if (!state.Profiles.TryGetValue(productId, out var profile)) return await CatalogMaskDetail(productId, name, null);
         var source = profile.Sources.Last(); var sourceStatus = "ready";
         try { if ((await Inspect(source.Asset.Image)).Asset.Sha256 != source.Asset.Sha256) sourceStatus = "stale"; }
         catch (ProblemException error) when (error.Code is "source_missing" or "invalid_source") { sourceStatus = "stale"; }
@@ -39,18 +40,38 @@ public sealed partial class PersonalizationSourceStore
         return result.ToArray();
     }
 
-    public async Task<SingleSourceMaskDetail> GetMask(string productId)
+    public async Task<SingleSourceMaskDetail> GetMask(string productId, string? catalogPhotoId = null)
     {
         await Product(productId);
         var name = (await catalog.ReadAsync()).Products.Single(p => p.Id == productId).Name;
         var state = await store.Read(); Validate(state);
+        if (!state.Profiles.ContainsKey(productId)) return await CatalogMaskDetail(productId, name, catalogPhotoId);
         return await MaskDetail(productId, name, state);
+    }
+
+    private async Task<CatalogMaskPhoto[]> CatalogPhotos(string productId)
+    {
+        var product = (await catalog.ReadAsync()).Products.Single(p => p.Id == productId);
+        var photos = new List<CatalogMaskPhoto>();
+        if (!string.IsNullOrEmpty(product.OriginalImage)) photos.Add(new("original", "Orijinal ürün fotoğrafı", product.OriginalImage));
+        photos.AddRange(product.Variants.Where(v => !string.IsNullOrEmpty(v.Image)).Select(v => new CatalogMaskPhoto(v.Id, v.Color + " · " + v.Sku, v.Image)));
+        return photos.ToArray();
+    }
+    private async Task<SingleSourceMaskDetail> CatalogMaskDetail(string productId, string name, string? selected)
+    {
+        var photos = await CatalogPhotos(productId);
+        var photo = selected is null ? photos.FirstOrDefault() : photos.SingleOrDefault(x => x.Id == selected)
+            ?? throw ProblemException.NotFound("source_missing", "Seçili katalog fotoğrafı bulunamadı.");
+        if (photo is null) return new(productId,name,0,0,"none",null,"none",null,null,photos);
+        try { return new(productId,name,0,0,"ready",(await Inspect(photo.Image)).Asset,"none",null,null,photos,photo.Id); }
+        catch (ProblemException error) when (error.Code is "source_missing" or "invalid_source")
+        { return new(productId,name,0,0,"none",null,"none",null,null,photos,photo.Id); }
     }
 
     private static PersonalizationSourceProfile CheckMaskSource(State state, string productId, SingleSourceMaskAction request)
     {
         Validate(state);
-        if (!state.Profiles.TryGetValue(productId, out var profile)) throw new ProblemException("source_missing", "Önce katalogda tek kaynak fotoğrafı kaydedin.", 409);
+        if (!state.Profiles.TryGetValue(productId, out var profile)) throw new ProblemException("source_missing", "Önce ürün fotoğrafına ait maskeyi taslağa yükleyin.", 409);
         var source = profile.Sources.Last();
         if (profile.ProfileRevision != request.ExpectedRevision || source.Revision != request.SourceRevision || source.Asset.Sha256 != request.SourceSha256)
             throw new ProblemException("source_revision_conflict", "Kaynak veya maske değişti. Güncel kaydı yükleyip yeniden inceleyin.", 409);
@@ -86,7 +107,10 @@ public sealed partial class PersonalizationSourceStore
     {
         await Product(productId);
         var action = new SingleSourceMaskAction(request.SourceSha256, request.SourceRevision, request.ExpectedRevision);
-        var state = await store.Read(); var profile = CheckMaskSource(state, productId, action); var source = profile.Sources.Last().Asset;
+        var state = await store.Read(); Validate(state);
+        if (!state.Profiles.ContainsKey(productId) && request.ExpectedRevision == 0 && request.SourceRevision == 0)
+            return await UploadCatalogMask(productId, request);
+        var profile = CheckMaskSource(state, productId, action); var source = profile.Sources.Last().Asset;
         if (source.Image != request.Image || (await Inspect(source.Image)).Asset.Sha256 != source.Sha256)
             throw new ProblemException("source_changed", "Kaynak fotoğraf değişti; güncel kaydı yükleyin.", 409);
         if (string.IsNullOrWhiteSpace(request.WebpBase64) || request.WebpBase64.Length > 12 * 1024 * 1024)

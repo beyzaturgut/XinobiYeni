@@ -67,7 +67,7 @@ try{
  f.failExport(true);await p.getByRole('button',{name:'Taslak WebP maskeyi aç / indir',exact:true}).click();await p.getByRole('alert').filter({hasText:'İzole indirme hatası'}).waitFor()
  f.failExport(false);const exportDownload=p.waitForEvent('download');await p.getByRole('button',{name:'Taslak WebP maskeyi aç / indir',exact:true}).click();assert.deepEqual(readFileSync(await(await exportDownload).path()),f.webp)
  const before=f.writes;p.once('dialog',d=>d.dismiss());await p.getByRole('button',{name:'Taslağı onayla',exact:true}).click();assert.equal(f.writes,before)
- p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Taslağı onayla',exact:true}).click();await p.getByRole('status').filter({hasText:'Maske bu kaynak için onaylandı.'}).waitFor();await p.getByRole('status').filter({hasText:'Yeni tasarımlar bu onaylı yüzeyi kullanır; eski sipariş dosyaları korunur.'}).waitFor()
+ p.once('dialog',d=>d.accept());await p.getByRole('button',{name:'Taslağı onayla',exact:true}).click();await p.getByRole('status').filter({hasText:'Maske bu kaynak için onaylandı.'}).waitFor();await p.getByRole('status').filter({hasText:'Yalnız bu ürün fotoğrafı için geçerlidir; başka renklere uygulanmaz. Eski sipariş dosyaları korunur.'}).waitFor()
  const scan=await new AxeBuilder({page:p}).include('.surface-masks').withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();assert.deepEqual(scan.violations.filter(v=>['serious','critical'].includes(v.impact)).map(v=>v.id),[])
  for(const width of [320,390,768,1440]){await p.setViewportSize({width,height:1000});assert.ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Overflow '+width)}
  await p.evaluate(()=>scrollTo(0,0));await p.waitForTimeout(100)
@@ -79,7 +79,7 @@ try{
  assert.equal(await p.getByRole('button',{name:'Taslağı onayla',exact:true}).isDisabled(),true)
  assert.equal(await p.locator('.surface-stage canvas').evaluate(c=>c.getContext('2d').getImageData(0,0,c.width,c.height).data.every(x=>x===0)),true)
  await p.close()
- for(const sourceStatus of ['none','stale']){const x=await fixture({sourceStatus});await x.page.getByRole('alert').filter({hasText:sourceStatus==='none'?'henüz kaydedilmedi':'değişmiş veya kayıp'}).waitFor();assert.equal(await x.page.getByLabel('Maske WebP dosyası').count(),0);assert.equal(x.writes,0);await x.page.close()}
+ for(const sourceStatus of ['none','stale']){const x=await fixture({sourceStatus});await x.page.getByRole('alert').filter({hasText:sourceStatus==='none'?'kullanılabilir katalog fotoğrafı yok':'değişmiş veya kayıp'}).waitFor();assert.equal(await x.page.getByLabel('Maske WebP dosyası').count(),0);assert.equal(x.writes,0);await x.page.close()}
  const missingPhoto=await fixture({photoError:true})
  await missingPhoto.page.getByRole('alert').filter({hasText:'Kaynak fotoğraf önizlemesi açılamadı'}).waitFor()
  assert.equal(await missingPhoto.page.getByRole('button',{name:'Taslağı onayla',exact:true}).isDisabled(),true)

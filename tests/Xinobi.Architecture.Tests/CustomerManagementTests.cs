@@ -135,6 +135,12 @@ public sealed class CustomerManagementTests
     public async Task ExplicitSqlFailureCannotFallBackToTheFileDirectory()
     {
         await using var f=new IsolatedApiFactory().WithWebHostBuilder(b=>b.ConfigureTestServices(s=>{
+            // The application's DbContext can capture appsettings.Local before fixture configuration is reasserted.
+            // This guard test must always use an explicitly empty SQL connection, never the owner's database.
+            foreach (var service in s.Where(x => x.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService)
+                && x.ImplementationType == typeof(MaintenanceWorker)).ToArray()) s.Remove(service);
+            s.RemoveAll<XinobiDbContext>();
+            s.AddScoped(_ => new XinobiDbContext(new DbContextOptionsBuilder<XinobiDbContext>().UseSqlServer((string?)null).Options));
             s.RemoveAll<IAccountStore>();s.AddSingleton<IAccountStore>(p=>p.GetRequiredService<SqlAccountStore>());
             s.AddAuthentication(o=>{o.DefaultAuthenticateScheme="SqlGuardFixture";o.DefaultChallengeScheme="SqlGuardFixture";}).AddScheme<AuthenticationSchemeOptions,SqlGuardStaff>("SqlGuardFixture",null);
         }));

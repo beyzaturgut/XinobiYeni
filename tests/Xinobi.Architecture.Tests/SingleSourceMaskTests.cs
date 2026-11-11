@@ -42,12 +42,13 @@ public sealed class SingleSourceMaskTests
         await client.SendAsync(new HttpRequestMessage(HttpMethod.Delete, path) { Content = JsonContent.Create(request) });
 
     [Fact]
-    public async Task ProductListDoesNotFallBackToColourAndMissingSourceHasNoMask()
+    public async Task ProductListOffersCataloguePhotosWithoutCreatingProfile()
     {
         using var factory = Factory(); using var client = await TestStaff.Client(factory);
         var list = (await client.GetFromJsonAsync<SingleSourceMaskDetail[]>(Root))!;
         Assert.Equal(list.Length, list.Select(x => x.ProductId).Distinct().Count());
-        var item = Assert.Single(list, x => x.ProductId == Product); Assert.Null(item.Source); Assert.Equal("none", item.SourceStatus);
+        var item = Assert.Single(list, x => x.ProductId == Product); Assert.NotNull(item.CatalogPhotos); Assert.Equal("none", item.Status);
+        Assert.Equal(0,item.ProfileRevision);Assert.Equal("none",(await factory.Services.GetRequiredService<PersonalizationSourceStore>().Get(Product)).Status);
         var response = await client.PostAsJsonAsync(Item + "/mask", new SingleSourceMaskUpload("", "", 0, 0, "", "alpha"));
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }

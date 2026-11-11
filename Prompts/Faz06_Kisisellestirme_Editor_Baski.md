@@ -1,5 +1,9 @@
 # Faz06 — Kişiselleştirme, gelişmiş editör ve baskı dosyası
 
+## 11.11.2026 — Maskeleme akışının geri getirilmesi
+
+Ayrı kaynak fotoğraf kaydı zorunluluğu kaldırıldı. Ürün yüzeyleri mevcut katalog fotoğrafını indirme, gerçek boyutlu prompt kopyalama, WebP maske yükleme, önizleme ve yalnız seçilen fotoğrafa onayı destekler. Başka renkler için toplu onay/kopyalama yoktur. GET salt okunur; ilk geçerli maske yüklemesi kaynak kopyasıyla taslağı kaydeder. Eski kaynaklar/siparişler ve normal katalog korunur. [Kapsam kararı](../docs/decisions/catalog-photo-mask-workflow-2026-11-11.md), [TST-272](../test/2026-11-11/TST-272-catalog-photo-mask-workflow.md). Gerçek veri taşıma veya deploy yapılmadı.
+
 ## 03.11.2026 - Sipariş tasarım detayı kapsam kararı (yalnız plan)
 
 Kullanıcı üretime hazırlama/gönderme bölümü istemiyor. Teslim: sipariş satırındaki kayıtlı editör yerleşimi, ayrı ham desen, maskelemede kullanılan ürün kaynak görseli ve indirilebilir giydirilmiş dijital önizleme. [9 alt task ve kabul koşulları](../docs/tasks/order-design-detail-scope-2026-11-03.md). Uygulama başlamadı; eski planlarda çelişen fiziksel üretim şartları bu karar için geçerli değil. Tarihsel kod/test kayıtları silinmedi.

@@ -1,5 +1,9 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 11.11.2026 — Maskeleme akışının geri getirilmesi
+
+Ayrı kaynak fotoğraf kaydı zorunluluğu kaldırıldı. Ürün yüzeyleri mevcut katalog fotoğrafını indirme, gerçek boyutlu prompt kopyalama, WebP maske yükleme, önizleme ve yalnız seçilen fotoğrafa onayı destekler. Başka renkler için toplu onay/kopyalama yoktur. GET salt okunur; ilk geçerli maske yüklemesi kaynak kopyasıyla taslağı kaydeder. Eski kaynaklar/siparişler ve normal katalog korunur. [Kapsam kararı](../docs/decisions/catalog-photo-mask-workflow-2026-11-11.md), [TST-272](../test/2026-11-11/TST-272-catalog-photo-mask-workflow.md). Gerçek veri taşıma veya deploy yapılmadı.
+
 ## 04.11.2026 - Sürat uçtan uca test (TST-249)
 
 Gerçek API/adaptör/depo zinciri bellek içi sağlayıcıyla ve admin/müşteri ekranları sahte API ile test edildi. Formun hata sonrası kaybolması ve boş takip belgesinin başarı sayılması düzeltildi; güvenli hata neden sınıfları kalıcı kayda eklendi. Nihai API 589 geçti / 29 atlandı / 0 başarısız; API Release 0 uyarı/hata, admin lint/build ve 8 Chrome fixture senaryosu, web üretim derlemesi ve 2 takip testi, bağımsız yazılımsal Code128 okuma geçti. [Senaryo bazlı sonuç ve bağımlılıklar](../test/2026-11-04/TST-249-surat-end-to-end.md). Onaylı test alıcı/paket verisi ve güvenli yerel test hesabı yok: gerçek gönderi/takip zinciri çalıştırılamadı. Yeni gerçek ön kontrol yalnız kimliksiz edge 302; Windows/IIS sonucu değildir. Production koruması korunuyor; gerçek SQL çoklu süreç ve fiziksel barkod/şube kabulü açık. Deploy/APK yok; TIC-08 kısmen yapıldı.

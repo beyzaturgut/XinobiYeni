@@ -49,7 +49,7 @@ public static class ProductSurfaceEndpoints
 
         // Single-source Admin workspace. Legacy variant reads remain for historical consumers; writes are retired.
         group.MapGet("/products", async (PersonalizationSourceStore sources) => Results.Ok(await sources.ListMasks()));
-        group.MapGet("/products/{productId}", async (string productId, PersonalizationSourceStore sources) => Results.Ok(await sources.GetMask(productId)));
+        group.MapGet("/products/{productId}", async (string productId, string? catalogPhotoId, PersonalizationSourceStore sources) => Results.Ok(await sources.GetMask(productId, catalogPhotoId)));
         group.MapPost("/products/{productId}/mask", async (string productId, SingleSourceMaskUpload request, PersonalizationSourceStore sources) => Results.Ok(await sources.UploadMask(productId, request)));
         group.MapPost("/products/{productId}/approval", async (string productId, SingleSourceMaskAction request, PersonalizationSourceStore sources) => Results.Ok(await sources.MaskAction(productId, request, "approve")));
         group.MapDelete("/products/{productId}/approval", async (string productId, [Microsoft.AspNetCore.Mvc.FromBody] SingleSourceMaskAction request, PersonalizationSourceStore sources) => Results.Ok(await sources.MaskAction(productId, request, "revoke")));

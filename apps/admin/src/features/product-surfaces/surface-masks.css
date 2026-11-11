@@ -45,3 +45,5 @@
 .mask-prompt>label textarea{display:block;box-sizing:border-box;width:100%;min-width:0;resize:vertical;padding:10px;border:1px solid #bbb;border-radius:4px;background:#fff;color:#222;font:inherit;line-height:1.5}
 
 .surface-stage img{image-orientation:none}.surface-panel input[type=file],.surface-panel select{box-sizing:border-box;max-width:100%;min-width:0;width:100%;font:inherit}.surface-row{width:100%;box-sizing:border-box}.surface-editor button{max-width:100%;white-space:normal}.surface-panel{overflow-wrap:anywhere}
+
+.surface-editor>label{display:grid;gap:6px;min-width:0}.surface-editor>label select{width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-height:44px;font:inherit;padding:8px}

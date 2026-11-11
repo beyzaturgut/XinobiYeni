@@ -1,6 +1,6 @@
 # Kişiselleştirilmiş ürünlerde tek kaynak fotoğraf ve maske — task planı
 
-> **10.11.2026 kullanıcı kararı:** Katalogdaki “XINOBI U · Tek kaynak fotoğraf” bölümü ve içindeki fotoğraf/SKU yönetim kontrolleri kaldırıldı. Bu bölümün aşağıdaki eski kullanım adımları tarihsel kalır; mevcut kayıt/API/sipariş dosyaları silinmedi. [Güncel kapsam kararı](../decisions/catalog-source-section-removal-2026-11-10.md).
+> **11.11.2026 kapsam düzeltmesi:** Ayrı kaynak fotoğraf kaydı zorunluluğu kaldırıldı. Ürün yüzeylerinde mevcut katalog fotoğrafı indirilir, prompt kopyalanır, WebP maske yüklenip yalnız bu fotoğraf onaylanır. Başka renkler için onay/kopyalama yoktur. [Güncel karar](../decisions/catalog-photo-mask-workflow-2026-11-11.md).
 
 Tarih: **06.11.2026**. Durum: **Aşamalı uygulama; KIS-TEK-01 teknik model tamam; ürün bazlı ticari eşleme kabulü bekliyor. KIS-TEK-02 planlama teslimi tamamlandı; KIS-TEK-03, 04, 05, 06, 07, 08, 09, 10 ve 11 uygulandı; KIS-TEK-12 yazılımsal birleşik kabul/regresyon tamamlandı (10.11.2026). Android/iOS gerçek cihaz, SQL/IIS/restore ve iş sahibi kabulü açık. Gerçek veri geçişi, deploy veya APK yapılmadı.**
 

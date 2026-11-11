@@ -1,13 +1,13 @@
 # Tek kaynak kişiselleştirme — güncel kullanım rehberi
 
-> **10.11.2026 kullanıcı kararı:** Katalogdaki “XINOBI U · Tek kaynak fotoğraf” bölümü ve içindeki fotoğraf/SKU yönetim kontrolleri kaldırıldı. Bu bölümün aşağıdaki eski kullanım adımları tarihsel kalır; mevcut kayıt/API/sipariş dosyaları silinmedi. [Güncel kapsam kararı](../decisions/catalog-source-section-removal-2026-11-10.md).
+> **11.11.2026 kapsam düzeltmesi:** Ayrı kaynak fotoğraf kaydı zorunluluğu kaldırıldı. Ürün yüzeylerinde mevcut katalog fotoğrafı indirilir, prompt kopyalanır, WebP maske yüklenip yalnız bu fotoğraf onaylanır. Başka renkler için onay/kopyalama yoktur. [Güncel karar](../decisions/catalog-photo-mask-workflow-2026-11-11.md).
 
 10.11.2026 · KIS-TEK-11 · Yeni iş akışının giriş noktası. Teknik uygulama 03–11 ve 12 yazılımsal birleşik regresyon tamam; gerçek cihaz/SQL/IIS/iş sahibi kabulü ayrı açıktır. [Sonuçlar ve tekrar adımları](single-source-acceptance.md).
 
 ## Kaynağı ve maskeyi hazırlama
 
-1. Admin → Katalog → **XINOBI U · Tek kaynak fotoğraf**: ürünü aç, bir fotoğrafı doğrudan yükle veya mevcut katalog medyasından açıkça seç ve kaydet. İlk renk fotoğrafı otomatik kaynak değildir. Normal katalog renklerini silme.
-2. Ürünler → **Ürün yüzeyleri**: aynı ürünü aç; kaynak sürümünü ve gerçek genişlik/yüksekliği kontrol et. **Maskeleme için kaynak fotoğrafı indir** ile hash'i doğrulanan orijinal dosyayı indir. Ekran görüntüsü veya küçültülmüş tarayıcı önizlemesini kaynak olarak kullanma.
+1. Admin → Ürünler → **Ürün yüzeyleri**: ürünü aç. Ayrı kaynak fotoğrafını kaydetme alanı yoktur. Henüz yüzey kaydı yoksa mevcut katalog fotoğrafları görünür; maskelenecek fotoğrafı seç. Fotoğraf yoksa ürünün normal Medya alanına yükle. Eski kayıtlı kaynaklar korunur.
+2. Gerçek genişlik/yüksekliği kontrol et. **Maskeleme için kaynak fotoğrafı indir** ile hash'i doğrulanan orijinal dosyayı indir. Seçim ve indirme veri yazmaz; ilk geçerli maske yüklemesinde seçilen fotoğrafın değişmez kopyası ve taslak birlikte kaydedilir. Ekran görüntüsü veya küçültülmüş önizlemeyi kullanma.
 3. **Maskeleme promptu** metnini bu dosyayla birlikte kullan. Prompt gerçek kaynak boyutunu, SHA ve sürümü taşır. Fotoğraf üretme aşaması yoktur. Logo, kulp, metal, ayrık gövdeler ve şeffaflık talimatları korunur; renkler arası hizalama veya bir maskeyi başka fotoğraflara uygulama yoktur.
 4. Aynı gerçek kaynak tuvalinde tek kareli, kayıpsız **WebP maske** yükle. Alfa veya siyah-beyaz modunu dosyaya göre seç. Kaynak ve maskeyi kırpma, esnetme veya standart 1333×2000 tuvale çevirme. Maskenin kendi kaynak koordinatlarıyla eşleşmesi zorunludur.
 5. Taslağı pembe kaplama ve örnek desenle incele; logo, parçalar ve sınırları kontrol et. Doğrulanamayan önizlemeyi onaylama. Gerekirse taslağı WebP indir, düzelt ve yeniden yükle. **Taslağı onayla** yalnız bu ürünün güncel kaynak sürümünü onaylar.
@@ -16,7 +16,7 @@ Kaynak için sabit piksel/en-boy oranı şartı yoktur. Bu, sınırsız işlem k
 
 ## Tasarım, satış ve sipariş
 
-Katalogdaki **Kişiselleştirme satış SKU’su** gerçek fiziksel ürüne işletme tarafından açıkça eşlenir. Bu ticari bağ görsel renk seçimi değildir. Fiyat/stok mevcut katalogdan doğrulanır; eksik fiyat başka renkten alınmaz. Onaylı kaynak/maskeyle web veya Flutter'da görsel yükleme ve AI desen üretimi devam eder. Kaldırılan özellik ürün fotoğrafı üretim promptudur; müşterinin AI desen üretimi korunur.
+Varyant fotoğrafı açıkça seçilerek ilk maske yüklendiğinde o varyant fiziksel satış SKU’su olur. Orijinal ürün fotoğrafı tek başına ticari SKU seçmez; mevcut ticari eşlemeler korunur. Bu ticari bağ görsel renk seçimi değildir. Fiyat/stok mevcut katalogdan doğrulanır; eksik fiyat başka renkten alınmaz. Onaylı kaynak/maskeyle web veya Flutter'da görsel yükleme ve AI desen üretimi devam eder. Kaldırılan özellik ürün fotoğrafı üretim promptudur; müşterinin AI desen üretimi korunur.
 
 Yerleşim kaydı yüzey/SKU/revizyon bağıyla saklanır; kaynak değişiminde yeniden yerleştirme gerekir. Sipariş detayında kayıtlı yerleşim ve üç ayrı dosya bulunur: **desen**, **maskelemede kullanılan kaynak ürün fotoğrafı**, **giydirilmiş temsilî önizleme**. İkinci dosya alfa maskesi değildir. Eski sipariş dosyaları güncel katalogdan yeniden üretilmez; eksik dosya başka görselle doldurulmaz. Üretime hazırlama, baskıya gönderme veya sevk operasyonu bu akışa eklenmez.
 

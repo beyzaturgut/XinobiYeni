@@ -1,5 +1,7 @@
 # Admin — tek kişiselleştirme kaynağı yönetimi
 
+> **11.11.2026:** Maskeleme için ayrı kaynak kayıt ekranı gerekmez. Mevcut katalog fotoğrafıyla indirme/prompt/WebP/onay akışı [burada](single-source-masking.md) devam eder. Aşağıdaki kaynak yönetimi adımları tarihsel API modelini açıklar.
+
 > **10.11.2026 kullanıcı kararı:** Katalogdaki “XINOBI U · Tek kaynak fotoğraf” bölümü ve içindeki fotoğraf/SKU yönetim kontrolleri kaldırıldı. Bu bölümün aşağıdaki eski kullanım adımları tarihsel kalır; mevcut kayıt/API/sipariş dosyaları silinmedi. [Güncel kapsam kararı](../decisions/catalog-source-section-removal-2026-11-10.md).
 
 > **Güncel giriş (10.11.2026):** [Tek kaynak kişiselleştirme](single-source-personalization.md). 03–12 teknik uygulama/izole kabul tamamlandı; gerçek cihaz/SQL/IIS/iş sahibi kabulü açıktır. [Son kabul kaydı](single-source-acceptance.md). Aşağıdaki tarihli testler kendi teslimlerinin kanıtıdır.

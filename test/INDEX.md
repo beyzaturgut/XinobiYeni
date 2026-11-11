@@ -2,6 +2,7 @@
 
 | Rapor ID | Tarih | Kapsam | Sonuç | Ortam/seviye | Rapor |
 |---|---|---|---|---|---|
+| TST-273 | 11.11.2026 | Eksik/bozuk maske ürün bazlı hata ve liste/kurtarma | API 642 PASS/30 SKIP; admin UI/lint/TS/build PASS | ISOLATED API / BROWSER | [Rapor](2026-11-11/TST-273-missing-mask-list-recovery.md) |
 | TST-272 | 11.11.2026 | Mevcut katalog fotoğrafından indirme/prompt/WebP/tek fotoğraf onayı; ayrı kaynak kaydı yok | API 641 PASS/30 SKIP; 2 admin tarayıcı paketi, lint/TS/build PASS | ISOLATED API / BROWSER / LOCAL READ | [Rapor](2026-11-11/TST-272-catalog-photo-mask-workflow.md) |
 | TST-271 | 10.11.2026 | Müşteri suspend/activate/delete yetkisi, oturum/sipariş/audit ve migration 0010 | API 637 PASS/30 SKIP; admin müşteri+15 durum, TS/Dart 13, Flutter 302 PASS | ISOLATED API / BROWSER / CONTRACT / MODEL | [Rapor](2026-11-10/TST-271-customer-account-management.md) |
 | TST-270 | 10.11.2026 | İptal edilen katalog tek kaynak fotoğraf/SKU bölümünü kaldırma | Admin lint/TS/build ve 3 izole tarayıcı paketi PASS | ADMIN / ISOLATED BROWSER | [Rapor](2026-11-10/TST-270-catalog-source-section-removal.md) |

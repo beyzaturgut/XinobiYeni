@@ -126,8 +126,38 @@ public sealed class SingleSourceMaskTests
         var source = await Source(factory, client); var draft = await Ok(await client.PostAsJsonAsync(Item + "/mask", Upload(source, Image(113, 67, true))));
         Assert.Equal(HttpStatusCode.Unauthorized, (await anonymous.GetAsync(draft.Draft!.Image)).StatusCode);
         await factory.Services.GetRequiredService<IFileStore>().Save(FileAreas.Designs, "surface-mask-" + draft.Draft.Id + ".png", new MemoryStream([1,2,3]), "image/png");
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.GetAsync(Item)).StatusCode);
+        var unavailable = await Ok(await client.GetAsync(Item));
+        Assert.Equal("unavailable", unavailable.Status); Assert.Null(unavailable.Draft);
+        Assert.Equal("mask_corrupt", Assert.Single(unavailable.MaskIssues!).Code);
+        Assert.Contains((await client.GetFromJsonAsync<SingleSourceMaskDetail[]>(Root))!, x => x.ProductId == Product);
         Assert.Equal(HttpStatusCode.ServiceUnavailable, (await client.PostAsJsonAsync(Item + "/approval", Action(draft))).StatusCode);
+    }
+
+    [Fact]
+    public async Task MissingApprovedMaskDoesNotHideOtherProductsAndCanBeReplacedWithoutChangingHistory()
+    {
+        using var factory = Factory(); using var staff = await TestStaff.Client(factory); using var visitor = factory.CreateClient();
+        var source = await Source(factory, staff);
+        var draft = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(source, Image(113,67,true))));
+        var approved = await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(draft)));
+        var catalog = factory.Services.GetRequiredService<LocalCommerceStore>(); var before = JsonSerializer.Serialize(await catalog.Read());
+        var profilePath = Path.Combine(catalog.DataDirectory, "personalization/personalization-profiles.json");
+        var history = await File.ReadAllTextAsync(profilePath);
+        await factory.Services.GetRequiredService<IFileStore>().Delete(FileAreas.Designs, "surface-mask-" + approved.Approved!.Id + ".png");
+        var list = (await staff.GetFromJsonAsync<SingleSourceMaskDetail[]>(Root))!;
+        Assert.True(list.Length > 1); Assert.Contains(list, x => x.ProductId != Product);
+        var broken = Assert.Single(list, x => x.ProductId == Product);
+        Assert.Equal("unavailable", broken.Status); Assert.Equal("ready", broken.SourceStatus); Assert.Null(broken.Approved);
+        Assert.Equal("mask_missing", Assert.Single(broken.MaskIssues!).Code);
+        Assert.Equal(history, await File.ReadAllTextAsync(profilePath));
+        Assert.Equal(HttpStatusCode.NotFound, (await visitor.GetAsync(Public)).StatusCode);
+        var replacement = await Ok(await staff.PostAsJsonAsync(Item + "/mask", Upload(broken, Image(113,67,true))));
+        Assert.NotNull(replacement.Draft); Assert.Equal("unavailable", replacement.Status);
+        var repaired = await Ok(await staff.PostAsJsonAsync(Item + "/approval", Action(replacement)));
+        Assert.Equal("approved", repaired.Status); Assert.Null(repaired.MaskIssues);
+        Assert.Equal(HttpStatusCode.OK, (await visitor.GetAsync(Public)).StatusCode);
+        Assert.Equal(before, JsonSerializer.Serialize(await catalog.Read()));
+        Assert.Contains(approved.Approved.Id, await File.ReadAllTextAsync(profilePath));
     }
 
     private const string Public = "/api/v1/product-surfaces/" + Product + "/rendering-inputs";

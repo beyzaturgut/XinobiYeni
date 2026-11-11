@@ -41,3 +41,10 @@ Sonra yapılacak kod işi:
 3. Medya için `Catalog:AssetBaseUrl` CDN alan adına çevrilir; tasarımlar yine API üzerinden (sahiplik kontrolüyle) sunulur, gerekirse kısa ömürlü imzalı URL.
 4. MinIO ile yerel entegrasyon testi, ardından mevcut dosyaların `rclone copy` ile bucket'lara aktarımı ve sayı/boyut karşılaştırması.
 5. Yükleme sonrası `media.Assets` satırı (sahip, SHA-256, boyut, durum) yazılması.
+
+
+## 11.11.2026 — Ürün maskesi kaydı var, dosyası yok
+
+Admin liste/detay mask_missing veya mask_corrupt hatasını ilgili üründe gösterir; diğer ürünleri kapatmaz. Public yayın eksik maskeyi yayınlamaz. Yeni maskeler `<Storage:LocalRoot>/designs/files/surface-mask-{id}.png`; eski media maskeleri `<Storage:LocalRoot>/media/{id}.png`. SQL personalization-profiles belgesinin varlığı fiziksel dosyanın taşındığı anlamına gelmez. Ortam değişkeni/IIS override'ları dahil etkin Storage:LocalRoot kontrol edilir; yapılandırma içeriği/secret loga yazılmaz.
+
+Önce kalıcı depo/yedek ve gerçek dosya hash'i kontrol edilir. Kaynak sağlamsa yeni WebP yüklenip açıkça onaylanabilir; bu yeni yüzey olur, eski sipariş dosyalarını yenilemez. Başka ürün/renk dosyası yedek olarak kullanılmaz; belgeyi silerek hata gizlenmez. [TST-273](../../test/2026-11-11/TST-273-missing-mask-list-recovery.md).

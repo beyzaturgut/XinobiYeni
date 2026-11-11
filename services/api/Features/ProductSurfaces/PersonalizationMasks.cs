@@ -7,8 +7,9 @@ namespace Xinobi.Api.Features.ProductSurfaces;
 
 public sealed record PersonalizationMask(string Id, int SourceRevision, string SourceSha256, string Image, string Sha256, long Bytes, string Method, DateTimeOffset CreatedAt, string StorageArea = "media");
 public sealed record SingleSourceMaskDetail(string ProductId, string ProductName, int ProfileRevision, int SourceRevision, string SourceStatus,
-    PersonalizationSourceAsset? Source, string Status, PersonalizationMask? Draft, PersonalizationMask? Approved, CatalogMaskPhoto[]? CatalogPhotos = null, string? CatalogPhotoId = null);
+    PersonalizationSourceAsset? Source, string Status, PersonalizationMask? Draft, PersonalizationMask? Approved, CatalogMaskPhoto[]? CatalogPhotos = null, string? CatalogPhotoId = null, MaskFileIssue[]? MaskIssues = null);
 public sealed record SingleSourceMaskUpload(string Image, string SourceSha256, int SourceRevision, int ExpectedRevision, string WebpBase64, string Mode, string? CatalogPhotoId = null);
+public sealed record MaskFileIssue(string Slot, string Code, string Message);
 public sealed record CatalogMaskPhoto(string Id, string Label, string Image);
 public sealed record SingleSourceMaskAction(string SourceSha256, int SourceRevision, int ExpectedRevision, string? DraftId = null);
 
@@ -24,11 +25,20 @@ public sealed partial class PersonalizationSourceStore
         try { if ((await Inspect(source.Asset.Image)).Asset.Sha256 != source.Asset.Sha256) sourceStatus = "stale"; }
         catch (ProblemException error) when (error.Code is "source_missing" or "invalid_source") { sourceStatus = "stale"; }
         var draft = CurrentMask(profile, profile.DraftId); var approved = CurrentMask(profile, profile.ApprovedId);
-        foreach (var mask in new[] { draft, approved }.OfType<PersonalizationMask>()) await MaskBytes(mask);
-        var status = sourceStatus == "stale" ? "stale" : draft is not null ? "draft" : approved is not null ? "approved"
+        var issues = new List<MaskFileIssue>();
+        async Task<PersonalizationMask?> Available(PersonalizationMask? mask, string slot)
+        {
+            if (mask is null) return null;
+            try { await MaskBytes(mask); return mask; }
+            catch (ProblemException error) when (error.Code is "mask_missing" or "mask_corrupt")
+            { issues.Add(new(slot, error.Code, error.Message)); return null; }
+        }
+        draft = await Available(draft, "draft"); approved = await Available(approved, "approved");
+        var status = issues.Count > 0 ? "unavailable" : sourceStatus == "stale" ? "stale" : draft is not null ? "draft" : approved is not null ? "approved"
             : profile.DraftId is not null || profile.ApprovedId is not null ? "stale" : "none";
         return new(productId, name, profile.ProfileRevision, source.Revision, sourceStatus, source.Asset, status,
-            sourceStatus == "ready" && draft is not null ? draft with { Image = MaskUrl(productId, draft.Id) } : null, sourceStatus == "ready" && approved is not null ? approved with { Image = MaskUrl(productId, approved.Id) } : null);
+            sourceStatus == "ready" && draft is not null ? draft with { Image = MaskUrl(productId, draft.Id) } : null, sourceStatus == "ready" && approved is not null ? approved with { Image = MaskUrl(productId, approved.Id) } : null,
+            MaskIssues: issues.Count > 0 ? issues.ToArray() : null);
     }
 
     public async Task<SingleSourceMaskDetail[]> ListMasks()

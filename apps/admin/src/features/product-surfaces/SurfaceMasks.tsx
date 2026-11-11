@@ -6,14 +6,14 @@ import MaskPrompt from './MaskPrompt'
 import {sourceChecksum} from './source-checksum'
 import './surface-masks.css'
 
-type Status='none'|'draft'|'approved'|'stale'
+type Status='none'|'draft'|'approved'|'stale'|'unavailable'
 type Source={image:string;sha256:string;mime:string;bytes:number;width:number;height:number}
 type Mask={id:string;image:string;sha256:string;method:string;sourceRevision:number;sourceSha256:string}
-type Detail={productId:string;productName:string;profileRevision:number;sourceRevision:number;sourceStatus:'none'|'ready'|'stale';source:Source|null;status:Status;draft:Mask|null;approved:Mask|null;catalogPhotos?:{id:string;label:string;image:string}[]|null;catalogPhotoId?:string|null}
+type Detail={productId:string;productName:string;profileRevision:number;sourceRevision:number;sourceStatus:'none'|'ready'|'stale';source:Source|null;status:Status;draft:Mask|null;approved:Mask|null;catalogPhotos?:{id:string;label:string;image:string}[]|null;catalogPhotoId?:string|null;maskIssues?:{slot:string;code:string;message:string}[]|null}
 type Activity={dirty:boolean;busy:boolean}
 const root='/surfaces/products'
 const asset=(path:string)=>path.startsWith('/api/v1/local-commerce/')?commerceApi.replace(/\/api\/v1\/local-commerce\/?$/,'')+path:mediaUrl(path,commerceApi,'http://127.0.0.1:3000')
-const text:Record<Status,string>={none:'Maske yok',draft:'Taslak',approved:'Onaylı',stale:'Eski kaynak'}
+const text:Record<Status,string>={none:'Maske yok',draft:'Taslak',approved:'Onaylı',stale:'Eski kaynak',unavailable:'Maske dosyası sorunu'}
 const problem=(value:unknown)=>value instanceof Error?value.message:'Maske işlemi tamamlanamadı.'
 function checked(value:Detail):Detail{
  if(!value||typeof value.productId!=='string'||typeof value.productName!=='string'||!Number.isInteger(value.profileRevision)||!Number.isInteger(value.sourceRevision)||!['none','ready','stale'].includes(value.sourceStatus)||!Object.hasOwn(text,value.status)||value.sourceStatus!=='none'&&(!value.source||value.source.width<1||value.source.height<1||!/^[a-f0-9]{64}$/.test(value.source.sha256)))throw new Error('Yüzey servisinden geçerli kayıt alınamadı.')
@@ -40,7 +40,7 @@ export default function SurfaceMasks(){
   <div className="surface-side"><aside className="surface-list">
    <p className="surface-intro">Ürünün mevcut fotoğrafını indir, maskeleme promptunu kopyala, hazırladığın WebP maskeyi yükleyip bu fotoğraf için onayla. Başka renklere uygulanmaz.</p>
    <label>Ürün ara<input value={query} onChange={event=>setQuery(event.target.value)}/></label>
-   <div className="surface-filters" role="group" aria-label="Durum filtresi">{['all','none','draft','approved','stale'].map(status=><button key={status} aria-pressed={filter===status} onClick={()=>setFilter(status)}>{status==='all'?`Tümü${loading||error?'':` (${items.length})`}`:`${text[status as Status]}${loading||error?'':` (${counts(status)})`}`}</button>)}</div>
+   <div className="surface-filters" role="group" aria-label="Durum filtresi">{['all','none','draft','approved','stale','unavailable'].map(status=><button key={status} aria-pressed={filter===status} onClick={()=>setFilter(status)}>{status==='all'?`Tümü${loading||error?'':` (${items.length})`}`:`${text[status as Status]}${loading||error?'':` (${counts(status)})`}`}</button>)}</div>
    {loading&&<p role="status">Ürün yüzeyleri yükleniyor…</p>}{error&&<p role="alert" className="surface-error">{error} <button onClick={()=>void refresh()}>Tekrar dene</button></p>}
    {!loading&&!error&&!shown.length&&<p className="surface-empty">Listelenecek XINOBI U ürünü yok.</p>}
    {shown.map(item=><button key={item.productId} className="surface-row" aria-current={selected===item.productId?'true':undefined} onClick={()=>select(item.productId)}>
@@ -103,6 +103,7 @@ function Editor({productId,side,onChanged,onActivity}:{productId:string;side:HTM
   {detail&&<header><div><h2>{detail.productName}</h2><p>Kaynak sürümü {detail.sourceRevision} · {source?`${source.width}×${source.height} px`:'Kaynak fotoğraf yok'} · {text[detail.status]}</p></div></header>}
   {!!detail?.catalogPhotos?.length&&<label>Maskelenecek ürün fotoğrafı<select aria-label="Maskelenecek ürün fotoğrafı" value={detail.catalogPhotoId??''} disabled={!!busy} onChange={event=>{if(current.current.dirty&&!window.confirm('Kaydedilmemiş maske veya prompt değişikliği silinsin mi?'))return;void run(()=>commerceRequest<Detail>(commerceApi,path+'?'+new URLSearchParams({catalogPhotoId:event.target.value})), '', true)}}>{detail.catalogPhotos.map(photo=><option key={photo.id} value={photo.id}>{photo.label}</option>)}</select></label>}
   {detail&&!usable&&<p role="alert" className="surface-warning">{source?'Kaynak fotoğraf değişmiş veya kayıp. Eski maske yeni kaynağa uygulanmaz.':'Bu ürün için kullanılabilir katalog fotoğrafı yok. Ürünün Medya alanına fotoğraf ekleyin.'}</p>}
+  {!!detail?.maskIssues?.length&&<div role="alert" className="surface-warning"><strong>Bu ürünün kayıtlı maske dosyasında sorun var.</strong><ul>{detail.maskIssues.map(issue=><li key={issue.slot}>{issue.slot==='draft'?'Taslak maske':'Onaylı maske'}: {issue.message}</li>)}</ul><p>Sunucudaki dosya deposu ve yedeği kontrol edilmeli. Kaynak fotoğraf kullanılabiliyorsa yeni WebP maske yükleyip inceleyerek onaylayabilirsin. Geçmiş kayıtlar ve sipariş dosyaları değiştirilmez.</p></div>}
   {detail?.status==='stale'&&usable&&<p role="status" className="surface-warning">Kaynak değişti. Önceki maske korunuyor ancak bu fotoğrafa uygulanmıyor. Yeni maske yükleyin.</p>}
   {usable&&source&&detail&&<>
    {side&&createPortal(<><button className="surface-source-download" disabled={!!busy} onClick={()=>void download()}>Maskeleme için kaynak fotoğrafı indir</button>

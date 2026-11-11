@@ -1,5 +1,10 @@
 # Faz00 — Xinobi yürütme, karar ve kesintiden devam defteri
 
+## 11.11.2026 — Canlıda eksik maskenin listeyi kapatması
+
+Eksik/bozuk maske hatası ürün bazında gösteriliyor; liste ve diğer ürünler korunuyor. Kaynak sağlamsa indirme/prompt/yeni maske yükleme ve açık onayla kurtarma mümkün. Public eksik maskeyi yayınlamaz; eski kayıt/sipariş dosyaları değişmez. Sunucuda kalıcı dosya kökü ve yedek kontrolü ayrıca gerekli. [TST-273](../test/2026-11-11/TST-273-missing-mask-list-recovery.md). Bu kayıt gerçek dosyanın sunucuda onarıldığı veya yeni IIS kurulumunun yapıldığı anlamına gelmez.
+
+
 ## 11.11.2026 — Maskeleme akışının geri getirilmesi
 
 Ayrı kaynak fotoğraf kaydı zorunluluğu kaldırıldı. Ürün yüzeyleri mevcut katalog fotoğrafını indirme, gerçek boyutlu prompt kopyalama, WebP maske yükleme, önizleme ve yalnız seçilen fotoğrafa onayı destekler. Başka renkler için toplu onay/kopyalama yoktur. GET salt okunur; ilk geçerli maske yüklemesi kaynak kopyasıyla taslağı kaydeder. Eski kaynaklar/siparişler ve normal katalog korunur. [Kapsam kararı](../docs/decisions/catalog-photo-mask-workflow-2026-11-11.md), [TST-272](../test/2026-11-11/TST-272-catalog-photo-mask-workflow.md). Gerçek veri taşıma veya deploy yapılmadı.

@@ -8,12 +8,13 @@ const require=createRequire(new URL('../../web/package.json',import.meta.url)),{
 const browser=await chromium.launch({channel:'chrome',headless:true}),base=process.env.ADMIN_UI_URL||'http://127.0.0.1:5173/',out=process.env.ADMIN_CONSISTENCY_OUTPUT||'/tmp/xinobi-single-mask-ui'
 await mkdir(out,{recursive:true})
 const sha=b=>createHash('sha256').update(b).digest('hex'),image='/api/v1/local-commerce/media/'+'a'.repeat(32)+'.png',maskImage='/api/v1/local-commerce/surfaces/products/MASK-P1/masks/MASK-D1.png'
-async function fixture({sourceStatus='ready',write=true,loadError=false,photoError=false}={}){
+async function fixture({sourceStatus='ready',write=true,loadError=false,photoError=false,maskIssue=false}={}){
  const context=await browser.newContext({viewport:{width:1440,height:1000}}),page=await context.newPage();page.on('pageerror',error=>console.error('PAGE',error.message))
  const encoded=await page.evaluate(()=>{const c=document.createElement('canvas');c.width=113;c.height=67;const x=c.getContext('2d');x.fillStyle='#777';x.fillRect(0,0,113,67);const source=c.toDataURL('image/png');x.clearRect(0,0,113,67);x.fillStyle='white';x.fillRect(20,0,60,67);return {source,mask:c.toDataURL('image/png'),webp:c.toDataURL('image/webp')}})
  const bytes=Buffer.from(encoded.source.split(',')[1],'base64'),png=Buffer.from(encoded.mask.split(',')[1],'base64'),webp=Buffer.from(encoded.webp.split(',')[1],'base64')
  const source={image,sha256:sha(bytes),mime:'image/png',bytes:bytes.length,width:113,height:67}
  let item={productId:'MASK-P1',productName:'Tek kaynak test ürünü',profileRevision:1,sourceRevision:1,sourceStatus,source:sourceStatus==='none'?null:source,status:sourceStatus==='stale'?'stale':'none',draft:null,approved:null}
+ if(maskIssue)item={...item,status:'unavailable',maskIssues:[{slot:'approved',code:'mask_missing',message:'Kayıtlı maske dosyası bulunamadı.'}]}
  let writes=0,failUpload=false,failExport=false,changed=false
  await mockPanel(page,{permissions:write?permissions:permissions.filter(p=>!p.endsWith('.write')),handler:async(route,path)=>{
   const req=route.request()
@@ -30,7 +31,7 @@ async function fixture({sourceStatus='ready',write=true,loadError=false,photoErr
      assert.deepEqual(Buffer.from(body.webpBase64,'base64'),webp)
      item={...item,status:'draft',profileRevision:item.profileRevision+1,draft:{id:'MASK-D1',image:maskImage,sha256:sha(png),sourceRevision:item.sourceRevision,sourceSha256:source.sha256,bytes:png.length,method:'webp-alpha'}}
     }else if(path.endsWith('/approval')&&req.method()==='POST'){
-     assert.equal(body.draftId,item.draft.id);item={...item,status:'approved',profileRevision:item.profileRevision+1,approved:item.draft,draft:null}
+     assert.equal(body.draftId,item.draft.id);item={...item,maskIssues:null,status:'approved',profileRevision:item.profileRevision+1,approved:item.draft,draft:null}
     }else if(path.endsWith('/approval'))item={...item,status:'none',profileRevision:item.profileRevision+1,approved:null}
     else if(path.endsWith('/draft'))item={...item,status:'none',profileRevision:item.profileRevision+1,draft:null}
     else throw new Error('Unexpected synthetic write '+path)
@@ -85,6 +86,21 @@ try{
  assert.equal(await missingPhoto.page.getByRole('button',{name:'Taslağı onayla',exact:true}).isDisabled(),true)
  assert.equal(missingPhoto.writes,0);await missingPhoto.page.close()
  const readonly=await fixture({write:false});await readonly.page.getByLabel('Maske WebP dosyası').waitFor();assert.equal(await readonly.page.getByLabel('Maske WebP dosyası').isDisabled(),true);assert.equal(readonly.writes,0);await readonly.page.close()
+ for(const width of [390,1440]){
+  const missing=await fixture({maskIssue:true}),m=missing.page;await m.setViewportSize({width,height:1100})
+  await m.getByRole('alert').filter({hasText:'Kayıtlı maske dosyası bulunamadı.'}).waitFor()
+  await m.getByRole('button',{name:/İkinci ürün/}).waitFor();await m.getByLabel('Hazır maskeleme promptu',{exact:true}).waitFor()
+  assert.equal(await m.getByRole('button',{name:'Taslağı onayla',exact:true}).isDisabled(),true)
+  assert.equal(missing.writes,0);assert.ok(await m.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1))
+  await m.screenshot({path:out+'/missing-mask-'+width+'.png',fullPage:true})
+  await m.getByLabel('Maske WebP dosyası').setInputFiles({name:'replacement.webp',mimeType:'image/webp',buffer:missing.webp})
+  await m.getByRole('button',{name:'WebP maskeyi taslağa yükle',exact:true}).click()
+  await m.waitForFunction(()=>!document.querySelector('.surface-decisions .approve').disabled)
+  m.once('dialog',d=>d.accept());await m.getByRole('button',{name:'Taslağı onayla',exact:true}).click()
+  await m.getByRole('status').filter({hasText:'Maske bu kaynak için onaylandı.'}).waitFor()
+  assert.equal(await m.getByRole('alert').filter({hasText:'Kayıtlı maske dosyası bulunamadı.'}).count(),0)
+  assert.equal(missing.writes,2);await m.close()
+ }
  const error=await fixture({loadError:true});await error.page.getByRole('alert').filter({hasText:'İzole maske servisi hatası'}).waitFor();assert.equal(await error.page.getByText('Listelenecek XINOBI U ürünü yok.',{exact:true}).count(),0);await error.page.close()
  console.log('PASS single-source mask upload/approve/export/errors/source-change/permissions/prompt/responsive/axe; no real API writes')
 }finally{await browser.close()}
